@@ -1,0 +1,9 @@
+{
+  "name": "lhm-marketing-hub",
+  "description": "Marketing workflow orchestrator - asks what you want to work on, identifies the client, and loads the right skill.",
+  "version": "1.0.0",
+  "author": {
+    "name": "LHM Digital"
+  },
+  "keywords": ["marketing", "google-ads", "seo", "cro", "agency"]
+}
