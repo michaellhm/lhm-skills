@@ -1,26 +1,50 @@
 ---
 name: start
-description: "Start a marketing work session. Use this when the user wants to begin working, asks 'what should I work on', mentions a client, or invokes /lhm-marketing-hub:start. This skill identifies the client, asks what they want to accomplish, and loads the right marketing skill."
+description: "Start a marketing work session. Use this when the user wants to begin working, asks 'what should I work on', mentions a client, or invokes /lhm-marketing-hub:start. This skill runs the pre-flight check, identifies the client, loads their profile, and routes to the right skill."
 ---
 
 # Start a Marketing Session
 
-You are starting a new marketing work session. Follow these steps:
+Follow these steps in order. Do not skip steps.
 
-## 1. Identify the Client
+## 1. Pre-flight — Verify Clients Folder
 
-Ask the user: **"Which client are we working on today?"**
+Check whether the current working directory contains multiple client-named folders.
 
-Once they respond:
-- Search the current working directory for a folder matching the client name (try the name as-is, lowercase, kebab-case, abbreviations)
-- If found, confirm: "I found the folder at [path] - is that right?"
-- If not found, ask where the client files are or offer to create a new folder
+- The Clients root folder is **dynamic** — do not assume a fixed path
+- If you can see client folders, narrate: "I can see X client folders."
+- If you cannot: say "I can't see any client folders. Please navigate to your Clients directory." and **stop**
 
-## 2. Ask What They Want to Work On
+## 2. Select & Validate Client
 
-Ask: **"What do you want to work on today?"**
+Ask: **"Which client are we working on today?"**
 
-Then match their response to the best skill from the catalog below.
+Once the user responds:
+- Search for a matching folder (try: as-is, lowercase, kebab-case, abbreviations)
+- **If found**: confirm it
+- **If not found**: create the folder and run the client-onboarding skill
+
+### Onboarding Triggers
+
+Run onboarding (read `${CLAUDE_PLUGIN_ROOT}/skills/client-onboarding/SKILL.md`) when:
+- The client folder was just created
+- `client_profile.md` does not exist
+- `client_profile.md` exists but is empty
+
+Onboarding **never overwrites** existing content. It only appends or enriches.
+
+## 3. Load Client Context
+
+- Read `client_profile.md` from the client folder
+- Treat it as authoritative context for all downstream skills
+- Do not re-ask for information already present
+- Narrate: "Client profile loaded."
+
+## 4. Ask What to Work On
+
+Ask: **"What are we working on today?"**
+
+Match the response to the skill catalog below. If multiple skills match, list options and let the user choose. If nothing fits, say so. **Do not invent skills.**
 
 ## Available Skills
 
@@ -63,12 +87,21 @@ Then match their response to the best skill from the catalog below.
 | **Signup Flow CRO** | Optimizing registration flows |
 | **Social Content** | Creating social media content |
 
-## 3. Load the Skill
+## 5. Load the Skill
 
-Once you know the task, read the matching SKILL.md from the plugin's skills directory:
+Read the matching SKILL.md from:
 
 `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`
 
-Read the full SKILL.md file and any referenced templates or examples in the same skill folder.
+Read any referenced templates or examples in the same skill folder.
 
-Once loaded, follow that skill's instructions completely to help the user with their task. Save all output to the client's folder.
+### Output Folder Structure
+
+For every skill execution, enforce this inside the client folder:
+1. Create a skill-specific folder: `google_ads/`, `pricing/`, `seo/`, `content/`, etc.
+2. Inside it, create a date-based subfolder: `YYYY-MM` (e.g. `google_ads/2026-02/`)
+3. Save all outputs there
+4. Formats: `.md` for analysis, `.csv` for data, `.json` for structured output
+5. **Never overwrite** — version files if needed
+
+Follow the skill's instructions completely.
