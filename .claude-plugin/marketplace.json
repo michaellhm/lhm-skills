@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "plugins": [
     {
       "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
-      "description": "Marketing workflow orchestrator - asks what you want to work on, identifies the client, and loads the right skill.",
-      "version": "1.0.0",
+      "description": "Structured marketing orchestrator — pre-flight client folder check, auto-onboarding, mandatory context load, skill routing, and enforced output discipline.",
+      "version": "2.0.0",
       "category": "marketing",
       "tags": ["marketing", "google-ads", "seo", "cro", "agency"]
     }
