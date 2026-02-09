@@ -55,7 +55,7 @@ Match the response to the skill catalog below. If multiple skills match, list op
 | **Bid & Budget Optimizer** | Adjusting budgets, bid strategies, or spend control |
 | **Keyword Optimizer** | Finding wasted spend, negative keywords, match types |
 | **Landing Page Optimizer** | Auditing landing pages for conversions |
-| **Monthly Strategy Session** | Start-of-month account review and zone analysis |
+| **Google Ads Monthly Review** | Account health check and AdPulse zone analysis |
 | **PMax Banner Generator** | Creating Performance Max banner assets |
 
 ### SaaS & Growth Marketing

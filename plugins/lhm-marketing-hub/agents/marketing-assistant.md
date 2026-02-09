@@ -90,7 +90,7 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 - `bid-budget-optimizer` — Adjust campaign budgets and bid strategies
 - `keyword-optimizer` — Find wasted spend, top performers, negative keywords, match types
 - `landing-page-optimizer` — Audit landing pages for conversion and compliance
-- `monthly-strategy-session` — Start-of-month analysis with AdPulse zone identification
+- `google-ads-monthly-review` — Quick zone check and account health analysis
 - `pmax-banner-generator` — Generate Performance Max banner ad copy and image prompts
 
 **SaaS & Growth Marketing:**
@@ -126,6 +126,23 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 **Client Management:**
 - `client-onboarding` — Establish client context and profile
 - `campaign-playbook-generator` — Transform client transcripts into Campaign & Sales Playbooks
+
+## Agent Routing
+
+Some tasks are better handled by a dedicated agent than a skill. Use this routing logic:
+
+**Route to `google-ads-monthly-review` agent when the user says:**
+- "Monthly review", "full review", "run the monthly"
+- "Run the monthly and fix things", "full Google Ads review"
+- "Run through the monthly actions", "do the whole review"
+- Any request that implies analysis + execution of recommended actions
+
+**Route to `google-ads-monthly-review` skill when the user says:**
+- "Quick zone check", "health check only", "what zone are we in"
+- "Quick review", "just tell me the zone", "account health"
+- Any request that only needs analysis without execution
+
+When in doubt, ask: "Do you want a quick zone check, or a full review where I execute the actions too?"
 
 ## Google Ads & Paid Ads Enforcement
 

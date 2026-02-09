@@ -365,7 +365,7 @@ Claude: [Provides AHPRA-compliant copy alternatives]
 
 ## Related Skills
 
-- **Monthly Strategy Session**: Identifies if landing page is the issue
+- **Google Ads Monthly Review**: Identifies if landing page is the issue
 - **Ad Copy Generator**: Ensure ad-to-page alignment
 - **Keyword Optimizer**: Keyword-to-page alignment check
 

@@ -323,4 +323,4 @@ Bondi Physio - PMax,TOF - Sports Recovery - Learn More,Image Prompt,[Scene: Clin
 
 - **Landing Page Optimizer**: Run first if no landing page exists
 - **Ad Copy Generator**: For RSA copy (not PMax)
-- **Monthly Strategy Session**: Identifies if PMax is the right channel
+- **Google Ads Monthly Review**: Identifies if PMax is the right channel

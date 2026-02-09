@@ -1,6 +1,6 @@
 # Strategy Session Information Gathering
 
-Use this template to gather all the information needed for a Monthly Strategy Session.
+Use this template to gather all the information needed for a Google Ads Monthly Review.
 
 ---
 

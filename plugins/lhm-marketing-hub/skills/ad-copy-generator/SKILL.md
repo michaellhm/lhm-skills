@@ -333,7 +333,7 @@ Description,2,AHPRA registered practitioners with 15+ years experience treating 
 
 ## Related Skills
 
-- **Monthly Strategy Session**: Identifies if ad performance is the issue
+- **Google Ads Monthly Review**: Identifies if ad performance is the issue
 - **Keyword Optimizer**: Ensure keywords and ads are aligned
 - **Landing Page Optimizer**: Ads drive traffic - page converts it
 

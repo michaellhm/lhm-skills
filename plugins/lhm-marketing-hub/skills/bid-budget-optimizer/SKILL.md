@@ -255,7 +255,7 @@ For any single campaign change greater than 25%:
 
 ## Related Skills
 
-- **Monthly Strategy Session**: Run first to identify zone and budget issues
+- **Google Ads Monthly Review**: Run first to identify zone and budget issues
 - **Keyword Optimizer**: If budget issues stem from keyword waste
 - **Ad Copy Generator**: If performance issues need creative refresh
 

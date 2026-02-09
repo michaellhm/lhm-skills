@@ -23,6 +23,7 @@ Use `/start` to begin a session, or just describe what you need.
 plugins/lhm-marketing-hub/             # The plugin
   .claude-plugin/plugin.json            # Plugin manifest
   agents/marketing-assistant.md         # Orchestrator agent
+  agents/google-ads-monthly-review.md  # Full monthly review with skill chaining
   skills/                              # All 35 skills
     start/                             # Entry point — /start command
     client-onboarding/                 # Client profile setup
@@ -30,7 +31,7 @@ plugins/lhm-marketing-hub/             # The plugin
     bid-budget-optimizer/              # Budget and bid strategy
     keyword-optimizer/                 # Keyword and wasted spend analysis
     landing-page-optimizer/            # Landing page audits
-    monthly-strategy-session/          # Monthly account review
+    google-ads-monthly-review/          # Account health check and zone analysis
     campaign-playbook-generator/       # Campaign & sales playbooks from transcripts
     pmax-banner-generator/             # Performance Max assets
     copywriting/                       # Marketing copy for any page
@@ -44,7 +45,7 @@ plugins/lhm-marketing-hub/             # The plugin
 
 **Client Management** (2 skills): Client onboarding and profile setup, campaign playbook generation from transcripts.
 
-**Google Ads & PPC** (6 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly strategy, PMax banners.
+**Google Ads & PPC** (6 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), PMax banners.
 
 **SaaS & Growth Marketing** (25 skills): A/B testing, analytics tracking, competitor pages, content strategy, copy editing, copywriting, email sequences, form CRO, free tool strategy, launch strategy, marketing ideas, marketing psychology, onboarding CRO, page CRO, paid ads, paywall CRO, popup CRO, pricing strategy, product marketing, programmatic SEO, referral programs, schema markup, SEO audit, signup flow CRO, social content.
 

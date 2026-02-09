@@ -313,7 +313,7 @@ training
 
 ## Related Skills
 
-- **Monthly Strategy Session**: Run first to identify keyword issues
+- **Google Ads Monthly Review**: Run first to identify keyword issues
 - **Bid & Budget Optimizer**: After fixing keywords, optimise budgets
 - **Ad Copy Generator**: If keywords are fine but ads underperform
 
