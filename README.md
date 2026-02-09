@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-34 marketing skills packaged as a Claude Code plugin with a structured orchestration layer. The plugin enforces a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+35 marketing skills packaged as a Claude Code plugin with a structured orchestration layer. The plugin enforces a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -23,7 +23,7 @@ Use `/start` to begin a session, or just describe what you need.
 plugins/lhm-marketing-hub/             # The plugin
   .claude-plugin/plugin.json            # Plugin manifest
   agents/marketing-assistant.md         # Orchestrator agent
-  skills/                              # All 34 skills
+  skills/                              # All 35 skills
     start/                             # Entry point — /start command
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
@@ -31,6 +31,7 @@ plugins/lhm-marketing-hub/             # The plugin
     keyword-optimizer/                 # Keyword and wasted spend analysis
     landing-page-optimizer/            # Landing page audits
     monthly-strategy-session/          # Monthly account review
+    campaign-playbook-generator/       # Campaign & sales playbooks from transcripts
     pmax-banner-generator/             # Performance Max assets
     copywriting/                       # Marketing copy for any page
     email-sequence/                    # Drip campaigns and email flows
@@ -41,7 +42,7 @@ plugins/lhm-marketing-hub/             # The plugin
 
 ## Skills Catalog
 
-**Client Management** (1 skill): Client onboarding and profile setup.
+**Client Management** (2 skills): Client onboarding and profile setup, campaign playbook generation from transcripts.
 
 **Google Ads & PPC** (6 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly strategy, PMax banners.
 
