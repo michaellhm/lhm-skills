@@ -125,6 +125,7 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 
 **Client Management:**
 - `client-onboarding` — Establish client context and profile
+- `campaign-playbook-generator` — Transform client transcripts into Campaign & Sales Playbooks
 
 ## Google Ads & Paid Ads Enforcement
 
