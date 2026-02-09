@@ -93,6 +93,9 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 - `google-ads-monthly-review` — Quick zone check and account health analysis
 - `pmax-banner-generator` — Generate Performance Max banner ad copy and image prompts
 
+**Strategy & Research:**
+- `competitive-analysis` — Competitor evaluation with Porter's 5 Forces, matrices, and positioning maps
+
 **SaaS & Growth Marketing:**
 - `ab-test-setup` — Plan, design, or implement A/B tests
 - `analytics-tracking` — Set up, improve, or audit analytics tracking

@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-35 marketing skills packaged as a Claude Code plugin with a structured orchestration layer. The plugin enforces a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+36 marketing skills packaged as a Claude Code plugin with a structured orchestration layer. The plugin enforces a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -24,7 +24,7 @@ plugins/lhm-marketing-hub/             # The plugin
   .claude-plugin/plugin.json            # Plugin manifest
   agents/marketing-assistant.md         # Orchestrator agent
   agents/google-ads-monthly-review.md  # Full monthly review with skill chaining
-  skills/                              # All 35 skills
+  skills/                              # All 36 skills
     start/                             # Entry point — /start command
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
@@ -32,6 +32,7 @@ plugins/lhm-marketing-hub/             # The plugin
     keyword-optimizer/                 # Keyword and wasted spend analysis
     landing-page-optimizer/            # Landing page audits
     google-ads-monthly-review/          # Account health check and zone analysis
+    competitive-analysis/               # Competitor evaluation and market positioning
     campaign-playbook-generator/       # Campaign & sales playbooks from transcripts
     pmax-banner-generator/             # Performance Max assets
     copywriting/                       # Marketing copy for any page
@@ -46,6 +47,8 @@ plugins/lhm-marketing-hub/             # The plugin
 **Client Management** (2 skills): Client onboarding and profile setup, campaign playbook generation from transcripts.
 
 **Google Ads & PPC** (6 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), PMax banners.
+
+**Strategy & Research** (1 skill): Competitive analysis with Porter's 5 Forces, competitor matrices, and positioning maps.
 
 **SaaS & Growth Marketing** (25 skills): A/B testing, analytics tracking, competitor pages, content strategy, copy editing, copywriting, email sequences, form CRO, free tool strategy, launch strategy, marketing ideas, marketing psychology, onboarding CRO, page CRO, paid ads, paywall CRO, popup CRO, pricing strategy, product marketing, programmatic SEO, referral programs, schema markup, SEO audit, signup flow CRO, social content.
 

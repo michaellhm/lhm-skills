@@ -58,6 +58,11 @@ Match the response to the skill catalog below. If multiple skills match, list op
 | **Google Ads Monthly Review** | Account health check and AdPulse zone analysis |
 | **PMax Banner Generator** | Creating Performance Max banner assets |
 
+### Strategy & Research
+| Skill | Use When |
+|-------|----------|
+| **Competitive Analysis** | Evaluating competitors, Porter's 5 Forces, market positioning |
+
 ### SaaS & Growth Marketing
 | Skill | Use When |
 |-------|----------|
