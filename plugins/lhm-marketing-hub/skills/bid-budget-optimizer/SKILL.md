@@ -1,6 +1,6 @@
 ---
 name: bid-budget-optimizer
-description: Adjust Google Ads campaign budgets and bid strategies to improve performance or control spending. Use this when users request budget optimization, bid strategy changes, budget pacing fixes, spend control, budget reallocation, or scaling campaigns.
+description: "Campaign-by-campaign Google Ads performance review with bid strategy and budget recommendations. Use this when users request budget optimization, bid strategy changes, budget pacing fixes, spend control, budget reallocation, scaling campaigns, or period-over-period performance comparison."
 license: MIT
 ---
 
@@ -8,250 +8,111 @@ license: MIT
 
 ## Purpose
 
-Adjust campaign budgets and bid strategies to improve performance or control spending. Get specific recommendations for budget allocation, daily spend targets, and bid strategy changes with safety guardrails built in.
+Review each campaign's performance vs the previous period, make a short call on what's happening, and recommend bid strategy and budget changes. No waffle — one block per campaign, done.
 
 ## When to Use
 
-- **Red Zone accounts**: Reduce overspending and reallocate budget
-- **Yellow Zone accounts**: Scale budgets on performing campaigns
-- **Blue Zone accounts**: Pace budget or request increase from client
-- **Budget pacing issues**: Campaigns exhausting budget too early or late
-- **After strategy session**: When budget changes are recommended
-- **Mid-month corrections**: Account trending over/under budget
+- After a monthly review identifies budget or bid issues
+- Mid-month corrections when pacing is off
+- Reviewing what changed after bid strategy adjustments
+- Scaling or cutting campaigns based on performance
 
-## Prerequisites
+## Data Required
 
-- Client name and account context
-- Campaign performance data (last 30 days)
-- Current daily budgets per campaign
-- Monthly budget target
-- Target CPA or ROAS
-- (Optional) Bid strategy per campaign
+You need **two periods** of campaign data to compare. Default: last 30 days vs the 30 days before that.
 
-## How It Works
+### Option A: Google Ads MCP (Preferred)
 
-### Step 1: Data Access
+Fetch from MCC **394-736-1921**. Pull two periods of campaign-level data:
 
-**Option A: Google Ads MCP (Recommended)**
-If you have Google Ads MCP installed:
+**Metrics needed per campaign:**
+- Impressions, Clicks, Cost
+- Conversions, CPA, Conversion Value
+- Current bid strategy
+- Current daily budget
 
-> "Please fetch campaign budgets, spend, and performance data for [client name] for the last 30 days."
+### Option B: CSV Fallback
 
-**Option B: Manual Data (Fallback)**
-Please provide a table with:
+Ask the user for campaign data covering both periods, or two separate exports (current period + previous period).
 
-| Campaign | Current Daily Budget | Last 30 Days Spend | Conversions | CPA/ROAS | Bid Strategy |
-|----------|---------------------|-------------------|-------------|----------|--------------|
-| | $ | $ | | $ | |
+## Context to Gather
 
-### Step 2: Gather Context
+Before running the review, confirm:
+1. **Client name**
+2. **Monthly budget target**
+3. **Target CPA or ROAS**
+4. **Any recent changes** (bid strategy switches, budget adjustments, paused campaigns)
 
-I'll ask you for:
+Skip anything already known from `client_profile.md`.
 
-1. **Monthly Budget**: What's the total monthly budget?
-2. **Days Remaining**: How many days left in the month?
-3. **Focus Area**: What's the main goal?
-   - Reduce overspending
-   - Scale performing campaigns
-   - Fix pacing issues
-   - Reallocate to best performers
-4. **Constraints**: Any campaigns that can't be changed?
+## Output Format
 
-### Step 3: Calculate Ideal Daily Spend
-
-For each campaign, I'll calculate:
+Produce **one block per campaign**. Each block follows this exact structure:
 
 ```
-Remaining Budget = Monthly Budget - Spend to Date
-Ideal Daily Spend = Remaining Budget ÷ Days Remaining
-Current Pacing = (Actual Spend ÷ Expected Spend) × 100
+## [Campaign Name]
+
+Impressions: [Up/Down] X% (current vs previous)
+Clicks: [Up/Down] X% (current vs previous)
+Cost: [Up/Down] X% ($current vs $previous)
+Conversions: [Up/Down] X% (current vs previous)
+CPA: [Improved/Worsened] from $X to $X
+Conversion Value (Est.): $current vs $previous
+
+➡️ Comment: [1-2 sentences on what's happening — what improved, what's concerning, or what needs attention.]
+
+### Bid Strategy
+
+[Current strategy and any recent changes]
+[1-2 line recommendation with specific numbers — what to switch to, what target to set, or why to keep it]
+
+### Budget
+
+[1 line recommendation — specific daily budget number with brief reasoning]
 ```
 
-### Step 4: Apply 80/20 Analysis
+### Rules for the output
 
-Identify which campaigns deserve more/less budget:
+- **Always show the direction** — "Up 25%", "Down 18%", "Flat" — never just raw numbers
+- **Always show both values** — "(139 vs 86)", "($189.73 vs $72.14)"
+- **Comments are 1-2 sentences max** — no hedging, no filler
+- **Bid strategy recommendations are specific** — "Switch to Max Conversions with $25 target CPA", not "consider changing strategy"
+- **Budget recommendations are one line** — "$15/day (up from $10)" or "Pause — CPA 3x target with zero trend improvement"
+- **If a campaign should be paused, say so directly**
+- **If a campaign is performing well, say so and move on** — don't invent problems
 
-- **Top 20% performers**: Candidates for budget increase
-- **Middle 60%**: Maintain current allocation
-- **Bottom 20%**: Candidates for budget reduction or pause
+### Handling edge cases
 
-### Step 5: Generate Recommendations
+- **New campaign (no previous period)**: Note "New campaign — no comparison period" and comment on early signals only
+- **Paused campaign**: Note it's paused, state why if known, recommend whether to keep paused or reactivate
+- **Zero conversions**: Flag clearly, recommend action based on spend level and click volume
 
-For each campaign, provide:
-- Current budget vs recommended budget
-- Daily change amount
-- Reason for change
-- Priority level
-- Expected impact
+## After All Campaigns
 
-### Step 6: Apply Safety Rules
-
-Before finalising recommendations:
-
-✅ **Max 20% daily increase** for:
-- Max Clicks
-- Max Conversions
-- Max Conversion Value
-
-✅ **Total budget check**: Ensure changes don't overshoot monthly budget
-
-✅ **Gradual changes**: Large adjustments split over multiple days
-
-### Step 7: Generate Outputs
-
-- CSV file ready for implementation
-- Markdown summary with reasoning
-- Net impact projection
-
-## Expected Interaction Flow
+End with a short summary block:
 
 ```
-You: [Paste this SKILL.md content]
+## Summary
 
-I need to optimise budgets for Sydney Podiatry. We're in Red zone -
-overspending with poor CPA.
+Total Cost: $X → $X ([Up/Down] X%)
+Total Conversions: X → X ([Up/Down] X%)
+Blended CPA: $X → $X
+Monthly Budget Target: $X | Current Daily Total: $X/day | Projected: $X/month
 
-Here's the campaign data:
-[Provides campaign table]
-
-Monthly budget: $2,500
-Days remaining: 18
-Focus: Reduce overspending and improve allocation
-
-Claude: Got it! Let me analyse your campaigns...
-
-[Analysis and recommendations]
-
-## Budget Recommendations
-
-| Campaign | Current | Recommended | Change | Reason |
-|----------|---------|-------------|--------|--------|
-| Brand | $30 | $35 | +$5 | Best performer, protect |
-| Generic | $50 | $25 | -$25 | High CPA, reduce waste |
-| ...
-
-**Safety Check:**
-✅ Total daily budget stays within target
-✅ No bid strategy limits exceeded
-⚠️ Generic reduction is 50% - recommend gradual over 3 days
-
-Would you like me to generate the implementation CSV?
-
-You: Yes, and explain the gradual approach for Generic.
-
-Claude: [Provides CSV and detailed implementation steps]
+[1-2 sentences: overall direction and the single most important thing to do next]
 ```
 
-## Outputs
+## Output File
 
-### 1. Budget Recommendations CSV
+Save to: `google_ads/YYYY-MM/bid-budget-review-YYYY-MM.md`
 
-```csv
-Campaign,Current Budget,Recommended Budget,Daily Change,Reason,Priority,Expected Impact
-Brand - Sydney Podiatry,30,35,+5,Best performer CPA $28,High,Protect conversions
-Generic - Podiatrist,50,25,-25,CPA $95 vs $50 target,Critical,Reduce waste
-Generic - Foot Pain,35,20,-15,CPA $72 - underperforming,High,Reduce waste
-Competitor,25,15,-10,Low conversion volume,Medium,Test viability
-```
+## Safety Guardrails
 
-### 2. Implementation Summary (Markdown)
+Apply these silently — don't explain them in the output unless a recommendation hits one:
 
-```markdown
-## Budget Changes - Sydney Podiatry
-Date: [Today]
-
-### Summary
-- Total Daily Budget: $140 → $95 (-32%)
-- Projected Monthly Impact: -$810 spend, maintain core conversions
-- Focus: Reduce waste on underperforming campaigns
-
-### Critical Changes (Implement Today)
-1. Generic - Podiatrist: $50 → $25 (CPA too high)
-
-### High Priority (Implement This Week)
-2. Generic - Foot Pain: $35 → $20
-3. Brand - Sydney Podiatry: $30 → $35 (protect)
-
-### Gradual Implementation Required
-- Generic - Podiatrist: Large reduction
-  - Day 1: $50 → $40
-  - Day 2: $40 → $32
-  - Day 3: $32 → $25
-
-### Net Impact
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Daily Spend | $140 | $95 | -32% |
-| Monthly Projection | $4,200 | $2,850 | -32% |
-| Est. Conversions | ~42 | ~35 | -17% |
-| Est. CPA | $100 | $81 | -19% |
-```
-
-### 3. Safety Warnings
-
-Any safety concerns will be clearly flagged:
-
-```
-⚠️ SAFETY WARNINGS
-
-1. BID STRATEGY LIMIT
-   Campaign: Generic - Podiatrist
-   Current: Max Conversions
-   Requested increase: 30%
-   Limit: 20% max daily increase
-   Adjusted to: 20% increase
-
-2. BUDGET OVERSHOOT
-   If all changes applied: $3,100/month
-   Monthly budget: $2,500
-   Action: Reduced allocations to fit budget
-
-3. GRADUAL CHANGE REQUIRED
-   Campaign: Generic - Foot Pain
-   Change: -43%
-   Recommendation: Split over 2-3 days
-```
-
-## Safety Rules Detail
-
-### Bid Strategy Limits
-
-For campaigns using these bid strategies, **never increase budget by more than 20% per day**:
-
-| Bid Strategy | Max Daily Increase | Reason |
-|--------------|-------------------|--------|
-| Max Clicks | 20% | Algorithm needs time to adjust |
-| Max Conversions | 20% | Sudden increases can spike CPAs |
-| Max Conversion Value | 20% | Can cause overspending |
-| Target CPA | No limit | Self-regulating |
-| Target ROAS | No limit | Self-regulating |
-| Manual CPC | No limit | You control bids directly |
-
-### Total Budget Check
-
-Before finalising:
-
-```
-Sum of all recommended daily budgets × Days remaining ≤ Monthly budget remaining
-```
-
-If exceeded, I'll automatically adjust the lowest-priority increases.
-
-### Gradual Changes
-
-For any single campaign change greater than 25%:
-
-- **25-40% change**: Split over 2 days
-- **40-60% change**: Split over 3 days
-- **>60% change**: Split over 4+ days or consider pausing
-
-## Tips
-
-- **Protect best performers**: Don't cut budgets on campaigns hitting targets
-- **Cut waste first**: Reduce budget on high-CPA campaigns before increasing anywhere
-- **Gradual scaling**: Increase budgets 10-20% at a time
-- **Monitor after changes**: Check performance 2-3 days after major changes
-- **Document reasoning**: The markdown summary helps explain changes to clients
+- **Max 20% daily budget increase** for Max Clicks, Max Conversions, or Max Conversion Value campaigns
+- **Gradual large changes**: If recommending >30% budget cut, note "gradual reduction over 2-3 days" in the budget line
+- **Total budget check**: Ensure recommended daily budgets don't exceed monthly target
 
 ## Related Skills
 
@@ -261,4 +122,4 @@ For any single campaign change greater than 25%:
 
 ---
 
-*Control your spend, maximise your impact*
+*Short, sharp, campaign by campaign*
