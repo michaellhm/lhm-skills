@@ -171,6 +171,10 @@ Date: [Today's Date]
 - [List of all output files created during the session]
 ```
 
+## URL & Web Page Reading
+
+When you need to read a URL or web page (e.g. landing pages for audit), **always use the browser tool (Claude Chrome extension)** as the default. Do not use the native `WebFetch` tool — it strips pages to markdown and loses important content.
+
 ## Data Integrity Rules
 
 - **Never fabricate metrics** — use real data from MCP or CSV only

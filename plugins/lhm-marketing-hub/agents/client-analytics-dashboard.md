@@ -101,6 +101,10 @@ If the investigation points to issues that another skill can address, suggest it
 2. **Narrate key findings** — 3-5 bullet summary of the most important insights
 3. **Suggest follow-up actions** — which skills to run next based on the data
 
+## URL & Web Page Reading
+
+When you need to read a URL or web page, **always use the browser tool (Claude Chrome extension)** as the default. Do not use the native `WebFetch` tool — it strips pages to markdown and loses important content.
+
 ## Data Integrity Rules
 
 - **Never fabricate metrics** — use real data from MCP only

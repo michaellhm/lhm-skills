@@ -118,6 +118,10 @@ Between phases, carry forward:
 - **Optimization changes**: what was added/changed in Phase 3
 - **Quality scores**: dimension scores from Phase 4
 
+## URL & Web Page Reading
+
+When you need to read a URL or web page (e.g. competitor pages, content to audit), **always use the browser tool (Claude Chrome extension)** as the default. Do not use the native `WebFetch` tool — it strips pages to markdown and loses important content.
+
 ## Rules
 
 1. **Always start with context** — read `client_profile.md` first

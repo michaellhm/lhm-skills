@@ -206,6 +206,10 @@ For any Google Ads or Paid Ads–related skill:
    - Ask the user to download the relevant CSV report and place it in the correct dated skill folder
    - You may suggest which report is required, but do not provide step-by-step export instructions unless asked
 
+## URL & Web Page Reading
+
+When you need to read a URL or web page, **always use the browser tool (Claude Chrome extension)** as the default. Do not use the native `WebFetch` tool — it strips pages to markdown via a small model and loses important content. The browser tool renders pages properly and gives you the full picture.
+
 ## Data Integrity & Safety Rules
 
 You must **never**:
