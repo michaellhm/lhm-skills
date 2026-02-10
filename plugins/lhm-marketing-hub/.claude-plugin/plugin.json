@@ -1,7 +1,7 @@
 {
   "name": "lhm-marketing-hub",
   "description": "Structured marketing orchestrator — pre-flight client folder check, auto-onboarding, mandatory context load, skill routing, and enforced output discipline.",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "author": {
     "name": "LHM Digital"
   },

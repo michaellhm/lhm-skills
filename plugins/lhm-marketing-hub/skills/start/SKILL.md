@@ -64,6 +64,16 @@ Match the response to the skill catalog below. If multiple skills match, list op
 | **Competitive Analysis** | Evaluating competitors, Porter's 5 Forces, market positioning |
 | **Keyword Research** | Finding keyword opportunities, intent analysis, topic clusters |
 
+### SEO & Content
+| Skill | Use When |
+|-------|----------|
+| **Content Gap Analysis** | Finding keyword, topic, and content format gaps vs competitors |
+| **SEO Content Writer** | Writing SEO-optimized blog posts, guides, and articles |
+| **GEO Content Optimizer** | Optimizing content for AI citations and generative engines |
+| **Meta Tags Optimizer** | Creating title tags, meta descriptions, OG and Twitter tags |
+| **Content Quality Auditor** | Running a full CORE-EEAT 80-item quality audit |
+| **Content Refresher** | Identifying and refreshing underperforming content |
+
 ### SaaS & Growth Marketing
 | Skill | Use When |
 |-------|----------|

@@ -97,6 +97,14 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 - `competitive-analysis` — Competitor evaluation with Porter's 5 Forces, matrices, and positioning maps
 - `keyword-research` — Discover keywords with intent analysis, difficulty scoring, and topic clustering
 
+**SEO & Content:**
+- `content-gap-analysis` — Identify keyword, topic, and content format gaps vs competitors
+- `seo-content-writer` — Write SEO-optimized blog posts, guides, and articles
+- `geo-content-optimizer` — Optimize content for AI citations (GEO)
+- `meta-tags-optimizer` — Create optimized title tags, meta descriptions, OG tags
+- `content-quality-auditor` — Run CORE-EEAT 80-item quality audit
+- `content-refresher` — Identify and refresh underperforming content
+
 **SaaS & Growth Marketing:**
 - `ab-test-setup` — Plan, design, or implement A/B tests
 - `analytics-tracking` — Set up, improve, or audit analytics tracking
@@ -147,6 +155,17 @@ Some tasks are better handled by a dedicated agent than a skill. Use this routin
 - Any request that only needs analysis without execution
 
 When in doubt, ask: "Do you want a quick zone check, or a full review where I execute the actions too?"
+
+**Route to `seo-specialist` agent when the user says:**
+- "Full SEO workflow", "SEO content pipeline", "research to publish"
+- "Create and optimize content", "help me create SEO content"
+- Any request that spans multiple SEO skills (research + write + optimize)
+
+**Route to individual SEO skills when the user wants just one thing:**
+- "Write a blog post" → `seo-content-writer`
+- "Audit my SEO" → `seo-audit`
+- "Optimize for AI citations" → `geo-content-optimizer`
+- "Run a content quality audit" → `content-quality-auditor`
 
 ## Google Ads & Paid Ads Enforcement
 

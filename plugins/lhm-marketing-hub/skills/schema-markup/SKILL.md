@@ -1,95 +1,100 @@
 ---
 name: schema-markup
-description: When the user wants to add, fix, or optimize schema markup and structured data on their site. Also use when the user mentions "schema markup," "structured data," "JSON-LD," "rich snippets," "schema.org," "FAQ schema," "product schema," "review schema," or "breadcrumb schema." For broader SEO issues, see seo-audit.
+description: "When the user wants to add, fix, or optimize schema markup and structured data on their site. Also use when the user mentions 'schema markup,' 'structured data,' 'JSON-LD,' 'rich snippets,' 'schema.org,' 'FAQ schema,' 'product schema,' 'review schema,' 'breadcrumb schema,' 'HowTo schema,' 'LocalBusiness schema,' or 'rich results.' Covers all schema types with content-type mapping and validation."
 ---
 
 # Schema Markup
 
-You are an expert in structured data and schema markup. Your goal is to implement schema.org markup that helps search engines understand content and enables rich results in search.
+Implements schema.org markup in JSON-LD format to help search engines and AI systems understand content and enable rich results in search.
 
 ## Initial Assessment
 
-**Check for product marketing context first:**
-If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
+**Check for client profile first:**
+If `client_profile.md` exists, read it before asking questions.
 
 Before implementing schema, understand:
+1. **Page Type** — what kind of page, primary content, possible rich results
+2. **Current State** — existing schema, errors, which rich results already appear
+3. **Goals** — which rich results targeted, business value
 
-1. **Page Type** - What kind of page? What's the primary content? What rich results are possible?
+---
 
-2. **Current State** - Any existing schema? Errors in implementation? Which rich results already appearing?
+## Content-Type to Schema Mapping
 
-3. **Goals** - Which rich results are you targeting? What's the business value?
+Use this table to select the right schema for each content type:
+
+| Content Type | Required Schema | Conditional Schema |
+|-------------|----------------|-------------------|
+| Blog (guide) | Article, Breadcrumb | FAQ, HowTo |
+| Blog (tools/review) | Article, Breadcrumb | FAQ, Review |
+| Comparison/Alternative | Article, Breadcrumb, FAQ | AggregateRating |
+| Best-of/Listicle | ItemList, Breadcrumb, FAQ | AggregateRating per item |
+| FAQ page | FAQPage, Breadcrumb | — |
+| Landing page | SoftwareApplication, Breadcrumb, FAQ | WebPage |
+| Product page | Product, Breadcrumb | FAQ, Review |
+| Local business | LocalBusiness, Breadcrumb | FAQ |
+| Event | Event, Breadcrumb | — |
+| How-to/Tutorial | HowTo, Article, Breadcrumb | FAQ |
 
 ---
 
 ## Core Principles
 
-### 1. Accuracy First
-- Schema must accurately represent page content
-- Don't markup content that doesn't exist
-- Keep updated when content changes
-
-### 2. Use JSON-LD
-- Google recommends JSON-LD format
-- Easier to implement and maintain
-- Place in `<head>` or end of `<body>`
-
-### 3. Follow Google's Guidelines
-- Only use markup Google supports
-- Avoid spam tactics
-- Review eligibility requirements
-
-### 4. Validate Everything
-- Test before deploying
-- Monitor Search Console
-- Fix errors promptly
+1. **Accuracy First** — schema must accurately represent visible page content
+2. **Use JSON-LD** — Google's recommended format, place in `<head>` or before `</body>`
+3. **Follow Google's Guidelines** — only use markup Google supports for rich results
+4. **Validate Everything** — test before deploying, monitor Search Console
 
 ---
 
-## Common Schema Types
-
-| Type | Use For | Required Properties |
-|------|---------|-------------------|
-| Organization | Company homepage/about | name, url |
-| WebSite | Homepage (search box) | name, url |
-| Article | Blog posts, news | headline, image, datePublished, author |
-| Product | Product pages | name, image, offers |
-| SoftwareApplication | SaaS/app pages | name, offers |
-| FAQPage | FAQ content | mainEntity (Q&A array) |
-| HowTo | Tutorials | name, step |
-| BreadcrumbList | Any page with breadcrumbs | itemListElement |
-| LocalBusiness | Local business pages | name, address |
-| Event | Events, webinars | name, startDate, location |
-
-**For complete JSON-LD examples**: See [references/schema-examples.md](references/schema-examples.md)
-
----
-
-## Quick Reference
+## Schema Types & Templates
 
 ### Organization (Company Page)
-Required: name, url
-Recommended: logo, sameAs (social profiles), contactPoint
+Required: name, url | Recommended: logo, sameAs, contactPoint
 
 ### Article/BlogPosting
-Required: headline, image, datePublished, author
-Recommended: dateModified, publisher, description
+Required: headline, image, datePublished, author | Recommended: dateModified, publisher, description
 
 ### Product
-Required: name, image, offers (price + availability)
-Recommended: sku, brand, aggregateRating, review
+Required: name, image, offers (price + availability) | Recommended: sku, brand, aggregateRating, review
 
 ### FAQPage
 Required: mainEntity (array of Question/Answer pairs)
 
+### HowTo
+Required: name, step (array of HowToStep) | Recommended: totalTime, estimatedCost
+
 ### BreadcrumbList
 Required: itemListElement (array with position, name, item)
 
+### LocalBusiness
+Required: name, address | Recommended: geo, telephone, openingHoursSpecification
+
+### Event
+Required: name, startDate, location | Recommended: endDate, offers, performer
+
+**For complete JSON-LD code examples**: See [references/schema-examples.md](references/schema-examples.md)
+
 ---
 
-## Multiple Schema Types
+## Rich Result Eligibility
 
-You can combine multiple schema types on one page using `@graph`:
+| Rich Result Type | Schema Required | Impact |
+|-----------------|----------------|--------|
+| FAQ dropdowns | FAQPage | High — expands SERP presence |
+| How-To steps | HowTo | Medium — shows steps in SERP |
+| Product price/stars | Product + Offer + AggregateRating | High — shows price, availability |
+| Review stars | Review or AggregateRating | High — shows star ratings |
+| Article info | Article | Medium — shows date, author |
+| Breadcrumbs | BreadcrumbList | Medium — shows navigation path |
+| Video thumbnail | VideoObject | High — shows video in SERP |
+| Sitelinks searchbox | WebSite + SearchAction | Medium — enables site search |
+
+---
+
+## Combining Multiple Schema Types
+
+Use `@graph` to combine multiple schema types on one page:
 
 ```json
 {
@@ -97,7 +102,9 @@ You can combine multiple schema types on one page using `@graph`:
   "@graph": [
     { "@type": "Organization", ... },
     { "@type": "WebSite", ... },
-    { "@type": "BreadcrumbList", ... }
+    { "@type": "BreadcrumbList", ... },
+    { "@type": "Article", ... },
+    { "@type": "FAQPage", ... }
   ]
 }
 ```
@@ -112,64 +119,59 @@ You can combine multiple schema types on one page using `@graph`:
 - **Search Console**: Enhancements reports
 
 ### Common Errors
+- **Missing required properties** — check Google docs for required fields
+- **Invalid values** — dates must be ISO 8601, URLs fully qualified
+- **Mismatch with page content** — schema doesn't match what's visible
+- **Trailing commas** — JSON syntax error
+- **Relative URLs** — must be absolute
 
-**Missing required properties** - Check Google's documentation for required fields
-
-**Invalid values** - Dates must be ISO 8601, URLs fully qualified, enumerations exact
-
-**Mismatch with page content** - Schema doesn't match visible content
+### Validation Checklist
+- [ ] JSON syntax validates (no trailing commas, proper quotes)
+- [ ] All required properties present for chosen schema type
+- [ ] URLs are absolute, not relative
+- [ ] Dates in ISO 8601 format
+- [ ] Schema content matches visible page content exactly
+- [ ] Passes Rich Results Test with no errors
+- [ ] No policy violations (no markup for hidden content)
 
 ---
 
 ## Implementation
 
 ### Static Sites
-- Add JSON-LD directly in HTML template
-- Use includes/partials for reusable schema
+Add JSON-LD directly in HTML template head.
 
 ### Dynamic Sites (React, Next.js)
-- Component that renders schema
-- Server-side rendered for SEO
-- Serialize data to JSON-LD
+Component that renders schema, server-side rendered.
 
 ### CMS / WordPress
-- Plugins (Yoast, Rank Math, Schema Pro)
-- Theme modifications
-- Custom fields to structured data
+Plugins (Yoast, Rank Math, Schema Pro) or theme modifications.
+
+### Placement
+```html
+<head>
+  <script type="application/ld+json">
+    { ... your schema ... }
+  </script>
+</head>
+```
 
 ---
 
 ## Output Format
 
-### Schema Implementation
-```json
-// Full JSON-LD code block
-{
-  "@context": "https://schema.org",
-  "@type": "...",
-  // Complete markup
-}
-```
-
-### Testing Checklist
-- [ ] Validates in Rich Results Test
-- [ ] No errors or warnings
-- [ ] Matches page content
-- [ ] All required properties included
-
----
-
-## Task-Specific Questions
-
-1. What type of page is this?
-2. What rich results are you hoping to achieve?
-3. What data is available to populate the schema?
-4. Is there existing schema on the page?
-5. What's your tech stack?
+For each page, provide:
+1. **Schema type recommendation** with reasoning
+2. **Complete JSON-LD code block** ready to copy
+3. **Testing checklist** results
+4. **SERP preview** showing expected rich result
 
 ---
 
 ## Related Skills
 
-- **seo-audit**: For overall SEO including schema review
-- **programmatic-seo**: For templated schema at scale
+- **seo-audit** — broader SEO including schema review
+- **meta-tags-optimizer** — meta tags alongside structured data
+- **geo-content-optimizer** — FAQ schema helps GEO optimization
+- **seo-content-writer** — create content worth marking up
+- **programmatic-seo** — templated schema at scale
