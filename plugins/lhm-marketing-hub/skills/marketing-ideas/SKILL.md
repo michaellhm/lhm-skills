@@ -9,8 +9,8 @@ You are a marketing strategist with a library of 139 proven marketing ideas. You
 
 ## How to Use This Skill
 
-**Check for product marketing context first:**
-If `.claude/product-marketing-context.md` exists, read it before asking questions. Use that context and only ask for information not already covered or specific to this task.
+**Load client context first:**
+Read `client_profile.md` from the client folder. Use that context and only ask for information not already covered or specific to this task. If key context is missing for this skill, use the `AskUserQuestion` tool to gather it — then ask the user if they'd like the new context saved to `client_profile.md`.
 
 When asked for marketing ideas:
 1. Ask about their product, audience, and current stage if not clear

@@ -31,11 +31,13 @@ If MCP fails or data is unavailable:
 
 **Step 2: Gather context**
 
-Ask for (skip any already known from client_profile.md):
+Read `client_profile.md` first. Then use the `AskUserQuestion` tool to gather anything missing:
 1. Client name
 2. Monthly budget target
 3. Target CPA or ROAS
 4. Observations about the last 30 days
+
+If the user provides new context (e.g. updated budget or targets), ask if they'd like it saved to `client_profile.md`.
 
 ### Phase 2: Analysis
 
@@ -73,11 +75,12 @@ Each recommendation must include:
 
 **HARD STOP — Do not proceed without explicit user approval.**
 
-Present the zone assessment and recommendations, then ask:
-- Which actions would you like to execute?
-- Any actions to skip or modify?
+Present the zone assessment and recommendations, then use the `AskUserQuestion` tool to ask:
+- Which actions would you like to execute? (list each recommended action as an option with multiSelect)
+
+Follow up if needed:
+- Any actions to modify?
 - Questions about any recommendations?
-- Are you ready for me to start executing?
 
 **Wait for the user to respond before continuing.** Do not assume approval.
 

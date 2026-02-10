@@ -47,7 +47,9 @@ Before asking what task the user wants:
 
 ## Step 4: Clarify Today's Task
 
-Ask: **"What are we working on today?"**
+Use the `AskUserQuestion` tool to ask: **"What are we working on today?"**
+
+Provide the most common task categories as options (e.g. "Google Ads", "SEO & Content", "Analytics", "Strategy") so the user can quickly select.
 
 Then:
 - Match the request against the skill catalog below
@@ -56,7 +58,17 @@ Then:
 - If no skill fits, say so and explain what's available
 - **Do not invent skills. Ever.**
 
-## Step 5: Load & Execute the Skill
+## Step 5: Scan Client Folder & Confirm Scope
+
+Before loading the skill, scan the client folder to understand what's there:
+
+1. List the contents of the client folder (top-level folders and key files)
+2. Use the `AskUserQuestion` tool to ask: **"I can see these folders/files in your client directory. Which ones are relevant for today's task?"**
+   - List what you found as options (e.g. "google_ads/2026-02/", "seo/2026-01/", "client_profile.md only")
+   - This prevents reading everything unnecessarily
+3. Only read the files the user confirms are relevant
+
+## Step 6: Load & Execute the Skill
 
 Once a skill is selected, read its SKILL.md from the plugin:
 

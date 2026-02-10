@@ -19,6 +19,16 @@ Route to **individual skills** when the user wants just one thing (e.g. "write a
 
 ## Workflow Phases
 
+### Phase 0: Context & Scope
+**Goal**: Understand what the user needs and what's already done.
+
+1. Read `client_profile.md` from the client folder
+2. Scan the client's `seo/` folder (if it exists) to see what work has been done previously
+3. Use the `AskUserQuestion` tool to clarify:
+   - "What's the goal for this SEO session?" (options: "New content from scratch", "Optimize existing content", "Full audit", "Content refresh")
+   - If relevant prior work exists, ask which files to reference
+4. If key context is missing from `client_profile.md` (e.g. target audience, competitors), use `AskUserQuestion` to gather it — then ask if they'd like it saved to `client_profile.md`
+
 ### Phase 1: Research
 **Goal**: Understand what to create and why.
 
@@ -32,7 +42,7 @@ Route to **individual skills** when the user wants just one thing (e.g. "write a
    - Check AI citation gaps (GEO)
    - Prioritize what to create
 
-**Approval gate**: Present research findings and recommended content to create. Wait for user approval before proceeding.
+**Approval gate**: Present research findings and recommended content to create. Use the `AskUserQuestion` tool to confirm which content pieces to proceed with. Wait for user approval before proceeding.
 
 ### Phase 2: Content Creation
 **Goal**: Write high-quality, SEO-optimized content.

@@ -13,10 +13,12 @@ The `ga-event-config` and `ga-dashboard` **skills** can be used individually. Th
 
 ### Phase 1: Client & GA Property
 
-**Step 1: Load client context**
+**Step 1: Load client context & scan folder**
 
 - Read `client_profile.md` from the client folder
-- Look for the `## Google Analytics` section
+- Scan the client's `analytics/` folder (if it exists) to see what dashboards have been generated previously
+- Look for the `## Google Analytics` section in `client_profile.md`
+- If prior dashboards exist, use the `AskUserQuestion` tool to ask: "I found previous dashboards in your analytics folder. Would you like me to reference any of them, or start fresh?"
 
 **Step 2: Check GA configuration**
 
@@ -41,17 +43,18 @@ After saving, reload `client_profile.md` to pick up the new GA section.
 
 ### Phase 3: Context Gathering
 
-Ask the user:
+Use the `AskUserQuestion` tool to gather the brief:
 
-1. **"What period would you like to analyse?"**
-   - Last 30 days vs previous 30 days (default)
-   - Last 90 days vs previous 90 days
-   - Custom dates
+1. **"What period would you like to analyse?"** — provide options:
+   - "Last 30 days vs previous 30 days" (default, recommended)
+   - "Last 90 days vs previous 90 days"
+   - "Custom dates"
 
-2. **"Anything specific you want me to investigate?"** (optional)
-   - e.g. "Why did traffic drop last week"
-   - e.g. "Check conversion rate trends"
-   - e.g. "How is organic performing"
+2. **"Anything specific you want me to investigate?"** — provide options:
+   - "No, just the standard dashboard"
+   - "Traffic dropped — investigate why"
+   - "Check conversion rates"
+   - "Organic performance deep dive"
 
 If the user says "just run it" or similar, use the 30-day default with no specific focus.
 
@@ -77,7 +80,7 @@ Present the dashboard to the user.
 
 ### Phase 5: Deep Dive (optional)
 
-After presenting the dashboard, ask: **"Would you like me to dig deeper into anything?"**
+After presenting the dashboard, use the `AskUserQuestion` tool to ask: **"Would you like me to dig deeper into anything?"** — provide options based on what the data revealed (e.g. "Investigate traffic drop", "Landing page deep dive", "Channel breakdown", "No, looks good").
 
 If the user wants to investigate further, run targeted reports:
 - **Specific page analysis**: filter by landing page and break down by source/medium
