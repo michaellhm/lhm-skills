@@ -132,6 +132,10 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 - `signup-flow-cro` — Optimize signup and registration flows
 - `social-content` — Create and optimize social media content
 
+**Analytics & Reporting:**
+- `ga-event-config` — Discover GA events and classify conversions/funnels
+- `ga-dashboard` — Generate analytics dashboard with period comparison
+
 **Pricing:**
 - `pricing-strategy-standalone` — Pricing decisions, packaging, monetization
 
@@ -155,6 +159,17 @@ Some tasks are better handled by a dedicated agent than a skill. Use this routin
 - Any request that only needs analysis without execution
 
 When in doubt, ask: "Do you want a quick zone check, or a full review where I execute the actions too?"
+
+**Route to `client-analytics-dashboard` agent when the user says:**
+- "Analytics dashboard", "GA dashboard", "client dashboard"
+- "How is the site performing", "traffic report", "analytics report"
+- "Generate a dashboard", "monthly analytics review"
+- Any request that needs GA property setup + dashboard generation
+
+**Route to `ga-dashboard` skill when the user says:**
+- "Quick dashboard", "just show me the numbers"
+- "Quick traffic check", "quick analytics"
+- Any request that only needs a dashboard without setup
 
 **Route to `seo-specialist` agent when the user says:**
 - "Full SEO workflow", "SEO content pipeline", "research to publish"

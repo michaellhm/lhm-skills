@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-43 marketing skills packaged as a Claude Code plugin with a structured orchestration layer. The plugin enforces a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+45 marketing skills packaged as a Claude Code plugin with a structured orchestration layer. The plugin enforces a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -25,7 +25,8 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/marketing-assistant.md         # Orchestrator agent
   agents/google-ads-monthly-review.md  # Full monthly review with skill chaining
   agents/seo-specialist.md             # Multi-skill SEO workflow orchestrator
-  skills/                              # All 43 skills
+  agents/client-analytics-dashboard.md # GA4 analytics dashboard workflow
+  skills/                              # All 45 skills
     start/                             # Entry point — /start command
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
@@ -41,6 +42,8 @@ plugins/lhm-marketing-hub/             # The plugin
     meta-tags-optimizer/               # Title tags, meta descriptions, OG tags
     content-quality-auditor/           # CORE-EEAT 80-item quality audit
     content-refresher/                 # Identify and refresh underperforming content
+    ga-event-config/                   # GA4 event discovery and conversion classification
+    ga-dashboard/                      # Analytics dashboard with period comparison
     campaign-playbook-generator/       # Campaign & sales playbooks from transcripts
     pmax-banner-generator/             # Performance Max assets
     copywriting/                       # Marketing copy for any page
@@ -59,6 +62,8 @@ plugins/lhm-marketing-hub/             # The plugin
 **Strategy & Research** (2 skills): Competitive analysis with Porter's 5 Forces, keyword research with intent analysis and topic clustering.
 
 **SEO & Content** (6 skills): Content gap analysis, SEO content writing, GEO/AI citation optimization, meta tags optimization, CORE-EEAT content quality auditing, content refresh planning.
+
+**Analytics & Reporting** (2 skills): GA4 event discovery and conversion classification, analytics dashboard generation with period comparison.
 
 **SaaS & Growth Marketing** (25 skills): A/B testing, analytics tracking, competitor pages, content strategy, copy editing, copywriting, email sequences, form CRO, free tool strategy, launch strategy, marketing ideas, marketing psychology, onboarding CRO, page CRO, paid ads, paywall CRO, popup CRO, pricing strategy, product marketing, programmatic SEO, referral programs, schema markup, SEO audit, signup flow CRO, social content.
 

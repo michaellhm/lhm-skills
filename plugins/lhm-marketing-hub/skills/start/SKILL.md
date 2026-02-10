@@ -74,6 +74,12 @@ Match the response to the skill catalog below. If multiple skills match, list op
 | **Content Quality Auditor** | Running a full CORE-EEAT 80-item quality audit |
 | **Content Refresher** | Identifying and refreshing underperforming content |
 
+### Analytics & Reporting
+| Skill | Use When |
+|-------|----------|
+| **GA Event Config** | Setting up GA4 property, classifying events and conversions |
+| **GA Dashboard** | Generating analytics dashboards with period comparison |
+
 ### SaaS & Growth Marketing
 | Skill | Use When |
 |-------|----------|
