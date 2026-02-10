@@ -95,6 +95,7 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 
 **Strategy & Research:**
 - `competitive-analysis` — Competitor evaluation with Porter's 5 Forces, matrices, and positioning maps
+- `keyword-research` — Discover keywords with intent analysis, difficulty scoring, and topic clustering
 
 **SaaS & Growth Marketing:**
 - `ab-test-setup` — Plan, design, or implement A/B tests

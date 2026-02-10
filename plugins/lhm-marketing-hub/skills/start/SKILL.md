@@ -62,6 +62,7 @@ Match the response to the skill catalog below. If multiple skills match, list op
 | Skill | Use When |
 |-------|----------|
 | **Competitive Analysis** | Evaluating competitors, Porter's 5 Forces, market positioning |
+| **Keyword Research** | Finding keyword opportunities, intent analysis, topic clusters |
 
 ### SaaS & Growth Marketing
 | Skill | Use When |
