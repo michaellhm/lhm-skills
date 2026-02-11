@@ -80,6 +80,11 @@ Match the response to the skill catalog below. If multiple skills match, list op
 | **GA Event Config** | Setting up GA4 property, classifying events and conversions |
 | **GA Dashboard** | Generating analytics dashboards with period comparison |
 
+### Client Management
+| Skill | Use When |
+|-------|----------|
+| **Client Update Email** | Writing an update email to the client about work done |
+
 ### SaaS & Growth Marketing
 | Skill | Use When |
 |-------|----------|

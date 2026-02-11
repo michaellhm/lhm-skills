@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-45 marketing skills packaged as a Claude Code plugin with a structured orchestration layer. The plugin enforces a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+46 marketing skills packaged as a Claude Code plugin with a structured orchestration layer. The plugin enforces a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -26,7 +26,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/google-ads-monthly-review.md  # Full monthly review with skill chaining
   agents/seo-specialist.md             # Multi-skill SEO workflow orchestrator
   agents/client-analytics-dashboard.md # GA4 analytics dashboard workflow
-  skills/                              # All 45 skills
+  skills/                              # All 46 skills
     start/                             # Entry point — /start command
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
@@ -44,6 +44,7 @@ plugins/lhm-marketing-hub/             # The plugin
     content-refresher/                 # Identify and refresh underperforming content
     ga-event-config/                   # GA4 event discovery and conversion classification
     ga-dashboard/                      # Analytics dashboard with period comparison
+    client-update-email/               # Plain-language client update emails
     campaign-playbook-generator/       # Campaign & sales playbooks from transcripts
     pmax-banner-generator/             # Performance Max assets
     copywriting/                       # Marketing copy for any page
@@ -55,7 +56,7 @@ plugins/lhm-marketing-hub/             # The plugin
 
 ## Skills Catalog
 
-**Client Management** (2 skills): Client onboarding and profile setup, campaign playbook generation from transcripts.
+**Client Management** (3 skills): Client onboarding and profile setup, campaign playbook generation from transcripts, plain-language client update emails.
 
 **Google Ads & PPC** (6 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), PMax banners.
 
