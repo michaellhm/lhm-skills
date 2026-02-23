@@ -35,7 +35,7 @@ When a user requests SEO content:
 
 Before writing anything, gather voice/style guidelines (anti-AI writing rules, tone docs, brand voice) and confirm all internal page URLs the content should link to. Applying style guidelines or adding links after writing forces a full revision pass that risks introducing errors.
 
-If writing multiple articles in a batch, write and confirm one article at a time. Writing 4+ full articles in a single session risks hitting context limits mid-batch.
+If writing multiple articles in a batch, write and confirm one article at a time. Writing 4+ full articles in a single session risks hitting context limits mid-batch. Vary word count and structure between posts in a batch (mix 1,200-word posts with 1,800-word posts). Identical-length posts with identical section patterns look artificial.
 
 ```markdown
 ### Content Requirements
@@ -49,7 +49,10 @@ If writing multiple articles in a batch, write and confirm one article at a time
 **Tone**: [professional/casual/technical/friendly]
 **CTA Goal**: [what action should readers take]
 **Internal Link Targets**: [list of confirmed page URLs to link to]
+**Publishing Target**: [WordPress via wp-blog-publisher / CMS / static site]
 ```
+
+If the content will be published via **wp-blog-publisher**, use its frontmatter format (seo_title, meta_description, slug, primary_keyword, secondary_keywords, status). These fields map directly to WordPress post fields and Yoast SEO meta.
 
 ### 2. Research and Plan
 
@@ -119,7 +122,9 @@ Follow this structure for the actual content:
 - **Introduction**: Hook → Problem → Promise → Overview
 - **Body sections**: Each H2 covers one main topic with H3 sub-sections
 - **Use variety**: paragraphs, bullet points, tables, blockquotes, bold key phrases
-- **FAQ section**: At least 3 questions, direct answers in 40-60 words each
+- **FAQ section**: At least 3 questions, direct answers in 40-60 words each. For blog posts, use bold question + inline answer format (`**Question?** Answer text.`) rather than H3 + separate paragraph. This renders better on most blog templates.
+- **Related Reading**: If linking to other posts in the series, use a list at the end: `- *[Link Text](/path)*`
+- **Section dividers**: Use markdown horizontal rules (`---`) between major sections for visual separation
 - **Conclusion**: Recap → Final insight → CTA
 
 ### 7. Apply On-Page SEO Checklist

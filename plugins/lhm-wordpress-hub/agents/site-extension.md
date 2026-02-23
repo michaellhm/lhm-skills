@@ -15,6 +15,15 @@ Use this agent after the initial build is complete (Phase F done) when:
 - Retiring/unpublishing a page
 - Adding a new service or location
 - Updating brand or design elements
+- Publishing or scheduling blog posts
+
+### Blog Posts
+
+For publishing blog posts (markdown files to WordPress), load the dedicated skill:
+
+`${CLAUDE_PLUGIN_ROOT}/skills/wp-blog-publisher/SKILL.md`
+
+This handles markdown-to-HTML conversion, category creation, author assignment, scheduled publishing, and Yoast SEO meta. Use this instead of wp-page-builder for blog posts.
 
 ## Workflow: Adding a New Page
 

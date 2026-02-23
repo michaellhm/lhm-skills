@@ -73,6 +73,10 @@ wp option update page_on_front <page_id>
 
 4. Verify the frontend renders pixel-perfect. If it doesn't, the issue is in the CSS extraction (theme-scaffold step), not in the block conversion
 
+### Template hierarchy warning
+
+If the site will have a blog, use `front-page.html` (not `home.html`) for the homepage template. WordPress reserves `home.html` for the blog posts index when `show_on_front = page`. If you build the homepage using `home.html` and later add a blog, you'll need to rename the homepage template to `front-page.html` and create a new `home.html` for the blog listing. Plan this from the start.
+
 ### What you get
 - Pixel-perfect frontend rendering
 - A working reference page
@@ -367,6 +371,10 @@ After each page is built, update `/wp/wp_state.md`:
 | Home | /content/home.md | /wp/homepage-content.html | /wp/homepage-content-blocks.html | Published | 42 |
 | About | /content/about.md | /wp/about-content.html | /wp/about-content-blocks.html | Published | 43 |
 ```
+
+## Cache Busting After CSS Changes
+
+After adding or modifying CSS in `custom.css`, bump the theme version in `style.css`. The theme's `functions.php` uses `wp_get_theme()->get('Version')` as the version parameter for enqueued stylesheets, so incrementing the version busts browser caches automatically.
 
 ## Step 8: Approval Gate
 
