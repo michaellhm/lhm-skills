@@ -16,7 +16,10 @@ Build individual pages in WordPress using a two-step process: first push the raw
 5. **Read the homepage prototype** - read the approved version from `/design/prototype/homepage/` (e.g. `index.html` or the specific approved version like `v2.html`) as the pixel-perfect visual reference
 6. **Read WP state** - read `/wp/wp_state.md` to see what's already built
 7. **Read WP-CLI reference** - read `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md`
-8. Verify the theme is installed and activated
+8. **Read viewport reference** - read `${CLAUDE_PLUGIN_ROOT}/skills/visual-qa/references/viewports.md` for standard breakpoint sizes
+9. Verify the theme is installed and activated
+
+**Playwright MCP tools are available** for screenshotting and visual comparison. Key tools used in this skill: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_resize`, `mcp__playwright__browser_take_screenshot`, `mcp__playwright__browser_wait_for`, `mcp__playwright__browser_evaluate`. If the browser is not installed, run `mcp__playwright__browser_install` first.
 
 ## Step 1: Build Order
 
@@ -78,6 +81,45 @@ wp option update page_on_front <page_id>
 - Editor editability (the entire page is raw HTML in the editor)
 
 **This is intentional.** Step 2 solves the visual problem. Step 3 solves the editor problem.
+
+### Screenshot Comparison: HTML Push vs Prototype
+
+Before asking for approval, run an automated visual check at two viewports (Desktop Standard and Mobile Standard). This catches CSS issues before the user has to eyeball anything.
+
+**For each viewport (Desktop Standard 1440x900, Mobile Standard 390x844):**
+
+1. **Resize the viewport:**
+   ```
+   mcp__playwright__browser_resize → width: [width], height: [height]
+   ```
+
+2. **Screenshot the prototype** (skip if already captured for this page):
+   ```
+   mcp__playwright__browser_navigate → url: "file:///[absolute-path]/design/prototype/{slug}/index.html"
+   mcp__playwright__browser_wait_for → wait for network idle
+   mcp__playwright__browser_take_screenshot
+   ```
+   Save to `/qa/{page-slug}/prototype-desktop-standard.png` and `prototype-mobile-standard.png`
+
+3. **Screenshot the live WordPress page:**
+   ```
+   mcp__playwright__browser_navigate → url: "[wordpress-url]/{page-slug}"
+   mcp__playwright__browser_wait_for → wait for network idle
+   mcp__playwright__browser_evaluate → document.getElementById('wpadminbar')?.remove()
+   mcp__playwright__browser_take_screenshot
+   ```
+   Save to `/qa/{page-slug}/html-push-desktop-standard.png` and `html-push-mobile-standard.png`
+
+4. **Visually compare** each pair using your multimodal vision. Check:
+   - Layout structure matches
+   - Colors and backgrounds render correctly
+   - Typography loads and displays correctly
+   - Spacing and alignment are consistent
+   - No broken images or missing elements
+
+5. **If issues found:** fix the CSS/markup, re-push, re-screenshot, and verify the fix before proceeding
+
+This is a lightweight 2-viewport check. The full 8-viewport visual-qa pass with accessibility, hover states, and computed styles runs before launch.
 
 ### Approval Gate: Confirm Before Block Conversion
 
@@ -242,6 +284,19 @@ The CSS in `custom.css` was extracted directly from the HTML prototype. The JS i
 ### After Each Section Conversion
 
 Compare the frontend against the Step 2 HTML baseline. If the converted version looks different, the issue is in the block structure, not the CSS (because Step 2 already proved the CSS works). Fix the block structure before moving to the next section.
+
+### Screenshot Comparison: Block Conversion vs Prototype
+
+After all sections are converted, run the same 2-viewport screenshot check to catch regressions introduced during block conversion. The prototype screenshots were already captured in Step 2.
+
+**For each viewport (Desktop Standard 1440x900, Mobile Standard 390x844):**
+
+1. **Resize, navigate to the WordPress page, remove admin bar, and screenshot** (same sequence as Step 2)
+2. Save to `/qa/{page-slug}/blocks-desktop-standard.png` and `blocks-mobile-standard.png`
+3. **Compare against the prototype screenshots** (`prototype-desktop-standard.png` and `prototype-mobile-standard.png`)
+4. If regressions found: fix block structure, re-push, re-screenshot, and verify before proceeding
+
+After this check passes, proceed to Editor QA (Step 5).
 
 ## Step 4: Save Both Content Files
 
