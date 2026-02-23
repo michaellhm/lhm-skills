@@ -1,0 +1,9 @@
+{
+  "name": "lhm-wordpress-hub",
+  "description": "Guided WordPress website build system — phased delivery from client intake through SEO, content, design, WordPress build, and ops hardening.",
+  "version": "1.1.1",
+  "author": {
+    "name": "LHM Digital"
+  },
+  "keywords": ["wordpress", "website-builder", "block-theme", "agency"]
+}
