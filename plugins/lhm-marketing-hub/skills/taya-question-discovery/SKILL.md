@@ -45,6 +45,7 @@ Use the `AskUserQuestion` tool to gather anything missing:
 - Primary location/market if local (e.g. "Melbourne, Australia")
 - Target patient/customer profile (e.g. "adults 35-60 with chronic pain")
 - Any services or topics the client has flagged as sensitive or off-limits
+- If the client has recently changed or expanded their service offering, ask to see current homepage copy before finalising the question bank. Retrofitting a new service line into completed briefs takes longer than incorporating it during discovery
 
 ---
 
@@ -103,6 +104,8 @@ Organise all discovered questions into the Big 5 categories. For each question i
 - Estimated priority: High / Medium / Low (based on search frequency and buyer intent signals)
 - Data source: where it was found (Reddit, review mining, GSC, etc.)
 
+**Multi-service businesses**: When a client offers multiple distinct services (e.g. paid ads management AND website builds), split the Big 5 question bank into per-service sections rather than blending them. Mixed question banks produce confused article angles and unclear CTAs.
+
 Format as a table for readability.
 
 ---
@@ -125,9 +128,11 @@ After presenting the full list, highlight:
 
 Deliver results as:
 
-1. **Full question bank table** — All questions organised by Big 5 category with priority and buyer stage
-2. **Top 10 priority articles** — The highest-impact content to write first, with a suggested title for each
-3. **Content gap summary** — 2-3 sentences on where the biggest opportunity sits based on what competitors aren't covering
+1. **Next 4 articles to publish** — Surface the immediate next batch prominently at the top of the document. Users look for "what do I publish first" and shouldn't have to scan a full table to find it.
+2. **Full question bank table** — All questions organised by Big 5 category with priority and buyer stage
+3. **Top 10 priority articles** — The highest-impact content to write first, with a suggested title for each
+4. **Content gap summary** — 2-3 sentences on where the biggest opportunity sits based on what competitors aren't covering
+5. **Scheduling confirmation** — After delivering the briefs, confirm which month the client wants to start and which article IDs are scheduled first. Skipping this creates a separate clarification session before any writing can begin.
 
 ---
 

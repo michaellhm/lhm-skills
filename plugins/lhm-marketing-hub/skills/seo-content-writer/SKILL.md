@@ -33,6 +33,10 @@ When a user requests SEO content:
 
 ### 1. Gather Requirements
 
+Before writing anything, gather voice/style guidelines (anti-AI writing rules, tone docs, brand voice) and confirm all internal page URLs the content should link to. Applying style guidelines or adding links after writing forces a full revision pass that risks introducing errors.
+
+If writing multiple articles in a batch, write and confirm one article at a time. Writing 4+ full articles in a single session risks hitting context limits mid-batch.
+
 ```markdown
 ### Content Requirements
 
@@ -44,6 +48,7 @@ When a user requests SEO content:
 **Search Intent**: [informational/commercial/transactional]
 **Tone**: [professional/casual/technical/friendly]
 **CTA Goal**: [what action should readers take]
+**Internal Link Targets**: [list of confirmed page URLs to link to]
 ```
 
 ### 2. Research and Plan
@@ -144,7 +149,7 @@ Follow this structure for the actual content:
 - [ ] Table of contents for long content
 
 **Links**:
-- [ ] Internal links (3-5 relevant pages)
+- [ ] Internal links (3-5 relevant pages) — use relative paths (e.g. `/google-ads-management`), not absolute URLs. Absolute internal URLs break on staging and are harder to maintain if the domain changes. Only use full URLs for external domains.
 - [ ] External links (2-3 authoritative sources)
 - [ ] Image alt text with keywords
 ```
@@ -202,6 +207,8 @@ See [Content Structure Templates](./references/content-structure-templates.md) f
 3. **Use data and examples** — specific beats generic every time
 4. **Write for humans first** — SEO optimization should feel natural
 5. **Include visual elements** — break up text with tables, lists, blockquotes
+6. **Verify before editing saved files** — when editing a saved MD file to add links or make revisions, use Grep to verify the exact string exists before running Edit. Saved file wording often differs slightly from the original draft
+7. **Check for formatting side effects** — after any Edit operation that adds markdown links, scan surrounding text for accidentally introduced punctuation changes (especially em dashes from auto-substitution). Also check YAML frontmatter for duplicate field entries after revision passes
 
 ## Reference Materials
 
