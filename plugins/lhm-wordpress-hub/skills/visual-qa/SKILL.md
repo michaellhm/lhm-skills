@@ -75,9 +75,13 @@ For each page being tested, screenshot the HTML prototype file at every breakpoi
    mcp__playwright__browser_resize → width: [breakpoint width], height: [breakpoint height]
    ```
 
-2. **Navigate to the prototype:**
+2. **Serve the prototype via local HTTP server** (file:// URLs are blocked by Playwright MCP):
+   ```bash
+   python3 -m http.server 8899 --directory /[absolute-path]/design/prototype/homepage/
    ```
-   mcp__playwright__browser_navigate → url: "file:///[absolute-path]/design/prototype/homepage/index.html"
+   Then navigate:
+   ```
+   mcp__playwright__browser_navigate → url: "http://localhost:8899/index.html"
    ```
 
 3. **Wait for full render:**
@@ -127,8 +131,8 @@ For the same page, screenshot the live WordPress build at each breakpoint using 
    mcp__playwright__browser_wait_for → wait for network idle
    ```
 
-4. **Dismiss obstructions** (if present):
-   - WordPress admin bar: use `mcp__playwright__browser_evaluate` to run `document.getElementById('wpadminbar')?.remove()` before screenshotting
+4. **Remove obstructions** (always do this before screenshotting):
+   - WordPress admin bar (**mandatory** — shifts page down 32px and distorts comparisons): use `mcp__playwright__browser_evaluate` to run `document.getElementById('wpadminbar')?.remove(); document.documentElement.style.marginTop='0'`
    - Cookie consent banner: use `mcp__playwright__browser_click` to dismiss it, or use `browser_evaluate` to remove it from the DOM
    - Any popups or overlays: dismiss or remove them
 
@@ -397,7 +401,8 @@ Update `/qa/{page-slug}/qa-report.md` with the final status.
 
 This skill must run in these situations:
 
-1. **After homepage build** (Sub-Phase E3) - compare `/design/prototype/homepage/` vs live homepage
+1. **After theme scaffold** (Sub-Phase E1) - the `theme-scaffold` skill runs a lightweight visual diff (2 viewports) immediately after installation. This catches CSS divergence before any pages are built
+2. **After homepage build** (Sub-Phase E3) - compare `/design/prototype/homepage/` vs live homepage
 2. **After each page build** (Sub-Phase E4) - if a prototype exists for that page, compare. If no prototype exists, still screenshot the WordPress build at all breakpoints for a standalone responsive check
 3. **After any CSS or theme changes** - re-run QA on affected pages
 4. **After site extension** (new pages, modified pages) - run QA on the changed pages

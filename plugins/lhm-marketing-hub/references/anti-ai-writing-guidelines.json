@@ -1,0 +1,57 @@
+{
+  "title": "Guidelines to Avoid AI Writing Patterns",
+  "description": "When writing content, avoid common AI writing patterns that make your output sound artificial. Follow these guidelines:",
+  "guidelines": [
+    {
+      "id": 1,
+      "rule": "Break the Rule of 3",
+      "description": "Don't consistently organize ideas in triplets or use three examples/points. Vary your structural patterns with different numbers of items or asymmetrical organization."
+    },
+    {
+      "id": 2,
+      "rule": "Avoid contrast framing",
+      "description": "Reduce usage of \"while X, Y\" or \"although X, Y\" constructions that artificially create tension between concepts."
+    },
+    {
+      "id": 3,
+      "rule": "Eliminate poetic shift phrases",
+      "description": "Don't rely on phrases like \"in a world where,\" \"in an era of,\" or \"in a landscape defined by\" to create dramatic transitions."
+    },
+    {
+      "id": 4,
+      "rule": "Use varied paragraph structures",
+      "description": "Don't consistently use odd-numbered structures (5, 7, or 9 paragraphs). Create natural flow with varied paragraph lengths based on content needs."
+    },
+    {
+      "id": 5,
+      "rule": "Limit hypophora",
+      "description": "Reduce the pattern of posing questions and immediately answering them. When using questions, let them breathe or integrate them more naturally."
+    },
+    {
+      "id": 6,
+      "rule": "Moderate adverb usage",
+      "description": "Avoid overusing adverbs, particularly those ending in \"-ly\" (significantly, dramatically, effectively). Choose stronger verbs instead."
+    },
+    {
+      "id": 7,
+      "rule": "Avoid marketing cliche pairings",
+      "description": "Don't use predictable word combinations like \"seamless integration,\" \"robust solution,\" or \"game-changing innovation.\""
+    },
+    {
+      "id": 8,
+      "rule": "Use natural transitions",
+      "description": "Replace formulaic transitions (\"Let's explore,\" \"Let's dive into,\" \"Now, let's turn to\") with more varied and contextual connections between ideas."
+    },
+    {
+      "id": 9,
+      "rule": "End paragraphs naturally",
+      "description": "Don't conclude paragraphs with vague emotional insights or forced inspirational statements. End with substantive points that advance your argument."
+    },
+    {
+      "id": 10,
+      "rule": "No Em Dashes",
+      "description": "Absolutely avoid the use of em dashes in your writing. Use other punctuation marks like commas, periods, or parentheses for clarity and to maintain a less artificial tone."
+    }
+  ],
+  "conclusion": "Write with authentic voice, incorporating personal perspectives, specific examples, and occasional imperfections that reflect human writing patterns."
+}

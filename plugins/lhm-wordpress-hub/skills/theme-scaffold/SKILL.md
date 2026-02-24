@@ -37,15 +37,17 @@ Also ask:
 Read `/design/prototype/homepage/assets/css/style.css` and copy it into the theme at `assets/css/custom.css`.
 
 **Rules:**
-- Copy the CSS verbatim first. Do NOT rename classes, do NOT refactor, do NOT "improve" the CSS
+- Copy the CSS verbatim first. Do NOT rename classes, do NOT refactor, do NOT "improve" the CSS. This must be taken literally. In past builds, the CSS was rewritten with different design decisions (e.g. 3-column steps vs vertical, banner trust strip vs inline dots) which caused hours of debugging. Copy first, replace CSS variables second, change nothing else
 - After copying verbatim, make ONLY these targeted replacements:
   - Replace hardcoded color hex values with `var(--wp--preset--color--{slug})` where a matching theme.json palette entry exists
   - Replace hardcoded font-family values with `var(--wp--preset--font-family--{slug})` where a matching theme.json font family exists
   - Replace hardcoded spacing values with `var(--wp--preset--spacing--{slug})` ONLY where an exact match exists in the spacing scale
   - Replace hardcoded font-size values with `var(--wp--preset--font-size--{slug})` ONLY where an exact match exists
+- **Include ALL utility/layout classes** (`.container`, `.section`, `.text-center`, `.btn-group`, `.mb-6`, etc.), not just component classes. Missing `.container` causes every section to render full-width in WordPress. Scan the prototype CSS for every class definition and verify each is present in the theme CSS
 - Keep ALL class names exactly as they appear in the prototype. Do NOT rename `.hero-section` to `.{theme-slug}-hero` or add prefixes
 - Keep ALL media queries, animations, transitions, keyframes, hover states, and pseudo-elements exactly as they are
 - Keep `@import` statements (Google Fonts, etc.) at the top
+- Preserve self-hosted font `@font-face` declarations exactly from the prototype CSS. If the prototype uses Google Fonts `@import`, keep that too. Do not silently switch font loading strategies
 - If in doubt, keep the original value. A working hardcoded value is better than a broken CSS variable reference
 
 **Important: CSS should handle style, NOT structure.** The `custom.css` file will contain grid/flex declarations from the prototype (e.g. `.card-grid { display: grid; grid-template-columns: repeat(3, 1fr) }`). Keep these in the CSS for frontend rendering, but understand that the block editor will ignore them. The wp-page-builder skill uses WP layout attributes (`type:"grid"`, `type:"flex"`) for structure, which work in both editor and frontend. The CSS grid/flex rules act as a frontend enhancement on top of WP's layout system.
@@ -59,6 +61,21 @@ Read `/design/prototype/homepage/assets/css/style.css` and copy it into the them
 | Grid/flex layout (display, grid-template-columns) | Yes (frontend enhancement) | No (WP layout handles this in editor) |
 | Animations, transitions, keyframes | Yes | No (overridden by editor.css) |
 | Pseudo-elements (::before, ::after) | Yes | No (not rendered in editor) |
+
+**After copying, add WordPress layout resets** to the end of `custom.css`:
+
+```css
+/* WordPress layout resets — prevent default block gaps */
+.wp-site-blocks > * + *,
+.is-layout-flow > * + *,
+.is-layout-constrained > * + * {
+  margin-block-start: 0;
+}
+```
+
+WordPress injects default block spacing that creates white gaps between full-bleed sections. These resets are mandatory.
+
+**Specificity warning:** WordPress block group `display` styles can override component CSS. If a component uses `display: none` (e.g. a sticky mobile CTA hidden on desktop), the WP `.wp-block-group` display will override it. Fix with double specificity: `.wp-block-group.sticky-cta { display: none !important }` inside a media query.
 
 ### 2b: Copy JS → `assets/js/custom.js`
 
@@ -205,6 +222,8 @@ Refer to `${CLAUDE_PLUGIN_ROOT}/references/theme-json-guide.md` for the exact fo
  * [Theme Name] functions and definitions
  */
 
+define('THEME_VERSION', '1.0.0');
+
 // Register navigation menus
 function theme_slug_register_menus() {
     register_nav_menus([
@@ -235,7 +254,7 @@ function theme_slug_enqueue_assets() {
         'theme-slug-custom',
         get_template_directory_uri() . '/assets/css/custom.css',
         [],
-        wp_get_theme()->get('Version')
+        THEME_VERSION
     );
 
     // Only enqueue JS if the file exists (prototype may not have had JS)
@@ -245,7 +264,7 @@ function theme_slug_enqueue_assets() {
             'theme-slug-custom',
             get_template_directory_uri() . '/assets/js/custom.js',
             [],
-            wp_get_theme()->get('Version'),
+            THEME_VERSION,
             true // Load in footer
         );
     }
@@ -334,7 +353,11 @@ Check the scaffolded theme:
 17. `functions.php` registers all needed pattern categories
 18. **Class name check**: compare CSS classes used in `parts/header.html`, `parts/footer.html`, and patterns against `custom.css` to confirm they match
 
-## Step 4: Installation Instructions
+## Step 4: Visual Diff After Installation
+
+After the theme is installed and activated, run a visual diff immediately. Push a minimal test page with representative sections from the prototype and screenshot both the prototype (served via local HTTP server) and the WordPress page at Desktop Standard (1440x900) and Mobile Standard (390x844). Catching CSS divergence at theme scaffold time saves rebuilding pages later. Use the `css-sync-check` skill for this.
+
+## Step 5: Installation Instructions
 
 Tell the user how to install the theme:
 
@@ -355,7 +378,7 @@ Tell the user how to install the theme:
 > **Option C: WordPress MCP**
 > If using a WordPress MCP, use the theme installation tool.
 
-## Step 5: Approval Gate
+## Step 6: Approval Gate
 
 Use the `AskUserQuestion` tool:
 

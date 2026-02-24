@@ -59,6 +59,20 @@ wp theme activate {theme-slug}
 
 Verify the theme is active before proceeding.
 
+### Sub-Phase E2.5: CSS Sync Check (mandatory)
+
+**Before building any pages**, validate that the theme CSS matches the prototype CSS. CSS divergence is the #1 cause of pages not matching prototypes.
+
+Load: `${CLAUDE_PLUGIN_ROOT}/skills/css-sync-check/SKILL.md`
+
+- Compare prototype CSS classes against theme CSS classes
+- Identify missing utility/layout classes (especially `.container`, `.section`)
+- Check for property-level differences in shared classes
+- Push a test page and visually compare against the prototype
+- Fix all issues before proceeding
+
+Do NOT skip this step. Building pages on a diverged CSS foundation wastes hours of debugging.
+
 ### Sub-Phase E3: Homepage Build
 
 Build the homepage first as a proof of concept. This is where you verify that the WordPress build matches the approved prototype.
