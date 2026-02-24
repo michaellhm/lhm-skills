@@ -17,9 +17,12 @@ Build individual pages in WordPress using a two-step process: first push the raw
 6. **Read WP state** - read `/wp/wp_state.md` to see what's already built
 7. **Read WP-CLI reference** - read `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md`
 8. **Read viewport reference** - read `${CLAUDE_PLUGIN_ROOT}/skills/visual-qa/references/viewports.md` for standard breakpoint sizes
-9. Verify the theme is installed and activated
+9. **Diff prototype CSS against theme CSS** - compare the prototype's CSS (`design/prototype/*/assets/css/style.css`) against the theme CSS (`assets/css/custom-components.css` or `custom.css`). Class names will match but styling rules often diverge during theme scaffold. Fix CSS discrepancies BEFORE pushing page content, not after.
+10. **Verify `.container` class exists** in the theme CSS with `max-width`, `margin: 0 auto`, and gutter padding. Without it, every section using `<div class="container">` renders full-width and content overflows. This is the single highest-impact missing class.
+11. **Verify logo is set** - the `wp:site-logo` block in the header requires a logo attachment via Customizer theme_mods (`custom_logo` key). Upload via `wp media import [url]` then set via `wp option update theme_mods_[theme-slug]`. Without this, the header logo area is blank.
+12. Verify the theme is installed and activated
 
-**Playwright MCP tools are available** for screenshotting and visual comparison. Key tools used in this skill: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_resize`, `mcp__playwright__browser_take_screenshot`, `mcp__playwright__browser_wait_for`, `mcp__playwright__browser_evaluate`. If the browser is not installed, run `mcp__playwright__browser_install` first.
+**Playwright MCP tools are available** for screenshotting and visual comparison. Key tools used in this skill: `mcp__playwright__browser_navigate`, `mcp__playwright__browser_resize`, `mcp__playwright__browser_take_screenshot`, `mcp__playwright__browser_wait_for`, `mcp__playwright__browser_evaluate`. If the browser is not installed, run `mcp__playwright__browser_install` first. Note: `file://` URLs are blocked in Playwright MCP. To screenshot local prototypes, run `python3 -m http.server [port] --directory [path]` and navigate to `http://localhost:[port]/filename.html`.
 
 ## Step 1: Build Order
 
@@ -52,11 +55,26 @@ The theme's `custom.css` was extracted from the same prototype. The CSS classes 
 - A working visual baseline to compare against during native block conversion
 - Immediate client review of the design in a real WordPress environment
 
+### WordPress CSS Resets Required
+
+WordPress adds default block gap margins that create visible white strips between full-width sections. Add these resets to `custom.css` if not already present:
+
+```css
+/* Reset WP default block gaps */
+.wp-site-blocks > * + *,
+.is-layout-flow > * + * {
+  margin-block-start: 0;
+}
+```
+
+Also watch for WordPress block group `display` styles overriding component CSS. For example, a `.sticky-cta { display: none }` rule gets overridden by WP's `.wp-block-group` display. Fix with specificity: `.wp-block-group.sticky-cta { display: none !important }` inside a media query.
+
 ### How to do it
 
 1. Extract the `<body>` content from the prototype HTML (everything between `<body>` and `</body>`, excluding header and footer which are already in template parts)
-2. Save it to `/wp/homepage-content.html`
-3. Push to WordPress:
+2. **Wrap each section in a separate `<!-- wp:html -->` block** (hero, services, FAQ, CTA, etc.). One monolithic HTML block is impossible to debug and edit.
+3. Save it to `/wp/homepage-content.html`
+4. Push to WordPress:
 
 ```bash
 # Create or update the page with raw HTML
@@ -274,6 +292,10 @@ All list content (checklists, feature lists, fit/not-fit sections) should use `w
 
 Style checkmark icons via CSS `list-style-image` or `::marker` in `custom.css`.
 
+### Scroll Animations
+
+`.reveal` classes for IntersectionObserver scroll animations must be explicitly added to the page content HTML. They don't come from WordPress blocks or templates. Add `class="... reveal"` to each animatable element and `data-delay="N"` for stagger timing. Make sure `custom.js` with the IntersectionObserver code is enqueued by the theme.
+
 ### Critical Rule: Use Exact Prototype Classes
 
 The CSS in `custom.css` was extracted directly from the HTML prototype. The JS in `custom.js` (if present) targets elements by the same class names. For styles and interactions to work, the WordPress block markup MUST use the exact same classes.
@@ -374,7 +396,7 @@ After each page is built, update `/wp/wp_state.md`:
 
 ## Cache Busting After CSS Changes
 
-After adding or modifying CSS in `custom.css`, bump the theme version in `style.css`. The theme's `functions.php` uses `wp_get_theme()->get('Version')` as the version parameter for enqueued stylesheets, so incrementing the version busts browser caches automatically.
+After adding or modifying CSS, bump the theme version constant in `functions.php` (e.g. `THEME_VERSION`). This constant is used as the version parameter for enqueued stylesheets, so incrementing it busts browser caches. Use a named constant rather than `wp_get_theme()->get('Version')` for easier programmatic bumping.
 
 ## Step 8: Approval Gate
 
