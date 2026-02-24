@@ -17,8 +17,7 @@ Build individual pages in WordPress using a two-step process: first push the raw
 6. **Read WP state** - read `/wp/wp_state.md` to see what's already built
 7. **Read WP-CLI reference** - read `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md`
 8. **Read viewport reference** - read `${CLAUDE_PLUGIN_ROOT}/skills/visual-qa/references/viewports.md` for standard breakpoint sizes
-9. **Diff prototype CSS against theme CSS** - compare the prototype's CSS (`design/prototype/*/assets/css/style.css`) against the theme CSS (`assets/css/custom-components.css` or `custom.css`). Class names will match but styling rules often diverge during theme scaffold. Fix CSS discrepancies BEFORE pushing page content, not after.
-10. **Verify `.container` class exists** in the theme CSS with `max-width`, `margin: 0 auto`, and gutter padding. Without it, every section using `<div class="container">` renders full-width and content overflows. This is the single highest-impact missing class.
+9. **Run CSS sync check** - run the `css-sync-check` skill to diff the prototype CSS against the theme CSS. Class names will match but styling rules often diverge during theme scaffold. Fix CSS discrepancies BEFORE pushing page content, not after. This check also verifies the `.container` class exists with `max-width`, `margin: 0 auto`, and gutter padding (the single highest-impact missing class).
 11. **Verify logo is set** - the `wp:site-logo` block in the header requires a logo attachment via Customizer theme_mods (`custom_logo` key). Upload via `wp media import [url]` then set via `wp option update theme_mods_[theme-slug]`. Without this, the header logo area is blank.
 12. Verify the theme is installed and activated
 
