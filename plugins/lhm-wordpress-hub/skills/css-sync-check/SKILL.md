@@ -67,8 +67,24 @@ For classes that exist in both files, compare the CSS property values. Focus on 
 
 For each difference found, categorise as:
 - **Breaking** — will cause a visible layout or styling difference
-- **Intentional** — CSS variable substitution (e.g. `#0D9488` replaced with `var(--wp--preset--color--primary)`)
+- **Intentional** — CSS variable substitution (e.g. prototype uses `--color-primary` but theme uses `--healthcare-primary` injected via Customizer PHP). This is expected when the theme has a Customizer-based colour system. Verify the Customizer defaults in `css-custom-properties.php` match the design tokens
 - **Enhancement** — WordPress-specific addition that doesn't conflict
+
+## Step 2b: CSS Foundation Verification
+
+Before checking component-level CSS, verify the theme includes the WordPress CSS foundation. All of these must be present:
+
+1. **CSS Reset** — `box-sizing: border-box`, `body { margin: 0 }`, `img { max-width: 100% }`
+2. **WordPress Layout Resets** — `.wp-site-blocks > * + *`, `.wp-site-blocks .entry-content > * + *`, `.is-layout-flow > * + *` all set to `margin-block-start: 0`
+3. **Alignment Classes** — `.alignwide` and `.alignfull` with correct max-width/margin rules
+4. **WP Button Compatibility** — `.wp-element-button` and `.wp-block-button__link` styled to match theme buttons
+5. **WP Image Block Reset** — `.wp-block-image { margin: 0 }`
+
+If any are missing, flag them as **Breaking** — they cause layout issues on every page, not just specific components.
+
+### Customizer Key Gotcha
+
+If the theme uses Customizer-injected CSS variables (e.g. `--healthcare-primary`), verify that the PHP setting keys registered in `inc/css-custom-properties.php` match the keys actually stored in the `theme_mods` DB option. Mismatches cause silent fallbacks to defaults.
 
 ## Step 3: Visual Validation (Push Test Page)
 

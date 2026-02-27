@@ -92,6 +92,21 @@ Cross-plugin: `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/copywriting/SKI
 1. First: load `${CLAUDE_PLUGIN_ROOT}/skills/wp-performance/SKILL.md`
 2. Then: load `${CLAUDE_PLUGIN_ROOT}/skills/wp-security/SKILL.md`
 
+## Landing Page Pipeline
+
+Separate from the phased website build, the landing page pipeline handles PPC campaign landing pages on WordPress multisite. The workflow runs in order:
+
+1. `lp-subsite-setup` — Configure the multisite subsite (theme, branding, locations)
+2. `lp-copy` — Write landing page copy for each ad group
+3. `lp-prototype` — Build HTML/CSS prototypes from the copy
+4. `lp-deploy-1` — Push the first prototype into WordPress as HTML blocks
+5. `lp-deploy-2` — Convert HTML blocks to native Gutenberg blocks
+6. `lp-deploy-3` — Deploy all remaining ad group pages
+
+To load any of these: `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`
+
+Detect landing page work when the user mentions "landing pages", "LP campaign", "ad group pages", "PPC landing pages", or when an `/lp/` folder exists in the project.
+
 ## Approval Gates
 
 Every phase ends with an explicit approval gate. **Do not proceed to the next phase without user confirmation.** Use the `AskUserQuestion` tool:

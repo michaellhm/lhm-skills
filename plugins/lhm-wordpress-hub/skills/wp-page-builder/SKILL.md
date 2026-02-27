@@ -88,6 +88,37 @@ wp option update show_on_front page
 wp option update page_on_front <page_id>
 ```
 
+### Multisite Considerations
+
+On WordPress multisite installations, **every WP-CLI command** needs the `--url` flag pointing to the correct subsite:
+
+```bash
+# All commands must include --url for the target subsite
+wp post create --post_type=page \
+  --post_title="Page Title" \
+  --post_status=publish \
+  --url=http://localhost:8083/ehp/ \
+  --post_content="$(cat wp/page-content.html)"
+```
+
+When running inside Docker, use `docker cp` to get content files into the container, then `cat` from inside:
+
+```bash
+docker cp wp/page-content.html wp-wordpress-1:/tmp/page-content.html
+docker exec wp-wordpress-1 wp --allow-root post create \
+  --post_type=page \
+  --post_title="Page Title" \
+  --post_status=publish \
+  --url=http://localhost:8083/ehp/ \
+  --post_content="$(docker exec wp-wordpress-1 cat /tmp/page-content.html)"
+```
+
+If the theme uses Location CPTs (or similar) for dynamic data (phone numbers, addresses), link the location to the page after creation:
+
+```bash
+wp post meta update <page_id> _healthcare_location_id <location_id> --url=http://localhost:8083/ehp/
+```
+
 4. Verify the frontend renders pixel-perfect. If it doesn't, the issue is in the CSS extraction (theme-scaffold step), not in the block conversion
 
 ### Template hierarchy warning

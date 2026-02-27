@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-47 marketing skills packaged as a Claude Code plugin with a structured orchestration layer. The plugin enforces a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+70 skills across two Claude Code plugins (47 marketing, 23 WordPress) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -53,6 +53,41 @@ plugins/lhm-marketing-hub/             # The plugin
     pricing-strategy/                  # Pricing and packaging
     taya-question-discovery/            # They Ask, You Answer question bank
     ... and 22 more
+plugins/lhm-wordpress-hub/             # WordPress build plugin
+  .claude-plugin/plugin.json            # Plugin manifest
+  agents/                               # 8 phase agents
+    wordpress-orchestrator.md           # Main entry point and phase router
+    client-intake.md                    # Phase A — client context extraction
+    seo-strategist.md                   # Phase B — sitemap and briefs
+    content-writer.md                   # Phase C — page copywriting
+    design-system.md                    # Phase D — brand, design, prototype
+    wordpress-builder.md                # Phase E — theme scaffold and page build
+    site-ops.md                         # Phase F — performance and security
+    site-extension.md                   # Post-launch page management
+  skills/                               # All 23 skills
+    wp-start/                           # Entry point — /wp-start command
+    wp-project-setup/                   # Initialize project folder structure
+    client-context-intake/              # Extract facts from call notes
+    sitemap-architect/                  # Site IA and keyword map
+    page-brief-generator/               # Per-page content briefs
+    page-copywriter/                    # Write page copy from briefs
+    brand-discovery/                    # Brand guidelines extraction
+    design-system-generator/            # Design tokens and theme.json specs
+    html-prototype/                     # Static HTML/CSS prototypes
+    block-architect/                    # Gutenberg block specifications
+    theme-scaffold/                     # Custom block theme scaffolding
+    css-sync-check/                     # Validate theme CSS matches prototype
+    wp-page-builder/                    # Build pages in WordPress
+    wp-blog-publisher/                  # Publish blog posts via WP-CLI
+    visual-qa/                          # Pixel-perfect visual regression testing
+    wp-performance/                     # Performance audit and optimization
+    wp-security/                        # Security hardening checklist
+    lp-subsite-setup/                   # Configure multisite subsite for LP campaign
+    lp-copy/                            # Write landing page copy per ad group
+    lp-prototype/                       # Build HTML/CSS landing page prototypes
+    lp-deploy-1/                        # Push first LP prototype to WordPress
+    lp-deploy-2/                        # Convert LP to native Gutenberg blocks
+    lp-deploy-3/                        # Deploy remaining LP pages
 ```
 
 ## Skills Catalog
@@ -70,6 +105,12 @@ plugins/lhm-marketing-hub/             # The plugin
 **SaaS & Growth Marketing** (25 skills): A/B testing, analytics tracking, competitor pages, content strategy, copy editing, copywriting, email sequences, form CRO, free tool strategy, launch strategy, marketing ideas, marketing psychology, onboarding CRO, page CRO, paid ads, paywall CRO, popup CRO, pricing strategy, product marketing, programmatic SEO, referral programs, schema markup, SEO audit, signup flow CRO, social content.
 
 **Pricing** (1 skill): Standalone pricing strategy and monetization.
+
+### WordPress Hub
+
+**Website Build Pipeline** (17 skills): Project setup, client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, and the /wp-start entry point.
+
+**Landing Page Pipeline** (6 skills): Subsite setup for LP campaigns, landing page copywriting per ad group, HTML/CSS prototype generation, WordPress deployment (HTML blocks), Gutenberg block conversion, and multi-page deployment.
 
 ## Key Behaviours
 

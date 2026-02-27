@@ -62,18 +62,45 @@ Read `/design/prototype/homepage/assets/css/style.css` and copy it into the them
 | Animations, transitions, keyframes | Yes | No (overridden by editor.css) |
 | Pseudo-elements (::before, ::after) | Yes | No (not rendered in editor) |
 
-**After copying, add WordPress layout resets** to the end of `custom.css`:
+**After copying, add the WordPress CSS foundation** to `custom.css`. This is a checklist — verify ALL items are present:
 
+**1. CSS Reset** (add at top of file, before any component styles):
 ```css
-/* WordPress layout resets — prevent default block gaps */
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+img { max-width: 100%; height: auto; display: block; }
+```
+
+**2. WordPress Layout Resets** (prevent default block gaps between sections):
+```css
 .wp-site-blocks > * + *,
-.is-layout-flow > * + *,
-.is-layout-constrained > * + * {
+.wp-site-blocks .entry-content > * + *,
+.is-layout-flow > * + * {
   margin-block-start: 0;
 }
 ```
 
-WordPress injects default block spacing that creates white gaps between full-bleed sections. These resets are mandatory.
+**3. WordPress Alignment Classes**:
+```css
+.alignwide { max-width: var(--width-wide); margin-left: auto; margin-right: auto; }
+.alignfull { width: 100vw; margin-left: calc(50% - 50vw); }
+```
+
+**4. WordPress Button Compatibility** (so Gutenberg button blocks match theme buttons):
+```css
+.wp-element-button,
+.wp-block-button__link {
+  /* Match your .btn--primary styles: display, padding, font, colors, border-radius, transitions */
+}
+```
+
+**5. WordPress Image Block Reset**:
+```css
+.wp-block-image { margin: 0; }
+.wp-block-image img { max-width: 100%; height: auto; display: block; }
+```
+
+All five are mandatory. Missing any one causes visual issues when prototype HTML is pushed to WordPress.
 
 **Specificity warning:** WordPress block group `display` styles can override component CSS. If a component uses `display: none` (e.g. a sticky mobile CTA hidden on desktop), the WP `.wp-block-group` display will override it. Fix with double specificity: `.wp-block-group.sticky-cta { display: none !important }` inside a media query.
 
