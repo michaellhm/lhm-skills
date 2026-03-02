@@ -99,11 +99,56 @@ lp/
 
 | Industry | Theme Slug |
 |----------|-----------|
-| Healthcare, allied health, physiotherapy, chiropractic, podiatry, psychology | `lhm-health` |
+| Healthcare, allied health, physiotherapy, chiropractic, podiatry, psychology | `healthcare-theme` |
 | (future) Dental | TBD |
 | (future) Cosmetic | TBD |
 
 Add new entries to this table and to LEARNED.md of the relevant skill when a new theme is created.
+
+## Central Multisite Infrastructure
+
+The WordPress multisite Docker instance lives in a shared central location, NOT inside any client folder. This allows multiple client subsites to share the same Docker instance and theme.
+
+### Directory Layout
+
+```
+~/Documents/
+  leadscalepro-wordpress-multisite/           # CENTRAL — docker lives here
+    docker-compose.yml
+    .env                                      # COMPOSE_PROJECT_NAME=wp + DB creds
+    wp.sh                                     # start/stop/restart/status helper
+    SETUP.md
+    wp-content/themes/healthcare-theme/       # Canonical theme copy
+
+  Clients/
+    [Client Name]/[project-folder]/
+      wp/
+        healthcare-theme -> symlink to central theme
+        wp-cli.sh                             # WP-CLI helper targeting this client's subsite
+```
+
+### Key Points
+
+1. **Start/stop Docker** from the central dir: `~/Documents/leadscalepro-wordpress-multisite/wp.sh start|stop|status`
+2. **Client wp-cli.sh** handles everything — auto-installs WP-CLI if missing, passes the correct `--url` flag. Use it instead of raw `docker exec`.
+3. **Theme symlink** in each client folder points to the central canonical copy. Edit the theme from either location — it's the same files.
+4. **`COMPOSE_PROJECT_NAME=wp`** in `.env` is critical. It ensures Docker uses the existing `wp_wordpress_data` and `wp_db_data` named volumes. Without it, Docker derives a different project name from the directory name and creates empty volumes, losing all data.
+5. **WP-CLI is ephemeral** — the standard `wordpress:6.7-php8.2-apache` image does not include WP-CLI. It gets lost every time the container is recreated. The `wp-cli.sh` helpers detect this and auto-install it.
+6. **Container name** is always `wp-wordpress-1` (derived from the compose project name `wp`).
+
+### Using wp-cli.sh from a Client Folder
+
+```bash
+# From the client project folder:
+./wp/wp-cli.sh post list --post_type=page
+./wp/wp-cli.sh option get blogname
+./wp/wp-cli.sh theme status
+```
+
+This is equivalent to:
+```bash
+docker exec wp-wordpress-1 wp --allow-root --url=http://localhost:8083/[subsite-slug]/ [command]
+```
 
 ## WP-CLI Multisite Pattern
 

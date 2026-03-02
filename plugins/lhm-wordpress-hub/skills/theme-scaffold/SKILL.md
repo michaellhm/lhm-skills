@@ -36,6 +36,8 @@ Also ask:
 
 Read `/design/prototype/homepage/assets/css/style.css` and copy it into the theme at `assets/css/custom.css`.
 
+**Note:** The existing healthcare-theme uses `custom-components.css` instead of `custom.css`. When working with that theme, target the correct filename. For new themes scaffolded by this skill, `custom.css` is the convention. The canonical theme copy lives at the central multisite location (`~/Documents/leadscalepro-wordpress-multisite/wp-content/themes/`). Client folders have symlinks at `wp/{theme-slug}` pointing there.
+
 **Rules:**
 - Copy the CSS verbatim first. Do NOT rename classes, do NOT refactor, do NOT "improve" the CSS. This must be taken literally. In past builds, the CSS was rewritten with different design decisions (e.g. 3-column steps vs vertical, banner trust strip vs inline dots) which caused hours of debugging. Copy first, replace CSS variables second, change nothing else
 - After copying verbatim, make ONLY these targeted replacements:
@@ -61,6 +63,13 @@ Read `/design/prototype/homepage/assets/css/style.css` and copy it into the them
 | Grid/flex layout (display, grid-template-columns) | Yes (frontend enhancement) | No (WP layout handles this in editor) |
 | Animations, transitions, keyframes | Yes | No (overridden by editor.css) |
 | Pseudo-elements (::before, ::after) | Yes | No (not rendered in editor) |
+
+**Button nesting conflict:** WordPress block buttons create `div.wp-block-button.btn.btn--primary > a.wp-block-button__link`. Both the wrapper div and inner link receive padding/border from `.btn` and `.wp-block-button__link` rules. Add a reset to `custom.css`:
+```css
+.wp-block-button.btn { padding: 0; border: none; background: transparent; border-radius: 0; }
+```
+
+**Secondary/ghost buttons:** Use `background: transparent`, not `background: var(--color-white)`. White background is visually different from transparent when the button sits on a coloured or grey background section.
 
 **After copying, add the WordPress CSS foundation** to `custom.css`. This is a checklist — verify ALL items are present:
 
@@ -100,7 +109,15 @@ img { max-width: 100%; height: auto; display: block; }
 .wp-block-image img { max-width: 100%; height: auto; display: block; }
 ```
 
-All five are mandatory. Missing any one causes visual issues when prototype HTML is pushed to WordPress.
+**6. Dark Background Overrides** (if the design has dark sections or nav backgrounds):
+```css
+/* Auto-derive nav text colour — add healthcare_is_dark_color() helper in PHP using sRGB luminance */
+/* Links inside dark sections need explicit override */
+.cta-dark a:where(:not(.wp-element-button)) { color: var(--color-white); }
+```
+Links inside dark-background sections inherit the global `a:where(:not(.wp-element-button))` primary colour, making them invisible. Must add explicit white override for dark sections.
+
+All six are mandatory where applicable. Missing any one causes visual issues when prototype HTML is pushed to WordPress.
 
 **Specificity warning:** WordPress block group `display` styles can override component CSS. If a component uses `display: none` (e.g. a sticky mobile CTA hidden on desktop), the WP `.wp-block-group` display will override it. Fix with double specificity: `.wp-block-group.sticky-cta { display: none !important }` inside a media query.
 

@@ -10,9 +10,10 @@ Configure a WordPress multisite subsite with the client's branding, identity, an
 ## Before Starting
 
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/lp-subsite-setup/LEARNED.md` — apply any relevant entries
-2. Read `client_profile.md` to load branding, logo, colours, social media URLs, and clinic info
-3. Read `lp/lp_state.md` if it exists — it may already contain the subsite URL and theme slug
-4. Read `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md` for WP-CLI patterns
+2. Read `${CLAUDE_PLUGIN_ROOT}/references/lp-reference.md` — especially the "Central Multisite Infrastructure" section
+3. Read `client_profile.md` to load branding, logo, colours, social media URLs, and clinic info
+4. Read `lp/lp_state.md` if it exists — it may already contain the subsite URL and theme slug
+5. Read `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md` for WP-CLI patterns
 
 ## Step 1: Confirm Subsite Config
 
@@ -21,14 +22,18 @@ If `lp/lp_state.md` already has a subsite URL and theme, skip to Step 2.
 Use the `AskUserQuestion` tool to confirm:
 - The multisite base URL (e.g. `http://localhost:8083/`)
 - The subsite slug for this client (e.g. `physio-clinic-name`)
-- The industry/theme to activate (default: `lhm-health` for healthcare clients)
+- The industry/theme to activate (default: `healthcare-theme` for healthcare clients)
 
-Then detect the Docker container name:
+Then verify Docker is running. The container name is `wp-wordpress-1` (from COMPOSE_PROJECT_NAME=wp in the central `.env`). **Critical:** this env var must be set. Without it, Docker derives the project name from the directory name and creates empty volumes, losing all site data.
+
+If containers are not running, start them from the central dir:
 ```bash
-docker ps --format "{{.Names}}" | grep -i wp
+~/Documents/leadscalepro-wordpress-multisite/wp.sh start
 ```
 
-Store as `CONTAINER` for all subsequent commands. If not using Docker, run WP-CLI directly.
+**WP-CLI is NOT pre-installed** in the `wordpress:6.7-php8.2-apache` image. It must be installed on each container recreate. The `wp-cli.sh` helpers handle auto-install, but be aware of a first-run delay.
+
+If the client folder has a `wp/wp-cli.sh` helper, prefer using it for all WP-CLI commands — it auto-installs WP-CLI and passes the correct `--url` flag. Otherwise, use `docker exec wp-wordpress-1 wp --allow-root --url=[SUBSITE_URL]`.
 
 ## Step 2: Create or Confirm the Subsite
 
@@ -62,7 +67,7 @@ docker exec $CONTAINER wp --allow-root theme status --url=[SUBSITE_URL]
 ```
 
 **Theme slug mapping:**
-- Healthcare, allied health, physiotherapy, chiropractic, podiatry → `lhm-health`
+- Healthcare, allied health, physiotherapy, chiropractic, podiatry → `healthcare-theme`
 - Add new mappings to LEARNED.md as new themes are created
 
 ## Step 4: Configure Site Identity
@@ -116,16 +121,18 @@ docker exec $CONTAINER wp --allow-root option get theme_mods_[THEME_SLUG] \
   --url=[SUBSITE_URL]
 ```
 
-Map these values from `client_profile.md` to the theme's mod keys. Common key names for `lhm-health`:
+Map these values from `client_profile.md` to the theme's mod keys. Common key names for `healthcare-theme`:
 
-| Setting | theme_mods key |
-|---------|---------------|
-| Primary colour | `primary_color` |
-| Primary dark | `primary_dark_color` |
-| Primary light | `primary_light_color` |
-| Header colour | `header_color` |
-| Body text colour | `body_text_color` |
-| Google font | `body_font_family` |
+| Setting | theme_mods key | CSS variable injected |
+|---------|---------------|----------------------|
+| Primary colour | `primary_color` | `--healthcare-primary` |
+| Primary dark | `primary_dark_color` | `--healthcare-primary-dark` |
+| Primary light | `primary_light_color` | `--healthcare-primary-light` |
+| Header colour | `header_color` | `--healthcare-header` |
+| Body text colour | `body_text_color` | `--healthcare-body-text` |
+| Google font | `body_font_family` | — |
+
+These Customizer keys are registered in `inc/customizer.php` and injected as CSS variables by `inc/css-custom-properties.php`. Verify that the PHP setting keys match the keys stored in the `theme_mods` DB option, as mismatches cause silent fallbacks to defaults.
 
 Build the full theme_mods JSON by reading the existing value, merging in the brand values, then updating:
 ```bash
@@ -172,16 +179,17 @@ docker exec $CONTAINER wp --allow-root post create \
   --url=[SUBSITE_URL]
 ```
 
-After creating each location post, add its meta fields:
+After creating each location post, add its meta fields. The healthcare-theme uses the `_healthcare_` prefix for all location meta keys:
 ```bash
 LOCATION_ID=<id from output>
 
-docker exec $CONTAINER wp --allow-root post meta add $LOCATION_ID phone "[PHONE]" --url=[SUBSITE_URL]
-docker exec $CONTAINER wp --allow-root post meta add $LOCATION_ID address "[ADDRESS]" --url=[SUBSITE_URL]
-docker exec $CONTAINER wp --allow-root post meta add $LOCATION_ID google_maps_embed "[MAPS_EMBED_URL]" --url=[SUBSITE_URL]
-docker exec $CONTAINER wp --allow-root post meta add $LOCATION_ID booking_url "[BOOKING_URL]" --url=[SUBSITE_URL]
-docker exec $CONTAINER wp --allow-root post meta add $LOCATION_ID open_hours "[HOURS_STRING]" --url=[SUBSITE_URL]
+docker exec $CONTAINER wp --allow-root post meta add $LOCATION_ID _healthcare_phone "[PHONE]" --url=[SUBSITE_URL]
+docker exec $CONTAINER wp --allow-root post meta add $LOCATION_ID _healthcare_address "[ADDRESS]" --url=[SUBSITE_URL]
+docker exec $CONTAINER wp --allow-root post meta add $LOCATION_ID _healthcare_maps_embed "[MAPS_EMBED_URL]" --url=[SUBSITE_URL]
+docker exec $CONTAINER wp --allow-root post meta add $LOCATION_ID _healthcare_booking_url "[BOOKING_URL]" --url=[SUBSITE_URL]
 ```
+
+The theme provides shortcodes `[healthcare_phone_link]` and `[healthcare_phone_button]` for rendering phone links. Pages link to locations via the `_healthcare_location_id` post meta key.
 
 If the theme uses ACF for CPT fields, use `wp acf post update` instead. Check LEARNED.md for the confirmed approach.
 

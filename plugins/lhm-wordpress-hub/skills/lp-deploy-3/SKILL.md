@@ -19,6 +19,8 @@ Build and push every remaining ad group's landing page to WordPress. Each page f
 
 If any ad group is missing a prototype, stop and ask the user to run lp-prototype for that group first.
 
+**Prefer the client's `wp/wp-cli.sh` helper** over raw `docker exec` commands. It auto-installs WP-CLI and passes the correct `--url` flag. Container name is `wp-wordpress-1`. The healthcare-theme CSS file is `assets/css/custom-components.css` (not `custom.css`). Theme files can be edited directly via the client's `wp/healthcare-theme` symlink to the central canonical copy.
+
 ## Step 1: Confirm Deployment Scope
 
 Use the `AskUserQuestion` tool:
@@ -35,6 +37,12 @@ Options:
 - "Deploy as HTML only (I'll convert blocks separately)"
 
 Default to HTML-only deployment. Block conversion per page can run after each HTML push is approved.
+
+## kses and Content Placement Warnings
+
+`wp_update_post()` strips `<iframe>` tags via kses sanitisation. When batch-deploying pages with Google Maps embeds or video iframes, use `$wpdb->update()` + `clean_post_cache()` instead. See `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md` for the pattern.
+
+When inserting content into service cards or group blocks via string replacement, place new blocks BEFORE the closing `</div>`, not between `</div>` and `<!-- /wp:group -->`. The `</div>` closes the rendered DOM element.
 
 ## Step 2: Verify CSS is Already Present
 

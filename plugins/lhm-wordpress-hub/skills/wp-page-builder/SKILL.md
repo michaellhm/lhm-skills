@@ -101,7 +101,9 @@ wp post create --post_type=page \
   --post_content="$(cat wp/page-content.html)"
 ```
 
-When running inside Docker, use `docker cp` to get content files into the container, then `cat` from inside:
+**Prefer the client's `wp/wp-cli.sh` helper** over raw `docker exec` commands where available. It auto-installs WP-CLI (which is ephemeral in `wordpress:6.7-php8.2-apache`) and passes the correct `--url` flag. The healthcare-theme CSS file is `assets/css/custom-components.css` (not `custom.css`). Theme files can be edited directly via the client's `wp/healthcare-theme` symlink to the central canonical copy.
+
+When running inside Docker without the helper, use `docker cp` to get content files into the container, then `cat` from inside:
 
 ```bash
 docker cp wp/page-content.html wp-wordpress-1:/tmp/page-content.html
@@ -325,6 +327,18 @@ Style checkmark icons via CSS `list-style-image` or `::marker` in `custom.css`.
 ### Scroll Animations
 
 `.reveal` classes for IntersectionObserver scroll animations must be explicitly added to the page content HTML. They don't come from WordPress blocks or templates. Add `class="... reveal"` to each animatable element and `data-delay="N"` for stagger timing. Make sure `custom.js` with the IntersectionObserver code is enqueued by the theme.
+
+### kses Sanitisation Warning
+
+`wp_update_post()` strips `<iframe>` tags via kses sanitisation. When pages contain Google Maps embeds or video iframes in `<!-- wp:html -->` blocks, use `$wpdb->update()` + `clean_post_cache()` instead. See `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md` for the full pattern.
+
+### Content Placement in Gutenberg Blocks
+
+When inserting content into `wp:group` blocks via string replacement, place new blocks BEFORE the closing `</div>`, not between `</div>` and `<!-- /wp:group -->`. The `</div>` closes the rendered DOM element. Anything after it renders outside the component.
+
+### Inline Style Override Warning
+
+Block editor inline padding (e.g. `style="padding:24px"`) overrides CSS class padding. Use `!important` on component CSS when the design requires larger/different padding than what the editor sets.
 
 ### Critical Rule: Use Exact Prototype Classes
 

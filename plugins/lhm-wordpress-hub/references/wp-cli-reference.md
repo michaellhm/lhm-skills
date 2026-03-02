@@ -90,6 +90,39 @@ wp post delete <page_id>
 wp post meta update <page_id> _wp_page_template "templates/landing-page.html"
 ```
 
+## Bypassing kses Sanitisation (Iframes / Embeds)
+
+`wp_update_post()` and `wp post update` run content through kses which strips `<iframe>`, `<script>`, and other "unsafe" tags. When you need to insert Google Maps embeds, video iframes, or other HTML into `<!-- wp:html -->` blocks, use a PHP script with `$wpdb->update()` instead:
+
+```php
+<?php
+// Bootstrap WordPress
+define('ABSPATH', '/var/www/html/');
+require_once ABSPATH . 'wp-load.php';
+switch_to_blog($blog_id); // multisite only
+global $wpdb;
+
+$iframe = '<iframe class="location-map" src="https://www.google.com/maps/embed?pb=..." allowfullscreen="" loading="lazy"></iframe>';
+
+// Replace empty wp:html placeholder
+$post = get_post($page_id);
+$content = str_replace(
+    "<!-- wp:html -->\n\n<!-- /wp:html -->",
+    "<!-- wp:html -->\n{$iframe}\n<!-- /wp:html -->",
+    $post->post_content
+);
+
+// Direct DB update bypasses kses
+$wpdb->update(
+    $wpdb->posts,
+    array('post_content' => $content),
+    array('ID' => $page_id),
+    array('%s'),
+    array('%d')
+);
+clean_post_cache($page_id);
+```
+
 ## Menus
 
 ```bash

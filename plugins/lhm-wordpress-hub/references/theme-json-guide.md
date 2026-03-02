@@ -248,6 +248,30 @@ theme-name/
     /images/             # Theme images
 ```
 
+## Customizer-Based Themes: Preset Variable Aliasing
+
+When a theme uses Customizer-injected CSS variables (e.g. `--healthcare-primary` from PHP) instead of relying solely on theme.json, the block editor still generates inline styles referencing `var(--wp--preset--color--primary)`. These two variable systems must be bridged or inline styles fall back to theme.json defaults (wrong colours).
+
+**Fix:** In the PHP that outputs `:root` custom properties, alias the WP preset variables to the Customizer variables:
+
+```css
+:root {
+  /* Customizer values */
+  --healthcare-primary: #f25f2d;
+  --healthcare-primary-dark: #172b37;
+  --healthcare-primary-light: #fdeee8;
+
+  /* Bridge: WP preset vars → Customizer vars */
+  --wp--preset--color--primary: var(--healthcare-primary);
+  --wp--preset--color--primary-dark: var(--healthcare-primary-dark);
+  --wp--preset--color--primary-light: var(--healthcare-primary-light);
+  --wp--preset--color--heading: var(--healthcare-heading);
+  --wp--preset--color--body: var(--healthcare-body);
+}
+```
+
+This ensures that block editor inline styles like `border-left-color: var(--wp--preset--color--primary)` resolve to the Customizer colour, not the theme.json default. Without this, elements like callout box borders, background colours set in the editor, and any block with a preset colour selection will show the wrong colour.
+
 ## Key Principles
 
 1. **No custom CSS if theme.json can do it** — use theme.json settings and styles first. Only add CSS for things theme.json can't express.
@@ -255,3 +279,4 @@ theme-name/
 3. **Design tokens as presets** — define colors, font sizes, and spacing as presets. Reference them with `var(--wp--preset--...)` throughout.
 4. **Disable defaults** — set `defaultPalette`, `defaultGradients`, and `defaultFontSizes` to false to keep the editor clean.
 5. **Self-host fonts** — use `fontFace` to serve fonts from the theme for performance and privacy.
+6. **Bridge Customizer and preset variables** — if the theme uses Customizer PHP for colours, alias `--wp--preset--color--*` to the Customizer variables in `:root` so inline styles follow the brand.

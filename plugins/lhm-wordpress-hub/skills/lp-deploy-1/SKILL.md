@@ -10,14 +10,17 @@ Take the approved HTML prototype for the primary ad group, slice it into per-sec
 ## Before Starting
 
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/lp-deploy-1/LEARNED.md`
-2. Read `lp/lp_state.md` — confirm:
+2. Read `${CLAUDE_PLUGIN_ROOT}/references/lp-reference.md` — especially "Central Multisite Infrastructure"
+3. Read `lp/lp_state.md` — confirm:
    - Subsite URL and container name are present
    - Theme is activated
    - At least one prototype exists in `/lp/prototype/`
-3. If lp-subsite-setup has NOT been run, stop and tell the user to run it first
-4. Read `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md` for WP-CLI patterns
+4. If lp-subsite-setup has NOT been run, stop and tell the user to run it first
+5. Read `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md` for WP-CLI patterns
 
 Store the subsite URL and container name as variables. All WP-CLI commands in this skill require `--url=[SUBSITE_URL]`.
+
+**Prefer the client's `wp/wp-cli.sh` helper** over raw `docker exec` commands. It auto-installs WP-CLI (which is ephemeral in `wordpress:6.7-php8.2-apache`) and passes the correct `--url` flag. The theme can also be edited directly via the client's `wp/healthcare-theme` symlink, which points to the central canonical copy.
 
 ## Step 1: Confirm Target Ad Group
 
@@ -60,15 +63,17 @@ Save the sliced content to `/lp/deploy/[SLUG]-content.html`.
 
 The prototype's `<style>` block contains CSS that the WordPress theme doesn't have yet. Extract it and add it to the theme's custom CSS.
 
-Check if the theme has a custom CSS file:
+Check what the theme's custom CSS file is called:
 ```bash
 docker exec $CONTAINER ls wp-content/themes/[THEME_SLUG]/assets/css/ --allow-root 2>/dev/null
 ```
 
-If a `custom.css` exists, append the prototype CSS to it:
+The healthcare-theme uses `custom-components.css` (not `custom.css`). Other themes may differ. Check for the actual filename before appending.
+
+Append the prototype CSS. If a `wp/healthcare-theme` symlink exists in the client folder, you can edit the file directly through that symlink (it points to the central canonical theme copy). Otherwise use docker cp:
 ```bash
 docker cp /path/to/lp/prototype/[SLUG]/extracted.css [CONTAINER]:/tmp/lp-styles.css
-docker exec $CONTAINER bash -c "cat /tmp/lp-styles.css >> /var/www/html/wp-content/themes/[THEME_SLUG]/assets/css/custom.css"
+docker exec $CONTAINER bash -c "cat /tmp/lp-styles.css >> /var/www/html/wp-content/themes/[THEME_SLUG]/assets/css/[CSS_FILENAME]"
 ```
 
 Also add WordPress block gap resets if not already present:
@@ -89,6 +94,12 @@ docker exec $CONTAINER wp --allow-root option update [THEME_SLUG]_custom_css "[C
 ## Step 4: Enqueue Google Fonts (if needed)
 
 If the prototype uses a Google Font, verify it is enqueued by the theme on this subsite. Check `functions.php` for the font. If missing, add it to the theme's functions.php or use the Customizer additional CSS to load it via `@import`.
+
+## kses Sanitisation Warning
+
+`wp_update_post()` and `wp post update` run content through kses sanitisation, which strips `<iframe>`, `<script>`, and other "unsafe" tags. If the landing page contains Google Maps embeds, video iframes, or other HTML in `<!-- wp:html -->` blocks, use `$wpdb->update()` on the posts table directly + `clean_post_cache($pid)` to bypass kses. See `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md` for the pattern.
+
+Empty `<!-- wp:html -->` blocks (e.g. map placeholders) survive deployment but their embed content (iframes) needs to be populated separately after page creation using the `$wpdb->update()` bypass. Include map embeds in the initial content file where possible, or run a post-deploy PHP script.
 
 ## Step 5: Create the WordPress Page
 

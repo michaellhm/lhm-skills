@@ -14,7 +14,8 @@ The golden rule: **the frontend proven in deploy-1 is the reference. Every conve
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/lp-deploy-2/LEARNED.md`
 2. Read `lp/lp_state.md` — confirm the target page has status "HTML Live" and has a Post ID
 3. Read `${CLAUDE_PLUGIN_ROOT}/skills/wp-page-builder/SKILL.md` — specifically the section "Step 3: Convert to Native Blocks". The conversion patterns in that skill (wp:cover, wp:columns, wp:group with layout attributes, wp:list, wp:image for icons) apply here exactly.
-4. Get the current page content:
+4. **Prefer the client's `wp/wp-cli.sh` helper** over raw `docker exec` commands. It auto-installs WP-CLI and passes the correct `--url` flag. The theme CSS file is `assets/css/custom-components.css` (not `custom.css`) for the healthcare-theme. Theme files can be edited directly via the client's `wp/healthcare-theme` symlink.
+5. Get the current page content:
 
 ```bash
 docker exec $CONTAINER wp --allow-root post get [POST_ID] \
@@ -169,6 +170,17 @@ Convert one section at a time. After each section, re-push and visually compare.
 ```
 
 Note: `wp:details` requires WordPress 6.4+. If the site runs an earlier version, keep FAQ as `wp:html`.
+
+## kses and Content Placement Warnings
+
+### kses Strips Iframes
+`wp_update_post()` runs content through kses sanitisation which strips `<iframe>` tags (Google Maps embeds, videos). Use `$wpdb->update()` on the posts table directly + `clean_post_cache($pid)` to bypass. See `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md` for the full pattern.
+
+### Content Placement in Gutenberg Blocks
+When inserting content into `wp:group` blocks via regex or string replacement, the new content must go BEFORE the closing `</div>`, not between `</div>` and `<!-- /wp:group -->`. The `</div>` closes the rendered DOM element. Anything placed after it but before the block comment renders outside the component in the DOM.
+
+### Link Colour in Dark Sections
+"Learn more" links and other `::after` arrow pseudo-elements need explicit `color: var(--healthcare-primary)` (or the appropriate brand colour). Colour inheritance can fail when the parent `<p>` gets overridden by block editor paragraph styles.
 
 ## Push and Verify After Each Section
 

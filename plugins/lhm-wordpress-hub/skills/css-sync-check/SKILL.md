@@ -52,6 +52,22 @@ Compare the two lists. Report:
 - `.btn-group` (flex layout for button rows) — causes button stacking
 - Any WordPress layout resets (`.wp-site-blocks`, `.is-layout-flow` margin resets)
 
+## Common Block Editor Specificity Issues
+
+These are recurring issues to check for. They cause subtle visual breakage that's hard to trace:
+
+### Preset Variable Aliasing
+Block editor inline styles use `var(--wp--preset--color--primary)` from theme.json. If the theme uses Customizer-injected CSS vars (e.g. `--healthcare-primary`), the preset variables must be aliased in `:root` or inline border/background colours fall back to theme.json defaults instead of the brand colour.
+
+### Button Nesting Conflicts
+When WP adds both `.wp-block-button` and a custom `.btn` class on the wrapper div, both the wrapper and inner `<a>` link get button styles (double padding, double border). Needs an explicit reset on the wrapper: `.wp-block-button.btn { padding: 0; border: none; background: transparent; border-radius: 0; }`
+
+### Button Variant Selector Scoping
+Button variant classes (`.btn--secondary`, `.btn--outline-white`) live on the wrapper `<div>`, not the inner `<a>`. Using `.wp-element-button:not(.btn--secondary)` matches ALL links because the link never has those classes. Correct approach: `.wp-block-button:not(.btn--secondary) > .wp-block-button__link`.
+
+### Inline Style Overrides
+Block editor inline padding (e.g. `style="padding:24px"`) overrides CSS class padding. Use `!important` on the CSS rule when the design requires specific padding that differs from the editor default.
+
 ## Step 2: Property-Level Diff
 
 For classes that exist in both files, compare the CSS property values. Focus on properties that produce visible differences:
