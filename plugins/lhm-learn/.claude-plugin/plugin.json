@@ -1,0 +1,9 @@
+{
+  "name": "lhm-learn",
+  "description": "Session learning capture — scans conversation context, identifies skill learnings and client profile updates, writes to the correct LEARNED.md and client_profile.md files.",
+  "version": "1.0.0",
+  "author": {
+    "name": "LHM Digital"
+  },
+  "keywords": ["learning", "memory", "client-profile", "session-capture"]
+}

@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-79 skills across three Claude Code plugins (47 marketing, 25 WordPress, 7 content engine) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+80 skills across four Claude Code plugins (47 marketing, 25 WordPress, 7 content engine, 1 learn) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -101,6 +101,10 @@ plugins/lhm-content-engine/            # Content pipeline plugin
     publish-google-doc/                 # Create formatted Google Doc for review
     update-csv/                         # Update tracking CSV with results
     run-batch/                          # Orchestrate full pipeline for all rows
+plugins/lhm-learn/                    # Session learning capture plugin
+  .claude-plugin/plugin.json            # Plugin manifest
+  skills/                               # All 1 skill
+    learn/                              # /learn — capture session learnings
 ```
 
 ## Skills Catalog
@@ -130,6 +134,10 @@ plugins/lhm-content-engine/            # Content pipeline plugin
 ### Content Engine
 
 **Content Pipeline** (7 skills): CSV-driven batch processing for allied health clinics. Structured article outline generation, blog writing with anti-AI refinement, GMB social post generation, compliance quality gate, Google Doc publishing, tracking CSV updates, and full batch orchestration.
+
+### Learn
+
+**Session Capture** (1 skill): Scan conversation context for skill learnings and client profile updates, write to the correct LEARNED.md and client_profile.md files.
 
 ## Key Behaviours
 
