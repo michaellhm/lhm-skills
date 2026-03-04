@@ -76,6 +76,8 @@ docker cp /path/to/lp/prototype/[SLUG]/extracted.css [CONTAINER]:/tmp/lp-styles.
 docker exec $CONTAINER bash -c "cat /tmp/lp-styles.css >> /var/www/html/wp-content/themes/[THEME_SLUG]/assets/css/[CSS_FILENAME]"
 ```
 
+If the prototype already has a global CSS reset (`* { margin: 0 }`), this prevents WP `--wp--style--block-gap` from adding unwanted spacing between sections. This reset also helps when content is later converted to native blocks in deploy-2.
+
 Also add WordPress block gap resets if not already present:
 ```css
 /* Reset WP default block gaps */
@@ -150,6 +152,8 @@ Check these things visually:
 **If layout is broken**: the most common cause is WordPress adding default block gap margins. Add the gap resets from Step 3 if not already present.
 
 **If CSS is missing**: verify the custom.css file contains the prototype styles and the theme is enqueuing it.
+
+**Playwright screenshot note**: `fullPage` screenshots don't trigger IntersectionObserver, so `.reveal` elements stay at `opacity: 0`. To verify reveal animations work, scroll programmatically with `window.scrollTo` or evaluate `document.querySelectorAll('.reveal.is-visible').length` after scrolling.
 
 ## Step 8: Update State File
 

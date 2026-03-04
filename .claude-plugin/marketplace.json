@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "1.2.4"
+    "version": "1.2.5"
   },
   "plugins": [
     {
@@ -20,9 +20,17 @@
       "name": "lhm-wordpress-hub",
       "source": "./plugins/lhm-wordpress-hub",
       "description": "Guided WordPress website build system — phased delivery from client intake through SEO, content, design, WordPress build, and ops hardening.",
-      "version": "1.1.5",
+      "version": "1.1.6",
       "category": "wordpress",
       "tags": ["wordpress", "website-builder", "block-theme", "agency"]
+    },
+    {
+      "name": "lhm-content-engine",
+      "source": "./plugins/lhm-content-engine",
+      "description": "Automated multi-asset content pipeline for allied health clinics — CSV-driven batch processing, blog generation, GMB social posts, anti-AI refinement, Google Doc publishing, and tracking updates.",
+      "version": "1.0.0",
+      "category": "content",
+      "tags": ["content", "allied-health", "blog", "social", "clinic", "automation"]
     }
   ]
 }

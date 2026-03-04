@@ -222,7 +222,11 @@ The WordPress block editor and the frontend are two different rendering environm
 
 ### Using WP Layout Attributes for Multi-Column Sections
 
-Do NOT rely on custom CSS classes for grid/flex layout structure. The editor ignores them. Use WP's native layout attributes instead:
+**Warning: Do NOT use WP layout attributes when prototype CSS already handles responsive grid/flex.** WP grid layout (`layout: {type: "grid", columnCount: 3}`) ignores `@media` queries and breaks responsive breakpoints. If the prototype CSS defines `display: grid` with media queries, use `wp:group` with `className` only and let the prototype CSS handle layout. WP `is-layout-flow` margin rules use `:where()` selectors (0 specificity), so prototype CSS with class or element selectors wins automatically without `!important`.
+
+**`wp:button` incompatibility:** Custom button classes like `.btn .btn--primary` on bare `<a>` tags are incompatible with `wp:button` block structure, which wraps `<a>` inside `<div class="wp-block-button"><a class="wp-block-button__link">`. Use `wp:html` for custom button groups.
+
+When prototype CSS does NOT handle layout (e.g. new sections without responsive CSS), use WP's native layout attributes:
 
 **Grid layout (equal columns):**
 ```html

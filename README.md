@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-70 skills across two Claude Code plugins (47 marketing, 23 WordPress) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+79 skills across three Claude Code plugins (47 marketing, 25 WordPress, 7 content engine) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -64,7 +64,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     wordpress-builder.md                # Phase E — theme scaffold and page build
     site-ops.md                         # Phase F — performance and security
     site-extension.md                   # Post-launch page management
-  skills/                               # All 23 skills
+  skills/                               # All 25 skills
     wp-start/                           # Entry point — /wp-start command
     wp-project-setup/                   # Initialize project folder structure
     client-context-intake/              # Extract facts from call notes
@@ -88,6 +88,19 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     lp-deploy-1/                        # Push first LP prototype to WordPress
     lp-deploy-2/                        # Convert LP to native Gutenberg blocks
     lp-deploy-3/                        # Deploy remaining LP pages
+    lp-subsite-deploy/                  # Deploy subsite from Docker to live server
+    wp-ssh-deploy/                      # General WordPress SSH deployment
+plugins/lhm-content-engine/            # Content pipeline plugin
+  .claude-plugin/plugin.json            # Plugin manifest
+  agents/content-orchestrator.md        # Batch pipeline orchestrator
+  skills/                               # All 7 skills
+    generate-outline/                   # Structured article outline from CSV row
+    write-blog/                         # Full blog article from outline
+    generate-social-posts/              # GMB social posts from blog content
+    quality-controller/                 # Anti-AI refinement and compliance gate
+    publish-google-doc/                 # Create formatted Google Doc for review
+    update-csv/                         # Update tracking CSV with results
+    run-batch/                          # Orchestrate full pipeline for all rows
 ```
 
 ## Skills Catalog
@@ -110,7 +123,13 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
 
 **Website Build Pipeline** (17 skills): Project setup, client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, and the /wp-start entry point.
 
-**Landing Page Pipeline** (6 skills): Subsite setup for LP campaigns, landing page copywriting per ad group, HTML/CSS prototype generation, WordPress deployment (HTML blocks), Gutenberg block conversion, and multi-page deployment.
+**Landing Page Pipeline** (7 skills): Subsite setup for LP campaigns, landing page copywriting per ad group, HTML/CSS prototype generation, WordPress deployment (HTML blocks), Gutenberg block conversion, multi-page deployment, and live server deployment via SSH.
+
+**Deployment** (1 skill): General-purpose WordPress SSH deployment (theme, pages, CPTs, media, customizer, menus, options).
+
+### Content Engine
+
+**Content Pipeline** (7 skills): CSV-driven batch processing for allied health clinics. Structured article outline generation, blog writing with anti-AI refinement, GMB social post generation, compliance quality gate, Google Doc publishing, tracking CSV updates, and full batch orchestration.
 
 ## Key Behaviours
 

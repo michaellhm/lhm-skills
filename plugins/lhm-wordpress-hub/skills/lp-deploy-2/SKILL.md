@@ -47,8 +47,32 @@ Use this table to decide how to convert each landing page section. The class nam
 - The section uses JavaScript that can't be replicated natively (complex animations)
 - It relies on dynamic CPT data (locations grid)
 - Converting it would change the visual output and you can't resolve the discrepancy
+- Custom button classes (`.btn .btn--primary`) on bare `<a>` tags are used, since `wp:button` wraps `<a>` inside `<div class="wp-block-button">`, breaking CSS targeting
+- JS-driven FAQ accordion using `<button>` pattern with `.is-open` class toggling (converting to `wp:details` would lose single-open-at-a-time behaviour from frontend.js)
+- Hero sections with CSS grid (`hero__grid`), trust strip `<span>` elements, and custom button classes have too many inline elements with no native block equivalent
+- Announcement bar with inline `<span>` elements and pipe dividers (no native block equivalent)
+
+**Nesting `wp:html` inside `wp:group` is fine.** The HTML block renders correctly and the parent group remains editable in Gutenberg. Use this pattern for button groups or complex elements inside an otherwise native section.
 
 If keeping a section as `wp:html`, document why in `lp_state.md`.
+
+## Conversion Rules
+
+### Do NOT use WP layout attributes when prototype CSS handles responsive grid/flex
+
+If the prototype CSS already defines `display: grid` or `display: flex` with `@media` queries for responsive breakpoints, do NOT add WP layout attributes (`layout: {type: "grid"}`). WP grid layout ignores `@media` queries and breaks responsive breakpoints. Use `wp:group` with `className` only and let the prototype CSS handle the layout.
+
+### CSS specificity: prototype CSS always wins over WP defaults
+
+WP `is-layout-flow` margin rules use `:where()` selectors (0 specificity). Any prototype CSS with class or element selectors wins automatically without `!important`.
+
+### `wp:group` with `className` preserves custom classes
+
+WP adds `wp-block-group` and `is-layout-flow` alongside your custom classes. Custom CSS `display: grid`/`display: flex` overrides WP's `is-layout-flow` block display via specificity.
+
+### Reveal animation limitations on native blocks
+
+`data-delay` attributes for staggered IntersectionObserver reveal animations can't be added to native blocks. Accept simultaneous fade-in as a trade-off for editor editability. `.reveal { opacity: 0 }` works on real page scroll but causes elements to appear invisible in Playwright `fullPage` screenshots. Verify by programmatically scrolling or evaluating `document.querySelectorAll('.reveal.is-visible').length`.
 
 ## Conversion Process
 

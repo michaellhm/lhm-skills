@@ -11,6 +11,7 @@ lp-prototype      → Build HTML/CSS prototype per ad group
 lp-deploy-1       → Push primary landing page as Gutenberg HTML blocks
 lp-deploy-2       → Convert HTML blocks to native Gutenberg blocks
 lp-deploy-3       → Deploy all remaining ad group landing pages
+lp-subsite-deploy → Deploy complete subsite from local Docker to live server via SSH
 ```
 
 Skills can run in any order where prerequisites allow. The minimum prerequisite chain is:
@@ -19,6 +20,7 @@ Skills can run in any order where prerequisites allow. The minimum prerequisite 
 - `lp-prototype` before `lp-deploy-1`
 - `lp-deploy-1` before `lp-deploy-2`
 - `lp-deploy-1` before `lp-deploy-3`
+- `lp-subsite-deploy` after all local content is ready (any deploy skill)
 
 ## Folder Structure
 

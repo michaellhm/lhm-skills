@@ -102,10 +102,21 @@ Separate from the phased website build, the landing page pipeline handles PPC ca
 4. `lp-deploy-1` — Push the first prototype into WordPress as HTML blocks
 5. `lp-deploy-2` — Convert HTML blocks to native Gutenberg blocks
 6. `lp-deploy-3` — Deploy all remaining ad group pages
+7. `lp-subsite-deploy` — Deploy complete subsite from local Docker to live server via SSH
 
 To load any of these: `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`
 
 Detect landing page work when the user mentions "landing pages", "LP campaign", "ad group pages", "PPC landing pages", or when an `/lp/` folder exists in the project.
+
+## Standalone Deployment
+
+For general-purpose WordPress deployment (not specific to the LP pipeline):
+
+- `wp-ssh-deploy` — Push a local WordPress site to a remote server via SSH and WP-CLI (theme, pages, CPTs, media, customizer, menus, options)
+
+To load: `${CLAUDE_PLUGIN_ROOT}/skills/wp-ssh-deploy/SKILL.md`
+
+Detect deployment work when the user mentions "deploy to server", "push to production", "sync to live", "upload site via SSH", or "deploy via SSH".
 
 ## Approval Gates
 
