@@ -11,13 +11,14 @@ Build individual pages in WordPress using a two-step process: first push the raw
 
 1. **Read content files** - scan `/content/` for all page files
 2. **Read block specs** - read `/design/blocks.md` for component-to-pattern mapping. Pay attention to **WP layout**, **Prototype classes**, **Icon strategy**, and **Editor compatible** fields
-3. **Read custom CSS** - read `/wp/theme/{theme-slug}/assets/css/custom.css` for all available CSS classes
-4. **Read editor CSS** - read `/wp/theme/{theme-slug}/assets/css/editor.css` to understand editor overrides
-5. **Read the homepage prototype** - read the approved version from `/design/prototype/homepage/` (e.g. `index.html` or the specific approved version like `v2.html`) as the pixel-perfect visual reference
-6. **Read WP state** - read `/wp/wp_state.md` to see what's already built
-7. **Read WP-CLI reference** - read `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md`
-8. **Read viewport reference** - read `${CLAUDE_PLUGIN_ROOT}/skills/visual-qa/references/viewports.md` for standard breakpoint sizes
-9. **Run CSS sync check** - run the `css-sync-check` skill to diff the prototype CSS against the theme CSS. Class names will match but styling rules often diverge during theme scaffold. Fix CSS discrepancies BEFORE pushing page content, not after. This check also verifies the `.container` class exists with `max-width`, `margin: 0 auto`, and gutter padding (the single highest-impact missing class).
+3. **Read conversion patterns** - read `${CLAUDE_PLUGIN_ROOT}/references/gutenberg-conversion-patterns.md`. This is the single source of truth for block markup. Every section you convert in Step 3 MUST follow these patterns exactly. The patterns are extracted from production sites and are proven to work.
+4. **Read custom CSS** - read `/wp/theme/{theme-slug}/assets/css/custom.css` for all available CSS classes
+5. **Read editor CSS** - read `/wp/theme/{theme-slug}/assets/css/editor.css` to understand editor overrides
+6. **Read the homepage prototype** - read the approved version from `/design/prototype/homepage/` (e.g. `index.html` or the specific approved version like `v2.html`) as the pixel-perfect visual reference
+7. **Read WP state** - read `/wp/wp_state.md` to see what's already built
+8. **Read WP-CLI reference** - read `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md`
+9. **Read viewport reference** - read `${CLAUDE_PLUGIN_ROOT}/skills/visual-qa/references/viewports.md` for standard breakpoint sizes
+10. **Run CSS sync check** - run the `css-sync-check` skill to diff the prototype CSS against the theme CSS. Class names will match but styling rules often diverge during theme scaffold. Fix CSS discrepancies BEFORE pushing page content, not after. This check also verifies the `.container` class exists with `max-width`, `margin: 0 auto`, and gutter padding (the single highest-impact missing class).
 11. **Verify logo is set** - the `wp:site-logo` block in the header requires a logo attachment via Customizer theme_mods (`custom_logo` key). Upload via `wp media import [url]` then set via `wp option update theme_mods_[theme-slug]`. Without this, the header logo area is blank.
 12. Verify the theme is installed and activated
 
@@ -191,6 +192,34 @@ Options:
 ## Step 3: Convert to Native Blocks (Editor Experience)
 
 With the proven frontend as your reference, systematically convert each section from raw HTML to native WordPress blocks. After each section is converted, compare the frontend against the Step 2 baseline to catch any visual regressions.
+
+### Section Inventory (Mandatory First Step)
+
+Before converting anything, create a complete inventory of every section on the page. This prevents the "half converted" problem where some sections get done and others are missed.
+
+1. List every section by its class name, in order from top to bottom
+2. For each section, decide: convert to native blocks or keep as wp:html
+3. Present the inventory to the user for approval before starting conversion
+
+Do not start converting until the user approves the inventory.
+
+### The Mandatory Full-Width Pattern
+
+Every section that spans the full viewport width in the prototype MUST use this nesting:
+
+```html
+<!-- wp:group {"className":"section-name","align":"full","layout":{"type":"default"}} -->
+<div class="wp-block-group alignfull section-name">
+<!-- wp:group {"className":"container","layout":{"type":"default"}} -->
+<div class="wp-block-group container">
+  <!-- inner content blocks -->
+</div>
+<!-- /wp:group -->
+</div>
+<!-- /wp:group -->
+```
+
+This is the #1 reason conversions fail. Without `"align":"full"` AND `alignfull` on the div, sections are constrained to `contentSize` from theme.json (~800px), causing the page to appear ~600px wide in the editor. See `${CLAUDE_PLUGIN_ROOT}/references/gutenberg-conversion-patterns.md` for the full set of proven patterns for every section type.
 
 ### The Dual-Rendering Principle
 
@@ -408,6 +437,29 @@ If any section fails these checks, identify the issue:
 - **Content invisible/raw code** → Switch from `wp:html` to native blocks
 - **Animated elements hidden** → Check `editor.css` has overrides for `.reveal`, `.fade-in`, etc.
 - **Icons invisible** → Switch from inline SVG to `wp:image` with SVG file
+- **Sections appear narrow (~600px)** → Missing `"align":"full"` on outer section groups. See Editor Width Fix below.
+
+### Editor Width Fix
+
+If sections appear narrow in the editor instead of full-width:
+
+1. Check every outer section group has `"align":"full"` in JSON AND `alignfull` on the div
+2. Check theme.json has `useRootPaddingAwareAlignments: true`
+3. Check editor.css has: `.editor-styles-wrapper .alignfull { max-width: none; }`
+4. Check theme.json `styles.spacing.blockGap` is `"0"` (prevents white strips between sections)
+
+### Completion Checklist
+
+Before declaring a page done, verify against the section inventory:
+
+```
+[ ] All sections from inventory are accounted for
+[ ] Converted sections match frontend baseline at desktop and mobile
+[ ] HTML-kept sections are documented with reasons
+[ ] Editor shows full-width sections (not constrained to contentSize)
+[ ] All text is editable in block editor
+[ ] No "This block contains unexpected content" errors
+```
 
 Tell the user the results:
 

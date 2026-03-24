@@ -3,17 +3,17 @@ name: lp-deploy-2
 description: "Convert a landing page from raw Gutenberg HTML blocks to native WordPress blocks for full editor editability. Use this when the user says 'convert to blocks', 'convert to Gutenberg', 'lp-deploy-2', 'make the landing page editable', 'convert the HTML blocks', or 'Gutenberg conversion'. Requires lp-deploy-1 to have run successfully. Produces a native block version of the page that works in the Gutenberg editor."
 ---
 
-# LP Deploy 2 — Convert HTML to Native Gutenberg Blocks
+# LP Deploy 2 -- Convert HTML to Native Gutenberg Blocks
 
-Take the raw HTML prototype (currently sitting in `wp:html` blocks) and convert it section by section to native WordPress blocks. The visual frontend should not change — only the editor experience improves.
+Take the raw HTML prototype (currently sitting in `wp:html` blocks) and convert it section by section to native WordPress blocks. The visual frontend should not change. Only the editor experience improves.
 
 The golden rule: **the frontend proven in deploy-1 is the reference. Every converted section must match it.**
 
 ## Before Starting
 
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/lp-deploy-2/LEARNED.md`
-2. Read `lp/lp_state.md` — confirm the target page has status "HTML Live" and has a Post ID
-3. Read `${CLAUDE_PLUGIN_ROOT}/skills/wp-page-builder/SKILL.md` — specifically the section "Step 3: Convert to Native Blocks". The conversion patterns in that skill (wp:cover, wp:columns, wp:group with layout attributes, wp:list, wp:image for icons) apply here exactly.
+2. Read `lp/lp_state.md` -- confirm the target page has status "HTML Live" and has a Post ID
+3. **Read the conversion patterns reference** -- `${CLAUDE_PLUGIN_ROOT}/references/gutenberg-conversion-patterns.md`. This is the single source of truth for block markup. Every section you convert MUST follow these patterns exactly.
 4. **Prefer the client's `wp/wp-cli.sh` helper** over raw `docker exec` commands. It auto-installs WP-CLI and passes the correct `--url` flag. The theme CSS file is `assets/css/custom-components.css` (not `custom.css`) for the healthcare-theme. Theme files can be edited directly via the client's `wp/healthcare-theme` symlink.
 5. Get the current page content:
 
@@ -25,175 +25,129 @@ docker exec $CONTAINER wp --allow-root post get [POST_ID] \
 
 Save the current content as `/lp/deploy/[SLUG]-content.html` (this is your fallback if something goes wrong).
 
-## Section-to-Block Mapping
+## Step 1: Section Inventory (Mandatory)
 
-Use this table to decide how to convert each landing page section. The class names match what lp-prototype produces.
+Before converting anything, create a complete inventory of every section on the page. This prevents the "half converted" problem where some sections get done and others are missed.
 
-| Section class | Native block approach |
-|--------------|----------------------|
-| `.site-header` | Template part (skip — already in theme header template) |
-| `.hero-section` | `wp:cover` with background colour and inner text/button blocks |
-| `.trust-bar` | `wp:group` with `layout: {type:"flex"}` containing `wp:paragraph` items |
-| `.pain-points-section` | `wp:group` containing `wp:heading` + `wp:group` grid with `wp:paragraph` items |
-| `.solution-section` | `wp:group` with `wp:heading` + `wp:paragraph` |
-| `.features-section` | `wp:group` containing heading + `wp:group` with `layout: {type:"grid"}` for feature cards |
-| `.testimonials-section` | `wp:group` containing heading + quote blocks (`wp:quote`) |
-| `.process-section` | `wp:group` with heading + ordered `wp:list` |
-| `.faq-section` | `wp:group` with heading + `wp:details` blocks (FAQ accordion) |
-| `.locations-section` | `wp:group` containing heading, paragraph, and location `wp:html` (dynamic content — keep as `wp:html` since it uses CPT data) |
-| `.site-footer` | Template part (skip — already in theme footer template) |
+1. Read the current page content (the `wp:html` blocks from deploy-1)
+2. List every section by its class name, in order from top to bottom
+3. For each section, decide: **convert to native blocks** or **keep as wp:html**
+4. Present the inventory to the user for approval before starting
 
-**Keep as `wp:html` only if:**
-- The section uses JavaScript that can't be replicated natively (complex animations)
-- It relies on dynamic CPT data (locations grid)
+Example inventory format:
+
+```
+Section Inventory for [PAGE NAME]:
+1. .hero-section -- CONVERT (wp:cover or wp:group with align:full)
+2. .trust-bar -- CONVERT (wp:group with grid layout)
+3. .pain-points-section -- CONVERT (wp:group with heading + paragraphs)
+4. .features-section -- CONVERT (wp:group with grid layout)
+5. .testimonials-section -- CONVERT (wp:quote blocks)
+6. .process-section -- CONVERT (wp:group with grid layout)
+7. .faq-section -- KEEP AS HTML (JS-driven accordion with single-open behaviour)
+8. .locations-section -- KEEP AS HTML (dynamic CPT data)
+9. .cta-section -- CONVERT (wp:group with align:full)
+
+Total: 9 sections. 7 will be converted, 2 kept as HTML.
+```
+
+**Do not start converting until the user approves the inventory.**
+
+### Keep as `wp:html` only if:
+
+- The section uses JavaScript that can't be replicated natively (complex animations, single-open accordion)
+- It relies on dynamic CPT data (locations grid with PHP shortcodes)
 - Converting it would change the visual output and you can't resolve the discrepancy
-- Custom button classes (`.btn .btn--primary`) on bare `<a>` tags are used, since `wp:button` wraps `<a>` inside `<div class="wp-block-button">`, breaking CSS targeting
 - JS-driven FAQ accordion using `<button>` pattern with `.is-open` class toggling (converting to `wp:details` would lose single-open-at-a-time behaviour from frontend.js)
 - Hero sections with CSS grid (`hero__grid`), trust strip `<span>` elements, and custom button classes have too many inline elements with no native block equivalent
 - Announcement bar with inline `<span>` elements and pipe dividers (no native block equivalent)
 
-**Nesting `wp:html` inside `wp:group` is fine.** The HTML block renders correctly and the parent group remains editable in Gutenberg. Use this pattern for button groups or complex elements inside an otherwise native section.
+**Nesting `wp:html` inside `wp:group` is fine.** The HTML block renders correctly and the parent group remains editable in Gutenberg.
 
 If keeping a section as `wp:html`, document why in `lp_state.md`.
 
-## Conversion Rules
+## Step 2: Convert Sections (One at a Time)
 
-### Do NOT use WP layout attributes when prototype CSS handles responsive grid/flex
+Work through the inventory in order, converting one section at a time. After each section, push and visually verify before moving on.
 
-If the prototype CSS already defines `display: grid` or `display: flex` with `@media` queries for responsive breakpoints, do NOT add WP layout attributes (`layout: {type: "grid"}`). WP grid layout ignores `@media` queries and breaks responsive breakpoints. Use `wp:group` with `className` only and let the prototype CSS handle the layout.
+### The Mandatory Full-Width Pattern
 
-### CSS specificity: prototype CSS always wins over WP defaults
+Every section MUST use this nesting structure. This is the #1 reason conversions fail (pages appear ~600px wide in the editor instead of full-width):
 
-WP `is-layout-flow` margin rules use `:where()` selectors (0 specificity). Any prototype CSS with class or element selectors wins automatically without `!important`.
-
-### `wp:group` with `className` preserves custom classes
-
-WP adds `wp-block-group` and `is-layout-flow` alongside your custom classes. Custom CSS `display: grid`/`display: flex` overrides WP's `is-layout-flow` block display via specificity.
-
-### Reveal animation limitations on native blocks
-
-`data-delay` attributes for staggered IntersectionObserver reveal animations can't be added to native blocks. Accept simultaneous fade-in as a trade-off for editor editability. `.reveal { opacity: 0 }` works on real page scroll but causes elements to appear invisible in Playwright `fullPage` screenshots. Verify by programmatically scrolling or evaluating `document.querySelectorAll('.reveal.is-visible').length`.
-
-## Conversion Process
-
-Convert one section at a time. After each section, re-push and visually compare.
-
-### Hero Section
 ```html
-<!-- wp:cover {"backgroundColor":"primary","align":"full","className":"hero-section","minHeight":600} -->
-<div class="wp-block-cover alignfull hero-section has-primary-background-color has-background" style="min-height:600px">
-  <div class="wp-block-cover__inner-container">
-    <!-- wp:heading {"level":1,"className":"hero-headline"} -->
-    <h1 class="wp-block-heading hero-headline">[HEADLINE]</h1>
-    <!-- /wp:heading -->
-    <!-- wp:paragraph {"className":"hero-subheadline"} -->
-    <p class="hero-subheadline">[SUBHEADLINE]</p>
-    <!-- /wp:paragraph -->
-    <!-- wp:buttons {"className":"hero-cta-group"} -->
-    <div class="wp-block-buttons hero-cta-group">
-      <!-- wp:button {"className":"hero-cta btn-primary"} -->
-      <div class="wp-block-button hero-cta btn-primary">
-        <a class="wp-block-button__link wp-element-button" href="#book">[CTA TEXT]</a>
-      </div>
-      <!-- /wp:button -->
-    </div>
-    <!-- /wp:buttons -->
-    <!-- wp:paragraph {"className":"hero-cta-subtext"} -->
-    <p class="hero-cta-subtext">[CTA SUBTEXT]</p>
-    <!-- /wp:paragraph -->
-  </div>
+<!-- wp:group {"className":"section-name","align":"full","layout":{"type":"default"}} -->
+<div class="wp-block-group alignfull section-name">
+<!-- wp:group {"className":"container","layout":{"type":"default"}} -->
+<div class="wp-block-group container">
+
+  <!-- inner content blocks here -->
+
 </div>
-<!-- /wp:cover -->
-```
-
-### Trust Bar
-```html
-<!-- wp:group {"className":"trust-bar","layout":{"type":"flex","flexWrap":"wrap","justifyContent":"center"}} -->
-<div class="wp-block-group trust-bar">
-  <!-- wp:paragraph {"className":"trust-item"} -->
-  <p class="trust-item"><strong class="trust-rating">[RATING]★</strong> [REVIEW COUNT] Google Reviews</p>
-  <!-- /wp:paragraph -->
-  <!-- wp:separator {"className":"trust-divider"} -->
-  <hr class="wp-block-separator trust-divider" />
-  <!-- /wp:separator -->
-  <!-- wp:paragraph {"className":"trust-item"} -->
-  <p class="trust-item">[STAT 1]</p>
-  <!-- /wp:paragraph -->
+<!-- /wp:group -->
 </div>
 <!-- /wp:group -->
 ```
 
-### Feature Grid (4-6 items)
-```html
-<!-- wp:group {"className":"features-section"} -->
-<div class="wp-block-group features-section">
-  <!-- wp:heading {"level":2,"className":"section-heading"} -->
-  <h2 class="wp-block-heading section-heading">[HEADING]</h2>
-  <!-- /wp:heading -->
-  <!-- wp:group {"className":"features-grid","layout":{"type":"grid","columnCount":3,"minimumColumnWidth":"280px"}} -->
-  <div class="wp-block-group features-grid">
-    <!-- wp:group {"className":"feature-card"} -->
-    <div class="wp-block-group feature-card">
-      <!-- wp:heading {"level":3,"className":"feature-title"} -->
-      <h3 class="wp-block-heading feature-title">[FEATURE]</h3>
-      <!-- /wp:heading -->
-      <!-- wp:paragraph {"className":"feature-body"} -->
-      <p class="feature-body">[DESCRIPTION]</p>
-      <!-- /wp:paragraph -->
-    </div>
-    <!-- /wp:group -->
-    <!-- repeat for each feature -->
-  </div>
-  <!-- /wp:group -->
-</div>
-<!-- /wp:group -->
+Critical requirements:
+- `"align":"full"` in the JSON AND `alignfull` on the rendered div -- both are required
+- Inner `container` group for centred content with max-width
+- `"layout":{"type":"default"}` to prevent WP from injecting layout classes that conflict with prototype CSS
+
+### Section-to-Block Mapping
+
+Refer to `${CLAUDE_PLUGIN_ROOT}/references/gutenberg-conversion-patterns.md` for the exact markup of each pattern. The patterns file has copy-paste-ready examples for every section type.
+
+| Section class | Block approach | Pattern to use |
+|---|---|---|
+| `.site-header` | Skip (template part) | N/A |
+| `.hero-section` (with background image/video) | `wp:cover` with inner blocks | Hero with Video Background |
+| `.hero-section` (colour only) | `wp:group` with align:full | Hero with Background Colour |
+| `.trust-bar` | `wp:group` > grid > stat items | Trust Bar |
+| `.pain-points-section` | `wp:group` > container > heading + paragraphs | Content Section (Narrow) |
+| `.solution-section` | `wp:group` > container > heading + paragraphs | Content Section (Narrow) |
+| `.features-section` | `wp:group` > container > grid with feature cards | Features Grid |
+| `.services-section` | `wp:group` > container > grid with service cards | Card Grid |
+| `.testimonials-section` | `wp:group` > container > grid with `wp:quote` | Card Grid (with quote blocks) |
+| `.process-section` | `wp:group` > container > grid with step items | Process/Steps |
+| `.results-section` | `wp:group` > container > metrics grid | Results/Case Study |
+| `.industry-section` | `wp:group` > container > grid with industry cards | Industry Grid |
+| `.fit-section` | `wp:group` > container > 2-column grid | Good Fit / Bad Fit |
+| `.faq-section` | `wp:group` > container > `wp:details` blocks | FAQ (if no JS accordion) |
+| `.cta-section` | `wp:group` > container > heading + list + buttons | CTA Section |
+| `.locations-section` | Keep as `wp:html` (dynamic CPT data) | N/A |
+| `.site-footer` | Skip (template part) | N/A |
+
+### Conversion Rules
+
+**Use exact prototype class names.** The CSS was extracted from the prototype. If the prototype has `.hero-section`, the block must have `className: "hero-section"`. WordPress adds its own classes alongside yours. They stack, they don't conflict.
+
+**JSON attributes must match rendered HTML.** The Gutenberg block validator compares JSON against HTML. Mismatches cause "This block contains unexpected content" errors.
+
+**Do NOT use WP layout attributes when prototype CSS handles responsive grid/flex.** If the prototype CSS already defines `display: grid` or `display: flex` with `@media` queries for responsive breakpoints, do NOT add WP layout attributes (`layout: {type: "grid"}`). WP grid layout ignores `@media` queries and breaks responsive breakpoints. Use `wp:group` with `className` only and let the prototype CSS handle the layout.
+
+**CSS specificity: prototype CSS always wins over WP defaults.** WP `is-layout-flow` margin rules use `:where()` selectors (0 specificity). Any prototype CSS with class or element selectors wins automatically without `!important`.
+
+**Reveal animation limitations.** `data-delay` attributes for staggered IntersectionObserver reveal animations can't be added to native blocks. Accept simultaneous fade-in as a trade-off for editor editability.
+
+**Buttons: use `wp:buttons` wrapper.** Don't use raw `<a>` tags. Exception: if prototype CSS targets bare `.btn` on `<a>` tags and the `wp:button` wrapper breaks styling, keep the button group as `wp:html` nested inside the otherwise-native section.
+
+**Lists: use `wp:list` + `wp:list-item`.** Every `<ul>` or `<ol>` in the prototype gets converted to native list blocks.
+
+**Inline SVG icons: use emoji or wp:image.** Inline SVG in `wp:html` blocks is invisible in the editor.
+
+### Push and Verify After Each Section
+
+After converting a section, save the full page markup to `/lp/deploy/[SLUG]-content-blocks.html` and push:
+
+```bash
+docker cp lp/deploy/[SLUG]-content-blocks.html $CONTAINER:/tmp/[SLUG]-content-blocks.html
+
+docker exec $CONTAINER wp --allow-root post update [POST_ID] \
+  --post_content="$(docker exec $CONTAINER cat /tmp/[SLUG]-content-blocks.html)" \
+  --url=[SUBSITE_URL]
 ```
 
-### Testimonials
-```html
-<!-- wp:group {"className":"testimonials-section"} -->
-<div class="wp-block-group testimonials-section">
-  <!-- wp:heading {"level":2,"className":"section-heading"} -->
-  <h2 class="wp-block-heading section-heading">[HEADING]</h2>
-  <!-- /wp:heading -->
-  <!-- wp:group {"className":"testimonials-grid","layout":{"type":"grid","columnCount":2}} -->
-  <div class="wp-block-group testimonials-grid">
-    <!-- wp:quote {"className":"testimonial-card"} -->
-    <blockquote class="wp-block-quote testimonial-card">
-      <!-- wp:paragraph -->
-      <p>[QUOTE]</p>
-      <!-- /wp:paragraph -->
-      <cite>[NAME], [SUBURB]</cite>
-    </blockquote>
-    <!-- /wp:quote -->
-    <!-- repeat -->
-  </div>
-  <!-- /wp:group -->
-</div>
-<!-- /wp:group -->
-```
-
-### FAQ Section (using wp:details)
-```html
-<!-- wp:group {"className":"faq-section"} -->
-<div class="wp-block-group faq-section">
-  <!-- wp:heading {"level":2,"className":"section-heading"} -->
-  <h2 class="wp-block-heading section-heading">[FAQ HEADING]</h2>
-  <!-- /wp:heading -->
-  <!-- wp:details {"className":"faq-item"} -->
-  <details class="wp-block-details faq-item">
-    <summary>[QUESTION]</summary>
-    <!-- wp:paragraph -->
-    <p>[ANSWER]</p>
-    <!-- /wp:paragraph -->
-  </details>
-  <!-- /wp:details -->
-  <!-- repeat for each FAQ -->
-</div>
-<!-- /wp:group -->
-```
-
-Note: `wp:details` requires WordPress 6.4+. If the site runs an earlier version, keep FAQ as `wp:html`.
+Check the frontend after each section push. If a section looks wrong after conversion, the issue is in the block structure (not the CSS, because deploy-1 proved the CSS works). Fix block structure and re-push before moving on.
 
 ## kses and Content Placement Warnings
 
@@ -206,29 +160,43 @@ When inserting content into `wp:group` blocks via regex or string replacement, t
 ### Link Colour in Dark Sections
 "Learn more" links and other `::after` arrow pseudo-elements need explicit `color: var(--healthcare-primary)` (or the appropriate brand colour). Colour inheritance can fail when the parent `<p>` gets overridden by block editor paragraph styles.
 
-## Push and Verify After Each Section
+## Step 3: Editor QA
 
-After converting a section, save the block markup to `/lp/deploy/[SLUG]-content-blocks.html` and push:
+After ALL sections in the inventory are converted (or explicitly kept as HTML), verify the editor experience. This is not optional.
 
-```bash
-docker cp lp/deploy/[SLUG]-content-blocks.html $CONTAINER:/tmp/[SLUG]-content-blocks.html
+Open the block editor and check every item:
 
-docker exec $CONTAINER wp --allow-root post update [POST_ID] \
-  --post_content="$(docker exec $CONTAINER cat /tmp/[SLUG]-content-blocks.html)" \
-  --url=[SUBSITE_URL]
+1. **Every section has visible, editable content** -- no blank white space, no raw code
+2. **Sections span full width** -- not constrained to ~600px in the editor. If narrow, you're missing `align:full`
+3. **Multi-column layouts show columns** -- not stacked single-column blocks
+4. **All text (headings, paragraphs, CTAs) is editable inline**
+5. **Icons are visible** (emoji or images, not blank SVG placeholders)
+6. **No unexplained `wp:html` blocks** except the ones documented in your inventory
+
+### Editor Width Fix
+
+If sections appear narrow in the editor (~600px instead of full-width):
+
+1. Check every outer section group has `"align":"full"` in JSON AND `alignfull` on the div
+2. Check theme.json has `useRootPaddingAwareAlignments: true`
+3. Check editor.css has: `.editor-styles-wrapper .alignfull { max-width: none; }`
+4. Check theme.json `styles.spacing.blockGap` is `"0"` (prevents white strips between sections)
+
+## Step 4: Completion Checklist
+
+Before declaring done, verify against the original inventory:
+
 ```
-
-Check the frontend after each section push. If a section looks wrong after conversion, the issue is in the block structure (not the CSS — deploy-1 proved the CSS works). Fix block structure and re-push before moving on.
-
-## Editor QA
-
-After all sections are converted, open the block editor and verify:
-
-1. Every section has visible, editable content (no blank white space)
-2. Multi-column layouts show columns, not stacked rows
-3. All text (headings, paragraphs, CTAs) is editable inline
-4. No unexplained `wp:html` blocks except documented exceptions
-5. The locations section (if it uses CPT data) is clearly labelled as an intentional `wp:html` block
+Conversion Complete:
+[ ] All sections from inventory are accounted for
+[ ] Converted sections: [list with status]
+[ ] HTML-kept sections: [list with reasons]
+[ ] Frontend matches deploy-1 baseline at desktop and mobile
+[ ] Editor shows full-width sections (not constrained to contentSize)
+[ ] All text is editable in block editor
+[ ] No "This block contains unexpected content" errors
+[ ] Content saved to /lp/deploy/[SLUG]-content-blocks.html
+```
 
 Tell the user the results:
 > "Editor QA: [N] sections converted to native blocks. [SECTION] kept as HTML because [REASON]. Full editor editability confirmed."
