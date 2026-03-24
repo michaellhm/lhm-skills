@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-80 skills across four Claude Code plugins (47 marketing, 25 WordPress, 7 content engine, 1 learn) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+81 skills across four Claude Code plugins (48 marketing, 25 WordPress, 7 content engine, 1 learn) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -26,7 +26,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/google-ads-monthly-review.md  # Full monthly review with skill chaining
   agents/seo-specialist.md             # Multi-skill SEO workflow orchestrator
   agents/client-analytics-dashboard.md # GA4 analytics dashboard workflow
-  skills/                              # All 47 skills
+  skills/                              # All 48 skills
     start/                             # Entry point — /start command
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
@@ -51,6 +51,7 @@ plugins/lhm-marketing-hub/             # The plugin
     email-sequence/                    # Drip campaigns and email flows
     seo-audit/                         # SEO diagnostics
     pricing-strategy/                  # Pricing and packaging
+    service-page-generator/             # Full service/condition page generation
     taya-question-discovery/            # They Ask, You Answer question bank
     ... and 22 more
 plugins/lhm-wordpress-hub/             # WordPress build plugin
@@ -115,7 +116,7 @@ plugins/lhm-learn/                    # Session learning capture plugin
 
 **Strategy & Research** (3 skills): Competitive analysis with Porter's 5 Forces, keyword research with intent analysis and topic clustering, They Ask You Answer question discovery.
 
-**SEO & Content** (6 skills): Content gap analysis, SEO content writing, GEO/AI citation optimization, meta tags optimization, CORE-EEAT content quality auditing, content refresh planning.
+**SEO & Content** (7 skills): Content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, meta tags optimization, CORE-EEAT content quality auditing, content refresh planning.
 
 **Analytics & Reporting** (2 skills): GA4 event discovery and conversion classification, analytics dashboard generation with period comparison.
 

@@ -15,6 +15,8 @@ Build the site information architecture: keyword map, sitemap hierarchy, and pag
 
 ## Step 1: Keyword Research
 
+**Important:** Treat client website briefs as input, not gospel. Use keyword volume data to validate and override page structure decisions. The client may propose pages with no search demand or miss high-opportunity pages.
+
 Build the keyword map. For each potential page, identify:
 
 - **Primary keyword** — the main search term this page targets
@@ -124,6 +126,8 @@ Before finalizing, check:
 3. **No orphan pages** — every page is reachable from navigation or internal links
 4. **No keyword cannibalization** — each page targets a unique primary keyword
 5. **Depth ≤ 3** — most important pages within 3 clicks of homepage
+6. **Merge thin pages** — combine problem/symptom pages that share the same root cause rather than creating separate thin pages. E.g. "swollen door" + "door won't close" + "door sticking" are all moisture-related and belong on one comprehensive page. Thin pages cannibalize each other.
+7. **Branded product pages** — proprietary/branded product pages will have near-zero organic search volume when the brand is unknown. Their SEO value comes from internal cross-linking, not direct organic traffic. Build these pages for conversion, not discovery.
 
 ## Step 4: Approval Gate
 

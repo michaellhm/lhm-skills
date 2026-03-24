@@ -93,6 +93,7 @@ For each confirmed skill learning:
    ```
    plugins/{plugin-name}/skills/{skill-name}/LEARNED.md
    ```
+   **Critical:** Always write to the source repo (e.g. `/Users/.../lhm-skills-v3/plugins/`), NOT to the cached/installed version at `~/.claude/plugins/marketplaces/` or `~/.claude/plugins/cache/`. The cache is overwritten on plugin updates and learnings will be lost.
    If the skills repo isn't the current working directory, search for LEARNED.md files using Glob: `**/plugins/*/skills/*/LEARNED.md`
 3. **Read the existing LEARNED.md** to check current entries and count
 4. **If at or over 50 entries**, consolidate first (merge duplicates, drop stale entries)

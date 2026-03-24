@@ -114,6 +114,7 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 
 **SEO & Content:**
 - `content-gap-analysis` -Identify keyword, topic, and content format gaps vs competitors
+- `service-page-generator` -Generate full service/condition pages with keyword research, copy, citations, and schema
 - `seo-content-writer` -Write SEO-optimized blog posts, guides, and articles
 - `geo-content-optimizer` -Optimize content for AI citations (GEO)
 - `meta-tags-optimizer` -Create optimized title tags, meta descriptions, OG tags

@@ -27,6 +27,8 @@ Options:
 
 ## Step 2: Generate Each Brief
 
+**Performance tip:** When generating 20+ briefs, split the work into two parallel agents (e.g. core pages + secondary pages). Provide full context in each agent prompt since they don't share state.
+
 For each page, create a file at `/seo/page_briefs/{slug}.md` with this structure:
 
 ```markdown

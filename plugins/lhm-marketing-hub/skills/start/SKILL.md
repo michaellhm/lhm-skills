@@ -67,6 +67,7 @@ Match the response to the skill catalog below. If multiple skills match, list op
 ### SEO & Content
 | Skill | Use When |
 |-------|----------|
+| **Service Page Generator** | Creating full service or condition pages with keyword research, copy, citations, and schema |
 | **Content Gap Analysis** | Finding keyword, topic, and content format gaps vs competitors |
 | **SEO Content Writer** | Writing SEO-optimized blog posts, guides, and articles |
 | **GEO Content Optimizer** | Optimizing content for AI citations and generative engines |

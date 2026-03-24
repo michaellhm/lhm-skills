@@ -9,10 +9,11 @@ Write complete page content from a page brief. Each content file includes SEO me
 
 ## Before Starting
 
-1. **Read client context** — read `/client/client_profile.md` for brand voice, audience, and key facts
-2. **Read the page brief** — read the specific brief from `/seo/page_briefs/{slug}.md`
-3. **Read any existing content** — if `/content/{slug}.md` already exists, read it first
-4. If no brief exists for the requested page, offer to run the Page Brief Generator first
+1. **Read anti-AI writing guidelines** — read `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/references/anti-ai-writing-guidelines.json` and apply all rules to every piece of content you write. Key rules: no em dashes, break rule of 3, no marketing cliche pairings, no "let's explore" transitions, no forced inspirational endings.
+2. **Read client context** — read `/client/client_profile.md` for brand voice, audience, and key facts
+3. **Read the page brief** — read the specific brief from `/seo/page_briefs/{slug}.md`
+4. **Read any existing content** — if `/content/{slug}.md` already exists, read it first
+5. If no brief exists for the requested page, offer to run the Page Brief Generator first
 
 ### Cross-Plugin Integration
 
