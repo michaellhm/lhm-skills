@@ -119,6 +119,7 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 - `geo-content-optimizer` -Optimize content for AI citations (GEO)
 - `meta-tags-optimizer` -Create optimized title tags, meta descriptions, OG tags
 - `content-quality-auditor` -Run CORE-EEAT 80-item quality audit
+- `pr-content-auditor` -Rewrite rejected Digital PRs to pass distributor quality checks
 - `content-refresher` -Identify and refresh underperforming content
 
 **SaaS & Growth Marketing:**
@@ -198,6 +199,7 @@ When in doubt, ask: "Do you want a quick zone check, or a full review where I ex
 - "Audit my SEO" → `seo-audit`
 - "Optimize for AI citations" → `geo-content-optimizer`
 - "Run a content quality audit" → `content-quality-auditor`
+- "PR got rejected" / "Rewrite the PR" / "Fix the press release" → `pr-content-auditor`
 
 ## Google Ads & Paid Ads Enforcement
 

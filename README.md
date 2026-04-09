@@ -26,7 +26,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/google-ads-monthly-review.md  # Full monthly review with skill chaining
   agents/seo-specialist.md             # Multi-skill SEO workflow orchestrator
   agents/client-analytics-dashboard.md # GA4 analytics dashboard workflow
-  skills/                              # All 48 skills
+  skills/                              # All 49 skills
     start/                             # Entry point — /start command
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
@@ -41,6 +41,7 @@ plugins/lhm-marketing-hub/             # The plugin
     geo-content-optimizer/             # AI citation and GEO optimization
     meta-tags-optimizer/               # Title tags, meta descriptions, OG tags
     content-quality-auditor/           # CORE-EEAT 80-item quality audit
+    pr-content-auditor/                # Rewrite rejected Digital PRs
     content-refresher/                 # Identify and refresh underperforming content
     ga-event-config/                   # GA4 event discovery and conversion classification
     ga-dashboard/                      # Analytics dashboard with period comparison
@@ -116,7 +117,7 @@ plugins/lhm-learn/                    # Session learning capture plugin
 
 **Strategy & Research** (3 skills): Competitive analysis with Porter's 5 Forces, keyword research with intent analysis and topic clustering, They Ask You Answer question discovery.
 
-**SEO & Content** (7 skills): Content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, meta tags optimization, CORE-EEAT content quality auditing, content refresh planning.
+**SEO & Content** (8 skills): Content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, meta tags optimization, CORE-EEAT content quality auditing, PR content rewriting for rejected distributions, content refresh planning.
 
 **Analytics & Reporting** (2 skills): GA4 event discovery and conversion classification, analytics dashboard generation with period comparison.
 

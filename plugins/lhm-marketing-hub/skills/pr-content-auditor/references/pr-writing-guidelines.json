@@ -1,0 +1,49 @@
+{
+  "title": "Content & Digital PR Writing Guidelines",
+  "description": "A combined set of rules for producing content that earns editorial coverage, builds authority backlinks, and avoids AI writing patterns that undermine credibility with both journalists and search engines.",
+  "sections": {
+    "anti_ai_writing": {
+      "label": "Anti-AI Writing Guidelines",
+      "description": "Avoid patterns that signal machine-generated content. Journalists and editors spot these immediately, and they kill pitch credibility before the story idea even lands.",
+      "guidelines": [
+        {"id": "w1", "rule": "Break the Rule of 3", "description": "Resist the pull toward triplets. Two points can be more decisive; four can show genuine depth. Vary your structure based on what the content actually demands, not what feels symmetrical."},
+        {"id": "w2", "rule": "Avoid contrast framing", "description": "Cut 'while X, Y' and 'although X, Y' constructions. They manufacture tension that often isn't there. State your point, then build on it rather than framing it against something else."},
+        {"id": "w3", "rule": "No poetic scene-setting", "description": "Skip openers like 'in a world where' or 'in an era defined by'. Journalists and editors read hundreds of pitches. Get to the point in the first sentence."},
+        {"id": "w4", "rule": "Vary paragraph structure", "description": "Odd-numbered paragraph counts are an AI fingerprint. Write to the content's natural stopping points, not to a predetermined structure."},
+        {"id": "w5", "rule": "Limit hypophora", "description": "Posing a question and immediately answering it is a filler pattern. If you're going to ask a question in content, let it sit or make it genuinely rhetorical."},
+        {"id": "w6", "rule": "Cut adverb reliance", "description": "Words like 'significantly', 'dramatically', and 'effectively' are weak intensifiers. Find a stronger verb or use a specific data point instead."},
+        {"id": "w7", "rule": "Avoid cliche pairings", "description": "Phrases like 'seamless integration', 'robust solution', and 'game-changing innovation' are invisible to readers. Use concrete, specific language that describes the actual thing."},
+        {"id": "w8", "rule": "Natural transitions", "description": "Drop 'let's explore', 'let's dive in', and 'now let's turn to'. Connect ideas through logic, not signposting."},
+        {"id": "w9", "rule": "End paragraphs with substance", "description": "Vague inspirational closers ('this is what sets brands apart') add nothing. Finish each paragraph with a point that moves the reader forward."},
+        {"id": "w10", "rule": "No em dashes", "description": "Em dashes are a strong AI tell. Use commas, parentheses, or restructure the sentence entirely."}
+      ]
+    },
+    "digital_pr_seo": {
+      "label": "Digital PR for SEO Guidelines",
+      "description": "Principles for producing content that earns genuine editorial coverage, high-authority backlinks, and builds E-E-A-T signals that compound over time.",
+      "guidelines": [
+        {"id": "pr1", "rule": "Lead with a newsworthy angle, not a keyword", "description": "Content pitched to journalists needs a story hook first. The SEO keyword strategy sits behind it. If the only reason to write a piece is to rank for a term, it won't earn coverage. Ask whether a reporter would file this as a story without you asking them to."},
+        {"id": "pr2", "rule": "Original data is the strongest link magnet", "description": "Surveys, proprietary studies, and first-party research give journalists something to cite that doesn't exist elsewhere. Generic content gets ignored; original findings get linked. If you can produce a stat that doesn't exist anywhere else, build the piece around it."},
+        {"id": "pr3", "rule": "Earn the right to speak on a topic", "description": "Coverage and links carry SEO weight only when the linking publication is relevant to your niche. A physio clinic getting a link from a health journal beats getting one from a general business directory. Pitch within the territory your brand has credibly earned."},
+        {"id": "pr4", "rule": "Target publications with real editorial standards", "description": "Links from outlets that accept unvetted guest posts or paid placements are low-value and carry penalty risk. Target publications where a journalist or editor decides what gets published. Those are the links that move domain authority."},
+        {"id": "pr5", "rule": "Build the asset before pitching", "description": "Journalists won't cover a promise. Have the data, tool, interactive, or expert commentary ready before outreach begins. A complete, linked asset in a pitch converts dramatically better than 'we're planning to publish research on X'."},
+        {"id": "pr6", "rule": "Prioritise interactive and embed-only content", "description": "A screenshot can replace a static infographic. An interactive tool, calculator, or map can only be experienced on your site. This forces journalists to link back rather than reproduce the content. Static assets earn fewer contextual links."},
+        {"id": "pr7", "rule": "Use reactive PR for fast, high-relevance links", "description": "When a news story breaks in your industry, a fast expert response to a journalist inquiry (via HARO, Qwoted, or direct contact) can earn links from major outlets within 24 to 48 hours. This works best when you can offer a specific point of view, not a general one."},
+        {"id": "pr8", "rule": "Position founders and practitioners as sources", "description": "Journalists link to people and brands they've interviewed, not just content they've found. Getting a practitioner quoted in a trade publication or national outlet builds both the backlink and the E-E-A-T signals Google weighs for healthcare and YMYL content."},
+        {"id": "pr9", "rule": "Measure traffic and branded search, not just link count", "description": "A large volume of low-traffic links tells you very little. Track whether earned coverage is driving referral visits and whether branded search volume increases after major placements. Those are the signals that reflect actual PR impact on SEO."},
+        {"id": "pr10", "rule": "Don't confuse syndication with digital PR", "description": "Press release distribution platforms push the same content to hundreds of sites simultaneously. Google devalues these at scale. Genuine digital PR means a journalist or editor made an independent decision to cover your story. One real editorial placement outweighs 50 syndicated URLs."},
+        {"id": "pr11", "rule": "Healthcare content requires compliance before distribution", "description": "For AHPRA-regulated clients, any claim in a pitched article or media asset must meet advertising compliance standards before it reaches a journalist. A non-compliant piece that earns coverage can create regulatory exposure far beyond the SEO benefit."},
+        {"id": "pr12", "rule": "Build journalist relationships before you need them", "description": "Cold pitches get ignored at high rates. Editors who know your name, or who have published you once before, are far more likely to respond. Invest time in building a list of relevant contacts and engaging with their work before you have something to pitch."}
+      ]
+    }
+  },
+  "combined_principles": {
+    "label": "Principles That Apply to Both",
+    "description": "These govern content quality whether the output is an article, a media pitch, or a journalist-facing asset.",
+    "guidelines": [
+      {"id": "c1", "rule": "Specificity beats generality every time", "description": "A specific claim with a number, name, or location is more credible to both readers and journalists than a broad assertion. 'Plantar fasciitis affects roughly 10% of the population' is citable. 'Many people experience foot pain' is not."},
+      {"id": "c2", "rule": "Write for the first reader, not the algorithm", "description": "Content that earns links does so because a real person found it useful or interesting enough to reference. Keyword density, heading structure, and internal link patterns matter, but only after the content is worth reading."},
+      {"id": "c3", "rule": "Voice consistency builds brand authority", "description": "Content that sounds like it was written by different tools on different days does not build a recognisable brand voice. Journalists and editors notice when pitches sound different from the published content they link to. Keep the voice consistent across assets."}
+    ]
+  }
+}
