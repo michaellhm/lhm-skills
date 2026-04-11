@@ -164,38 +164,39 @@ This file is the single source of truth for where a client is in their GMB optim
 - **Client:** [Name]
 - **Primary Location:** [Address]
 - **Primary Modality:** [e.g. Physiotherapy]
-- **Current Cycle:** 1 (started YYYY-MM-DD)
-- **Current Phase:** Month 0 — Onboarding & GBP Foundation
 - **Last Updated:** YYYY-MM-DD
 
 ## Focus Keywords & Ranking History
 
-| Keyword | Target | M0 (Baseline) | M1 | M2 | M3 | Trend |
-|---------|--------|---------------|----|----|----|----|
-| [Primary Modality] [City] | Top 3 | — | — | — | — | — |
-| [Service 2] [City] | Top 3 | — | — | — | — | — |
-| [Service 3] [City] | Top 5 | — | — | — | — | — |
-| [Service 4] [City] | Top 5 | — | — | — | — | — |
-| [Service 5] [City] | Top 5 | — | — | — | — | — |
-| [Service 6] [City] | Top 10 | — | — | — | — | — |
-| [Service 7] [City] | Top 10 | — | — | — | — | — |
+| Keyword | Cycle 1 M0 | Cycle 1 M1 | Cycle 1 M2 | Cycle 1 M3 | Cycle 2 M0 | Cycle 2 M1 | ... |
+|---------|-----------|-----------|-----------|-----------|-----------|-----------|-----|
+| [Primary Modality] [City] | — | — | — | — | — | — | |
+| [Service 2] [City] | — | — | — | — | — | — | |
+| [Service 3] [City] | — | — | — | — | — | — | |
+| [Service 4] [City] | — | — | — | — | — | — | |
+| [Service 5] [City] | — | — | — | — | — | — | |
+| [Service 6] [City] | — | — | — | — | — | — | |
+| [Service 7] [City] | — | — | — | — | — | — | |
 
-## Diagnostic Summary
-- **Threshold Decision:** [Topical relevance / Proximity / Mixed]
-- **Top Competitor Top3%:** [X]%
-- **Client Top3%:** [X]% ([X]% of competitor = [above/below] threshold)
-- **Month 2 Direction:** [FAQ content / Neighbourhood overlays / Mixed]
-
-## Priority Services (Current Cycle)
-1. [Service 1]
-2. [Service 2]
-3. [Service 3]
+Each cell contains: Position and Top3% metric (e.g. "Pos 5 (28%)")
 
 ---
 
-## Month 0 — Onboarding & GBP Foundation
+## 3-Month Cycle 1 — Apr 2026 to Jun 2026
 
-### Tasks
+### Cycle Focus
+- **Priority Services:**
+  1. [Service 1] (reason)
+  2. [Service 2] (reason)
+  3. [Service 3] (reason)
+- **Selection Reasoning:** [Which scenario from the decision framework applies and why]
+- **Approved by:** [Name] (YYYY-MM-DD)
+- **Diagnostic Direction:** [Topical relevance / Proximity / Mixed]
+- **Threshold:** Client Top3% [X]% vs Competitor Top3% [X]% = [above/below] threshold
+
+### Month 0 — Onboarding (MMM YYYY)
+
+#### Tasks
 - [ ] Run baseline diagnostic
 - [ ] Competitor audit (3 competitors)
 - [ ] GBP categories optimised (up to 10)
@@ -208,10 +209,9 @@ This file is the single source of truth for where a client is in their GMB optim
 - [ ] Site architecture mapped
 - [ ] **Exit criteria met**
 
-## Month 1 — Service Page Optimisation
+### Month 1 — Service Pages (MMM YYYY)
 
-### Tasks
-- [ ] Priority services selected and approved
+#### Tasks
 - [ ] Homepage consistency signal audit
 - [ ] Service page: [Service 1]
 - [ ] Service page: [Service 2]
@@ -221,9 +221,9 @@ This file is the single source of truth for where a client is in their GMB optim
 - [ ] Month 1 report generated
 - [ ] **Exit criteria met**
 
-## Month 2 — Content Expansion
+### Month 2 — Content Expansion (MMM YYYY)
 
-### Tasks
+#### Tasks
 - [ ] Diagnostic re-run (compare to baseline)
 - [ ] Content direction decided (FAQ vs overlay vs mixed)
 - [ ] Supporting content for [Service 1] (X pages)
@@ -232,9 +232,9 @@ This file is the single source of truth for where a client is in their GMB optim
 - [ ] Month 2 report generated
 - [ ] **Exit criteria met**
 
-## Month 3 — Link Building
+### Month 3 — Link Building (MMM YYYY)
 
-### Tasks
+#### Tasks
 - [ ] Link gap audit completed
 - [ ] "Not AI slop" links: [Service 1] page
 - [ ] "Not AI slop" links: [Service 2] page
@@ -246,6 +246,40 @@ This file is the single source of truth for where a client is in their GMB optim
 - [ ] Month 3 / full cycle report generated
 - [ ] **Exit criteria met**
 
+### Cycle 1 Summary
+- **Pages created:** [count] service pages, [count] supporting pages
+- **Links acquired:** [count] external links, [count] chambers, [count] sponsorships
+- **Ranking movement:** [Primary keyword] Pos X → Pos Y (+Z positions)
+- **Carry-over:** [Any incomplete items for next cycle]
+
+---
+
+## 3-Month Cycle 2 — Jul 2026 to Sep 2026
+
+### Cycle Focus
+- **Priority Services:**
+  1. [Service 4] (reason)
+  2. [Service 5] (reason)
+  3. [Service 6] (reason)
+- **Selection Reasoning:** [Updated reasoning based on Cycle 1 results]
+- **Approved by:** [Name] (YYYY-MM-DD)
+- **Diagnostic Direction:** [Topical relevance / Proximity / Mixed]
+- **Threshold:** Client Top3% [X]% vs Competitor Top3% [X]% = [above/below] threshold
+
+### Month 0 — Re-diagnostic (MMM YYYY)
+*(Lighter than Cycle 1 — GBP foundation already complete)*
+
+#### Tasks
+- [ ] Re-run diagnostic for all keywords
+- [ ] Select 3 new priority services
+- [ ] Approved by Michael
+- [ ] **Exit criteria met**
+
+*(GBP optimisation, citations, entity map, site architecture, post generation NOT repeated unless specifically requested)*
+
+### Month 1 — Service Pages (MMM YYYY)
+...
+
 ---
 
 ## Notes & Decisions
@@ -255,11 +289,14 @@ This file is the single source of truth for where a client is in their GMB optim
 ### Update Rules
 
 - Every skill updates this file when it completes
-- Tasks are marked `[x]` with a completion date appended: `- [x] Run baseline diagnostic — completed 2026-04-01`
-- Rankings are updated when new data is available (via MCP or manual input)
-- Sub-tasks are expanded as needed (e.g. citation audit lists each directory)
+- Tasks are marked `[x]` with a completion date appended: `- [x] Run baseline diagnostic — 2026-04-01`
+- Rankings are updated when new data is available (via MCP or manual input — user chooses via AskUserQuestion)
+- Sub-tasks are expanded as needed (e.g. citation audit lists each directory with status)
 - Notes section captures decisions that affect future work
-- When a new cycle starts, new Month 0-3 sections are appended below the previous cycle
+- When a new cycle starts, a new `## 3-Month Cycle N` section is appended with its own Cycle Focus and Month 0-3 task sections
+- The ranking history table grows horizontally, adding columns for each new cycle's months
+- Each cycle ends with a Cycle Summary capturing pages created, links acquired, ranking movement, and carry-over items
+- Re-cycle Month 0 is lighter: only diagnostic + service selection. Foundation tasks from Cycle 1 are not repeated unless the user specifically requests them
 
 ---
 
