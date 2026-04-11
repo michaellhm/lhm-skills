@@ -1,0 +1,22 @@
+{
+  "local-falcon": {
+    "command": "npx",
+    "args": ["@local-falcon/mcp"],
+    "env": {
+      "LOCAL_FALCON_API_KEY": ""
+    }
+  },
+  "dataforseo": {
+    "command": "npx",
+    "args": ["dataforseo-mcp"],
+    "env": {
+      "DATAFORSEO_LOGIN": "",
+      "DATAFORSEO_PASSWORD": ""
+    }
+  },
+  "screaming-frog": {
+    "command": "uvx",
+    "args": ["screaming-frog-mcp"],
+    "env": {}
+  }
+}

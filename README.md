@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-81 skills across four Claude Code plugins (48 marketing, 25 WordPress, 7 content engine, 1 learn) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+98 skills across five Claude Code plugins (48 marketing, 25 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -92,6 +92,40 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     lp-deploy-3/                        # Deploy remaining LP pages
     lp-subsite-deploy/                  # Deploy subsite from Docker to live server
     wp-ssh-deploy/                      # General WordPress SSH deployment
+plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
+  .claude-plugin/plugin.json            # Plugin manifest
+  agents/                               # 6 agents
+    gmb-orchestrator.md                 # Master agent — phase detection and routing
+    onboarding-agent.md                 # Month 0 — GBP foundation
+    service-optimizer-agent.md          # Month 1 — service pages
+    content-expansion-agent.md          # Month 2 — FAQ or overlay pages
+    link-building-agent.md              # Month 3 — link acquisition
+    content-writer.md                   # 8-pass writing utility
+  skills/                               # All 17 skills
+    gmb-project-manager/                # Project tracking and status
+    run-local-diagnostic/               # Grid scans + competitor audit
+    gbp-optimiser/                      # GBP profile optimisation
+    gbp-post-generator/                 # 52 weekly posts
+    citation-audit/                     # Directory NAP check
+    entity-mapper/                      # Competitor entity extraction
+    site-architecture-mapper/           # GBP-mirrored silo
+    service-priority-selector/          # Pick 3 services per cycle
+    consistency-signal-audit/           # 8 homepage signals
+    service-page-writer/                # Goal-completion content
+    technical-page-audit/               # Schema, speed, indexing
+    faq-content-builder/                # PAA to supporting pages
+    neighbourhood-overlay-writer/       # Geo pages
+    link-gap-finder/                    # Pages missing links
+    local-authority-finder/             # Chambers, sponsorships
+    pr-brief-generator/                 # Press release drafts
+    monthly-cycle-report/               # Monthly/cycle reports
+  references/                           # 10 reference files
+    anti-ai-writing-guidelines.json
+    ahpra-compliance-framework.md
+    gmb-ranking-principles.md
+    mcp-setup-guide.md
+    8-pass-writing-engine.md
+    content-guardrails/                 # 4 content type guardrails
 plugins/lhm-content-engine/            # Content pipeline plugin
   .claude-plugin/plugin.json            # Plugin manifest
   agents/content-orchestrator.md        # Batch pipeline orchestrator
@@ -124,6 +158,18 @@ plugins/lhm-learn/                    # Session learning capture plugin
 **SaaS & Growth Marketing** (25 skills): A/B testing, analytics tracking, competitor pages, content strategy, copy editing, copywriting, email sequences, form CRO, free tool strategy, launch strategy, marketing ideas, marketing psychology, onboarding CRO, page CRO, paid ads, paywall CRO, popup CRO, pricing strategy, product marketing, programmatic SEO, referral programs, schema markup, SEO audit, signup flow CRO, social content.
 
 **Pricing** (1 skill): Standalone pricing strategy and monetization.
+
+### GMB Hub (Local SEO)
+
+**Month 0 — Onboarding** (7 skills): Project management and tracking, 169-point grid scan diagnostics, GBP profile optimisation, 52 weekly post generation, citation audit, competitor entity mapping, GBP-mirrored site architecture.
+
+**Month 1 — Service Pages** (4 skills): Priority service selection, homepage consistency signal audit, goal-completion service page writing (via 8-pass engine), technical page audit with schema and indexing checks.
+
+**Month 2 — Content Expansion** (2 skills): FAQ and supporting content from PAA/Reddit questions, hyper-local neighbourhood overlay pages for proximity problems.
+
+**Month 3 — Link Building** (3 skills): Link gap analysis, local authority opportunities (chambers, sponsorships, .edu links), PR brief generation.
+
+**Cross-Phase** (1 skill): Adaptive monthly/cycle reporting with ranking trends.
 
 ### WordPress Hub
 
