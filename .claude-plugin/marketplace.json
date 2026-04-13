@@ -47,6 +47,14 @@
       "version": "1.2.8",
       "category": "local-seo",
       "tags": ["gmb", "gbp", "local-seo", "google-business-profile", "agency"]
+    },
+    {
+      "name": "lhm-finance-hub",
+      "source": "./plugins/lhm-finance-hub",
+      "description": "Weekly financial management hub combining cash flow forecasting, profit formula analysis, and Profit First allocations. Monday rhythm with weekly, monthly, and quarterly review cadences.",
+      "version": "1.0.0",
+      "category": "finance",
+      "tags": ["finance", "cashflow", "profit", "forecasting", "profit-first"]
     }
   ]
 }
