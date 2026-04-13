@@ -58,12 +58,13 @@ A weekly financial management plugin for Local Health Marketing (LHM) that combi
 | `cashflow-forecast.xlsx` | Tab 1: Cash Flow Forecast, Tab 2: Profit First Allocations |
 | `profit-calculator.xlsx` | 7-lever profit formula with current, target, gap analysis, scenario table |
 | `five-year-plan.xlsx` | Annual projections for 5 years with milestones |
+| `client-list.xlsx` | Source of truth for income forecasting — all clients, types, payment structures |
 
 ### Config Files
 
 | File | Contents |
 |------|----------|
-| `config/state.json` | Current week in quarter, last session date/type, client list, retainer rate, Profit First percentages, known upcoming lump sums, rolling averages |
+| `config/state.json` | Current week in quarter, last session date/type, Profit First percentages, rolling averages |
 
 ---
 
@@ -73,19 +74,20 @@ A weekly financial management plugin for Local Health Marketing (LHM) that combi
 
 **Trigger:** Monday scheduled task or manual invocation.
 
-**Input:** Two Xero bank CSV exports:
-1. Income account (last 7 days)
-2. OPEX account (last 7 days)
+**Input:**
+1. Two Xero bank CSV exports: Income account + OPEX account (last 7 days)
+2. Client update check: "Any clients won, lost, or project milestones hit?"
 
 **Processing steps:**
-1. Parse CSVs — extract transactions, dates, amounts
-2. Bucket transactions into the week they fall in (Mon-Sun)
-3. Calculate weekly totals: Total Cash In, Total Cash Out, Net Cash Flow
-4. Write actuals into `cashflow-forecast.xlsx` for the completed week
-5. Recalculate rolling average from last 6 months of actuals
-6. Update 13-week forecast columns using new rolling average
-7. If new retainer clients added (user informs agent), bump forecast income
-8. Colour-code closing balance: green (healthy), orange (tight), red (danger)
+1. Ask about client changes first — update `client-list.xlsx` if needed
+2. Parse CSVs — extract transactions, dates, amounts
+3. Bucket transactions into the week they fall in (Mon-Sun)
+4. Calculate weekly totals: Total Cash In, Total Cash Out, Net Cash Flow
+5. Write actuals into `cashflow-forecast.xlsx` for the completed week
+6. Recalculate rolling average from last 6 months of actuals
+7. Recalculate forecast from `client-list.xlsx` — retainer clients drive base income, project payments placed in expected weeks
+8. Update 13-week forecast columns
+9. Colour-code closing balance: green (healthy), orange (tight), red (danger)
 
 **Tab 1: Cash Flow Forecast — Columns per week:**
 
@@ -135,32 +137,38 @@ A weekly financial management plugin for Local Health Marketing (LHM) that combi
 
 **Trigger:** First Monday of each month, or manual.
 
+**Input:** Xero P&L export (monthly, cash basis). The P&L feeds the Profit Calculator with properly allocated expenses — unlike bank CSVs which only show money movement.
+
 **The 7 levers for LHM:**
 
-| Lever | What it means for LHM |
-|-------|----------------------|
-| Price | Average monthly retainer (~$1,500) |
-| Volume | Number of retainer clients + project clients |
-| COGS | Direct costs to deliver (subcontractors, tools per client) |
-| Team | Staff/contractor costs |
-| Marketing | Own lead gen spend |
-| Overheads | Software, subscriptions, general admin |
-| Property | Office/rent if applicable |
+| Lever | Xero P&L Categories | Description |
+|-------|---------------------|-------------|
+| **Price** | Derived from `client-list.xlsx` | Average monthly retainer (~$1,500) |
+| **Volume** | Derived from `client-list.xlsx` | Number of active retainer clients + project clients |
+| **COGS** | Software - Client Delivery, Operations | Direct costs to deliver per client |
+| **Team** | Contractor - Multiply Mii, Contractor - Alvina, Contractor - Developer, Contractor - Marketing Wingz, Contractor - Other, Virtual Assistant | Delivery team — scales with volume |
+| **Marketing** | Advertising & Marketing | Own lead gen spend |
+| **Owner's Pay** | Salaries & Wages, Superannuation (via Profit First) | Personal draw — separate from Team because it's a fixed personal need, not a delivery cost |
+| **Overheads** | Subscriptions, Internet, Food & Bev, Merchant/Stripe/Bank Fees, Accounting, Filing Fees, Motor Vehicles, Travel, Entertainment, Other expenses | Everything that doesn't scale with clients |
+
+> **Note:** Property is N/A for LHM (no office rent). Owner's Pay replaces Property as the 7th lever, which maps cleanly to the Profit First system.
 
 **Spreadsheet structure (`profit-calculator.xlsx`):**
 
-- **Row: "Now"** — current 7 numbers based on actuals
+- **Row: "Now"** — current 7 numbers based on Xero P&L actuals
 - **Row: "Target"** — where you want to be
 - **Gap analysis** — dollar difference per lever, highlights biggest unlock
 - **Scenario table** — steps through volume (e.g. 19, 20, 21... 30 clients) showing Income, each cost bucket, Profit, Margin at each step
 - **Break-even calculation** — minimum clients at current costs
 
 **Monthly review flow:**
-1. Agent pulls last month's actuals from cash flow data
-2. Updates the "Now" row in the spreadsheet
-3. Compares to target
-4. Tells user: "Your biggest unlock right now is X. Here's why."
-5. Updates scenario table
+1. User uploads Xero P&L export for the prior month
+2. Agent maps Xero categories to the 7 levers
+3. Updates the "Now" row in the spreadsheet
+4. Updates Price and Volume from `client-list.xlsx`
+5. Compares to target
+6. Tells user: "Your biggest unlock right now is X. Here's why."
+7. Updates scenario table
 
 ---
 
@@ -214,7 +222,7 @@ A weekly financial management plugin for Local Health Marketing (LHM) that combi
 
 **Spreadsheet structure (`five-year-plan.xlsx`):**
 
-| Year | Clients | Avg Price | Revenue | COGS | Team | Marketing | Overheads | Property | Total Costs | Profit | Margin |
+| Year | Clients | Avg Price | Revenue | COGS | Team | Marketing | Owner's Pay | Overheads | Total Costs | Profit | Margin |
 |------|---------|-----------|---------|------|------|-----------|-----------|----------|-------------|--------|--------|
 | Year 1 (current) | Actuals | ... | ... | ... | ... | ... | ... | ... | ... | ... | ...% |
 | Year 2 | Target | ... | ... | ... | ... | ... | ... | ... | ... | ... | ...% |
@@ -262,6 +270,37 @@ A weekly financial management plugin for Local Health Marketing (LHM) that combi
 
 ---
 
+## Client List (`client-list.xlsx`)
+
+The client list is the **source of truth** for income forecasting. Rather than relying solely on rolling averages, the cash flow forecast knows exactly which clients are paying what and when.
+
+**Columns:**
+
+| Column | Description |
+|--------|-------------|
+| Client Name | e.g. "Door Replaced" |
+| Type | Retainer / Project |
+| Monthly Retainer | $1,500 (if retainer) |
+| Project Value | $4,000 (if project) |
+| Payment Structure | Monthly / 50-50 / Upfront |
+| Start Date | When first payment expected |
+| Status | Active / Won (pending start) / Lost / Completed |
+| Notes | "Website build, deposit expected May Week 2" |
+
+**Status logic for forecasting:**
+- **Active** = included in every future week's forecast
+- **Won (pending start)** = drops into forecast from the start week onwards
+- **Lost** = removed from forecast from the end week onwards
+- **Completed** = project finished, no further income
+
+**For project clients, payment structure matters:**
+- 50/50 = deposit lands in Week X, completion payment in Week Y
+- Agent asks user to estimate those weeks when adding the project
+
+**Updated at the start of every Monday session** — agent asks about client changes before processing bank CSVs.
+
+---
+
 ## Finance Orchestrator (`finance-orchestrator`)
 
 **Role:** Runs the Monday session and determines which skills to trigger based on timing.
@@ -286,7 +325,17 @@ Agent: "Good morning! It's Monday — time for your weekly cash flow update.
        This is Week 8 of Q3, and it's the first Monday of the month,
        so we'll also review your Profit Calculator and Owner's Pay.
 
-       Please upload your Xero CSVs:
+       First — any client changes this week?
+       - New clients won?
+       - Clients lost or paused?
+       - Project milestones hit? (deposits received, completions due)"
+
+User: "Won a new retainer — Sleep Well Clinic, $1,650/mo, starts billing next week"
+
+Agent: "Got it. Added Sleep Well Clinic to the client list — forecast updated 
+       from next week onwards. That bumps projected weekly income from $X to $Y.
+
+       Now please upload your Xero CSVs:
        1. Income account export (last 7 days)
        2. OPEX account export (last 7 days)"
 
@@ -339,9 +388,16 @@ Agent: [triggers finance-advisor, models it, shows impact]
 - All spreadsheets are `.xlsx` format, stored in `~/Local Health Marketing/finance/`, synced to Google Drive via local Drive sync
 - Agent reads/writes locally; user views in Google Drive browser
 - No MCP dependency for spreadsheet access — direct local file operations
-- Cash flow forecast uses rolling 6-month average for projections, auto-adjusting as new actuals come in
+- **Two different data inputs for two different purposes:**
+  - Cash Flow Forecaster ← Xero bank CSVs (actual money movement, weekly)
+  - Profit Calculator ← Xero P&L export (accrual-based, properly allocated expenses, monthly)
+- Cash flow forecast uses client list as primary income driver, supplemented by rolling 6-month average for expenses
 - GST handling: income figures may include GST — track gross amounts for cash flow purposes (cash flow is about actual money movement, not accounting treatment)
-- Profit Calculator works on ex-GST figures for accurate margin analysis
+- Profit Calculator works on ex-GST figures for accurate margin analysis (Xero P&L on cash basis provides this)
+- **Xero P&L structure** (entity: Colman Collective Pty Ltd, cash basis):
+  - Trading Income: Sales, Hosting Income
+  - Cost of Sales: Contractors (Multiply Mii, Alvina, Developer, Marketing Wingz, Other), Operations, Software - Client Delivery
+  - Operating Expenses: Subscriptions, Virtual Assistant, Food & Bev, Internet, Merchant/Stripe/Bank Fees, Accounting, Salaries & Wages, Superannuation, Filing Fees, Motor Vehicles, Travel, Entertainment, Other expenses, Realised Currency Gains
 
 ---
 
