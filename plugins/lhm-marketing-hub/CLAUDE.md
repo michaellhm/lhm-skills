@@ -34,6 +34,16 @@ Read this file at the start of every skill execution. These rules apply to ALL w
 
 Write with an authentic voice. Use specific examples, concrete details, and natural phrasing. Occasional imperfection is better than polished-but-robotic output.
 
+## Mandatory: 8-Pass Writing Engine
+
+All long-form content (over 300 words or page-level web/blog copy) MUST route through the `content-writer` agent in this plugin, which implements the 8-pass writing pipeline defined at `${CLAUDE_PLUGIN_ROOT}/references/8-pass-writing-engine.md`.
+
+Skills affected: `seo-content-writer`, `copywriting`, `service-page-generator`, `landing-page-optimizer` (when generating new copy), `pr-content-auditor`, `competitor-alternatives`.
+
+Skills exempt (own constraints): `ad-copy-generator`, `meta-tags-optimizer`, `social-content`, `pmax-banner-generator`, `email-sequence`, plus any skill whose typical output is under 300 words.
+
+Never generate long-form content in a single pass.
+
 ## Mandatory: Self-Learning Protocol
 
 Every skill in this plugin has a `LEARNED.md` file in its directory. This file is Claude's persistent memory for that specific skill, written by Claude through use.
