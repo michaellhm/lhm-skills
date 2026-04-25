@@ -9,7 +9,7 @@ You manage post-launch changes to WordPress sites built with this system. The co
 
 ## When to Use
 
-Use this agent after the initial build is complete (Phase F done) when:
+Use this agent after the initial build is complete (Phase 6 done) when:
 - Adding a new page to the site
 - Modifying existing page content
 - Retiring/unpublishing a page
@@ -34,22 +34,22 @@ Ask the user about the new page:
 - What's the page about?
 - Where does it fit in the site hierarchy?
 
-Create a brief at `/seo/page_briefs/{slug}.md` — follow the same format as existing briefs. Reference existing keyword map to avoid cannibalization.
+Create a brief at `seo/page_briefs/{slug}.md` — follow the same format as existing briefs. Reference existing keyword map to avoid cannibalization.
 
 ### Step 2: Write the Content
 
 Load: `${CLAUDE_PLUGIN_ROOT}/skills/page-copywriter/SKILL.md`
 
 Create the content file at the appropriate location:
-- Service page: `/content/services/{slug}.md`
-- Location page: `/content/locations/{slug}.md`
-- Other: `/content/{slug}.md`
+- Service page: `content/services/{slug}.md`
+- Location page: `content/locations/{slug}.md`
+- Other: `content/{slug}.md`
 
 ### Step 3: Assess Design Needs
 
 Check if the new page needs any components not already in the block architecture:
-- Read `/design/blocks.md` for existing patterns
-- If new patterns are needed, update `blocks.md` and create the pattern files
+- Read `wp/blocks.md` for existing patterns
+- If new patterns are needed, update `wp/blocks.md` and create the pattern files
 
 ### Step 4: Build in WordPress
 
@@ -58,7 +58,7 @@ Load: `${CLAUDE_PLUGIN_ROOT}/skills/wp-page-builder/SKILL.md`
 - Convert content to block markup
 - Create the page in WordPress
 - Update navigation if needed
-- Update `/wp/wp_state.md`
+- Update `wp/wp_state.md`
 
 ### Step 5: Visual QA
 
@@ -73,7 +73,7 @@ Load: `${CLAUDE_PLUGIN_ROOT}/skills/visual-qa/SKILL.md`
 
 ### Step 6: Update Sitemap
 
-Update `/seo/sitemap.md` with the new page entry.
+Update `seo/sitemap.md` with the new page entry.
 
 ## Workflow: Modifying a Page
 
@@ -103,7 +103,7 @@ Update the page in WordPress:
 wp post update <page_id> --post_content="[updated block markup]"
 ```
 
-Update `/wp/wp_state.md` with the change log entry.
+Update `wp/wp_state.md` with the change log entry.
 
 ### Step 4: Visual QA on Modified Page
 
@@ -112,7 +112,7 @@ After pushing changes, run visual QA on the modified page:
 Load: `${CLAUDE_PLUGIN_ROOT}/skills/visual-qa/SKILL.md`
 
 - Run a responsive check at minimum breakpoints (4 viewports)
-- Compare against the previous state if screenshots exist in `/qa/{page-slug}/`
+- Compare against the previous state if screenshots exist in `qa/{page-slug}/`
 - Check that changes haven't broken layout or responsive behaviour
 - Fix any Critical issues
 
@@ -138,14 +138,14 @@ wp post update <page_id> --post_status=draft
 
 1. Add `status: retired` to the content file's frontmatter
 2. Remove from navigation
-3. Update `/seo/sitemap.md`
-4. Update `/wp/wp_state.md`
+3. Update `seo/sitemap.md`
+4. Update `wp/wp_state.md`
 
 ## Delta Detection
 
 When the user asks "what's changed?" or "is the site in sync?", compare:
 
-1. Content files in `/content/` vs pages listed in `/wp/wp_state.md`
+1. Content files in `content/` vs pages listed in `wp/wp_state.md`
 2. Flag any content files without corresponding WordPress pages
 3. Flag any WordPress pages not tracked in `wp_state.md`
 4. Check if content file `status` fields show `review` or `draft` (needs publishing)
@@ -154,6 +154,6 @@ Present the delta table:
 
 | File | WP Page | Status | Action Needed |
 |------|---------|--------|--------------|
-| /content/new-service.md | — | New file | Create in WP |
-| /content/about.md | ID 43 | Updated | Push update to WP |
+| content/new-service.md | — | New file | Create in WP |
+| content/about.md | ID 43 | Updated | Push update to WP |
 | — | ID 55 | In WP only | Review — may need content file |

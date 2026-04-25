@@ -1,0 +1,1 @@
+# LEARNED — lp-project-manager

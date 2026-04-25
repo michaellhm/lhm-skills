@@ -1,108 +1,65 @@
 ---
 name: wp-start
-description: "Start a WordPress website build session. Use this when the user wants to begin a website project, asks 'build a website', 'start a WordPress site', mentions 'website build', 'new site', or invokes /lhm-wordpress-hub:wp-start. This skill explains the phased delivery system, detects where the project is at, and routes to the right phase."
+description: "Start a session in the WordPress hub. Use this when the user wants to begin a website project, asks 'build a website', 'start a WordPress site', mentions 'website build', 'new site', 'landing page', 'LP campaign', or invokes /lhm-wordpress-hub:wp-start. This skill is a router — it detects which workflow (full WP build or LP campaign) and hands off to the right orchestrator."
 ---
 
-# Start a WordPress Build Session
+# WP Start — Router
 
-Follow these steps in order. Do not skip steps.
+The plugin handles two workflows. This skill detects which one and hands off.
 
-## 1. Pre-flight — Verify Project Location
+## Step 1: Detect Workflow
 
-Check whether the current working directory is a client project folder or contains client folders.
+Use Glob to inspect the current working directory and any client folders detected:
 
-- Use Glob or ls to inspect the current directory
-- The location is **dynamic** — do not assume a fixed path
-- If you can see a project structure (e.g. `/client/`, `/seo/`, `/content/` folders), you're inside a project
-- If you can see client-named folders, ask which client to work on
-- If neither: say "I can't find a project folder. Would you like me to create a new project?" and offer to run the `wp-project-setup` skill
+| Signal | Workflow |
+|---|---|
+| `wordpress/website-project-management.md` exists | Full Website Build |
+| `landing-pages/[campaign]/landing-page-project-management.md` exists | Landing Page Campaign |
+| Both exist | Ask user which to work on |
+| Neither exists, but a `client_profile.md` exists | Ask user — both workflows are possible |
+| Nothing exists | Ask user — fresh start, both workflows are possible |
 
-## 2. Explain the System
+## Step 2: Confirm with User
 
-Briefly tell the user:
+Use AskUserQuestion:
 
-> This is a phased WordPress build system. Each phase produces markdown files that become the source of truth. WordPress mirrors the filesystem — not the other way around.
->
-> **Phases:**
-> - **A. Client Intake** — Extract facts from conversations and documents
-> - **B. SEO & Information Architecture** — Keywords, sitemap, page briefs
-> - **C. Content** — Write page copy from briefs
-> - **D. Design** — Brand guidelines, design tokens, block specs
-> - **E. WordPress Build** — Theme scaffold, block registration, page building
-> - **F. Ops** — Performance hardening, security, pre-launch checklist
->
-> Each phase needs approval before moving to the next.
+> "Which workflow are we running today?"
 
-## 3. Detect Current Phase
+Options (presented based on what was detected):
+- "Full WordPress website build"
+- "Landing page campaign"
+- "Set up a new project / something else"
 
-Inspect the project folder to determine which phase to work on next. Read `${CLAUDE_PLUGIN_ROOT}/references/folder-structure.md` for the phase detection rules.
+## Step 3: Route
 
-Check which folders exist:
+### Full Website Build
+Hand off to `website-build-orchestrator`:
+- Tell the user: "Starting a full website build session. Loading the website-build-orchestrator."
+- Load `${CLAUDE_PLUGIN_ROOT}/agents/website-build-orchestrator.md`
 
-| Folders Present | Current State | Next Action |
-|----------------|---------------|-------------|
-| None or empty | Fresh project | Run Phase A — Client Intake |
-| `/client/` only | Intake done | Run Phase B — SEO & IA |
-| `/client/` + `/seo/` | SEO done | Run Phase C — Content |
-| `/client/` + `/seo/` + `/content/` | Content done | Run Phase D — Design |
-| All above + `/design/` | Design done | Run Phase E — WP Build |
-| All above + `/wp/` | Build done | Run Phase F — Ops |
-| All folders populated | Site launched | Offer Site Extension |
+### Landing Page Campaign
+Hand off to `landing-page-orchestrator`:
+- Tell the user: "Starting a landing page campaign session. Loading the landing-page-orchestrator."
+- Load `${CLAUDE_PLUGIN_ROOT}/agents/landing-page-orchestrator.md`
 
-Tell the user: "Your project is at **Phase X**. The next step is **[description]**. Ready to proceed?"
+### Fresh / New Project
+Use AskUserQuestion:
+> "What kind of project are we setting up?"
 
-## 4. Route to Phase
+Options:
+- "Full WordPress website build" → run `wp-project-setup`, then `website-build-orchestrator`
+- "Landing page campaign" → run `wp-project-setup` (creates client root if needed), then `landing-page-orchestrator` (which sets up the campaign folder via `lp-project-manager`)
+- "Not sure yet — let's just create the client folder" → run `wp-project-setup` and stop
 
-Use the `AskUserQuestion` tool to confirm the next phase or let the user pick a different one:
+## Step 4: Confirm Handoff
 
-- **Phase A**: Read `${CLAUDE_PLUGIN_ROOT}/skills/client-context-intake/SKILL.md`
-- **Phase B**: Read `${CLAUDE_PLUGIN_ROOT}/skills/sitemap-architect/SKILL.md` (then `page-brief-generator`)
-- **Phase C**: Read `${CLAUDE_PLUGIN_ROOT}/skills/page-copywriter/SKILL.md`
-- **Phase D**: Read `${CLAUDE_PLUGIN_ROOT}/skills/brand-discovery/SKILL.md` (then `design-system-generator`, `block-architect`)
-- **Phase E**: Read `${CLAUDE_PLUGIN_ROOT}/skills/theme-scaffold/SKILL.md` (then `wp-page-builder`)
-- **Phase F**: Read `${CLAUDE_PLUGIN_ROOT}/skills/wp-performance/SKILL.md` (then `wp-security`)
+Tell the user which orchestrator was loaded and let it take over from here. Do not proceed with phase work in this skill — that's the orchestrator's job.
 
-Or the user can run any individual skill directly.
+## What This Skill Does NOT Do
 
-## 5. Available Skills
+- Phase detection (orchestrators handle this)
+- Skill routing within a workflow (orchestrators handle this)
+- Project management updates (`wp-project-manager` / `lp-project-manager` handle this)
+- Folder creation (`wp-project-setup` handles this)
 
-### Phase A: Client Intake
-| Skill | Use When |
-|-------|----------|
-| **Client Context Intake** | Extracting facts from call notes, transcripts, or uploads |
-
-### Phase B: SEO & Information Architecture
-| Skill | Use When |
-|-------|----------|
-| **Sitemap Architect** | Building site structure, keyword map, page hierarchy |
-| **Page Brief Generator** | Creating per-page briefs with keywords and sections |
-
-### Phase C: Content
-| Skill | Use When |
-|-------|----------|
-| **Page Copywriter** | Writing page content from a brief |
-
-### Phase D: Design
-| Skill | Use When |
-|-------|----------|
-| **Brand Discovery** | Defining brand colors, typography, tone, imagery |
-| **Design System Generator** | Creating design tokens and component specs |
-| **Block Architect** | Evaluating native vs custom blocks |
-| **HTML Prototype** | Building static HTML prototypes |
-
-### Phase E: WordPress Build
-| Skill | Use When |
-|-------|----------|
-| **Theme Scaffold** | Scaffolding the block theme files |
-| **WP Page Builder** | Building individual pages in WordPress |
-
-### Phase F: Ops
-| Skill | Use When |
-|-------|----------|
-| **WP Performance** | Performance audit and optimization |
-| **WP Security** | Security hardening and pre-launch checklist |
-
-### Utility
-| Skill | Use When |
-|-------|----------|
-| **Project Setup** | Creating the canonical folder structure for a new project |
+This skill is a thin router. Keep it that way.
