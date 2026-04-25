@@ -1,6 +1,6 @@
 ---
 name: sitemap-architect
-description: "Build the site information architecture — keyword map, sitemap, and page hierarchy. Use this when the user says 'plan the sitemap', 'site structure', 'information architecture', 'IA planning', 'page hierarchy', 'keyword mapping', or 'site map'. Phase B of the website build. Requires client profile from Phase A."
+description: "Build the site information architecture — keyword map, sitemap, and page hierarchy. Use this when the user says 'plan the sitemap', 'site structure', 'information architecture', 'IA planning', 'page hierarchy', 'keyword mapping', or 'site map'. Phase 2 of the website build. Requires client profile from Phase 1."
 ---
 
 # Sitemap Architect

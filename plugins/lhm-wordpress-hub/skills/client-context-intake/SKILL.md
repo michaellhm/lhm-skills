@@ -1,6 +1,6 @@
 ---
 name: client-context-intake
-description: "Extract structured facts from client call notes, Fathom transcripts, meeting recordings, or uploaded documents. Use this when the user says 'process call notes', 'extract client info', 'intake from transcript', 'add client context', 'process Fathom notes', 'client discovery', or 'client onboarding'. Outputs facts only — no marketing copy. Phase A of the website build."
+description: "Extract structured facts from client call notes, Fathom transcripts, meeting recordings, or uploaded documents. Use this when the user says 'process call notes', 'extract client info', 'intake from transcript', 'add client context', 'process Fathom notes', 'client discovery', or 'client onboarding'. Outputs facts only — no marketing copy. Phase 1 of the website build."
 ---
 
 # Client Context Intake
@@ -109,7 +109,7 @@ After processing, present a summary:
 
 Use the `AskUserQuestion` tool to ask:
 
-> "Client intake is complete. Review the files and let me know if anything needs correction. Ready to proceed to **Phase B: SEO & Information Architecture**?"
+> "Client intake is complete. Review the files and let me know if anything needs correction. Ready to proceed to **Phase 2: SEO Architecture & Content Planning**?"
 
 ## Rules
 

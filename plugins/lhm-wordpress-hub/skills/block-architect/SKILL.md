@@ -1,6 +1,6 @@
 ---
 name: block-architect
-description: "Evaluate Gutenberg native blocks vs custom blocks for the project. Output block specifications and pattern requirements. Use this when the user says 'block architecture', 'which blocks do I need', 'custom blocks', 'block specs', 'gutenberg blocks', 'block evaluation', or 'native vs custom'. Phase D of the website build. Requires content files and design system."
+description: "Evaluate Gutenberg native blocks vs custom blocks for the project. Output block specifications and pattern requirements. Use this when the user says 'block architecture', 'which blocks do I need', 'custom blocks', 'block specs', 'gutenberg blocks', 'block evaluation', or 'native vs custom'. Phase 4 of the website build. Requires content files and design system."
 ---
 
 # Block Architect

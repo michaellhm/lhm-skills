@@ -1,6 +1,6 @@
 ---
 name: wp-page-builder
-description: "Build individual pages in WordPress from content and design artefacts. Use this when the user says 'build pages', 'create pages in WordPress', 'page builder', 'add pages to WordPress', 'build the homepage', or 'WP build'. Phase E of the website build. Requires content files, design system, and theme installed."
+description: "Build individual pages in WordPress from content and design artefacts. Use this when the user says 'build pages', 'create pages in WordPress', 'page builder', 'add pages to WordPress', 'build the homepage', or 'WP build'. Phase 5 of the website build. Requires content files, design system, and theme installed."
 ---
 
 # WP Page Builder
@@ -43,6 +43,16 @@ Options:
 5. Location pages — if applicable
 6. FAQ — supporting content
 7. Utility pages — privacy, terms
+
+### Parallel Agent Strategy for Multi-Page Builds
+
+When converting multiple pages simultaneously (not sequentially), spin out one parallel agent per page rather than running them in series. Each agent needs a detailed shared prompt containing the complete block pattern library extracted from the homepage reference — section wrappers, feature blocks, pricing cards, FAQ items, CTA, review cards, and any site-specific patterns. This produces consistent block markup across all pages at once rather than introducing drift when patterns are re-derived page by page.
+
+The shared prompt must include:
+- The full pattern reference (copy directly from the homepage-content-blocks.html or gutenberg-conversion-patterns.md)
+- The exact prototype CSS class names to preserve
+- The WP-CLI command pattern with the correct `--url` flag if on multisite
+- Which sections are candidates for Synced Patterns (see below)
 
 ## Step 2: Push Raw HTML Prototype (Prove the Design)
 
@@ -203,6 +213,30 @@ Before converting anything, create a complete inventory of every section on the 
 
 Do not start converting until the user approves the inventory.
 
+### Synced Patterns for Identical Sections
+
+Use WordPress Synced Patterns (`wp_block` post type) for sections that are character-identical across multiple pages — for example, a reviews/testimonials block that appears unchanged on every service page. A Synced Pattern means a single edit updates all pages simultaneously.
+
+**Create a Synced Pattern via WP-CLI:**
+
+```bash
+# Create the synced pattern
+wp post create \
+  --post_type=wp_block \
+  --post_title="Reviews Section" \
+  --post_status=publish \
+  --post_content="$(cat wp/reviews-section.html)"
+# Note the returned post ID (e.g. 88)
+```
+
+**Reference it in any page:**
+
+```html
+<!-- wp:block {"ref":88} /-->
+```
+
+**When NOT to use a Synced Pattern:** sections that vary per page — even slightly — should remain independent blocks. For example, a "Final CTA" section where the heading and button text differ per service page has SEO and contextual value in being unique. Syncing it would force the same copy everywhere. Keep those as standalone `wp:group` blocks on each page.
+
 ### The Mandatory Full-Width Pattern
 
 Every section that spans the full viewport width in the prototype MUST use this nesting:
@@ -361,6 +395,23 @@ Style checkmark icons via CSS `list-style-image` or `::marker` in `custom.css`.
 
 `.reveal` classes for IntersectionObserver scroll animations must be explicitly added to the page content HTML. They don't come from WordPress blocks or templates. Add `class="... reveal"` to each animatable element and `data-delay="N"` for stagger timing. Make sure `custom.js` with the IntersectionObserver code is enqueued by the theme.
 
+#### Editor CSS Overrides Required for Animated Elements
+
+Scroll-reveal CSS animations (e.g. `opacity:0; transform:translateY(30px)`) make elements invisible in the Gutenberg editor because the frontend IntersectionObserver JS never runs there. Any element that starts hidden via animation CSS will appear as blank white space in the editor. Fix this by adding overrides to `editor.css`:
+
+```css
+/* Reveal animation overrides — editor only */
+.editor-styles-wrapper .reveal,
+.editor-styles-wrapper [class*="fade"],
+.editor-styles-wrapper [class*="slide"] {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+```
+
+Adjust selectors to match whatever animation classes the prototype uses. Load this via `enqueue_block_editor_assets` (same hook used for all other `editor.css` rules). The `!important` is required to override the inline-style-like specificity of animation CSS.
+
 ### kses Sanitisation Warning
 
 `wp_update_post()` strips `<iframe>` tags via kses sanitisation. When pages contain Google Maps embeds or video iframes in `<!-- wp:html -->` blocks, use `$wpdb->update()` + `clean_post_cache()` instead. See `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md` for the full pattern.
@@ -448,6 +499,21 @@ If sections appear narrow in the editor instead of full-width:
 3. Check editor.css has: `.editor-styles-wrapper .alignfull { max-width: none; }`
 4. Check theme.json `styles.spacing.blockGap` is `"0"` (prevents white strips between sections)
 
+### Hiding the Post Title in the Editor
+
+The `.editor-post-title` element sits **outside** `.editor-styles-wrapper` in the Gutenberg editor. Scoped rules like `.editor-styles-wrapper .editor-post-title` will not reach it. To hide the post title area (common on full-page designs where the H1 lives inside the hero block), target these three selectors directly in `editor.css`:
+
+```css
+/* Post title is outside .editor-styles-wrapper — must be targeted globally */
+.editor-post-title,
+.editor-post-title__input,
+.edit-post-visual-editor__post-title-wrapper {
+  display: none !important;
+}
+```
+
+CSS loaded via `enqueue_block_editor_assets` is global in the editor scope, so it can reach these selectors even though they sit outside `.editor-styles-wrapper`.
+
 ### Completion Checklist
 
 Before declaring a page done, verify against the section inventory:
@@ -506,7 +572,7 @@ After building each page (or batch), use the `AskUserQuestion` tool:
 
 After all pages are built:
 
-> "All pages built and navigation configured. Ready to proceed to **Phase F: Ops (Performance & Security)**?"
+> "All pages built and navigation configured. Ready to proceed to **Phase 6: QA & Go-Live**?"
 
 Options:
 - "Approved — proceed to ops"

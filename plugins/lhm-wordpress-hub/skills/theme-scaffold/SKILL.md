@@ -1,6 +1,6 @@
 ---
 name: theme-scaffold
-description: "Scaffold a custom WordPress block theme with theme.json, templates, template parts, patterns, and styles. Use this when the user says 'scaffold theme', 'create theme', 'build theme', 'theme.json', 'block theme', 'custom theme', or 'WordPress theme'. Phase E of the website build. Requires design system and block specs."
+description: "Scaffold a custom WordPress block theme with theme.json, templates, template parts, patterns, and styles. Use this when the user says 'scaffold theme', 'create theme', 'build theme', 'theme.json', 'block theme', 'custom theme', or 'WordPress theme'. Phase 5 of the website build. Requires design system and block specs."
 ---
 
 # Theme Scaffold

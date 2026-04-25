@@ -1,6 +1,6 @@
 ---
 name: page-copywriter
-description: "Write page content from a page brief. Produces complete page copy with YAML frontmatter, SEO metadata, section-by-section content, and component declarations. Use this when the user says 'write page content', 'write the copy', 'write homepage', 'content from brief', 'fill in the content', or 'write [page name] page'. Phase C of the website build. Requires page briefs from Phase B."
+description: "Write page content from a page brief. Produces complete page copy with YAML frontmatter, SEO metadata, section-by-section content, and component declarations. Use this when the user says 'write page content', 'write the copy', 'write homepage', 'content from brief', 'fill in the content', or 'write [page name] page'. Phase 3 of the website build. Requires page briefs from Phase 2."
 ---
 
 # Page Copywriter
@@ -167,4 +167,4 @@ Use the `AskUserQuestion` tool:
 Options:
 - "Approved — write the next page"
 - "Needs edits" (then discuss changes)
-- "Approved — all pages done, proceed to Phase D: Design"
+- "Approved — all pages done, proceed to Phase 4: Brand, Design System & Prototype"

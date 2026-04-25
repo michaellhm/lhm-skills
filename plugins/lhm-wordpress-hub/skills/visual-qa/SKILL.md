@@ -401,12 +401,12 @@ Update `/qa/{page-slug}/qa-report.md` with the final status.
 
 This skill must run in these situations:
 
-1. **After theme scaffold** (Sub-Phase E1) - the `theme-scaffold` skill runs a lightweight visual diff (2 viewports) immediately after installation. This catches CSS divergence before any pages are built
-2. **After homepage build** (Sub-Phase E3) - compare `/design/prototype/homepage/` vs live homepage
-2. **After each page build** (Sub-Phase E4) - if a prototype exists for that page, compare. If no prototype exists, still screenshot the WordPress build at all breakpoints for a standalone responsive check
+1. **After theme scaffold** (Step 5.2) - the `theme-scaffold` skill runs a lightweight visual diff (2 viewports) immediately after installation. This catches CSS divergence before any pages are built
+2. **After homepage build** (Step 5.3) - compare `/design/prototype/homepage/` vs live homepage
+2. **After each page build** (Step 5.4) - if a prototype exists for that page, compare. If no prototype exists, still screenshot the WordPress build at all breakpoints for a standalone responsive check
 3. **After any CSS or theme changes** - re-run QA on affected pages
 4. **After site extension** (new pages, modified pages) - run QA on the changed pages
-5. **Before launch** (Phase F) - full-site QA pass at all breakpoints
+5. **Before launch** (Phase 6) - full-site QA pass at all breakpoints
 6. **After blog posts or new content** - run responsive check (no prototype comparison needed, just check for layout breaks)
 
 ## Pages Without Prototypes

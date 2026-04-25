@@ -1,6 +1,6 @@
 ---
 name: wp-security
-description: "Security hardening checklist for WordPress sites. Headers, permissions, plugin audit, backups, and pre-launch checks. Use this when the user says 'security hardening', 'secure WordPress', 'security audit', 'pre-launch checklist', 'security headers', 'harden WordPress', or 'launch checklist'. Phase F of the website build. Can also be run standalone."
+description: "Security hardening checklist for WordPress sites. Headers, permissions, plugin audit, backups, and pre-launch checks. Use this when the user says 'security hardening', 'secure WordPress', 'security audit', 'pre-launch checklist', 'security headers', 'harden WordPress', or 'launch checklist'. Phase 6 of the website build. Can also be run standalone."
 ---
 
 # WP Security
@@ -176,7 +176,7 @@ Before going live, verify:
 - [ ] Industry compliance (AHPRA, NDIS, etc. from constraints.md)
 
 ### Performance
-- [ ] Performance audit passed (see `/ops/performance.md`)
+- [ ] Performance audit passed (see `qa/performance.md`)
 - [ ] Mobile-friendly test passed
 - [ ] All images optimized
 
@@ -190,7 +190,7 @@ Before going live, verify:
 
 ## Step 4: Generate Security Report
 
-Write `/ops/security.md`:
+Write `qa/security.md`:
 
 ```markdown
 ---
@@ -231,7 +231,7 @@ status: draft
 
 ## Step 5: Create Editor Notes
 
-Write `/ops/editor_notes.md`:
+Write `qa/editor_notes.md`:
 
 ```markdown
 # Editor Notes
@@ -271,7 +271,7 @@ When adding new sections to pages:
 
 Use the `AskUserQuestion` tool:
 
-> "Security hardening and pre-launch checklist complete. The site is ready for launch. Review `/ops/security.md` and `/ops/editor_notes.md`. What's next?"
+> "Security hardening and pre-launch checklist complete. The site is ready for launch. Review `qa/security.md` and `qa/editor_notes.md`. What's next?"
 
 Options:
 - "Launch the site"

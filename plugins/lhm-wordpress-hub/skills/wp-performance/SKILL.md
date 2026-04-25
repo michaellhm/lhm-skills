@@ -1,6 +1,6 @@
 ---
 name: wp-performance
-description: "Performance audit and optimization for WordPress sites. Core Web Vitals, caching, image optimization, and speed improvements. Use this when the user says 'performance audit', 'speed optimization', 'Core Web Vitals', 'page speed', 'site speed', 'LCP', 'CLS', 'FID', 'caching', or 'optimize WordPress'. Phase F of the website build. Can also be run standalone on any WordPress site."
+description: "Performance audit and optimization for WordPress sites. Core Web Vitals, caching, image optimization, and speed improvements. Use this when the user says 'performance audit', 'speed optimization', 'Core Web Vitals', 'page speed', 'site speed', 'LCP', 'CLS', 'FID', 'caching', or 'optimize WordPress'. Phase 6 of the website build. Can also be run standalone on any WordPress site."
 ---
 
 # WP Performance
@@ -137,7 +137,7 @@ If using the block theme:
 
 ## Step 3: Generate Performance Report
 
-Write `/ops/performance.md`:
+Write `qa/performance.md`:
 
 ```markdown
 ---
@@ -192,7 +192,7 @@ status: draft
 
 Use the `AskUserQuestion` tool:
 
-> "Performance audit complete. Review `/ops/performance.md`. Proceed to **WP Security** hardening?"
+> "Performance audit complete. Review `qa/performance.md`. Proceed to **WP Security** hardening?"
 
 Options:
 - "Approved — proceed to security"

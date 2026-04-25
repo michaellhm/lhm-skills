@@ -153,14 +153,14 @@ After each significant action, update `wp/wp_state.md` with:
 
 ### Step 5.9: Full-Site Visual QA
 
-Before completing Phase E, run a comprehensive visual QA pass across all pages:
+Before completing Phase 5, run a comprehensive visual QA pass across all pages:
 
 Load: `${CLAUDE_PLUGIN_ROOT}/skills/visual-qa/SKILL.md`
 
 - Run at full breakpoints (all 8 viewports) for the homepage
 - Run at minimum breakpoints (4 viewports) for all other pages
 - Generate a consolidated QA summary across the entire site
-- All Critical issues must be resolved before Phase E can complete
+- All Critical issues must be resolved before Phase 5 can complete
 
 ### Step 5.10: Phase Completion
 

@@ -103,7 +103,7 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 - `ad-copy-generator` -Generate AHPRA-compliant responsive search ads (RSAs)
 - `bid-budget-optimizer` -Adjust campaign budgets and bid strategies
 - `keyword-optimizer` -Find wasted spend, top performers, negative keywords, match types
-- `landing-page-optimizer` -Audit landing pages for conversion and compliance
+- `landing-page-optimizer` -Audit landing pages for conversion and compliance (8-pass content-writer for new copy generation)
 - `google-ads-monthly-review` -Quick zone check and account health analysis
 - `pmax-banner-generator` -Generate Performance Max banner ad copy and image prompts
 
@@ -114,21 +114,21 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 
 **SEO & Content:**
 - `content-gap-analysis` -Identify keyword, topic, and content format gaps vs competitors
-- `service-page-generator` -Generate full service/condition pages with keyword research, copy, citations, and schema
-- `seo-content-writer` -Write SEO-optimized blog posts, guides, and articles
+- `service-page-generator` -Generate full service/condition pages with keyword research, copy, citations, and schema (uses 8-pass content-writer agent)
+- `seo-content-writer` -Write SEO-optimized blog posts, guides, and articles (uses 8-pass content-writer agent)
 - `geo-content-optimizer` -Optimize content for AI citations (GEO)
 - `meta-tags-optimizer` -Create optimized title tags, meta descriptions, OG tags
 - `content-quality-auditor` -Run CORE-EEAT 80-item quality audit
-- `pr-content-auditor` -Rewrite rejected Digital PRs to pass distributor quality checks
+- `pr-content-auditor` -Rewrite rejected Digital PRs to pass distributor quality checks (uses 8-pass for full rewrites)
 - `content-refresher` -Identify and refresh underperforming content
 
 **SaaS & Growth Marketing:**
 - `ab-test-setup` -Plan, design, or implement A/B tests
 - `analytics-tracking` -Set up, improve, or audit analytics tracking
-- `competitor-alternatives` -Create competitor comparison pages for SEO
+- `competitor-alternatives` -Create competitor comparison pages for SEO (uses 8-pass content-writer for comparison pages)
 - `content-strategy` -Plan content strategy and topic coverage
 - `copy-editing` -Edit, review, or improve existing marketing copy
-- `copywriting` -Write marketing copy for any page type
+- `copywriting` -Write marketing copy for any page type (uses 8-pass content-writer agent)
 - `email-sequence` -Create or optimize email sequences and drip campaigns
 - `form-cro` -Optimize lead capture, contact, and checkout forms
 - `free-tool-strategy` -Plan free tools for lead gen or SEO

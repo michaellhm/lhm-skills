@@ -9,7 +9,7 @@ Validate that the WordPress theme's CSS produces the same visual result as the a
 
 ## When to Run
 
-- After theme-scaffold (Phase E1) and theme installation (Phase E2), before page building (Phase E3)
+- After theme-scaffold (Step 5.2) and theme installation (Step 5.2), before page building (Step 5.3)
 - After any manual edits to the theme's custom CSS
 - When a page build doesn't match the prototype and you suspect CSS issues
 

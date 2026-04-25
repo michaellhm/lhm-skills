@@ -1,6 +1,6 @@
 ---
 name: design-system-generator
-description: "Generate design tokens, spacing scale, and component specs for theme.json. Use this when the user says 'design system', 'design tokens', 'spacing scale', 'generate theme.json settings', 'component specs', or 'design variables'. Phase D of the website build. Requires brand guidelines from Brand Discovery."
+description: "Generate design tokens, spacing scale, and component specs for theme.json. Use this when the user says 'design system', 'design tokens', 'spacing scale', 'generate theme.json settings', 'component specs', or 'design variables'. Phase 4 of the website build. Requires brand guidelines from Brand Discovery."
 ---
 
 # Design System Generator

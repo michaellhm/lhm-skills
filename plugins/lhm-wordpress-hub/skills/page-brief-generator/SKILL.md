@@ -1,6 +1,6 @@
 ---
 name: page-brief-generator
-description: "Generate per-page content briefs with target keywords, search intent, page sections, and CTAs. Use this when the user says 'create page briefs', 'write a brief', 'page brief', 'content brief', 'brief for homepage', 'brief for service page', or 'section outline'. Phase B of the website build. Requires sitemap and keyword map from the Sitemap Architect."
+description: "Generate per-page content briefs with target keywords, search intent, page sections, and CTAs. Use this when the user says 'create page briefs', 'write a brief', 'page brief', 'content brief', 'brief for homepage', 'brief for service page', or 'section outline'. Phase 2 of the website build. Requires sitemap and keyword map from the Sitemap Architect."
 ---
 
 # Page Brief Generator
@@ -149,4 +149,4 @@ Present the brief summary to the user. For each page, show:
 
 Use the `AskUserQuestion` tool:
 
-> "Page briefs generated for X pages. Review the briefs in `/seo/page_briefs/`. Approved — proceed to **Phase C: Content Writing**?"
+> "Page briefs generated for X pages. Review the briefs in `/seo/page_briefs/`. Approved — proceed to **Phase 3: Web Copy Production**?"

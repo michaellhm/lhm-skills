@@ -1,6 +1,6 @@
 ---
 name: brand-discovery
-description: "Extract or define brand guidelines — colors, typography, tone of voice, imagery direction. Use this when the user says 'brand guidelines', 'define the brand', 'brand discovery', 'color palette', 'brand identity', 'typography choices', 'visual identity', or 'brand direction'. Phase D of the website build. Can also be run standalone."
+description: "Extract or define brand guidelines — colors, typography, tone of voice, imagery direction. Use this when the user says 'brand guidelines', 'define the brand', 'brand discovery', 'color palette', 'brand identity', 'typography choices', 'visual identity', or 'brand direction'. Phase 4 of the website build. Can also be run standalone."
 ---
 
 # Brand Discovery

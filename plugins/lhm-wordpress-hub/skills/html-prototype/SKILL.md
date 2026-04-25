@@ -1,6 +1,6 @@
 ---
 name: html-prototype
-description: "Generate static HTML prototypes of key pages using the design system. Use this when the user says 'HTML prototype', 'static prototype', 'mockup', 'preview the design', 'HTML preview', or 'prototype the homepage'. Phase D of the website build. Optional step — requires brand guidelines and design system."
+description: "Generate static HTML prototypes of key pages using the design system. Use this when the user says 'HTML prototype', 'static prototype', 'mockup', 'preview the design', 'HTML preview', or 'prototype the homepage'. Phase 4 of the website build. Optional step — requires brand guidelines and design system."
 ---
 
 # HTML Prototype
@@ -246,7 +246,7 @@ If multiple versions were created:
 
 Use the `AskUserQuestion` tool:
 
-> "Review the prototype in your browser. Does the design direction look right? Approved — proceed to **Phase E: WordPress Build**?"
+> "Review the prototype in your browser. Does the design direction look right? Approved — proceed to **Phase 5: WordPress Build**?"
 
 Options:
 - "Approved — start theme scaffold"
