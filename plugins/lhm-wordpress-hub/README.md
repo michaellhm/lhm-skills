@@ -91,7 +91,7 @@ plugins/lhm-wordpress-hub/
     wordpress-builder.md            # Phase 5 agent
     qa-and-launch.md                # Phase 6 agent
     site-extension.md               # Post-launch agent
-  skills/                            # 26 skills (15 full-build, 8 LP, 3 shared utility)
+  skills/                            # 27 skills (16 full-build, 8 LP, 3 shared utility)
     [full build...]
     [LP...]
     [shared utility: wp-start, wp-project-setup, wp-ssh-deploy, css-sync-check, visual-qa, wp-blog-publisher]
