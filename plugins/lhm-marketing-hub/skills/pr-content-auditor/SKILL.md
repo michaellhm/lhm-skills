@@ -29,6 +29,19 @@ Rewrites rejected Digital PR articles so they pass distributor quality checks on
 
 5. **Check for rejection feedback.** Ask: "Did the publisher give any feedback on why it was rejected?" Accept text, screenshots, or "no feedback." This is optional context, not a blocker.
 
+## Mandatory: Route Long-Form Writing Through content-writer Agent
+
+Long-form content (over 300 words or page-level web/blog copy) goes through the 8-pass pipeline. This skill is responsible for:
+
+1. Research and brief construction
+2. Outline planning
+3. Building a `structured_brief` for the content-writer (target keyword, intent, outline, internal/external link targets, client voice notes from `client_profile.md` or product marketing context)
+4. Calling the content-writer agent with `content_type: "blog-post"` and the structured brief
+5. Saving returned content to the agreed output path
+6. Final SEO validation (primary keyword density, internal link count, meta description) where applicable
+
+Do not generate the body content directly. Delegate to content-writer.
+
 ## Rewrite Process
 
 Read the PR writing guidelines from `${CLAUDE_PLUGIN_ROOT}/skills/pr-content-auditor/references/pr-writing-guidelines.json` and the plugin-wide anti-AI writing guidelines from `${CLAUDE_PLUGIN_ROOT}/references/anti-ai-writing-guidelines.json`.

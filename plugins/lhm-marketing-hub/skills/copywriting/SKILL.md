@@ -36,6 +36,21 @@ Gather this context (ask if not provided):
 
 ---
 
+## Mandatory: Route Long-Form Writing Through content-writer Agent
+
+Long-form content (over 300 words or page-level web/blog copy) goes through the 8-pass pipeline. This skill is responsible for:
+
+1. Research and brief construction
+2. Outline planning
+3. Building a `structured_brief` for the content-writer (target keyword, intent, outline, internal/external link targets, client voice notes from `client_profile.md` or product marketing context)
+4. Calling the content-writer agent with `content_type: "page-copy"` and the structured brief
+5. Saving returned content to the agreed output path
+6. Final SEO validation (primary keyword density, internal link count, meta description) where applicable
+
+Do not generate the body content directly. Delegate to content-writer.
+
+---
+
 ## Copywriting Principles
 
 ### Clarity Over Cleverness

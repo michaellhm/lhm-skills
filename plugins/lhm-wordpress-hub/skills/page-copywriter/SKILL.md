@@ -21,6 +21,22 @@ For copywriting best practices, you can reference the marketing hub's copywritin
 
 Reference: `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/copywriting/SKILL.md`
 
+## Mandatory: Route Long-Form Writing Through content-writer Agent
+
+For any page over 300 words (which is essentially every full website page), the actual writing pass MUST be delegated to the content-writer agent. This skill is responsible for:
+
+1. Reading the page brief (`seo/page_briefs/[page].md`)
+2. Reading shared client context (`../client_profile.md`, `../playbook.md`, `../design/brand_guidelines.md` if exists)
+3. Building a structured brief for the content-writer
+4. Calling the content-writer agent with `content_type: "web-copy"` and the structured brief
+5. Writing the returned content to `content/[page].md` with YAML frontmatter and component declarations
+6. Validating SEO requirements (primary keyword in H1, meta tags, etc.)
+7. Asking the user via AskUserQuestion whether to mark this page complete in the PM doc — if yes, invoke `wp-project-manager` Mode 3 (Mark Complete).
+
+Do not generate the body content directly in this skill. Delegate to content-writer. The 8-pass pipeline is non-negotiable for full-website page copy.
+
+For pages under 300 words (rare — usually only thank-you pages or 404s), this skill can write directly without the content-writer agent.
+
 ## Step 1: Scope
 
 Use the `AskUserQuestion` tool to confirm:
@@ -29,11 +45,29 @@ Use the `AskUserQuestion` tool to confirm:
 
 Options based on available briefs in `/seo/page_briefs/`. If the user wants all pages, work through them one at a time, presenting each for review before moving to the next.
 
-## Step 2: Write the Content File
+## Step 2: Delegate to content-writer Agent (or Write Directly for Short Pages)
 
-Create `/content/{slug}.md` (or `/content/services/{slug}.md` for service pages, `/content/locations/{slug}.md` for location pages).
+### For Pages Over 300 Words (Standard Full-Website Pages)
+
+Call the content-writer agent with:
+
+```
+content_type: "web-copy"
+page_slug: "{slug}"
+page_brief: "[Full content of the page brief from seo/page_briefs/[slug].md]"
+client_context: "[Relevant extracts from client_profile.md, playbook.md, brand_guidelines.md]"
+page_type: "[e.g., 'homepage', 'service', 'location', 'landing-page']"
+```
+
+The content-writer agent will return fully formatted content ready to save. You will then save it to `/content/{slug}.md` and proceed to Step 3 (SEO Validation).
+
+### For Pages Under 300 Words (Rare Cases Only)
+
+If the brief specifies a page under 300 words, you may write directly in this skill. Use the format below and save to `/content/{slug}.md`.
 
 ### File Format
+
+Create `/content/{slug}.md` (or `/content/services/{slug}.md` for service pages, `/content/locations/{slug}.md` for location pages).
 
 ```markdown
 ---

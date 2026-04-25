@@ -44,7 +44,7 @@ Key rules (always enforce):
 
 All content-producing skills MUST route content generation through the content-writer agent which implements the 8-pass writing pipeline. Skills handle research and context gathering; the content-writer agent handles the actual writing.
 
-Reference: `${CLAUDE_PLUGIN_ROOT}/references/8-pass-writing-engine.md`
+Reference: `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/references/8-pass-writing-engine.md`
 
 Never generate long-form content in a single pass. The 8-pass system exists to produce content that passes AI detection, reads naturally, and converts.
 

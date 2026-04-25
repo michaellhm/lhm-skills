@@ -10,6 +10,15 @@ license: MIT
 
 Audit landing pages for conversion optimisation, identify issues affecting performance, and generate AHPRA-compliant copy improvements. Get a scored audit with prioritised recommendations and A/B test suggestions.
 
+## Routing Through content-writer Agent (When Generating New Copy)
+
+This skill has two modes:
+
+1. **Audit existing copy** (no content-writer routing) — review the current page, score it, suggest improvements inline. The 8-pass agent is not invoked because no new long-form copy is being generated.
+2. **Generate replacement copy** — when the audit recommends a substantial rewrite, call the content-writer agent with `content_type: "page-copy"` and a structured brief built from the audit findings. The brief should include the original page's failures, the target conversion improvements, and any client voice notes.
+
+Use AskUserQuestion to confirm with the user which mode they want before proceeding.
+
 ## When to Use
 
 - **Low conversion rate** - Good CTR but poor conversion

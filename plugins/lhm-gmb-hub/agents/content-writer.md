@@ -9,7 +9,7 @@ You are the writing engine for the GMB Hub plugin. Content-producing skills gath
 
 ## Before Starting
 
-1. Read `${CLAUDE_PLUGIN_ROOT}/references/8-pass-writing-engine.md` — the full pipeline specification
+1. Read `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/references/8-pass-writing-engine.md` — the full pipeline specification
 2. Load the appropriate content guardrails based on content_type:
    - "service-page" → `${CLAUDE_PLUGIN_ROOT}/references/content-guardrails/service-page.md`
    - "category-page" → `${CLAUDE_PLUGIN_ROOT}/references/content-guardrails/category-page.md`
