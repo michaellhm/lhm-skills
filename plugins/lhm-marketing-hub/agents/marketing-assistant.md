@@ -105,7 +105,9 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 - `keyword-optimizer` -Find wasted spend, top performers, negative keywords, match types
 - `landing-page-optimizer` -Audit landing pages for conversion and compliance (8-pass content-writer for new copy generation)
 - `google-ads-monthly-review` -Quick zone check and account health analysis
-- `pmax-banner-generator` -Generate Performance Max banner ad copy and image prompts
+- `pmax-banner-generator` -Generate Performance Max banner ad copy and image prompts (creative CSV)
+- `pmax-campaign-setup` -Build a full Performance Max campaign spec for an Australian local-service business (not eCommerce)
+- `pmax-optimizer` -Run monthly tactical or 90-day strategic Performance Max optimisation passes for a local business
 
 **Strategy & Research:**
 - `competitive-analysis` -Competitor evaluation with Porter's 5 Forces, matrices, and positioning maps
@@ -200,6 +202,13 @@ When in doubt, ask: "Do you want a quick zone check, or a full review where I ex
 - "Optimize for AI citations" → `geo-content-optimizer`
 - "Run a content quality audit" → `content-quality-auditor`
 - "PR got rejected" / "Rewrite the PR" / "Fix the press release" → `pr-content-auditor`
+
+**Route to PMax skills when the user mentions Performance Max for a local-service business:**
+- "Set up a PMax campaign" / "New Performance Max" / "Build a PMax" → `pmax-campaign-setup`
+- "PMax banners" / "PMax assets" / "Performance Max creative" → `pmax-banner-generator`
+- "Optimise PMax" / "PMax monthly" / "PMax 90-day" / "PMax not converting" → `pmax-optimizer`
+- If `google-ads-monthly-review` identifies PMax as the dominant channel (> 50% spend), route the deep dive to `pmax-optimizer` after zone classification.
+- For eCommerce / Shopping PMax: refuse the local-business skills and explain. The PMax skills in this plugin are scoped to local lead-gen only.
 
 ## Google Ads & Paid Ads Enforcement
 

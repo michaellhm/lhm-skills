@@ -102,6 +102,8 @@ After approval, execute each approved action by loading the relevant skill.
 | Keyword waste, negative keywords, match type changes, search terms | `keyword-optimizer` |
 | Ad performance issues, creative refresh, new RSAs | `ad-copy-generator` |
 | Landing page conversion issues, page audit | `landing-page-optimizer` |
+| PMax-dominant account (> 50% spend), PMax-specific issues | `pmax-optimizer` (deep dive after zone classification) |
+| New PMax campaign needed for a local-service client | `pmax-campaign-setup` (route once the user confirms) |
 
 **For each skill:**
 
