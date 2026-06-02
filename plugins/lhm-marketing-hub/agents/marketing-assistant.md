@@ -105,6 +105,7 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 - `keyword-optimizer` -Find wasted spend, top performers, negative keywords, match types
 - `landing-page-optimizer` -Audit landing pages for conversion and compliance (8-pass content-writer for new copy generation)
 - `google-ads-monthly-review` -Quick zone check and account health analysis
+- `quarterly-adversarial-review` -90-day red-team review vs prior 90 days with AdPulse zone and waste hunt
 - `pmax-banner-generator` -Generate Performance Max banner ad copy and image prompts
 
 **Strategy & Research:**

@@ -97,18 +97,19 @@ Save the zone assessment to the client folder:
 
 **File**: `google_ads/YYYY-MM/monthly-review-YYYY-MM.md`
 
+**This report is a one-pager. One page maximum.** Keep prose to a minimum, lead with the data, no preamble or wrap-up. The whole thing should fit on a single printed page.
+
+Include the **Execution Checklist for the matched zone only** (pull it from `templates/zone-analysis.md`). Do not paste all five zone checklists — only the one that applies.
+
 ```
 # Google Ads Monthly Review: [Client Name]
 Date: [Today's Date]
 
-## Zone Assessment: [Emoji] [Zone] — [Priority]
+## Zone: [Emoji] [Zone] — [Priority]
 
 ### Key Metrics
-- Monthly Budget: $X,XXX
-- Actual Spend: $X,XXX (XX% of month elapsed)
-- Budget Pacing: XXX%
-- Target CPA: $XX | Actual CPA: $XX
-- Performance vs Target: XX%
+- Monthly Budget: $X,XXX | Actual Spend: $X,XXX (XX% of month elapsed)
+- Budget Pacing: XXX% | Target CPA: $XX | Actual CPA: $XX | Performance vs Target: XX%
 
 ### Campaign Breakdown
 | Campaign | Spend | Conv | CPA | vs Target | Status |
@@ -118,6 +119,9 @@ Date: [Today's Date]
 ### Priority Actions
 1. [Action] — [Impact] — [Reasoning]
 2. ...
+
+### [Zone] Execution Checklist
+[Paste the matched zone's checklist from zone-analysis.md]
 
 ### Recommended Next Skills
 - [Skill name] for [specific focus]

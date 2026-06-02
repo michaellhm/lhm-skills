@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-98 skills across five Claude Code plugins (48 marketing, 25 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+99 skills across five Claude Code plugins (49 marketing, 25 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -26,7 +26,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/google-ads-monthly-review.md  # Full monthly review with skill chaining
   agents/seo-specialist.md             # Multi-skill SEO workflow orchestrator
   agents/client-analytics-dashboard.md # GA4 analytics dashboard workflow
-  skills/                              # All 49 skills
+  skills/                              # All 50 skills
     start/                             # Entry point — /start command
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
@@ -34,6 +34,7 @@ plugins/lhm-marketing-hub/             # The plugin
     keyword-optimizer/                 # Keyword and wasted spend analysis
     landing-page-optimizer/            # Landing page audits
     google-ads-monthly-review/          # Account health check and zone analysis
+    quarterly-adversarial-review/       # 90-day red-team review with AdPulse zone
     competitive-analysis/               # Competitor evaluation and market positioning
     keyword-research/                  # Keyword discovery, intent analysis, topic clusters
     content-gap-analysis/              # Keyword, topic, and content gap identification
@@ -147,7 +148,7 @@ plugins/lhm-learn/                    # Session learning capture plugin
 
 **Client Management** (3 skills): Client onboarding and profile setup, campaign playbook generation from transcripts, plain-language client update emails.
 
-**Google Ads & PPC** (6 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), PMax banners.
+**Google Ads & PPC** (7 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), quarterly adversarial 90-day review, PMax banners.
 
 **Strategy & Research** (3 skills): Competitive analysis with Porter's 5 Forces, keyword research with intent analysis and topic clustering, They Ask You Answer question discovery.
 

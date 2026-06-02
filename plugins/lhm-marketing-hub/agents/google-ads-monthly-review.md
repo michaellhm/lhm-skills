@@ -123,10 +123,12 @@ After completing each skill, briefly summarise what was done and ask:
 
 ### Phase 5: Session Summary
 
-After all approved actions are executed (or the user decides to stop), produce two output files:
+After all approved actions are executed (or the user decides to stop), produce two output files. **Each file is a one-pager — one page maximum.** Lead with data, cut preamble and filler.
 
 **File 1: Zone Assessment**
 Save to: `google_ads/YYYY-MM/monthly-review-YYYY-MM.md`
+
+Include the **Execution Checklist for the matched zone only**, pulled from `${CLAUDE_PLUGIN_ROOT}/skills/google-ads-monthly-review/templates/zone-analysis.md`. Never paste all five zone checklists — only the one that applies.
 
 ```
 # Google Ads Monthly Review: [Client Name]
@@ -135,11 +137,8 @@ Date: [Today's Date]
 ## Zone: [Emoji] [Zone] -[Priority]
 
 ### Key Metrics
-- Monthly Budget: $X,XXX
-- Actual Spend: $X,XXX (XX% of month elapsed)
-- Budget Pacing: XXX%
-- Target CPA: $XX | Actual CPA: $XX
-- Performance vs Target: XX%
+- Monthly Budget: $X,XXX | Actual Spend: $X,XXX (XX% of month elapsed)
+- Budget Pacing: XXX% | Target CPA: $XX | Actual CPA: $XX | Performance vs Target: XX%
 
 ### Campaign Breakdown
 | Campaign | Spend | Conv | CPA | vs Target | Status |
@@ -149,6 +148,9 @@ Date: [Today's Date]
 ### Recommendations
 1. [Action] -[Impact] -[Status: Approved/Skipped]
 2. ...
+
+### [Zone] Execution Checklist
+[Paste the matched zone's checklist from zone-analysis.md]
 ```
 
 **File 2: Session Summary**
@@ -162,7 +164,6 @@ Date: [Today's Date]
 
 ## Actions Executed
 1. [Skill name]: [What was done] -[Key outcome]
-2. ...
 
 ## Actions Deferred
 - [Action]: [Reason deferred]

@@ -44,7 +44,7 @@ Reference guide for Responsive Search Ad structure, character limits, and best p
 - `Physio Gold Coast` (16 chars)
 - `Sports Physiotherapy` (20 chars)
 - `Gold Coast Physio` (17 chars)
-- `Expert Physiotherapy` (20 chars)
+- `Local Physiotherapy` (19 chars)
 
 **Character counting tips:**
 - Keep location short (GC instead of Gold Coast if needed)
@@ -82,15 +82,17 @@ Reference guide for Responsive Search Ad structure, character limits, and best p
 **Template:**
 ```
 [Years] Years Experience
-AHPRA Registered [Profession]
-[Qualification] [Profession]
+University Qualified [Profession]
+[Association] Member
 ```
 
 **Examples:**
-- `AHPRA Registered Team` (21 chars)
 - `15 Years Experience` (19 chars)
 - `University Qualified` (20 chars)
 - `Experienced Physios` (19 chars)
+- `APA Member Clinic` (17 chars)
+
+> Never use "AHPRA registered", "specialist", or "expert" in headlines.
 
 ---
 
@@ -146,17 +148,19 @@ Near [Landmark/Area]
 **Template:**
 ```
 [Unique Feature]
-[Specialisation]
-[Patient Type] Specialists
+[Area Of Focus] Care
+[Patient Type] Care
 [Approach] Based Care
 ```
 
 **Examples:**
-- `Sports Injury Experts` (21 chars)
-- `Work Injury Specialists` (23 chars)
+- `Sports Injury Care` (18 chars)
+- `Work Injury Care` (16 chars)
 - `Same Day Appointments` (21 chars)
 - `Evidence-Based Care` (19 chars)
 - `Personalised Treatment` (22 chars)
+
+> Avoid "specialist" / "expert" wording — describe the area of focus as "care" instead.
 
 ---
 
@@ -164,30 +168,26 @@ Near [Landmark/Area]
 
 ### Description 1: Core Service + Benefit
 
+All descriptions are written in **Title Case** (every major word capitalised).
+
 **Purpose:** Primary service description with patient benefit
 
 **Template:**
 ```
-[Core service description]. [Key benefit statement]. [Optional CTA].
+[Core Service Description]. [Key Benefit Statement]. [Optional CTA].
 ```
 
 **Example:**
 ```
-Expert physiotherapy services on the Gold Coast. Supporting your recovery journey. Book today.
+Physiotherapy Services On The Gold Coast. Supporting Your Recovery Journey. Book Today.
 ```
-(94 chars - too long, needs editing)
-
-**Edited:**
-```
-Expert physio services on the Gold Coast. Supporting your recovery. Book today.
-```
-(79 chars ✅)
+(86 chars ✅)
 
 ---
 
 ### Description 2: Credentials + Trust
 
-**Purpose:** Establish credibility and expertise
+**Purpose:** Establish credibility through qualifications and experience
 
 **Template:**
 ```
@@ -196,9 +196,9 @@ Expert physio services on the Gold Coast. Supporting your recovery. Book today.
 
 **Example:**
 ```
-AHPRA registered physiotherapists with 15+ years experience. Trusted by local athletes.
+University Qualified Physios With 15+ Years Experience. Trusted By Local Athletes.
 ```
-(87 chars ✅)
+(81 chars ✅)
 
 ---
 
@@ -213,7 +213,7 @@ AHPRA registered physiotherapists with 15+ years experience. Trusted by local at
 
 **Example:**
 ```
-Book your assessment today. Personalised treatment plans tailored to your needs.
+Book Your Assessment Today. Personalised Treatment Plans Tailored To Your Needs.
 ```
 (80 chars ✅)
 
@@ -230,9 +230,9 @@ Book your assessment today. Personalised treatment plans tailored to your needs.
 
 **Example:**
 ```
-Specialising in sports injuries and work-related conditions. Evidence-based approach.
+Sports Injury And Work-Related Condition Care. Evidence-Based, Tailored To You.
 ```
-(86 chars ✅)
+(78 chars ✅)
 
 ---
 
@@ -301,11 +301,12 @@ Pinning locks a headline or description to a specific position.
 
 ### Trust Builders for Healthcare
 
-- AHPRA registration
 - Years of experience
-- Qualifications
+- University qualifications
 - Association memberships
 - Patient testimonials (with consent)
+
+> Do not use "AHPRA registered", "specialist", or "expert" as trust builders in ad copy.
 
 ### Safe Healthcare CTAs
 
@@ -355,29 +356,13 @@ Pinning locks a headline or description to a specific position.
 
 ---
 
-## RSA Template Table
+## RSA Export Format (Google Ads Editor)
+
+The deliverable CSV is the Google Ads Editor RSA import format: one row per ad, one column per headline/description. Descriptions in Title Case. Credential slots use experience/qualification/association — never registration, "specialist", or "expert".
 
 ```csv
-Type,Position,Copy,Characters,Category,AHPRA Status
-Headline,1,[Keyword + Location],XX,Keyword,COMPLIANT
-Headline,2,[Primary Keyword],XX,Keyword,COMPLIANT
-Headline,3,[Second Keyword],XX,Keyword,COMPLIANT
-Headline,4,[Key Benefit],XX,Benefit,COMPLIANT
-Headline,5,[Secondary Benefit],XX,Benefit,COMPLIANT
-Headline,6,[Years Experience],XX,Credential,COMPLIANT
-Headline,7,[Registration],XX,Credential,COMPLIANT
-Headline,8,[Qualification],XX,Credential,COMPLIANT
-Headline,9,[Primary CTA],XX,CTA,COMPLIANT
-Headline,10,[Secondary CTA],XX,CTA,COMPLIANT
-Headline,11,[Location 1],XX,Location,COMPLIANT
-Headline,12,[Location 2],XX,Location,COMPLIANT
-Headline,13,[Differentiator 1],XX,Differentiator,COMPLIANT
-Headline,14,[Differentiator 2],XX,Differentiator,COMPLIANT
-Headline,15,[Unique Angle],XX,Differentiator,COMPLIANT
-Description,1,[Core Service + Benefit],XX,-,COMPLIANT
-Description,2,[Credentials + Trust],XX,-,COMPLIANT
-Description,3,[CTA + Value],XX,-,COMPLIANT
-Description,4,[Differentiator + Secondary],XX,-,COMPLIANT
+Campaign,Ad Group,Headline 1,Headline 2,Headline 3,Headline 4,Headline 5,Headline 6,Headline 7,Headline 8,Headline 9,Headline 10,Headline 11,Headline 12,Headline 13,Headline 14,Headline 15,Description 1,Description 2,Description 3,Description 4,Path 1,Path 2,Final URL
+[Campaign],[Ad Group],[Keyword + Location],[Primary Keyword],[Second Keyword],[Key Benefit],[Secondary Benefit],[Years Experience],[University Qualified],[Association Member],[Primary CTA],[Secondary CTA],[Location 1],[Location 2],[Differentiator 1],[Differentiator 2],[Unique Angle],[Core Service + Benefit],[Credentials + Trust],[CTA + Value],[Differentiator + Value],[path1],[path2],[final-url]
 ```
 
 ---

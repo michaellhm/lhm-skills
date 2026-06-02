@@ -13,6 +13,9 @@ Before publishing any healthcare ad, verify:
 - [ ] No therapeutic claims
 - [ ] No success rates or statistics
 - [ ] No before/after promises
+- [ ] No "specialise", "specialist", or "expert" (and variants)
+- [ ] No "AHPRA registered" phrasing
+- [ ] No bold/absolute statements ("the only", "always works", "guaranteed to")
 - [ ] Credentials are accurate
 - [ ] CTA is consultation-focused
 - [ ] No urgency/fear language
@@ -103,17 +106,58 @@ Before publishing any healthcare ad, verify:
 
 ---
 
+### 7. Specialist / Expert Claims ❌
+
+AHPRA restricts "specialise", "specialist", and "expert" (and variants) unless a recognised specialist title is actually held. Never use them in ad copy.
+
+| Banned Phrase | Why | Compliant Alternative |
+|--------------|-----|----------------------|
+| "Sports Injury Experts" | "expert" restricted | "Sports Injury Care" |
+| "Specialist Physio Team" | "specialist" restricted | "Experienced Physio Team" |
+| "We Specialise In Backs" | "specialise" restricted | "Focused On Back Care" |
+| "Expert Treatment" | "expert" restricted | "Professional Treatment" |
+
+**Detection Pattern:** Contains "special" (specialise, specialist, specialising, specialty), "expert", "expertise"
+
+---
+
+### 8. "AHPRA Registered" Phrasing ❌
+
+Do not put the phrase "AHPRA registered" in ad copy. Build trust through qualifications, experience, and association membership instead.
+
+| Banned Phrase | Why | Compliant Alternative |
+|--------------|-----|----------------------|
+| "AHPRA Registered Physios" | Don't advertise registration | "University Qualified Physios" |
+| "AHPRA Registered Clinic" | Don't advertise registration | "APA Member Clinic" |
+
+**Detection Pattern:** Contains "AHPRA registered", "AHPRA-registered"
+
+---
+
+### 9. Bold / Absolute Statements ❌
+
+| Banned Phrase | Why | Compliant Alternative |
+|--------------|-----|----------------------|
+| "The Only Clinic You Need" | Absolute claim | "Comprehensive Care Under One Roof" |
+| "Always Works" | Absolute outcome | "Evidence-Based Approach" |
+| "Guaranteed To Help" | Absolute + outcome | "Aims To Support Your Recovery" |
+
+**Detection Pattern:** Contains "the only", "always", "never fails", "guaranteed to", "every time"
+
+---
+
 ## Safe Patterns
 
 ### Credential Language ✅
 
 | Pattern | Example |
 |---------|---------|
-| Registration | "AHPRA registered practitioners" |
 | Qualifications | "University qualified team" |
 | Experience | "15 years of experience" |
 | Membership | "APA member" |
-| Specialisation | "Specialising in sports injuries" |
+| Area of focus | "Sports injury care" (never "specialising") |
+
+> Never use "AHPRA registered", "specialist", "specialise", or "expert" as credential language.
 
 ---
 
@@ -166,6 +210,9 @@ cure, cures, eliminate, fix, heal, remove
 % (percentages)
 before, after, transformation, results
 don't wait, act now, limited, dangerous
+specialise, specialist, specialising, specialty, expert, expertise
+AHPRA registered
+the only, always, never fails, guaranteed to, every time
 ```
 
 ### Step 2: Review Context
@@ -178,9 +225,10 @@ If red flag word found, check context:
 ### Step 3: Verify Credentials
 
 If credentials claimed, verify:
-- AHPRA registration verifiable?
 - Years experience accurate?
 - Qualifications claimed are held?
+- Association membership current?
+- No "AHPRA registered", "specialist", or "expert" phrasing used
 
 ### Step 4: Check CTAs
 
@@ -250,12 +298,14 @@ Ensure CTAs are:
 4. Percentages/Statistics → Remove
 5. Before/After → Remove
 6. Don't Wait/Act Now → Change to "when ready"
+7. Specialise/Specialist/Expert → Change to "care" / "experienced"
+8. AHPRA Registered → Change to qualifications or association membership
+9. The Only/Always/Guaranteed To → Remove the absolute claim
 
 **Always Include:**
-1. AHPRA registration (if claiming)
-2. Consultation-focused CTA
-3. Evidence-based language
-4. Verifiable credentials only
+1. Consultation-focused CTA
+2. Evidence-based language
+3. Verifiable credentials only (qualifications, experience, membership — never "AHPRA registered")
 
 ---
 

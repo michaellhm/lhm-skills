@@ -47,6 +47,8 @@ Skip anything already known from `client_profile.md`.
 
 ## Output Format
 
+**This report is a one-pager. One page maximum.** For accounts with more than ~6 active campaigns, drop the per-campaign blocks and use a single compact table (one row per campaign: Campaign, Cost Δ, Conv Δ, CPA, Bid rec, Budget rec) so the whole review still fits on one page. For 6 or fewer campaigns, use the per-campaign block format below.
+
 Produce **one block per campaign**. Each block follows this exact structure:
 
 ```

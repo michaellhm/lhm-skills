@@ -49,6 +49,40 @@ Quick reference for analysing accounts and determining appropriate actions based
 - Landing page conversion rate
 - Impression share (budget lost)
 
+### Execution Checklist (from AdPulse whitepaper)
+
+Emit this checklist verbatim in the report when the account lands in Red. Stabilise the patient: check vitals, treat life-threatening issues first, then stabilise.
+
+**One-off**
+- [ ] Budget reduced to 80-90% of ideal daily calculation
+- [ ] Budget allocation tweaked to favour best performers
+- [ ] Conversion actions are firing
+- [ ] Geo-targeting tight enough
+- [ ] Search partners performance checked
+- [ ] Ad extensions - all relevant types exist
+- [ ] Search term audit - wasted spend focus
+- [ ] Blocked search terms checked
+- [ ] Competitor analysis - check ads and special deals
+- [ ] Best campaigns - can they be expanded? (duplicate with different bid strategy / match type upgrade / demographics / audiences / geo)
+
+**Daily**
+- [ ] Budget reduced to 80-90% of ideal daily calculation
+- [ ] Budget allocation tweaked to favour best performers
+- [ ] All ads approved
+- [ ] No 404 errors on landing pages
+
+**Weekly**
+- [ ] Budgets lasting all day - adjust bids down if not
+- [ ] Search terms - wasted spend focus
+- [ ] Check troubleshooter to find weak metrics
+
+**Monthly**
+- [ ] Check performance & add bid modifiers on anomalies (devices / locations / audiences / demographics)
+- [ ] Pause/exclude poor performers (landing pages / ad groups / ads / keywords / search terms)
+- [ ] Bid strategy - change/experiment?
+- [ ] Landing page speed
+- [ ] Bounce rate or time-on-page metrics
+
 ---
 
 ## 🟠 Orange Zone Analysis
@@ -83,6 +117,39 @@ Quick reference for analysing accounts and determining appropriate actions based
 - Click-through rate by ad
 - Conversion rate by landing page
 - Search term relevance
+
+### Execution Checklist (from AdPulse whitepaper)
+
+Emit this checklist verbatim in the report when the account lands in Orange. Flip the Red Zone priorities: performance fixes on top, budget increases only once performance is back on track.
+
+**One-off**
+- [ ] Budget allocation tweaked to favour best performers
+- [ ] Conversion actions are firing
+- [ ] Feed issues checked
+- [ ] Geo-targeting tight enough
+- [ ] Search partners performance checked
+- [ ] Ad extensions - all relevant types exist
+- [ ] Search term audit - wasted spend focus
+- [ ] Blocked search terms checked
+- [ ] Competitor analysis - check ads and special deals
+- [ ] Best campaigns - can they be expanded? (duplicate with different bid strategy / match type upgrade / demographics / audiences / geo)
+
+**Daily**
+- [ ] Budget allocation tweaked to favour best performers
+- [ ] All ads approved
+- [ ] No 404 errors on landing pages
+
+**Weekly**
+- [ ] Budgets lasting all day - adjust bids down if not
+- [ ] Search terms - wasted spend focus
+- [ ] Check troubleshooter to find weak metrics
+
+**Monthly**
+- [ ] Check performance & add bid modifiers on anomalies (devices / locations / audiences / demographics)
+- [ ] Pause/exclude poor performers (landing pages / ad groups / ads / keywords / search terms)
+- [ ] Bid strategy - change/experiment?
+- [ ] Landing page speed
+- [ ] Bounce rate or time-on-page metrics
 
 ---
 
@@ -119,6 +186,34 @@ Quick reference for analysing accounts and determining appropriate actions based
 - Lost IS due to rank
 - Search volume available
 
+### Execution Checklist (from AdPulse whitepaper)
+
+Emit this checklist verbatim in the report when the account lands in Yellow. Easy zone: increase budgets where impactful, expand existing campaigns, then add new campaign types/networks.
+
+**One-off**
+- [ ] Budget allocation - increase where impactful
+- [ ] Raise bids in best campaigns
+- [ ] Blocked search terms checked
+- [ ] Turn on search partners?
+- [ ] Ad extensions - all relevant types exist
+- [ ] Best campaigns - can they be expanded? (duplicate with different bid strategy / match type upgrade / keyword expansion / new ad formats / demographics / audiences / geo)
+- [ ] Remarketing campaigns?
+- [ ] Pay-for-conversions (display)?
+- [ ] Add new campaign types?
+- [ ] New networks (Bing)?
+
+**Daily**
+- [ ] Budget allocation - ensure top performers are not limited
+- [ ] All ads approved
+- [ ] No 404 errors on landing pages
+
+**Weekly**
+- [ ] Budgets lasting all day? Increase budgets if not
+
+**Monthly**
+- [ ] Check performance & add positive bid modifiers on anomalies (devices / locations / audiences / demographics)
+- [ ] Bid strategy - change/experiment?
+
 ---
 
 ## 🔵 Blue Zone Analysis
@@ -153,6 +248,15 @@ Quick reference for analysing accounts and determining appropriate actions based
 - Client communication timing
 - Available budget flexibility
 
+### Execution Checklist (from AdPulse whitepaper)
+
+The whitepaper gives Blue no checklist - the actions are sequential and run in order until spend is back in line. Emit these as ordered steps in the report:
+
+1. [ ] Ask the client for more budget (performance is good - more leads/sales is an easy conversation)
+2. [ ] Decrease bids, starting with poorer performers (10%/day until spend drops)
+3. [ ] Decrease budget on poorer performers if bids alone do not pull spend back
+4. [ ] Turn off worst-performing keywords / ad groups / campaigns as a last resort
+
 ---
 
 ## 🟢 Green Zone Analysis
@@ -186,6 +290,16 @@ Quick reference for analysing accounts and determining appropriate actions based
 - Quality Score stability
 - Seasonal forecast alignment
 - New keyword opportunities
+
+### Execution Checklist (maintenance mode)
+
+Green has no remedial checklist - the account is healthy. Emit these maintenance items in the report:
+
+- [ ] Test a new strategy or experiment (use the stability to learn)
+- [ ] Incremental optimisation - small, low-risk improvements
+- [ ] Monitor competitor impression share and offers
+- [ ] Plan for next month / anticipate seasonal shifts
+- [ ] Document what is working as a template for other accounts
 
 ---
 
@@ -223,7 +337,8 @@ START
 4. Use matrix to determine zone
 5. Review relevant zone section for actions
 6. Present prioritised recommendations
-7. Wait for user approval before proceeding
+7. **Emit the matched zone's Execution Checklist in the report** (only the one zone that applies, not all five)
+8. Wait for user approval before proceeding
 
 ---
 

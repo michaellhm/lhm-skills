@@ -79,6 +79,12 @@ Analyse search terms to identify:
 - Competitor terms performing poorly
 - Question/research queries with no conversions
 
+**Always decompose to n-grams, never block the whole phrase.** When a wasteful search term is a multi-word phrase, do not add the full phrase as a negative. Identify the individual word(s) that signal the bad intent and add each as its own single-word (unigram) negative. Example: the search term `how much does physio cost` should not become a negative as-is — add `"how"` and `"cost"` as two separate n-gram negatives instead. This catches every future variant that contains those words, not just the one phrase.
+
+**Every negative is phrase match, wrapped in quotes.** Output each negative as `"keyword"` (with the double quotes) so it pastes straight into a Google Ads phrase-match negative list. One keyword per line.
+
+**Group into named categories.** Each category becomes a separately identifiable negative keyword list the user can name and reuse. See the TXT output format below.
+
 ### Step 6: Blocked Terms Audit
 
 Check if any negatives are blocking valuable queries:
@@ -95,9 +101,10 @@ For top performers, suggest:
 
 ### Step 8: Generate Outputs
 
-- CSV with keyword recommendations
-- TXT file with negative keywords (import-ready)
-- Markdown summary report
+Three deliverables:
+1. **Short 1-pager** (Markdown) — summary only, one page maximum
+2. **Google Ads Editor CSV** — keyword status (pause/enable) and match-type changes, ready to import into Google Ads Editor
+3. **Negative keywords TXT** — categorised, phrase-match, quoted, n-gram decomposed
 
 ## Expected Interaction Flow
 
@@ -185,19 +192,22 @@ Look for common word combinations in non-converting search terms:
 
 ```
 Example Search Terms (0 conversions):
-- "chiropractor jobs perth"
-- "chiropractic jobs near me"
-- "chiropractor career salary"
+- chiropractor jobs perth
+- chiropractic jobs near me
+- chiropractor career salary
+- how much does a chiropractor cost
 
-N-Gram Pattern Identified: "jobs", "career", "salary"
+N-Gram tokens signalling bad intent: jobs, career, salary, how, cost
 
-Negative Keywords to Add:
-- jobs
-- careers
-- career
-- salary
-- employment
+Negative Keywords to Add (phrase match, quoted, one n-gram per line):
+"jobs"
+"career"
+"salary"
+"how"
+"cost"
 ```
+
+Note how the multi-word phrases are never added whole — only the offending single-word n-grams are, so every future variant is caught.
 
 **Categories of Negatives:**
 
@@ -225,80 +235,81 @@ perth chiro clinic,3,$42,-perth,Check if intentional
 
 ## Outputs
 
-### 1. Keyword Recommendations CSV
+### 1. Google Ads Editor CSV
 
-**Filename:** `keyword-recommendations-[client]-[date].csv`
+**Filename:** `keyword-changes-[client]-[date].csv`
+
+Built for direct import into **Google Ads Editor**. Exactly these columns, in this order:
 
 ```csv
-Type,Keyword,Campaign,Ad Group,Spend,Conversions,CPA,Tier,Action,Reason,Priority
-Pause,back pain exercises,Generic,Back Pain,$145,0,-,Waste,Pause,High spend no conversions,Critical
-Reduce,back specialist,Generic,Back Pain,$285,3,$95,Bottom 20%,Reduce Bid 30%,CPA 2x target,High
-Protect,chiropractor perth,Generic,Chiropractor,$1420,45,$32,Top 20%,Maintain,Best performer,High
-Upgrade,perth chiro,Generic,Chiropractor,$576,12,$48,Top 20%,Add Phrase Match,Consistent converter,Medium
+Campaign,Ad Group,Keyword,Status,Match Type
+Generic,Back Pain,back pain exercises,Paused,Phrase
+Generic,Back Pain,back specialist,Paused,Phrase
+Generic,Chiropractor,perth chiro,Enabled,Phrase
+Generic,Chiropractor,chiropractor perth,Enabled,Exact
 ```
+
+Rules:
+- **Status** is only ever `Paused` or `Enabled`.
+- **Match Type** is `Broad`, `Phrase`, or `Exact` (capitalised — Editor is case-sensitive on import).
+- **To pause a wasteful keyword:** add a row with the keyword at its *current* match type and `Status = Paused`.
+- **To re-enable a paused winner:** same keyword, current match type, `Status = Enabled`.
+- **For a match-type upgrade:** add a row with the keyword at the *new* match type and `Status = Enabled` (Editor adds it as a new keyword; pause the old match type in a separate row if you want it removed).
+- Do **not** put negative keywords in this file — they go in the TXT.
 
 ### 2. Negative Keywords TXT
 
-**Filename:** `negative-keywords-[campaign]-[date].txt`
+**Filename:** `negative-keywords-[client]-[date].txt`
 
-Ready for direct import into Google Ads:
+Categorised so each block can be pasted into its own named negative keyword list. Every keyword is phrase match, wrapped in double quotes, one per line. Multi-word wasteful phrases are decomposed into single-word n-gram negatives (see Step 5).
 
 ```
-jobs
-careers
-career
-salary
-employment
-hiring
-exercises
-free
-at home
-diy
-self treatment
-course
-degree
-how to become
-training
+=== Information / research intent ===
+"how"
+"cost"
+"price"
+"vs"
+
+=== Job seekers ===
+"jobs"
+"careers"
+"salary"
+"hiring"
+
+=== DIY / free ===
+"exercises"
+"free"
+"diy"
+
+=== Education ===
+"course"
+"degree"
+"training"
+
+=== Wrong location ===
+"sydney"
+"melbourne"
 ```
 
-### 3. Summary Report (Markdown)
+Category headers are `=== Label ===` lines so they are obvious to skip when copying — copy only the quoted keyword lines into each Google Ads list.
+
+### 3. Short 1-Pager (Markdown)
+
+**Filename:** `keyword-optimization-[client]-[date].md`
+
+**One page maximum.** Summary only — the detail lives in the CSV and TXT.
 
 ```markdown
-## Keyword Optimization Report
-**Client**: Perth Chiropractic
-**Campaign**: Generic - Back Pain
-**Date**: 15th July 2024
+## Keyword Optimization: Perth Chiropractic — Generic
+**Date:** 15th July 2024
 
-### Summary
-- Total Keywords Analysed: 85
-- Wasted Spend Identified: $650 (18% of total spend)
-- Negative Keywords Generated: 42
-- Match Type Changes Recommended: 8
+- Keywords analysed: 85 | Wasted spend: $650 (18%) | Negatives generated: 42 | Match-type changes: 8
+- Top performers protected: chiropractor perth ($32 CPA), back pain treatment ($41), perth chiro ($48)
 
-### Wasted Spend Breakdown
-| Category | Amount | Keywords |
-|----------|--------|----------|
-| Zero conversions, high spend | $450 | 12 |
-| CPA >2x target | $200 | 6 |
-| **Total** | **$650** | **18** |
-
-### Top Performers (Protect)
-1. chiropractor perth - $32 CPA, 45 conversions
-2. back pain treatment - $41 CPA, 28 conversions
-3. perth chiro - $48 CPA, 12 conversions
-
-### Negative Keywords by Category
-- Job seekers: 8 keywords
-- DIY/Free: 12 keywords
-- Education: 6 keywords
-- Wrong location: 10 keywords
-- Irrelevant: 6 keywords
-
-### Recommended Actions
-1. [Priority] Pause 12 high-waste keywords
-2. [Priority] Add 42 negative keywords
-3. [Medium] Reduce bids on 6 low-efficiency keywords
-4. [Medium] Add phrase match versions of top 3 exact match keywords
+### Actions (in the CSV / TXT)
+1. Pause 12 high-waste keywords — see CSV (Status = Paused)
+2. Add 42 phrase-match negatives across 5 lists — see TXT
+3. Reduce/upgrade 8 keywords by match type — see CSV
 ```
 
 ## Tips
