@@ -34,7 +34,7 @@ plugins/lhm-marketing-hub/             # The plugin
     keyword-optimizer/                 # Keyword and wasted spend analysis
     landing-page-optimizer/            # Landing page audits
     google-ads-monthly-review/          # Account health check and zone analysis
-    quarterly-adversarial-review/       # 90-day red-team review with AdPulse zone
+    quarterly-adversarial-review/       # 90-day red-team review: reconstructs prior work, tests assumptions, assigns AdPulse zone
     competitive-analysis/               # Competitor evaluation and market positioning
     keyword-research/                  # Keyword discovery, intent analysis, topic clusters
     content-gap-analysis/              # Keyword, topic, and content gap identification

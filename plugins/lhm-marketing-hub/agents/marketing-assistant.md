@@ -105,7 +105,7 @@ All skills live in `${CLAUDE_PLUGIN_ROOT}/skills/[skill-name]/SKILL.md`.
 - `keyword-optimizer` -Find wasted spend, top performers, negative keywords, match types
 - `landing-page-optimizer` -Audit landing pages for conversion and compliance (8-pass content-writer for new copy generation)
 - `google-ads-monthly-review` -Quick zone check and account health analysis
-- `quarterly-adversarial-review` -90-day red-team review vs prior 90 days with AdPulse zone and waste hunt
+- `quarterly-adversarial-review` -90-day red-team review vs prior 90 days: reconstructs last quarter's work from the client folder, puts its assumptions on trial, runs cynical + path-tracer waste hunts, assigns AdPulse zone
 - `pmax-banner-generator` -Generate Performance Max banner ad copy and image prompts (creative CSV)
 - `pmax-campaign-setup` -Build a full Performance Max campaign spec for an Australian local-service business (not eCommerce)
 - `pmax-optimizer` -Run monthly tactical or 90-day strategic Performance Max optimisation passes for a local business
