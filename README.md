@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-99 skills across five Claude Code plugins (49 marketing, 25 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+110 skills across six Claude Code plugins (52 marketing, 27 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn, 6 finance) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -26,7 +26,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/google-ads-monthly-review.md  # Full monthly review with skill chaining
   agents/seo-specialist.md             # Multi-skill SEO workflow orchestrator
   agents/client-analytics-dashboard.md # GA4 analytics dashboard workflow
-  skills/                              # All 50 skills
+  skills/                              # All 52 skills
     start/                             # Entry point — /start command
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
@@ -48,7 +48,9 @@ plugins/lhm-marketing-hub/             # The plugin
     ga-dashboard/                      # Analytics dashboard with period comparison
     client-update-email/               # Plain-language client update emails
     campaign-playbook-generator/       # Campaign & sales playbooks from transcripts
-    pmax-banner-generator/             # Performance Max assets
+    pmax-banner-generator/             # Performance Max creative assets (CSV)
+    pmax-campaign-setup/               # Performance Max campaign build spec for local businesses
+    pmax-optimizer/                    # Performance Max monthly + 90-day optimisation passes
     copywriting/                       # Marketing copy for any page
     email-sequence/                    # Drip campaigns and email flows
     seo-audit/                         # SEO diagnostics
@@ -148,7 +150,7 @@ plugins/lhm-learn/                    # Session learning capture plugin
 
 **Client Management** (3 skills): Client onboarding and profile setup, campaign playbook generation from transcripts, plain-language client update emails.
 
-**Google Ads & PPC** (7 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), quarterly adversarial 90-day review, PMax banners.
+**Google Ads & PPC** (9 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), quarterly adversarial 90-day review, PMax banner creative, PMax campaign setup for local businesses, PMax monthly + 90-day optimisation.
 
 **Strategy & Research** (3 skills): Competitive analysis with Porter's 5 Forces, keyword research with intent analysis and topic clustering, They Ask You Answer question discovery.
 
