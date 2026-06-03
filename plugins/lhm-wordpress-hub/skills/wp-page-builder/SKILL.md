@@ -99,6 +99,8 @@ wp option update show_on_front page
 wp option update page_on_front <page_id>
 ```
 
+**Don't trust the stdout of a `post update --post_content="$(cat ...)"`.** When the HTML content is large, WP-CLI often echoes output that LOOKS like an argument-parse error (the tail of the file content followed by something like `in 'cli'`) even though the update succeeded. Never conclude the push failed from that message alone. Verify by comparing byte counts and block markers: `wp post get <id> --field=content | wc -c` against the source file, and grep the stored content for expected block comments (`<!-- wp:`). Trust the DB, not the echo.
+
 ### Multisite Considerations
 
 On WordPress multisite installations, **every WP-CLI command** needs the `--url` flag pointing to the correct subsite:
@@ -203,12 +205,33 @@ Options:
 
 With the proven frontend as your reference, systematically convert each section from raw HTML to native WordPress blocks. After each section is converted, compare the frontend against the Step 2 baseline to catch any visual regressions.
 
+### The `wp:html` Policy (Strict)
+
+Once the HTML baseline is approved, the page converts to **100% native Gutenberg blocks**. `wp:html` is permitted in exactly **two** cases:
+
+1. **A plugin renders the section** — its shortcode / widget / block (e.g. an Elfsight reviews widget, a Gravity Forms / Contact Form 7 form, a booking widget).
+2. **The section is an `<iframe>` embed** — Google Maps, a YouTube video, or a similar third-party embed.
+
+**Nothing else qualifies.** "Bespoke", "complex", or "has a custom CSS grid" is NEVER a reason to keep `wp:html` — every one of those has a native equivalent and MUST be converted:
+
+| Section type | Native block (NOT `wp:html`) |
+|---|---|
+| Bespoke CSS grid / card grid | `wp:group` with `className` only — the prototype CSS drives the grid |
+| FAQ accordion | `wp:details` (one per question) |
+| Data / pricing / hours table | `wp:table` |
+| Hero / any section with a background image or video | `wp:cover` |
+| Buttons with custom classes (`.btn`, `.btn--primary`) | `wp:buttons` + `wp:button` with `className`; style `.wp-block-button__link` in CSS |
+| "Whole-card" link wrapping multiple blocks | Drop the outer `<a>`; make the card heading (or its CTA button) the link |
+| Icons | `wp:image` with an SVG file, or emoji in `wp:paragraph` |
+
+If you reach for `wp:html` for anything other than the two allowed cases, stop and convert it instead. This is the single most common cause of a build that looks finished on the frontend but is uneditable in the editor.
+
 ### Section Inventory (Mandatory First Step)
 
 Before converting anything, create a complete inventory of every section on the page. This prevents the "half converted" problem where some sections get done and others are missed.
 
 1. List every section by its class name, in order from top to bottom
-2. For each section, decide: convert to native blocks or keep as wp:html
+2. For each section the default is **convert to native blocks**. Mark a section `wp:html` ONLY if it meets one of the two exceptions in the wp:html Policy above (plugin-rendered or iframe embed) — and note which one. If you can't name the plugin or the iframe, it converts.
 3. Present the inventory to the user for approval before starting conversion
 
 Do not start converting until the user approves the inventory.
@@ -281,13 +304,13 @@ The WordPress block editor and the frontend are two different rendering environm
 3. **Multi-column layouts** (card grids, feature grids, steps) — use WP layout attributes (`type:"grid"` or `type:"flex"`)
 4. **Background sections** (hero, CTA with background image/video) — use `wp:cover`
 5. **Icon elements** — use `wp:image` with SVG files from `assets/icons/`, or emoji in `wp:paragraph`
-6. **Complex interactive elements** — keep as `wp:html` ONLY if no native alternative exists (refer to the `wp:html` decision tree in block-architect)
+6. **Plugin-rendered or iframe sections** — these are the ONLY sections that stay `wp:html` (see the wp:html Policy above). Everything else, however "complex" or "bespoke", converts to native blocks. FAQ accordions → `wp:details`; data/hours tables → `wp:table`.
 
 ### Using WP Layout Attributes for Multi-Column Sections
 
 **Warning: Do NOT use WP layout attributes when prototype CSS already handles responsive grid/flex.** WP grid layout (`layout: {type: "grid", columnCount: 3}`) ignores `@media` queries and breaks responsive breakpoints. If the prototype CSS defines `display: grid` with media queries, use `wp:group` with `className` only and let the prototype CSS handle layout. WP `is-layout-flow` margin rules use `:where()` selectors (0 specificity), so prototype CSS with class or element selectors wins automatically without `!important`.
 
-**`wp:button` incompatibility:** Custom button classes like `.btn .btn--primary` on bare `<a>` tags are incompatible with `wp:button` block structure, which wraps `<a>` inside `<div class="wp-block-button"><a class="wp-block-button__link">`. Use `wp:html` for custom button groups.
+**`wp:button` with custom classes — convert, don't fall back:** The prototype's `.btn .btn--primary` sits on a bare `<a>`, whereas `wp:button` wraps it as `<div class="wp-block-button {className}"><a class="wp-block-button__link wp-element-button">`. Convert anyway — do NOT use `wp:html` for buttons. Put the modifier class on the button via `className` (e.g. `<!-- wp:button {"className":"btn btn--primary"} -->`) and point the prototype's button CSS at `.wp-block-button__link` (or `.btn .wp-block-button__link`). A button is never a reason to keep a section as raw HTML.
 
 When prototype CSS does NOT handle layout (e.g. new sections without responsive CSS), use WP's native layout attributes:
 
@@ -353,6 +376,20 @@ Any section with a background image, video, or color overlay MUST use `wp:cover`
 
 The editor will show the video background with overlay and all content is editable in-place.
 
+**Video background + custom gradient overlay is serialization-sensitive — recover it, don't hand-author it.** A `wp:cover` with a video background AND a gradient overlay (rather than the solid `overlayColor` shown above) frequently fails block validation when typed by hand. Canonical serialization for that variant puts the `<video class="wp-block-cover__video-background intrinsic-ignore" autoplay muted loop playsinline ...>` element BEFORE the overlay `<span>`, and the gradient span carries the exact class string `has-background-dim-100 has-background-dim wp-block-cover__gradient-background has-background-gradient`. Get one token wrong and the editor flags "unexpected or invalid content".
+
+Rather than guess this markup, **recover the canonical form from the editor**: insert the block, open the page in the editor, then for any block flagged invalid run —
+```js
+// In the editor console (or via Playwright browser_evaluate)
+const { getBlocks } = wp.data.select('core/block-editor');
+const target = /* the invalid block's clientId */;
+const b = getBlocks().find(x => x.clientId === target);
+const fresh = wp.blocks.createBlock(b.name, b.attributes, b.innerBlocks);
+wp.data.dispatch('core/block-editor').replaceBlock(target, fresh);
+await wp.data.dispatch('core/editor').savePost();
+```
+Then pull the now-canonical content back into your source `.html` file: `wp post get <id> --field=content`. This recovers valid markup straight from Gutenberg's own serializer instead of trial-and-error.
+
 ### Using `wp:image` for Icons
 
 Do NOT use inline SVG in `wp:html` blocks for icons. They're invisible in the editor.
@@ -412,6 +449,22 @@ Scroll-reveal CSS animations (e.g. `opacity:0; transform:translateY(30px)`) make
 
 Adjust selectors to match whatever animation classes the prototype uses. Load this via `enqueue_block_editor_assets` (same hook used for all other `editor.css` rules). The `!important` is required to override the inline-style-like specificity of animation CSS.
 
+#### Body-Scoped Variant Styles Don't Reach the Editor Canvas
+
+If the theme applies a per-page "variant" scope class via the PHP `body_class` filter (e.g. `.variant-warm` on `<body>` swapping fonts or section backgrounds), that class never reaches the **iframed** Gutenberg editor canvas — and `admin_body_class` only sets the OUTER admin body, not the canvas. The result: every `.variant-scope` rule (fonts, section backgrounds) is missing while editing, so the editing surface diverges from the frontend even though the frontend is correct. Fix by enqueuing a small script via `enqueue_block_editor_assets` that adds the scope class to the canvas body, re-applying on remount:
+
+```js
+// editor-canvas-scope.js — enqueued via enqueue_block_editor_assets
+( function () {
+  const apply = () => {
+    const iframe = document.querySelector('iframe[name="editor-canvas"]');
+    iframe?.contentDocument?.body.classList.add('variant-warm'); // the active scope class
+  };
+  apply();
+  new MutationObserver(apply).observe(document.body, { childList: true, subtree: true });
+} )();
+```
+
 ### kses Sanitisation Warning
 
 `wp_update_post()` strips `<iframe>` tags via kses sanitisation. When pages contain Google Maps embeds or video iframes in `<!-- wp:html -->` blocks, use `$wpdb->update()` + `clean_post_cache()` instead. See `${CLAUDE_PLUGIN_ROOT}/references/wp-cli-reference.md` for the full pattern.
@@ -434,6 +487,8 @@ The CSS in `custom.css` was extracted directly from the HTML prototype. The JS i
 - If the prototype has a wrapper `<div class="card-grid">`, the WordPress block must also have `className: "card-grid"`
 - WordPress will add its own classes (like `wp-block-group`, `is-layout-grid`) alongside yours. That's fine, they stack
 - The custom CSS handles visual styling (colors, borders, spacing, typography). WP layout attributes handle structure (grid columns, flex direction). They work together
+
+**Copy page-specific inline `<style>` blocks into the theme CSS — don't assume the shared stylesheet covers it.** A prototype page often carries its own inline `<style>` block (bespoke section classes: grids, cards, FAQ accordions, 2-col editorial) IN ADDITION to the shared `style.css`. When porting that page, those inline rules must be copied into the theme's `custom.css`. If skipped, the WP markup uses the correct class names but they're unstyled, so grids and 2-col layouts silently fall back to stacked block flow and the page "doesn't match the prototype". Before QA, diff every `.selector` in each prototype page's inline `<style>` against the theme CSS and confirm each definition is present (the inline blocks are often identical copies across pages, but verify per page — a class can be defined inline on one page and nowhere else).
 
 ### After Each Section Conversion
 
@@ -481,7 +536,35 @@ Open the block editor at `/wp-admin/post.php?post=<page_id>&action=edit` and che
 3. **All text (headings, paragraphs, buttons, lists) is editable inline**
 4. **Icons are visible** (even if not perfectly styled)
 5. **Background images/videos are visible** (via wp:cover)
-6. **No `wp:html` blocks are present** except documented exceptions from the block spec
+6. **No `wp:html` blocks are present** except the two allowed exceptions (plugin-rendered or iframe embed). Verify the count programmatically — see below.
+
+### Verify Conversion Completeness (Programmatic — Mandatory)
+
+Eyeballing the canvas misses blocks below the fold, so confirm the counts directly. Log into the editor, then via Playwright `browser_evaluate` (or the browser console) read the editor canvas iframe:
+
+```js
+const doc = document.querySelector('iframe[name="editor-canvas"]').contentDocument;
+({
+  htmlBlocks: doc.querySelectorAll('[data-type="core/html"]').length,
+  warnings:   doc.querySelectorAll('.block-editor-warning').length,
+});
+```
+
+- `warnings` MUST be `0` (no "this block contains unexpected or invalid content" blocks).
+- `htmlBlocks` MUST equal the number of **documented plugin/iframe exceptions** for that page — and no more. If it's higher, a bespoke section was wrongly left as `wp:html`; go convert it.
+
+The DOM `.block-editor-warning` count catches *rendered* warnings, but the most reliable validity check reads Gutenberg's own parse state — recurse `getBlocks()` and flag any block whose `isValid === false` (these don't always surface a visible warning node):
+
+```js
+const { getBlocks } = wp.data.select('core/block-editor');
+const invalid = [];
+(function walk(blocks){ blocks.forEach(b => { if (b.isValid === false) invalid.push(b.name); walk(b.innerBlocks || []); }); })(getBlocks());
+invalid; // MUST be []
+```
+
+A frontend HTTP 200 and a matching screenshot prove the design *renders*. They do NOT prove *editability*. This count is the editability gate — do not declare a page done until it passes.
+
+> **Screenshot gotcha:** sections carrying a `.reveal` scroll-animation class are `opacity:0` until the IntersectionObserver adds `.is-visible` on scroll. A Playwright `fullPage` screenshot does not trigger the observer, so converted content can look blank. Before screenshotting the frontend, force them visible: `browser_evaluate` → `document.querySelectorAll('.reveal').forEach(el=>el.classList.add('is-visible'))`. Blank ≠ broken.
 
 If any section fails these checks, identify the issue:
 - **Layout stacked vertically** → Switch to WP native layout attributes (`type:"grid"` or `type:"flex"`)
@@ -521,10 +604,10 @@ Before declaring a page done, verify against the section inventory:
 ```
 [ ] All sections from inventory are accounted for
 [ ] Converted sections match frontend baseline at desktop and mobile
-[ ] HTML-kept sections are documented with reasons
+[ ] core/html count == documented plugin/iframe exceptions only (verified programmatically)
 [ ] Editor shows full-width sections (not constrained to contentSize)
 [ ] All text is editable in block editor
-[ ] No "This block contains unexpected content" errors
+[ ] block-editor-warning count == 0 (no "unexpected/invalid content" blocks)
 ```
 
 Tell the user the results:

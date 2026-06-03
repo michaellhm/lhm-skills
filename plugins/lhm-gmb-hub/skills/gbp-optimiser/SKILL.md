@@ -47,10 +47,13 @@ In the meantime, I'll use web search to research competitor GBP categories.
 
 ### 3. Recommend Up to 10 Categories
 
+**Australia only — use the Google AU category list.** LHM clients are Australian, so every recommended category MUST exist in the Google Business Profile AU category set. Read `${CLAUDE_PLUGIN_ROOT}/references/au-gbp-categories.md` before recommending. Never suggest a US-only category name (e.g. "Physical Therapist", "Medical Center", "Attorney"). Competitor research and most online sources default to US English — translate any US category name to its AU equivalent before recommending it, and match Australian spelling exactly ("Centre", not "Center"). If a category is not in the reference mapping, verify it exists in the live AU category picker before recommending it rather than assuming.
+
 Based on competitor research and the client's actual services:
 - Select 1 primary category (most relevant to the primary modality)
 - Select up to 9 secondary categories
 - Each category must represent a real service the client offers
+- Each category must be a valid Google AU category name
 - Explain the reasoning for each category choice
 
 ### 4. Generate 30+ Service Listings

@@ -89,6 +89,13 @@ For each page being tested, screenshot the HTML prototype file at every breakpoi
    mcp__playwright__browser_wait_for → wait for network idle (fonts, images loaded)
    ```
 
+3b. **Force scroll-reveal content visible (mandatory before any `fullPage` capture):**
+   A `fullPage:true` screenshot does NOT trigger the page's scroll IntersectionObserver, so any section gated behind a reveal animation stays `opacity:0; transform:...` and the screenshot comes back mostly blank below the fold. Blank ≠ broken — force them visible first:
+   ```
+   mcp__playwright__browser_evaluate → document.querySelectorAll('.reveal,[class*="reveal"]').forEach(el=>{el.classList.add('is-visible');el.style.opacity='1';el.style.transform='none';})
+   ```
+   Adjust the selector to the prototype's actual animation classes (`.fade-in`, `.slide-up`, etc.).
+
 4. **Take a full-page screenshot:**
    ```
    mcp__playwright__browser_take_screenshot
@@ -135,6 +142,7 @@ For the same page, screenshot the live WordPress build at each breakpoint using 
    - WordPress admin bar (**mandatory** — shifts page down 32px and distorts comparisons): use `mcp__playwright__browser_evaluate` to run `document.getElementById('wpadminbar')?.remove(); document.documentElement.style.marginTop='0'`
    - Cookie consent banner: use `mcp__playwright__browser_click` to dismiss it, or use `browser_evaluate` to remove it from the DOM
    - Any popups or overlays: dismiss or remove them
+   - Scroll-reveal animations (**mandatory** — same blank-screenshot trap as the prototype): `mcp__playwright__browser_evaluate` → `document.querySelectorAll('.reveal,[class*="reveal"]').forEach(el=>{el.classList.add('is-visible');el.style.opacity='1';el.style.transform='none';})`. A `fullPage` capture never fires the IntersectionObserver, so revealed sections stay invisible and the WP screenshot looks broken when it isn't.
 
 5. **Take a full-page screenshot:**
    ```
@@ -201,6 +209,7 @@ Beyond static screenshots, verify interactive elements using Playwright:
   - Scroll-triggered animations fire
   - Lazy-loaded images appear
   - Section backgrounds render correctly during scroll
+- **Disable smooth scrolling before measuring scroll-direction behaviour.** When verifying header headroom / hide-on-scroll-down / sticky logic, a synchronous `window.scrollTo(0, Y)` followed by an immediate `window.scrollY` read returns a STALE value (~0) if the page has `scroll-behavior: smooth` — the scroll is still animating, so the handler never sees the new position and the class never toggles, making a working header look broken. Set `document.documentElement.style.scrollBehavior = 'auto'` first, then step the scroll position with ~100ms `setTimeout` gaps between each scroll and its assertion so the real scroll event fires and `scrollY` settles.
 
 ## Step 6: Visual Comparison
 

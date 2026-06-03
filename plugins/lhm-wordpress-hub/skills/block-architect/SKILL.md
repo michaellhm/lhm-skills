@@ -66,9 +66,11 @@ The WordPress block editor and the frontend are two different rendering environm
 5. Does it need icons? → **Use `wp:image` with SVG files from `assets/icons/`**, or emoji in `wp:paragraph`
 6. Does it need a list with custom icons? → **Use `wp:list` + `wp:list-item`** with CSS `::marker` or `list-style` styling
 7. Is it purely decorative and non-editable (e.g. a background shape)? → **CSS pseudo-element** (acceptable, no block needed)
-8. None of the above work? → **`wp:html` with explicit warning**
+8. Is the section rendered by a **plugin** (shortcode / widget / form) OR is it an **`<iframe>` embed** (Google Maps, a video)? → **`wp:html` with explicit warning**. These are the ONLY two cases that justify `wp:html`.
 
-If you must use `wp:html`, document it with this warning: *"This section will appear as raw code in the block editor. The client cannot visually edit it."*
+If a section is none of 1–7 AND is not a plugin or iframe, it still converts — go back to step 2 (nested native blocks) until it does. "Bespoke", "complex", or "has a custom CSS grid" is never a valid reason for `wp:html`: a custom grid becomes a `wp:group` with `className` only (prototype CSS drives the layout), an FAQ accordion becomes `wp:details`, a table becomes `wp:table`, a whole-card link drops the outer `<a>` and links the heading/CTA instead.
+
+If you must use `wp:html` (plugin or iframe only), document it with this warning: *"This section will appear as raw code in the block editor. The client cannot visually edit it."*
 
 ### Layout: Use WP Native Layout Attributes
 

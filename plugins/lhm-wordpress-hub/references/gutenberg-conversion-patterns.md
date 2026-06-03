@@ -569,6 +569,125 @@ Every page section MUST use this nesting structure to achieve full-width backgro
 <!-- /wp:paragraph -->
 ```
 
+### FAQ Accordion (core/details — NEVER wp:html)
+
+An expand/collapse FAQ is a native block. `core/details` renders a real `<details>/<summary>` with no JavaScript, and it is fully editable in the canvas. Do not reach for `wp:html` here. The markup below is extracted verbatim from a shipped page (zero validation warnings):
+
+```html
+<!-- wp:group {"className":"faq-list","layout":{"type":"default"}} -->
+<div class="wp-block-group faq-list">
+<!-- wp:details {"className":"faq-item"} -->
+<details class="wp-block-details faq-item"><summary>How often should a women's cut be booked?</summary>
+<!-- wp:paragraph -->
+<p>Most of Tumi's clients return on a six to eight week rhythm for a cut.</p>
+<!-- /wp:paragraph -->
+</details>
+<!-- /wp:details -->
+<!-- ...one wp:details per question... -->
+</div>
+<!-- /wp:group -->
+```
+
+CSS bridge: the open/close marker is styled on the summary, not the markup. Hide the native triangle and add your own:
+
+```css
+.faq-item > summary { list-style: none; cursor: pointer; }
+.faq-item > summary::-webkit-details-marker { display: none; }
+.faq-item > summary::after { content: "+"; /* position right */ }
+.faq-item[open] > summary::after { content: "\00d7"; } /* × */
+```
+
+The answer body is real block content (paragraphs, lists, buttons) nested inside `<details>`, so the client edits it inline like any other block.
+
+### Data / Hours Table (core/table — NEVER wp:html)
+
+Any tabular data — opening hours, price lists, comparison rows — is `core/table`. It must be wrapped in `<figure class="wp-block-table">`. Extracted verbatim from a shipped page:
+
+```html
+<!-- wp:table {"className":"hours-table"} -->
+<figure class="wp-block-table hours-table"><table><tbody>
+<tr><td>Monday</td><td>10:00 – 18:00</td></tr>
+<tr><td>Tuesday</td><td>10:00 – 20:00</td></tr>
+<tr><td>Sunday</td><td><em>Closed</em></td></tr>
+</tbody></table></figure>
+<!-- /wp:table -->
+```
+
+Use `<thead>` for a header row when the prototype has one. Inline emphasis (`<em>`, `<strong>`, `<a>`) inside cells is valid and stays editable.
+
+### Section Separator (core/separator)
+
+A horizontal rule / hairline divider is `core/separator`, not a styled `<div>` in `wp:html`:
+
+```html
+<!-- wp:separator {"className":"hairline"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity hairline"/>
+<!-- /wp:separator -->
+```
+
+Keep `has-alpha-channel-opacity` — Gutenberg adds it by default and the validator expects it. Your `.hairline` class controls colour/width/margin.
+
+### Editorial 2-Column Split (image + text, className-only)
+
+A text-beside-image band where the prototype CSS already defines the two-column grid with `@media` collapse. Do NOT use `wp:columns` or WP grid layout here — a plain `className` group lets the prototype CSS drive structure AND responsiveness. Each side is its own `wp:group`; the image is a real `wp:image` (swappable in the editor), not a CSS background. Extracted verbatim:
+
+```html
+<!-- wp:group {"className":"editorial-2col","layout":{"type":"default"}} -->
+<div class="wp-block-group editorial-2col">
+<!-- wp:group {"className":"editorial-2col__image","layout":{"type":"default"}} -->
+<div class="wp-block-group editorial-2col__image">
+<!-- wp:image {"sizeSlug":"full","className":"size-full"} -->
+<figure class="wp-block-image size-full"><img src="/wp-content/themes/theme-slug/assets/images/intro-image.webp" alt="Descriptive alt."/></figure>
+<!-- /wp:image -->
+</div>
+<!-- /wp:group -->
+<!-- wp:group {"layout":{"type":"default"}} -->
+<div class="wp-block-group">
+<!-- wp:paragraph {"className":"eyebrow"} --><p class="eyebrow"><span class="eyebrow__rule"></span>The Story</p><!-- /wp:paragraph -->
+<!-- wp:heading --><h2 class="wp-block-heading">Heading</h2><!-- /wp:heading -->
+<!-- wp:paragraph --><p>Body copy.</p><!-- /wp:paragraph -->
+</div>
+<!-- /wp:group -->
+</div>
+<!-- /wp:group -->
+```
+
+To alternate image/text sides per row, add a modifier class (e.g. `editorial-2col--reverse` or `subservice-row--reverse`) and let CSS flip `flex-direction`/`order`. This is the pattern behind alternating "Approach / Work / Hair Spa"-style stacks — each row is a `subservice-row` group, the stack is a `subservice-stack` group, all className-only.
+
+### Whole-Card Link (drop the outer anchor)
+
+In a prototype, an entire card is often wrapped in `<a class="card">…</a>`. Gutenberg has no "group that is a link" block, so do NOT keep the card as `wp:html` to preserve the wrapper. Instead, drop the outer `<a>` and link the heading and/or an explicit CTA inside the card. The card stays a normal editable `wp:group`:
+
+```html
+<!-- wp:group {"className":"subservice-row__link-card","layout":{"type":"default"}} -->
+<div class="wp-block-group subservice-row__link-card">
+<!-- wp:heading {"level":3} --><h3 class="wp-block-heading"><a href="/womens-cuts">Women's Cuts</a></h3><!-- /wp:heading -->
+<!-- wp:paragraph --><p>Short description.</p><!-- /wp:paragraph -->
+<!-- wp:paragraph --><p><a class="subservice-row__link" href="/womens-cuts">Explore women's cuts →</a></p><!-- /wp:paragraph -->
+</div>
+<!-- /wp:group -->
+```
+
+If the prototype relied on the whole card being clickable, restore that with a tiny progressive-enhancement script that makes `.subservice-row__link-card` clickable via its inner link — but the editable structure stays native.
+
+### The Only Legitimate wp:html: Plugins & iframes
+
+`wp:html` survives in exactly two cases. Document each with the editor warning. Examples:
+
+```html
+<!-- Plugin-rendered form (Gravity Forms / CF7 shortcode placeholder) -->
+<!-- wp:html -->
+<form class="enquiry-form" aria-label="Enquiry form">…fields…</form>
+<!-- /wp:html -->
+
+<!-- iframe embed (Google Map / video) -->
+<!-- wp:html -->
+<iframe src="https://www.google.com/maps/embed?…" loading="lazy" title="Salon location"></iframe>
+<!-- /wp:html -->
+```
+
+In production the form `wp:html` is replaced by the actual plugin shortcode (`[gravityform id="1"]`), which is itself editable as a shortcode block. Nothing else qualifies — "bespoke", "complex", or "custom grid" all have native paths above.
+
 ## Critical Conversion Rules
 
 ### 1. Every section gets `align: full`
@@ -597,7 +716,9 @@ Common mismatches:
 
 ### 5. Do NOT use WP grid when prototype CSS has responsive breakpoints
 
-If your prototype CSS defines `display: grid` with `@media` queries for mobile/tablet, do NOT add `layout: {type: "grid"}` to the block. WP grid ignores media queries and breaks responsive behaviour. Use `wp:group` with `className` only and let prototype CSS handle it.
+If your prototype CSS defines `display: grid`/`flex` with `@media` queries for mobile/tablet, do NOT add `layout: {type: "grid"}` to the block. WP grid ignores media queries and breaks responsive behaviour. Use `wp:group` with `className` only and let prototype CSS handle structure AND breakpoints.
+
+**This is the default for prototype-driven builds** — the prototype CSS was extracted into the theme, so it already owns the grid. Reserve `layout: {type:"grid"|"flex"}` for *new* sections you author without responsive CSS (see the Card Grid / Features Grid examples above, which assume no prototype `@media`). When in doubt, className-only is the safe choice: it never fights the prototype. See "Editorial 2-Column Split" and "Alternating Subservice Rows" above for className-only multi-column markup.
 
 ### 6. Buttons: use wp:buttons, not raw anchors
 
@@ -615,7 +736,17 @@ If your prototype CSS defines `display: grid` with `@media` queries for mobile/t
 <!-- /wp:buttons -->
 ```
 
-Exception: If prototype CSS targets bare `.btn` on `<a>` tags and `wp:button` wrapper breaks the styling, keep as `wp:html`.
+**No exception — custom-styled buttons still convert.** If prototype CSS targets bare `.btn` on `<a>` tags, do NOT keep the button as `wp:html`. Move the `className` onto `wp:button` and retarget the prototype CSS at the WP anchor. The block renders `<div class="wp-block-button btn-group__item"><a class="wp-block-button__link wp-element-button btn btn--primary">`. Either keep your `.btn`/`.btn--primary` classes on the inner `<a>` (they ride alongside `wp-block-button__link`), or rewrite the selector to `.wp-block-button__link`. Both keep the button fully editable. `wp:html` is reserved for plugins and iframes only — a styled anchor is neither.
+
+```html
+<!-- wp:buttons {"className":"btn-group"} -->
+<div class="wp-block-buttons btn-group">
+<!-- wp:button {"className":"btn btn--primary"} -->
+<div class="wp-block-button btn btn--primary"><a class="wp-block-button__link wp-element-button" href="/contact">Book a consultation</a></div>
+<!-- /wp:button -->
+</div>
+<!-- /wp:buttons -->
+```
 
 ### 7. Lists: use wp:list + wp:list-item
 

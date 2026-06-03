@@ -162,6 +162,8 @@ If the HTML prototype uses icons (SVG icons, icon fonts, or decorative elements)
 2. For each unique icon, create a standalone `.svg` file (e.g. `plumbing.svg`, `electrical.svg`, `checkmark.svg`)
 3. The wp-page-builder skill will reference these via `wp:image` blocks so they're visible in the block editor
 
+**`currentColor` icons must be inlined, not loaded via `<img src>`.** An SVG that uses `fill="currentColor"` (e.g. a logo or icon meant to recolour to match its context) renders BLACK when loaded through `<img src="icon.svg">`, because the external SVG document has no inherited `color` to resolve against. A light logo on a dark header ends up invisible. For any such icon, inline an SVG sprite once (in the header part: `<svg style="position:absolute;width:0;height:0"><symbol id="logo" viewBox="...">...</symbol></svg>`) and reference it with `<svg><use href="#logo"/></svg>` — `currentColor` then inherits the element's CSS `color` correctly. Solid-fill icons with no `currentColor` are fine as `wp:image`/`<img>`.
+
 If the prototype uses no icons, skip this directory.
 
 ### 2d-ii: Copy Images → `assets/images/`
@@ -293,12 +295,17 @@ function theme_slug_register_pattern_categories() {
 add_action('init', 'theme_slug_register_pattern_categories');
 
 // Enqueue custom CSS and JS on the frontend
+// Use filemtime() as the version arg, NOT the static THEME_VERSION constant.
+// A static ?ver=1.0.0 means edits to custom.css/custom.js never reach the browser
+// (it serves the cached asset) — the classic "my fix isn't rendering" trap even
+// though the file on disk and the server response are both correct.
 function theme_slug_enqueue_assets() {
+    $css_path = get_template_directory() . '/assets/css/custom.css';
     wp_enqueue_style(
         'theme-slug-custom',
         get_template_directory_uri() . '/assets/css/custom.css',
         [],
-        THEME_VERSION
+        file_exists($css_path) ? filemtime($css_path) : THEME_VERSION
     );
 
     // Only enqueue JS if the file exists (prototype may not have had JS)
@@ -308,7 +315,7 @@ function theme_slug_enqueue_assets() {
             'theme-slug-custom',
             get_template_directory_uri() . '/assets/js/custom.js',
             [],
-            THEME_VERSION,
+            filemtime($js_path),
             true // Load in footer
         );
     }
@@ -385,7 +392,7 @@ Check the scaffolded theme:
 5. `assets/css/editor.css` exists and overrides all animation/transition classes (`.reveal`, `.fade-in`, etc.) with `opacity: 1 !important; transform: none !important`
 6. `assets/js/custom.js` exists if the prototype had a JS file (`assets/js/main.js`)
 7. `assets/icons/` directory exists with SVG files if the prototype used icons
-8. `functions.php` enqueues `custom.css` on both frontend and editor
+8. `functions.php` enqueues `custom.css` on both frontend and editor, using `filemtime()` (not a static version constant) as the frontend version arg so edits bust the browser cache
 9. `functions.php` enqueues `editor.css` via `add_editor_style()` AFTER `custom.css`
 10. `functions.php` enqueues `custom.js` in the footer (if it exists)
 11. `functions.php` registers navigation menus (`primary` and `footer`)
