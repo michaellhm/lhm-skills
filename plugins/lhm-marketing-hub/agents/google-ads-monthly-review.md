@@ -90,9 +90,15 @@ Follow up if needed:
 
 **Wait for the user to respond before continuing.** Do not assume approval.
 
-### Phase 4: Skill Chaining
+### Phase 4: Guided Task Execution
 
-After approval, execute each approved action by loading the relevant skill.
+After approval, hand off to the shared guided task execution protocol:
+
+`${CLAUDE_PLUGIN_ROOT}/references/guided-task-execution.md`
+
+Read it and follow it. In short: write the approved actions to the chat as a numbered task list ("Here are the N tasks"), ask if the user wants to work through them one at a time, then walk them one task at a time — presenting or executing each, asking "Is that one done?" before moving on. Execute each task by loading the relevant skill scoped to just that task, carrying forward all context.
+
+**Action-to-skill mapping:**
 
 **Action-to-skill mapping:**
 
@@ -118,14 +124,14 @@ After approval, execute each approved action by loading the relevant skill.
 4. Execute the skill's instructions
 5. Save outputs to the client's folder per the skill's output format
 
-**Mini approval gate between skills:**
-After completing each skill, briefly summarise what was done and ask:
-- "Ready to move on to [next skill]?"
-- Let the user adjust, ask questions, or skip ahead
+**Done-check between tasks (per the protocol):**
+After each task, briefly summarise what was done and ask "Is that one done?" Answer any follow-up questions, then move to the next task only once the user confirms done or chooses to skip. Track each task as done, skipped, or deferred.
 
-### Phase 5: Session Summary
+### Phase 5: Session Closeout
 
-After all approved actions are executed (or the user decides to stop), produce two output files. **Each file is a one-pager — one page maximum.** Lead with data, cut preamble and filler.
+When every task is handled (or the user decides to stop), follow **Step 4 of the guided task execution protocol**: write reusable learnings to this agent's context and the relevant skill `LEARNED.md` files, offer to save any new client facts to `client_profile.md`, then always close by asking "Do you want me to schedule a follow-up?" — offering either a real scheduled run (~30 days out) or just a noted next-review date, per the user's choice that session.
+
+Alongside the closeout, produce two output files. **Each file is a one-pager — one page maximum.** Lead with data, cut preamble and filler.
 
 **File 1: Zone Assessment**
 Save to: `google_ads/YYYY-MM/monthly-review-YYYY-MM.md`

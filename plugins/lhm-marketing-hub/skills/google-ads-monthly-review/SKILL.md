@@ -91,6 +91,14 @@ Based on approved actions, suggest which skills to run next:
 
 Include specific parameters to pass to the next skill.
 
+### Step 8: Guided Task Execution
+
+Once the report is saved and the user has approved which actions matter, hand off to the shared guided task execution protocol:
+
+`${CLAUDE_PLUGIN_ROOT}/references/guided-task-execution.md`
+
+Read it and follow it. It writes the approved actions to the chat as a numbered task list ("Here are the N tasks"), asks if the user wants to work through them one at a time, walks them one task at a time asking "Is that one done?" before moving on, then closes the session by writing learnings and always asking whether to schedule a follow-up.
+
 ## Output
 
 Save the zone assessment to the client folder:

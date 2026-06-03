@@ -132,6 +132,14 @@ Before writing the verdict, revisit the work and confirm nothing was skipped:
 
 Present the verdict, zone, and top findings. Ask which findings to action this quarter before chaining into `keyword-optimizer`, `bid-budget-optimizer`, or `ad-copy-generator`.
 
+### Step 9: Guided task execution
+
+Once the user has approved which findings to action, hand off to the shared guided task execution protocol:
+
+`${CLAUDE_PLUGIN_ROOT}/references/guided-task-execution.md`
+
+Read it and follow it. It writes the approved findings to the chat as a numbered task list ("Here are the N tasks"), asks if the user wants to work through them one at a time, walks them one task at a time asking "Is that one done?" before moving on, then closes the session by writing learnings and always asking whether to schedule a follow-up (for this review, a real scheduled run is roughly 90 days out).
+
 ## Output
 
 **Filename:** `google_ads/YYYY-Qn/quarterly-review-YYYY-Qn.md` (e.g. `2026-Q2/quarterly-review-2026-Q2.md`)
