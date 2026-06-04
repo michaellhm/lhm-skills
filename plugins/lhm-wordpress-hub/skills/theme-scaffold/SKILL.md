@@ -179,9 +179,10 @@ Read the `<header>` element from the prototype (including its full inner HTML) a
 **Rules:**
 - Preserve the exact HTML structure and class names from the prototype header
 - Wrap the header content in a `<!-- wp:group -->` block with the same classes the prototype header uses
-- Replace the static navigation `<nav>` / `<ul>` / `<li>` links with a WordPress `<!-- wp:navigation -->` block so the menu is dynamic
+- For the navigation, **do NOT use `<!-- wp:navigation -->`**. Use the classic-menu shortcode approach (see **2f-ii**) so the menu is managed from Appearance → Menus. In the header part, drop the nav in as `<!-- wp:shortcode -->[{theme_slug}_primary_nav]<!-- /wp:shortcode -->`
 - Keep all other header elements (logo, phone number, CTA button, etc.) as close to the prototype HTML as possible using `<!-- wp:html -->` blocks if needed to preserve exact markup
 - The header CSS classes must match what's in `custom.css` so styles apply
+- **Ghost/outline CTA in the header:** if the header has a transparent outline button (common on a dark header), give its rule extra specificity (prefix with `.site-header`) so a later equal-specificity generic `.btn--primary` link rule can't override it on source order — that repaints it solid (and a transparent border is invisible on a dark header). Verify with computed styles, not just by eye
 
 ### 2f: Extract Footer → `parts/footer.html`
 
@@ -190,7 +191,34 @@ Read the `<footer>` element from the prototype and convert it to WordPress block
 **Rules:**
 - Same approach as header: preserve exact HTML structure and class names
 - Use `<!-- wp:html -->` blocks where needed to keep the markup identical to the prototype
-- Footer navigation can use `<!-- wp:navigation -->` for dynamic links, but preserve the wrapper classes
+- For footer link columns/menus, **do NOT use `<!-- wp:navigation -->`**. Use the classic-menu shortcode approach (see **2f-ii**): keep each column's heading and brand/address/social as static markup, and replace each list of links with `<!-- wp:shortcode -->[{theme_slug}_footer_nav location="footer-…"]<!-- /wp:shortcode -->`. A footer with three link columns = three footer menus/locations
+
+### 2f-ii: Navigation Menus — classic, dashboard-controlled (REQUIRED)
+
+The site's menus must be managed from **Appearance → Menus** (classic `wp_nav_menu`), NOT the `wp:navigation` block. The block stores the menu in a `wp_navigation` post edited only in the Site Editor — clients expect Appearance → Menus, and its separate entity-save is easily missed so edits appear not to "take". Scaffold the classic approach for the header and every footer link group.
+
+**Build all of the following (functions.php template below already includes them):**
+
+1. **Register locations** in `functions.php` — `primary` for the header, plus one location per footer link column (e.g. `footer-services`, `footer-community`, `footer-visit`). A single generic `footer` location is fine if the footer has just one link list.
+
+2. **A custom walker** at `inc/class-{theme-slug}-nav-walker.php` (`extends Walker_Nav_Menu`) for the HEADER nav, emitting clean `.site-nav__*` markup (top `<ul>`, `<li class="site-nav__item[ --parent]">`, `<a class="site-nav__link">`, `<ul class="site-nav__submenu">`, caret on parents, `aria-haspopup`/`aria-expanded`). Footer menus are flat single-level lists and need NO walker — default `wp_nav_menu` output styled by the existing `.footer-col ul/li` rules is enough.
+
+3. **Shortcodes** that render the menus and are dropped into the template parts via `wp:shortcode` blocks:
+   - `[{theme_slug}_primary_nav]` → header `wp_nav_menu(['theme_location'=>'primary','walker'=>new {Theme}_Nav_Walker(),'depth'=>2,...])`, wrapped with the hamburger toggle + slide-in panel markup.
+   - `[{theme_slug}_footer_nav location="…"]` → parameterised, `depth=>1`, no walker.
+
+4. **The `core/shortcode` unautop filter (CRITICAL).** WP core's `core/shortcode` block render callback is literally `return wpautop($content);`, and the template-part renderer runs `do_shortcode()` BEFORE `do_blocks()`. So shortcode-returned block markup (your `<nav>`) gets wrapped in a `<p>` that the browser splits at the block children — injecting a stray empty `<p>` that drops/misaligns the menu. Add a `render_block` filter that returns `do_shortcode($block['innerHTML'])` (no autop) for `core/shortcode` blocks (see functions.php template).
+
+5. **Create + assign the classic menus** with WP-CLI after install, seeded from the approved sitemap (Phase 2) / prototype links:
+   ```bash
+   MENU=$(wp menu create "Primary Navigation" --porcelain)
+   wp menu item add-custom $MENU "Services" "/services"   # add --parent-id for sub-items
+   wp menu location assign $MENU primary
+   # repeat per footer location with its own menu
+   ```
+   Mark this off as the two PM tasks: **"Set up WP Menu — main navigation"** and **"Set up WP Menu — footer navigation(s)"** (Step 5.2).
+
+**Mobile panel gotcha:** if the header has `will-change: transform` (headroom/sticky), a `position:fixed` slide-in panel inside it is trapped by that containing block — `inset:0 0 0 auto` resolves to the header box, not the viewport, so the panel is only header-height tall. Size it with `top:0; right:0; height:100dvh` (with `100vh` fallback) instead.
 
 ### 2g: Scaffold the Theme Directory
 
@@ -201,6 +229,8 @@ Create the theme at `/wp/theme/{theme-slug}/`:
   style.css
   theme.json
   functions.php
+  /inc/
+    class-{theme-slug}-nav-walker.php   (header nav walker — see 2f-ii)
   /templates/
     index.html
     home.html
@@ -270,14 +300,84 @@ Refer to `${CLAUDE_PLUGIN_ROOT}/references/theme-json-guide.md` for the exact fo
 
 define('THEME_VERSION', '1.0.0');
 
-// Register navigation menus
+// Register navigation menu locations — header + one per footer link column.
+// Collapse the footer-* locations to a single 'footer' if the footer has just
+// one link list. Menus are managed from Appearance → Menus (see 2f-ii).
 function theme_slug_register_menus() {
     register_nav_menus([
-        'primary'  => 'Primary Navigation',
-        'footer'   => 'Footer Navigation',
+        'primary'          => 'Primary Navigation',
+        'footer-services'  => 'Footer — Services',
+        'footer-community' => 'Footer — Community',
+        'footer-visit'     => 'Footer — Visit & Book',
     ]);
 }
 add_action('init', 'theme_slug_register_menus');
+
+// Header nav walker (clean .site-nav__* markup for the classic primary menu).
+require_once get_template_directory() . '/inc/class-theme-slug-nav-walker.php';
+
+// Header navigation — classic wp_nav_menu wrapped with a hamburger toggle +
+// slide-in panel. Dropped into parts/header.html via a wp:shortcode block.
+function theme_slug_primary_nav_shortcode() {
+    if (!has_nav_menu('primary')) { return ''; }
+    $menu = wp_nav_menu([
+        'theme_location' => 'primary',
+        'container'      => false,
+        'menu_class'     => 'menu site-nav__menu',
+        'menu_id'        => 'primary-menu',
+        'depth'          => 2,
+        'walker'         => new Theme_Slug_Nav_Walker(),
+        'echo'           => false,
+        'fallback_cb'    => false,
+    ]);
+    if (empty($menu)) { return ''; }
+    ob_start(); ?>
+    <nav class="site-nav" aria-label="Primary navigation">
+        <button class="site-nav__toggle" type="button" aria-expanded="false" aria-controls="site-nav-panel" aria-label="Open menu">
+            <span class="site-nav__toggle-bar" aria-hidden="true"></span>
+            <span class="site-nav__toggle-bar" aria-hidden="true"></span>
+            <span class="site-nav__toggle-bar" aria-hidden="true"></span>
+        </button>
+        <div class="site-nav__panel" id="site-nav-panel">
+            <button class="site-nav__close" type="button" aria-label="Close menu">&times;</button>
+            <?php echo $menu; // wp_nav_menu returns safe markup ?>
+        </div>
+    </nav>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('theme_slug_primary_nav', 'theme_slug_primary_nav_shortcode');
+
+// Footer column navigation (flat list, no walker). Styled by `.footer-col ul/li`.
+// Usage in parts/footer.html: [theme_slug_footer_nav location="footer-services"]
+function theme_slug_footer_nav_shortcode($atts) {
+    $atts = shortcode_atts(['location' => ''], $atts, 'theme_slug_footer_nav');
+    if (empty($atts['location']) || !has_nav_menu($atts['location'])) { return ''; }
+    $menu = wp_nav_menu([
+        'theme_location' => $atts['location'],
+        'container'      => false,
+        'menu_class'     => 'footer-col__list',
+        'depth'          => 1,
+        'echo'           => false,
+        'fallback_cb'    => false,
+    ]);
+    return $menu ?: '';
+}
+add_shortcode('theme_slug_footer_nav', 'theme_slug_footer_nav_shortcode');
+
+// CRITICAL: render core/shortcode blocks WITHOUT wpautop. Core's callback is
+// literally `return wpautop($content);`, which wraps shortcode-returned block
+// markup (the <nav>) in a <p> that the browser splits at the block children —
+// injecting a stray empty <p> that drops/misaligns the menu. The template-part
+// renderer runs do_shortcode() BEFORE do_blocks(), so by the time this fires the
+// block's innerHTML is already expanded; re-run do_shortcode() (idempotent), no autop.
+function theme_slug_unautop_shortcode_block($block_content, $block) {
+    if (!empty($block['blockName']) && 'core/shortcode' === $block['blockName']) {
+        return do_shortcode(isset($block['innerHTML']) ? $block['innerHTML'] : $block_content);
+    }
+    return $block_content;
+}
+add_filter('render_block', 'theme_slug_unautop_shortcode_block', 10, 2);
 
 // Register block pattern categories
 function theme_slug_register_pattern_categories() {
@@ -370,10 +470,10 @@ Build all templates listed in the scaffold structure.
 ### Template Parts
 
 #### `parts/header.html`
-Build a header with: site logo, site title, navigation menu. Use core blocks: `core/site-logo`, `core/site-title`, `core/navigation`.
+Build a header with: site logo, site title, navigation, CTA. Use `core/site-logo`/`core/site-title` (or inlined SVG logo per 2d), and render the menu with the classic-menu shortcode `<!-- wp:shortcode -->[{theme_slug}_primary_nav]<!-- /wp:shortcode -->` (NOT `core/navigation` — see 2f-ii).
 
 #### `parts/footer.html`
-Build a footer with: footer navigation, copyright notice, contact info. Use core blocks: `core/group`, `core/columns`, `core/paragraph`, `core/navigation`.
+Build a footer with: link columns, copyright, contact info, social. Use `core/group`/`core/columns`/`core/paragraph` for structure and static content; render each footer link column with `<!-- wp:shortcode -->[{theme_slug}_footer_nav location="footer-…"]<!-- /wp:shortcode -->` (NOT `core/navigation`).
 
 ### Block Patterns
 
@@ -395,14 +495,15 @@ Check the scaffolded theme:
 8. `functions.php` enqueues `custom.css` on both frontend and editor, using `filemtime()` (not a static version constant) as the frontend version arg so edits bust the browser cache
 9. `functions.php` enqueues `editor.css` via `add_editor_style()` AFTER `custom.css`
 10. `functions.php` enqueues `custom.js` in the footer (if it exists)
-11. `functions.php` registers navigation menus (`primary` and `footer`)
+11. `functions.php` registers nav locations (`primary` + footer column location(s)), requires the nav walker, defines the `[..._primary_nav]` + `[..._footer_nav]` shortcodes, and adds the `core/shortcode` unautop `render_block` filter
 12. `parts/header.html` preserves the prototype's header structure and CSS classes
 13. `parts/footer.html` preserves the prototype's footer structure and CSS classes
-14. Header uses `<!-- wp:navigation -->` for dynamic menu (not static `<a>` links)
-15. Every pattern from `/design/blocks.md` has a corresponding PHP file
-16. All templates reference header and footer parts
-17. `functions.php` registers all needed pattern categories
-18. **Class name check**: compare CSS classes used in `parts/header.html`, `parts/footer.html`, and patterns against `custom.css` to confirm they match
+14. Header + footer render menus via the classic-menu shortcodes (NOT `<!-- wp:navigation -->` and NOT static `<a>` links); `inc/class-{theme-slug}-nav-walker.php` exists
+15. Classic menus created + assigned to their locations via WP-CLI (the two PM tasks in Step 5.2), seeded from the approved sitemap; verify the rendered nav has no stray `<p>`/`<br>` (the wpautop trap) and the menu is vertically centred in the header
+16. Every pattern from `/design/blocks.md` has a corresponding PHP file
+17. All templates reference header and footer parts
+18. `functions.php` registers all needed pattern categories
+19. **Class name check**: compare CSS classes used in `parts/header.html`, `parts/footer.html`, and patterns against `custom.css` to confirm they match
 
 ## Step 4: Visual Diff After Installation
 

@@ -360,6 +360,8 @@ For each batch of 3–4 pages:
 - [ ] Install and activate theme on local WP
 - [ ] Upload client logo via Site Identity
 - [ ] Upload favicon as site icon
+- [ ] Set up WP Menu — main navigation (register `primary` location, walker + nav shortcode in header, core/shortcode unautop filter, create + assign classic menu; managed from Appearance → Menus)
+- [ ] Set up WP Menu — footer navigation(s) (register footer location(s), footer nav shortcode in footer, create + assign classic menu(s))
 - [ ] Run CSS Sync Check Skill — fix any missing classes
 - [ ] Confirm header/footer template parts render
 
