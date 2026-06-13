@@ -22,6 +22,31 @@ Detect intelligently:
 - If CWD has sibling `gmb/` or `landing-pages/` folders → current is client root
 - Otherwise → ask the user explicitly via AskUserQuestion
 
+## Step 1b: Record Platform Choice
+
+If the platform choice was passed in from `wp-start`, use it directly. If not (e.g. this skill was invoked standalone), ask:
+
+Use `AskUserQuestion`:
+> "Which platform are we building on?"
+
+Options:
+- "WordPress (block theme — standard LHM build)"
+- "Astro (static site framework — git-only workflow)"
+
+Write `platform:` into `client_profile.md` YAML frontmatter (create the frontmatter block if missing):
+
+```yaml
+---
+business_name: ""
+industry: ""
+website: ""
+primary_contact: ""
+platform: wordpress   # or: astro
+---
+```
+
+> **Astro note:** The full Astro build pipeline does not exist yet. Phases 1–4 (intake, SEO, copy, design) run identically. Phase 5 (build) will diverge — flag this to the user now so they know to expect incomplete coverage. Record the choice and proceed.
+
 ## Step 2: Create Client-Root Scaffolding (if not present)
 
 Check whether these files exist at the client root:
@@ -34,9 +59,11 @@ Check whether these files exist at the client root:
 
 If any are missing, create them with the templates in Step 4. Inform the user that Phase 1 (Steps 1.1–1.4) must populate these documents before Phase 2 can begin.
 
-## Step 3: Create WordPress Subtree
+## Step 3: Create Build Subtree
 
-Create `[client_root]/wordpress/` containing:
+> **Platform branch:** If `platform: astro` was recorded in Step 1b, skip the WordPress-specific structure below and create only `[client_root]/astro/docs/superpowers/specs/` and `[client_root]/astro/docs/superpowers/plans/`. The full Astro folder convention will be defined when the Astro pipeline is built. Tell the user: "Astro project folder scaffolded. Phase 5 build skills are WordPress-only for now — we'll define the Astro build path when it's ready."
+
+For **WordPress builds**, create `[client_root]/wordpress/` containing:
 
 ````
 wordpress/
@@ -70,6 +97,7 @@ business_name: ""
 industry: ""
 website: ""
 primary_contact: ""
+platform: ""          # wordpress | astro
 ---
 
 # Client Profile

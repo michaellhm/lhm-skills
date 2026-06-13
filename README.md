@@ -69,16 +69,17 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     wordpress-builder.md                # Phase E — theme scaffold and page build
     site-ops.md                         # Phase F — performance and security
     site-extension.md                   # Post-launch page management
-  skills/                               # All 25 skills
+  skills/                               # All 30 skills
     wp-start/                           # Entry point — /wp-start command
-    wp-project-setup/                   # Initialize project folder structure
+    wp-project-setup/                   # Initialize project folder structure (platform choice)
+    wp-project-manager/                 # PM doc — create, read, mark complete, gate-check
     client-context-intake/              # Extract facts from call notes
     sitemap-architect/                  # Site IA and keyword map
     page-brief-generator/               # Per-page content briefs
     page-copywriter/                    # Write page copy from briefs
     brand-discovery/                    # Brand guidelines extraction
     design-system-generator/            # Design tokens and theme.json specs
-    html-prototype/                     # Static HTML/CSS prototypes
+    html-prototype/                     # Static HTML/CSS prototypes → pushes to prototype repo
     block-architect/                    # Gutenberg block specifications
     theme-scaffold/                     # Custom block theme scaffolding
     css-sync-check/                     # Validate theme CSS matches prototype
@@ -87,9 +88,13 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     visual-qa/                          # Pixel-perfect visual regression testing
     wp-performance/                     # Performance audit and optimization
     wp-security/                        # Security hardening checklist
+    repo-init/                          # Create GitHub repos and scaffold docs/ for a new client
+    repo-install/                       # Clone client repos onto a new machine
+    astro-build/                        # Phase 5 for Astro — scaffold, convert prototype, SEO, deploy
+    lp-project-manager/                 # LP campaign PM doc — create, read, mark complete
     lp-subsite-setup/                   # Configure multisite subsite for LP campaign
     lp-copy/                            # Write landing page copy per ad group
-    lp-prototype/                       # Build HTML/CSS landing page prototypes
+    lp-prototype/                       # Build HTML/CSS landing page prototypes → pushes to prototype repo
     lp-deploy-1/                        # Push first LP prototype to WordPress
     lp-deploy-2/                        # Convert LP to native Gutenberg blocks
     lp-deploy-3/                        # Deploy remaining LP pages
@@ -176,9 +181,11 @@ plugins/lhm-learn/                    # Session learning capture plugin
 
 ### WordPress Hub
 
-**Website Build Pipeline** (17 skills): Project setup, client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, and the /wp-start entry point.
+**Website Build Pipeline** (18 skills): Project setup (with WordPress/Astro platform choice), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, and the Astro build skill (scaffold, prototype conversion, SEO, deployment).
 
-**Landing Page Pipeline** (7 skills): Subsite setup for LP campaigns, landing page copywriting per ad group, HTML/CSS prototype generation, WordPress deployment (HTML blocks), Gutenberg block conversion, multi-page deployment, and live server deployment via SSH.
+**Git Repo Workflow** (2 skills): First-time client repo setup — creates GitHub repos, scaffolds docs/ context folder, commits initial scaffold (`repo-init`). Clones an existing client project onto a new machine or pulls the latest (`repo-install`).
+
+**Landing Page Pipeline** (7 skills): Subsite setup for LP campaigns, landing page copywriting per ad group, HTML/CSS prototype generation (auto-pushed to prototype repo), WordPress deployment (HTML blocks), Gutenberg block conversion, multi-page deployment, and live server deployment via SSH.
 
 **Deployment** (1 skill): General-purpose WordPress SSH deployment (theme, pages, CPTs, media, customizer, menus, options).
 

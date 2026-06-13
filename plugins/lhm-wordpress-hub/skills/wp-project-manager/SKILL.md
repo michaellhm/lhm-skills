@@ -12,6 +12,7 @@ Manages the per-project `website-project-management.md` file that tracks the ful
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/wp-project-manager/LEARNED.md`
 2. Identify the project location: `[client_root]/wordpress/`
 3. Check whether `website-project-management.md` exists in the wordpress folder
+4. Read `platform:` from `[client_root]/client_profile.md` YAML frontmatter. Surface this at session start: "Platform: WordPress" or "Platform: Astro". If `platform: astro`, note that Phase 5 build skills are WordPress-only and flag any Phase 5 tasks the user attempts.
 
 ## Modes
 
@@ -36,6 +37,7 @@ Inputs:
 
 Generate `[client_root]/wordpress/website-project-management.md` using the template in the next section, populating:
 - Client name from `client_profile.md`
+- Platform from `client_profile.md` YAML frontmatter `platform:` field (`wordpress` or `astro`)
 - Owner names from defaults: Aiya (build), Krystalyn (PM), Jaimee (SEO), Michael (strategy). Confirm with user via AskUserQuestion if unclear.
 - Reference paths to the spec and plan files
 - Page inventory rows from `seo/sitemap.md` if it exists, otherwise leave empty
@@ -46,11 +48,13 @@ Generate `[client_root]/wordpress/website-project-management.md` using the templ
 When called for status display:
 
 1. Read the PM doc
-2. Identify the lowest-numbered phase containing `[ ]` items
-3. Display:
+2. Read `platform:` from `../client_profile.md` YAML frontmatter
+3. Identify the lowest-numbered phase containing `[ ]` items
+4. Display:
 
 ```
 Project: [Client Name]
+Platform: [WordPress | Astro]
 Current Phase: Phase [N] — [Phase Name]
 Current Step: Step [X.Y] — [Step Name]
 
@@ -136,6 +140,7 @@ When creating a new PM doc (Mode 1), use this template. Replace placeholder `[Cl
 
 ## Overview
 - **Client:** [Name]
+- **Platform:** [WordPress | Astro]
 - **Primary URL:** [URL or "TBD"]
 - **Project slug:** [slug]
 - **Owners:** Aiya (build), Krystalyn (PM), Jaimee (SEO), Michael (strategy)

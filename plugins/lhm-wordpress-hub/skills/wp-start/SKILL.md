@@ -1,6 +1,6 @@
 ---
 name: wp-start
-description: "Start a session in the WordPress hub. Use this when the user wants to begin a website project, asks 'build a website', 'start a WordPress site', mentions 'website build', 'new site', 'landing page', 'LP campaign', or invokes /lhm-wordpress-hub:wp-start. This skill is a router — it detects which workflow (full WP build or LP campaign) and hands off to the right orchestrator."
+description: "Start a session in the WordPress hub. Use this when the user wants to begin a website project, asks 'build a website', 'start a WordPress site', 'start an Astro site', mentions 'website build', 'new site', 'landing page', 'LP campaign', or invokes /lhm-wordpress-hub:wp-start. This skill is a router — it detects which workflow (full WP build or LP campaign) and hands off to the right orchestrator."
 ---
 
 # WP Start — Router
@@ -47,9 +47,22 @@ Use AskUserQuestion:
 > "What kind of project are we setting up?"
 
 Options:
-- "Full WordPress website build" → run `wp-project-setup`, then `website-build-orchestrator`
+- "Full website build" → ask platform question below, then run `wp-project-setup`, then `website-build-orchestrator`
 - "Landing page campaign" → run `wp-project-setup` (creates client root if needed), then `landing-page-orchestrator` (which sets up the campaign folder via `lp-project-manager`)
 - "Not sure yet — let's just create the client folder" → run `wp-project-setup` and stop
+
+**If "Full website build" selected:** ask the platform question before handing off to `wp-project-setup`:
+
+Use AskUserQuestion:
+> "Which platform are we building on?"
+
+Options:
+- "WordPress (block theme — standard LHM build)"
+- "Astro (static site framework — git-only workflow)"
+
+Pass this choice to `wp-project-setup`. The skill records it in `client_profile.md` and the PM doc, so every downstream skill knows which path it's on.
+
+> **Note for Astro builds:** the full Astro build pipeline is not yet built. `wp-project-setup` and `wp-project-manager` record the platform, but Phase 5 build skills (theme-scaffold, wp-page-builder, etc.) are WordPress-only. Flag this to the user if they select Astro, and proceed with the workflow phases that do apply (intake, SEO, copy, design).
 
 ## Step 4: Confirm Handoff
 

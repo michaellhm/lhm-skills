@@ -312,10 +312,56 @@ Update `/lp/lp_state.md` — Pages Built table:
 | [Ad Group] | /lp/copy/[slug]-copy.md | /lp/prototype/[slug]/index.html | ⏳ | ⏳ | - | Copy + Prototype ready |
 ```
 
+## Step 7: Commit and Push to Prototype Repo
+
+Per the Client Repo Workflow SOP, finished prototypes go straight into the client's `<client>-prototype` repo — not left as loose local files.
+
+1. **Detect the client slug** — read from `client_profile.md` YAML frontmatter `business_name` or ask the user.
+
+2. **Check if the prototype repo is cloned locally:**
+   - Mac: `~/Documents/Projects/<client>/<client>-prototype/`
+   - Windows: `C:\Users\<username>\Documents\Projects\<client>\<client>-prototype\`
+
+   If the folder does not exist or is not a Git repo:
+   > "The prototype repo (`<client>-prototype`) doesn't appear to be cloned locally. Run `repo-install` first to clone it, then come back here to push the prototype."
+   
+   Stop at this point and do not continue with the push.
+
+3. **Copy prototype files into the repo:**
+
+   One folder per ad group slug inside the prototype repo:
+   ```
+   <client>-prototype/
+     <ad-group-slug>/
+       index.html
+       assets/
+   ```
+
+   Copy the prototype folder from `/lp/prototype/[slug]/` into `<prototype-repo-path>/<slug>/`.
+
+4. **Commit and push:**
+
+   ```bash
+   cd ~/Documents/Projects/<client>/<client>-prototype
+   git add <slug>/
+   git commit -m "feat: add <slug> landing page prototype"
+   git push
+   ```
+
+   **Windows:**
+   ```powershell
+   Set-Location "$env:USERPROFILE\Documents\Projects\<client>\<client>-prototype"
+   git add <slug>/
+   git commit -m "feat: add <slug> landing page prototype"
+   git push
+   ```
+
+5. Confirm: "Prototype pushed to `github.com/<destination>/<client>-prototype/<slug>/`."
+
 ## Handoff
 
 Tell the user:
 
-> "Prototype complete for [AD GROUP] at `/lp/prototype/[slug]/index.html`. Check it in your browser then run **lp-deploy-1** to push it to WordPress."
+> "Prototype complete for [AD GROUP] at `/lp/prototype/[slug]/index.html` and pushed to the prototype repo. Check it in your browser then run **lp-deploy-1** to push it to WordPress."
 
 If building all ad groups: confirm each prototype before building the next.

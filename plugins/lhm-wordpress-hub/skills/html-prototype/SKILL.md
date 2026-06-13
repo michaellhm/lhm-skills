@@ -242,6 +242,52 @@ If multiple versions were created:
 
 > "Created [N] versions at `/design/prototype/{slug}/`. Open any version in your browser — use the pill buttons in the bottom-right corner to switch between them."
 
+## Step 3b: Commit and Push to Prototype Repo
+
+Per the Client Repo Workflow SOP, finished prototypes go straight into the client's `<client>-prototype` repo — not left as loose local files.
+
+1. **Detect the client slug** — read from `client_profile.md` YAML frontmatter `business_name` or ask the user.
+
+2. **Check if the prototype repo is cloned locally:**
+   - Mac: `~/Documents/Projects/<client>/<client>-prototype/`
+   - Windows: `C:\Users\<username>\Documents\Projects\<client>\<client>-prototype\`
+
+   If the folder does not exist or is not a Git repo:
+   > "The prototype repo (`<client>-prototype`) doesn't appear to be cloned locally. Run `repo-install` first to clone it, then come back here to push the prototype."
+   
+   Stop at this point and do not continue with the push.
+
+3. **Copy prototype files into the repo:**
+
+   The destination is one folder per page slug inside the prototype repo:
+   ```
+   <client>-prototype/
+     <page-slug>/
+       index.html    (or v1.html, v2.html, v3.html)
+       assets/
+   ```
+
+   Copy the prototype folder from `/design/prototype/{slug}/` into `<prototype-repo-path>/<slug>/`.
+
+4. **Commit and push:**
+
+   ```bash
+   cd ~/Documents/Projects/<client>/<client>-prototype
+   git add <slug>/
+   git commit -m "feat: add <slug> prototype"
+   git push
+   ```
+
+   **Windows:**
+   ```powershell
+   Set-Location "$env:USERPROFILE\Documents\Projects\<client>\<client>-prototype"
+   git add <slug>/
+   git commit -m "feat: add <slug> prototype"
+   git push
+   ```
+
+5. Confirm: "Prototype pushed to `github.com/<destination>/<client>-prototype/<slug>/`."
+
 ## Step 4: Approval Gate
 
 Use the `AskUserQuestion` tool:

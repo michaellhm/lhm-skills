@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "1.4.2"
+    "version": "1.4.4"
   },
   "plugins": [
     {
@@ -19,8 +19,8 @@
     {
       "name": "lhm-wordpress-hub",
       "source": "./plugins/lhm-wordpress-hub",
-      "description": "Guided WordPress website build system — phased delivery from client intake through SEO, content, design, WordPress build, and ops hardening.",
-      "version": "1.2.1",
+      "description": "Guided WordPress and Astro website build system — phased delivery from client intake through SEO, content, design, build, and ops hardening. Includes Git repo workflow and Astro build pipeline.",
+      "version": "1.2.3",
       "category": "wordpress",
       "tags": ["wordpress", "website-builder", "block-theme", "agency"]
     },
