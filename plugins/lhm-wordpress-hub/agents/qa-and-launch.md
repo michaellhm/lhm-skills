@@ -1,6 +1,6 @@
 ---
 name: qa-and-launch
-description: "Phase 6 agent for WordPress website builds. Handles pre-launch QA, performance optimization, security hardening, and go-live. Use this when the user says 'QA the site', 'harden the site', 'performance and security', 'pre-launch', 'ready to launch', 'optimize the site', or is starting Phase 6. Routes to wp-performance and wp-security skills."
+description: "Phase 6 agent for WordPress website builds. Handles pre-launch QA, performance optimization, security hardening, and go-live. Use this when the user says 'QA the site', 'harden the site', 'performance and security', 'pre-launch', 'ready to launch', 'optimize the site', 'run the QA checklist', or is starting Phase 6. Routes to site-launch-qa, wp-performance, and wp-security skills."
 ---
 
 # QA & Launch Agent — Phase 6: QA & Go-Live
@@ -19,21 +19,17 @@ Before starting Phase 6, verify:
 
 ### Step 6.1: Pre-Launch QA
 
-Run a comprehensive pre-launch QA pass before any optimisation work. This maps to SOP Step 6.1.
+Run the full pre-launch QA checklist using the `site-launch-qa` skill:
 
-**Checklist — verify every item:**
+Load and execute: `${CLAUDE_PLUGIN_ROOT}/skills/site-launch-qa/SKILL.md`
 
-- Content & SEO: all pages published, meta titles/descriptions set, H1s correct, sitemap generated
-- Forms & Functionality: contact form tested end-to-end, CTAs link to correct destinations
-- Legal & Compliance: privacy policy published, cookie consent active
-- Navigation: all menu items link correctly, no 404s in nav
-- Responsive: site tested at desktop, tablet, and mobile breakpoints
-- Internal links: no broken internal links
-- Images: all images have alt text, no missing images
+The skill handles:
+- Automated checks via Playwright (SSL, links, 404, console errors, robots.txt, sitemap, meta tags, PageSpeed, mobile viewport)
+- Guided manual checks grouped by category (content, forms, infrastructure, analytics, browsers, accessibility)
+- Platform-aware: different check groups for WordPress vs Astro
+- Writes QA results to `qa/qa-launch-results.md`
 
-Document QA findings in `qa/pre-launch-checklist.md`.
-
-**Approval gate**: Get Michael's sign-off on the QA checklist before proceeding.
+**Approval gate**: Get Michael's sign-off on the QA results before proceeding.
 
 ### Step 6.2: Performance Optimization
 
