@@ -1,11 +1,26 @@
 ---
 name: wp-start
-description: "Start a session in the WordPress hub. Use this when the user wants to begin a website project, asks 'build a website', 'start a WordPress site', 'start an Astro site', mentions 'website build', 'new site', 'landing page', 'LP campaign', or invokes /lhm-wordpress-hub:wp-start. This skill is a router — it detects which workflow (full WP build or LP campaign) and hands off to the right orchestrator."
+description: "Start a session in the WordPress hub. Use this when the user wants to begin a website project, asks 'build a website', 'start a WordPress site', 'start an Astro site', mentions 'website build', 'new site', 'landing page', 'LP campaign', or invokes /lhm-wordpress-hub:wp-start. Also use when the user mentions 'contact form', 'form submissions', 'wire up forms', 'set up form handling', 'Cloudflare forms', 'D1 form submissions', or 'Turnstile'. Also use when the user mentions 'QA checklist', 'run the QA', 'pre-launch checklist', 'site QA', 'launch checklist', or 'ready to go live'. This skill is a router — it detects which workflow (full WP build, LP campaign, or standalone utility skill) and hands off to the right orchestrator or skill."
 ---
 
 # WP Start — Router
 
 The plugin handles two workflows. This skill detects which one and hands off.
+
+## Step 0: Check for Standalone Utility Intent
+
+If the user's request clearly targets a standalone skill rather than a full workflow, route directly without going through workflow detection:
+
+| User says | Route to |
+|---|---|
+| "contact form", "form submissions", "wire up forms", "set up form handling", "Cloudflare forms", "D1 submissions", "Turnstile" | `contact-form-submissions` skill |
+| "QA checklist", "run the QA", "pre-launch checklist", "site QA", "launch checklist", "quality assurance", "ready to go live checklist" | `site-launch-qa` skill |
+
+For a standalone route: tell the user what you're loading, then load the relevant skill file and follow it:
+- Contact forms → `${CLAUDE_PLUGIN_ROOT}/skills/contact-form-submissions/SKILL.md`
+- QA checklist → `${CLAUDE_PLUGIN_ROOT}/skills/site-launch-qa/SKILL.md`
+
+---
 
 ## Step 1: Detect Workflow
 
@@ -76,3 +91,10 @@ Tell the user which orchestrator was loaded and let it take over from here. Do n
 - Folder creation (`wp-project-setup` handles this)
 
 This skill is a thin router. Keep it that way.
+
+## Standalone Skills Routable from Here
+
+| Skill | When to route |
+|---|---|
+| `contact-form-submissions` | User asks about contact forms, D1 form storage, Turnstile, or form email notifications |
+| `site-launch-qa` | User asks about the QA checklist, pre-launch checks, running QA, or going live |

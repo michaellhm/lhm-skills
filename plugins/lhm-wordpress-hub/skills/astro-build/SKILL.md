@@ -596,6 +596,10 @@ Create `public/_redirects` for any URL redirects (old site URLs → new slugs):
    - Node version: match local (set via environment variable `NODE_VERSION`)
 4. Deploy and verify the preview URL loads correctly
 
+> **Deployment warnings:**
+> - Do NOT add `npx wrangler pages deploy` as a deploy command in Cloudflare for Git-connected projects. Use the framework build command + output directory only. Mixing both deploy paths causes conflicts.
+> - `Authentication error [code: 10000]` from Wrangler is not always a credentials problem. It can also mean wrong project type (Worker vs Pages), wrong project name, or wrong deployment model. Check project type before regenerating tokens.
+
 **Vercel (if applicable):**
 
 No adapter needed for static output. Connect repo in Vercel dashboard, set build command `npm run build`, output `dist`. Framework preset: "Astro".

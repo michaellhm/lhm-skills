@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-110 skills across six Claude Code plugins (52 marketing, 27 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn, 6 finance) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+111 skills across six Claude Code plugins (52 marketing, 28 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn, 6 finance) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -69,7 +69,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     wordpress-builder.md                # Phase E — theme scaffold and page build
     site-ops.md                         # Phase F — performance and security
     site-extension.md                   # Post-launch page management
-  skills/                               # All 30 skills
+  skills/                               # All 32 skills
     wp-start/                           # Entry point — /wp-start command
     wp-project-setup/                   # Initialize project folder structure (platform choice)
     wp-project-manager/                 # PM doc — create, read, mark complete, gate-check
@@ -88,6 +88,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     visual-qa/                          # Pixel-perfect visual regression testing
     wp-performance/                     # Performance audit and optimization
     wp-security/                        # Security hardening checklist
+    site-launch-qa/                     # Automated + guided pre-launch QA checklist (WordPress & Astro)
     repo-init/                          # Create GitHub repos and scaffold docs/ for a new client
     repo-install/                       # Clone client repos onto a new machine
     astro-build/                        # Phase 5 for Astro — scaffold, convert prototype, SEO, deploy
@@ -100,6 +101,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     lp-deploy-3/                        # Deploy remaining LP pages
     lp-subsite-deploy/                  # Deploy subsite from Docker to live server
     wp-ssh-deploy/                      # General WordPress SSH deployment
+    contact-form-submissions/           # Cloudflare Pages contact form — D1, Turnstile, email, admin view
 plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
   .claude-plugin/plugin.json            # Plugin manifest
   agents/                               # 6 agents
@@ -181,13 +183,15 @@ plugins/lhm-learn/                    # Session learning capture plugin
 
 ### WordPress Hub
 
-**Website Build Pipeline** (18 skills): Project setup (with WordPress/Astro platform choice), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, and the Astro build skill (scaffold, prototype conversion, SEO, deployment).
+**Website Build Pipeline** (19 skills): Project setup (with WordPress/Astro platform choice), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), and the pre-launch QA checklist (automated + guided, for both WordPress and Astro).
 
 **Git Repo Workflow** (2 skills): First-time client repo setup — creates GitHub repos, scaffolds docs/ context folder, commits initial scaffold (`repo-init`). Clones an existing client project onto a new machine or pulls the latest (`repo-install`).
 
 **Landing Page Pipeline** (7 skills): Subsite setup for LP campaigns, landing page copywriting per ad group, HTML/CSS prototype generation (auto-pushed to prototype repo), WordPress deployment (HTML blocks), Gutenberg block conversion, multi-page deployment, and live server deployment via SSH.
 
 **Deployment** (1 skill): General-purpose WordPress SSH deployment (theme, pages, CPTs, media, customizer, menus, options).
+
+**Cloudflare Pages Forms** (1 skill): End-to-end contact form implementation for Astro/Cloudflare Pages — Cloudflare D1 persistence, Turnstile spam protection, Mailgun/Postmark/Resend email notifications, GA-trackable thank-you pages, and a Basic Auth protected admin submissions view.
 
 ### Content Engine
 

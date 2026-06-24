@@ -19,8 +19,8 @@
     {
       "name": "lhm-wordpress-hub",
       "source": "./plugins/lhm-wordpress-hub",
-      "description": "Guided WordPress and Astro website build system — phased delivery from client intake through SEO, content, design, build, and ops hardening. Includes Git repo workflow and Astro build pipeline.",
-      "version": "1.2.3",
+      "description": "Guided WordPress and Astro website build system — phased delivery from client intake through SEO, content, design, build, and ops hardening. Includes Git repo workflow, Astro build pipeline, Cloudflare Pages contact form setup, and automated pre-launch QA checklist.",
+      "version": "1.2.5",
       "category": "wordpress",
       "tags": ["wordpress", "website-builder", "block-theme", "agency"]
     },
