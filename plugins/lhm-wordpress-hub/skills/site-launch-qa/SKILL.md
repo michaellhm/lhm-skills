@@ -104,7 +104,16 @@ If the page fails to load, stop and tell the user the site is not reachable at t
 - Record mobile and desktop scores
 - **Pass**: Mobile ≥ 50, Desktop ≥ 70 (flag if lower, don't hard-fail)
 
-### 1.12 Copyright Footer
+### 1.12 Google Tag Manager
+
+- Use `browser_evaluate` to check for the GTM script: `document.querySelector("script[src*='googletagmanager.com/gtm.js']") !== null`
+- Also check for the `<noscript>` iframe fallback in the body: `document.querySelector("noscript iframe[src*='googletagmanager']") !== null`
+- Extract the GTM container ID if present (look for `GTM-XXXXXXX` pattern in the script src or inline dataLayer push)
+- **Pass**: GTM script found in `<head>` and noscript fallback in `<body>`, container ID recorded
+- **Fail**: GTM snippet missing entirely
+- **Warning**: Script present but noscript fallback missing (degraded tracking for users with JS disabled)
+
+### 1.13 Copyright Footer
 
 - On homepage, use `browser_evaluate` to check for copyright text in the footer
 - Look for current year (2025 or 2026)
@@ -142,6 +151,7 @@ After completing all automated checks, present a clean summary table:
 | Meta Tags | ✅ Pass | |
 | Mobile Viewport | ✅ Pass | |
 | PageSpeed (mobile/desktop) | ⚠️ 48 / 72 | Mobile below threshold |
+| Google Tag Manager | ✅ Pass | GTM-XXXXXXX |
 | Copyright Footer | ✅ Pass | |
 ```
 

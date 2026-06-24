@@ -118,11 +118,12 @@ Full item list with instructions for each check. Used by the site-launch-qa skil
 
 | Item | How to Check |
 |------|-------------|
+| Google Tag Manager installed | View page source — confirm GTM script in `<head>` and `<noscript>` iframe in `<body>`. Note the container ID (GTM-XXXXXXX). |
+| GTM container published and tags firing | GTM → Preview mode → visit the site → confirm all required tags fire (GA4, conversion tracking, etc.) |
 | Analytics tracking installed and working | GA4 Real-Time report — visit the site and confirm active user appears |
 | Event tracking set up for key metrics | Trigger a form submission, call click, or booking — confirm event fires in GA4 |
 | Search Console set up and linked | GSC → Property settings — confirm site is verified |
 | Sitemap submitted to GSC | GSC → Sitemaps → confirm `sitemap.xml` is submitted and indexed |
-| GTM connected (if applicable) | GTM → Preview mode → visit the site and confirm tags fire |
 
 ---
 

@@ -72,11 +72,12 @@ Full item list for Astro static/SSR sites deployed to Vercel or Netlify. Used by
 
 | Item | How to Check |
 |------|-------------|
+| Google Tag Manager installed | View page source — confirm GTM script in `<head>` and `<noscript>` iframe in `<body>`. Note the container ID (GTM-XXXXXXX). For Astro: GTM is typically added via a Layout component. |
+| GTM container published and tags firing | GTM → Preview mode → visit the site → confirm all required tags fire (GA4, conversion tracking, etc.) |
 | GA4 installed and recording sessions | GA4 Real-Time report — visit the site and confirm active user shows up |
 | GA4 installed via Partytown or native script | Check page source — confirm gtag script is present and loading |
 | Event tracking set up for key conversions | Trigger contact form submit, phone click, booking — confirm events in GA4 |
 | Google Search Console verified | GSC → confirm site is verified (DNS or meta tag method) |
-| GTM connected (if applicable) | GTM Preview mode → visit site → confirm container tags fire |
 
 ---
 
