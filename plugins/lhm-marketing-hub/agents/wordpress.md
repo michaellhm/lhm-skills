@@ -31,7 +31,7 @@ Ask: "What needs updating?"
 
 Classify:
 - **Level 1:** Title tag, meta description, body copy edit, image alt text, blog post publish → proceed directly
-- **Level 2:** Page structure, menu update, new page creation, template change → confirm with user before proceeding, consider backup gate
+- **Level 2:** Page structure, menu update, new page creation, template change → confirm with user before proceeding → backup gate required (see Step 5)
 
 ## Step 5: Backup gate
 
