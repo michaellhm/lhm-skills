@@ -61,7 +61,7 @@ Ask for:
 | >110% | Good | Blue — Low |
 | 90-110% | Good | Green — Maintain |
 
-See `templates/zone-analysis.md` for full zone decision tree and action frameworks.
+See the **Zone Reference** section below for full zone decision trees and execution checklists.
 
 ### Step 5: Generate Recommendations
 
@@ -107,7 +107,7 @@ Save the zone assessment to the client folder:
 
 **This report is a one-pager. One page maximum.** Keep prose to a minimum, lead with the data, no preamble or wrap-up. The whole thing should fit on a single printed page.
 
-Include the **Execution Checklist for the matched zone only** (pull it from `templates/zone-analysis.md`). Do not paste all five zone checklists — only the one that applies.
+Include the **Execution Checklist for the matched zone only** (see Zone Reference section below). Do not paste all five zone checklists — only the one that applies.
 
 ```
 # Google Ads Monthly Review: [Client Name]
@@ -152,3 +152,129 @@ Date: [Today's Date]
 ---
 
 *Quick zone check — let AdPulse guide your priorities*
+
+---
+
+## Zone Reference
+
+### Zone Determination Matrix
+
+| Budget Pacing | Performance | Zone | Priority |
+|--------------|-------------|------|----------|
+| >110% (Over) | >110% CPA or <90% ROAS (Poor) | Red | CRITICAL |
+| 90-110% (On Pace) | >110% CPA or <90% ROAS (Poor) | Orange | High |
+| <90% (Under) | ≤110% CPA or ≥90% ROAS (Good) | Yellow | Medium |
+| >110% (Over) | ≤110% CPA or ≥90% ROAS (Good) | Blue | Low |
+| 90-110% (On Pace) | ≤110% CPA or ≥90% ROAS (Good) | Green | Maintain |
+
+### Red Zone Execution Checklist
+
+Stabilise the patient: check vitals, treat life-threatening issues first, then stabilise.
+
+**One-off**
+- [ ] Budget reduced to 80-90% of ideal daily calculation
+- [ ] Budget allocation tweaked to favour best performers
+- [ ] Conversion actions are firing
+- [ ] Geo-targeting tight enough
+- [ ] Search partners performance checked
+- [ ] Ad extensions - all relevant types exist
+- [ ] Search term audit - wasted spend focus
+- [ ] Blocked search terms checked
+- [ ] Competitor analysis - check ads and special deals
+- [ ] Best campaigns - can they be expanded? (duplicate with different bid strategy / match type upgrade / demographics / audiences / geo)
+
+**Daily**
+- [ ] Budget reduced to 80-90% of ideal daily calculation
+- [ ] Budget allocation tweaked to favour best performers
+- [ ] All ads approved
+- [ ] No 404 errors on landing pages
+
+**Weekly**
+- [ ] Budgets lasting all day - adjust bids down if not
+- [ ] Search terms - wasted spend focus
+- [ ] Check troubleshooter to find weak metrics
+
+**Monthly**
+- [ ] Check performance & add bid modifiers on anomalies (devices / locations / audiences / demographics)
+- [ ] Pause/exclude poor performers (landing pages / ad groups / ads / keywords / search terms)
+- [ ] Bid strategy - change/experiment?
+- [ ] Landing page speed
+- [ ] Bounce rate or time-on-page metrics
+
+### Orange Zone Execution Checklist
+
+Flip the Red Zone priorities: performance fixes on top, budget increases only once performance is back on track.
+
+**One-off**
+- [ ] Budget allocation tweaked to favour best performers
+- [ ] Conversion actions are firing
+- [ ] Feed issues checked
+- [ ] Geo-targeting tight enough
+- [ ] Search partners performance checked
+- [ ] Ad extensions - all relevant types exist
+- [ ] Search term audit - wasted spend focus
+- [ ] Blocked search terms checked
+- [ ] Competitor analysis - check ads and special deals
+- [ ] Best campaigns - can they be expanded? (duplicate with different bid strategy / match type upgrade / demographics / audiences / geo)
+
+**Daily**
+- [ ] Budget allocation tweaked to favour best performers
+- [ ] All ads approved
+- [ ] No 404 errors on landing pages
+
+**Weekly**
+- [ ] Budgets lasting all day - adjust bids down if not
+- [ ] Search terms - wasted spend focus
+- [ ] Check troubleshooter to find weak metrics
+
+**Monthly**
+- [ ] Check performance & add bid modifiers on anomalies (devices / locations / audiences / demographics)
+- [ ] Pause/exclude poor performers (landing pages / ad groups / ads / keywords / search terms)
+- [ ] Bid strategy - change/experiment?
+- [ ] Landing page speed
+- [ ] Bounce rate or time-on-page metrics
+
+### Yellow Zone Execution Checklist
+
+Easy zone: increase budgets where impactful, expand existing campaigns, then add new campaign types/networks.
+
+**One-off**
+- [ ] Budget allocation - increase where impactful
+- [ ] Raise bids in best campaigns
+- [ ] Blocked search terms checked
+- [ ] Turn on search partners?
+- [ ] Ad extensions - all relevant types exist
+- [ ] Best campaigns - can they be expanded? (duplicate with different bid strategy / match type upgrade / keyword expansion / new ad formats / demographics / audiences / geo)
+- [ ] Remarketing campaigns?
+- [ ] Pay-for-conversions (display)?
+- [ ] Add new campaign types?
+- [ ] New networks (Bing)?
+
+**Daily**
+- [ ] Budget allocation - ensure top performers are not limited
+- [ ] All ads approved
+- [ ] No 404 errors on landing pages
+
+**Weekly**
+- [ ] Budgets lasting all day? Increase budgets if not
+
+**Monthly**
+- [ ] Check performance & add positive bid modifiers on anomalies (devices / locations / audiences / demographics)
+- [ ] Bid strategy - change/experiment?
+
+### Blue Zone Actions (ordered steps)
+
+The whitepaper gives Blue no checklist. Run these in order until spend is back in line:
+
+1. [ ] Ask the client for more budget (performance is good - more leads/sales is an easy conversation)
+2. [ ] Decrease bids, starting with poorer performers (10%/day until spend drops)
+3. [ ] Decrease budget on poorer performers if bids alone do not pull spend back
+4. [ ] Turn off worst-performing keywords / ad groups / campaigns as a last resort
+
+### Green Zone Maintenance
+
+- [ ] Test a new strategy or experiment (use the stability to learn)
+- [ ] Incremental optimisation - small, low-risk improvements
+- [ ] Monitor competitor impression share and offers
+- [ ] Plan for next month / anticipate seasonal shifts
+- [ ] Document what is working as a template for other accounts

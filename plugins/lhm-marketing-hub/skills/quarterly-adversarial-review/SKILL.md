@@ -101,9 +101,7 @@ Report only the unhandled paths and the broken assumptions. This pass exists to 
 
 ### Step 5: Determine the AdPulse zone
 
-Use the same framework as the monthly review. Read the full decision tree and per-zone checklists from:
-
-`${CLAUDE_PLUGIN_ROOT}/skills/google-ads-monthly-review/templates/zone-analysis.md`
+Use the same framework as the monthly review. Refer to the Zone Reference section in `${CLAUDE_PLUGIN_ROOT}/skills/google-ads-monthly-review/SKILL.md` for the full decision tree and per-zone checklists.
 
 | Budget Pacing (90-day) | Performance | Zone |
 |--------------|-------------|------|
@@ -126,7 +124,7 @@ Before writing the verdict, revisit the work and confirm nothing was skipped:
 ### Step 7: Write the verdict and emit the zone checklist
 
 1. **Verdict** — one blunt paragraph: is the account healthier or worse than last quarter, and is the trajectory real or fragile? Name the single biggest threat for next quarter.
-2. **Zone checklist** — pull the **matched zone's Execution Checklist only** from `zone-analysis.md` (never all five). This is the prescribed action set for the quarter ahead.
+2. **Zone checklist** — pull the **matched zone's Execution Checklist only** from the Zone Reference section in the monthly-review SKILL.md (never all five). This is the prescribed action set for the quarter ahead.
 
 ### Step 8: Approval gate
 
@@ -175,7 +173,7 @@ Period: [last 90 days] vs [prior 90 days] | Date: [Today]
 [1-2 lines: is the result explained by seasonality / one-off / tracking, or by the work?]
 
 ## [Zone] Execution Checklist
-[Paste the matched zone's checklist from zone-analysis.md — only that one zone]
+[Paste the matched zone's checklist from the Zone Reference section in google-ads-monthly-review/SKILL.md — only that one zone]
 ```
 
 ## HALT CONDITIONS

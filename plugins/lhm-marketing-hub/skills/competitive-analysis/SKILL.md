@@ -179,4 +179,4 @@ For detailed frameworks and templates, see:
 
 - `references/porters-five-forces.md` - Complete Porter's framework
 - `references/competitive-matrix-template.md` - Matrix templates
-- `examples/competitive-analysis-report.md` - Sample report
+

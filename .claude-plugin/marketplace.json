@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "1.4.4"
+    "version": "2.0.1"
   },
   "plugins": [
     {
@@ -14,7 +14,12 @@
       "description": "Guided WordPress and Astro website build system - phased delivery from client intake through SEO, content, design, build, and ops hardening.",
       "version": "1.2.6",
       "category": "wordpress",
-      "tags": ["wordpress", "website-builder", "block-theme", "agency"]
+      "tags": [
+        "wordpress",
+        "website-builder",
+        "block-theme",
+        "agency"
+      ]
     },
     {
       "name": "lhm-content-engine",
@@ -22,7 +27,14 @@
       "description": "Automated multi-asset content pipeline for allied health clinics - CSV-driven batch processing, blog generation, GMB social posts, anti-AI refinement, Google Doc publishing, and tracking updates.",
       "version": "1.0.0",
       "category": "content",
-      "tags": ["content", "allied-health", "blog", "social", "clinic", "automation"]
+      "tags": [
+        "content",
+        "allied-health",
+        "blog",
+        "social",
+        "clinic",
+        "automation"
+      ]
     },
     {
       "name": "lhm-learn",
@@ -30,7 +42,12 @@
       "description": "Session learning capture - scans conversation context, identifies skill learnings and client profile updates, writes to the correct LEARNED.md and client_profile.md files.",
       "version": "1.0.0",
       "category": "utilities",
-      "tags": ["learning", "memory", "client-profile", "session-capture"]
+      "tags": [
+        "learning",
+        "memory",
+        "client-profile",
+        "session-capture"
+      ]
     },
     {
       "name": "lhm-gmb-hub",
@@ -38,7 +55,13 @@
       "description": "Google Business Profile optimisation system - repeating 3-month cycle of GBP foundation, service page optimisation, content expansion, and strategic link building with per-client project management tracking.",
       "version": "1.2.10",
       "category": "local-seo",
-      "tags": ["gmb", "gbp", "local-seo", "google-business-profile", "agency"]
+      "tags": [
+        "gmb",
+        "gbp",
+        "local-seo",
+        "google-business-profile",
+        "agency"
+      ]
     },
     {
       "name": "lhm-finance-hub",
@@ -46,15 +69,28 @@
       "description": "Weekly financial management hub combining cash flow forecasting, profit formula analysis, and Profit First allocations. Monday rhythm with weekly, monthly, and quarterly review cadences.",
       "version": "1.0.0",
       "category": "finance",
-      "tags": ["finance", "cashflow", "profit", "forecasting", "profit-first"]
+      "tags": [
+        "finance",
+        "cashflow",
+        "profit",
+        "forecasting",
+        "profit-first"
+      ]
     },
     {
       "name": "lhm-marketing-hub",
-      "source": "./plugins/lhm-marketing-hub-test",
+      "source": "./plugins/lhm-marketing-hub",
       "description": "Five self-sufficient specialist agents (Google Ads, SEO, Content, WordPress, Start) with shared client context, LHM philosophy, multi-model writing pipeline, and agency-level learning.",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "category": "utilities",
-      "tags": ["marketing", "google-ads", "seo", "content", "wordpress", "agency"]
+      "tags": [
+        "marketing",
+        "google-ads",
+        "seo",
+        "content",
+        "wordpress",
+        "agency"
+      ]
     }
   ]
 }

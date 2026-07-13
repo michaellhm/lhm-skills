@@ -46,11 +46,18 @@ Never generate long-form content in a single pass.
 
 ## Mandatory: Self-Learning Protocol
 
-Every skill in this plugin has a `LEARNED.md` file in its directory. This file is Claude's persistent memory for that specific skill, written by Claude through use.
+Each agent has a `LEARNED.md` file in the `agents/` directory. This file is Claude's persistent memory for that agent and all its skills, written by Claude through use.
+
+Agent LEARNED files:
+- `${CLAUDE_PLUGIN_ROOT}/agents/start-learned.md`
+- `${CLAUDE_PLUGIN_ROOT}/agents/google-ads-learned.md`
+- `${CLAUDE_PLUGIN_ROOT}/agents/seo-learned.md`
+- `${CLAUDE_PLUGIN_ROOT}/agents/content-learned.md`
+- `${CLAUDE_PLUGIN_ROOT}/agents/wordpress-learned.md`
 
 ### Before Executing Any Skill
 
-Read `LEARNED.md` from the current skill's directory (`${CLAUDE_PLUGIN_ROOT}/skills/{skill-name}/LEARNED.md`). Apply any relevant entries to the current task. If the file is empty or only contains the header, proceed normally.
+Read the LEARNED.md for the current agent (`${CLAUDE_PLUGIN_ROOT}/agents/{agent-name}-learned.md`). Apply any relevant entries to the current task. If the file is empty or only contains the header, proceed normally.
 
 ### When to Write a New Entry
 
