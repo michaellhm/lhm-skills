@@ -62,8 +62,14 @@ Active: [current projects summary]
 - **Adversarial by default:** Assume waste exists until data proves otherwise. Monthly = zone check + coaching. Quarterly = full red-team (Cynic lens + Path Tracer lens).
 - **Coach mode:** Walk tasks one at a time. Push back when user wants to skip — ask them to justify. If justification reveals something new, trigger self-improvement check.
 - **AHPRA compliance:** Only applies when `is_health_client = true`. Never apply to non-health clients.
+- **Ad copy multi-model creative process:** `ad-copy-generator` uses a creative director model — multiple models contribute headlines/descriptions, Claude curates and compliance-checks:
+  1. Claude generates a set anchored to brief and AHPRA compliance rules
+  2. GPT-4o via OpenRouter generates a second set from a different creative angle
+  3. Claude curates the combined pool — selects strongest, removes duplicates, flags compliance issues, verifies character limits
+  4. Curated set goes to user for approval — never raw output from both models
+  - AHPRA compliance review is always Claude's responsibility. No GPT-4o headline goes to the client without Claude reviewing it first.
 - **Second opinion:** Offered after zone classification and before execution on significant changes.
-- **MCP tools:** Google Ads MCP (MCC 394-736-1921), AdPulse MCP, Keywords Everywhere.
+- **MCP tools:** Google Ads MCP (MCC 394-736-1921), AdPulse MCP, Keywords Everywhere, OpenRouter MCP.
 
 ### `references/lhm-philosophy/seo.md`
 
@@ -80,10 +86,14 @@ Active: [current projects summary]
 - **Interview before writing:** Always understand the goal, audience, and intent before producing anything.
 - **Research before brief:** Offer research options — keyword research, TAYA question discovery, web research — before the brief is written. Never skip this step.
 - **Brief before writing:** A structured brief is always generated and confirmed before any content is written. No exceptions.
-- **8-pass pipeline:** All content over 300 words routes through the content-writer 8-pass engine. No single-pass content.
+- **8-pass pipeline with multi-model routing:** All content over 300 words routes through the 8-pass engine. Passes are split across models by role:
+  - Pass 1 (research synthesis): Gemini 2.5 Pro via OpenRouter — strongest at grounding and factual recall
+  - Passes 2-7 (outline, drafts, burstiness, perplexity, human bookends, conversion): Claude — voice consistency during core writing
+  - Pass 8 (final QC): GPT-4o via OpenRouter — fresh eyes, different bias, catches what Claude misses in its own output
+- **No single-pass content.** Never generate long-form in one call regardless of model.
 - **Anti-AI writing:** All output enforces the anti-AI writing guidelines from `references/anti-ai-writing-guidelines.json`.
 - **Second opinion:** Offered after brief generation, before writing begins.
-- **MCP tools:** Keywords Everywhere, GSC MCP, browser (for research).
+- **MCP tools:** Keywords Everywhere, GSC MCP, OpenRouter MCP, browser (for research).
 
 ### `references/lhm-philosophy/wordpress.md`
 
