@@ -46,18 +46,18 @@ Never generate long-form content in a single pass.
 
 ## Mandatory: Self-Learning Protocol
 
-Each agent has a `LEARNED.md` file in the `agents/` directory. This file is Claude's persistent memory for that agent and all its skills, written by Claude through use.
+Each agent has a `-learned.md` file in the `learnings/` directory. This file is Claude's persistent memory for that agent and all its skills, written by Claude through use.
 
 Agent LEARNED files:
-- `${CLAUDE_PLUGIN_ROOT}/agents/start-learned.md`
-- `${CLAUDE_PLUGIN_ROOT}/agents/google-ads-learned.md`
-- `${CLAUDE_PLUGIN_ROOT}/agents/seo-learned.md`
-- `${CLAUDE_PLUGIN_ROOT}/agents/content-learned.md`
-- `${CLAUDE_PLUGIN_ROOT}/agents/wordpress-learned.md`
+- `${CLAUDE_PLUGIN_ROOT}/learnings/start-learned.md`
+- `${CLAUDE_PLUGIN_ROOT}/learnings/google-ads-learned.md`
+- `${CLAUDE_PLUGIN_ROOT}/learnings/seo-learned.md`
+- `${CLAUDE_PLUGIN_ROOT}/learnings/content-learned.md`
+- `${CLAUDE_PLUGIN_ROOT}/learnings/wordpress-learned.md`
 
 ### Before Executing Any Skill
 
-Read the LEARNED.md for the current agent (`${CLAUDE_PLUGIN_ROOT}/agents/{agent-name}-learned.md`). Apply any relevant entries to the current task. If the file is empty or only contains the header, proceed normally.
+Read the LEARNED.md for the current agent (`${CLAUDE_PLUGIN_ROOT}/learnings/{agent-name}-learned.md`). Apply any relevant entries to the current task. If the file is empty or only contains the header, proceed normally.
 
 ### When to Write a New Entry
 
