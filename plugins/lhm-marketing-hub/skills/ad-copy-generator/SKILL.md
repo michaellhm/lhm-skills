@@ -51,6 +51,32 @@ From the landing page, I'll identify:
 - Trust signals (years experience, qualifications)
 - Call-to-action style
 
+## Multi-Model Creative Process
+
+RSA generation uses a creative director model — two models contribute, Claude curates and compliance-checks.
+
+### Pass 1 — Claude generates (AHPRA-anchored)
+Generate 10 headlines and 4 descriptions. Anchor to:
+- The client brief and value proposition
+- AHPRA compliance rules (if `is_health_client = true`): no testimonials, no guaranteed outcomes, no before/after claims, no comparative claims without substantiation
+- Character limits: headlines ≤ 30 characters, descriptions ≤ 90 characters
+
+### Pass 2 — GPT-4o generates (different angles)
+Use OpenRouter MCP `send-message` with model `openai/gpt-4o`.
+
+Prompt:
+"You are a Google Ads copywriter. Generate 10 RSA headlines and 4 descriptions for the following brief. Deliberately choose different creative angles than you would typically default to — avoid generic benefit statements, focus on specificity, urgency, differentiation, and curiosity. Do NOT use em dashes. Keep headlines under 30 characters, descriptions under 90 characters. Brief: [brief]. [If health client: These ads are for a healthcare business in Australia — do not include testimonials, guaranteed outcomes, before/after claims, or comparative claims.]"
+
+### Pass 3 — Claude curates
+From the combined pool of 20 headlines and 8 descriptions:
+1. Remove any that exceed character limits
+2. Remove AHPRA violations (health clients only) — flag them to the user as removed and why
+3. Remove obvious duplicates (same idea, different words)
+4. Select the strongest 15 headlines and 4 descriptions based on: specificity, differentiation, relevance to search intent, likely CTR
+5. Present the curated set to the user — do not present raw outputs from both models separately
+
+AHPRA compliance review is always Claude's responsibility. No GPT-4o line goes to the client without Claude reviewing it first.
+
 ### Step 3: Generate 15 Headlines
 
 Create 15 unique headlines (30 characters max each):
