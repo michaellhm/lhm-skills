@@ -49,7 +49,7 @@
       "tags": ["finance", "cashflow", "profit", "forecasting", "profit-first"]
     },
     {
-      "name": "lhm-hub",
+      "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
       "description": "Five self-sufficient specialist agents (Google Ads, SEO, Content, WordPress, Start) with shared client context, LHM philosophy, multi-model writing pipeline, and agency-level learning.",
       "version": "2.0.0",
