@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-111 skills across six Claude Code plugins (52 marketing, 28 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn, 6 finance) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+112 skills across six Claude Code plugins (53 marketing, 28 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn, 6 finance) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -22,12 +22,13 @@ Use `/start` to begin a session, or just describe what you need.
 .claude-plugin/marketplace.json         # Marketplace manifest
 plugins/lhm-marketing-hub/             # The plugin
   .claude-plugin/plugin.json            # Plugin manifest
-  agents/marketing-assistant.md         # Orchestrator agent
-  agents/google-ads-monthly-review.md  # Full monthly review with skill chaining
-  agents/seo-specialist.md             # Multi-skill SEO workflow orchestrator
-  agents/client-analytics-dashboard.md # GA4 analytics dashboard workflow
-  skills/                              # All 52 skills
-    start/                             # Entry point — /start command
+  agents/start.md                       # Main entry point — client context, routing, session management
+  agents/google-ads.md                  # Self-sufficient Google Ads specialist
+  agents/seo.md                         # Self-sufficient SEO specialist
+  agents/content.md                     # Self-sufficient content specialist
+  agents/wordpress.md                   # Self-sufficient WordPress specialist
+  agents/marketing-assistant.md         # (legacy alias) — routes to start agent
+  skills/                              # All 53 skills
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
     bid-budget-optimizer/              # Budget and bid strategy
@@ -45,7 +46,7 @@ plugins/lhm-marketing-hub/             # The plugin
     pr-content-auditor/                # Rewrite rejected Digital PRs
     content-refresher/                 # Identify and refresh underperforming content
     ga-event-config/                   # GA4 event discovery and conversion classification
-    ga-dashboard/                      # Analytics dashboard with period comparison
+    ga-dashboard-artifact/             # Analytics dashboard artifact with period comparison
     client-update-email/               # Plain-language client update emails
     campaign-playbook-generator/       # Campaign & sales playbooks from transcripts
     pmax-banner-generator/             # Performance Max creative assets (CSV)
@@ -155,7 +156,7 @@ plugins/lhm-learn/                    # Session learning capture plugin
 
 ## Skills Catalog
 
-**Client Management** (3 skills): Client onboarding and profile setup, campaign playbook generation from transcripts, plain-language client update emails.
+**Client Management** (5 skills): Client onboarding and profile setup, campaign playbook generation from transcripts, plain-language client update emails, post-meeting review and action extraction, structured client update reports.
 
 **Google Ads & PPC** (9 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), quarterly adversarial 90-day review, PMax banner creative, PMax campaign setup for local businesses, PMax monthly + 90-day optimisation.
 
@@ -163,7 +164,7 @@ plugins/lhm-learn/                    # Session learning capture plugin
 
 **SEO & Content** (8 skills): Content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, meta tags optimization, CORE-EEAT content quality auditing, PR content rewriting for rejected distributions, content refresh planning.
 
-**Analytics & Reporting** (2 skills): GA4 event discovery and conversion classification, analytics dashboard generation with period comparison.
+**Analytics & Reporting** (2 skills): GA4 event discovery and conversion classification, analytics dashboard artifact with period comparison and visual output.
 
 **SaaS & Growth Marketing** (25 skills): A/B testing, analytics tracking, competitor pages, content strategy, copy editing, copywriting, email sequences, form CRO, free tool strategy, launch strategy, marketing ideas, marketing psychology, onboarding CRO, page CRO, paid ads, paywall CRO, popup CRO, pricing strategy, product marketing, programmatic SEO, referral programs, schema markup, SEO audit, signup flow CRO, social content.
 
