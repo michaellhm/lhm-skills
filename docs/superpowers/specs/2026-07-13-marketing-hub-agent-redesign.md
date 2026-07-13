@@ -272,7 +272,17 @@ Trigger: On-demand — agent offers after generating significant recommendations
 
 Standard offer: "Want me to get a second opinion on this before we proceed?"
 
-Implementation: Anthology MCP (primary). Browser tool to ChatGPT/Gemini (fallback if Anthology MCP doesn't cover the need).
+Implementation: **OpenRouter MCP** (primary) — install with two commands, provides access to GPT-4o, Gemini 2.5 Pro, Grok and 400+ models via a single `send-message` tool call. Enable BYOK in OpenRouter settings to use your own OpenAI/Google API keys at direct pricing. Default $10 spend cap — raise in OpenRouter settings.
+
+Setup:
+```bash
+claude mcp add --transport http openrouter https://mcp.openrouter.ai/mcp
+claude mcp login openrouter
+```
+
+Fallback: Bash curl with `$OPENAI_API_KEY` env var — works immediately in any skill with no MCP required.
+
+Note: "Anthology MCP" does not exist — confirmed via research. Was likely a confusion with AnythingLLM (different product, different use case).
 
 Not applicable in `wordpress` agent — execution-focused, not strategic.
 
@@ -291,9 +301,41 @@ Not applicable in `wordpress` agent — execution-focused, not strategic.
 
 ---
 
+## New Skills (Additional)
+
+### `ga-dashboard-artifact` (replaces `ga-dashboard` skill and `client-analytics-dashboard` agent)
+
+**Scope: Barebones v1, iterate from there.**
+
+1. Connect to GA4 via analytics MCP
+2. Pull core metrics for chosen date range vs prior period: sessions, users, conversions, top pages, traffic sources
+3. Render as a Claude Artifact — KPI tiles at top, bar/line charts for trends, period comparison
+4. Save a `analytics/YYYY-MM/dashboard-summary-YYYY-MM.md` to client folder alongside the Artifact
+
+`ga-event-config` skill is unchanged — setup work, not reporting.  
+`client-analytics-dashboard` agent is retired.  
+`ga-dashboard` skill is replaced by this.
+
+---
+
+## Decisions Made
+
+| Decision | Rationale |
+|----------|-----------|
+| Specialist agents are self-sufficient (don't require start) | Power users jump straight in; start is a concierge not a gate |
+| Agency learnings are a separate tier from client LEARNED.md | Client patterns stay client-specific; cross-client wins become agency IP |
+| Second opinion is on-demand, not automatic | Keeps routine sessions fast; option is always visible |
+| post-meeting-review triggers client-update automatically | One command after a meeting keeps all state files current |
+| AHPRA gated on is_health_client flag | LHM works with non-health clients; AHPRA should never apply to them |
+| Fathom MCP primary, paste fallback | Fathom MCP now connected — confirm tool names at implementation start |
+| OpenRouter MCP for second opinions | Two-command install, access to GPT-4o/Gemini/Grok, BYOK removes markup |
+| ga-dashboard-artifact replaces ga-dashboard skill + client-analytics-dashboard agent | Artifacts produce better output than markdown dashboards; iterate from barebones v1 |
+
+---
+
 ## Out of Scope
 
 - WordPress hub refactor (separate plugin, separate concern)
 - GMB hub refactor (separate plugin)
-- Anthology MCP configuration (MCP setup is separate from plugin design)
-- Fathom MCP configuration (same)
+- OpenRouter MCP configuration (user sets up separately; plugin uses `send-message` tool once connected)
+- Fathom MCP configuration (user sets up separately; skill uses transcript tool once connected)
