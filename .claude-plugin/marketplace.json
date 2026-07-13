@@ -13,7 +13,7 @@
       "source": "./plugins/lhm-marketing-hub",
       "description": "Five self-sufficient specialist agents (Google Ads, SEO, Content, WordPress, Start) with shared client context, LHM philosophy, multi-model writing pipeline, and agency-level learning.",
       "version": "1.4.4",
-      "category": "marketing",
+      "category": "utilities",
       "tags": ["marketing", "google-ads", "seo", "cro", "agency"]
     },
     {
