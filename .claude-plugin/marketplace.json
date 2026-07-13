@@ -12,7 +12,7 @@
       "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
       "description": "Structured marketing orchestrator — pre-flight client folder check, auto-onboarding, mandatory context load, skill routing, and enforced output discipline.",
-      "version": "1.4.2",
+      "version": "1.4.3",
       "category": "marketing",
       "tags": ["marketing", "google-ads", "seo", "cro", "agency"]
     },

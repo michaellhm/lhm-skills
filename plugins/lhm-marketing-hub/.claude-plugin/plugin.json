@@ -1,9 +1,9 @@
 {
   "name": "lhm-marketing-hub",
-  "description": "Structured marketing orchestrator — pre-flight client folder check, auto-onboarding, mandatory context load, skill routing, and enforced output discipline.",
-  "version": "1.4.2",
+  "description": "LHM Marketing Hub — five self-sufficient specialist agents (Google Ads, SEO, Content, WordPress, Start) with shared client context, LHM philosophy, multi-model writing pipeline, and agency-level learning.",
+  "version": "1.4.3",
   "author": {
     "name": "LHM Digital"
   },
-  "keywords": ["marketing", "google-ads", "seo", "cro", "agency"]
+  "keywords": ["marketing", "google-ads", "seo", "content", "wordpress", "agency", "openrouter"]
 }
