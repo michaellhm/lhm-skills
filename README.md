@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-112 skills across six Claude Code plugins (53 marketing, 28 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn, 6 finance) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+113 skills across six Claude Code plugins (54 marketing, 28 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn, 6 finance) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -28,7 +28,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/content.md                     # Self-sufficient content specialist
   agents/wordpress.md                   # Self-sufficient WordPress specialist
   agents/marketing-assistant.md         # (legacy alias) — routes to start agent
-  skills/                              # All 53 skills
+  skills/                              # All 54 skills
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
     bid-budget-optimizer/              # Budget and bid strategy
@@ -42,6 +42,7 @@ plugins/lhm-marketing-hub/             # The plugin
     seo-content-writer/                # SEO-optimized blog posts and articles
     geo-content-optimizer/             # AI citation and GEO optimization
     meta-tags-optimizer/               # Title tags, meta descriptions, OG tags
+    meta-tag-refresh/                  # Site-wide meta refresh from Ads/GSC data, slug audit, Rank Math push + 301s
     content-quality-auditor/           # CORE-EEAT 80-item quality audit
     pr-content-auditor/                # Rewrite rejected Digital PRs
     content-refresher/                 # Identify and refresh underperforming content
@@ -162,7 +163,7 @@ plugins/lhm-learn/                    # Session learning capture plugin
 
 **Strategy & Research** (3 skills): Competitive analysis with Porter's 5 Forces, keyword research with intent analysis and topic clustering, They Ask You Answer question discovery.
 
-**SEO & Content** (8 skills): Content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, meta tags optimization, CORE-EEAT content quality auditing, PR content rewriting for rejected distributions, content refresh planning.
+**SEO & Content** (9 skills): Content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, meta tags optimization, site-wide meta tag refresh (Ads conversion + GSC decline data, slug audit, Rank Math REST push with 301 redirects), CORE-EEAT content quality auditing, PR content rewriting for rejected distributions, content refresh planning.
 
 **Analytics & Reporting** (2 skills): GA4 event discovery and conversion classification, analytics dashboard artifact with period comparison and visual output.
 

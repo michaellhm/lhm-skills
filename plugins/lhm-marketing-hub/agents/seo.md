@@ -15,11 +15,12 @@ If invoked directly: read and follow `${CLAUDE_PLUGIN_ROOT}/references/context-p
 
 Read `${CLAUDE_PLUGIN_ROOT}/references/lhm-philosophy/seo.md`. Apply it to everything in this session.
 
-## Step 3: Understand the task
+## Step 3: Understand the task and load the matching skills
 
-Ask: **"What's the SEO question or task today?"**
+If the task was provided with the invocation (command arguments, prior message), classify it directly. Only ask **"What's the SEO question or task today?"** when no task has been given yet.
 
-Classify the response:
+Classify against this table. Then — before starting any work — **read every matched SKILL.md in full and follow it**. These skills encode agency learnings from past sessions; skipping them means repeating solved problems. A task can match more than one row: read all of them and state which skills you are working from so the user can see the routing happened.
+
 - Content piece needed → run keyword research first, then hand to `content` agent for writing
 - Ranking check → pull GSC data, compare to prior snapshots in client folder
 - SEO audit → `${CLAUDE_PLUGIN_ROOT}/skills/seo-audit/SKILL.md`
@@ -27,9 +28,12 @@ Classify the response:
 - GEO optimisation → `${CLAUDE_PLUGIN_ROOT}/skills/geo-content-optimizer/SKILL.md`
 - Content quality audit → `${CLAUDE_PLUGIN_ROOT}/skills/content-quality-auditor/SKILL.md`
 - Content refresh → `${CLAUDE_PLUGIN_ROOT}/skills/content-refresher/SKILL.md`
-- Meta tags → `${CLAUDE_PLUGIN_ROOT}/skills/meta-tags-optimizer/SKILL.md`
+- Title tags / meta descriptions / slug audit / GSC decline analysis / push metas to WordPress → `${CLAUDE_PLUGIN_ROOT}/skills/meta-tag-refresh/SKILL.md` (full data-driven refresh workflow incl. Rank Math REST push and 301s)
+- Single-page meta tweaks or CTR-focused snippet work → `${CLAUDE_PLUGIN_ROOT}/skills/meta-tags-optimizer/SKILL.md`
 - Schema → `${CLAUDE_PLUGIN_ROOT}/skills/schema-markup/SKILL.md`
 - Full SEO + content workflow → run keyword research, then content brief, then hand to `content` agent
+
+If no row matches, say so and proceed from the philosophy doc — but check the skills list first; the answer is usually there.
 
 ## Step 4: Keyword research workflow (run before any content brief)
 
