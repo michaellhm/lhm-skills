@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rank Math Redirects"
+  short_description: "Import and verify Rank Math 301 redirects."
+  default_prompt: "Use $rankmath-redirects to import old WordPress URLs into Rank Math and verify the public 301 responses."
