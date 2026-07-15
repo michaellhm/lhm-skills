@@ -206,6 +206,8 @@ Image optimization is built into Astro v3+ — no separate integration needed. U
 
 For local health business sites (no logged-in users, no dynamic data), **static output with no adapter is the default**. Only add an adapter if you have a confirmed SSR requirement.
 
+**Cloudflare Pages Git-connected settings:** use the Pages product with the GitHub repo connected directly, production branch `main`, build command `npm run build`, output directory `dist`, root directory empty unless the Astro app is in a subfolder, and no deploy command. Do not use `npx wrangler deploy` or `npx wrangler pages deploy` inside Cloudflare for Git-connected Pages. If the UI requires a deploy command, verify you are not in a Worker/direct-upload style project or similarly named app.
+
 ### 2.4 `astro.config.mjs` baseline
 
 ```js

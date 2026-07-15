@@ -4,8 +4,8 @@ Add to `src/scripts/contact-form.js` (or inline in layout/page).
 
 ```js
 // contact-form.js
-// Intercepts [data-contact-form] submits, posts to /api/contact,
-// renders Turnstile widgets, handles success/error states.
+// Intercepts [data-contact-form] submits, stamps a form_started_at timer,
+// posts to /api/contact, renders Turnstile widgets, handles success/error states.
 
 (function () {
   const TURNSTILE_SITE_KEY = document
@@ -39,6 +39,15 @@ Add to `src/scripts/contact-form.js` (or inline in layout/page).
 
   // Handle form submission
   document.querySelectorAll('[data-contact-form]').forEach(form => {
+    let startedAt = form.querySelector('input[name="form_started_at"]');
+    if (!startedAt) {
+      startedAt = document.createElement('input');
+      startedAt.type = 'hidden';
+      startedAt.name = 'form_started_at';
+      form.appendChild(startedAt);
+    }
+    startedAt.value = String(Date.now());
+
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
 
@@ -109,6 +118,14 @@ Add inside each `<form>` where you want an inline error message:
 
 ```html
 <p data-form-error hidden class="contact-form__error" role="alert" aria-live="polite"></p>
+```
+
+## Adding the timing field to forms
+
+Add this hidden field inside every form. The client JS sets it on page load, and the server rejects submissions that arrive unrealistically quickly.
+
+```html
+<input type="hidden" name="form_started_at" value="">
 ```
 
 ## Loading the script

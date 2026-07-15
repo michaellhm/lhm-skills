@@ -8,9 +8,20 @@ Accumulated from real project sessions. Consult before touching deployment confi
 
 **Rule:** For Git-connected Cloudflare Pages projects, NEVER add `npx wrangler pages deploy` as a deploy command inside the Cloudflare dashboard.
 
-- Git-connected deployment uses: build command (e.g. `npm run build`) + output directory (`dist`)
+- Git-connected deployment uses Cloudflare Pages' internal build/publish flow:
+  - Product: Cloudflare Pages, not Worker
+  - GitHub repo connected directly to the Pages project
+  - Production branch: `main`
+  - Build command: `npm run build`
+  - Build output directory: `dist`
+  - Root directory: empty unless the app is in a subfolder (e.g. `astro`)
+  - Deploy command: empty / not used
+  - No `CLOUDFLARE_API_TOKEN` required for deployment
 - Wrangler direct upload is a separate model — do not mix the two
 - If you add `wrangler pages deploy` to a Git-connected project, deploys may duplicate, conflict, or fail with cryptic authentication errors
+- If the Cloudflare UI requires a deploy command, treat that as a red flag that you may be in a Worker/direct-upload style app or the wrong project flow. Do not enter `true`, `echo ok`, `npx wrangler deploy`, or `npx wrangler pages deploy` as a workaround until the project type is confirmed.
+
+**Only use `npx wrangler pages deploy dist --project-name PROJECT_NAME` from external CI/direct upload workflows where an API token is intentionally configured.**
 
 ## Authentication error [code: 10000]
 
@@ -18,6 +29,7 @@ This Wrangler error does not always mean bad credentials. It can also mean:
 - Wrong project type (Worker vs Pages)
 - Wrong project name or account
 - Wrong deployment model (Wrangler vs Git-connected)
+- Calling Pages deploy from inside a Git-connected Pages build
 
 Diagnose the project type before assuming credential issues.
 

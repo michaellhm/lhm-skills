@@ -7,6 +7,15 @@ description: This skill should be used when the user wants to "set up contact fo
 
 Complete implementation workflow for contact form submissions on Astro/Cloudflare Pages projects. Covers spam protection (Turnstile), D1 persistence, email notifications, GA-trackable thank-you pages, and a protected admin view.
 
+**Default for all future Astro builds:** include the full anti-spam stack from the start, not as a later hardening pass:
+- Server-side Turnstile verification
+- Honeypot field with silent pass plus rejection logging
+- Browser-side submission timing token and server-side "too fast" rejection
+- Email and phone validation
+- Lightweight content filtering for obvious outreach/spam terms and excessive links
+- D1 logging for rejected attempts
+- Admin visibility for both accepted submissions and rejected attempts
+
 ## Before Starting — Gather Project Details
 
 Before editing any files, ask the user for:
@@ -72,9 +81,30 @@ CREATE INDEX IF NOT EXISTS idx_contact_submissions_email_status
   ON contact_submissions (email_status);
 CREATE INDEX IF NOT EXISTS idx_contact_submissions_crm_status
   ON contact_submissions (crm_status);
+
+CREATE TABLE IF NOT EXISTS contact_spam_rejections (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  rejected_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  reason TEXT NOT NULL,
+  detail TEXT,
+  name TEXT,
+  phone TEXT,
+  email TEXT,
+  message_preview TEXT,
+  source_path TEXT,
+  user_agent TEXT,
+  ip_address TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_contact_spam_rejections_rejected_at
+  ON contact_spam_rejections (rejected_at);
+CREATE INDEX IF NOT EXISTS idx_contact_spam_rejections_reason
+  ON contact_spam_rejections (reason);
 ```
 
-`crm_status` is included even if no CRM integration is planned — it avoids a schema migration when GHL/HubSpot is added later.
+`crm_status` is included even if no CRM integration is planned — it avoids a schema migration when GHL/HubSpot is added later. `contact_spam_rejections` is mandatory for future Astro builds so blocked enquiries are inspectable rather than disappearing silently.
+
+Apply this via `wrangler d1 execute`. For clients wary of installing/authenticating Wrangler, the migration SQL above is additive (`CREATE TABLE IF NOT EXISTS`) and can instead be run manually in the Cloudflare dashboard's D1 console.
 
 ---
 
@@ -115,10 +145,14 @@ Create `functions/api/contact.js`. See the full reference implementation in [ref
 Key requirements:
 - Accept POST only; return 405 for other methods
 - Parse `FormData` from the request
-- Silently pass (return success, store nothing) if honeypot field `website` is filled
-- Validate required fields: `name`, `email`, `message`
+- Silently pass (return success, store nothing in `contact_submissions`) if honeypot field `website` is filled, but log the attempt to `contact_spam_rejections` with reason `honeypot`
+- Validate required fields: `name`, `phone`, `email`, `message`
 - Clean and truncate all fields to sane lengths (name: 100, email: 254, message: 5000, etc.)
 - Verify Turnstile token via `TURNSTILE_SECRET_KEY`; if key is missing (local dev), allow but set `turnstile_verified = 0`
+- Reject submissions that fail Turnstile and log reason `turnstile_failed`
+- Require and validate `form_started_at`; reject unrealistically fast submissions (default: under 3 seconds) and log reason `timing_check_failed`
+- Validate email format and phone shape server-side; log `invalid_email` / `invalid_phone`
+- Apply lightweight content filtering for obvious spam terms and excessive links; log reason `content_filter`
 - **Save to D1 first**, before attempting email
 - Attempt email via `sendNotification(submission, env)` — email failure must not fail the user-facing response; update `email_status = 'failed'` on error
 - Return `{ ok: true, message: "..." }` or `{ ok: false, message: "..." }`
@@ -168,6 +202,7 @@ Update every contact form to use the `data-contact-form` pattern:
 >
   <input type="hidden" name="source_path" value="/contact/">
   <input type="hidden" name="form_name" value="Contact Form">
+  <input type="hidden" name="form_started_at" value="">
 
   <!-- Honeypot — hidden from real users, traps bots -->
   <div class="contact-form__field contact-form__field--hidden" aria-hidden="true">
@@ -189,7 +224,7 @@ CSS for honeypot (add to global styles):
 .contact-form__field--hidden { display: none !important; visibility: hidden !important; }
 ```
 
-**Client-side JS** (`src/scripts/contact-form.js` or equivalent): intercept submit → POST FormData → on success redirect to `form.dataset.thankYou` → on error show inline message and reset Turnstile. Do not redirect on API failure. See [references/client-js.md](references/client-js.md) for the full implementation.
+**Client-side JS** (`src/scripts/contact-form.js` or equivalent): set `form_started_at` when the form is initialised, intercept submit → POST FormData → on success redirect to `form.dataset.thankYou` → on error show inline message and reset Turnstile. Do not redirect on API failure. See [references/client-js.md](references/client-js.md) for the full implementation.
 
 ---
 
@@ -228,6 +263,7 @@ Key requirements:
 - HTTP Basic Auth using `ADMIN_USERNAME` / `ADMIN_PASSWORD` env vars
 - If credentials missing, return 403 (do not guess or skip auth)
 - Query latest 100 rows from D1: `SELECT * FROM contact_submissions ORDER BY submitted_at DESC LIMIT 100`
+- Also query latest 100 rows from `contact_spam_rejections` and render them in a separate "Rejected Attempts" section
 - Render a plain HTML table — no JS frameworks
 - Escape every user-submitted value before rendering (replace `&`, `<`, `>`, `"`, `'`)
 - Response headers: `cache-control: no-store`, `x-robots-tag: noindex, nofollow`
@@ -252,6 +288,8 @@ Key requirements:
 - [ ] Visit `/admin/submissions` → confirm Basic Auth challenge appears
 - [ ] Confirm login works with configured credentials
 - [ ] Confirm table shows latest rows
+- [ ] Trigger or manually insert a rejected attempt → confirm `/admin/submissions` shows it under "Rejected Attempts"
+- [ ] Confirm honeypot, Turnstile, timing, validation, and content-filter rejections write reason codes to `contact_spam_rejections`
 - [ ] Confirm thank-you pages return `noindex, nofollow` in `<head>`
 - [ ] If testing on a Cloudflare Pages preview URL, confirm that hostname is registered in Turnstile widget
 

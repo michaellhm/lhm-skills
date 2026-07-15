@@ -12,7 +12,7 @@
       "name": "lhm-wordpress-hub",
       "source": "./plugins/lhm-wordpress-hub",
       "description": "Guided WordPress and Astro website build system - phased delivery from client intake through SEO, content, design, build, and ops hardening.",
-      "version": "1.2.6",
+      "version": "1.2.7",
       "category": "wordpress",
       "tags": [
         "wordpress",
@@ -53,7 +53,7 @@
       "name": "lhm-gmb-hub",
       "source": "./plugins/lhm-gmb-hub",
       "description": "Google Business Profile optimisation system - repeating 3-month cycle of GBP foundation, service page optimisation, content expansion, and strategic link building with per-client project management tracking.",
-      "version": "1.2.10",
+      "version": "1.4.0",
       "category": "local-seo",
       "tags": [
         "gmb",

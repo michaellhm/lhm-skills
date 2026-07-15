@@ -593,11 +593,14 @@ Create `public/_redirects` for any URL redirects (old site URLs → new slugs):
 3. Build settings:
    - Build command: `npm run build`
    - Build output directory: `dist`
+   - Root directory: empty unless the Astro app is in a subfolder (for example, `astro`)
+   - Deploy command: empty / not used
    - Node version: match local (set via environment variable `NODE_VERSION`)
 4. Deploy and verify the preview URL loads correctly
 
 > **Deployment warnings:**
-> - Do NOT add `npx wrangler pages deploy` as a deploy command in Cloudflare for Git-connected projects. Use the framework build command + output directory only. Mixing both deploy paths causes conflicts.
+> - Do NOT add `npx wrangler deploy`, `npx wrangler pages deploy`, `true`, or `echo ok` as a deploy command in Cloudflare for Git-connected projects. Use the Pages Git integration build command + output directory only. Mixing both deploy paths causes conflicts.
+> - If Cloudflare requires a deploy command, you are probably in the wrong product/project flow (Worker/direct upload or a similarly named app), not the normal Git-connected Pages build settings.
 > - `Authentication error [code: 10000]` from Wrangler is not always a credentials problem. It can also mean wrong project type (Worker vs Pages), wrong project name, or wrong deployment model. Check project type before regenerating tokens.
 
 **Vercel (if applicable):**

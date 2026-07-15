@@ -76,10 +76,11 @@ All available skills in this plugin:
 | `gmb-project-manager` | "GMB status", "update rankings" | Any |
 | `run-local-diagnostic` | "Run diagnostic for [Client]" | 0, 2 |
 | `gbp-optimiser` | "Optimise GBP for [Client]" | 0 |
-| `gbp-post-generator` | "Generate 52 GBP posts" | 0 |
+| `gbp-post-generator` | "Generate GBP posts" (13 weekly, 3-month cycle) | 0 |
 | `citation-audit` | "Citation audit for [Client]" | 0 |
 | `entity-mapper` | "Entity mapping for [Client]" | 0 |
 | `site-architecture-mapper` | "Map site architecture" | 0 |
+| `blog-schedule-builder` | "Blog schedule for [Client]" (3-month, posts/month from PM doc) | 0 |
 | `service-priority-selector` | "Select priority services" | 1 (start) |
 | `consistency-signal-audit` | "Audit consistency signals" | 1 |
 | `service-page-writer` | "Write service page for [Service]" | 1 |

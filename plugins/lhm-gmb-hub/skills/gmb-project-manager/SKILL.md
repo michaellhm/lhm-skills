@@ -21,7 +21,7 @@ Look for `[client_folder]/gmb/GMBProjectManagement.md`.
 
 **If it does NOT exist:** Create the `gmb/` directory and a new `GMBProjectManagement.md` using the template below. Populate the Overview section from `client_profile.md`. Set Current Phase to "Month 0 — Onboarding". Ask the user for the 7 focus keywords (or suggest them based on the client profile).
 
-**If it DOES exist:** Read it and proceed to step 2.
+**If it DOES exist:** Read it and proceed to step 2. If the Overview section is missing a **Blog Posts Per Month** field (legacy doc created before this field existed), backfill it: check for an existing content plan/blog folder to infer current cadence, propose it to the user, and add the field once confirmed — don't guess silently.
 
 ### 2. Present Status Summary
 
@@ -74,6 +74,7 @@ When creating a new project doc, use this structure:
 - **Client:** [Name]
 - **Primary Location:** [Address]
 - **Primary Modality:** [e.g. Physiotherapy]
+- **Blog Posts Per Month:** [N — confirm with client/team; varies per client, check any existing content plan/publishing cadence for a sensible default before asking]
 - **Last Updated:** [Today's date]
 
 ## Focus Keywords & Ranking History
@@ -108,10 +109,11 @@ When creating a new project doc, use this structure:
 - [ ] GBP services listed (30+)
 - [ ] 750-char business description written
 - [ ] All GBP profile fields completed
-- [ ] 52 weekly GBP posts generated
+- [ ] 13 weekly GBP posts generated (3-month cycle)
 - [ ] Citation audit completed
 - [ ] Entity mapping completed
 - [ ] Site architecture mapped
+- [ ] Blog content schedule generated (3 months)
 - [ ] **Exit criteria met**
 
 ### Month 1 — Service Pages ([Month Year])

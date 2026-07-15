@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-113 skills across six Claude Code plugins (54 marketing, 28 WordPress, 17 GMB/local SEO, 7 content engine, 1 learn, 6 finance) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+115 skills across six Claude Code plugins (54 marketing, 28 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -113,14 +113,16 @@ plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
     content-expansion-agent.md          # Month 2 — FAQ or overlay pages
     link-building-agent.md              # Month 3 — link acquisition
     content-writer.md                   # 8-pass writing utility
-  skills/                               # All 17 skills
+  skills/                               # All 19 skills
     gmb-project-manager/                # Project tracking and status
     run-local-diagnostic/               # Grid scans + competitor audit
     gbp-optimiser/                      # GBP profile optimisation
-    gbp-post-generator/                 # 52 weekly posts
+    gbp-post-generator/                 # Weekly posts (13, matched to 3-month cycle)
     citation-audit/                     # Directory NAP check
     entity-mapper/                      # Competitor entity extraction
     site-architecture-mapper/           # GBP-mirrored silo
+    blog-schedule-builder/              # 3-month blog content schedule
+    monthly-loop-setup/                 # Scheduled automation for the monthly GMB cycle
     service-priority-selector/          # Pick 3 services per cycle
     consistency-signal-audit/           # 8 homepage signals
     service-page-writer/                # Goal-completion content
@@ -173,7 +175,7 @@ plugins/lhm-learn/                    # Session learning capture plugin
 
 ### GMB Hub (Local SEO)
 
-**Month 0 — Onboarding** (7 skills): Project management and tracking, 169-point grid scan diagnostics, GBP profile optimisation, 52 weekly post generation, citation audit, competitor entity mapping, GBP-mirrored site architecture.
+**Month 0 — Onboarding** (8 skills): Project management and tracking, 169-point grid scan diagnostics, GBP profile optimisation, weekly post generation (13 posts, matched to the 3-month cycle), citation audit, competitor entity mapping, GBP-mirrored site architecture, 3-month blog content schedule builder.
 
 **Month 1 — Service Pages** (4 skills): Priority service selection, homepage consistency signal audit, goal-completion service page writing (via 8-pass engine), technical page audit with schema and indexing checks.
 
@@ -181,7 +183,7 @@ plugins/lhm-learn/                    # Session learning capture plugin
 
 **Month 3 — Link Building** (3 skills): Link gap analysis, local authority opportunities (chambers, sponsorships, .edu links), PR brief generation.
 
-**Cross-Phase** (1 skill): Adaptive monthly/cycle reporting with ranking trends.
+**Cross-Phase** (2 skills): Adaptive monthly/cycle reporting with ranking trends, scheduled automation setup for the recurring monthly GMB cycle (Telegram + email notifications, BasicOps task creation, site-change staging).
 
 ### WordPress Hub
 
