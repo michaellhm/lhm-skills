@@ -36,6 +36,8 @@ If Google Ads MCP is available, fetch campaign performance data automatically. A
 **Option B: CSV Export (Fallback)**
 If MCP isn't available, ask the user to provide a campaign performance CSV with columns: Campaign, Cost, Conversions, Conv. Value, CPA, ROAS, Budget. Date range: last 30 days.
 
+**Zone data specifically: use AdPulse MCP directly, don't hand-calculate it.** Read `${CLAUDE_PLUGIN_ROOT}/references/adpulse-integration.md` and pull `pacing`/`kpiPercentage` straight from AdPulse for Step 3-4 below instead of computing budget pacing % / performance variance % from raw Google Ads numbers. That reference also covers a known gap in the zone matrix (Under-pacing + Poor performance) and how to handle it.
+
 ### Step 2: Gather Context
 
 Ask for:
@@ -45,6 +47,8 @@ Ask for:
 4. **Observations**: What have you noticed recently?
 
 ### Step 3: Calculate Metrics
+
+If AdPulse MCP is connected, pull `pacing` and `kpiPercentage` directly (see `references/adpulse-integration.md`) and skip the manual math below. Only calculate by hand if AdPulse isn't available for this account:
 
 - **Budget Pacing %**: (Actual Spend / Expected Spend) x 100
 - **Performance Variance %**: (Actual CPA / Target CPA) x 100 — or ROAS equivalent
@@ -60,6 +64,8 @@ Ask for:
 | <90% | Good (CPA ≤110% of target or ROAS ≥90% of target) | Yellow — Scaling |
 | >110% | Good | Blue — Low |
 | 90-110% | Good | Green — Maintain |
+
+**Gap: Under-pacing (<90%) + Poor performance has no defined cell.** Do not default this to Yellow — see `references/adpulse-integration.md` for why, and treat it as Red-severity (performance overrides pacing when they disagree).
 
 See the **Zone Reference** section below for full zone decision trees and execution checklists.
 

@@ -17,12 +17,13 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/lhm-philosophy/google-ads.md`. Apply it t
 
 ## Step 3: Determine session type
 
-Ask: **"What are we working on — monthly check-in, quarterly adversarial review, or a specific task?"**
+Ask: **"What are we working on — monthly check-in, quarterly adversarial review, a specific task, or setting up the recurring monthly loop?"**
 
 Options:
 - Monthly check-in (zone classification + coaching through the checklist)
 - Quarterly adversarial review (red-team the last 90 days)
 - Specific task (ad copy, keywords, bid/budget, PMax, landing page)
+- Set up a recurring monthly loop (automate this client's monthly review on a schedule, unattended)
 
 ## Step 4: Execute
 
@@ -32,6 +33,9 @@ After zone classification, offer: "Want a second opinion on this zone call befor
 
 ### Quarterly adversarial review
 Follow `${CLAUDE_PLUGIN_ROOT}/skills/quarterly-adversarial-review/SKILL.md`.
+
+### Set up recurring monthly loop
+Follow `${CLAUDE_PLUGIN_ROOT}/skills/google-ads-monthly-loop/SKILL.md`.
 
 ### Specific tasks — route to skill:
 | Task | Skill |
@@ -62,10 +66,13 @@ Update `[client-folder]/google_ads/YYYY-MM/` with session outputs.
 ## MCP tools available
 
 - Google Ads MCP: all accounts under MCC 394-736-1921
-- AdPulse MCP: zone data and account history
+- AdPulse MCP: zone data (`pacing`/`kpiPercentage`) and account history — see `${CLAUDE_PLUGIN_ROOT}/references/adpulse-integration.md`
 - Keywords Everywhere MCP: keyword volume and research
 - OpenRouter MCP: second opinions via `send-message` tool
 - Browser tool (Chrome extension): for reading URLs and competitor research
+- BasicOps MCP: task/subtask creation and discussion messages (used by the monthly loop's output step)
+- Zapier MCP (Gmail send-email action): client-facing email summaries (used by the monthly loop's output step)
+- Scheduled-tasks MCP: registers the recurring monthly loop (`${CLAUDE_PLUGIN_ROOT}/skills/google-ads-monthly-loop/SKILL.md`)
 
 ## Data integrity
 
