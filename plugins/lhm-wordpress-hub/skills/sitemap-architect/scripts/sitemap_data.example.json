@@ -1,0 +1,76 @@
+{
+  "client": "Example Allied Health",
+  "version": "v1",
+  "date": "2026-07-21",
+  "live_url_total": 218,
+  "source_note": "Live URL count from all 7 sitemaps in sitemap_index.xml.",
+  "counts": [
+    ["Editorial pages", "57"],
+    ["Staff CPT pages", "15"],
+    ["Programmatic area pages", "26"],
+    ["Total pages in new build", "98"]
+  ],
+  "sections": [
+    {
+      "band": "CORE  (4 pages)",
+      "rows": [
+        {"level": 1, "page": "Home", "url": "/", "type": "Core",
+         "keyword": "brand term", "vol": "—", "status": "Planned"},
+        {"level": 1, "page": "About", "url": "/about/", "type": "Core",
+         "keyword": "about [brand]", "vol": "—", "status": "Planned"},
+        {"level": 2, "page": "Meet the Team (index)", "url": "/about/team/",
+         "type": "Core", "keyword": "practitioners [city]", "vol": "—",
+         "status": "Index -> Staff CPT"},
+        {"level": 1, "page": "Privacy Policy", "url": "/privacy-policy/",
+         "type": "Utility", "keyword": "—", "vol": "—", "status": "Planned"}
+      ]
+    },
+    {
+      "band": "LOCATIONS  (clinics + service x location + area pages)",
+      "rows": [
+        {"level": 1, "page": "Locations hub", "url": "/locations/",
+         "type": "Location", "keyword": "[brand] locations", "vol": "—",
+         "status": "Planned"},
+        {"level": 2, "page": "Suburb A", "url": "/locations/suburb-a/",
+         "type": "Clinic", "keyword": "osteopath suburb a", "vol": "390",
+         "status": "Planned"},
+        {"level": 3, "page": "Physiotherapy — Suburb A",
+         "url": "/locations/suburb-a/physiotherapy/", "type": "Service x Loc",
+         "keyword": "physio suburb a", "vol": "170", "status": "NEW — approved"},
+        {"level": 3, "page": "26 x programmatic area pages",
+         "url": "/locations/[suburb]/", "type": "Area page",
+         "keyword": "[suburb] + modality", "vol": "—", "status": "Migrate as-is"}
+      ]
+    },
+    {
+      "band": "OUTSTANDING — see 'Decisions' tab",
+      "rows": [
+        {"level": 0, "page": "Category archives — 30",
+         "url": "/category/[slug]/", "type": "Taxonomy",
+         "keyword": "(collides w/ conditions)", "vol": "—",
+         "status": "Indexation decision"}
+      ]
+    }
+  ],
+  "programmatic": {
+    "label": "Area Pages",
+    "group_field": "Serving Clinic",
+    "rows": [
+      {"name": "Suburb X", "url": "/locations/suburb-x/", "group": "Suburb A",
+       "type": "Area page (programmatic)", "status": "Migrate as-is — no redirect"},
+      {"name": "Suburb Y", "url": "/locations/suburb-y/", "group": "Suburb B",
+       "type": "Area page (programmatic)", "status": "Migrate as-is — no redirect"}
+    ]
+  },
+  "decisions": [
+    {"item": "Staff CPT", "urls": "15", "blocks": "RESOLVED",
+     "issue": "Architecture had one team page; live site has 15 indexable profiles.",
+     "recommendation": "DECIDED: keep as CPT. Team page becomes an index. Slugs unchanged."},
+    {"item": "Legacy CPT", "urls": "12", "blocks": "YES",
+     "issue": "Four articles collide with planned condition pages.",
+     "recommendation": "Retire; 301 into matching pages. Salvage copy first."},
+    {"item": "Blog migration", "urls": "76", "blocks": "No",
+     "issue": "Architecture scoped 5 posts — that was the new content plan, not migration scope.",
+     "recommendation": "Per-post disposition list. Consolidate duplicate clusters."}
+  ]
+}
