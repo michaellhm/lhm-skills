@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Blocks a commit if any plugin's staged changes don't come with a version
+# bump, or if plugin.json / marketplace.json versions are inconsistent.
+set -euo pipefail
+ROOT="$(git rev-parse --show-toplevel)"
+python3 "$ROOT/scripts/validate-plugin-versions.py" --bump-check

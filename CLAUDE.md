@@ -6,13 +6,16 @@ Before committing and pushing any changes that add, modify, or remove a skill, y
 
 ### 1. Version Bump
 
-Bump the patch version (e.g. 1.1.1 → 1.1.2) in **all three locations**:
+This repo ships **six plugins** (`lhm-marketing-hub`, `lhm-wordpress-hub`, `lhm-gmb-hub`, `lhm-content-engine`, `lhm-finance-hub`, `lhm-learn`), each independently versioned. For **every plugin you added, modified, or removed a skill/agent/command in**, bump its patch version (e.g. 1.1.1 → 1.1.2) in **both** locations:
 
-- `plugins/lhm-marketing-hub/.claude-plugin/plugin.json` → `version`
-- `.claude-plugin/marketplace.json` → `metadata.version`
-- `.claude-plugin/marketplace.json` → `plugins[0].version`
+- `plugins/<plugin-name>/.claude-plugin/plugin.json` → `version`
+- `.claude-plugin/marketplace.json` → the `plugins[]` entry whose `"name"` matches `<plugin-name>` → `version`
 
-All three must match.
+**Match the marketplace entry by its `name` field, never by array position.** Plugin order in `marketplace.json` has been reshuffled before (`lhm-marketing-hub` used to be `plugins[0]`, it is now last) — editing "index 0" instead of the entry with the right `name` is exactly how these versions have drifted out of sync in the past.
+
+`.claude-plugin/marketplace.json` → `metadata.version` (the top-level marketplace version) tracks **`lhm-marketing-hub` specifically**, as the flagship plugin. Only bump it when `lhm-marketing-hub` itself changes, and keep it equal to `lhm-marketing-hub`'s `plugin.json` version.
+
+**This is enforced automatically, not just by this checklist.** `scripts/validate-plugin-versions.py` checks version consistency across all six plugins, and a pre-commit hook (`.githooks/pre-commit`, installed via `scripts/install-git-hooks.sh`) will **block the commit** if any plugin's staged changes aren't accompanied by a version bump, or if `plugin.json` and `marketplace.json` versions disagree for any plugin. A pre-push hook re-checks consistency as a safety net. If a commit gets blocked, the error message names the exact file and field to fix. Run `python3 scripts/validate-plugin-versions.py` manually any time to check the current state.
 
 ### 2. Update README.md
 
