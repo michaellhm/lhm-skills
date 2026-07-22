@@ -16,6 +16,7 @@ The LHM WordPress Hub supports two workflows. Shared client artefacts live at th
     design_system.md                      # tokens, scales, component specs
 
   wordpress/                              # full WordPress build project
+  astro/                                  # full Astro build project
   landing-pages/[campaign]/               # PPC landing page campaigns
   gmb/                                    # GMB hub project (existing convention)
 ```
@@ -24,7 +25,7 @@ The LHM WordPress Hub supports two workflows. Shared client artefacts live at th
 
 ```
 [client_root]/wordpress/
-  website-project-management.md           # root-level PM doc (auto-created Phase 1.5)
+  website-project-management.md           # root-level PM doc (created at kickoff)
   seo/
     keyword_map.md                        # Phase 2 output
     sitemap.md                            # Phase 2 output
@@ -56,6 +57,27 @@ The LHM WordPress Hub supports two workflows. Shared client artefacts live at th
       specs/                              # Phase 1.5 — Superpowers spec docs
       plans/                              # Phase 1.5 — Superpowers implementation plans
 ```
+
+## Full Astro Website Build — `astro/` subtree
+
+```
+[client_root]/astro/
+  website-project-management.md           # kickoff brief, schedule, gates and status
+  seo/
+    sitemap.md
+    page_briefs/
+  content/
+    prototype/
+    remaining/
+  prototype/
+  qa/
+  docs/
+    superpowers/
+      specs/
+      plans/
+```
+
+Astro uses the seven-week active-delivery workflow in `wp-project-manager`: three weeks through prototype, then four weeks from prototype approval to launch. Client delays move dependent dates day-for-day.
 
 ## Landing Page Campaign — `landing-pages/[campaign]/` subtree
 

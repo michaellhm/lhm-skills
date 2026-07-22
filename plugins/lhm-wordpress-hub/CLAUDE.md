@@ -6,7 +6,7 @@ These rules apply to EVERY skill and agent in this plugin, without exception.
 
 Every session in this plugin operates on one of two workflows: **Full Website Build** or **Landing Page Campaign**. Before invoking any skill that produces output, you MUST know which workflow is active.
 
-- If `wordpress/website-project-management.md` exists in the current project, you're in a Full Website Build.
+- If `wordpress/website-project-management.md` or `astro/website-project-management.md` exists in the current project, you're in a Full Website Build.
 - If `landing-pages/[campaign]/landing-page-project-management.md` exists, you're in a Landing Page Campaign.
 - If both exist, ask the user which to work on via `AskUserQuestion`.
 - If neither exists, route through `wp-start` to set one up.

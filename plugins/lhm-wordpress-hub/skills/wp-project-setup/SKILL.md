@@ -33,7 +33,7 @@ Options:
 - "WordPress (block theme — standard LHM build)"
 - "Astro (static site framework — git-only workflow)"
 
-Write `platform:` into `client_profile.md` YAML frontmatter (create the frontmatter block if missing):
+Write `platform:` and the kickoff brief passed by `wp-start` into `client_profile.md` YAML frontmatter (create the frontmatter block if missing):
 
 ```yaml
 ---
@@ -42,10 +42,16 @@ industry: ""
 website: ""
 primary_contact: ""
 platform: wordpress   # or: astro
+client_relationship: ""       # new | existing
+strategy_call_required: ""    # yes | no
+design_scope: ""              # redesign | improve | migrate
+copy_scope: ""                # rewrite | selective | migrate
+fixed_deadline: ""            # ISO date, constraint, or none
+michael_approval_meetings: "" # case-by-case notes
 ---
 ```
 
-> **Astro note:** The full Astro build pipeline does not exist yet. Phases 1–4 (intake, SEO, copy, design) run identically. Phase 5 (build) will diverge — flag this to the user now so they know to expect incomplete coverage. Record the choice and proceed.
+> **Astro note:** Astro uses the seven-week delivery workflow in `wp-project-manager`. Do not route it through WordPress-only theme, Gutenberg, or SSH deployment steps.
 
 ## Step 2: Create Client-Root Scaffolding (if not present)
 
@@ -61,7 +67,22 @@ If any are missing, create them with the templates in Step 4. Inform the user th
 
 ## Step 3: Create Build Subtree
 
-> **Platform branch:** If `platform: astro` was recorded in Step 1b, skip the WordPress-specific structure below and create only `[client_root]/astro/docs/superpowers/specs/` and `[client_root]/astro/docs/superpowers/plans/`. The full Astro folder convention will be defined when the Astro pipeline is built. Tell the user: "Astro project folder scaffolded. Phase 5 build skills are WordPress-only for now — we'll define the Astro build path when it's ready."
+> **Platform branch:** If `platform: astro` was recorded in Step 1b, skip the WordPress-specific structure below and create the Astro structure shown here. Then invoke `wp-project-manager` in Kickoff Create mode.
+
+````
+astro/
+  seo/
+    page_briefs/
+  content/
+    prototype/
+    remaining/
+  prototype/
+  qa/
+  docs/
+    superpowers/
+      specs/
+      plans/
+````
 
 For **WordPress builds**, create `[client_root]/wordpress/` containing:
 
@@ -85,7 +106,7 @@ wordpress/
       plans/
 ````
 
-Do NOT create `website-project-management.md` here — that file is generated at the end of Phase 1 Step 1.5 by `wp-project-manager` after the Superpowers spec and plan exist.
+After scaffolding, invoke `wp-project-manager` in **Kickoff Create** mode to create `website-project-management.md` immediately. The PM doc must exist from the start so Krystalyn can schedule team work and client approval holds before strategy begins. Spec and plan references may remain `TBD` until they exist.
 
 ## Step 4: Create Starter Files at Client Root
 
@@ -98,6 +119,12 @@ industry: ""
 website: ""
 primary_contact: ""
 platform: ""          # wordpress | astro
+client_relationship: ""       # new | existing
+strategy_call_required: ""    # yes | no
+design_scope: ""              # redesign | improve | migrate
+copy_scope: ""                # rewrite | selective | migrate
+fixed_deadline: ""            # ISO date, constraint, or none
+michael_approval_meetings: "" # case-by-case notes
 ---
 
 # Client Profile
@@ -232,7 +259,7 @@ Tell the user:
 
 > Project structure created. Here's what's next:
 >
-> 1. **Phase 1: Client Onboarding & Strategy** — Run the strategy session, generate the Campaign Playbook (Step 1.3) and Website Brief (Step 1.4), then run the Superpowers skill to generate the spec, plan, and PM doc (Step 1.5).
-> 2. After Step 1.5 completes, the `wp-project-manager` skill will be invoked to create `wordpress/website-project-management.md`.
+> 1. **Project schedule created** — `website-project-management.md` now contains the standard seven-week active-delivery schedule, owners, dependencies, and client approval holds.
+> 2. **Phase 1: Client Onboarding & Strategy** — Run the strategy session when required, generate the Campaign Playbook and Website Brief, and obtain client approval by email before SEO begins.
 >
 > Run `wp-start` when you're ready to begin.

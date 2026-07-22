@@ -12,10 +12,11 @@
       "name": "lhm-wordpress-hub",
       "source": "./plugins/lhm-wordpress-hub",
       "description": "Guided WordPress and Astro website build system - phased delivery from client intake through SEO, content, design, build, and ops hardening.",
-      "version": "1.2.8",
+      "version": "1.2.9",
       "category": "wordpress",
       "tags": [
         "wordpress",
+        "astro",
         "website-builder",
         "block-theme",
         "agency"

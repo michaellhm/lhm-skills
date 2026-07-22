@@ -1,24 +1,24 @@
 ---
 name: wp-project-manager
-description: "Read, create, or update the website-project-management.md file for a WordPress full website build. Use this when the user mentions 'WP project status', 'where are we at with the website', 'update website project', 'create the website PM doc', 'website progress', 'what's left on the build', or 'website project management'. Also called by phase agents after task completion to mark off checkboxes, and by wp-start at session start to detect current state."
+description: "Read, create, or update the website-project-management.md file for a full WordPress or Astro website build. Use this when the user mentions 'WP project status', 'Astro project status', 'where are we at with the website', 'update website project', 'create the website PM doc', 'website progress', 'what's left on the build', or 'website project management'. Also called by phase agents after task completion to mark off checkboxes, and by wp-start at session start to detect current state."
 ---
 
-# WordPress Project Manager
+# Website Project Manager
 
-Manages the per-project `website-project-management.md` file that tracks the full state of a WordPress full website build: phase, step, completed tasks, page inventory, approval log, environments, and the continuation prompt.
+Manages the per-project `website-project-management.md` file that tracks the full state of a WordPress or Astro website build: phase, step, completed tasks, page inventory, approval log, environments, schedule changes, and the continuation prompt.
 
 ## Before Starting
 
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/wp-project-manager/LEARNED.md`
-2. Identify the project location: `[client_root]/wordpress/`
-3. Check whether `website-project-management.md` exists in the wordpress folder
-4. Read `platform:` from `[client_root]/client_profile.md` YAML frontmatter. Surface this at session start: "Platform: WordPress" or "Platform: Astro". If `platform: astro`, note that Phase 5 build skills are WordPress-only and flag any Phase 5 tasks the user attempts.
+2. Identify the project location from platform: `[client_root]/wordpress/` or `[client_root]/astro/`
+3. Check whether `website-project-management.md` exists in that platform folder
+4. Read `platform:` from `[client_root]/client_profile.md` YAML frontmatter. Surface this at session start: "Platform: WordPress" or "Platform: Astro". For Astro, follow the Astro PM template and never route through WordPress-only build skills.
 
 ## Modes
 
 This skill operates in five modes:
 
-1. **Create** — generate a new PM doc at end of Phase 1 Step 1.5
+1. **Kickoff Create** — generate a new PM doc immediately after project setup
 2. **Read/Status** — display current phase, step, completed tasks, next action
 3. **Mark Complete** — tick off a specific task with today's date (called by phase agents)
 4. **Phase Gate-Check** — before any phase advance, scan earlier phases for unresolved items
@@ -26,22 +26,25 @@ This skill operates in five modes:
 
 ## Mode 1: Create
 
-Triggered at the end of Phase 1 Step 1.5 after Superpowers has written the spec and plan to `docs/superpowers/specs/` and `docs/superpowers/plans/`.
+Triggered by `wp-project-setup` as soon as the kickoff brief and folder scaffold exist. The PM doc is an operating schedule, so it must exist before Phase 1 begins. Spec and plan links may be `TBD` until those files exist.
 
 Inputs:
 - `[client_root]/client_profile.md` (read)
 - `[client_root]/playbook.md` (read)
 - `[client_root]/website-brief.md` (read)
-- `docs/superpowers/specs/[filename].md` (read)
-- `docs/superpowers/plans/[filename].md` (read)
+- `docs/superpowers/specs/[filename].md` (read if present)
+- `docs/superpowers/plans/[filename].md` (read if present)
 
-Generate `[client_root]/wordpress/website-project-management.md` using the template in the next section, populating:
+Generate `[client_root]/[platform]/website-project-management.md` using the relevant template below, populating:
 - Client name from `client_profile.md`
 - Platform from `client_profile.md` YAML frontmatter `platform:` field (`wordpress` or `astro`)
-- Owner names from defaults: Aiya (build), Krystalyn (PM), Jaimee (SEO), Michael (strategy). Confirm with user via AskUserQuestion if unclear.
+- Owner names from defaults: Aiya (build and launch), Krystalyn (PM and remaining-copy production), Jaimee (SEO and QA), Michael (strategy, sitemap sign-off, prototype selection and prototype copy). Confirm only if the kickoff brief says otherwise.
 - Reference paths to the spec and plan files
 - Page inventory rows from `seo/sitemap.md` if it exists, otherwise leave empty
-- Continuation prompt with `[auto-filled]` placeholder pointing to "Phase 1, Step 1.6 — Confirm Phase 1 closure"
+- Kickoff brief fields: client relationship, strategy-call requirement, design scope, copy scope, deadline/constraint, special considerations, and Michael's approval-meeting attendance
+- Continuation prompt with `[auto-filled]` placeholder pointing to the first incomplete kickoff task
+
+For `platform: astro`, use the Astro template below. For `platform: wordpress`, use the legacy WordPress template unless the user explicitly requests the new Astro-style delivery workflow.
 
 ## Mode 2: Read/Status
 
@@ -131,7 +134,153 @@ Called by orchestrators at session end (or on user request). Logic:
 
 5. Apply the user's response
 
-## PM Doc Template
+## Astro PM Doc Template
+
+Use this template for `platform: astro`. Dates are scheduled from kickoff using seven weeks of active delivery time. Waiting for client feedback is not active delivery time. Every client delay moves all dependent dates by the same amount. Never compress QA or launch to recover client delay.
+
+At kickoff, Krystalyn places every client decision point in the calendar. The client may approve by email before the event and cancel the call, or attend the call to review and approve. The calendar event remains the deadline and alert. Its description must name the artefact, the decisions required, and the effect of late feedback.
+
+````markdown
+# Website Project Management — [Client Name]
+
+## Overview
+- **Client:** [Name]
+- **Platform:** Astro
+- **Client relationship:** [New | Existing]
+- **Design scope:** [Redesign | Improve | Migrate]
+- **Copy scope:** [Rewrite | Selective rewrite | Migrate]
+- **Active delivery target:** 7 weeks
+- **Fixed deadline / constraint:** [value or None]
+- **Owners:** Aiya (build + launch), Krystalyn (PM + remaining copy), Jaimee (SEO + QA), Michael (strategy + sitemap/prototype decisions)
+- **Last Updated:** [date]
+- **Current Phase:** Phase 0 — Kickoff & Scheduling
+- **Current Step:** Step 0.1 — Confirm brief and book approval holds
+
+## Kickoff Brief
+- **Strategy call required:** [Yes | No]
+- **Reason:** [New client mandatory | Existing client decision]
+- **Special requirements / sensitivities:** [notes]
+- **Michael attending:** [approval meetings or case-by-case]
+- **Prototype pages:** To be chosen by Michael at sitemap sign-off
+
+## Reference Documents
+- Client Profile: ../client_profile.md
+- Campaign Playbook: ../playbook.md
+- Website Brief: ../website-brief.md
+- Site Architecture: seo/sitemap.md
+- Prototype Copy: content/prototype/
+- Remaining Copy: content/remaining/
+- Design Spec: docs/superpowers/specs/[filename or TBD]
+- Implementation Plan: docs/superpowers/plans/[filename or TBD]
+
+## Schedule & Client Holds
+
+| Target | Event / milestone | Required decision | Status |
+|---|---|---|---|
+| End Week 1 | Strategy sign-off hold | Approve playbook + website brief by email | Scheduled |
+| End Week 3 | Prototype sign-off hold | Approve design, selected-page copy, hierarchy and direction | Scheduled |
+| Post-prototype Week 2 | Full-site feedback hold | Give one consolidated feedback round | Scheduled after prototype approval |
+| Post-prototype Week 3 | Final site sign-off hold | Confirm feedback resolved and authorise QA + launch | Scheduled after prototype approval |
+
+**Scheduling rule:** Prototype approval starts a new four-week clock. Client delay moves every dependent date day-for-day. QA time is never compressed.
+
+## Approval Log
+
+| Date | Artefact | Sent | Approved by email | Notes |
+|---|---|---|---|---|
+
+## Phase 0 — Kickoff & Scheduling
+**Owner:** Krystalyn
+- [ ] Kickoff brief confirmed with Michael
+- [ ] New/existing client recorded
+- [ ] Strategy-call requirement recorded (mandatory for new clients)
+- [ ] Design and copy scope recorded
+- [ ] Fixed deadline and special considerations recorded
+- [ ] Michael's meeting attendance decided case by case
+- [ ] Team tasks scheduled with dependencies
+- [ ] Client approval holds placed in calendar with sign-off requirements
+
+## Phase 1 — Week 1: Strategy
+**Owner:** Krystalyn, with Michael when a strategy call is required
+**Gate:** Client approves playbook and website brief by email before SEO begins
+- [ ] Client profile complete (minimum required context)
+- [ ] Strategy call scheduled (mandatory for new clients; as agreed for existing clients)
+- [ ] Strategy call completed or documented as not required
+- [ ] Campaign playbook prepared
+- [ ] Website brief prepared
+- [ ] Internal accuracy review complete
+- [ ] Strategy documents sent to client
+- [ ] Client approval received by email and logged
+
+## Phase 2 — Week 2: SEO Architecture
+**Owner:** Jaimee
+**Gate:** Michael approves sitemap internally and chooses prototype scope
+- [ ] Jaimee creates SEO sitemap from approved strategy documents
+- [ ] Sitemap saved to seo/sitemap.md
+- [ ] Michael reviews and approves sitemap
+- [ ] Michael chooses prototype pages and records the page set
+- [ ] Michael records any direction Aiya needs for those pages
+
+## Phase 3 — Week 3: Prototype
+**Owners:** Michael (copy), Aiya (prototype), Krystalyn (client communication)
+**Gate:** Client approves prototype by email
+- [ ] Michael creates copy for selected prototype pages
+- [ ] Aiya builds prototype from approved sitemap, copy, brief and playbook
+- [ ] Aiya posts prototype to team WhatsApp
+- [ ] Team collectively reviews prototype
+- [ ] Aiya applies internal feedback
+- [ ] Krystalyn sends prototype to client
+- [ ] Client approves design, selected-page copy, hierarchy and direction by email
+- [ ] Krystalyn schedules four-week post-prototype plan from approval date
+
+## Phase 4 — Post-Prototype Week 1: Remaining Copy & Astro Build
+**Owners:** Krystalyn (copy), Aiya (build)
+- [ ] Krystalyn generates remaining copy through Claude using all approved context
+- [ ] Aiya runs the astro-build skill and completes the full Astro build
+- [ ] Forms, metadata, redirects, analytics and tracking implemented
+- [ ] Aiya self-tests throughout build
+- [ ] Full site posted to team WhatsApp for internal feedback
+- [ ] Aiya applies internal feedback
+
+## Phase 5 — Post-Prototype Weeks 2–3: Client Feedback & Final Approval
+**Owner:** Krystalyn, with Aiya applying changes
+**Gate:** Client approves complete site and copy by email; this authorises QA and launch
+- [ ] Krystalyn sends full Astro site to client for copy and website feedback
+- [ ] Client provides one consolidated feedback round
+- [ ] Aiya applies client feedback in Astro
+- [ ] Changes reviewed internally where needed
+- [ ] Client confirms final approval by email
+- [ ] Any client delay recorded and downstream dates moved day-for-day
+
+## Phase 6 — Post-Prototype Week 4: QA & Launch
+**Owners:** Jaimee (QA), Aiya (fixes + launch), Krystalyn (coordination)
+**Gate:** Jaimee QA passed + team final sanity check. No second client approval required.
+- [ ] Jaimee completes formal pre-launch QA
+- [ ] SEO: metadata, slugs, schema, sitemap and redirects verified
+- [ ] Technical: responsive layouts, speed, links, SSL, 404 and assets verified
+- [ ] Forms tested end-to-end
+- [ ] Analytics and tracking verified
+- [ ] Content, compliance and placeholders checked
+- [ ] Aiya resolves QA issues
+- [ ] Team completes final WhatsApp sanity check
+- [ ] Aiya launches site
+- [ ] Jaimee completes post-launch QA on live domain
+- [ ] Aiya resolves live issues
+- [ ] Krystalyn sends completion confirmation and closes project
+
+## Parallel R&D Task
+- [ ] Aiya investigates a lightweight SaaS or Chrome extension for on-page client feedback (page URL, selected element, screenshot, commenter and resolution status)
+
+## Notes & Decisions
+[date]: Project kicked off. Seven-week active-delivery schedule created. Client delays move dependent dates day-for-day.
+
+## Continuation Prompt
+```text
+I'm continuing the [Client Name] Astro website build. Read client_profile.md, playbook.md, website-brief.md, website-project-management.md, seo/sitemap.md if present, and the current Astro repository. Report the current phase, outstanding gate, first incomplete task, owner and any schedule movement caused by client delay. Then ask whether to continue with that task or work elsewhere.
+```
+````
+
+## Legacy WordPress PM Doc Template
 
 When creating a new PM doc (Mode 1), use this template. Replace placeholder `[Client Name]` etc. with real values.
 
@@ -515,6 +664,6 @@ After reading, tell me which phase and step we're up to based on the PM doc. The
 
 ## Output
 
-- Creates: `[client_root]/wordpress/website-project-management.md`
+- Creates: `[client_root]/[platform]/website-project-management.md`
 - Modifies the file via Modes 3, 4, 5
 - Auto-updates the `[auto-filled]` placeholder in the Continuation Prompt on every change

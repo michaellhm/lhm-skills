@@ -1,9 +1,9 @@
 {
   "name": "lhm-wordpress-hub",
-  "description": "Guided WordPress website build system — phased delivery from client intake through SEO, content, design, WordPress build, and ops hardening.",
-  "version": "1.2.8",
+  "description": "Guided WordPress and Astro website delivery system, from kickoff brief through strategy, SEO, prototype, build, QA, and launch.",
+  "version": "1.2.9",
   "author": {
     "name": "LHM Digital"
   },
-  "keywords": ["wordpress", "website-builder", "block-theme", "agency"]
+  "keywords": ["wordpress", "astro", "website-builder", "block-theme", "agency"]
 }
