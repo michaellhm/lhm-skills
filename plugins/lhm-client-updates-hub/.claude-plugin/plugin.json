@@ -1,0 +1,16 @@
+{
+  "name": "lhm-client-updates-hub",
+  "description": "Client communication and meeting-wrap plugin — Fathom meeting debriefs with BasicOps sync and team notifications, client data change propagation, and client-facing update emails.",
+  "version": "1.0.0",
+  "author": {
+    "name": "LHM Digital"
+  },
+  "keywords": [
+    "client-communication",
+    "meeting-wrap",
+    "fathom",
+    "basicops",
+    "client-update",
+    "agency"
+  ]
+}

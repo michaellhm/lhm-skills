@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-115 skills across six Claude Code plugins (54 marketing, 28 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+115 skills across seven Claude Code plugins (51 marketing, 28 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -28,7 +28,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/content.md                     # Self-sufficient content specialist
   agents/wordpress.md                   # Self-sufficient WordPress specialist
   agents/marketing-assistant.md         # (legacy alias) — routes to start agent
-  skills/                              # All 54 skills
+  skills/                              # All 51 skills
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
     bid-budget-optimizer/              # Budget and bid strategy
@@ -48,7 +48,6 @@ plugins/lhm-marketing-hub/             # The plugin
     content-refresher/                 # Identify and refresh underperforming content
     ga-event-config/                   # GA4 event discovery and conversion classification
     ga-dashboard-artifact/             # Analytics dashboard artifact with period comparison
-    client-update-email/               # Plain-language client update emails
     campaign-playbook-generator/       # Campaign & sales playbooks from transcripts
     pmax-banner-generator/             # Performance Max creative assets (CSV)
     pmax-campaign-setup/               # Performance Max campaign build spec for local businesses
@@ -59,7 +58,7 @@ plugins/lhm-marketing-hub/             # The plugin
     pricing-strategy/                  # Pricing and packaging
     service-page-generator/             # Full service/condition page generation
     taya-question-discovery/            # They Ask, You Answer question bank
-    ... and 22 more
+    ... and 20 more
 plugins/lhm-wordpress-hub/             # WordPress build plugin
   .claude-plugin/plugin.json            # Plugin manifest
   agents/                               # 8 phase agents
@@ -155,11 +154,17 @@ plugins/lhm-learn/                    # Session learning capture plugin
   .claude-plugin/plugin.json            # Plugin manifest
   skills/                               # All 1 skill
     learn/                              # /learn — capture session learnings
+plugins/lhm-client-updates-hub/       # Client communication & meeting-wrap plugin
+  .claude-plugin/plugin.json            # Plugin manifest
+  skills/                               # All 3 skills
+    post-meeting-review/                # Fathom debrief — client files, BasicOps sync with context, team email
+    client-update/                      # Propagate a client data change across all client files
+    client-update-email/                # Plain-language client-facing update emails
 ```
 
 ## Skills Catalog
 
-**Client Management** (5 skills): Client onboarding and profile setup, campaign playbook generation from transcripts, plain-language client update emails, post-meeting review and action extraction, structured client update reports.
+**Client Management** (2 skills): Client onboarding and profile setup, campaign playbook generation from transcripts.
 
 **Google Ads & PPC** (9 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), quarterly adversarial 90-day review, PMax banner creative, PMax campaign setup for local businesses, PMax monthly + 90-day optimisation.
 
@@ -204,6 +209,10 @@ plugins/lhm-learn/                    # Session learning capture plugin
 ### Learn
 
 **Session Capture** (1 skill): Scan conversation context for skill learnings and client profile updates, write to the correct LEARNED.md and client_profile.md files.
+
+### Client Updates Hub
+
+**Client Communication** (3 skills): Post-meeting debrief from Fathom transcripts — updates client state files, syncs follow-up work to BasicOps with context (moves the client's card to Follow Up, adds a Meeting Notes subtask, creates follow-up tasks), and drafts a team summary email. Propagates a client data change (name, services, contact, branding) across every file that references it. Generates plain-language client-facing update emails after completing work.
 
 ## Key Behaviours
 
