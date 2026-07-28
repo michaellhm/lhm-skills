@@ -64,9 +64,17 @@ Add to `src/scripts/contact-form.js` (or inline in layout/page).
 
       let res, data;
       try {
+        const formData = new FormData(form);
+        const uploadInput = form.querySelector('input[type="file"][name="upload"]');
+        const uploadFile = uploadInput?.files?.[0];
+        if (uploadFile) {
+          formData.set('upload', uploadFile, uploadFile.name);
+          formData.set('upload_expected', uploadFile.name);
+        }
+
         res = await fetch('/api/contact', {
           method: 'POST',
-          body: new FormData(form),
+          body: formData,
         });
         data = await res.json();
       } catch (err) {
@@ -111,6 +119,8 @@ Add to `src/scripts/contact-form.js` (or inline in layout/page).
   }
 })();
 ```
+
+For drag/drop and full private R2 handling, read [file-uploads-r2.md](file-uploads-r2.md). The client code must explicitly add the selected file to `FormData`; the server remains responsible for type, extension, and size validation.
 
 ## Adding the error element to forms
 

@@ -102,7 +102,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     lp-deploy-3/                        # Deploy remaining LP pages
     lp-subsite-deploy/                  # Deploy subsite from Docker to live server
     wp-ssh-deploy/                      # General WordPress SSH deployment
-    contact-form-submissions/           # Cloudflare Pages contact form — D1, Turnstile, email, admin view
+    contact-form-submissions/           # Cloudflare Pages forms — D1, Turnstile, private R2 uploads, email, admin
 plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
   .claude-plugin/plugin.json            # Plugin manifest
   agents/                               # 6 agents

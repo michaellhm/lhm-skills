@@ -67,6 +67,26 @@ When applying D1 migrations:
 
 For Git-connected projects, the remote migration must be applied manually via Wrangler CLI or the Cloudflare dashboard. It does not run automatically on deploy.
 
+## File Upload Compatibility Date
+
+Every Pages project with a multipart file form must set a modern compatibility date:
+
+```toml
+compatibility_date = "YYYY-MM-DD"
+```
+
+Without a compatibility date, an older Pages runtime can convert uploaded files into strings, so `request.formData().get("upload")` is not a `File`. This often looks like a client upload bug even though the same code passes in local Wrangler, because local Wrangler may default to today's date.
+
+Do not add this redundant flag when the compatibility date is `2021-11-03` or newer:
+
+```toml
+compatibility_flags = ["formdata_parser_supports_files"]
+```
+
+Current Cloudflare deploys reject it with: `The compatibility flag formdata_parser_supports_files became the default ... so does not need to be specified anymore.`
+
+Validate the deployed configuration by submitting a real multipart file. A successful build is not proof that upload parsing, R2, or D1 metadata works.
+
 ## Turnstile Hostname Registration
 
 Each hostname must be explicitly allowed in the Turnstile widget settings:

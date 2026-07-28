@@ -1,11 +1,11 @@
 ---
 name: contact-form-submissions
-description: This skill should be used when the user wants to "set up contact form submissions", "wire up a contact form", "add form handling to Cloudflare Pages", "save form submissions to D1", "add Turnstile spam protection", "set up email notifications for forms", "create a thank-you page for a form", "add an admin submissions page", or "integrate a form with Cloudflare Pages Functions". Provides the complete implementation workflow for reliable, spam-protected, tracked contact form submissions on Astro/Cloudflare Pages sites.
+description: This skill should be used when the user wants to "set up contact form submissions", "wire up a contact form", "add form handling to Cloudflare Pages", "save form submissions to D1", "upload images or files from a form", "store form uploads in Cloudflare R2", "add Turnstile spam protection", "set up email notifications for forms", "create a thank-you page for a form", "add an admin submissions page", or "integrate a form with Cloudflare Pages Functions". Provides the complete implementation workflow for reliable, spam-protected, tracked contact forms and private file uploads on Astro/Cloudflare Pages sites.
 ---
 
 # Contact Form Submissions — Cloudflare Pages
 
-Complete implementation workflow for contact form submissions on Astro/Cloudflare Pages projects. Covers spam protection (Turnstile), D1 persistence, email notifications, GA-trackable thank-you pages, and a protected admin view.
+Complete implementation workflow for contact form submissions on Astro/Cloudflare Pages projects. Covers spam protection (Turnstile), D1 persistence, private R2 file storage, email notifications, GA-trackable thank-you pages, and a protected admin view.
 
 **Default for all future Astro builds:** include the full anti-spam stack from the start, not as a later hardening pass:
 - Server-side Turnstile verification
@@ -15,6 +15,7 @@ Complete implementation workflow for contact form submissions on Astro/Cloudflar
 - Lightweight content filtering for obvious outreach/spam terms and excessive links
 - D1 logging for rejected attempts
 - Admin visibility for both accepted submissions and rejected attempts
+- For forms accepting images/files: private R2 storage, D1 object metadata, and authenticated downloads
 
 ## Before Starting — Gather Project Details
 
@@ -30,6 +31,8 @@ Before editing any files, ask the user for:
 8. **Forms to connect** — which pages/forms should be wired up?
 9. **Thank-you URLs** — what URL should each form redirect to on success? (e.g. `/contact/thank-you/`)
 10. **Admin username** — what username for the `/admin/submissions` page? Do not ask for the admin password in chat — tell the user to add `ADMIN_PASSWORD` as a secret in Cloudflare Pages settings.
+11. **File uploads** — which forms accept files, allowed formats, and maximum size?
+12. **R2 bucket** — what private bucket name should store uploads (e.g. `project-form-uploads`), or confirm it needs creating?
 
 Do not proceed to editing files until these answers are confirmed.
 
@@ -104,6 +107,20 @@ CREATE INDEX IF NOT EXISTS idx_contact_spam_rejections_reason
 
 `crm_status` is included even if no CRM integration is planned — it avoids a schema migration when GHL/HubSpot is added later. `contact_spam_rejections` is mandatory for future Astro builds so blocked enquiries are inspectable rather than disappearing silently.
 
+If any form accepts files, also add:
+
+```sql
+ALTER TABLE contact_submissions ADD COLUMN upload_key TEXT;
+ALTER TABLE contact_submissions ADD COLUMN upload_file_name TEXT;
+ALTER TABLE contact_submissions ADD COLUMN upload_content_type TEXT;
+ALTER TABLE contact_submissions ADD COLUMN upload_size INTEGER;
+
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_upload_key
+  ON contact_submissions (upload_key);
+```
+
+Use form-specific names such as `logo_key` when that makes the admin UI clearer. For a new table, include these columns in `CREATE TABLE`; use `ALTER TABLE` only for existing deployments.
+
 Apply this via `wrangler d1 execute`. For clients wary of installing/authenticating Wrangler, the migration SQL above is additive (`CREATE TABLE IF NOT EXISTS`) and can instead be run manually in the Cloudflare dashboard's D1 console.
 
 ---
@@ -113,6 +130,7 @@ Apply this via `wrangler d1 execute`. For clients wary of installing/authenticat
 Ensure the file contains (fill in real values from Step 0):
 
 ```toml
+compatibility_date = "YYYY-MM-DD"
 pages_build_output_dir = "dist"
 
 [[d1_databases]]
@@ -120,6 +138,10 @@ binding = "DB"
 database_name = "PROJECT_CONTACT_DB_NAME"
 database_id = "REPLACE_WITH_D1_DATABASE_ID"
 migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "FORM_UPLOADS"
+bucket_name = "PROJECT_FORM_UPLOADS_BUCKET"
 
 [vars]
 CONTACT_NOTIFICATION_TO = "client@example.com"
@@ -129,6 +151,10 @@ PUBLIC_TURNSTILE_SITE_KEY = "REPLACE_WITH_TURNSTILE_SITE_KEY"
 MAILGUN_DOMAIN = "REPLACE_WITH_MAILGUN_DOMAIN"
 MAILGUN_REGION = "us"
 ```
+
+Set `compatibility_date` to the current date when first configuring the project and verify it is supported by the deployed Wrangler version. This is mandatory for file forms: without a date on older Pages projects, uploaded multipart files can be converted to strings instead of `File` objects. Do not add `formdata_parser_supports_files` when the date is `2021-11-03` or newer; current Cloudflare deploys reject that redundant flag.
+
+Create the R2 bucket before deploying. Keep public access disabled. When bindings are managed through `wrangler.toml`, do not duplicate the R2 binding in the dashboard.
 
 **Secrets — never in `wrangler.toml`.** Tell the user to add these in Cloudflare Pages → Settings → Environment variables → Secrets:
 - `TURNSTILE_SECRET_KEY`
@@ -156,6 +182,18 @@ Key requirements:
 - **Save to D1 first**, before attempting email
 - Attempt email via `sendNotification(submission, env)` — email failure must not fail the user-facing response; update `email_status = 'failed'` on error
 - Return `{ ok: true, message: "..." }` or `{ ok: false, message: "..." }`
+
+For file forms:
+- Parse and validate the upload as a `File`/Blob-like object using `arrayBuffer()` and `stream()`, not only enumerable properties
+- Enforce allowed content types/extensions and a server-side size limit
+- Save the object to private R2 **before** inserting D1
+- Save object key, original filename, type, and size in D1
+- If D1 insert fails, delete the newly created R2 object
+- Treat email attachments as optional convenience; R2 is the durable source
+- Include an authenticated download link in notifications/admin
+- Reject false-success submissions when the client says a file was selected but the file field is absent
+
+Read [references/file-uploads-r2.md](references/file-uploads-r2.md) whenever a form accepts files.
 
 Email provider abstraction: wrap provider logic in `sendNotification()` so swapping providers only changes one function. Default: Mailgun. See [references/email-providers.md](references/email-providers.md) for Mailgun, Postmark, and Resend implementations.
 
@@ -199,6 +237,7 @@ Update every contact form to use the `data-contact-form` pattern:
   data-thank-you="/contact/thank-you/"
   action="/api/contact"
   method="post"
+  enctype="multipart/form-data"
 >
   <input type="hidden" name="source_path" value="/contact/">
   <input type="hidden" name="form_name" value="Contact Form">
@@ -225,6 +264,8 @@ CSS for honeypot (add to global styles):
 ```
 
 **Client-side JS** (`src/scripts/contact-form.js` or equivalent): set `form_started_at` when the form is initialised, intercept submit → POST FormData → on success redirect to `form.dataset.thankYou` → on error show inline message and reset Turnstile. Do not redirect on API failure. See [references/client-js.md](references/client-js.md) for the full implementation.
+
+For file inputs, explicitly put the selected `File` into `FormData`, set a companion `upload_expected` filename, and implement drag/drop if the UI claims to support it. Never advertise drag/drop without wiring `DataTransfer.files` into the input. See [references/file-uploads-r2.md](references/file-uploads-r2.md).
 
 ---
 
@@ -270,6 +311,8 @@ Key requirements:
 - `<meta name="robots" content="noindex, nofollow">` in HTML head
 - Do not add this route to site navigation
 
+For file forms, add an authenticated `/admin/upload?key=...` Function that reads from the private R2 binding. Validate the key format, reuse the same Basic Auth credentials, force `Content-Disposition: attachment`, and send `cache-control: private, no-store`. Show the filename and download link prominently beside the submitter name; do not hide it after a wide message column.
+
 ---
 
 ## Step 9 — Verification Checklist
@@ -278,6 +321,9 @@ Key requirements:
 - [ ] `npm run build` passes without errors
 - [ ] `node --check functions/api/contact.js` — no syntax errors
 - [ ] `node --check functions/admin/submissions.js` — no syntax errors
+- [ ] Start `wrangler pages dev` with local D1/R2 bindings
+- [ ] Submit a real small PNG/PDF with `curl -F` or browser automation
+- [ ] Confirm the local R2 object exists and D1 has the exact key, filename, type, and non-zero size
 
 ### Post-Deploy
 - [ ] Submit each form → confirm redirect to correct thank-you URL
@@ -288,6 +334,10 @@ Key requirements:
 - [ ] Visit `/admin/submissions` → confirm Basic Auth challenge appears
 - [ ] Confirm login works with configured credentials
 - [ ] Confirm table shows latest rows
+- [ ] Submit a real allowed file and confirm the live private R2 bucket size/object count changes
+- [ ] Confirm the latest D1 row has a non-empty upload key and non-zero size
+- [ ] Download the file through the authenticated admin link and verify it opens
+- [ ] Confirm a selected-but-missing file returns an error instead of a success redirect
 - [ ] Trigger or manually insert a rejected attempt → confirm `/admin/submissions` shows it under "Rejected Attempts"
 - [ ] Confirm honeypot, Turnstile, timing, validation, and content-filter rejections write reason codes to `contact_spam_rejections`
 - [ ] Confirm thank-you pages return `noindex, nofollow` in `<head>`
@@ -303,6 +353,7 @@ Key requirements:
 | `migrations/000N_contact_submissions.sql` | D1 schema |
 | `functions/api/contact.js` | Form handler Pages Function |
 | `functions/admin/submissions.js` | Admin view Pages Function |
+| `functions/admin/upload.js` | Authenticated private R2 download |
 | `src/layouts/BaseLayout.astro` | Turnstile script, robots meta prop |
 | `src/scripts/contact-form.js` | Client-side form intercept + Turnstile |
 | `src/pages/**/thank-you/index.astro` | Thank-you pages per form |
@@ -317,3 +368,4 @@ Key requirements:
 - [references/client-js.md](references/client-js.md) — Client-side form JS
 - [references/email-providers.md](references/email-providers.md) — Mailgun / Postmark / Resend implementations
 - [references/deployment-warnings.md](references/deployment-warnings.md) — Cloudflare Pages deployment gotchas
+- [references/file-uploads-r2.md](references/file-uploads-r2.md) — Private R2 upload, metadata, download, and real multipart testing
