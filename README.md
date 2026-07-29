@@ -212,7 +212,7 @@ plugins/lhm-client-updates-hub/       # Client communication & meeting-wrap plug
 
 ### Client Updates Hub
 
-**Client Communication** (3 skills): Post-meeting debrief from Fathom transcripts — updates client state files, syncs follow-up work to BasicOps with context (moves the client's card to Follow Up, adds a Meeting Notes subtask, creates follow-up tasks), identifies and routes any follow-on work the meeting generates to the right specialist agent (research and drafts run automatically, live-system changes get a ready-to-run plan), and drafts a team summary email. Propagates a client data change (name, services, contact, branding) across every file that references it. Generates plain-language client-facing update emails after completing work.
+**Client Communication** (3 skills): Post-meeting debrief from Fathom transcripts — updates client state files, syncs follow-up work to BasicOps with context (moves the client's card to Follow Up, adds a Meeting Notes subtask, creates follow-up tasks, and routes client-owed action items to Kristalyn for follow-up), identifies and routes any follow-on work the meeting generates to the right specialist agent (research and drafts run automatically, live-system changes get a ready-to-run plan you can resume in a fresh session), and drafts a team summary email. Propagates a client data change (name, services, contact, branding) across every file that references it. Generates plain-language client-facing update emails after completing work.
 
 ## Key Behaviours
 
