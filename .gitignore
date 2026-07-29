@@ -2,6 +2,7 @@
 docs/
 to-do.md
 *.zip
+.superpowers/
 
 # Internal SOP drafts (not shipped via marketplace)
 plugins/lhm-wordpress-hub/SOP-*
