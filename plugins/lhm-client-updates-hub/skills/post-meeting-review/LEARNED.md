@@ -1,15 +1,3 @@
 # Learned
 
 <!-- Auto-maintained by Claude. Max 50 entries. Oldest/unused entries pruned after 3 months. -->
-
-- (2026-07-27) BasicOps `create_message_in_task` takes raw HTML. Passing HTML-escaped entities (`&lt;p&gt;`) renders the tags literally in the discussion. Recovery is `delete_message` with the returned message id, then repost with unescaped HTML.
-- (2026-07-27) Follow-up tasks belong as subtasks under the client card, not as standalone tasks in the section. Pass `parentTaskId: <card id>` on `create_task`. Michael corrected this on the first run of the skill.
-- (2026-07-27) `update_task` with `parentTaskId` re-parents an existing BasicOps task and preserves its assignee, description, and discussion history. Use this to fix mis-parented tasks instead of deleting and recreating them.
-- (2026-07-27) Check for an existing meetings folder before creating one. The convention varies by client: mhealth uses `client-meetings/`, not `meetings/`. Match what is already there.
-- (2026-07-27) Fathom `list_meetings` with `created_after` set to the last few days is enough to find "the meeting I had today". Do not reach for `search_meetings`, which is for topic lookups across history.
-- (2026-07-27) Batching the assignee question into one `AskUserQuestion` with grouped task clusters works well, but answers routinely carry instruction beyond a name (for example "Aiya, fold this into the landing page build" or "Jaimee should be notified too"). Capture that extra instruction as a follow-up discussion message on the task; the `assignee` field alone loses it.
-- (2026-07-27) A meeting decision that discontinues a service invalidates artefacts far beyond the four state files. Dropping podiatry at mhealth left references in 26 files including the Astro sitemap, keyword map, redirect map, and the live GBP optimisation plan. Always run the propagation sweep in Step 3.5.
-- (2026-07-27) New decisions can reverse decisions previously signed off and recorded in the client folder. Dropping podiatry killed an orthotics consolidation Jaimee had confirmed five days earlier. Surface the conflict and the reasoning behind the original decision; never silently overwrite it.
-- (2026-07-27) Compliance reasoning stated in a meeting is high-value and easy to miss. The AHPRA rule about never advertising a service without a practitioner able to deliver it came out of an anecdote, not a decision statement. Extract it explicitly and write it into the client profile as standing posture.
-- (2026-07-27) Gmail `create_draft` is the reliable delivery path for the team email. Mailgun via Zapier (`MailgunCLIAPI` / `createEmail`) required an explicit `connection_id` because no default connection was set, and then still returned a 403 from Mailgun. Offer Mailgun only if the user asks, and fall back to Gmail without much fuss.
-- (2026-07-27) Pass a plain `&` in BasicOps task titles. `&amp;` renders as the literal entity. Discussion message bodies do accept HTML, so the rule differs between the two fields.
