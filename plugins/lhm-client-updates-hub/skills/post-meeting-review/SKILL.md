@@ -1,6 +1,6 @@
 ---
 name: post-meeting-review
-description: "Debrief a client meeting and update all client state files, sync follow-up work to BasicOps with context, and draft a team update email. Use this after any client call or meeting, or when the user says 'meeting wrap'. Pulls the Fathom transcript, extracts decisions and action items, updates goals.md, current-projects.md, client_profile.md, and the client's meeting notes folder, sweeps the whole client folder for artefacts the meeting's decisions invalidate, moves the client's BasicOps card to Follow Up with a Meeting Notes subtask, creates briefed follow-up subtasks under it, identifies and routes any follow-on work the meeting generates to the right specialist agent (research and drafts run automatically, live-system changes get a ready-to-run plan), and drafts a team summary email. Triggers on: 'we just had a meeting', 'meeting notes', 'Fathom', 'post-meeting', 'client call debrief', 'update from meeting', 'meeting wrap'."
+description: "Debrief a client meeting and update all client state files, sync follow-up work to BasicOps with context, and draft a team update email. Use this after any client call or meeting, or when the user says 'meeting wrap'. Pulls the Fathom transcript, extracts decisions and action items, updates goals.md, current-projects.md, client_profile.md, and the client's meeting notes folder, sweeps the whole client folder for artefacts the meeting's decisions invalidate, moves the client's BasicOps card to Follow Up with a Meeting Notes subtask, creates briefed follow-up subtasks under it (client-owed items get their own subtask too, always routed to Kristalyn for follow-up), identifies and routes any follow-on work the meeting generates to the right specialist agent (research and drafts run automatically, live-system changes get a ready-to-run plan you can resume in a fresh session), and drafts a team summary email. Triggers on: 'we just had a meeting', 'meeting notes', 'Fathom', 'post-meeting', 'client call debrief', 'update from meeting', 'meeting wrap'."
 ---
 
 # Post-Meeting Review
@@ -241,14 +241,16 @@ Tiering is **per task, not per agent** — the same agent can produce both an au
 [Anything the human running this should surface rather than assume]
 ```
 
-Then build the handoff prompt: plain text, ready to paste into a fresh Claude Code or ChatGPT session, with the plan file's contents inlined in full, not just linked (ChatGPT can't read the local filesystem, and the prompt needs to work identically on either platform):
+Then build the Resume prompt: plain text, ready to paste into a fresh Claude Code or ChatGPT session, coaching-framed so the human keeps their own hands on anything touching a live client system, with the plan file's contents inlined in full, not just linked (ChatGPT can't read the local filesystem, and the prompt needs to work identically on either platform):
 
 ```
-I'm ready to work on this: [task title] for [Client].
+I now need to [concrete next action] for [Client].
 
-Act as the [agent name] specialist. Here's the plan:
+Here's what's already done: [one-line summary of the plan already produced].
 
 [Plan file contents inlined]
+
+Coach me through doing this myself, step by step — don't do it for me.
 ```
 
 Nothing is dispatched for handoff-prompt tier. A human runs this elsewhere.
@@ -263,7 +265,21 @@ Same shape as Step 4, applied to Step 5's output instead of the meeting's action
 
 Posting the agent's actual output is not part of this step's own execution; it happens whenever the agent finishes, which may be well after Steps 6 through 8 have run and this skill invocation has ended. When that notification arrives: append the output as a follow-up message on the same subtask, attach any generated files (keyword CSVs, ad copy CSVs, content drafts) via `add_file_to_task`, save a copy to `[client-folder]/meeting-wraps/YYYY-MM-DD/`, and add a one-line pointer on the client card so a finished result isn't buried under other subtask threads. If the agent fails instead of completing, post what was attempted and what broke to the subtask discussion rather than losing it silently. This depends on the session staying reachable long enough to catch the completion notification; there is no separate fallback if it doesn't, and a result could go unposted with nothing surfacing that fact. Accepted as a known risk for now rather than solved with a dedicated dispatcher agent.
 
-**Handoff-prompt tier:** post the plan summary and the full handoff prompt built in 5c (plan file contents inlined, not just linked) to the discussion, wrapped in a `<pre>` block so the raw-HTML field preserves line breaks and spacing, with the plan's angle-bracket placeholders HTML-escaped first so they don't get swallowed as unrecognized tags.
+Once the output lands, also judge whether it implies a concrete, specific next live-system step: keyword research and ad copy drafting naturally continues into "push these live"; a pure research or competitive-analysis task usually doesn't have one. If it does, post a second discussion message with a Resume prompt in the same coaching-framed shape 5c builds for handoff-prompt tier, referencing the actual deliverable that just landed rather than the plan template's placeholders:
+
+```
+I now need to [concrete next action] for [Client].
+
+Here's what's already done: [one-line summary of the artifact that just landed, e.g. "keyword research and RSA copy are ready in the attached CSV"].
+
+[Reference to the attached file, or its contents inlined if the target platform can't read the local filesystem]
+
+Coach me through doing this myself, step by step — don't do it for me.
+```
+
+Skip this entirely when there's no clear next step rather than inventing one.
+
+**Handoff-prompt tier:** post two discussion messages, not one. First, the plan summary (why it matters, background, what done looks like — same fields 4c already uses). Second, a separate message with the Resume prompt built in 5c (plan file contents inlined, not just linked), wrapped in a `<pre>` block so the raw-HTML field preserves line breaks and spacing, with the plan's angle-bracket placeholders HTML-escaped first so they don't get swallowed as unrecognized tags. Keeping it a separate message means it can be selected and copied without scrolling past the plan summary's prose.
 
 **Assignment:** once all of this step's new subtasks exist, batch-ask who's assigned, same `AskUserQuestion` pattern Step 4c already uses. This only covers this step's own new subtasks; Step 4's are assigned within Step 4 itself and are not revisited here. Tasks that matched an existing Step 4 subtask (5a.5) keep that subtask's existing assignee.
 
