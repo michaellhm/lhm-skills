@@ -146,15 +146,15 @@ Call `list_tasks_in_project` with `projectId: 68655` and `filter_title` set to t
 ### 4b. Move the card and add the Meeting Notes subtask
 
 1. `update_task` with `taskId: <card id>`, `section: 107750`, which moves the card to Follow Up.
-2. `create_task` with `projectId: 68655`, `parentTaskId: <card id>`, `section: 107750`, `title: "<Client Name> - Meeting Notes - <Month Day>"` (e.g. `"mhealth - Meeting Notes - 27 July"`). Put a single line in `description` (e.g. "Digital catch-up with Nick and Steve, 27 July") and nothing more.
+2. `create_task` with `projectId: 68655`, `parentTaskId: <card id>`, `section: 107750`, `title: "<Acronym> - Meeting Notes - <Month Day>"` (e.g. `"YSP - Meeting Notes - 27 July"` — `<Acronym>` is the client's short-code from `client_profile.md`, resolved in Step 3). Put a single line in `description` (e.g. "Digital catch-up with Nick and Steve, 27 July") and nothing more.
 3. `create_message_in_task` on the new subtask with the actual briefing. This is where the substance goes: what was discussed, decisions made and why, wins and good news, relevant background, and the Fathom link plus the local meeting notes path. Write it as prose for a colleague who wasn't in the room, not as a transcript dump. This is the "why" behind the tasks created in 4c.
 4. `create_message_in_task` on the **client card itself** (`taskId: <card id>`) with a session trace covering decisions and their trade-offs, open risks, what is now in progress, and anything parked. The card then carries its own history, so anyone landing on it later can see how the project got here without reading back through six months of meeting notes.
 
 ### 4c. Create follow-up subtasks
 
-For each **LHM-owned** action item from Step 2. Client-owed action items stay in the meeting notes file only; do not push them to BasicOps.
+For each **LHM-owned** action item from Step 2. Client-owed action items get their own subtask too, but in 4d, not here, with a different owner and framing.
 
-1. `create_task` with `projectId: 68655`, **`parentTaskId: <card id>`**, `section: 107750`, `title: "<Client Name> — <task>"` (matches the existing `Client — task` convention already used on this board). These are **subtasks under the client card**, not standalone tasks floating in the section. The card is the client's home and everything hangs off it. Put at most one line in `description`.
+1. `create_task` with `projectId: 68655`, **`parentTaskId: <card id>`**, `section: 107750`, `title: "<Acronym> - Action - <task>"` (`<Acronym>` per Step 3 — this replaces the board's older `Client — task` title convention). These are **subtasks under the client card**, not standalone tasks floating in the section. The card is the client's home and everything hangs off it. Put at most one line in `description`.
 2. `create_message_in_task` with `taskId: <new task id>` containing the full briefing: why it matters (with the relevant quote or decision from the meeting), the background they need, what done looks like, and which judgement calls to surface rather than decide alone. Brief them like a capable colleague who wasn't in the room. Include the Meeting Notes subtask's link (from `link_to_task` on the id created in 4b) and the local path to the meeting notes file.
 3. Ask the user who should be assigned, rather than assuming. Batch this into a single `AskUserQuestion` with the tasks grouped into sensible clusters instead of asking once per task. Once answered, call `update_task` with `taskId` and `assignee` set. (`@mentions` inside task messages aren't confirmed to trigger real BasicOps notifications, so the `assignee` field is the reliable mechanism.)
 4. **Answers carry instruction beyond a name more often than not.** Real examples: "fold this into the landing page build", "X should be notified even though it isn't theirs", "they already have access, go through my account", "this one's urgent, the rest can wait". The `assignee` field loses all of that. Post it as a follow-up discussion message on the task.
@@ -197,14 +197,14 @@ Tiering is **per task, not per agent** — the same agent can produce both an au
 
 **Routing table:**
 
-| Trigger type | Agent | Typical tier |
-|---|---|---|
-| GA/GSC stat questions, quick performance checks | *(none — Claude direct)* | Direct |
-| Keyword research, ad copy drafting for a new ad group/service/location | `lhm-marketing-hub:google-ads` | Auto-run |
-| Live Ads account changes (submit campaign, adjust budget, pause/activate) | `lhm-marketing-hub:google-ads` | Handoff-prompt |
-| Keyword research, ranking/content strategy analysis | `lhm-marketing-hub:seo` | Auto-run |
-| Blog post, page copy draft, content brief | `lhm-marketing-hub:content` | Auto-run |
-| Live page edits on the client site | `lhm-wordpress-hub:site-extension` | Handoff-prompt |
+| Trigger type | Agent | Typical tier | Title type |
+|---|---|---|---|
+| GA/GSC stat questions, quick performance checks | *(none — Claude direct)* | Direct | `Analytics` |
+| Keyword research, ad copy drafting for a new ad group/service/location | `lhm-marketing-hub:google-ads` | Auto-run | `GAds` |
+| Live Ads account changes (submit campaign, adjust budget, pause/activate) | `lhm-marketing-hub:google-ads` | Handoff-prompt | `GAds` |
+| Keyword research, ranking/content strategy analysis | `lhm-marketing-hub:seo` | Auto-run | `SEO` |
+| Blog post, page copy draft, content brief | `lhm-marketing-hub:content` | Auto-run | `Blog Article` / `Landing Page` / `Content Brief` / `Page Copy` — whichever fits the specific task |
+| Live page edits on the client site | `lhm-wordpress-hub:site-extension` | Handoff-prompt | `Page Edit` |
 
 **No match.** If a task doesn't cleanly fit the table or Direct, fall back to a plain-text recommendation line in the email (Step 7). No subtask, no dispatch. Do not force a task into a tier it doesn't belong in.
 
@@ -245,7 +245,7 @@ Nothing is dispatched for handoff-prompt tier. A human runs this elsewhere.
 
 ## Step 6: Sync follow-on work to BasicOps
 
-Same shape as Step 4, applied to Step 5's output instead of the meeting's action items. For every task from Step 5 that did not match an existing Step 4 subtask (per 5a.5): `create_task` with `projectId: 68655`, `parentTaskId: <card id>` (the client card found in Step 4a), `section: 107750`, title `"<Client Name> — <task>"`, one line in `description`, full detail via `create_message_in_task` in the discussion. Tasks that matched an existing Step 4 subtask post there instead of creating a new one. Same BasicOps field rules as Step 4: nothing but a single line in `description`, raw HTML in discussion messages, a plain `&` in titles.
+Same shape as Step 4, applied to Step 5's output instead of the meeting's action items. For every task from Step 5 that did not match an existing Step 4 subtask (per 5a.5): `create_task` with `projectId: 68655`, `parentTaskId: <card id>` (the client card found in Step 4a), `section: 107750`, title `"<Acronym> - <Type> - <task>"` (`<Acronym>` per Step 3, `<Type>` from 5b's routing table), one line in `description`, full detail via `create_message_in_task` in the discussion. Tasks that matched an existing Step 4 subtask post there instead of creating a new one. Same BasicOps field rules as Step 4: nothing but a single line in `description`, raw HTML in discussion messages, a plain `&` in titles.
 
 **Direct tier:** post the answer, already in hand from 5c, to the subtask discussion. Nothing further to track; there's no pending work to follow up on.
 
