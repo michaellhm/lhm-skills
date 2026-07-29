@@ -1,6 +1,6 @@
 ---
 name: post-meeting-review
-description: "Debrief a client meeting and update all client state files, sync follow-up work to BasicOps with context, and draft a team update email. Use this after any client call or meeting, or when the user says 'meeting wrap'. Pulls the Fathom transcript, extracts decisions and action items, updates goals.md, current-projects.md, client_profile.md, and the client's meeting notes folder, sweeps the whole client folder for artefacts the meeting's decisions invalidate, moves the client's BasicOps card to Follow Up with a Meeting Notes subtask, creates briefed follow-up subtasks under it, and drafts a team summary email. Triggers on: 'we just had a meeting', 'meeting notes', 'Fathom', 'post-meeting', 'client call debrief', 'update from meeting', 'meeting wrap'."
+description: "Debrief a client meeting and update all client state files, sync follow-up work to BasicOps with context, and draft a team update email. Use this after any client call or meeting, or when the user says 'meeting wrap'. Pulls the Fathom transcript, extracts decisions and action items, updates goals.md, current-projects.md, client_profile.md, and the client's meeting notes folder, sweeps the whole client folder for artefacts the meeting's decisions invalidate, moves the client's BasicOps card to Follow Up with a Meeting Notes subtask, creates briefed follow-up subtasks under it, identifies and routes any follow-on work the meeting generates to the right specialist agent (research and drafts run automatically, live-system changes get a ready-to-run plan), and drafts a team summary email. Triggers on: 'we just had a meeting', 'meeting notes', 'Fathom', 'post-meeting', 'client call debrief', 'update from meeting', 'meeting wrap'."
 ---
 
 # Post-Meeting Review
@@ -12,6 +12,8 @@ Debrief a client meeting and keep all client state current: files, BasicOps, and
 **Option A. Fathom MCP (preferred)**
 Use the Fathom MCP tool to retrieve the most recent meeting transcript for this client.
 Search by client name or domain. If multiple meetings appear, ask the user which one.
+
+`list_meetings` with `created_after` set to the last few days is enough to find "the meeting I had today." Reach for `search_meetings` only for topic lookups across history, not for locating a specific recent call.
 
 **Option B. Manual (fallback)**
 If Fathom MCP is not available or cannot find the meeting:
@@ -109,7 +111,7 @@ This step **detects**. It does not edit. `client-update` owns the editing.
 
 **5. Hand off to `client-update`.** Invoke the skill and pass it four things: the change (and whether it is a substitution or a removal), the sorted file list, the conflicts found in item 3, and anything flagged in item 4. `client-update` picks up at its **Step 2e**, presents the whole picture to the user for confirmation, and only then edits. Nothing in the client folder changes until the user has signed off inside `client-update`.
 
-**6. Come back and finish.** The handoff is a detour, not an exit. When `client-update` completes, return here and continue at Step 4. Steps 4 through 7 have not run yet. Hold `client-update`'s downstream implications from its own Step 4 and fold them into Step 6 below, so the user gets one set of recommendations rather than two nearly identical prompts.
+**6. Come back and finish.** The handoff is a detour, not an exit. When `client-update` completes, return here and continue at Step 4. Steps 4 through 8 have not run yet. Hold `client-update`'s downstream implications from its own Step 4 and fold them into Step 5's task list below, alongside Step 2's skill triggers, so the user gets one set of routed follow-on work rather than two nearly identical prompts.
 
 **If nothing came back from the grep,** say so in a line and move on. No sweep findings is a normal outcome for a meeting that changed no entities.
 
@@ -153,20 +155,114 @@ For each **LHM-owned** action item from Step 2. Client-owed action items stay in
 
 If BasicOps MCP isn't authorized, skip this step entirely and tell the user: "BasicOps isn't connected. I've saved everything to the client files, but you'll need to add these to BasicOps manually."
 
-## Step 5: Draft the team email
+## Step 5: Identify & route follow-on work
+
+For every item in Step 2's "Skill triggers" list, plus any downstream implications Step 3.5 handed back from a `client-update` detour, identify the concrete task, classify it, and act on that classification. There is no approval gate in this step: the classification itself is the safety mechanism (see 5b). If there is nothing to route, say so in one line and move to Step 6.
+
+This step is about doing the work, or kicking it off. BasicOps bookkeeping — subtasks, discussion messages, file attachments, assignment — all happens in Step 6, once this step knows what it's dealing with.
+
+### 5a. Identify the task
+
+Turn the trigger into a specific, actionable task, not a category. "SEO review" becomes "investigate why /services/knee-pain isn't ranking, per the client's comment about losing traffic." Carry the meeting context (the actual quote or decision) forward; Step 6 needs it for the briefing.
+
+### 5a.5 Cross-check against Step 4's action items
+
+Before classifying, check whether this task describes the same underlying work as an LHM-owned action item Step 4 already turned into a subtask. Action items and skill triggers come from two separate extraction buckets in Step 2, and the same meeting decision can land in both — "we need a new blog post about the new service" is naturally both an action item and a content trigger. Skipping this check produces two subtasks for the same piece of work: an empty one from Step 4 and a routed, dispatched one from here.
+
+If a match is found, do not create a second subtask in Step 6. Carry the matched Step 4 subtask id forward, act on the task as normal in 5c, then in Step 6 post the briefing, dispatch note, or handoff prompt to that existing subtask's discussion instead of creating a new one. If no match, treat it as a new task.
+
+### 5b. Classify
+
+Two questions decide where a task lands:
+
+1. **Does it need a specialist agent's judgment, or can Claude do it directly with tools already connected in this session** (Analytics MCP, GSC MCP, etc.)?
+2. **Does the task's output mutate a live client-facing system** (a live WordPress page, a live Ads campaign, a live GBP listing), **or does it only produce an artifact** (a document, a CSV, a draft, an answer)?
+
+| | Artifact / answer only | Mutates a live system |
+|---|---|---|
+| **No agent needed** | **Direct** — do it now, in this session | (does not occur — live mutations always need a specialist agent) |
+| **Needs a specialist agent** | **Auto-run** — dispatch a background specialist agent | **Handoff-prompt** — prepare a plan and a prompt, a human executes elsewhere |
+
+Tiering is **per task, not per agent** — the same agent can produce both an auto-run task and a handoff-prompt task depending on what's being asked. `google-ads` is the clearest example: keyword research and ad copy drafting for a new ad group is auto-run (the output is a CSV, nothing in the account changes); submitting that ad group or changing a budget is handoff-prompt.
+
+**Routing table:**
+
+| Trigger type | Agent | Typical tier |
+|---|---|---|
+| GA/GSC stat questions, quick performance checks | *(none — Claude direct)* | Direct |
+| Keyword research, ad copy drafting for a new ad group/service/location | `lhm-marketing-hub:google-ads` | Auto-run |
+| Live Ads account changes (submit campaign, adjust budget, pause/activate) | `lhm-marketing-hub:google-ads` | Handoff-prompt |
+| Keyword research, ranking/content strategy analysis | `lhm-marketing-hub:seo` | Auto-run |
+| Blog post, page copy draft, content brief | `lhm-marketing-hub:content` | Auto-run |
+| Live page edits on the client site | `lhm-wordpress-hub:site-extension` | Handoff-prompt |
+
+**No match.** If a task doesn't cleanly fit the table or Direct, fall back to a plain-text recommendation line in the email (Step 7). No subtask, no dispatch. Do not force a task into a tier it doesn't belong in.
+
+### 5c. Act on the classification
+
+- **Direct:** run the check now and hold the answer for Step 6 to record. If the tool this needs isn't connected, note "needs manual check" for Step 7's email instead of blocking the rest of this step.
+- **Auto-run:** dispatch the specialist agent via the Agent tool with `run_in_background: true`. Dispatch every auto-run task for the meeting in parallel, in a single message. The agent keeps running after this step ends; its result lands later (Step 6) as a follow-up message on its subtask, whenever it finishes.
+- **Handoff-prompt:** write the plan file to `[client-folder]/meeting-wraps/YYYY-MM-DD/<slug>-plan.md`:
+
+```markdown
+# Plan — <task title>
+**Client:** <name>  **Date:** YYYY-MM-DD  **Agent:** <e.g. lhm-marketing-hub:google-ads>
+
+## Why
+[The meeting context/quote that triggered this]
+
+## Background
+[What the agent needs to know: current state, relevant history]
+
+## What done looks like
+[Concrete success criteria]
+
+## Judgment calls to flag, not decide alone
+[Anything the human running this should surface rather than assume]
+```
+
+Then build the handoff prompt: plain text, ready to paste into a fresh Claude Code or ChatGPT session, with the plan file's contents inlined in full, not just linked (ChatGPT can't read the local filesystem, and the prompt needs to work identically on either platform):
+
+```
+I'm ready to work on this: [task title] for [Client].
+
+Act as the [agent name] specialist. Here's the plan:
+
+[Plan file contents inlined]
+```
+
+Nothing is dispatched for handoff-prompt tier. A human runs this elsewhere.
+
+## Step 6: Sync follow-on work to BasicOps
+
+Same shape as Step 4, applied to Step 5's output instead of the meeting's action items. For every task from Step 5 that did not match an existing Step 4 subtask (per 5a.5): `create_task` with `parentTaskId: <card id>` (the client card found in Step 4a), `section: 107750`, title `"<Client Name> — <task>"`, one line in `description`, full detail via `create_message_in_task` in the discussion. Tasks that matched an existing Step 4 subtask post there instead of creating a new one. Same BasicOps field rules as Step 4: nothing but a single line in `description`, raw HTML in discussion messages, a plain `&` in titles.
+
+**Direct tier:** post the answer, already in hand from 5c, to the subtask discussion. Nothing further to track; there's no pending work to follow up on.
+
+**Auto-run tier:** post the dispatch briefing to the discussion when the subtask is created (why it matters, background, what done looks like — the same fields 4c already uses), noting the agent is running in the background.
+
+Posting the agent's actual output is not part of this step's own execution; it happens whenever the agent finishes, which may be well after Steps 6 through 8 have run and this skill invocation has ended. When that notification arrives: append the output as a follow-up message on the same subtask, attach any generated files (keyword CSVs, ad copy CSVs, content drafts) via `add_file_to_task`, save a copy to `[client-folder]/meeting-wraps/YYYY-MM-DD/`, and add a one-line pointer on the client card so a finished result isn't buried under other subtask threads. If the agent fails instead of completing, post what was attempted and what broke to the subtask discussion rather than losing it silently. This depends on the session staying reachable long enough to catch the completion notification; there is no separate fallback if it doesn't, and a result could go unposted with nothing surfacing that fact. Accepted as a known risk for now rather than solved with a dedicated dispatcher agent.
+
+**Handoff-prompt tier:** post the plan summary and the full handoff prompt built in 5c (plan file contents inlined, not just linked) to the discussion.
+
+**Assignment:** once all of this step's new subtasks exist, batch-ask who's assigned, same `AskUserQuestion` pattern Step 4c already uses. This only covers this step's own new subtasks; Step 4's are assigned within Step 4 itself and are not revisited here. Tasks that matched an existing Step 4 subtask (5a.5) keep that subtask's existing assignee.
+
+If BasicOps isn't connected, skip this step entirely and tell the user which Step 5 items would have been routed and that they need manual tracking — Step 5's work (Direct answers, dispatched agents, plan files) still happened, only the BasicOps sync is skipped. If Step 4a found no client card and the user declined to create one, drop `parentTaskId` and create these subtasks directly in section `107750`, the same no-card mode Step 4c uses.
+
+## Step 7: Draft the team email
 
 Default to the Gmail `create_draft` tool. It only creates drafts (no send capability), so this always stops for a human to review and send, and replies thread back to the sender's own address.
 
 If the user asks for a different channel (Mailgun via Zapier, for example), warn them what changes before doing it: the From address must sit on the connected Mailgun domain, so the mail will not come from their own address and will not appear in their Sent folder. Mailgun also sends on the spot rather than drafting. Fall back to Gmail without argument if it fails.
 
 1. Build the draft in chat first and ask: "Here's the team email. Does this capture everything?"
-   - **To:** kristalyn@localhealthmarketing.com.au, plus anyone assigned a task in Step 4c
+   - **To:** kristalyn@localhealthmarketing.com.au, plus anyone assigned a task in Step 4c or Step 6
    - **Cc:** michael@localhealthmarketing.com.au
    - **Subject:** `Meeting wrap — <Client Name> — <Date>`
    - **Body.** Internal audience, so LHM shorthand and jargon are fine here, unlike `client-update-email`:
      - One line: "Michael met with <Client> on <date>."
      - A short synthesis of what was discussed, including context and wins, rather than a task dump.
-     - The list of tasks just added to BasicOps in Step 4, each with its task link (from `link_to_task`).
+     - The list of tasks added to BasicOps in Steps 4 and 6, each with its task link (from `link_to_task`). For Step 6's tasks, note the tier: Direct tier gets its answer inline (e.g. "Organic traffic is up 12% MoM — details in the task"); auto-run tier is noted as running (e.g. "Keyword research for the new Riverside location — running now, results will land in the task"); handoff-prompt tier is noted as ready for hand-off (e.g. "Ads investigation — plan ready, prompt waiting in the task"), so the assignee knows to go get the prompt rather than expecting the work is already done.
      - Anything the team should watch for.
    - Apply the anti-AI writing guidelines from `${CLAUDE_PLUGIN_ROOT}/references/anti-ai-writing-guidelines.json` per this plugin's `CLAUDE.md`.
 2. On approval, call `create_draft` with the confirmed `to`, `cc`, `subject`, and `body`.
@@ -174,16 +270,7 @@ If the user asks for a different channel (Mailgun via Zapier, for example), warn
 
 If Gmail MCP isn't authorized, skip this step and tell the user the team email needs to be sent manually.
 
-## Step 6: Flag skill triggers
-
-After updating the files and syncing to BasicOps, list any recommended next actions. If Step 3.5 handed off to `client-update`, merge its downstream implications into this single list rather than presenting them separately:
-"Based on this meeting, I'd recommend:
-- [Specific skill] for [reason from meeting]
-- [Specific skill] for [reason from meeting]
-
-Want me to kick off any of these now?"
-
-## Step 7: Self-improvement
+## Step 8: Self-improvement
 
 Two things to offer at the end of the run:
 
