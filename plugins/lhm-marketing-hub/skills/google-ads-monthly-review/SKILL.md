@@ -180,7 +180,7 @@ Stabilise the patient: check vitals, treat life-threatening issues first, then s
 **One-off**
 - [ ] Budget reduced to 80-90% of ideal daily calculation
 - [ ] Budget allocation tweaked to favour best performers
-- [ ] Conversion actions are firing
+- [ ] Conversion actions are firing (check GA4 directly via `analytics-mcp` before asking the client — see "Conversion quality before volume" in the philosophy doc)
 - [ ] Geo-targeting tight enough
 - [ ] Search partners performance checked
 - [ ] Ad extensions - all relevant types exist
@@ -213,7 +213,7 @@ Flip the Red Zone priorities: performance fixes on top, budget increases only on
 
 **One-off**
 - [ ] Budget allocation tweaked to favour best performers
-- [ ] Conversion actions are firing
+- [ ] Conversion actions are firing (check GA4 directly via `analytics-mcp` before asking the client — see "Conversion quality before volume" in the philosophy doc)
 - [ ] Feed issues checked
 - [ ] Geo-targeting tight enough
 - [ ] Search partners performance checked

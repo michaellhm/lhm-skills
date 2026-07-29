@@ -47,6 +47,7 @@ Walk the list in priority order. For each task:
    - Creative refresh or new RSAs → `ad-copy-generator`
    - Landing page or conversion issue → `landing-page-optimizer`
    - PMax-specific issue → `pmax-optimizer`
+   - **"Conversion actions are firing"** → don't ask the client to check. Query GA4 directly via `analytics-mcp` for the booking event, per "Conversion quality before volume" in `references/lhm-philosophy/google-ads.md`. Present what GA4 shows as the task result; only fall back to asking the client if no GA4 property is on file or GA4 itself shows the event isn't firing.
    Run only the slice that this task needs. Do not run the whole skill end to end if a single change is all that is required.
 3. **Ask if it is done.** After presenting (or executing) the task:
 

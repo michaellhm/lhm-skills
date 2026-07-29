@@ -29,6 +29,14 @@ A high conversion count means nothing if the conversions are not tracked correct
 
 Rubbish in, rubbish out. Volume on bad data is worse than no data.
 
+**When Google Ads shows zero or falling conversions, check GA4 before asking the client.** Google Ads conversion counts are almost always fine on the tracking side — the far more common cause is a booking/lead event that fires correctly in GA4 but isn't imported into Google Ads (broken import link, wrong event name, conversion action paused). So:
+1. Pull the client's GA4 property ID and primary conversion event name from `client_profile.md` (set by `ga-event-config`). If missing, fall back to asking.
+2. Use the `analytics-mcp` tools (`run_realtime_report` / `run_conversions_report` / `run_report`) to check whether the booking event is actually firing in GA4 over the same window Google Ads is reporting zero/low conversions for.
+3. If the event **is** firing in GA4: the issue is the Ads↔GA4 conversion import, not client-side tracking. Say so directly — e.g. "Bookings are coming through in GA4, so the site tracking is fine. This is an Ads import/attribution issue, not a lost-lead issue" — and check `list_google_ads_links` for the import link status before looping the client in.
+4. Only ask the client to manually check bookings when GA4 itself shows the event isn't firing, or when no GA4 property is on file.
+
+This replaces defaulting to "can you check if conversions are coming through?" as the first move — that question should be the fallback, not the opener.
+
 ## AdPulse zone system
 
 The zone is determined before any action is recommended. The zone's checklist is the priority list.
