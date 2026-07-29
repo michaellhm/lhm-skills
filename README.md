@@ -157,7 +157,7 @@ plugins/lhm-learn/                    # Session learning capture plugin
 plugins/lhm-client-updates-hub/       # Client communication & meeting-wrap plugin
   .claude-plugin/plugin.json            # Plugin manifest
   skills/                               # All 3 skills
-    post-meeting-review/                # Fathom debrief — client files, BasicOps sync with context, team email
+    post-meeting-review/                # Fathom debrief — client files, BasicOps sync with context, agent routing, team email
     client-update/                      # Propagate a client data change across all client files
     client-update-email/                # Plain-language client-facing update emails
 ```
@@ -212,7 +212,7 @@ plugins/lhm-client-updates-hub/       # Client communication & meeting-wrap plug
 
 ### Client Updates Hub
 
-**Client Communication** (3 skills): Post-meeting debrief from Fathom transcripts — updates client state files, syncs follow-up work to BasicOps with context (moves the client's card to Follow Up, adds a Meeting Notes subtask, creates follow-up tasks), and drafts a team summary email. Propagates a client data change (name, services, contact, branding) across every file that references it. Generates plain-language client-facing update emails after completing work.
+**Client Communication** (3 skills): Post-meeting debrief from Fathom transcripts — updates client state files, syncs follow-up work to BasicOps with context (moves the client's card to Follow Up, adds a Meeting Notes subtask, creates follow-up tasks), identifies and routes any follow-on work the meeting generates to the right specialist agent (research and drafts run automatically, live-system changes get a ready-to-run plan), and drafts a team summary email. Propagates a client data change (name, services, contact, branding) across every file that references it. Generates plain-language client-facing update emails after completing work.
 
 ## Key Behaviours
 
