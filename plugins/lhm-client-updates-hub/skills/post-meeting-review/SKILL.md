@@ -64,6 +64,16 @@ If any client details changed (name, services, contacts, business details): upda
 
 Do not trigger `client-update` from here. Propagation beyond the state files is handled in Step 3.5, which gathers the context `client-update` needs before invoking it.
 
+### Resolve the client acronym
+
+Runs every time, regardless of whether anything else in the profile changed — every BasicOps task title from Step 4 onward needs this.
+
+Check `client_profile.md` for an `Acronym:` field.
+
+- **Present:** use it as-is. No questions asked.
+- **Missing:** derive one from the client's display name (first letter of each significant word, uppercase — "Your Story Physio" → `YSP`, "Australian Sports Physio" → `ASP`). Confirm with the user before proceeding (e.g. "Use YSP as the BasicOps short-code for Your Story Physio?"), since a bad auto-derivation is annoying to unwind once it's on ten subtask titles. Once confirmed, or the user gives a different value, write `Acronym: <value>` to `client_profile.md` so every future run just reads it.
+- **`client_profile.md` doesn't exist yet:** derive an acronym for this run only, tell the user it wasn't saved because the profile doesn't exist, and don't block the rest of the skill on it.
+
 ### Save meeting notes
 
 **Check for an existing meetings folder before creating one.** The convention varies by client. mhealth uses `client-meetings/`, others use `meetings/`. List the client folder and match what is already there. Only create `meetings/` if no equivalent exists.
