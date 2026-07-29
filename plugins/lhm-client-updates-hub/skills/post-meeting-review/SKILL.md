@@ -159,9 +159,19 @@ For each **LHM-owned** action item from Step 2. Client-owed action items get the
 3. Ask the user who should be assigned, rather than assuming. Batch this into a single `AskUserQuestion` with the tasks grouped into sensible clusters instead of asking once per task. Once answered, call `update_task` with `taskId` and `assignee` set. (`@mentions` inside task messages aren't confirmed to trigger real BasicOps notifications, so the `assignee` field is the reliable mechanism.)
 4. **Answers carry instruction beyond a name more often than not.** Real examples: "fold this into the landing page build", "X should be notified even though it isn't theirs", "they already have access, go through my account", "this one's urgent, the rest can wait". The `assignee` field loses all of that. Post it as a follow-up discussion message on the task.
 
-**If you mis-parent a task,** `update_task` with `parentTaskId` re-parents it and preserves the assignee, description, and discussion. No need to delete and recreate.
-
 **No-card mode.** If 4a found no card and the user declined to create one, drop `parentTaskId` and create the tasks directly in section `107750`. Everything else in 4c still applies: the full briefing still goes in the discussion, and the assignment question is still asked. Omit the Meeting Notes subtask link, since 4b did not run, and point at the local meeting notes path instead.
+
+### 4d. Create client follow-up subtasks
+
+For each **client-owed** action item from Step 2 — these used to stay in the meeting notes file only; now they also get a BasicOps trail so someone is actually chasing them.
+
+1. `create_task` with `projectId: 68655`, `parentTaskId: <card id>`, `section: 107750`, `title: "<Acronym> - Client - <task>"`. Put at most one line in `description`.
+2. `create_message_in_task` with the briefing: what's needed from the client (the specific asset, document, or approval), why it matters (what it's blocking), and the meeting context. Frame it as "chase the client for X," not "do X" — Kristalyn's job here is follow-up, not execution.
+3. `update_task` with `taskId: <new task id>`, `assignee` set to Kristalyn (`kristalyn@localhealthmarketing.com.au`; if the `assignee` field needs a BasicOps user id rather than an email, resolve it via `list_users` first). No assignment question for these, unlike 4c and Step 6 — chasing clients for outstanding items is always Kristalyn's, every meeting.
+
+**No-card mode.** Same as 4c: if 4a found no card and the user declined to create one, drop `parentTaskId` and create these directly in section `107750`.
+
+**If you mis-parent a task,** `update_task` with `parentTaskId` re-parents it and preserves the assignee, description, and discussion. No need to delete and recreate. Applies to 4c and 4d alike.
 
 If BasicOps MCP isn't authorized, skip this step entirely and tell the user: "BasicOps isn't connected. I've saved everything to the client files, but you'll need to add these to BasicOps manually."
 
