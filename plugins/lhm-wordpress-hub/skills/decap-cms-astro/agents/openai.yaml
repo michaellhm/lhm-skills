@@ -1,0 +1,4 @@
+interface:
+  display_name: "Add Decap CMS to Astro"
+  short_description: "Add client editing and previews to Astro"
+  default_prompt: "Use $decap-cms-astro to add Decap CMS to this Astro site on Cloudflare Pages."

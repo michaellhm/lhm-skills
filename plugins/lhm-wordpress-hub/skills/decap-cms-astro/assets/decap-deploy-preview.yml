@@ -1,0 +1,65 @@
+name: Decap Deploy Preview
+
+on:
+  push:
+    branches:
+      - 'cms/**'
+
+permissions:
+  contents: read
+  statuses: write
+
+jobs:
+  publish-preview-link:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Cloudflare and publish the preview link
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          branch="${GITHUB_REF_NAME}"
+          alias="$(printf '%s' "$branch" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | cut -c1-28 | sed 's/-$//')"
+          preview_url="https://${alias}.__CLOUDFLARE_PAGES_PROJECT__.pages.dev"
+          api_url="https://api.github.com/repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}"
+
+          resolve_preview_path() {
+            case "$branch" in
+              cms/pages/__PAGE_ENTRY_NAME__)
+                printf '%s' '/__PAGE_ROUTE__/'
+                ;;
+              *)
+                printf '/blog/%s/' "${branch##*/}"
+                ;;
+            esac
+          }
+
+          post_status() {
+            curl --fail-with-body --silent --show-error \
+              --request POST \
+              --header "Accept: application/vnd.github+json" \
+              --header "Authorization: Bearer ${GITHUB_TOKEN}" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "$api_url" \
+              --data "$(jq -n \
+                --arg state "$1" \
+                --arg target_url "$preview_url" \
+                --arg description "$2" \
+                --arg context "Decap Deploy Preview" \
+                '{state: $state, target_url: $target_url, description: $description, context: $context}')"
+          }
+
+          page_path="$(resolve_preview_path)"
+          post_status "pending" "Waiting for the Cloudflare draft preview"
+
+          for attempt in $(seq 1 60); do
+            status_code="$(curl --location --silent --output /dev/null --write-out '%{http_code}' "${preview_url}${page_path}")"
+            if [ "$status_code" = "200" ]; then
+              post_status "success" "Open the full Cloudflare draft preview"
+              exit 0
+            fi
+            sleep 5
+          done
+
+          post_status "error" "Cloudflare preview did not become ready"
+          exit 1
