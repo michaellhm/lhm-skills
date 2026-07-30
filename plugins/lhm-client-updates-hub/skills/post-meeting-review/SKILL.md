@@ -106,6 +106,8 @@ Last updated: YYYY-MM-DD
 -
 ```
 
+Replace the sample Active row with real projects from this meeting, or clear it if none were raised. Don't leave the placeholder text in place.
+
 - Mark completed projects as completed (with date)
 - Add new projects from action items
 - Update status of existing projects if discussed
@@ -199,7 +201,7 @@ Structure every labeled briefing as HTML blocks, not one flowing paragraph. Each
 </ul>
 ```
 
-This applies to every structured briefing this skill posts: 4b's session trace (worked example below), 4c and 4d's task briefings, and Step 6's dispatch briefing and plan summary. Free-flowing prose (4b's Meeting Notes briefing) keeps its own `<p>` breaks between distinct ideas, but doesn't get the label/list treatment — it isn't a checklist.
+This applies to every structured briefing this skill posts: 4b's session trace (worked example below), 4c and 4d's task briefings, Step 6's dispatch briefing and plan summary, and 5b's Briefly Prep output. Free-flowing prose (4b's Meeting Notes briefing) keeps its own `<p>` breaks between distinct ideas, but doesn't get the label/list treatment — it isn't a checklist.
 
 ### 4a. Find the client card
 
@@ -304,7 +306,7 @@ Tiering is **per task, not per agent** — the same agent can produce both an au
 1. **The proposed article topic** (informed by the keyword research when there was one).
 2. **Three questions to ask the client in the briefly** — the input only the client can supply that keyword data can't (their angle, patient stories or case specifics, service nuance, whatever this topic actually needs from them).
 
-Do not dispatch the `content` agent for this trigger. Writing the actual brief or draft happens after the client conversation, using what it surfaces, not before it. Post the topic and three questions to the subtask discussion in Step 6 exactly as produced; this is the complete output, not a draft of one.
+Do not dispatch the `content` agent for this trigger. Writing the actual brief or draft happens after the client conversation, using what it surfaces, not before it. Post the topic and three questions to the subtask discussion in Step 6 exactly as produced (formatted per the discussion-message rule: the topic as its own paragraph, the three questions as a `<ul>`); this is the complete output, not a draft of one.
 
 **No match.** If a task doesn't cleanly fit the table or Direct, fall back to a plain-text recommendation line in the email (Step 7). No subtask, no dispatch. Do not force a task into a tier it doesn't belong in.
 
