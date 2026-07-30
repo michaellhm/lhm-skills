@@ -49,12 +49,63 @@ Read the full transcript and extract:
 ## Step 3: Update client state files
 
 ### Update `goals.md`
-If any KPIs, budgets, or targets changed: update the relevant sections. Add a dated note:
+
+**If the file doesn't exist,** create it first, then continue below. Tell the user inline: "`goals.md` didn't exist for this client — created it from the template."
+
+```markdown
+# Goals — [Client Name]
+
+## Conversion Economics
+- Average revenue per conversion/booking: $
+- Estimated margin after overheads (%):
+- Profitable CPA threshold: $
+- Profitable ROAS threshold:
+
+## Channel KPIs
+### Google Ads
+- Monthly lead target:
+- CPA target: $
+- Monthly budget: $
+
+### SEO
+- Primary keyword targets:
+- Organic traffic target (monthly sessions):
+- Ranking targets (keyword → position by date):
+
+### Content
+- Monthly content output target:
+
+## Benchmarks
+- Last 90 days vs prior 90 days summary:
+- Last year vs this year:
+
+## Annual targets:
+-
+```
+
+If any KPIs, budgets, or targets changed (or this is a freshly created file and the meeting mentioned any): update the relevant sections. Leave anything the meeting didn't cover as the template's blank placeholder, don't invent figures. Add a dated note:
 ```
 <!-- Updated YYYY-MM-DD from meeting: [one-line summary of what changed] -->
 ```
 
 ### Update `current-projects.md`
+
+**If the file doesn't exist,** create it first, then continue below. Tell the user inline: "`current-projects.md` didn't exist for this client — created it from the template."
+
+```markdown
+# Current Projects — [Client Name]
+Last updated: YYYY-MM-DD
+
+## Active
+- [Project name] — [Brief description] — Started: YYYY-MM-DD
+
+## Completed this quarter
+-
+
+## Backlog
+-
+```
+
 - Mark completed projects as completed (with date)
 - Add new projects from action items
 - Update status of existing projects if discussed
@@ -347,7 +398,8 @@ If Gmail MCP isn't authorized, skip this step and tell the user the team email n
 
 ## Step 8: Self-improvement
 
-Two things to offer at the end of the run:
+Three things to offer at the end of the run:
 
 1. **Client facts.** If the meeting revealed anything about how this client works that isn't in `client_profile.md` (systems they use, who does what, standing constraints, compliance posture), offer to add it.
 2. **Skill learnings.** If anything went wrong in this run, or the user corrected you, offer to run `/lhm-learn:learn` so it lands in this skill's `LEARNED.md` rather than being lost. Tool quirks, output format corrections, workflow steps that needed adjusting, and anything the user had to tell you twice all belong there.
+3. **New state files.** If `goals.md` or `current-projects.md` were created for the first time this run (Step 3), remind the user to review them and fill any gaps the meeting didn't cover.
