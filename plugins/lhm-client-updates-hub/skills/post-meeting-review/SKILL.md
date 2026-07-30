@@ -44,6 +44,7 @@ Read the full transcript and extract:
 
 **Skill triggers:**
 - Anything that should prompt running a skill (poor Ads performance → zone check, content not ranking → SEO review, etc.)
+- A commitment to run a client briefing before content gets written ("we'll do a briefly," "we'll brief them on the next post") — flag this separately from a generic content trigger. It routes differently; see Step 5b's Briefly prep row.
 
 ## Step 3: Update client state files
 
@@ -214,7 +215,15 @@ Tiering is **per task, not per agent** — the same agent can produce both an au
 | Live Ads account changes (submit campaign, adjust budget, pause/activate) | `lhm-marketing-hub:google-ads` | Handoff-prompt | `GAds` |
 | Keyword research, ranking/content strategy analysis | `lhm-marketing-hub:seo` | Auto-run | `SEO` |
 | Blog post, page copy draft, content brief | `lhm-marketing-hub:content` | Auto-run | `Blog Article` / `Landing Page` / `Content Brief` / `Page Copy` — whichever fits the specific task |
+| Client briefing committed on upcoming content ("we'll do a briefly"), usually a blog post | `lhm-marketing-hub:seo` (keyword research only, when it's a blog post) | Auto-run | `Briefly Prep` |
 | Live page edits on the client site | `lhm-wordpress-hub:site-extension` | Handoff-prompt | `Page Edit` |
+
+**Briefly prep.** When the meeting commits to briefing the client on upcoming content rather than committing to the content itself, the task isn't to draft anything — it's to prepare what the human needs walking into that briefing. If a blog post is involved, run keyword research first (what's worth ranking for) and let it ground the topic; if it's some other content type, skip straight to the topic. The deliverable is exactly two things, nothing more:
+
+1. **The proposed article topic** (informed by the keyword research when there was one).
+2. **Three questions to ask the client in the briefly** — the input only the client can supply that keyword data can't (their angle, patient stories or case specifics, service nuance, whatever this topic actually needs from them).
+
+Do not dispatch the `content` agent for this trigger. Writing the actual brief or draft happens after the client conversation, using what it surfaces, not before it. Post the topic and three questions to the subtask discussion in Step 6 exactly as produced; this is the complete output, not a draft of one.
 
 **No match.** If a task doesn't cleanly fit the table or Direct, fall back to a plain-text recommendation line in the email (Step 7). No subtask, no dispatch. Do not force a task into a tier it doesn't belong in.
 
