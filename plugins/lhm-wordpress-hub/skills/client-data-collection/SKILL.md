@@ -33,23 +33,10 @@ Before creating anything, search Drive for an existing folder under `Campaigns/`
 
 1. Find the `Campaigns` folder under `My Drive > Local Health Marketing` by searching for a folder titled `Campaigns` — don't hardcode its ID, confirm it live.
 2. Create a new folder inside it, named after the client's domain (matching existing convention, e.g. `ClientName.com.au`).
-3. Inside that new folder, create a spreadsheet titled `[Client Name] - Access & Credentials Tracker` with one row per checklist item:
+3. Find the template spreadsheet titled `PROJECTNAME.com | Properties and Access TEMPLATE` (search by title, don't hardcode its ID — it lives in a shared template folder alongside other `PROJECTNAME.com |` templates).
+4. Duplicate it (`copy_file`) into the new client folder from Step 2, with `title` set to `[Client Name] | Properties and Access`.
 
-   | Item | Status | Value / Notes | Date Received |
-   |---|---|---|---|
-   | Logo | Not Started | | |
-   | Staff Images | Not Started | | |
-   | Clinic Images | Not Started | | |
-   | Google My Business Access | Not Started | | |
-   | Google Search Console Access | Not Started | | |
-   | Google Analytics Access | Not Started | | |
-   | Google Ads Access | Not Started | | |
-   | CMS Access | Not Started | | |
-   | Domain Host Access | Not Started | | |
-   | Website Host Access / cPanel | Not Started | | |
-   | Cloudflare Access | Not Started | | |
-
-This sheet is separate from the existing `LHM Master List - Campaign Profile Access` (the cross-client master list at the `Campaigns` root) — leave that file untouched.
+This is an internal-only tracker (never shared with or filled in by the client directly) — the team records credentials into it themselves once the client sends them by email. It's separate from the existing `LHM Master List - Campaign Profile Access` (the cross-client master list at the `Campaigns` root) — leave that file untouched.
 
 ## Step 3: Create the BasicOps Data Gathering Task
 
@@ -67,7 +54,7 @@ Draft — never send — an email in Gmail to the client's primary contact (cc K
 
 - A short intro referencing Michael's welcome email
 - The checklist items needed: Logo, Staff Images, Clinic Images, Google My Business Access, Google Search Console Access, Google Analytics Access, Google Ads Access, CMS Access, Domain Host Access, Website Host Access/cPanel, and **Cloudflare Access** — ask whether they already have an account; if yes, request admin access for `michael@localhealthmarketing.com.au`; if not, note the team will help set one up later (that part stays manual)
-- A link to the **Essential Logins** form for credentials. **Ask the user first whether that form has been updated with the Cloudflare item yet.** If not confirmed, ask for Cloudflare access directly in the email body instead of relying on the form.
+- Ask the client to **reply directly to the email** with the credentials/access for each item, rather than linking to any external form — the team collects these by email and records them internally, never through a client-facing form
 - A link to the client's **BrieflyFlow** task for the website-goals questionnaire. Remind the user this link is public and expires weekly — confirm it's freshly generated in BrieflyFlow before sending, or regenerate it first.
 - A link to the trimmed intake form, only if one exists for this client — don't link the old, redundant version if a trimmed one hasn't been prepared.
 
