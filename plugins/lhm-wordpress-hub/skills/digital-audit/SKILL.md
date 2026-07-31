@@ -33,7 +33,7 @@ The Google Analytics connector is a fixed server name (`analytics-mcp`) and can 
 
 For the matched `property_id`:
 
-1. **Receiving data**: `run_report` with `date_ranges: [{start_date: "30daysAgo", end_date: "today"}]`, `metrics: ["activeUsers", "sessions"]`. Pass if either metric is non-zero.
+1. **Receiving data**: `run_report` with `date_ranges: [{start_date: "30daysAgo", end_date: "today"}]`, `dimensions: ["date"]` (this tool rejects a dimension-less request — a pure-metrics call errors out even though the underlying GA4 Data API allows it), `metrics: ["activeUsers", "sessions"]`, `order_bys` on `sessions` descending, `limit: 1`. Pass if `row_count` is non-zero and the top row's metrics are non-zero.
 2. **Conversion / key events**: `run_report` with `dimensions: ["eventName"]`, `metrics: ["eventCount", "conversions"]`, same date range. Rows where the `conversions` metric is greater than zero are the actual marked key events (this is how GA4's Data API distinguishes key events from regular events — the `conversions` metric only counts events marked as key events). List them by name. Flag if none exist.
 3. **Google Ads link**: `list_google_ads_links` for the property. Pass if at least one link exists — note this is only relevant if the client runs Google Ads (check `client_profile.md` or ask if unsure).
 
