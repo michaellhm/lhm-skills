@@ -97,7 +97,7 @@
       "name": "lhm-client-updates-hub",
       "source": "./plugins/lhm-client-updates-hub",
       "description": "Client communication and meeting-wrap plugin. Fathom meeting debriefs with BasicOps sync and team notifications, client data change propagation with reversed-decision detection, and client-facing update emails.",
-      "version": "1.1.10",
+      "version": "1.1.11",
       "category": "utilities",
       "tags": [
         "client-communication",

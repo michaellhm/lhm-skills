@@ -263,7 +263,7 @@ If BasicOps MCP isn't authorized, skip this step entirely and tell the user: "Ba
 
 For every item in Step 2's "Skill triggers" list, plus any downstream implications Step 3.5 handed back from a `client-update` detour, identify the concrete task, classify it, and act on that classification. There is no approval gate in this step: the classification itself is the safety mechanism (see 5b). If there is nothing to route, say so in one line and move to Step 6.
 
-This step is about doing the work, or kicking it off. BasicOps bookkeeping — subtasks, discussion messages, file attachments, assignment — all happens in Step 6, once this step knows what it's dealing with.
+This step is about doing the work. BasicOps bookkeeping — subtasks, discussion messages, file attachments, assignment — all happens in Step 6, once this step knows what it's dealing with.
 
 ### 5a. Identify the task
 
@@ -313,7 +313,7 @@ Do not dispatch the `content` agent for this trigger. Writing the actual brief o
 ### 5c. Act on the classification
 
 - **Direct:** run the check now and hold the answer for Step 6 to record. If the tool this needs isn't connected, note "needs manual check" for Step 7's email instead of blocking the rest of this step.
-- **Auto-run:** dispatch the specialist agent via the Agent tool with `run_in_background: true`. Dispatch every auto-run task for the meeting in parallel, in a single message. The agent keeps running after this step ends; its result lands later (Step 6) as a follow-up message on its subtask, whenever it finishes.
+- **Auto-run:** dispatch the specialist agent via the Agent tool in the foreground (not `run_in_background`). Dispatch every auto-run task for the meeting in parallel, in a single message, multiple tool calls in the same turn, so they run concurrently. Do not move on to Step 6 until every dispatched auto-run task has returned; the actual result needs to be in hand before the BasicOps subtask gets created.
 - **Handoff-prompt:** write the plan file to `[client-folder]/meeting-wraps/YYYY-MM-DD/<slug>-plan.md`:
 
 ```markdown
