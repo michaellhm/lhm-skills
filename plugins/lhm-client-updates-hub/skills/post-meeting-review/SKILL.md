@@ -1,6 +1,6 @@
 ---
 name: post-meeting-review
-description: "Debrief a client meeting and update all client state files, sync follow-up work to BasicOps with context, and draft a team update email. Use this after any client call or meeting, or when the user says 'meeting wrap'. Pulls the Fathom transcript, extracts decisions and action items, updates goals.md, current-projects.md, client_profile.md, and the client's meeting notes folder, sweeps the whole client folder for artefacts the meeting's decisions invalidate, moves the client's BasicOps card to Follow Up with a Meeting Notes subtask, creates briefed follow-up subtasks under it (client-owed items get their own subtask too, always routed to Kristalyn for follow-up), identifies and routes any follow-on work the meeting generates to the right specialist agent (research and drafts run automatically, live-system changes get a ready-to-run plan you can resume in a fresh session), and drafts a team summary email. Triggers on: 'we just had a meeting', 'meeting notes', 'Fathom', 'post-meeting', 'client call debrief', 'update from meeting', 'meeting wrap'."
+description: "Debrief a client meeting and update all client state files, sync follow-up work to BasicOps with context, and draft a team update email. Use this after any client call or meeting, or when the user says 'meeting wrap'. Pulls the Fathom transcript, extracts decisions and action items, updates goals.md, current-projects.md, client_profile.md, and the client's meeting notes folder, sweeps the whole client folder for artefacts the meeting's decisions invalidate, moves the client's BasicOps card to Follow Up with the meeting context posted to it directly, creates briefed follow-up subtasks under it (client-owed items get their own subtask too, always routed to Kristalyn for follow-up), identifies and routes any follow-on work the meeting generates to the right specialist agent (research and drafts run automatically, live-system changes get a ready-to-run plan you can resume in a fresh session), and drafts a team summary email. Triggers on: 'we just had a meeting', 'meeting notes', 'Fathom', 'post-meeting', 'client call debrief', 'update from meeting', 'meeting wrap'."
 ---
 
 # Post-Meeting Review
@@ -191,7 +191,7 @@ Board: `*Client Flow` (project ID `68655`). Sections: `Follow Up` (ID `107750`),
 
 ### Formatting discussion messages
 
-Structure every labeled briefing as HTML blocks, not one flowing paragraph. Each labeled field gets its own `<p><strong>Label:</strong> content</p>`. A field with more than one item (decisions, risks, action items) becomes a list instead of a semicolon-joined sentence:
+Structure every labeled briefing as short, scannable HTML — dot points, not paragraphs, and no more fields than the task needs. Each labeled field gets its own `<p><strong>Label:</strong></p>` followed by a `<ul>` of terse bullets, even when there's only one point to make:
 
 ```html
 <p><strong>Label:</strong></p>
@@ -201,7 +201,11 @@ Structure every labeled briefing as HTML blocks, not one flowing paragraph. Each
 </ul>
 ```
 
-This applies to every structured briefing this skill posts: 4b's session trace (worked example below), 4c and 4d's task briefings, Step 6's dispatch briefing and plan summary, and 5b's Briefly Prep output. Free-flowing prose (4b's Meeting Notes briefing) keeps its own `<p>` breaks between distinct ideas, but doesn't get the label/list treatment — it isn't a checklist.
+**Task briefings carry exactly two labeled fields: Why it matters and What done looks like.** Nothing else goes in this message. Fold whatever background is essential into the Why it matters bullets rather than adding a third field, and keep the bullets short — this is a briefing, not a transcript.
+
+**Judgment calls get their own message, not a third field.** When there's a decision the assignee should surface rather than make alone, post it as a separate discussion message straight after the briefing — a plain bullet list under `<p><strong>Judgment calls:</strong></p>`, nothing else. Skip the message entirely when there's nothing to flag; don't manufacture one to fill the slot.
+
+This applies to every structured briefing this skill posts: 4b's session trace (worked example below), 4c and 4d's task briefings, Step 6's dispatch briefing and plan summary, and 5b's Briefly Prep output. Free-flowing prose (4b's meeting briefing on the client card) keeps its own `<p>` breaks between distinct ideas — it's a narrative record, not a checklist, so it doesn't get the label/list treatment.
 
 ### 4a. Find the client card
 
@@ -211,12 +215,13 @@ Call `list_tasks_in_project` with `projectId: 68655` and `filter_title` set to t
 - **One match:** that's the card. Continue to 4b.
 - **Multiple matches:** list them (title + URL from `link_to_task`) and ask the user which one is the client's card.
 
-### 4b. Move the card and add the Meeting Notes subtask
+### 4b. Move the card and post the meeting context
+
+The client card is the main task for this meeting — there's no separate Meeting Notes subtask. Everything about the meeting itself lands on the card directly.
 
 1. `update_task` with `taskId: <card id>`, `section: 107750`, which moves the card to Follow Up.
-2. `create_task` with `projectId: 68655`, `parentTaskId: <card id>`, `section: 107750`, `title: "<Acronym> - Meeting Notes - <Month Day>"` (e.g. `"YSP - Meeting Notes - 27 July"` — `<Acronym>` is the client's short-code from `client_profile.md`, resolved in Step 3). Put a single line in `description` (e.g. "Digital catch-up with Nick and Steve, 27 July") and nothing more.
-3. `create_message_in_task` on the new subtask with the actual briefing. This is where the substance goes: what was discussed, decisions made and why, wins and good news, relevant background, and the Fathom link plus the local meeting notes path. Write it as prose for a colleague who wasn't in the room, not as a transcript dump. This is the "why" behind the tasks created in 4c.
-4. `create_message_in_task` on the **client card itself** (`taskId: <card id>`) with a session trace covering decisions and their trade-offs, open risks, what is now in progress, and anything parked. The card then carries its own history, so anyone landing on it later can see how the project got here without reading back through six months of meeting notes. Format per the discussion-message rule above — decisions as a list, everything else as its own paragraph:
+2. `create_message_in_task` on the **client card** (`taskId: <card id>`) with the meeting briefing: what was discussed, decisions made and why, wins and good news, relevant background, and the Fathom link plus the local meeting notes path. Write it as prose for a colleague who wasn't in the room, not as a transcript dump. This is the "why" behind the tasks created in 4c.
+3. `create_message_in_task` on the client card, as a second message, with a session trace covering decisions and their trade-offs, open risks, what is now in progress, and anything parked. The card then carries its own history, so anyone landing on it later can see how the project got here without reading back through six months of meeting notes. Format per the discussion-message rule above — decisions as a list, everything else as its own paragraph:
 
 ```html
 <p><strong>Decided:</strong></p>
@@ -239,18 +244,19 @@ Call `list_tasks_in_project` with `projectId: 68655` and `filter_title` set to t
 For each **LHM-owned** action item from Step 2. Client-owed action items get their own subtask too, but in 4d, not here, with a different owner and framing.
 
 1. `create_task` with `projectId: 68655`, **`parentTaskId: <card id>`**, `section: 107750`, `title: "<Acronym> - Action - <task>"` (`<Acronym>` per Step 3 — this replaces the board's older `Client — task` title convention). These are **subtasks under the client card**, not standalone tasks floating in the section. The card is the client's home and everything hangs off it. Put at most one line in `description`.
-2. `create_message_in_task` with `taskId: <new task id>` containing the full briefing: why it matters (with the relevant quote or decision from the meeting), the background they need, what done looks like, and which judgement calls to surface rather than decide alone. Brief them like a capable colleague who wasn't in the room. Include the Meeting Notes subtask's link (from `link_to_task` on the id created in 4b) and the local path to the meeting notes file. Format per the discussion-message rule above.
-3. Ask the user who should be assigned, rather than assuming. Batch this into a single `AskUserQuestion` with the tasks grouped into sensible clusters instead of asking once per task. Once answered, call `update_task` with `taskId` and `assignee` set. (`@mentions` inside task messages aren't confirmed to trigger real BasicOps notifications, so the `assignee` field is the reliable mechanism.)
-4. **Answers carry instruction beyond a name more often than not.** Real examples: "fold this into the landing page build", "X should be notified even though it isn't theirs", "they already have access, go through my account", "this one's urgent, the rest can wait". The `assignee` field loses all of that. Post it as a follow-up discussion message on the task.
+2. `create_message_in_task` with `taskId: <new task id>` containing the briefing: **Why it matters** (the relevant quote or decision from the meeting, plus a link to the client card and the local meeting notes path) and **What done looks like**. Two fields, each a short bullet list — brief them like a capable colleague who wasn't in the room, but get to the point. Format per the discussion-message rule above.
+3. If there's a judgment call to surface — something the assignee should flag rather than decide alone — post it as a second discussion message per the Judgment calls rule above. Skip it if there isn't one.
+4. Ask the user who should be assigned, rather than assuming. Batch this into a single `AskUserQuestion` with the tasks grouped into sensible clusters instead of asking once per task. Once answered, call `update_task` with `taskId` and `assignee` set. (`@mentions` inside task messages aren't confirmed to trigger real BasicOps notifications, so the `assignee` field is the reliable mechanism.)
+5. **Answers carry instruction beyond a name more often than not.** Real examples: "fold this into the landing page build", "X should be notified even though it isn't theirs", "they already have access, go through my account", "this one's urgent, the rest can wait". The `assignee` field loses all of that. Post it as a follow-up discussion message on the task.
 
-**No-card mode.** If 4a found no card and the user declined to create one, drop `parentTaskId` and create the tasks directly in section `107750`. Everything else in 4c still applies: the full briefing still goes in the discussion, and the assignment question is still asked. Omit the Meeting Notes subtask link, since 4b did not run, and point at the local meeting notes path instead.
+**No-card mode.** If 4a found no card and the user declined to create one, drop `parentTaskId` and create the tasks directly in section `107750`. Everything else in 4c still applies: the briefing still goes in the discussion, and the assignment question is still asked. Omit the card link, since there's no card in no-card mode, and point at the local meeting notes path instead.
 
 ### 4d. Create client follow-up subtasks
 
 For each **client-owed** action item from Step 2 — these used to stay in the meeting notes file only; now they also get a BasicOps trail so someone is actually chasing them.
 
 1. `create_task` with `projectId: 68655`, `parentTaskId: <card id>`, `section: 107750`, `title: "<Acronym> - Client - <task>"`. Put at most one line in `description`.
-2. `create_message_in_task` with the briefing: what's needed from the client (the specific asset, document, or approval), why it matters (what it's blocking), and the meeting context. Frame it as "chase the client for X," not "do X" — Kristalyn's job here is follow-up, not execution. Format per the discussion-message rule above.
+2. `create_message_in_task` with the briefing: **Why it matters** (what's needed from the client — the specific asset, document, or approval — and what it's blocking) and **What done looks like** (the client has supplied it). Two fields, each a short bullet list. Frame it as "chase the client for X," not "do X" — Kristalyn's job here is follow-up, not execution. Format per the discussion-message rule above.
 3. `update_task` with `taskId: <new task id>`, `assignee` set to Kristalyn (`kristalyn@localhealthmarketing.com.au`; if the `assignee` field needs a BasicOps user id rather than an email, resolve it via `list_users` first). No assignment question for these, unlike 4c and Step 6 — chasing clients for outstanding items is always Kristalyn's, every meeting.
 
 **No-card mode.** Same as 4c: if 4a found no card and the user declined to create one, drop `parentTaskId` and create these directly in section `107750`.
@@ -333,6 +339,8 @@ Do not dispatch the `content` agent for this trigger. Writing the actual brief o
 [Anything the human running this should surface rather than assume]
 ```
 
+Keep every section to short bullet points, not prose. This file gets inlined into the Resume prompt verbatim, so wordiness here becomes wordiness in what the human pastes into a fresh session.
+
 Then build the Resume prompt: plain text, ready to paste into a fresh Claude Code or ChatGPT session, coaching-framed so the human keeps their own hands on anything touching a live client system, with the plan file's contents inlined in full, not just linked (ChatGPT can't read the local filesystem, and the prompt needs to work identically on either platform):
 
 ```
@@ -353,9 +361,9 @@ Same shape as Step 4, applied to Step 5's output instead of the meeting's action
 
 **Direct tier:** post the answer, already in hand from 5c, to the subtask discussion. Nothing further to track; there's no pending work to follow up on.
 
-**Auto-run tier:** by the time this step runs, 5c has already waited for the dispatched agent to finish, so the result is in hand. Post the dispatch context to the discussion first (why it matters, background, what done looks like — the same fields 4c already uses, formatted per the discussion-message rule), then immediately post the agent's actual output as a second discussion message right after it. Attach any generated files (keyword CSVs, ad copy CSVs, content drafts) via `add_file_to_task`, save a copy to `[client-folder]/meeting-wraps/YYYY-MM-DD/`, and add a one-line pointer on the client card so the result is visible without opening every subtask. If the agent failed instead of completing, that's already known at this point, so put what was attempted and what broke straight into the result message rather than the dispatch context.
+**Auto-run tier:** by the time this step runs, 5c has already waited for the dispatched agent to finish, so the result is in hand. Post the dispatch context to the discussion first (**Why it matters** and **What done looks like** — the same two fields 4c uses, formatted per the discussion-message rule), then immediately post the agent's actual output as the next discussion message. If there's a judgment call in the result, post it as its own message per the Judgment calls rule above, right after the output. Attach any generated files (keyword CSVs, ad copy CSVs, content drafts) via `add_file_to_task`, save a copy to `[client-folder]/meeting-wraps/YYYY-MM-DD/`, and add a one-line pointer on the client card so the result is visible without opening every subtask. If the agent failed instead of completing, that's already known at this point, so put what was attempted and what broke straight into the result message rather than the dispatch context.
 
-Also judge whether the completed output implies a concrete, specific next live-system step: keyword research and ad copy drafting naturally continues into "push these live"; a pure research or competitive-analysis task usually doesn't have one. If it does, post a third discussion message with a Resume prompt in the same coaching-framed shape 5c builds for handoff-prompt tier, referencing the actual deliverable that just landed rather than the plan template's placeholders:
+Also judge whether the completed output implies a concrete, specific next live-system step: keyword research and ad copy drafting naturally continues into "push these live"; a pure research or competitive-analysis task usually doesn't have one. If it does, post one more discussion message with a Resume prompt in the same coaching-framed shape 5c builds for handoff-prompt tier, referencing the actual deliverable that just landed rather than the plan template's placeholders:
 
 ```
 I now need to [concrete next action] for [Client].
@@ -369,7 +377,7 @@ Coach me through doing this myself, step by step — don't do it for me.
 
 Skip this entirely when there's no clear next step rather than inventing one.
 
-**Handoff-prompt tier:** post two discussion messages, not one. First, the plan summary (why it matters, background, what done looks like — same fields 4c already uses, formatted per the discussion-message rule). Second, a separate message with the Resume prompt built in 5c (plan file contents inlined, not just linked), wrapped in a `<pre>` block so the raw-HTML field preserves line breaks and spacing, with the plan's angle-bracket placeholders HTML-escaped first so they don't get swallowed as unrecognized tags. Keeping it a separate message means it can be selected and copied without scrolling past the plan summary's prose.
+**Handoff-prompt tier:** post up to three discussion messages. First, the plan summary — **Why it matters** and **What done looks like** only, each a short bullet list (formatted per the discussion-message rule), plus the local path to the plan file for anyone who wants the full background. Second, if the plan flags a judgment call, a **Judgment calls** message per the rule above — skip it if there isn't one. Third, the Resume prompt built in 5c (plan file contents inlined, not just linked), wrapped in a `<pre>` block so the raw-HTML field preserves line breaks and spacing, with the plan's angle-bracket placeholders HTML-escaped first so they don't get swallowed as unrecognized tags. Keeping the prompt its own message means it can be selected and copied without scrolling past the rest.
 
 **Assignment:** once all of this step's new subtasks exist, batch-ask who's assigned, same `AskUserQuestion` pattern Step 4c already uses. This only covers this step's own new subtasks; Step 4's are assigned within Step 4 itself and are not revisited here. Tasks that matched an existing Step 4 subtask (5a.5) keep that subtask's existing assignee.
 
