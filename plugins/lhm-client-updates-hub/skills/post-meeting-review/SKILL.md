@@ -285,7 +285,7 @@ Two questions decide where a task lands:
 | | Artifact / answer only | Mutates a live system |
 |---|---|---|
 | **No agent needed** | **Direct** — do it now, in this session | (does not occur — live mutations always need a specialist agent) |
-| **Needs a specialist agent** | **Auto-run** — dispatch a background specialist agent | **Handoff-prompt** — prepare a plan and a prompt, a human executes elsewhere |
+| **Needs a specialist agent** | **Auto-run** — dispatch a specialist agent and wait for the result | **Handoff-prompt** — prepare a plan and a prompt, a human executes elsewhere |
 
 Tiering is **per task, not per agent** — the same agent can produce both an auto-run task and a handoff-prompt task depending on what's being asked. `google-ads` is the clearest example: keyword research and ad copy drafting for a new ad group is auto-run (the output is a CSV, nothing in the account changes); submitting that ad group or changing a budget is handoff-prompt.
 
@@ -313,7 +313,7 @@ Do not dispatch the `content` agent for this trigger. Writing the actual brief o
 ### 5c. Act on the classification
 
 - **Direct:** run the check now and hold the answer for Step 6 to record. If the tool this needs isn't connected, note "needs manual check" for Step 7's email instead of blocking the rest of this step.
-- **Auto-run:** dispatch the specialist agent via the Agent tool in the foreground (not `run_in_background`). Dispatch every auto-run task for the meeting in parallel, in a single message, multiple tool calls in the same turn, so they run concurrently. Do not move on to Step 6 until every dispatched auto-run task has returned; the actual result needs to be in hand before the BasicOps subtask gets created.
+- **Auto-run:** dispatch the specialist agent via the Agent tool with `run_in_background: false` (the Agent tool backgrounds by default, so this must be passed explicitly, not just omitted). Dispatch every auto-run task for the meeting in parallel, in a single message, multiple tool calls in the same turn, so they run concurrently. Do not move on to Step 6 until every dispatched auto-run task has returned; the actual result needs to be in hand before the BasicOps subtask gets created.
 - **Handoff-prompt:** write the plan file to `[client-folder]/meeting-wraps/YYYY-MM-DD/<slug>-plan.md`:
 
 ```markdown
