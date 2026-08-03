@@ -15,10 +15,14 @@ If the user's request clearly targets a standalone skill rather than a full work
 |---|---|
 | "contact form", "form submissions", "wire up forms", "set up form handling", "Cloudflare forms", "D1 submissions", "Turnstile" | `contact-form-submissions` skill |
 | "QA checklist", "run the QA", "pre-launch checklist", "site QA", "launch checklist", "quality assurance", "ready to go live checklist" | `site-launch-qa` skill |
+| "start client onboarding", "new client data gathering", "set up new client folder", "collect client access", "chase client for credentials", "data gathering for [client]" | `client-data-collection` skill |
+| "digital audit", "audit analytics", "check GA4 setup", "check tracking", "verify conversions", "digital audit for [client]" | `digital-audit` skill |
 
 For a standalone route: tell the user what you're loading, then load the relevant skill file and follow it:
 - Contact forms → `${CLAUDE_PLUGIN_ROOT}/skills/contact-form-submissions/SKILL.md`
 - QA checklist → `${CLAUDE_PLUGIN_ROOT}/skills/site-launch-qa/SKILL.md`
+- Client data collection → `${CLAUDE_PLUGIN_ROOT}/skills/client-data-collection/SKILL.md`
+- Digital audit → `${CLAUDE_PLUGIN_ROOT}/skills/digital-audit/SKILL.md`
 
 ---
 
@@ -116,3 +120,5 @@ Do not ask which pages belong in the prototype at kickoff. Michael chooses the p
 |---|---|
 | `contact-form-submissions` | User asks about contact forms, D1 form storage, Turnstile, or form email notifications |
 | `site-launch-qa` | User asks about the QA checklist, pre-launch checks, running QA, or going live |
+| `client-data-collection` | User wants to start data gathering for a new client, set up their Drive folder/BasicOps task, or chase them for access/credentials |
+| `digital-audit` | User wants to check a client's GA4 setup, verify conversion tracking, or run the digital audit |

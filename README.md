@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-115 skills across seven Claude Code plugins (51 marketing, 28 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+123 skills across seven Claude Code plugins (52 marketing, 35 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -28,7 +28,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/content.md                     # Self-sufficient content specialist
   agents/wordpress.md                   # Self-sufficient WordPress specialist
   agents/marketing-assistant.md         # (legacy alias) — routes to start agent
-  skills/                              # All 51 skills
+  skills/                              # All 52 skills
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
     bid-budget-optimizer/              # Budget and bid strategy
@@ -70,10 +70,12 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     wordpress-builder.md                # Phase E — theme scaffold and page build
     site-ops.md                         # Phase F — performance and security
     site-extension.md                   # Post-launch page management
-  skills/                               # All 32 skills
+  skills/                               # All 35 skills
     wp-start/                           # Entry point — /wp-start command
     wp-project-setup/                   # Initialize project folder structure (platform choice)
     wp-project-manager/                 # PM doc — create, read, mark complete, gate-check
+    client-data-collection/             # Phase 0 — Drive folder, BasicOps checklist, data-gathering email, weekly follow-up
+    digital-audit/                      # Phase 4 — GA4 checks (data, key events, Ads link) + manual GTM/GSC checklist
     client-context-intake/              # Extract facts from call notes
     sitemap-architect/                  # Site IA and keyword map
     page-brief-generator/               # Per-page content briefs
@@ -103,6 +105,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     lp-subsite-deploy/                  # Deploy subsite from Docker to live server
     wp-ssh-deploy/                      # General WordPress SSH deployment
     contact-form-submissions/           # Cloudflare Pages forms — D1, Turnstile, private R2 uploads, email, admin
+    rankmath-redirects/                 # Rank Math 301 redirect creation, import, cleanup, and verification
 plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
   .claude-plugin/plugin.json            # Plugin manifest
   agents/                               # 6 agents
@@ -192,7 +195,7 @@ plugins/lhm-client-updates-hub/       # Client communication & meeting-wrap plug
 
 ### WordPress Hub
 
-**Website Build Pipeline** (19 skills): Project setup (with WordPress/Astro platform choice), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), and the pre-launch QA checklist (automated + guided, for both WordPress and Astro).
+**Website Build Pipeline** (22 skills): Project setup (with WordPress/Astro platform choice), Phase 0 client data collection (Drive folder, BasicOps access checklist, data-gathering email, weekly automated follow-up), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), the pre-launch QA checklist (automated + guided, for both WordPress and Astro), Rank Math 301 redirect management, and the Phase 4 digital audit (automated GA4 checks — data, key events, Ads link — plus a manual GTM/Search Console checklist).
 
 **Git Repo Workflow** (2 skills): First-time client repo setup — creates GitHub repos, scaffolds docs/ context folder, commits initial scaffold (`repo-init`). Clones an existing client project onto a new machine or pulls the latest (`repo-install`).
 
