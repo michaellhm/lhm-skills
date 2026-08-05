@@ -54,9 +54,14 @@ If the page fails to load, stop and tell the user the site is not reachable at t
 
 ### 1.5 Favicon
 
-- Use `browser_evaluate` to check `document.querySelector("link[rel*='icon']")` returns a result
-- **Pass**: Favicon link tag present
-- **Fail**: No favicon link tag
+- Use `browser_evaluate` to extract every `link[rel~='icon']` and `link[rel='apple-touch-icon']`, including resolved `href`, `type`, and `sizes`
+- Confirm at least one standard favicon is linked from the document head
+- Request every linked icon URL and confirm it returns a successful response with an image content type
+- For Astro sites, confirm the icon is client-branded and is not Astro's default starter favicon (inspect the asset name/content or compare it with the scaffolded default)
+- Record Apple touch icon absence as a warning; fail it when the build standard or approved design explicitly requires one
+- **Pass**: Branded favicon link present and its asset loads successfully
+- **Fail**: Link missing, asset broken/non-image, or framework/template default still in use
+- **Warning**: Branded favicon works but Apple touch icon is absent
 
 ### 1.6 Console Errors
 
@@ -129,6 +134,7 @@ If the page fails to load, stop and tell the user the site is not reachable at t
 **Astro only:**
 - Check for `_astro/` asset paths in page source (confirms build output is serving correctly)
 - Check `browser_console_messages` for hydration errors
+- Test production redirect URLs directly. On Cloudflare Pages, verify a Pages Function is not intercepting a path that should be handled by `public/_redirects`.
 
 ---
 

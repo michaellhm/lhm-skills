@@ -171,7 +171,15 @@ h1, h2, h3, h4, h5, h6 {
 
 ### `src/components/BaseHead.astro`
 
-Create this component to own all `<head>` content. Populate from `client_profile.md` (business name, site URL):
+Create this component to own all `<head>` content. Populate from `client_profile.md` (business name, site URL).
+
+Before wiring the component:
+- Replace Astro's default favicon with a favicon based on the approved client brand.
+- Add `public/favicon.svg`, `public/favicon.ico` (fallback), and `public/apple-touch-icon.png`.
+- Do not ship the Astro logo or another framework/template favicon.
+- Use the shared head component so favicon markup appears on every page.
+
+Then add the favicon links alongside the other site-wide metadata:
 
 ```astro
 ---
@@ -192,6 +200,9 @@ const siteTitle = '[Client Business Name]'  // from client_profile.md
 <meta name="description" content={description} />
 <link rel="canonical" href={canonicalURL} />
 <link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
 <meta property="og:type" content="website" />
 <meta property="og:url" content={canonicalURL} />

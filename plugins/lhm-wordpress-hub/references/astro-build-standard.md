@@ -15,7 +15,9 @@ This is the working reference for how LHM Astro projects are structured, how pro
 <client>-site/
   public/
     robots.txt                  ← static file, ships as-is
-    favicon.svg
+    favicon.svg                 ← branded primary favicon; never ship Astro's default
+    favicon.ico                 ← browser fallback
+    apple-touch-icon.png        ← iOS home-screen icon
   src/
     assets/                     ← hero images, post images — go through image pipeline
     components/
@@ -402,6 +404,9 @@ const siteTitle = 'Client Name'
 <title>{title} | {siteTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonicalURL} />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
@@ -460,6 +465,16 @@ For multi-location businesses, generate one `LocalBusiness` block per location a
 - Title tags: unique per page, front-load the meaningful word (service or location name first)
 - Meta descriptions: 120–155 characters, written for humans reading search results, not stuffed with keywords
 - Canonical: always set via `canonicalURL={Astro.url.href}` — never let it default to something ambiguous
+
+### 5.4 Favicons and touch icons
+
+Every build must replace Astro's starter favicon with assets based on the approved client brand:
+
+- `public/favicon.svg` — primary scalable browser icon
+- `public/favicon.ico` — fallback for older browsers and crawlers
+- `public/apple-touch-icon.png` — square PNG for iOS home screens
+
+Reference all three from `BaseHead.astro` so they appear site-wide. Do not retain the Astro logo or any other framework/template icon. After building, confirm the files exist in `dist/` and that each linked production URL returns a successful response.
 
 ---
 
@@ -536,6 +551,7 @@ For multi-location businesses, generate one `LocalBusiness` block per location a
 - Validate internal links post-build (e.g. with `muffet` or a custom script against `dist/`).
 - TypeScript errors at build time, not in production — run `astro check` in CI.
 - Verify `sitemap-index.xml` exists in `dist/` after every build.
+- Verify favicon and Apple touch icon files exist in `dist/`, are linked from the shared head, load successfully, and are not framework defaults.
 - Flip `robots.txt` from staging to production before DNS cutover.
 
 ---

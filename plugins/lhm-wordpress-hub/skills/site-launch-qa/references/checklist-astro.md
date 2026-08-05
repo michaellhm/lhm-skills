@@ -49,8 +49,8 @@ Full item list for Astro static/SSR sites deployed to Vercel or Netlify. Used by
 
 | Item | How to Check |
 |------|-------------|
-| Redirects configured in `vercel.json` or `netlify.toml` | Open the config file — confirm all old URLs have redirect rules |
-| Old URLs redirect correctly (301) | Test old/legacy URLs in browser — confirm 301 redirects fire |
+| Redirects configured for the actual host | Check `vercel.json`, `netlify.toml`, Astro redirects, or Cloudflare Pages `public/_redirects` / Functions as applicable |
+| Old URLs redirect correctly (301) | Test old/legacy URLs against production and inspect the full redirect chain. On Cloudflare Pages, confirm a matching Pages Function does not override `_redirects`. |
 | Clean URLs in place (no `.html` extensions) | Astro generates clean URLs by default with `trailingSlash` config |
 | All URL variants redirect to canonical | Test http://, www., and non-www — all should land at the canonical https://non-www version |
 | Dynamic routes working correctly | Test any `[slug].astro` pages with real and invalid slugs |
@@ -103,7 +103,7 @@ Full item list for Astro static/SSR sites deployed to Vercel or Netlify. Used by
 | Edge | Open site in Edge |
 | iOS real device | Open in Safari on iPhone — check layout, tap targets, forms |
 | Android real device | Open in Chrome on Android |
-| Favicon present | Check browser tab. Add touch icon meta tag for iOS home screen |
+| Branded favicon and touch icon present | Inspect icon link tags, request every linked asset and confirm a successful image response. Confirm the favicon is client-branded rather than Astro's starter icon. Add an Apple touch icon for iOS home screens. |
 
 ---
 
