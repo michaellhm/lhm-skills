@@ -3,7 +3,7 @@
 | Rhythm | What | Owner |
 |---|---|---|
 | Same business day | Reply to client emails | Whoever received it |
-| Within 24h of a meeting | Meeting-wrap email to client (post-meeting-review) | Meeting attendee |
+| Within 24h of a meeting | Meeting-wrap email to client (client-meeting-email) | Meeting attendee |
 | Every 48h | Chase outstanding client approvals (ad copy, LP copy, designs) | KP |
 | 3 days after expected first charge | GoCardless payment check | Josephine |
 | Weekly (every 7 days) during first 30 days | Client progress update (completed / next / approvals needed) | KP |

@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-142 skills across nine Claude Code plugins (52 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 16 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+143 skills across nine Claude Code plugins (52 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 17 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -167,7 +167,7 @@ plugins/lhm-client-updates-hub/       # (deprecated — skills migrated to lhm-p
 plugins/lhm-project-hub/              # Agency process hub — sales handover through monthly/quarterly reviews
   .claude-plugin/plugin.json            # Plugin manifest
   agents/pm-orchestrator.md             # Main entry point — reads client state, flags cadence breaches, routes to the right skill
-  skills/                               # All 16 skills
+  skills/                               # All 17 skills
     sales-handover/                     # Hand a newly-closed client from sales to delivery
     client-onboarding/                  # Tier 1 onboarding pipeline — 4 phases, resumable
     website-kickoff/                    # New website build kickoff (WordPress or Astro) → handoff to WordPress hub
@@ -178,6 +178,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     google-ads-kickoff/                 # New Google Ads campaign build kickoff — gates on conversion tracking
     monthly-review/                     # Monthly per-client review engine (3 modes: wrap, prep, account review)
     quarterly-review/                   # Quarterly strategy review — 3-month data pull + next-quarter plan
+    client-meeting-email/               # Client-ready meeting follow-up email from Fathom summary + transcript
     post-meeting-review/                # Fathom meeting debrief — state files, BasicOps sync, team email (migrated from client updates hub; shim remains)
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
@@ -257,7 +258,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 **Delivery Kickoffs** (6 skills): Website build kickoff (WordPress or Astro), PPC landing page campaign kickoff, SEO engagement kickoff, GMB/local SEO cycle kickoff, blog/article content pipeline kickoff, and Google Ads campaign build kickoff (gated on conversion tracking being live). Each follows the same shared pattern: intake, a project-management state file, a BasicOps scaffold with backwards-scheduled milestones, a client kickoff email, and handoff to the delivery specialist hub.
 
-**Client Success** (5 skills): Monthly per-client review engine with three modes (KP wrap-up, meeting prep, full account review). Quarterly strategy review — pulls three months of GA4/Ads/GSC data plus the quarter's monthly reports and drafts the next 3/6-month plan. Post-meeting debrief from Fathom transcripts — updates client state files, syncs follow-up work to BasicOps with context, routes follow-on work to the right specialist, drafts a team summary email (migrated from Client Updates Hub). Propagates a client data change across every file that references it (migrated from Client Updates Hub). Plain-language client-facing update emails after completing work (migrated from Client Updates Hub).
+**Client Success** (6 skills): Monthly per-client review engine with three modes (KP wrap-up, meeting prep, full account review). Quarterly strategy review — pulls three months of GA4/Ads/GSC data plus the quarter's monthly reports and drafts the next 3/6-month plan. Client-ready meeting follow-up email — turns the Fathom summary and transcript into a polished Gmail-ready wrap with decisions verified against the transcript, action items grouped by owner, and next steps. Post-meeting debrief from Fathom transcripts — updates client state files, syncs follow-up work to BasicOps with context, routes follow-on work to the right specialist, drafts a team summary email (migrated from Client Updates Hub). Propagates a client data change across every file that references it (migrated from Client Updates Hub). Plain-language client-facing update emails after completing work (migrated from Client Updates Hub).
 
 **Project Managers** (3 skills): Website build PM doc, landing page campaign PM doc, and GMB optimisation cycle PM doc — all migrated from their originating hubs (WordPress hub, WordPress hub, GMB hub respectively); shims remain in place there so existing routing keeps working.
 

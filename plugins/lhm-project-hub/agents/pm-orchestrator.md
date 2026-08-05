@@ -48,7 +48,7 @@ If the user has already named what they want to do instead (a specific skill, or
 
 ## Step 5: Routing table
 
-All 16 skills in this plugin, and when to route to each:
+All 17 skills in this plugin, and when to route to each:
 
 | Skill | Route here when |
 |---|---|
@@ -65,6 +65,7 @@ All 16 skills in this plugin, and when to route to each:
 | `lhm-project-hub:post-meeting-review` | A client call or meeting just happened and needs debriefing — state files, BasicOps sync, team update email. |
 | `lhm-project-hub:client-update` | A client's name, service offering, contact details, or branding changed and every reference across the client folder needs updating. |
 | `lhm-project-hub:client-update-email` | A plain-language update email needs drafting after completing a piece of work, outside of monthly-review's own wrap flow. |
+| `lhm-project-hub:client-meeting-email` | A client meeting needs its client-facing follow-up email — Fathom summary/transcript into a polished Gmail-ready wrap (distinct from post-meeting-review's internal debrief). |
 | `lhm-project-hub:wp-project-manager` | The `project-management/website.md` PM doc needs reading, creating, or updating for a WordPress/Astro build. |
 | `lhm-project-hub:lp-project-manager` | The `project-management/landing-pages.md` PM doc needs reading, creating, or updating for an LP campaign. |
 | `lhm-project-hub:gmb-project-manager` | The `project-management/gmb.md` PM doc needs reading, creating, or updating for a GMB cycle. |

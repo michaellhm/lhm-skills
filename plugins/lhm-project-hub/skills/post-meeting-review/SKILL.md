@@ -402,6 +402,8 @@ If the user asks for a different channel (Mailgun via Zapier, for example), warn
 
 If Gmail MCP isn't authorized, skip this step and tell the user the team email needs to be sent manually.
 
+After the team email, offer the client-facing follow-up: "Want me to draft the client wrap email too?" On yes, run `lhm-project-hub:client-meeting-email` — it reuses the same Fathom summary and transcript, so pass along the meeting reference rather than re-fetching. The 24-hour client wrap SLA (references/cadences.md) is met by that skill, not this one.
+
 ## Step 8: Self-improvement
 
 Three things to offer at the end of the run:
