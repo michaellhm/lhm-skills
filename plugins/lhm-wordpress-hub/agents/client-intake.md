@@ -75,4 +75,4 @@ Options:
 
 ## Phase Boundary Note
 
-Phase 1 ends at Step 1.5. After Michael's approval, the wp-project-manager skill (Mode 1) is invoked via Superpowers to set up the `wordpress/` project folder structure before Phase 2 begins.
+Phase 1 ends at Step 1.5. After Michael's approval, the `lhm-project-hub:wp-project-manager` skill (Mode 1) is invoked via Superpowers to set up the `wordpress/` project folder structure before Phase 2 begins.

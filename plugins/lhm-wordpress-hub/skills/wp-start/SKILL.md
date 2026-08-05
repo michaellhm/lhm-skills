@@ -32,8 +32,8 @@ Use Glob to inspect the current working directory and any client folders detecte
 
 | Signal | Workflow |
 |---|---|
-| `wordpress/website-project-management.md` or `astro/website-project-management.md` exists | Full Website Build |
-| `landing-pages/[campaign]/landing-page-project-management.md` exists | Landing Page Campaign |
+| `project-management/website.md` exists at the client root | Full Website Build |
+| `project-management/landing-pages.md` exists at the client root | Landing Page Campaign |
 | Both exist | Ask user which to work on |
 | Neither exists, but a `client_profile.md` exists | Ask user — both workflows are possible |
 | Nothing exists | Ask user — fresh start, both workflows are possible |
@@ -67,7 +67,7 @@ Use AskUserQuestion:
 
 Options:
 - "Full website build" → ask platform question below, then run `wp-project-setup`, then `website-build-orchestrator`
-- "Landing page campaign" → run `wp-project-setup` (creates client root if needed), then `landing-page-orchestrator` (which sets up the campaign folder via `lp-project-manager`)
+- "Landing page campaign" → run `wp-project-setup` (creates client root if needed), then `landing-page-orchestrator` (which sets up the campaign folder via `lhm-project-hub:lp-project-manager`)
 - "Not sure yet — let's just create the client folder" → run `wp-project-setup` and stop
 
 **If "Full website build" selected:** ask the platform question before handing off to `wp-project-setup`:
@@ -81,7 +81,7 @@ Options:
 
 Pass this choice to `wp-project-setup`. The skill records it in `client_profile.md` and the PM doc, so every downstream skill knows which path it's on.
 
-> **Note for Astro builds:** use the Astro workflow and PM template in `wp-project-manager`. Do not route Astro builds through WordPress-only theme, Gutenberg, or SSH-deploy skills.
+> **Note for Astro builds:** use the Astro workflow and PM template in `lhm-project-hub:wp-project-manager`. Do not route Astro builds through WordPress-only theme, Gutenberg, or SSH-deploy skills.
 
 ## Step 4: Confirm Handoff
 
@@ -91,7 +91,7 @@ Tell the user which orchestrator was loaded and let it take over from here. Do n
 
 - Phase detection (orchestrators handle this)
 - Skill routing within a workflow (orchestrators handle this)
-- Project management updates (`wp-project-manager` / `lp-project-manager` handle this)
+- Project management updates (`lhm-project-hub:wp-project-manager` / `lhm-project-hub:lp-project-manager` handle this)
 - Folder creation (`wp-project-setup` handles this)
 
 This skill is a router and, for a fresh full website project, the kickoff brief collector. Do not begin project setup until the kickoff brief below is complete.

@@ -12,7 +12,7 @@
       "name": "lhm-wordpress-hub",
       "source": "./plugins/lhm-wordpress-hub",
       "description": "Guided WordPress and Astro website build system - phased delivery from client intake through SEO, content, design, build, and ops hardening.",
-      "version": "1.2.15",
+      "version": "1.2.16",
       "category": "wordpress",
       "tags": [
         "wordpress",
@@ -125,7 +125,7 @@
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
       "description": "LHM project management hub — sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
-      "version": "0.1.4",
+      "version": "0.1.5",
       "category": "utilities",
       "tags": [
         "project-management",

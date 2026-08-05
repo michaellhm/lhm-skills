@@ -6,8 +6,8 @@ These rules apply to EVERY skill and agent in this plugin, without exception.
 
 Every session in this plugin operates on one of two workflows: **Full Website Build** or **Landing Page Campaign**. Before invoking any skill that produces output, you MUST know which workflow is active.
 
-- If `wordpress/website-project-management.md` or `astro/website-project-management.md` exists in the current project, you're in a Full Website Build.
-- If `landing-pages/[campaign]/landing-page-project-management.md` exists, you're in a Landing Page Campaign.
+- If `project-management/website.md` exists at the client root, you're in a Full Website Build.
+- If `project-management/landing-pages.md` exists at the client root, you're in a Landing Page Campaign.
 - If both exist, ask the user which to work on via `AskUserQuestion`.
 - If neither exists, route through `wp-start` to set one up.
 
@@ -18,7 +18,7 @@ Do not mix workflows in a single session.
 Every skill that completes a task that maps to a checkbox in the active project management doc MUST:
 
 1. **Ask before ticking.** Use `AskUserQuestion`: "Happy for me to mark off Step [X.Y] — [task name] in the project management doc?"
-2. **If approved, invoke the relevant project manager skill** (`wp-project-manager` for full builds, `lp-project-manager` for landing pages) in "mark complete" mode with the task ID and today's date.
+2. **If approved, invoke the relevant project manager skill** (`lhm-project-hub:wp-project-manager` for full builds, `lhm-project-hub:lp-project-manager` for landing pages) in "mark complete" mode with the task ID and today's date.
 3. **If the task surfaced a decision** (tool choice, scope deviation, client feedback), append a dated line to the project doc's Notes & Decisions section.
 4. **Never tick tasks Claude did not perform.** Tasks owned by Krystalyn, Aiya, Jaimee, or Michael (people-only checkboxes) are surfaced by the session-end sweep, not auto-prompted.
 

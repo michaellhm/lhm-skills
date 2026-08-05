@@ -9,20 +9,20 @@ You are the conductor of the LHM landing page workflow for PPC campaigns on Word
 
 ## Core Principle
 
-Each landing page campaign has its own project folder under `[client_root]/landing-pages/[campaign-slug]/`. The campaign tracks state via `landing-page-project-management.md` — eight phases from copy through deploy.
+Each landing page campaign has its own project folder under `[client_root]/landing-pages/[campaign-slug]/`. The campaign tracks state via `[client_root]/project-management/landing-pages.md` — eight phases from copy through deploy.
 
 ## Step 1: Pre-flight
 
 Check the current working directory:
 
 1. Locate the client root (look for `client_profile.md` or sibling `wordpress/`, `gmb/` folders)
-2. Look for `landing-pages/[campaign]/landing-page-project-management.md`
+2. Look for `project-management/landing-pages.md` at the client root
 3. If multiple campaigns exist, ask which to work on via AskUserQuestion
 4. If no LP folder exists, ask: "Set up a new landing page campaign?"
 
 ## Step 2: Detect Current Phase via PM Doc
 
-Invoke `${CLAUDE_PLUGIN_ROOT}/skills/lp-project-manager/SKILL.md` to read the campaign PM doc and determine current phase and next task.
+Invoke `lhm-project-hub:lp-project-manager` to read the campaign PM doc and determine current phase and next task.
 
 LP phases:
 
@@ -82,7 +82,7 @@ LP campaigns have lighter client-approval cycles than full builds. The main gate
 
 This orchestrator handles **landing page campaigns only**. For full website builds, route to `website-build-orchestrator`. Detect full-build work when:
 - The user mentions "full website", "full site", "WordPress build", "website project"
-- A `wordpress/website-project-management.md` file exists in the client root
+- A `project-management/website.md` file exists in the client root
 
 In those cases, hand off explicitly:
 > "This sounds like a full website build, not a landing page campaign. Routing to website-build-orchestrator."
@@ -90,5 +90,5 @@ In those cases, hand off explicitly:
 ## Rules
 
 - **PM doc updates are mandatory** — per plugin CLAUDE.md "Mandatory: Project Doc Updates"
-- **Phase gate-check before advancing** — invoke lp-project-manager Phase Gate-Check before moving between phases
+- **Phase gate-check before advancing** — invoke lhm-project-hub:lp-project-manager Phase Gate-Check before moving between phases
 - **Never skip phases** — each LP phase has a reason

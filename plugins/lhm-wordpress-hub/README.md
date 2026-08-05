@@ -8,9 +8,9 @@ Two-workflow Claude Code plugin for delivering WordPress projects: a six-phase f
 |---|---|---|
 | **When to use** | New WordPress site from scratch | PPC ad campaign LP on multisite |
 | **Orchestrator** | `website-build-orchestrator` | `landing-page-orchestrator` |
-| **Project doc** | `wordpress/website-project-management.md` | `landing-pages/[campaign]/landing-page-project-management.md` |
+| **Project doc** | `project-management/website.md` | `project-management/landing-pages.md` |
 | **Phases** | 1–6 (SOP-aligned) | 1–8 |
-| **Project manager skill** | `wp-project-manager` | `lp-project-manager` |
+| **Project manager skill** | `lhm-project-hub:wp-project-manager` | `lhm-project-hub:lp-project-manager` |
 | **Build owner** | Aiya | Aiya |
 
 Run `/lhm-wordpress-hub:wp-start` to begin a session — the router detects which workflow applies and hands off to the right orchestrator.
@@ -59,14 +59,15 @@ Shared client artefacts live at the client root for cross-project reuse (WordPre
     brand_guidelines.md
     brand_style_guide.pdf
     design_system.md
+  project-management/                     # ALL process state (owned by lhm-project-hub)
+    website.md                            # lhm-project-hub:wp-project-manager
+    landing-pages.md                      # lhm-project-hub:lp-project-manager
 
   wordpress/                              # full WP build
-    website-project-management.md
     seo/  content/  prototype/  wp/  qa/
     docs/superpowers/{specs,plans}/
 
   landing-pages/[campaign]/               # LP campaigns
-    landing-page-project-management.md
     ...
 
   gmb/                                    # GMB optimisation
@@ -116,7 +117,7 @@ plugins/lhm-wordpress-hub/
 |-------|-------------|
 | `wp-start` | Workflow router — detects full-build vs LP, hands off to the right orchestrator |
 | `wp-project-setup` | Initialize client-root scaffolding and `wordpress/` subtree |
-| `wp-project-manager` | Read, create, or update `website-project-management.md` |
+| `lhm-project-hub:wp-project-manager` | Read, create, or update `project-management/website.md` |
 
 ### Phase 1: Client Onboarding & Strategy
 | Skill | Description |
@@ -162,7 +163,7 @@ plugins/lhm-wordpress-hub/
 
 | Skill | Description |
 |-------|-------------|
-| `lp-project-manager` | Read, create, or update `landing-page-project-management.md` |
+| `lhm-project-hub:lp-project-manager` | Read, create, or update `project-management/landing-pages.md` |
 | `lp-copy` | Write landing page copy for each ad group |
 | `lp-prototype` | Build HTML/CSS landing page prototypes |
 | `lp-subsite-setup` | Configure WordPress multisite subsite for the campaign |

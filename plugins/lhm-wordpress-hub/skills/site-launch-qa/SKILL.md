@@ -320,7 +320,7 @@ Structure:
 After writing the QA results file:
 
 1. Ask the user: "Happy for me to mark the QA checklist as complete in the project management doc?"
-2. If yes, invoke `wp-project-manager` skill in "mark complete" mode for the QA/launch task
+2. If yes, invoke `lhm-project-hub:wp-project-manager` skill in "mark complete" mode for the QA/launch task
 3. Append a note to the PM doc's Notes & Decisions section: "QA completed [date]. Results at `[path]/qa-launch-results.md`. Outstanding items: [count]."
 
 ---

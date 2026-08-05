@@ -14,6 +14,9 @@ The LHM WordPress Hub supports two workflows. Shared client artefacts live at th
     brand_guidelines.md                   # internal brand doc
     brand_style_guide.pdf                 # client-shareable
     design_system.md                      # tokens, scales, component specs
+  project-management/                     # ALL process state (owned by lhm-project-hub)
+    website.md                            # full-build PM doc (lhm-project-hub:wp-project-manager)
+    landing-pages.md                      # LP campaign PM doc (lhm-project-hub:lp-project-manager)
 
   wordpress/                              # full WordPress build project
   astro/                                  # full Astro build project
@@ -25,7 +28,7 @@ The LHM WordPress Hub supports two workflows. Shared client artefacts live at th
 
 ```
 [client_root]/wordpress/
-  website-project-management.md           # root-level PM doc (created at kickoff)
+  # PM doc lives at [client_root]/project-management/website.md (lhm-project-hub:wp-project-manager)
   seo/
     keyword_map.md                        # Phase 2 output
     sitemap.md                            # Phase 2 output
@@ -62,7 +65,7 @@ The LHM WordPress Hub supports two workflows. Shared client artefacts live at th
 
 ```
 [client_root]/astro/
-  website-project-management.md           # kickoff brief, schedule, gates and status
+  # PM doc lives at [client_root]/project-management/website.md (lhm-project-hub:wp-project-manager)
   seo/
     sitemap.md
     page_briefs/
@@ -77,11 +80,11 @@ The LHM WordPress Hub supports two workflows. Shared client artefacts live at th
       plans/
 ```
 
-Astro uses the seven-week active-delivery workflow in `wp-project-manager`: three weeks through prototype, then four weeks from prototype approval to launch. Client delays move dependent dates day-for-day.
+Astro uses the seven-week active-delivery workflow in `lhm-project-hub:wp-project-manager`: three weeks through prototype, then four weeks from prototype approval to launch. Client delays move dependent dates day-for-day.
 
 ## Landing Page Campaign — `landing-pages/[campaign]/` subtree
 
-See `references/lp-reference.md` for full LP folder layout. The campaign folder uses `landing-page-project-management.md` as its tracking doc, and references shared brand/design artefacts at `../../design/...`.
+See `references/lp-reference.md` for full LP folder layout. The campaign's tracking doc lives at `[client_root]/project-management/landing-pages.md` (`lhm-project-hub:lp-project-manager`), and references shared brand/design artefacts at `../../design/...`.
 
 ## Phase detection rules (full WP build)
 

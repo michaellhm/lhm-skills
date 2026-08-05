@@ -31,7 +31,7 @@ For any page over 300 words (which is essentially every full website page), the 
 4. Calling the content-writer agent with `content_type: "web-copy"` and the structured brief
 5. Writing the returned content to `content/[page].md` with YAML frontmatter and component declarations
 6. Validating SEO requirements (primary keyword in H1, meta tags, etc.)
-7. Asking the user via AskUserQuestion whether to mark this page complete in the PM doc — if yes, invoke `wp-project-manager` Mode 3 (Mark Complete).
+7. Asking the user via AskUserQuestion whether to mark this page complete in the PM doc — if yes, invoke `lhm-project-hub:wp-project-manager` Mode 3 (Mark Complete).
 
 Do not generate the body content directly in this skill. Delegate to content-writer. The 8-pass pipeline is non-negotiable for full-website page copy.
 

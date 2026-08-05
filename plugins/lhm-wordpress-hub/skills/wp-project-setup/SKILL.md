@@ -51,7 +51,7 @@ michael_approval_meetings: "" # case-by-case notes
 ---
 ```
 
-> **Astro note:** Astro uses the seven-week delivery workflow in `wp-project-manager`. Do not route it through WordPress-only theme, Gutenberg, or SSH deployment steps.
+> **Astro note:** Astro uses the seven-week delivery workflow in `lhm-project-hub:wp-project-manager`. Do not route it through WordPress-only theme, Gutenberg, or SSH deployment steps.
 
 ## Step 2: Create Client-Root Scaffolding (if not present)
 
@@ -67,7 +67,7 @@ If any are missing, create them with the templates in Step 4. Inform the user th
 
 ## Step 3: Create Build Subtree
 
-> **Platform branch:** If `platform: astro` was recorded in Step 1b, skip the WordPress-specific structure below and create the Astro structure shown here. Then invoke `wp-project-manager` in Kickoff Create mode.
+> **Platform branch:** If `platform: astro` was recorded in Step 1b, skip the WordPress-specific structure below and create the Astro structure shown here. Then invoke `lhm-project-hub:wp-project-manager` in Kickoff Create mode.
 
 ````
 astro/
@@ -106,7 +106,7 @@ wordpress/
       plans/
 ````
 
-After scaffolding, invoke `wp-project-manager` in **Kickoff Create** mode to create `website-project-management.md` immediately. The PM doc must exist from the start so Krystalyn can schedule team work and client approval holds before strategy begins. Spec and plan references may remain `TBD` until they exist.
+After scaffolding, invoke `lhm-project-hub:wp-project-manager` in **Kickoff Create** mode to create `project-management/website.md` immediately. The PM doc must exist from the start so Krystalyn can schedule team work and client approval holds before strategy begins. Spec and plan references may remain `TBD` until they exist.
 
 ## Step 4: Create Starter Files at Client Root
 
@@ -259,7 +259,7 @@ Tell the user:
 
 > Project structure created. Here's what's next:
 >
-> 1. **Project schedule created** — `website-project-management.md` now contains the standard seven-week active-delivery schedule, owners, dependencies, and client approval holds.
+> 1. **Project schedule created** — `project-management/website.md` now contains the standard seven-week active-delivery schedule, owners, dependencies, and client approval holds.
 > 2. **Phase 1: Client Onboarding & Strategy** — Run the strategy session when required, generate the Campaign Playbook and Website Brief, and obtain client approval by email before SEO begins.
 >
 > Run `wp-start` when you're ready to begin.

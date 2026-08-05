@@ -17,7 +17,7 @@ Check the current working directory:
 
 1. Use Glob to inspect the directory structure
 2. Determine whether we're at the client root or inside the wordpress/ or astro/ subfolder
-3. Look for `wordpress/website-project-management.md` or `astro/website-project-management.md` — if either exists, this is an in-flight project
+3. Look for `project-management/website.md` at the client root — if it exists, this is an in-flight project
 4. Read `${CLAUDE_PLUGIN_ROOT}/references/folder-structure.md` for the canonical layout
 
 ### If no project structure exists:
@@ -29,7 +29,7 @@ Check the current working directory:
 
 ## Step 2: Detect Current Phase via PM Doc
 
-Invoke `${CLAUDE_PLUGIN_ROOT}/skills/wp-project-manager/SKILL.md` in Mode 2 (Read/Status) to determine current phase, step, and next action.
+Invoke `lhm-project-hub:wp-project-manager` in Mode 2 (Read/Status) to determine current phase, step, and next action.
 
 If the PM doc does not yet exist, route through `wp-start` to collect the kickoff brief, then `wp-project-setup`. A new PM doc is created immediately at setup. Do not wait until the end of strategy.
 
@@ -81,7 +81,7 @@ Do not use WordPress-only Phase 5 skills for Astro.
 **Phase 1: Client Onboarding & Strategy**
 1. Load `${CLAUDE_PLUGIN_ROOT}/skills/client-context-intake/SKILL.md` for Steps 1.1–1.4
 2. For Step 1.5 (Superpowers): load `${CLAUDE_PLUGIN_ROOT}/../superpowers/skills/brainstorming/SKILL.md` then `superpowers:writing-plans`
-3. After Step 1.5, invoke `${CLAUDE_PLUGIN_ROOT}/skills/wp-project-manager/SKILL.md` Mode 1 (Create) to generate the PM doc
+3. After Step 1.5, invoke `lhm-project-hub:wp-project-manager` Mode 1 (Create) to generate the PM doc
 
 Cross-plugin: `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/campaign-playbook-generator/SKILL.md` for the Step 1.3 Campaign Playbook.
 
@@ -119,7 +119,7 @@ Route through the web-copy-orchestrator agent (`agents/web-copy-orchestrator.md`
 
 ## Approval Gates
 
-Every phase ends with an explicit approval gate. **Do not proceed to the next phase without invoking wp-project-manager Mode 4 (Phase Gate-Check) and confirming user resolution.** Use AskUserQuestion:
+Every phase ends with an explicit approval gate. **Do not proceed to the next phase without invoking lhm-project-hub:wp-project-manager Mode 4 (Phase Gate-Check) and confirming user resolution.** Use AskUserQuestion:
 
 > "Phase [N] complete. Approval gates: [list with status]. Approved — proceed to Phase [N+1]?"
 
@@ -127,7 +127,7 @@ Every phase ends with an explicit approval gate. **Do not proceed to the next ph
 
 This workflow is designed to be resumed at any point. If the user returns mid-project:
 
-1. Detect current phase via wp-project-manager Mode 2
+1. Detect current phase via lhm-project-hub:wp-project-manager Mode 2
 2. Summarise what's done and what's next
 3. Offer to continue from where they left off
 
@@ -138,14 +138,14 @@ This workflow is designed to be resumed at any point. If the user returns mid-pr
 - **Never overwrite** — read existing files before writing
 - **Facts over assumptions** — if information is missing, ask rather than guess
 - **One phase at a time** — focus the user on the current phase
-- **PM doc updates are mandatory** — every task completion goes through wp-project-manager (per plugin CLAUDE.md "Mandatory: Project Doc Updates")
+- **PM doc updates are mandatory** — every task completion goes through lhm-project-hub:wp-project-manager (per plugin CLAUDE.md "Mandatory: Project Doc Updates")
 
 ## Out of Scope
 
 This orchestrator handles **full website builds only**. For PPC landing page campaigns, route to `landing-page-orchestrator`. Detect LP work when:
 - The user mentions "landing page", "LP campaign", "ad group pages", "PPC landing pages"
 - A `landing-pages/` folder exists in the client root
-- A `landing-page-project-management.md` file exists anywhere in the project
+- A `project-management/landing-pages.md` file exists at the client root
 
 In those cases, hand off explicitly:
 > "This sounds like a landing page campaign, not a full website build. Routing to landing-page-orchestrator."
