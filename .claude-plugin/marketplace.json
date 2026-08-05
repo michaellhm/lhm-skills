@@ -96,8 +96,8 @@
     {
       "name": "lhm-client-updates-hub",
       "source": "./plugins/lhm-client-updates-hub",
-      "description": "Client communication and meeting-wrap plugin. Fathom meeting debriefs with BasicOps sync and team notifications, client data change propagation with reversed-decision detection, and client-facing update emails.",
-      "version": "1.1.15",
+      "description": "DEPRECATED — skills have moved to lhm-project-hub. Shims remain for compatibility. Client communication and meeting-wrap plugin. Fathom meeting debriefs with BasicOps sync and team notifications, client data change propagation with reversed-decision detection, and client-facing update emails.",
+      "version": "1.1.16",
       "category": "utilities",
       "tags": [
         "client-communication",
@@ -125,7 +125,7 @@
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
       "description": "LHM project management hub — sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "category": "utilities",
       "tags": [
         "project-management",

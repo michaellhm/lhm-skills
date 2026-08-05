@@ -1,7 +1,7 @@
 {
   "name": "lhm-client-updates-hub",
-  "description": "Client communication and meeting-wrap plugin. Fathom meeting debriefs with BasicOps sync and team notifications, client data change propagation with reversed-decision detection, and client-facing update emails.",
-  "version": "1.1.15",
+  "description": "DEPRECATED — skills have moved to lhm-project-hub. Shims remain for compatibility. Client communication and meeting-wrap plugin. Fathom meeting debriefs with BasicOps sync and team notifications, client data change propagation with reversed-decision detection, and client-facing update emails.",
+  "version": "1.1.16",
   "author": {
     "name": "LHM Digital"
   },
