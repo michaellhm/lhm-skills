@@ -118,6 +118,7 @@ Every metric line gets a plain-English one-liner — write it the way `client-up
 
 ## 2. Right direction?
 - <one paragraph: is the account trending the way goals.md targets say it should, using Step 2's month-over-month data>
+- [If the underlying GA4/Ads/GSC data needed for this call is missing: "Data unavailable — <source> pull failed; cannot assess direction this month." Never default to "on track" or "within normal range" when the number behind the assessment is absent.]
 
 ## 3. Promised work on track?
 - <cross-check current-projects.md / project-management files against what was committed — handover doc promises, prior meeting-brief action items, sales commitments — flag anything slipping>
@@ -126,15 +127,15 @@ Every metric line gets a plain-English one-liner — write it the way `client-up
 - <opportunities surfaced by this review that aren't yet scoped as work>
 
 ## Anomaly flags (references/cadences.md)
-- Organic traffic: <flag if down ≥20% month-on-month, else "Within normal range">
-- Update cadence: <flag if >7 days since the last client-facing update (client_updates/ folder or BasicOps card activity), else "Within normal range">
+- Organic traffic: <flag if down ≥20% month-on-month>, <"Within normal range" only if the GA4/GSC comparison actually returned data>, or **["Data unavailable — <source> pull failed; do not infer" if the comparison data needed to compute this is missing]**
+- Update cadence: <flag if >7 days since the last client-facing update (client_updates/ folder or BasicOps card activity)>, <"Within normal range" only if both sources were actually checked>, or **["Data unavailable — <source> couldn't be checked; do not infer" if neither source was reachable]**
 
 ## Converting-keyword → SEO opportunity
 - <cross-reference GoogleAds execute_gaql's best-converting keywords against gscServer's organic position for the same terms; flag terms converting well in paid but ranking weakly or not at all organically>
 - Keyword brief for Jaimee: <drafted below if an opportunity was found, else "No opportunity found this month">
 ```
 
-**Anomaly flags.** Compute both directly from Step 2's data — traffic drop from the GA4/GSC comparison, update gap from the most recent file in `client_updates/YYYY-MM/` or the most recent BasicOps card message, whichever is more recent. Per `references/cadences.md`, a traffic drop ≥20% escalates to Michael immediately — since Michael is the one running internal mode, surface it prominently at the top of the report rather than burying it in section 1's list.
+**Anomaly flags.** Compute both directly from Step 2's data — traffic drop from the GA4/GSC comparison, update gap from the most recent file in `client_updates/YYYY-MM/` or the most recent BasicOps card message, whichever is more recent. Per `references/cadences.md`, a traffic drop ≥20% escalates to Michael immediately — since Michael is the one running internal mode, surface it prominently at the top of the report rather than burying it in section 1's list. **"Within normal range" is only a valid value when the underlying data actually came back.** If Step 2 flagged the GA4/GSC pull or the update-cadence check as missing or failed, the flag line says so explicitly — never let an absent metric collapse into the "normal" branch by default. This applies to every metric-driven line in this report, not just the two flags: section 2's direction call is equally subject to it.
 
 **Converting-keyword → SEO suggestions.** Pull the client's top-converting Google Ads keywords (execute_gaql, sorted by conversions) and check each against its organic ranking (compare_search_periods / the client's GSC data). Where a keyword converts well in paid but the client doesn't rank for it organically (or ranks weakly), that's a content opportunity worth a brief.
 
@@ -154,6 +155,7 @@ Read the most recent file in `project-management/meetings/` that carries action 
 
 ## This month's numbers
 - <Step 2's month-over-month traffic, conversions, ad spend/CPL, ranking movement — same figures the wrap/internal reports use, condensed to what's meeting-relevant>
+- [If any of Step 2's data sources came back missing or unauthenticated: list each one plainly, e.g. "Google Ads data unavailable — GoogleAds MCP not authenticated." Never omit the line or substitute a placeholder number — a gap here is a gap Michael needs to know about walking into the meeting.]
 
 ## Agenda
 <pre-filled from references/templates/meeting-agenda.md, with the "Project updates & deliverables" and "Last meeting's action items" sections populated from the above>
