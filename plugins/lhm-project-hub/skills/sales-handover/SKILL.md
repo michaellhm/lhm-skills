@@ -68,7 +68,7 @@ Post a handover summary as a discussion comment on the card via `create_message_
 
 ```markdown
 ## Onboarding — Status: active
-- Phase: Phase 1 — Billing
+- Phase: Phase 1 — Payment & Billing
 - Owner: Josephine
 - Next action: Gather billing details and set up GoCardless mandate (see checklists/tier1-billing.md)
 - Detail: project-management/onboarding.md

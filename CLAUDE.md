@@ -15,7 +15,7 @@ This repo ships **nine plugins** (`lhm-marketing-hub`, `lhm-wordpress-hub`, `lhm
 
 `.claude-plugin/marketplace.json` → `metadata.version` (the top-level marketplace version) tracks **`lhm-marketing-hub` specifically**, as the flagship plugin. Only bump it when `lhm-marketing-hub` itself changes, and keep it equal to `lhm-marketing-hub`'s `plugin.json` version.
 
-**This is enforced automatically, not just by this checklist.** `scripts/validate-plugin-versions.py` checks version consistency across all six plugins, and a pre-commit hook (`.githooks/pre-commit`, installed via `scripts/install-git-hooks.sh`) will **block the commit** if any plugin's staged changes aren't accompanied by a version bump, or if `plugin.json` and `marketplace.json` versions disagree for any plugin. A pre-push hook re-checks consistency as a safety net. If a commit gets blocked, the error message names the exact file and field to fix. Run `python3 scripts/validate-plugin-versions.py` manually any time to check the current state.
+**This is enforced automatically, not just by this checklist.** `scripts/validate-plugin-versions.py` checks version consistency across all nine plugins, and a pre-commit hook (`.githooks/pre-commit`, installed via `scripts/install-git-hooks.sh`) will **block the commit** if any plugin's staged changes aren't accompanied by a version bump, or if `plugin.json` and `marketplace.json` versions disagree for any plugin. A pre-push hook re-checks consistency as a safety net. If a commit gets blocked, the error message names the exact file and field to fix. Run `python3 scripts/validate-plugin-versions.py` manually any time to check the current state.
 
 ### 2. Update README.md
 

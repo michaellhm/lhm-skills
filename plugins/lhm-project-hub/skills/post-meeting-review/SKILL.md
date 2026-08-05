@@ -183,7 +183,7 @@ Board: `*Client Flow` (project ID `68655`). Sections: `Follow Up` (ID `107750`),
 
 ### BasicOps field rules (read before writing anything)
 
-- **Never put task detail in the `description` field.** All context, briefing detail, links, and "what done looks like" go into the task discussion via `create_message_in_task`. The description stays empty or holds a single line at most. This is a hard rule from this plugin's `CLAUDE.md` and applies to every write, every client, no exceptions.
+- **Never put task detail in the `description` field.** All context, briefing detail, links, and "what done looks like" go into the task discussion via `create_message_in_task`. The description stays empty or holds a single line at most. This is a hard rule and applies to every write, every client, no exceptions.
 - **Discussion messages take raw HTML.** Do not escape it to entities, because `&lt;p&gt;` renders as literal text. If you get it wrong, `delete_message` with the returned id and repost.
 - **Task titles take a plain `&`,** not `&amp;`, which renders as the literal entity.
 

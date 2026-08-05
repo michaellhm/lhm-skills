@@ -91,6 +91,7 @@ When creating a new project doc, use this structure:
 - **Client:** [Name]
 - **Primary Location:** [Address]
 - **Primary Modality:** [e.g. Physiotherapy]
+- **Current Phase:** Month 0 — Onboarding
 - **Blog Posts Per Month:** [N — confirm with client/team; varies per client, check any existing content plan/publishing cadence for a sensible default before asking]
 - **Last Updated:** [Today's date]
 

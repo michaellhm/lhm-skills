@@ -28,7 +28,7 @@ Found [N] references across [M] files:
 - client_profile.md (line 3): "Raise the Bar Psychology" → update to "Raise the Bar Clinic"
 - google_ads/2026-06/monthly-review-2026-06.md (line 1): "Raise the Bar Psychology"
 - seo/2026-05/keyword-map.md (lines 4, 12, 18)
-- meetings/2026-06-20-meeting-notes.md (line 1)
+- project-management/meetings/2026-06-20-meeting-notes.md (line 1)
 - [etc.]
 ```
 
