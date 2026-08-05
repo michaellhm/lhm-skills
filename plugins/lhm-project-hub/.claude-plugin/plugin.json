@@ -1,7 +1,7 @@
 {
   "name": "lhm-project-hub",
   "description": "LHM project management hub. Owns the agency process layer: sales handover, client onboarding (Tier 1 pipeline), delivery kickoffs (website, landing pages, SEO, GMB, blog, Google Ads), monthly and quarterly reviews, meeting wraps, and client updates. Delegates all delivery work to the specialist hubs; state lives in each client's project-management/ folder plus BasicOps.",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": { "name": "LHM Digital" },
   "keywords": ["project-management", "onboarding", "sales-handover", "client-success", "basicops", "agency", "kickoff", "monthly-review"]
 }
