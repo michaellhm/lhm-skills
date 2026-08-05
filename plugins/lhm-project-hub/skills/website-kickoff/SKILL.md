@@ -27,12 +27,14 @@ Once the state file exists, add or update the Website block in `current-projects
 
 ```markdown
 ## Website — Status: active
-- Phase: Phase 1 — Kickoff & Scheduling
-- Owner: Krystalyn
+- Phase: <as reported by the wp-project-manager state file, e.g. "Phase 0 — Kickoff & Scheduling" for Astro, or "Phase 1 — Client Onboarding & Strategy" for WordPress>
+- Owner: Kristalyn
 - Next action: Confirm kickoff brief and book approval holds
 - Detail: project-management/website.md
 - Updated: YYYY-MM-DD
 ```
+
+Don't hardcode a phase label here — the Astro and legacy WordPress templates in `wp-project-manager` name their opening phase differently, so always copy the `Current Phase` value straight out of the state file `wp-project-manager` just created rather than assuming one.
 
 ## Step 3: Scaffold
 
@@ -49,7 +51,7 @@ Create the BasicOps scaffold on the `*Client Flow` board (project ID `68655`) �
 | SEO/IA (sitemap approved) complete | 1 week before copy deadline |
 | Intake (kickoff brief confirmed) complete | today, or 2–3 days out |
 
-Adjust the lead times to fit the actual gap between today and the deadline — if the runway is short, compress evenly across phases rather than leaving QA squeezed at the end (QA is never compressed, per the wp-project-manager Astro template's scheduling rule). Assign owners from `references/team-roster.md`: Krystalyn (PM/copy), Jaimee (SEO/QA), Aiya (build/launch), Michael (strategy/sign-off).
+Adjust the lead times to fit the actual gap between today and the deadline — if the runway is short, compress evenly across phases rather than leaving QA squeezed at the end (QA is never compressed, per the wp-project-manager Astro template's scheduling rule). Assign owners from `references/team-roster.md`: Kristalyn (PM/copy), Jaimee (SEO/QA), Aiya (build/launch), Michael (strategy/sign-off).
 
 Create one BasicOps subtask per milestone with its computed due date and owner. Report the BasicOps card link once created.
 

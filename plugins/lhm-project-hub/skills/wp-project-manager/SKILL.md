@@ -48,7 +48,7 @@ Inputs:
 Generate `[client_root]/project-management/website.md` using the relevant template below, populating:
 - Client name from `client_profile.md`
 - Platform from `client_profile.md` YAML frontmatter `platform:` field (`wordpress` or `astro`)
-- Owner names from defaults: Aiya (build and launch), Krystalyn (PM and remaining-copy production), Jaimee (SEO and QA), Michael (strategy, sitemap sign-off, prototype selection and prototype copy). Confirm only if the kickoff brief says otherwise.
+- Owner names from defaults: Aiya (build and launch), Kristalyn (PM and remaining-copy production), Jaimee (SEO and QA), Michael (strategy, sitemap sign-off, prototype selection and prototype copy). Confirm only if the kickoff brief says otherwise.
 - Reference paths to the spec and plan files
 - Page inventory rows from `seo/sitemap.md` if it exists, otherwise leave empty
 - Kickoff brief fields: client relationship, strategy-call requirement, design scope, copy scope, deadline/constraint, special considerations, and Michael's approval-meeting attendance
@@ -148,7 +148,7 @@ Called by orchestrators at session end (or on user request). Logic:
 
 Use this template for `platform: astro`. Dates are scheduled from kickoff using seven weeks of active delivery time. Waiting for client feedback is not active delivery time. Every client delay moves all dependent dates by the same amount. Never compress QA or launch to recover client delay.
 
-At kickoff, Krystalyn places every client decision point in the calendar. The client may approve by email before the event and cancel the call, or attend the call to review and approve. The calendar event remains the deadline and alert. Its description must name the artefact, the decisions required, and the effect of late feedback.
+At kickoff, Kristalyn places every client decision point in the calendar. The client may approve by email before the event and cancel the call, or attend the call to review and approve. The calendar event remains the deadline and alert. Its description must name the artefact, the decisions required, and the effect of late feedback.
 
 ````markdown
 # Website Project Management — [Client Name]
@@ -161,7 +161,7 @@ At kickoff, Krystalyn places every client decision point in the calendar. The cl
 - **Copy scope:** [Rewrite | Selective rewrite | Migrate]
 - **Active delivery target:** 7 weeks
 - **Fixed deadline / constraint:** [value or None]
-- **Owners:** Aiya (build + launch), Krystalyn (PM + remaining copy), Jaimee (SEO + QA), Michael (strategy + sitemap/prototype decisions)
+- **Owners:** Aiya (build + launch), Kristalyn (PM + remaining copy), Jaimee (SEO + QA), Michael (strategy + sitemap/prototype decisions)
 - **Last Updated:** [date]
 - **Current Phase:** Phase 0 — Kickoff & Scheduling
 - **Current Step:** Step 0.1 — Confirm brief and book approval holds
@@ -200,7 +200,7 @@ At kickoff, Krystalyn places every client decision point in the calendar. The cl
 |---|---|---|---|---|
 
 ## Phase 0 — Kickoff & Scheduling
-**Owner:** Krystalyn
+**Owner:** Kristalyn
 - [ ] Kickoff brief confirmed with Michael
 - [ ] New/existing client recorded
 - [ ] Strategy-call requirement recorded (mandatory for new clients)
@@ -211,7 +211,7 @@ At kickoff, Krystalyn places every client decision point in the calendar. The cl
 - [ ] Client approval holds placed in calendar with sign-off requirements
 
 ## Phase 1 — Week 1: Strategy
-**Owner:** Krystalyn, with Michael when a strategy call is required
+**Owner:** Kristalyn, with Michael when a strategy call is required
 **Gate:** Client approves playbook and website brief by email before SEO begins
 - [ ] Client profile complete (minimum required context)
 - [ ] Strategy call scheduled (mandatory for new clients; as agreed for existing clients)
@@ -232,20 +232,20 @@ At kickoff, Krystalyn places every client decision point in the calendar. The cl
 - [ ] Michael records any direction Aiya needs for those pages
 
 ## Phase 3 — Week 3: Prototype
-**Owners:** Michael (copy), Aiya (prototype), Krystalyn (client communication)
+**Owners:** Michael (copy), Aiya (prototype), Kristalyn (client communication)
 **Gate:** Client approves prototype by email
 - [ ] Michael creates copy for selected prototype pages
 - [ ] Aiya builds prototype from approved sitemap, copy, brief and playbook
 - [ ] Aiya posts prototype to team WhatsApp
 - [ ] Team collectively reviews prototype
 - [ ] Aiya applies internal feedback
-- [ ] Krystalyn sends prototype to client
+- [ ] Kristalyn sends prototype to client
 - [ ] Client approves design, selected-page copy, hierarchy and direction by email
-- [ ] Krystalyn schedules four-week post-prototype plan from approval date
+- [ ] Kristalyn schedules four-week post-prototype plan from approval date
 
 ## Phase 4 — Post-Prototype Week 1: Remaining Copy & Astro Build
-**Owners:** Krystalyn (copy), Aiya (build)
-- [ ] Krystalyn generates remaining copy through Claude using all approved context
+**Owners:** Kristalyn (copy), Aiya (build)
+- [ ] Kristalyn generates remaining copy through Claude using all approved context
 - [ ] Aiya runs the astro-build skill and completes the full Astro build
 - [ ] Forms, metadata, redirects, analytics and tracking implemented
 - [ ] Aiya self-tests throughout build
@@ -253,9 +253,9 @@ At kickoff, Krystalyn places every client decision point in the calendar. The cl
 - [ ] Aiya applies internal feedback
 
 ## Phase 5 — Post-Prototype Weeks 2–3: Client Feedback & Final Approval
-**Owner:** Krystalyn, with Aiya applying changes
+**Owner:** Kristalyn, with Aiya applying changes
 **Gate:** Client approves complete site and copy by email; this authorises QA and launch
-- [ ] Krystalyn sends full Astro site to client for copy and website feedback
+- [ ] Kristalyn sends full Astro site to client for copy and website feedback
 - [ ] Client provides one consolidated feedback round
 - [ ] Aiya applies client feedback in Astro
 - [ ] Changes reviewed internally where needed
@@ -263,7 +263,7 @@ At kickoff, Krystalyn places every client decision point in the calendar. The cl
 - [ ] Any client delay recorded and downstream dates moved day-for-day
 
 ## Phase 6 — Post-Prototype Week 4: QA & Launch
-**Owners:** Jaimee (QA), Aiya (fixes + launch), Krystalyn (coordination)
+**Owners:** Jaimee (QA), Aiya (fixes + launch), Kristalyn (coordination)
 **Gate:** Jaimee QA passed + team final sanity check. No second client approval required.
 - [ ] Jaimee completes formal pre-launch QA
 - [ ] SEO: metadata, slugs, schema, sitemap and redirects verified
@@ -276,7 +276,7 @@ At kickoff, Krystalyn places every client decision point in the calendar. The cl
 - [ ] Aiya launches site
 - [ ] Jaimee completes post-launch QA on live domain
 - [ ] Aiya resolves live issues
-- [ ] Krystalyn sends completion confirmation and closes project
+- [ ] Kristalyn sends completion confirmation and closes project
 
 ## Parallel R&D Task
 - [ ] Aiya investigates a lightweight SaaS or Chrome extension for on-page client feedback (page URL, selected element, screenshot, commenter and resolution status)
@@ -302,7 +302,7 @@ When creating a new PM doc (Mode 1), use this template. Replace placeholder `[Cl
 - **Platform:** [WordPress | Astro]
 - **Primary URL:** [URL or "TBD"]
 - **Project slug:** [slug]
-- **Owners:** Aiya (build), Krystalyn (PM), Jaimee (SEO), Michael (strategy)
+- **Owners:** Aiya (build), Kristalyn (PM), Jaimee (SEO), Michael (strategy)
 - **Last Updated:** [Today's date]
 - **Current Phase:** Phase 1 — Client Onboarding & Strategy
 - **Current Step:** Step 1.6 — Confirm Phase 1 closure
@@ -356,7 +356,7 @@ Status values: Brief / Copy-Locked / Built / QA-Passed / Live
 
 ## Phase 1 — Client Onboarding & Strategy
 
-**Owner:** Krystalyn (with Michael for Step 1.2)
+**Owner:** Kristalyn (with Michael for Step 1.2)
 **Approval gate:** Playbook + Website Brief client-approved in writing
 
 ### Step 1.1 — Collect Client Assets
@@ -370,7 +370,7 @@ Status values: Brief / Copy-Locked / Built / QA-Passed / Live
 ### Step 1.2 — Strategy Session Call
 - [ ] Confirm Fathom on calendar invite
 - [ ] ChatGPT open during call
-- [ ] Michael runs discovery, Krystalyn captures notes
+- [ ] Michael runs discovery, Kristalyn captures notes
 - [ ] Download ChatGPT transcript
 - [ ] Download Fathom transcript
 
@@ -488,7 +488,7 @@ For each batch of 3–4 pages:
 - [ ] Run HTML Prototype Skill
 - [ ] Each variant is self-contained: prototype/v1/index.html, v2/, v3/
 - [ ] Mobile responsive verified per variant
-- [ ] Internal review (Michael, Krystalyn, Aiya)
+- [ ] Internal review (Michael, Kristalyn, Aiya)
 - [ ] Apply internal feedback
 - [ ] Decide which variant(s) go to client
 
@@ -610,7 +610,7 @@ For each batch of 3–4 pages:
 
 ## Phase 6 — QA & Go-Live
 
-**Owner:** Jaimee (complete) + Krystalyn (verify) + Michael (sign-off)
+**Owner:** Jaimee (complete) + Kristalyn (verify) + Michael (sign-off)
 **Approval gate:** Michael go-live sign-off → DNS cutover → client confirmation
 
 ### Step 6.1 — Pre-Launch QA
@@ -634,7 +634,7 @@ For each batch of 3–4 pages:
 ### Step 6.2 — Michael Sign-Off & Go-Live
 - [ ] Share QA checklist with Michael
 - [ ] **Michael go-live approval confirmed**
-- [ ] Krystalyn notifies client of go-live window
+- [ ] Kristalyn notifies client of go-live window
 - [ ] Jaimee points domain DNS to live server
 - [ ] Confirm site live, all pages resolve
 - [ ] Re-test forms on live domain

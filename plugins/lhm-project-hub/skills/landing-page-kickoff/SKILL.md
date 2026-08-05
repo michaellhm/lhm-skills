@@ -27,7 +27,7 @@ Once the state file exists, add or update the Landing Pages block in `current-pr
 ```markdown
 ## Landing Pages — Status: active
 - Phase: Phase 1 — Copy & Content
-- Owner: Krystalyn
+- Owner: Kristalyn
 - Next action: Import Google Ads CSV and confirm copy source
 - Detail: project-management/landing-pages.md
 - Updated: YYYY-MM-DD
@@ -48,7 +48,7 @@ Create the BasicOps scaffold on the `*Client Flow` board (project ID `68655`) �
 | Prototype approved by client (Phase 3) | 1 week before subsite deadline |
 | Master copy approved by client (Phase 1) | 1 week before prototype deadline |
 
-Adjust the lead times to fit the actual gap between today and the deadline — if the runway is short, compress evenly across phases rather than squeezing QA at the end. Assign owners from `references/team-roster.md`: Krystalyn (PM/copy/client comms), Aiya (subsite, prototype, deploy), Jaimee (QA/compliance).
+Adjust the lead times to fit the actual gap between today and the deadline — if the runway is short, compress evenly across phases rather than squeezing QA at the end. Assign owners from `references/team-roster.md`: Kristalyn (PM/copy/client comms), Aiya (subsite, prototype, deploy), Jaimee (QA/compliance).
 
 Create one BasicOps subtask per milestone with its computed due date and owner. Report the BasicOps card link once created.
 
