@@ -6,7 +6,7 @@ Before committing and pushing any changes that add, modify, or remove a skill, y
 
 ### 1. Version Bump
 
-This repo ships **six plugins** (`lhm-marketing-hub`, `lhm-wordpress-hub`, `lhm-gmb-hub`, `lhm-content-engine`, `lhm-finance-hub`, `lhm-learn`), each independently versioned. For **every plugin you added, modified, or removed a skill/agent/command in**, bump its patch version (e.g. 1.1.1 → 1.1.2) in **both** locations:
+This repo ships **eight plugins** (`lhm-marketing-hub`, `lhm-wordpress-hub`, `lhm-gmb-hub`, `lhm-content-engine`, `lhm-finance-hub`, `lhm-learn`, `lhm-client-updates-hub`, `lhm-skill-ops`), each independently versioned. For **every plugin you added, modified, or removed a skill/agent/command in**, bump its patch version (e.g. 1.1.1 → 1.1.2) in **both** locations:
 
 - `plugins/<plugin-name>/.claude-plugin/plugin.json` → `version`
 - `.claude-plugin/marketplace.json` → the `plugins[]` entry whose `"name"` matches `<plugin-name>` → `version`

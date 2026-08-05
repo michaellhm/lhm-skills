@@ -12,7 +12,7 @@
       "name": "lhm-wordpress-hub",
       "source": "./plugins/lhm-wordpress-hub",
       "description": "Guided WordPress and Astro website build system - phased delivery from client intake through SEO, content, design, build, and ops hardening.",
-      "version": "1.2.14",
+      "version": "1.2.15",
       "category": "wordpress",
       "tags": [
         "wordpress",
@@ -106,6 +106,19 @@
         "basicops",
         "client-update",
         "agency"
+      ]
+    },
+    {
+      "name": "lhm-skill-ops",
+      "source": "./plugins/lhm-skill-ops",
+      "description": "Team skill-improvement pipeline - syncs Task Observer observation logs to the shared repo and runs the weekly cross-team review that proposes skill updates as a PR.",
+      "version": "1.0.0",
+      "category": "utilities",
+      "tags": [
+        "skill-ops",
+        "task-observer",
+        "weekly-review",
+        "team-learning"
       ]
     }
   ]

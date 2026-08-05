@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-123 skills across seven Claude Code plugins (52 marketing, 35 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+125 skills across eight Claude Code plugins (52 marketing, 35 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -163,6 +163,11 @@ plugins/lhm-client-updates-hub/       # Client communication & meeting-wrap plug
     post-meeting-review/                # Fathom debrief — client files, BasicOps sync with context, agent routing, team email
     client-update/                      # Propagate a client data change across all client files
     client-update-email/                # Plain-language client-facing update emails
+plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
+  .claude-plugin/plugin.json            # Plugin manifest
+  skills/                               # All 2 skills
+    sync-observations/                  # Push local Task Observer logs to observations/<person>/
+    weekly-skill-review/                # Cross-team review — applies learnings on a branch, opens a PR
 ```
 
 ## Skills Catalog
@@ -216,6 +221,10 @@ plugins/lhm-client-updates-hub/       # Client communication & meeting-wrap plug
 ### Client Updates Hub
 
 **Client Communication** (3 skills): Post-meeting debrief from Fathom transcripts — updates client state files, syncs follow-up work to BasicOps with context (moves the client's card to Follow Up, adds a Meeting Notes subtask, creates follow-up tasks, and routes client-owed action items to Kristalyn for follow-up), identifies and routes any follow-on work the meeting generates to the right specialist agent (research and drafts run automatically, live-system changes get a ready-to-run plan you can resume in a fresh session), and drafts a team summary email. Propagates a client data change (name, services, contact, branding) across every file that references it. Generates plain-language client-facing update emails after completing work.
+
+### Skill Ops
+
+**Team Skill Improvement** (2 skills): Weekly sync of each person's local Task Observer observation logs into `observations/<person>/` in this repo, and a cross-team weekly review that deduplicates observations, applies clear improvements to plugin skills on a branch, bumps versions, and opens a PR for sign-off (see TEAM-SETUP.md).
 
 ## Key Behaviours
 

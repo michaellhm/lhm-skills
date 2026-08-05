@@ -1,0 +1,9 @@
+{
+  "name": "lhm-skill-ops",
+  "description": "Team skill-improvement pipeline — syncs each person's Task Observer observation logs into the shared repo, and runs a weekly cross-team review that proposes skill updates as a pull request.",
+  "version": "1.0.0",
+  "author": {
+    "name": "LHM Digital"
+  },
+  "keywords": ["skill-ops", "task-observer", "weekly-review", "observations", "team-learning"]
+}
