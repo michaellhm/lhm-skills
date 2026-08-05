@@ -18,8 +18,17 @@ Manages the per-client `project-management/gmb.md` file which tracks the full st
 Before reading state, check the legacy location (`gmb/GMBProjectManagement.md`). If
 found there and not at the new path: move the file to `project-management/gmb.md`,
 write a one-line pointer at the old path ("Moved to ../project-management/gmb.md on
-YYYY-MM-DD"), and add/update the process block in current-projects.md (see
-references/folder-convention.md).
+YYYY-MM-DD"), and add/update the process block in current-projects.md using this
+format (see references/folder-convention.md):
+
+```markdown
+## GMB — Status: <active | blocked | complete>
+- Phase: <phase name>
+- Owner: <team member>
+- Next action: <one line>
+- Detail: project-management/gmb.md
+- Updated: YYYY-MM-DD
+```
 
 ## Workflow
 

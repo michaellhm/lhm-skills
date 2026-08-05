@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-141 skills across nine Claude Code plugins (52 marketing, 35 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moving to project hub), 2 skill ops, 16 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+142 skills across nine Claude Code plugins (52 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 16 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -70,7 +70,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     wordpress-builder.md                # Phase E — theme scaffold and page build
     site-ops.md                         # Phase F — performance and security
     site-extension.md                   # Post-launch page management
-  skills/                               # All 35 skills
+  skills/                               # All 36 skills
     wp-start/                           # Entry point — /wp-start command
     wp-project-setup/                   # Initialize project folder structure (platform choice)
     wp-project-manager/                 # PM doc — create, read, mark complete, gate-check
@@ -95,6 +95,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     repo-init/                          # Create GitHub repos and scaffold docs/ for a new client
     repo-install/                       # Clone client repos onto a new machine
     astro-build/                        # Phase 5 for Astro — scaffold, convert prototype, SEO, deploy
+    decap-cms-astro/                    # Decap CMS setup for Astro on Cloudflare Pages — Git-backed editing, drafts, previews
     lp-project-manager/                 # LP campaign PM doc — create, read, mark complete
     lp-subsite-setup/                   # Configure multisite subsite for LP campaign
     lp-copy/                            # Write landing page copy per ad group
@@ -157,12 +158,40 @@ plugins/lhm-learn/                    # Session learning capture plugin
   .claude-plugin/plugin.json            # Plugin manifest
   skills/                               # All 1 skill
     learn/                              # /learn — capture session learnings
-plugins/lhm-client-updates-hub/       # Client communication & meeting-wrap plugin
+plugins/lhm-client-updates-hub/       # (deprecated — skills migrated to lhm-project-hub; shims remain)
   .claude-plugin/plugin.json            # Plugin manifest
-  skills/                               # All 3 skills
+  skills/                               # All 3 skills — shims that route to lhm-project-hub
     post-meeting-review/                # Fathom debrief — client files, BasicOps sync with context, agent routing, team email
     client-update/                      # Propagate a client data change across all client files
     client-update-email/                # Plain-language client-facing update emails
+plugins/lhm-project-hub/              # Agency process hub — sales handover through monthly/quarterly reviews
+  .claude-plugin/plugin.json            # Plugin manifest
+  agents/pm-orchestrator.md             # Main entry point — reads client state, flags cadence breaches, routes to the right skill
+  skills/                               # All 16 skills
+    sales-handover/                     # Hand a newly-closed client from sales to delivery
+    client-onboarding/                  # Tier 1 onboarding pipeline — 4 phases, resumable
+    website-kickoff/                    # New website build kickoff (WordPress or Astro) → handoff to WordPress hub
+    landing-page-kickoff/               # New PPC landing page campaign kickoff → handoff to WordPress hub
+    seo-kickoff/                        # New SEO engagement kickoff → handoff to the SEO specialist
+    gmb-kickoff/                        # New GMB/local SEO cycle kickoff → handoff to the GMB hub
+    blog-kickoff/                       # New blog/article content pipeline kickoff → handoff to the content engine
+    google-ads-kickoff/                 # New Google Ads campaign build kickoff — gates on conversion tracking
+    monthly-review/                     # Monthly per-client review engine (3 modes: wrap, prep, account review)
+    quarterly-review/                   # Quarterly strategy review — 3-month data pull + next-quarter plan
+    post-meeting-review/                # Fathom meeting debrief — state files, BasicOps sync, team email (migrated from client updates hub; shim remains)
+    client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
+    client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
+    wp-project-manager/                 # Website build PM doc (migrated from WordPress hub; shim remains)
+    lp-project-manager/                 # Landing page campaign PM doc (migrated from WordPress hub; shim remains)
+    gmb-project-manager/                # GMB optimisation cycle PM doc (migrated from GMB hub; shim remains)
+  references/                           # 5 reference files + checklists/ + templates/
+    folder-convention.md                # Canonical client folder + current-projects.md structure
+    team-roster.md                      # Team roles, contacts, retired-tool warnings
+    cadences.md                         # Review/report cadence rules per client tier
+    kickoff-pattern.md                  # Shared kickoff skill pattern (intake → state → BasicOps → email → handoff)
+    anti-ai-writing-guidelines.json     # Shared anti-AI writing guardrails
+    checklists/                         # 4 onboarding checklists (billing, platform access, tracking, first 30 days)
+    templates/                          # 6 email/doc templates (kickoff, billing, welcome, handover, meeting agenda)
 plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
   .claude-plugin/plugin.json            # Plugin manifest
   skills/                               # All 2 skills
@@ -200,7 +229,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 ### WordPress Hub
 
-**Website Build Pipeline** (22 skills): Project setup (with WordPress/Astro platform choice), Phase 0 client data collection (Drive folder, BasicOps access checklist, data-gathering email, weekly automated follow-up), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), the pre-launch QA checklist (automated + guided, for both WordPress and Astro), Rank Math 301 redirect management, and the Phase 4 digital audit (automated GA4 checks — data, key events, Ads link — plus a manual GTM/Search Console checklist).
+**Website Build Pipeline** (23 skills): Project setup (with WordPress/Astro platform choice), Phase 0 client data collection (Drive folder, BasicOps access checklist, data-gathering email, weekly automated follow-up), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), Decap CMS setup for Astro on Cloudflare Pages (Git-backed editing, drafts, scheduled publishing, deploy previews), the pre-launch QA checklist (automated + guided, for both WordPress and Astro), Rank Math 301 redirect management, and the Phase 4 digital audit (automated GA4 checks — data, key events, Ads link — plus a manual GTM/Search Console checklist).
 
 **Git Repo Workflow** (2 skills): First-time client repo setup — creates GitHub repos, scaffolds docs/ context folder, commits initial scaffold (`repo-init`). Clones an existing client project onto a new machine or pulls the latest (`repo-install`).
 
@@ -218,9 +247,19 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 **Session Capture** (1 skill): Scan conversation context for skill learnings and client profile updates, write to the correct LEARNED.md and client_profile.md files.
 
-### Client Updates Hub
+### Client Updates Hub (deprecated — moved to Project Hub)
 
-**Client Communication** (3 skills): Post-meeting debrief from Fathom transcripts — updates client state files, syncs follow-up work to BasicOps with context (moves the client's card to Follow Up, adds a Meeting Notes subtask, creates follow-up tasks, and routes client-owed action items to Kristalyn for follow-up), identifies and routes any follow-on work the meeting generates to the right specialist agent (research and drafts run automatically, live-system changes get a ready-to-run plan you can resume in a fresh session), and drafts a team summary email. Propagates a client data change (name, services, contact, branding) across every file that references it. Generates plain-language client-facing update emails after completing work.
+**Client Communication** (3 skills, shims only): All three skills now live in `lhm-project-hub`; the entries here route straight there. See the Project Hub catalog below for current descriptions. Kept in place so existing muscle memory and any external references to `lhm-client-updates-hub:*` keep working.
+
+### Project Hub
+
+**Client Lifecycle** (2 skills): Sales-to-delivery handover — pulls the sales conversation, creates the client folder, and hands off with a structured brief. Tier 1 client onboarding pipeline across four resumable phases (payment/billing, platform access, tracking setup, first 30 days).
+
+**Delivery Kickoffs** (6 skills): Website build kickoff (WordPress or Astro), PPC landing page campaign kickoff, SEO engagement kickoff, GMB/local SEO cycle kickoff, blog/article content pipeline kickoff, and Google Ads campaign build kickoff (gated on conversion tracking being live). Each follows the same shared pattern: intake, a project-management state file, a BasicOps scaffold with backwards-scheduled milestones, a client kickoff email, and handoff to the delivery specialist hub.
+
+**Client Success** (5 skills): Monthly per-client review engine with three modes (KP wrap-up, meeting prep, full account review). Quarterly strategy review — pulls three months of GA4/Ads/GSC data plus the quarter's monthly reports and drafts the next 3/6-month plan. Post-meeting debrief from Fathom transcripts — updates client state files, syncs follow-up work to BasicOps with context, routes follow-on work to the right specialist, drafts a team summary email (migrated from Client Updates Hub). Propagates a client data change across every file that references it (migrated from Client Updates Hub). Plain-language client-facing update emails after completing work (migrated from Client Updates Hub).
+
+**Project Managers** (3 skills): Website build PM doc, landing page campaign PM doc, and GMB optimisation cycle PM doc — all migrated from their originating hubs (WordPress hub, WordPress hub, GMB hub respectively); shims remain in place there so existing routing keeps working.
 
 ### Skill Ops
 

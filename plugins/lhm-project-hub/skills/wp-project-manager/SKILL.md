@@ -22,7 +22,16 @@ Before reading state, check the legacy locations
 `lp/**/landing-page-project-management.md` for LP). If found there and not at
 the new path: move the file to the new path, write a one-line pointer at the
 old path ("Moved to <new path> on YYYY-MM-DD"), and add/update the process
-block in current-projects.md (see references/folder-convention.md).
+block in current-projects.md using this format (see references/folder-convention.md):
+
+```markdown
+## Website — Status: <active | blocked | complete>
+- Phase: <phase name>
+- Owner: <team member>
+- Next action: <one line>
+- Detail: project-management/website.md
+- Updated: YYYY-MM-DD
+```
 
 ## Modes
 
