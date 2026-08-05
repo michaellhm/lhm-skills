@@ -119,7 +119,7 @@ Present all completed overlay pages with their linking instructions. Ask the use
 
 Save each approved page to `[client_folder]/gmb/monthly-optimization/YYYY-MM/[service]-near-[landmark-slug].md`.
 
-Update `GMBProjectManagement.md`:
+Update `project-management/gmb.md`:
 - Mark each overlay page as a completed sub-task with today's date
 - Record the output file paths
 - Note the internal linking instructions for implementation
@@ -137,4 +137,4 @@ If Local Falcon is not available, the skill can still run with user-supplied sub
 ## Output
 
 - `[client_folder]/gmb/monthly-optimization/YYYY-MM/[service]-near-[landmark-slug].md` — One file per overlay page (includes content, metadata, schema, linking instructions)
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md` — Sub-tasks marked complete
+- Updates: `[client_folder]/project-management/gmb.md` — Sub-tasks marked complete

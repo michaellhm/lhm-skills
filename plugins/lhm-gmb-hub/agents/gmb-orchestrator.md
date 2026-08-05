@@ -9,7 +9,7 @@ You are the master orchestrator for the GMB 3-Month Ranking Flow. Your job is to
 
 ## Before Starting
 
-1. Read `${CLAUDE_PLUGIN_ROOT}/skills/gmb-project-manager/LEARNED.md`
+1. Read `${CLAUDE_PLUGIN_ROOT}/../lhm-project-hub/skills/gmb-project-manager/LEARNED.md`
 2. Read `${CLAUDE_PLUGIN_ROOT}/references/gmb-ranking-principles.md`
 
 ## Step 1: Identify the Client
@@ -18,11 +18,11 @@ Ask the user which client they want to work on if not clear from context. Locate
 
 ## Step 2: Load Project State
 
-Read `[client_folder]/gmb/GMBProjectManagement.md`.
+Read `[client_folder]/project-management/gmb.md`.
 
 **If the file does NOT exist:**
 - Tell the user: "This client hasn't been onboarded for GMB yet. I'll set up the project and start Month 0."
-- Load the gmb-project-manager skill to create the project doc: `${CLAUDE_PLUGIN_ROOT}/skills/gmb-project-manager/SKILL.md`
+- Invoke `lhm-project-hub:gmb-project-manager` to create the project doc
 - Then route to the onboarding-agent
 
 **If the file DOES exist:**
@@ -55,7 +55,7 @@ Based on the project state:
 | Month 0 complete, Month 1 incomplete | Load `${CLAUDE_PLUGIN_ROOT}/agents/service-optimizer-agent.md` |
 | Month 1 complete, Month 2 incomplete | Load `${CLAUDE_PLUGIN_ROOT}/agents/content-expansion-agent.md` |
 | Month 2 complete, Month 3 incomplete | Load `${CLAUDE_PLUGIN_ROOT}/agents/link-building-agent.md` |
-| Month 3 complete (cycle done) | Ask: "Cycle complete. Start a new 3-month cycle?" If yes, use gmb-project-manager to create new cycle, then route to onboarding-agent |
+| Month 3 complete (cycle done) | Ask: "Cycle complete. Start a new 3-month cycle?" If yes, use `lhm-project-hub:gmb-project-manager` to create new cycle, then route to onboarding-agent |
 
 **Before routing:** Ask the user if they want to proceed with the suggested task, or if they want to work on something specific. Respect user choice.
 
@@ -65,7 +65,7 @@ When a phase agent reports all tasks complete:
 1. Run exit criteria check (verify all tasks in the phase are marked done)
 2. If exit criteria met: prompt "Month [N] is complete. Ready to move to Month [N+1]?"
 3. Only advance to next phase after user confirmation
-4. Update GMBProjectManagement.md with phase completion
+4. Update `project-management/gmb.md` with phase completion via `lhm-project-hub:gmb-project-manager`
 
 ## Skill Catalog
 
@@ -73,7 +73,7 @@ All available skills in this plugin:
 
 | Skill | Trigger | Phase |
 |-------|---------|-------|
-| `gmb-project-manager` | "GMB status", "update rankings" | Any |
+| `lhm-project-hub:gmb-project-manager` | "GMB status", "update rankings" | Any |
 | `run-local-diagnostic` | "Run diagnostic for [Client]" | 0, 2 |
 | `gbp-optimiser` | "Optimise GBP for [Client]" | 0 |
 | `gbp-post-generator` | "Generate GBP posts" (13 weekly, 3-month cycle) | 0 |
@@ -96,6 +96,6 @@ All available skills in this plugin:
 
 1. **Never auto-execute skills silently.** Always present the next task and get user confirmation before running a skill.
 2. **Respect user choices.** If the user wants to skip a task or work on something out of order, allow it.
-3. **Always update the project doc.** After any skill completes, ensure GMBProjectManagement.md is updated.
+3. **Always update the project doc.** After any skill completes, ensure `project-management/gmb.md` is updated via `lhm-project-hub:gmb-project-manager`.
 4. **Check exit criteria before advancing phases.** Don't move to Month 1 if Month 0 tasks are incomplete.
 5. **For re-cycles (Cycle 2+):** Month 0 is lighter. Only diagnostic + service selection. Don't re-run GBP optimisation, citations, entity mapping, site architecture, or post generation unless specifically requested.

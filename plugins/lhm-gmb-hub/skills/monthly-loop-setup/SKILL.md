@@ -1,11 +1,11 @@
 ---
 name: monthly-loop-setup
-description: "Set up (or update) a recurring automated monthly GMB optimisation run for a client — a scheduled task that works the client's GMBProjectManagement.md checklist, stages any site changes on a branch, creates a BasicOps follow-up task, and notifies the team via Telegram and email. Use this when the user says 'set up the monthly GMB loop for [Client]', 'automate the GMB cycle for [Client]', 'turn on the monthly loop', 'create a scheduled GMB run', or wants to repurpose an existing client's loop for a new client."
+description: "Set up (or update) a recurring automated monthly GMB optimisation run for a client — a scheduled task that works the client's project-management/gmb.md checklist, stages any site changes on a branch, creates a BasicOps follow-up task, and notifies the team via Telegram and email. Use this when the user says 'set up the monthly GMB loop for [Client]', 'automate the GMB cycle for [Client]', 'turn on the monthly loop', 'create a scheduled GMB run', or wants to repurpose an existing client's loop for a new client."
 ---
 
 # Monthly Loop Setup
 
-Creates a `create_scheduled_task` cron job that runs the GMB monthly cycle end-to-end for one client: works the outstanding checklist items in `GMBProjectManagement.md`, stages any site edits on a branch (never merges), updates the PM doc, creates a BasicOps task with per-action sub-tasks, and sends a Telegram + email summary. This skill only sets up the automation — it does not itself run the monthly work.
+Creates a `create_scheduled_task` cron job that runs the GMB monthly cycle end-to-end for one client: works the outstanding checklist items in `project-management/gmb.md`, stages any site edits on a branch (never merges), updates the PM doc, creates a BasicOps task with per-action sub-tasks, and sends a Telegram + email summary. This skill only sets up the automation — it does not itself run the monthly work.
 
 This was first built and proven out manually for Align Health Co (see `${CLAUDE_PLUGIN_ROOT}/skills/monthly-loop-setup/references/loop-prompt-template.md` — that template is the distilled, working version). Use this skill to repeat the setup for any other client without re-deriving it from scratch.
 
@@ -15,8 +15,8 @@ Read `${CLAUDE_PLUGIN_ROOT}/skills/monthly-loop-setup/LEARNED.md` if it exists �
 
 ## Step 1: Identify the client and confirm prerequisites
 
-1. Confirm which client. Locate `[client_folder]/gmb/GMBProjectManagement.md`.
-2. **If it doesn't exist:** this client hasn't been onboarded for GMB yet. Route to the `gmb-project-manager` skill / `gmb-orchestrator` agent first — the loop needs a PM doc to work from. Don't proceed with loop setup until it exists.
+1. Confirm which client. Locate `[client_folder]/project-management/gmb.md`.
+2. **If it doesn't exist:** this client hasn't been onboarded for GMB yet. Route to the `lhm-project-hub:gmb-project-manager` skill / `gmb-orchestrator` agent first — the loop needs a PM doc to work from. Don't proceed with loop setup until it exists.
 3. Check for a website repo (Astro, WordPress, or otherwise) under the client folder — look for a `website/` or similar directory with a `.git` repo. Note whether it exists, its path, its default branch, and whether `git status` on the default branch is currently clean or has pending uncommitted work. If there's no site repo yet, the loop simply skips the site-staging section entirely.
 
 ## Step 2: Collect the config

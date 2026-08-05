@@ -70,7 +70,7 @@ Categorise each directory into:
 
 For corrections, specify exactly what needs to change (e.g. "Change phone from 03 9123 4567 to (03) 9123 4567").
 
-### 6. Update GMBProjectManagement.md
+### 6. Update project-management/gmb.md
 
 - Mark "Citation audit completed" as complete with today's date
 - Add a note listing the total: X directories checked, Y need new submissions, Z need corrections
@@ -84,5 +84,5 @@ For corrections, specify exactly what needs to change (e.g. "Change phone from 0
 ## Output
 
 - `[client_folder]/gmb/onboarding/citation_audit.md`
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md`
+- Updates: `[client_folder]/project-management/gmb.md`
 - Note: Manual submission and correction is still required. This skill identifies what needs doing.

@@ -54,7 +54,7 @@
       "name": "lhm-gmb-hub",
       "source": "./plugins/lhm-gmb-hub",
       "description": "Google Business Profile optimisation system - repeating 3-month cycle of GBP foundation, service page optimisation, content expansion, and strategic link building with per-client project management tracking.",
-      "version": "1.4.0",
+      "version": "1.4.1",
       "category": "local-seo",
       "tags": [
         "gmb",
@@ -125,7 +125,7 @@
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
       "description": "LHM project management hub — sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
-      "version": "0.1.5",
+      "version": "0.1.6",
       "category": "utilities",
       "tags": [
         "project-management",

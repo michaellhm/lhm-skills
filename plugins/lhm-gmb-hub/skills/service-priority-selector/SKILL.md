@@ -88,7 +88,7 @@ Display prominently: **"Confirm with Michael before proceeding."**
 
 Do not mark as complete or update the project doc until the user confirms the selection has been approved.
 
-### 7. Update GMBProjectManagement.md
+### 7. Update project-management/gmb.md
 
 Once approved:
 - Record the 3 priority services in the Cycle Focus section
@@ -108,4 +108,4 @@ Once approved:
 ## Output
 
 - `[client_folder]/gmb/monthly-optimization/YYYY-MM/service_priorities.md`
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md`
+- Updates: `[client_folder]/project-management/gmb.md`

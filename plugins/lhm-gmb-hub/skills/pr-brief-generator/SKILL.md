@@ -23,7 +23,7 @@ Check whether PR distribution is part of this client's plan. If unclear, ask the
 
 "PR distribution is an optional part of Month 3. Does [Client] have budget for PR distribution this cycle? If not, we can skip this and focus on chambers and sponsorships."
 
-If the user confirms no budget, mark as skipped in `GMBProjectManagement.md` and exit.
+If the user confirms no budget, mark as skipped in `project-management/gmb.md` and exit.
 
 ### 2. Identify Newsworthy Angle
 
@@ -106,7 +106,7 @@ Ask the user to review, approve, or request changes. Note that the actual distri
 
 ### 8. Update Project Doc
 
-Update `GMBProjectManagement.md`:
+Update `project-management/gmb.md`:
 - Mark the PR brief task as complete with today's date (or mark as "skipped — no viable angle" if that was the outcome)
 - Record the target link URLs
 - Note the newsworthy angle used
@@ -122,4 +122,4 @@ This skill has no hard MCP dependencies. It runs entirely on web search and the 
 ## Output
 
 - `[client_folder]/gmb/monthly-optimization/YYYY-MM/press_release.md` — Full press release draft with target link URLs
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md` — Task marked complete or skipped
+- Updates: `[client_folder]/project-management/gmb.md` — Task marked complete or skipped

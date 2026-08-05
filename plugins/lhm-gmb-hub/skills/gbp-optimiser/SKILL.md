@@ -109,7 +109,7 @@ Present the complete optimisation plan to the user:
 
 Ask the user to review and approve before marking as complete.
 
-### 9. Update GMBProjectManagement.md
+### 9. Update project-management/gmb.md
 
 Mark the following tasks as complete (as applicable):
 - GBP categories optimised
@@ -127,5 +127,5 @@ Mark the following tasks as complete (as applicable):
 ## Output
 
 - `[client_folder]/gmb/onboarding/gbp_optimisation_plan.md`
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md`
+- Updates: `[client_folder]/project-management/gmb.md`
 - Note: Changes must be manually applied in the GBP dashboard. This skill generates the plan only.

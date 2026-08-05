@@ -11,13 +11,13 @@ Runs a 169-point grid scan for the client's primary keyword, records the Top 3% 
 
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/run-local-diagnostic/LEARNED.md`
 2. Read `client_profile.md` for client details, primary keyword, and location
-3. Check `GMBProjectManagement.md` to determine if this is a Month 0 baseline or Month 2 re-run
+3. Check `project-management/gmb.md` to determine if this is a Month 0 baseline or Month 2 re-run
 
 ## Workflow
 
 ### 1. Determine Diagnostic Type
 
-Read the client's `GMBProjectManagement.md` to determine:
+Read the client's `project-management/gmb.md` to determine:
 - **Baseline (Month 0):** First diagnostic for this cycle. No previous data to compare against.
 - **Re-run (Month 2):** Previous baseline exists. Will compare against it to show trend.
 
@@ -88,7 +88,7 @@ Write the full diagnostic report including:
 - Threshold calculation and direction recommendation
 - If re-run: comparison table against previous diagnostic
 
-### 10. Update GMBProjectManagement.md
+### 10. Update project-management/gmb.md
 
 - Record the Top 3% metric in the ranking history table
 - Record the threshold decision and diagnostic direction in the Cycle Focus section
@@ -107,4 +107,4 @@ Write the full diagnostic report including:
 
 - **Month 0 baseline:** `[client_folder]/gmb/onboarding/diagnostic_report.md`
 - **Month 2 re-run:** `[client_folder]/gmb/monthly-optimization/YYYY-MM/diagnostic_rerun.md`
-- **Always updates:** `[client_folder]/gmb/GMBProjectManagement.md`
+- **Always updates:** `[client_folder]/project-management/gmb.md`

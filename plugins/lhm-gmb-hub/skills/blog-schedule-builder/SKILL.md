@@ -1,13 +1,13 @@
 ---
 name: blog-schedule-builder
-description: "Generate a 3-month blog content schedule (topics, target keywords, publish dates) for a client, matching the GMB program's 3-month cycle length. Posts-per-month is client-specific, read from GMBProjectManagement.md. Use this when the user mentions 'blog schedule for [Client]', 'blog content calendar', 'blog plan', 'quarterly blog schedule', or '3 month blog plan'."
+description: "Generate a 3-month blog content schedule (topics, target keywords, publish dates) for a client, matching the GMB program's 3-month cycle length. Posts-per-month is client-specific, read from project-management/gmb.md. Use this when the user mentions 'blog schedule for [Client]', 'blog content calendar', 'blog plan', 'quarterly blog schedule', or '3 month blog plan'."
 ---
 
 # Blog Schedule Builder
 
-Generates a 3-month blog content schedule for a client: topics, target keywords, publish dates, and internal-link targets. Scoped to 3 months to match the GMB program's cycle length (see `gmb-project-manager`) — regenerate a fresh schedule at the start of each new cycle rather than planning a year at once.
+Generates a 3-month blog content schedule for a client: topics, target keywords, publish dates, and internal-link targets. Scoped to 3 months to match the GMB program's cycle length (see `lhm-project-hub:gmb-project-manager`) — regenerate a fresh schedule at the start of each new cycle rather than planning a year at once.
 
-Posts-per-month varies by client (budget, content team capacity, existing cadence) and is not assumed — it's read from `GMBProjectManagement.md`, confirmed with the user, and stored there for future runs.
+Posts-per-month varies by client (budget, content team capacity, existing cadence) and is not assumed — it's read from `project-management/gmb.md`, confirmed with the user, and stored there for future runs.
 
 ## Before Starting
 
@@ -15,7 +15,7 @@ Posts-per-month varies by client (budget, content team capacity, existing cadenc
 2. Read `client_profile.md` for services, modality, ICP, brand voice, and location
 3. Read `${CLAUDE_PLUGIN_ROOT}/references/anti-ai-writing-guidelines.json`
 4. If healthcare client: read `${CLAUDE_PLUGIN_ROOT}/references/ahpra-compliance-framework.md`
-5. Read `[client_folder]/gmb/GMBProjectManagement.md`
+5. Read `[client_folder]/project-management/gmb.md`
 
 ## Workflow
 
@@ -24,7 +24,7 @@ Posts-per-month varies by client (budget, content team capacity, existing cadenc
 Read the **Blog Posts Per Month** field from the PM doc's Overview section.
 
 - **If present:** use it, but sanity-check against reality — look for an existing blog folder or content plan (e.g. `content-strategy/*.csv`, `blog_draft/`) and compare actual recent publishing cadence against the stated figure. If they've drifted apart, flag the mismatch to the user before proceeding rather than silently trusting the stale number.
-- **If missing:** this is a legacy client doc from before this field existed. Look for an existing content plan or blog folder to infer a sensible default cadence (count posts published over a recent 3-month window), propose it to the user, confirm, then write it into the PM doc's Overview section via the `gmb-project-manager` skill so future runs don't need to ask again.
+- **If missing:** this is a legacy client doc from before this field existed. Look for an existing content plan or blog folder to infer a sensible default cadence (count posts published over a recent 3-month window), propose it to the user, confirm, then write it into the PM doc's Overview section via the `lhm-project-hub:gmb-project-manager` skill so future runs don't need to ask again.
 - **If no signal at all:** ask the user directly. Don't default silently — cadence has real cost/resourcing implications for the team.
 
 ### 2. Gather topic inputs
@@ -65,9 +65,9 @@ For healthcare/regulated clients, sanity-check every title/angle against the AHP
 Publish Date, Article Title, Main Keyword, Monthly Search Volume, Competition Score, Target URL, Modality, ICP, Internal Link Destination, Strategic Note
 ```
 
-### 6. Update GMBProjectManagement.md
+### 6. Update project-management/gmb.md
 
-Mark "Blog content schedule generated (3 months)" as complete with today's date. Note the posts-per-month figure used and where it came from (existing field / inferred / user-confirmed).
+Mark "Blog content schedule generated (3 months)" as complete with today's date, via `lhm-project-hub:gmb-project-manager`. Note the posts-per-month figure used and where it came from (existing field / inferred / user-confirmed).
 
 ## MCP Dependencies
 
@@ -79,5 +79,5 @@ Mark "Blog content schedule generated (3 months)" as complete with today's date.
 ## Output
 
 - `[client_folder]/content-strategy/blog_schedule_[start-month]-[end-month]-[year].csv` (match existing naming convention if a content-strategy folder already exists) — falls back to `[client_folder]/gmb/onboarding/blog_schedule_3_months.csv` if there's no existing content-strategy folder
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md` (task completion + Blog Posts Per Month field if it was missing/inferred)
+- Updates: `[client_folder]/project-management/gmb.md` (task completion + Blog Posts Per Month field if it was missing/inferred)
 - Note: schedule needs human review for priority/voice before writers start producing drafts

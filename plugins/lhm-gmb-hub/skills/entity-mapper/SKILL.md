@@ -76,7 +76,7 @@ Write the entity map with:
 - Gap analysis against client's current content
 - Priority entities to incorporate in future content
 
-### 7. Update GMBProjectManagement.md
+### 7. Update project-management/gmb.md
 
 - Mark "Entity mapping completed" as complete with today's date
 - Note the total entity count and number of gaps identified
@@ -92,5 +92,5 @@ Write the entity map with:
 ## Output
 
 - `[client_folder]/gmb/onboarding/entity_map.md`
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md`
+- Updates: `[client_folder]/project-management/gmb.md`
 - Note: The entity map is referenced automatically by all content-producing skills (service-page-writer, faq-content-builder, neighbourhood-overlay-writer)

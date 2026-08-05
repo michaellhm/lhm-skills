@@ -21,7 +21,7 @@ Discovers real questions people ask about a service through Google PAA expansion
 
 ### 1. Confirm Service and Context
 
-Confirm which service to build FAQ content for. Check `GMBProjectManagement.md` for which services were optimised in Month 1 and which supporting content tasks are outstanding.
+Confirm which service to build FAQ content for. Check `project-management/gmb.md` for which services were optimised in Month 1 and which supporting content tasks are outstanding.
 
 Identify the parent service page URL (the page this FAQ content will link back to and support).
 
@@ -120,7 +120,7 @@ Present all completed FAQ pages with their brief answers and editorial link text
 
 Save each approved page to `[client_folder]/gmb/monthly-optimization/YYYY-MM/faq-[question-slug].md`.
 
-Update `GMBProjectManagement.md`:
+Update `project-management/gmb.md`:
 - Mark each FAQ page as a completed sub-task with today's date
 - Record the output file paths
 - Note the brief answers and editorial links (for when the parent service page is updated)
@@ -137,4 +137,4 @@ If Keywords Everywhere is not available, display setup instructions from `${CLAU
 ## Output
 
 - `[client_folder]/gmb/monthly-optimization/YYYY-MM/faq-[question-slug].md` — One file per FAQ page (includes content, metadata, schema)
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md` — Sub-tasks marked complete
+- Updates: `[client_folder]/project-management/gmb.md` — Sub-tasks marked complete

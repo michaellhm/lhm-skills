@@ -129,7 +129,7 @@ Ask the user to review and approve, or flag sections for revision.
 
 Save the approved content to `[client_folder]/gmb/monthly-optimization/YYYY-MM/[service-slug].md`.
 
-Update `GMBProjectManagement.md`:
+Update `project-management/gmb.md`:
 - Mark the service page task as complete with today's date
 - Record the output file path
 - Add any notes about the content direction or decisions made
@@ -147,4 +147,4 @@ If Keywords Everywhere is not available, display setup instructions from `${CLAU
 ## Output
 
 - `[client_folder]/gmb/monthly-optimization/YYYY-MM/[service-slug].md` — Full service page content with metadata and schema
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md` — Task marked complete
+- Updates: `[client_folder]/project-management/gmb.md` — Task marked complete

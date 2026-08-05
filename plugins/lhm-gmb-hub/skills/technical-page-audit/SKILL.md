@@ -108,7 +108,7 @@ Action Items:
 
 ### 9. Update Project Doc
 
-Update `GMBProjectManagement.md`:
+Update `project-management/gmb.md`:
 - Mark the technical audit task as complete with today's date
 - Record the overall pass/fail count
 - Note any items that need manual fixing (e.g. adding page to sitemap, fixing schema)
@@ -125,4 +125,4 @@ If GSC is not available, display setup instructions from `${CLAUDE_PLUGIN_ROOT}/
 ## Output
 
 - `[client_folder]/gmb/monthly-optimization/YYYY-MM/technical_audit.md` — Pass/fail checklist with action items
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md` — Task marked complete
+- Updates: `[client_folder]/project-management/gmb.md` — Task marked complete

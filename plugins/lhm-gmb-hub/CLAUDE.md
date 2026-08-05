@@ -50,7 +50,7 @@ Never generate long-form content in a single pass. The 8-pass system exists to p
 
 ## Mandatory: Project Doc Updates
 
-Every skill that completes a task MUST update `GMBProjectManagement.md` in the client's gmb/ folder:
+Every skill that completes a task MUST update `project-management/gmb.md` at the client root, via the `lhm-project-hub:gmb-project-manager` skill:
 - Mark the relevant task as `[x]` with a completion date
 - Record any key outputs or metrics
 - Add notes for any decisions made
@@ -107,14 +107,18 @@ This plugin uses several MCP servers that may not be installed. When a skill req
 
 ## Output Structure
 
-All skill outputs go to the client folder under `gmb/`:
+The PM doc lives at `client_folder/project-management/gmb.md` (owned by
+`lhm-project-hub:gmb-project-manager`). All other skill outputs go to the client
+folder under `gmb/`:
 
 ```
-client_folder/gmb/
-├── GMBProjectManagement.md
-├── onboarding/           # Month 0 outputs
-└── monthly-optimization/
-    └── YYYY-MM/          # Per-month outputs
+client_folder/
+├── project-management/
+│   └── gmb.md
+└── gmb/
+    ├── onboarding/           # Month 0 outputs
+    └── monthly-optimization/
+        └── YYYY-MM/          # Per-month outputs
 ```
 
 Skills must create these directories if they don't exist before writing output files.

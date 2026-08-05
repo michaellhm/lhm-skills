@@ -11,7 +11,7 @@ Pulls performance data from GSC, GA4, and Local Falcon, compares against the bas
 
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/monthly-cycle-report/LEARNED.md`
 2. Identify the client and locate their `client_profile.md`
-3. Read `[client_folder]/gmb/GMBProjectManagement.md` — determine which month of the cycle this is
+3. Read `[client_folder]/project-management/gmb.md` — determine which month of the cycle this is
 4. Read `[client_folder]/gmb/onboarding/diagnostic_report.md` — baseline data for comparison
 5. Read `[client_folder]/gmb/monthly-optimization/YYYY-MM/service_priorities.md` — current cycle's priority services
 
@@ -19,7 +19,7 @@ Pulls performance data from GSC, GA4, and Local Falcon, compares against the bas
 
 ### 1. Determine Report Type
 
-Read `GMBProjectManagement.md` to identify:
+Read `project-management/gmb.md` to identify:
 - Current cycle number
 - Current month within the cycle (1, 2, or 3)
 - Which tasks have been completed this month
@@ -58,7 +58,7 @@ Calculate changes:
 
 ### 4. Compile Work Summary
 
-From `GMBProjectManagement.md`, list all completed tasks for the current month with their completion dates and output file paths.
+From `project-management/gmb.md`, list all completed tasks for the current month with their completion dates and output file paths.
 
 ### 5. Generate Report — Adapt by Month
 
@@ -200,7 +200,7 @@ Present the formatted report for review. Ask if any sections need adjustment or 
 
 Save the report to `[client_folder]/gmb/monthly-optimization/YYYY-MM/month_N_report.md`.
 
-Update `GMBProjectManagement.md`:
+Update `project-management/gmb.md`:
 - Mark the month report task as complete with today's date
 - Update the ranking history table with current month's data
 - For Month 3: complete the Cycle Summary section and add next-cycle recommendations
@@ -219,4 +219,4 @@ If any MCP is unavailable, display setup instructions from `${CLAUDE_PLUGIN_ROOT
 ## Output
 
 - `[client_folder]/gmb/monthly-optimization/YYYY-MM/month_N_report.md` — Formatted monthly or cycle report
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md` — Rankings updated, report task marked complete, Cycle Summary populated (Month 3 only)
+- Updates: `[client_folder]/project-management/gmb.md` — Rankings updated, report task marked complete, Cycle Summary populated (Month 3 only)

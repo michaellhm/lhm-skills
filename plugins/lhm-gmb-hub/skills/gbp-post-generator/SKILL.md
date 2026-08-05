@@ -7,7 +7,7 @@ description: "Generate 13 weekly Google Business Profile posts (one 3-month cycl
 
 Generates one 3-month cycle's worth (13 weekly posts) of Google Business Profile posts in CSV format, rotating between service highlights, tips, seasonal content, and team spotlights. All posts are AHPRA compliant and follow anti-AI writing guidelines.
 
-The GMB program runs in 3-month cycles (see `gmb-project-manager`) — the post calendar is scoped to match, so it's fully consumed and reviewed within the cycle it belongs to rather than going stale for 9 months. Generate a fresh 13-post batch at the start of each new cycle (Month 0) rather than trying to plan a year up front.
+The GMB program runs in 3-month cycles (see `lhm-project-hub:gmb-project-manager`) — the post calendar is scoped to match, so it's fully consumed and reviewed within the cycle it belongs to rather than going stale for 9 months. Generate a fresh 13-post batch at the start of each new cycle (Month 0) rather than trying to plan a year up front.
 
 ## Before Starting
 
@@ -23,7 +23,7 @@ If a legacy 52-week/12-month calendar file already exists for this client:
 1. Read it in full.
 2. Keep only the first 13 rows (weeks 1–13 / the first ~3 months from its start date) — these are the posts closest to being reviewed/scheduled and most likely already brand-voice-approved or in progress.
 3. Write the trimmed result to `[client_folder]/gmb/onboarding/gbp_posts_3_months.csv` (new filename — see Output). Do not overwrite the original file; leave it in place as a historical artifact.
-4. Note in `GMBProjectManagement.md` that the calendar was shortened from 52 to 13 weeks to match the 3-month cycle length, and that weeks 14–52 of the old file were dropped (a fresh 13-post batch will be generated at the start of the next cycle instead).
+4. Note in `project-management/gmb.md` that the calendar was shortened from 52 to 13 weeks to match the 3-month cycle length, and that weeks 14–52 of the old file were dropped (a fresh 13-post batch will be generated at the start of the next cycle instead).
 5. Skip Steps 1–4 below — go straight to Step 5 (CSV output, already done) and Step 6 (update PM doc).
 
 If no existing calendar (or an existing 13-or-fewer-row one) is found, proceed with the normal generation workflow below.
@@ -80,9 +80,9 @@ Week Number, Post Date, Post Type, Post Content, CTA Link
 
 Ensure the Post Content column properly escapes any commas or quotes.
 
-### 6. Update GMBProjectManagement.md
+### 6. Update project-management/gmb.md
 
-Mark "13 weekly GBP posts generated (3-month cycle)" as complete with today's date.
+Mark "13 weekly GBP posts generated (3-month cycle)" as complete with today's date, via `lhm-project-hub:gmb-project-manager`.
 
 ## MCP Dependencies
 
@@ -93,5 +93,5 @@ Mark "13 weekly GBP posts generated (3-month cycle)" as complete with today's da
 ## Output
 
 - `[client_folder]/gmb/onboarding/gbp_posts_3_months.csv`
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md`
+- Updates: `[client_folder]/project-management/gmb.md`
 - Note: Posts need human review for brand voice before scheduling in GBP

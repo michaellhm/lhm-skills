@@ -6,7 +6,7 @@ A Claude Code plugin that executes a repeating 3-month Google Business Profile o
 
 17 skills and 6 agents organised into a structured workflow: Month 0 (onboarding and GBP foundation), Month 1 (service page optimisation), Month 2 (content expansion), Month 3 (strategic link building). The cycle then repeats with new priority services.
 
-The plugin maintains a per-client `GMBProjectManagement.md` file that tracks all tasks, focus keywords with ranking history, and cycle progress. When resuming work, the orchestrator reads this file to understand where the client is and what needs doing next.
+The plugin maintains a per-client `project-management/gmb.md` file (via `lhm-project-hub:gmb-project-manager`) that tracks all tasks, focus keywords with ranking history, and cycle progress. When resuming work, the orchestrator reads this file to understand where the client is and what needs doing next.
 
 All content production uses an 8-pass writing engine designed to produce human-like content that passes AI detection.
 
@@ -16,7 +16,7 @@ All content production uses an 8-pass writing engine designed to produce human-l
 2. **Detection** — The orchestrator reads the project doc and identifies the current phase
 3. **Routing** — Routes to the appropriate phase agent (onboarding, service optimizer, content expansion, or link building)
 4. **Execution** — Phase agent walks through skills in order, getting user confirmation before each
-5. **Tracking** — Every completed task updates GMBProjectManagement.md
+5. **Tracking** — Every completed task updates `project-management/gmb.md` via `lhm-project-hub:gmb-project-manager`
 
 ## Structure
 
@@ -33,7 +33,7 @@ plugins/lhm-gmb-hub/
 │   ├── link-building-agent.md              # Month 3
 │   └── content-writer.md                   # 8-pass writing utility
 ├── skills/                                 # All 17 skills
-│   ├── gmb-project-manager/                # Project tracking
+│   ├── gmb-project-manager/                # Shim → lhm-project-hub:gmb-project-manager
 │   ├── run-local-diagnostic/               # Grid scans + competitor audit
 │   ├── gbp-optimiser/                      # GBP profile optimisation
 │   ├── gbp-post-generator/                 # 52 weekly posts
@@ -69,7 +69,7 @@ plugins/lhm-gmb-hub/
 
 | Skill | Description |
 |-------|-------------|
-| `gmb-project-manager` | Read, create, or update the per-client project tracking document |
+| `lhm-project-hub:gmb-project-manager` | Read, create, or update `project-management/gmb.md` |
 | `run-local-diagnostic` | 169-point grid scan, competitor audit, threshold calculation |
 | `gbp-optimiser` | Categories, services, business description, profile completion |
 | `gbp-post-generator` | 52 weekly GBP posts in CSV format |

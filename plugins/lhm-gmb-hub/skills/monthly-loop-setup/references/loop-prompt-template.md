@@ -8,22 +8,22 @@ You are running the monthly GMB (Google Business Profile) optimisation cycle for
 
 ## 0. Orientation
 - Working directory root: `{{CLIENT_FOLDER}}`
-- Project management file (the source of truth for what's done/pending): `gmb/GMBProjectManagement.md`
+- Project management file (the source of truth for what's done/pending): `project-management/gmb.md` (owned by `lhm-project-hub:gmb-project-manager`)
 - {{OPTIONAL: SITE REPO LINE}} Website repo: `{{SITE_REPO_PATH}}` (git repo, remote `origin` = `{{SITE_REPO_REMOTE}}`, default branch `{{SITE_REPO_DEFAULT_BRANCH}}`)
 - {{OPTIONAL: NOTEBOOKLM LINE}} If you get stuck, hit an ambiguous decision, or need background on how this GMB process/infrastructure was built, consult the NotebookLM notebook FIRST before guessing: {{NOTEBOOKLM_URL}} (use the `notebooklm` MCP tools — `ask_question` etc.)
 - Use the `lhm-gmb-hub` plugin skills/agents for all GMB-specific work (start with the `lhm-gmb-hub:gmb-orchestrator` agent — it detects the current phase from the PM doc and routes to the right phase agent: onboarding-agent for Month 0, service-optimizer-agent for Month 1, content-expansion-agent for Month 2, link-building-agent for Month 3). Also use `lhm-marketing-hub` skills where they're a better fit for a specific sub-task than the GMB-hub equivalent.
 
 ## 1. Read state
-- Read `gmb/GMBProjectManagement.md` in full. Identify the current phase (Month 0/1/2/3) and which checklist items are unchecked.
+- Read `project-management/gmb.md` in full. Identify the current phase (Month 0/1/2/3) and which checklist items are unchecked.
 - {{OPTIONAL: SITE REPO BLOCK}} Check the site repo's git status/log to understand what's already been done there. If `{{SITE_REPO_DEFAULT_BRANCH}}` has significant pre-existing uncommitted/untracked work that looks unrelated to this run, do NOT commit, discard, or otherwise touch it — note it in your Telegram update and the PM doc, and skip straight to any non-site tasks (GBP profile, citations, link building, diagnostics, reporting) instead. Only proceed with site-repo work once `{{SITE_REPO_DEFAULT_BRANCH}}` is clean.
 
 ## 2. Do the work
-- Work through the current phase's unchecked checklist items in `GMBProjectManagement.md`, running the relevant `lhm-gmb-hub` skills/agents for each (e.g. `gbp-post-generator`, `citation-audit`, `entity-mapper`, `site-architecture-mapper`, `service-priority-selector`, `service-page-writer`, `technical-page-audit`, `run-local-diagnostic`, `faq-content-builder`, `neighbourhood-overlay-writer`, `link-gap-finder`, `local-authority-finder`, `pr-brief-generator`, `monthly-cycle-report`, etc. — pick whichever match the outstanding items).
+- Work through the current phase's unchecked checklist items in `project-management/gmb.md`, running the relevant `lhm-gmb-hub` skills/agents for each (e.g. `gbp-post-generator`, `citation-audit`, `entity-mapper`, `site-architecture-mapper`, `service-priority-selector`, `service-page-writer`, `technical-page-audit`, `run-local-diagnostic`, `faq-content-builder`, `neighbourhood-overlay-writer`, `link-gap-finder`, `local-authority-finder`, `pr-brief-generator`, `monthly-cycle-report`, etc. — pick whichever match the outstanding items).
 - {{OPTIONAL: SITE REPO STAGING BLOCK}} **Site-editing staging workflow**: if `{{SITE_REPO_DEFAULT_BRANCH}}` is clean (see above), before making any site edits: `git checkout {{SITE_REPO_DEFAULT_BRANCH}} && git pull` then create/checkout a branch named `gmb-cycle-YYYY-MM` (year-month of this run) off latest `{{SITE_REPO_DEFAULT_BRANCH}}`. Make all site content/code changes on this branch only. Commit with clear messages. Push the branch to `origin`. Do NOT merge into `{{SITE_REPO_DEFAULT_BRANCH}}` and do NOT open a PR unless explicitly asked — a human merges the branch manually after review.
 - GBP profile changes (categories, services, description, posts, Q&A, photos) and any other live/client-facing publishing action: complete the drafting/prep work, but if the action is irreversible or client-visible (e.g. actually publishing to the live Google Business Profile, or anything requiring the client's own login), stop short of executing it, prepare everything ready to go, and flag clearly what's ready and waiting.
 
 ## 3. Update the project management file
-- After each task (or attempted task) this run, edit `gmb/GMBProjectManagement.md`:
+- After each task (or attempted task) this run, edit `project-management/gmb.md`:
   - Tick off `[ ]` → `[x]` for completed checklist items, with the date.
   - Add a short dated note under a "Notes & Watch-Items" or "Monthly Loop Log" section for anything relevant: what was done, what's blocked, what's waiting on the client/human, links to any new files produced.
   - If you moved into a new Month/phase, update the `Current Phase` field at the top.

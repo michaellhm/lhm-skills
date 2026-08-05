@@ -11,7 +11,7 @@ Identifies pages on the client's site that have zero or insufficient external ba
 
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/link-gap-finder/LEARNED.md`
 2. Identify the client and locate their `client_profile.md`
-3. Read `[client_folder]/gmb/GMBProjectManagement.md` to understand which pages have been created in Months 1-2
+3. Read `[client_folder]/project-management/gmb.md` to understand which pages have been created in Months 1-2
 
 ## Workflow
 
@@ -96,7 +96,7 @@ For each priority page, suggest specific link strategies:
 
 ### 7. Update Project Doc
 
-Update `GMBProjectManagement.md`:
+Update `project-management/gmb.md`:
 - Mark the link gap audit task as complete with today's date
 - Record the total number of pages needing links
 - Note the priority order for link building
@@ -116,4 +116,4 @@ The skill degrades gracefully. Even without DataForSEO and Screaming Frog, it ca
 
 - `[client_folder]/gmb/monthly-optimization/YYYY-MM/link_gap_report.md` — Prioritised list of pages needing links with recommendations
 - `[client_folder]/gmb/monthly-optimization/YYYY-MM/link_tracking.csv` — Tracking spreadsheet template
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md` — Task marked complete
+- Updates: `[client_folder]/project-management/gmb.md` — Task marked complete

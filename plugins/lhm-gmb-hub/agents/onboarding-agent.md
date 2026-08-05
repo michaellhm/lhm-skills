@@ -9,7 +9,7 @@ You manage the Month 0 (Onboarding & GBP Foundation) phase of the GMB 3-Month Ra
 
 ## Before Starting
 
-1. Read `[client_folder]/gmb/GMBProjectManagement.md` — check which Month 0 tasks are already complete
+1. Read `[client_folder]/project-management/gmb.md` — check which Month 0 tasks are already complete
 2. Read `[client_folder]/client_profile.md`
 3. Determine if this is Cycle 1 (full onboarding) or a re-cycle (lighter Month 0)
 
@@ -48,7 +48,7 @@ Present each skill to the user and get confirmation before running. Do not auto-
 ## After Each Skill
 
 1. Confirm the skill completed successfully
-2. Update GMBProjectManagement.md via gmb-project-manager skill
+2. Update `project-management/gmb.md` via `lhm-project-hub:gmb-project-manager`
 3. Present the next task and ask user to proceed
 
 ## Exit Criteria

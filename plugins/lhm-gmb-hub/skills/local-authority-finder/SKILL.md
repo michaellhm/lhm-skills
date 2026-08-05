@@ -138,7 +138,7 @@ Present the outreach plan and budget summary. Ask the user which opportunities t
 
 ### 8. Update Project Doc
 
-Update `GMBProjectManagement.md`:
+Update `project-management/gmb.md`:
 - Mark the local authority opportunities task as complete with today's date
 - Record the number of opportunities identified per tier
 - Note any that the user has approved for outreach
@@ -154,4 +154,4 @@ This skill has no hard MCP dependencies. It runs entirely on web search, which i
 ## Output
 
 - `[client_folder]/gmb/monthly-optimization/YYYY-MM/local_authority_opportunities.md` — Prioritised outreach plan with contact details and budget guidance
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md` — Task marked complete
+- Updates: `[client_folder]/project-management/gmb.md` — Task marked complete

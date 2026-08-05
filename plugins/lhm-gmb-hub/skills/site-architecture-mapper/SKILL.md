@@ -91,7 +91,7 @@ Display the complete architecture to the user:
 
 Ask the user to review and confirm before finalising.
 
-### 7. Update GMBProjectManagement.md
+### 7. Update project-management/gmb.md
 
 - Mark "Site architecture mapped" as complete with today's date
 - Note the total page count (existing + new)
@@ -105,4 +105,4 @@ Ask the user to review and confirm before finalising.
 ## Output
 
 - `[client_folder]/gmb/onboarding/site_architecture.md`
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md`
+- Updates: `[client_folder]/project-management/gmb.md`

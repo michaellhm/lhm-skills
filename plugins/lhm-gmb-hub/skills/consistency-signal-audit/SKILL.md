@@ -88,7 +88,7 @@ For multi-location clients, also verify:
 
 Flag any GBP listings that point to the wrong page.
 
-### 6. Update GMBProjectManagement.md
+### 6. Update project-management/gmb.md
 
 - Mark "Homepage consistency signal audit" as complete with today's date
 - Expand the task with sub-items for each of the 8 signals (pass/fail)
@@ -104,4 +104,4 @@ Flag any GBP listings that point to the wrong page.
 ## Output
 
 - `[client_folder]/gmb/monthly-optimization/YYYY-MM/consistency_audit.md`
-- Updates: `[client_folder]/gmb/GMBProjectManagement.md`
+- Updates: `[client_folder]/project-management/gmb.md`
