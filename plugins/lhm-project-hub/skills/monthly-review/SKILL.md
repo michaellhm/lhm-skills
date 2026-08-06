@@ -145,7 +145,7 @@ Every metric line gets a plain-English one-liner — write it the way `client-up
 
 Brief + timed agenda ahead of the monthly client meeting. Produces `project-management/meetings/YYYY-MM-DD-meeting-brief.md`.
 
-Read the most recent file in `project-management/meetings/` that carries action items — prefer the latest `*-monthly-wrap.md`; if none exists yet (e.g. the first meeting after onboarding), fall back to the latest `*-meeting-notes.md` from `post-meeting-review`. Pull its "Next month's focus" / "Action Items" section as last meeting's open items.
+Read the most recent file in `project-management/meetings/` that carries action items — prefer the latest `*-monthly-wrap.md`; if none exists yet (e.g. the first meeting after onboarding), fall back to the latest `*-meeting-notes.md` from `client-meeting-email`. Pull its "Next month's focus" / "Action Items" section as last meeting's open items.
 
 ```markdown
 # Meeting Brief — <Client> — <Meeting Date>
@@ -163,7 +163,7 @@ Read the most recent file in `project-management/meetings/` that carries action 
 
 Use `references/templates/meeting-agenda.md` as the timed-agenda skeleton verbatim — don't redesign the agenda structure, just fill it with this client's specifics.
 
-Close with a reminder, exactly: "After the meeting, run `lhm-project-hub:post-meeting-review` to debrief it and update everything downstream."
+Close with a reminder, exactly: "After the meeting, run `lhm-project-hub:client-meeting-email` to capture it, then `lhm-project-hub:post-meeting-review` to triage the follow-up."
 
 ## Rules
 

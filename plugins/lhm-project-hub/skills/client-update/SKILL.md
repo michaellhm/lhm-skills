@@ -9,7 +9,7 @@ Propagate a change in client data across all files in the client folder. Log the
 
 ## Step 1: Understand the change
 
-**Read this before asking anything.** If invoked as a handoff from `post-meeting-review`, its Step 3.5 sweep has already produced the change, the file list, the forward-looking and historical split, the reversed decisions, and anything flagged on live advertising surfaces. Take those as given. Skip the questions below, skip the scan in Step 2, skip the detection work in 2b, 2c and 2d, then **start at Step 2e**. Do not skip that gate. It is the only thing standing between the handoff and edited files, because `post-meeting-review` deliberately edits nothing itself. When you finish Step 5, hand control back so `post-meeting-review` can continue at its Step 4.
+**Read this before asking anything.** If invoked as a handoff from `post-meeting-review`, its Step 3 sweep has already produced the change, the file list, the forward-looking and historical split, the reversed decisions, and anything flagged on live advertising surfaces. Take those as given. Skip the questions below, skip the scan in Step 2, skip the detection work in 2b, 2c and 2d, then **start at Step 2e**. Do not skip that gate. It is the only thing standing between the handoff and edited files, because `post-meeting-review` deliberately edits nothing itself. When you finish Step 5, hand control back so `post-meeting-review` can continue at its Step 4.
 
 Otherwise, ask:
 - What changed? (name, services, contact details, branding, location, other)
@@ -71,7 +71,7 @@ For each confirmed **forward-looking** file:
 
 Historical records do not get touched, whether the sort came from 2b or arrived with the handoff.
 
-For `client_profile.md`: add a change log entry at the top. If `post-meeting-review` has already updated the profile in its own Step 3, do not undo or duplicate that work; just add the log entry alongside it.
+For `client_profile.md`: add a change log entry at the top. If `post-meeting-review` has already updated the profile in its own Step 2, do not undo or duplicate that work; just add the log entry alongside it.
 ```markdown
 ## Change Log
 - YYYY-MM-DD: [What changed] (old: [value] → new: [value])
@@ -102,7 +102,7 @@ Want me to queue any of these now?"
 
 "Update complete. [N] references updated across [M] files. Change logged in client_profile.md."
 
-If this run was a handoff from `post-meeting-review`, this is not the end of the session. Hand control back so it can resume at its Step 4, and hold the Step 4 implications above so they can be merged into its Step 6 rather than presented twice.
+If this run was a handoff from `post-meeting-review`, this is not the end of the session. Hand control back so it can resume at its Step 4, and hold the Step 4 implications above so they can be merged into its Step 5 rather than presented twice.
 
 ## Rules
 
