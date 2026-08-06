@@ -300,7 +300,9 @@ Before finalising the email, verify:
 2. Offer to create a Gmail draft via the Gmail MCP `create_draft` (draft only —
    never send). If Gmail MCP is unavailable, say so; the pasted version stands.
 3. Save a copy to `clients/<client>/project-management/meetings/YYYY-MM-DD-client-wrap-email.md`
-   so the follow-up trail lives with the meeting record.
+   so the follow-up trail lives with the meeting record. Create
+   `project-management/meetings/` if it doesn't exist yet — see
+   `references/folder-convention.md`.
 4. Save the Step 2.5 extraction to
    `clients/<client>/project-management/meetings/YYYY-MM-DD-meeting-notes.md`:
 
@@ -328,6 +330,9 @@ Before finalising the email, verify:
    ## Compliance Signals
    -
 
+   ## Skill Triggers
+   -
+
    ## Recommended Next Steps
    -
    ```
@@ -339,24 +344,29 @@ Before finalising the email, verify:
    - **No match:** ask the user "No client card found in *Client Flow for
      [Client]. Want me to create one?" If yes, `create_task` with
      `projectId: 68655` and a title matching the client's short name. If no,
-     skip to step 8 and note that the BasicOps card step was skipped.
+     skip to step 9 and note that the BasicOps card step was skipped.
    - **One match:** that's the card.
    - **Multiple matches:** list them (title + URL from `link_to_task`) and ask
      the user which one is the client's card.
-6. `update_task` with `taskId: <card id>`, `section: 107750` (`Follow Up`),
+6. Check the card's existing discussion (`list_messages_in_task`) for a
+   meeting-summary note already posted for this meeting's date — this skill
+   may have already run for it, including under the pre-split workflow. If one
+   is found, don't move the card or post a second note; tell the user the card
+   is already up to date for this meeting and skip to step 9.
+7. `update_task` with `taskId: <card id>`, `section: 107750` (`Follow Up`),
    moving the card to Follow Up.
-7. `create_message_in_task` on the client card with one discussion message,
+8. `create_message_in_task` on the client card with one discussion message,
    close to the email itself: meeting summary by topic, key decisions, action
    items grouped by owner, next steps, and the recording link — the email's own
    content, minus the greeting and sign-off, not a separately-structured
    internal briefing. Discussion messages take raw HTML — do not escape it to
    entities, because `&lt;p&gt;` renders as literal text. If you get it wrong,
    `delete_message` with the returned id and repost.
-8. Remind the user of the 24-hour SLA for meeting-wrap emails
+9. Remind the user of the 24-hour SLA for meeting-wrap emails
    (references/cadences.md) if the meeting was more than a day ago.
-9. Close with: "Meeting notes and BasicOps card are ready. Run
-   `lhm-project-hub:post-meeting-review` when you're ready to work through
-   follow-ups."
+10. Close with: "Meeting notes and BasicOps card are ready. Run
+    `lhm-project-hub:post-meeting-review` when you're ready to work through
+    follow-ups."
 
 ## Rules
 
@@ -373,3 +383,4 @@ Before finalising the email, verify:
   the BasicOps card with a meeting-summary note. `lhm-project-hub:post-meeting-review`
   is the separate follow-up triage pass — it reads what this skill saves rather
   than re-pulling Fathom, and turns action items into assigned subtasks.
+- Folder contract: read references/folder-convention.md (lhm-project-hub).
