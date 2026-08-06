@@ -28,9 +28,9 @@ of `client-meeting-email` extracts: decisions made, action items (LHM vs.
 client), client updates, strategic signals, compliance signals, and skill
 triggers. Watch for compliance signals in anecdotes and asides, not just stated
 decisions — they seldom arrive announced as decisions, and they're often the
-most valuable thing in the meeting. Save the result to `meeting-notes.md` in the
-format Step 3 below expects, so the rest of this skill proceeds the same way
-regardless of which option supplied it.
+most valuable thing in the meeting. Save the result to `meeting-notes.md`, using the exact template in
+`client-meeting-email`'s Step 4, so the rest of this skill proceeds the same
+way regardless of which option supplied it.
 
 **Option C. Manual (fallback of the fallback)**
 If Fathom MCP is not available or cannot find the meeting:
