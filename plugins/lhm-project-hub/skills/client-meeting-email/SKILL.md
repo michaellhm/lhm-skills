@@ -12,6 +12,26 @@ when the next meeting is scheduled, and where the recording can be accessed. The
 final output must be professional, concise, client-friendly, and ready to paste
 into Gmail.
 
+## Step 0: Locate the client folder
+
+Do this before touching Fathom and before writing any file. Everything this
+skill saves lives inside the client's **existing** folder — creating a stray
+new folder splits the client's records in two and breaks `post-meeting-review`'s
+pickup.
+
+1. List the workspace's client folders (the directory the team keeps clients
+   in — check the current directory and its `clients/` subfolder for folders
+   containing `client_profile.md` or `project-management/`).
+2. Match the client's name against those folders, tolerating naming variants
+   ("Raise the Bar" vs "raise-the-bar-psychology"). One clear match → use it.
+3. Multiple candidates or no match → list what you found and ask. **Never
+   create a new client folder without the user explicitly confirming that this
+   is a brand-new client with no existing folder.**
+4. `project-management/` sits **directly inside the client folder root**
+   (`<client folder>/project-management/meetings/...` — see
+   `references/folder-convention.md`). Never nest it under a subfolder and
+   never create it anywhere else.
+
 ## Step 1: Gather inputs
 
 Collect whatever is available. The Fathom MCP is the preferred source:
@@ -122,6 +142,27 @@ Each action item must:
 - Identify dependencies where relevant
 - Avoid vague wording such as "look into" unless no firmer commitment was made
 
+**Use nested sub-bullets whenever an action has parts.** A multi-part
+deliverable reads far better as a parent line with indented dot points than as
+one long sentence. For example:
+
+```
+- Once access is available, perform a complete Google Ads account review and
+  record a Loom walkthrough explaining:
+   - Current campaign structure
+   - Existing keywords
+   - Campaign performance
+   - Areas for improvement
+   - Recommendations moving forward
+- Prepare a proposal outlining:
+   - Management approach
+   - Estimated investment
+   - Recommended implementation plan
+```
+
+Never bury three deliverables in one bullet's prose — split them into
+sub-bullets the reader can scan.
+
 Preserve uncertainty where the meeting was not conclusive. Use: "Review and
 recommend", "Confirm whether", "Test and report back", "Prepare a proposal",
 "Send the requested information". Do not use "Complete immediately", "Implement",
@@ -133,12 +174,13 @@ Do not assign an action to someone unless the transcript supports it.
 
 The Next Steps section describes the expected sequence of work. This is different
 from Action Items: Action Items explain who must do what; Next Steps explain how
-the project moves forward. For example:
+the project moves forward. Write it as a short bullet list in sequence order,
+one step per line — never a paragraph. For example:
 
-1. LHM will complete the Google Ads review after access is granted.
-2. A Loom walkthrough and recommendations will be prepared.
-3. The client will review the proposal internally.
-4. The campaign will proceed only after approval.
+- LHM will complete the Google Ads review once access has been granted.
+- A Loom walkthrough and recommendations will be prepared.
+- The client will review the proposal internally.
+- The campaign will proceed only after approval.
 
 Keep this section focused on the next phase, not the full long-term roadmap.
 
@@ -189,14 +231,13 @@ Subject: [Client or Project] | Meeting Summary & Action Items
 
 Hi [Names],
 
-Thanks again for your time [today/yesterday/on date].
-
-[One short paragraph summarising the main focus of the meeting.]
+Thank you everyone for your time [today/yesterday/on date]. Below is a summary
+of our discussion and the agreed action items.
 
 Meeting Summary
 
 [Topic]
-[Summary]
+[Summary — short paragraphs are fine here; this is the one narrative section.]
 
 [Topic]
 [Summary]
@@ -209,14 +250,18 @@ Action Items
 
 Local Health Marketing
 - [Action]
-- [Action]
+- [Action with parts:]
+   - [Part]
+   - [Part]
 
 [Client Name]
 - [Action]
 - [Action]
 
 Next Steps
-[Short sequence of what will happen next.]
+- [Step, in sequence order]
+- [Step]
+- [Step]
 
 Our next meeting is scheduled for [date and time].
 
@@ -233,6 +278,12 @@ Local Health Marketing
 ```
 
 Only include the Key Decisions section where useful.
+
+**Scannability rule:** outside the Meeting Summary, everything is dot points —
+decisions, action items (with nested sub-bullets for multi-part work), and next
+steps. The reader should be able to find their own name and their own tasks in
+under ten seconds. The Meeting Summary is the only section where short
+paragraphs belong.
 
 ## Step 2.5: Extract the structured meeting record
 
@@ -293,23 +344,30 @@ Before finalising the email, verify:
 - The email can be sent without editing
 - The tone sounds like Local Health Marketing
 - The email is not unnecessarily long
+- Action items with multiple parts use nested sub-bullets; Next Steps is a bullet list
+- Files will save into the client folder Step 0 resolved — not a new folder
 
 ## Step 4: Deliver
 
 1. Present the finished email in chat, ready to paste into Gmail.
 2. Offer to create a Gmail draft via the Gmail MCP `create_draft` (draft only —
    never send). If Gmail MCP is unavailable, say so; the pasted version stands.
-3. Save a copy to `clients/<client>/project-management/meetings/YYYY-MM-DD-client-wrap-email.md`
+3. Save a copy to `<client folder>/project-management/meetings/YYYY-MM-DD-client-wrap-email.md`
+   — the client folder Step 0 resolved, never a newly-invented path
    so the follow-up trail lives with the meeting record. Create
    `project-management/meetings/` if it doesn't exist yet — see
    `references/folder-convention.md`.
 4. Save the Step 2.5 extraction to
-   `clients/<client>/project-management/meetings/YYYY-MM-DD-meeting-notes.md`:
+   `<client folder>/project-management/meetings/YYYY-MM-DD-meeting-notes.md`:
 
    ```markdown
    # Meeting Notes — [Client Name]
    **Date:** YYYY-MM-DD
+   **Meeting title:** [Fathom meeting title]
    **Attendees:** [if noted in transcript]
+   **Recording:** [Fathom share/recording URL — always include; post-meeting-review and the team read it from here]
+   **Client wrap email:** YYYY-MM-DD-client-wrap-email.md
+   **Triaged:** no
 
    ## Decisions
    -

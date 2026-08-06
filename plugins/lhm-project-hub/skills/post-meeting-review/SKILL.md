@@ -14,9 +14,24 @@ has captured the meeting.
 **Option A. Saved meeting record (preferred)**
 Look for `[client-folder]/project-management/meetings/YYYY-MM-DD-meeting-notes.md`
 and the matching `-client-wrap-email.md`, saved by `lhm-project-hub:client-meeting-email`
-when it ran right after the meeting. If more than one date is plausible, ask the
-user which meeting. This is the primary path — no Fathom call needed, since
-`client-meeting-email` already extracted everything.
+when it ran right after the meeting. This is the primary path — no Fathom call
+needed, since `client-meeting-email` already extracted everything, including the
+recording URL in the notes header.
+
+**Find the record yourself — don't make the user point at it.** If the user
+just said "meeting wrap" without naming a client or meeting, sweep the
+workspace's client folders for `project-management/meetings/*-meeting-notes.md`
+files from the last 14 days whose header says `Triaged: no` (or has no
+`Triaged:` line — older captures predate the marker). Present what you found,
+newest first ("Found an untriaged meeting for Raise the Bar captured yesterday —
+work through that one?"), and confirm before proceeding. Only ask the user to
+identify the meeting when the sweep finds nothing or several equally-recent
+candidates.
+
+**Never ask for a Fathom link, transcript, or client re-introduction when a
+saved record exists** — every fact this skill needs is in the meeting-notes
+file and its matching wrap email. Asking again for what the capture step
+already saved is the exact failure this split exists to prevent.
 
 **Option B. Fathom MCP (fallback)**
 If no saved meeting-notes file exists for this meeting — meaning
@@ -348,6 +363,11 @@ If the user asks for a different channel (Mailgun via Zapier, for example), warn
 3. Tell the user the draft is ready in Gmail for review and sending.
 
 If Gmail MCP isn't authorized, skip this step and tell the user the team email needs to be sent manually.
+
+**Mark the meeting triaged.** Update the meeting-notes file's header line from
+`**Triaged:** no` to `**Triaged:** YYYY-MM-DD` (add the line if the file
+predates the marker). This is how the next bare "meeting wrap" run and the
+pm-orchestrator's cadence check know this meeting is done.
 
 ## Step 7: Self-improvement
 

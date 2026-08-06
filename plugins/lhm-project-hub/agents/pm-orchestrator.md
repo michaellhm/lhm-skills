@@ -38,7 +38,7 @@ Note on `current-projects.md` block shapes: blocks in the wild may not all match
 
 - **Update gap** — more than 7 days since the last client-facing update (most recent `client_updates/` file or BasicOps card message), for any active project.
 - **Monthly wrap not run this month** — no `project-management/meetings/YYYY-MM-*-monthly-wrap.md` file dated in the current calendar month.
-- **Unactioned meeting wrap** — a `project-management/meetings/` meeting-notes file from `client-meeting-email` older than 24 hours that `post-meeting-review` hasn't been run on yet (no action-item subtasks synced to BasicOps).
+- **Unactioned meeting wrap** — a `project-management/meetings/` meeting-notes file from `client-meeting-email` older than 24 hours whose header still says `Triaged: no` (or lacks a `Triaged:` line and has no action-item subtasks synced to BasicOps).
 
 ## Step 4: Route
 

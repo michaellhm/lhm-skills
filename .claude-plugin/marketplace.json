@@ -125,7 +125,7 @@
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
       "description": "LHM project management hub — sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
-      "version": "0.1.25",
+      "version": "0.1.26",
       "category": "utilities",
       "tags": [
         "project-management",
