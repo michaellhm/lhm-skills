@@ -161,7 +161,7 @@ plugins/lhm-learn/                    # Session learning capture plugin
 plugins/lhm-client-updates-hub/       # (deprecated — skills migrated to lhm-project-hub; shims remain)
   .claude-plugin/plugin.json            # Plugin manifest
   skills/                               # All 3 skills — shims that route to lhm-project-hub
-    post-meeting-review/                # Fathom debrief — client files, BasicOps sync with context, agent routing, team email
+    post-meeting-review/                # Post-meeting follow-up triage — state files, BasicOps subtasks, agent routing, team email (shim → lhm-project-hub)
     client-update/                      # Propagate a client data change across all client files
     client-update-email/                # Plain-language client-facing update emails
 plugins/lhm-project-hub/              # Agency process hub — sales handover through monthly/quarterly reviews
@@ -178,8 +178,8 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     google-ads-kickoff/                 # New Google Ads campaign build kickoff — gates on conversion tracking
     monthly-review/                     # Monthly per-client review engine (3 modes: wrap, prep, account review)
     quarterly-review/                   # Quarterly strategy review — 3-month data pull + next-quarter plan
-    client-meeting-email/               # Client-ready meeting follow-up email from Fathom summary + transcript
-    post-meeting-review/                # Fathom meeting debrief — state files, BasicOps sync, team email (migrated from client updates hub; shim remains)
+    client-meeting-email/               # Client-ready meeting follow-up email + meeting capture — saves notes, stands up the BasicOps card
+    post-meeting-review/                # Post-meeting follow-up triage — state files, BasicOps subtasks, team email (migrated from client updates hub; shim remains)
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
     wp-project-manager/                 # Website build PM doc (migrated from WordPress hub; shim remains)
@@ -258,7 +258,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 **Delivery Kickoffs** (6 skills): Website build kickoff (WordPress or Astro), PPC landing page campaign kickoff, SEO engagement kickoff, GMB/local SEO cycle kickoff, blog/article content pipeline kickoff, and Google Ads campaign build kickoff (gated on conversion tracking being live). Each follows the same shared pattern: intake, a project-management state file, a BasicOps scaffold with backwards-scheduled milestones, a client kickoff email, and handoff to the delivery specialist hub.
 
-**Client Success** (6 skills): Monthly per-client review engine with three modes (KP wrap-up, meeting prep, full account review). Quarterly strategy review — pulls three months of GA4/Ads/GSC data plus the quarter's monthly reports and drafts the next 3/6-month plan. Client-ready meeting follow-up email — turns the Fathom summary and transcript into a polished Gmail-ready wrap with decisions verified against the transcript, action items grouped by owner, and next steps. Post-meeting debrief from Fathom transcripts — updates client state files, syncs follow-up work to BasicOps with context, routes follow-on work to the right specialist, drafts a team summary email (migrated from Client Updates Hub). Propagates a client data change across every file that references it (migrated from Client Updates Hub). Plain-language client-facing update emails after completing work (migrated from Client Updates Hub).
+**Client Success** (6 skills): Monthly per-client review engine with three modes (KP wrap-up, meeting prep, full account review). Quarterly strategy review — pulls three months of GA4/Ads/GSC data plus the quarter's monthly reports and drafts the next 3/6-month plan. Client-ready meeting follow-up email and meeting capture — turns the Fathom summary and transcript into a polished Gmail-ready wrap with decisions verified against the transcript, action items grouped by owner, and next steps; also saves the structured meeting record and stands up the client's BasicOps card with a matching summary note. Post-meeting follow-up triage — reads that saved meeting record to update client state files, sweep the client folder for stale artefacts, and turn action items into BasicOps subtasks, walking through each one to propose an owner and offer to run research or prepare a live-system handoff plan before drafting a team summary email (migrated from Client Updates Hub). Propagates a client data change across every file that references it (migrated from Client Updates Hub). Plain-language client-facing update emails after completing work (migrated from Client Updates Hub).
 
 **Project Managers** (3 skills): Website build PM doc, landing page campaign PM doc, and GMB optimisation cycle PM doc — all migrated from their originating hubs (WordPress hub, WordPress hub, GMB hub respectively); shims remain in place there so existing routing keeps working.
 

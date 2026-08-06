@@ -38,7 +38,7 @@ Note on `current-projects.md` block shapes: blocks in the wild may not all match
 
 - **Update gap** — more than 7 days since the last client-facing update (most recent `client_updates/` file or BasicOps card message), for any active project.
 - **Monthly wrap not run this month** — no `project-management/meetings/YYYY-MM-*-monthly-wrap.md` file dated in the current calendar month.
-- **Unactioned meeting wrap** — a `project-management/meetings/` file from `post-meeting-review` older than 24 hours whose action items haven't been synced to BasicOps yet.
+- **Unactioned meeting wrap** — a `project-management/meetings/` meeting-notes file from `client-meeting-email` older than 24 hours that `post-meeting-review` hasn't been run on yet (no action-item subtasks synced to BasicOps).
 
 ## Step 4: Route
 
@@ -62,10 +62,10 @@ All 17 skills in this plugin, and when to route to each:
 | `lhm-project-hub:google-ads-kickoff` | A new Google Ads campaign build needs to start (gates on conversion tracking). |
 | `lhm-project-hub:monthly-review` | Monthly wrap, internal account review, or meeting-prep brief is due — three modes, ask which if unclear. |
 | `lhm-project-hub:quarterly-review` | Quarterly strategy review and next 3/6-month campaign plan is due. |
-| `lhm-project-hub:post-meeting-review` | A client call or meeting just happened and needs debriefing — state files, BasicOps sync, team update email. |
+| `lhm-project-hub:post-meeting-review` | `client-meeting-email` has already captured a meeting and the follow-up needs triaging — state files, propagation sweep, action items turned into assigned BasicOps subtasks, team update email. |
 | `lhm-project-hub:client-update` | A client's name, service offering, contact details, or branding changed and every reference across the client folder needs updating. |
 | `lhm-project-hub:client-update-email` | A plain-language update email needs drafting after completing a piece of work, outside of monthly-review's own wrap flow. |
-| `lhm-project-hub:client-meeting-email` | A client meeting needs its client-facing follow-up email — Fathom summary/transcript into a polished Gmail-ready wrap (distinct from post-meeting-review's internal debrief). |
+| `lhm-project-hub:client-meeting-email` | A client meeting just happened and needs capturing — Fathom summary/transcript into a polished Gmail-ready client wrap, plus saved meeting notes and the BasicOps card. Run this first; `post-meeting-review` triages what it saves. |
 | `lhm-project-hub:wp-project-manager` | The `project-management/website.md` PM doc needs reading, creating, or updating for a WordPress/Astro build. |
 | `lhm-project-hub:lp-project-manager` | The `project-management/landing-pages.md` PM doc needs reading, creating, or updating for an LP campaign. |
 | `lhm-project-hub:gmb-project-manager` | The `project-management/gmb.md` PM doc needs reading, creating, or updating for a GMB cycle. |
