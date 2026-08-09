@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian Vault Manager"
+  short_description: "Maintain a structured, linked Obsidian vault"
+  default_prompt: "Use $obsidian-vault-manager to organise and update my Obsidian vault."

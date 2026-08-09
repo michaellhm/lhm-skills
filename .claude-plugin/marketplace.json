@@ -122,6 +122,20 @@
       ]
     },
     {
+      "name": "lhm-knowledge-hub",
+      "source": "./plugins/lhm-knowledge-hub",
+      "description": "LHM knowledge system for Obsidian vault management, strategic thinking, weekly planning, and weekly Claude conversation capture.",
+      "version": "1.0.0",
+      "category": "utilities",
+      "tags": [
+        "obsidian",
+        "knowledge-management",
+        "weekly-review",
+        "conversation-capture",
+        "agency"
+      ]
+    },
+    {
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
       "description": "LHM project management hub — sales handover, client onboarding, delivery kickoffs, reviews, and client success.",

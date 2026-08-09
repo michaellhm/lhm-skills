@@ -1,0 +1,4 @@
+interface:
+  display_name: "LHM Weekly Flow"
+  short_description: "Run the LHM weekly review and planning flow"
+  default_prompt: "Use $lhm-weekly-flow to run my Local Health Marketing weekly review."

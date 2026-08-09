@@ -1,0 +1,15 @@
+{
+  "name": "lhm-knowledge-hub",
+  "version": "1.0.0",
+  "description": "Local Health Marketing knowledge system for Obsidian vault management, strategic thinking, weekly planning, and Claude conversation capture.",
+  "author": {
+    "name": "LHM Digital Skills"
+  },
+  "keywords": [
+    "obsidian",
+    "knowledge-management",
+    "weekly-review",
+    "conversation-capture",
+    "agency"
+  ]
+}

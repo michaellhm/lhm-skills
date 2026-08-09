@@ -1,0 +1,4 @@
+interface:
+  display_name: "LHM Conversation Capture"
+  short_description: "Capture weekly LHM insights into Obsidian"
+  default_prompt: "Use $lhm-conversation-capture to review last week’s Claude conversations and update the LHM Obsidian vault."

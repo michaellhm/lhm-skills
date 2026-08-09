@@ -1,0 +1,4 @@
+interface:
+  display_name: "LHM Vault Thinking"
+  short_description: "Think across the LHM Obsidian vault"
+  default_prompt: "Use $lhm-vault-thinking to challenge my current thinking using evidence from the LHM vault."
