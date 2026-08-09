@@ -19,8 +19,9 @@ Run an evidence-led weekly operating review for Local Health Marketing. Use the 
    - `30 Projects/Projects.md` and active project notes
    - `25 Marketing/Marketing.md` and current linked strategy notes
 5. Find and read the most recent completed weekly review, if one exists.
-6. Search the vault for unresolved checkboxes, explicit blockers, `Still to define`, `Open decisions`, `alignment issue`, and recent material changes. Do not automatically copy ordinary project tasks into the Attention Queue.
-7. Use Australia/Melbourne dates and ISO week numbers.
+6. Find and read every `Claude Conversation Capture` or other AI conversation-capture note created since the previous weekly review. Collect lessons marked `Needs Michael`, `Promote to Knowledge`, `Update SOP`, or `Observe again`.
+7. Search the vault for unresolved checkboxes, explicit blockers, `Still to define`, `Open decisions`, `alignment issue`, and recent material changes. Do not automatically copy ordinary project tasks into the Attention Queue.
+8. Use Australia/Melbourne dates and ISO week numbers.
 
 Do not ask Michael for information already available in the vault. Briefly surface relevant existing context and ask only for changes, results or judgments that cannot be discovered.
 
@@ -40,6 +41,7 @@ Give a compact briefing before the first question:
 - The most relevant unfinished outcomes from the previous week
 - Urgent Attention Queue items
 - Active project changes already visible in the vault
+- New AI-captured lessons, knowledge candidates and operational blockers since the previous review
 - Missing scorecard data that may need to be supplied
 
 Then run the interview one section at a time. Ask one main question per message; use up to three tightly related prompts only when they are naturally answered together. Do not dump the entire questionnaire on Michael.
@@ -66,7 +68,21 @@ After the answer:
 - Extract lessons or operating changes.
 - Add a new Attention Queue item only if Michael's decision, approval or intervention is genuinely required.
 
-### 3. Scorecard
+### 3. Knowledge and lessons
+
+Before the scorecard, review material lessons captured since the previous weekly review. Skip lessons already applied that require no validation; mention them briefly in the opening context instead.
+
+For each unresolved lesson, ask Michael only when judgment is needed, then assign one disposition:
+
+- `Applied`
+- `Promote to Knowledge`
+- `Update SOP`
+- `Needs Michael`
+- `Observe again`
+
+Record the decision under `Knowledge and lessons` in the weekly note. Immediately update the canonical Knowledge, SOP, project or Attention Queue note when the disposition requires it. Do not promote a one-off project fact into `60 Knowledge`.
+
+### 4. Scorecard
 
 Review the template scorecard. State any values already known, then ask for missing values that are currently meaningful:
 
@@ -81,7 +97,7 @@ Review the template scorecard. State any values already known, then ask for miss
 
 Do not force meaningless zeros or collect metrics that are not yet measurable. Mark unavailable data as `not tracked` and flag tracking setup only when it merits attention.
 
-### 4. Attention Queue
+### 5. Attention Queue
 
 Work through urgent items first. For each selected item, ask for a decision, defer it with a reason/date, or identify what information is needed.
 
@@ -94,13 +110,13 @@ When Michael resolves an item:
 
 Do not treat every queue item as a priority for the current week.
 
-### 5. Active projects and opportunities
+### 6. Active projects and opportunities
 
 Summarise the health and next milestone of each material active project. Ask what changed, what is blocked and whether any project should start, stop, continue or change scope.
 
 Capture new ideas in `40 Ideas` only when they are genuine opportunities rather than immediate actions. Capture new time-bound work as a project only after its outcome and owner are clear.
 
-### 6. Plan the coming week
+### 7. Plan the coming week
 
 Ask what would make the coming week successful. Develop possible outcomes from goals, project milestones, attention items and Michael's answer.
 
@@ -114,7 +130,7 @@ Challenge:
 
 Agree on no more than three primary outcomes. Each outcome must be observable by the end of the week.
 
-### 7. Commitments and final check
+### 8. Commitments and final check
 
 Turn each outcome into the minimum necessary commitments with owner and due date. Ask what could derail the week and what should deliberately not be worked on.
 
@@ -135,7 +151,7 @@ If the session stops early, leave `status: draft` and tell Michael which section
 
 When Michael confirms the plan:
 
-1. Ensure the weekly note contains wins, losses, lessons, available scorecard data, reviewed attention items, active project changes, three or fewer outcomes, commitments, decisions and parking-lot items.
+1. Ensure the weekly note contains wins, losses, lesson dispositions, available scorecard data, reviewed attention items, active project changes, three or fewer outcomes, commitments, decisions and parking-lot items.
 2. Move completed attention items to `Resolved`; keep deferred items in `Waiting` with a reason and review date.
 3. Add newly discovered Michael-level decisions using the next unused stable `ATT-nnn` identifier.
 4. Update canonical goal, marketing and project notes without duplicating detailed task lists.

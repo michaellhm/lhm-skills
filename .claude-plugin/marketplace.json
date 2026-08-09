@@ -125,7 +125,7 @@
       "name": "lhm-knowledge-hub",
       "source": "./plugins/lhm-knowledge-hub",
       "description": "LHM knowledge system for Obsidian vault management, strategic thinking, weekly planning, and weekly Claude conversation capture.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "category": "utilities",
       "tags": [
         "obsidian",

@@ -62,6 +62,18 @@ Use the smallest appropriate destination:
 
 Do not silently convert a question into a decision, an idea into a project, or an assistant suggestion into Michael's stated belief.
 
+## Close the lesson loop
+
+Give every material lesson exactly one disposition:
+
+- **Applied:** update the relevant project, goal or marketing note because the lesson has already changed current work.
+- **Promote to Knowledge:** create or update a note in `60 Knowledge` only when the lesson is durable, reusable across projects and supported by evidence or repeated experience.
+- **Update SOP:** update the relevant procedure in `70 SOPs` when the lesson changes repeatable execution.
+- **Needs Michael:** add an Attention Queue item only when Michael must decide, approve, reconnect, authorize or intervene.
+- **Observe again:** retain the lesson in the weekly capture when it is plausible but unproven or requires another occurrence.
+
+Do not create a standalone Knowledge note for a one-off project fact. Record the disposition and destination in the weekly capture. Mark unresolved knowledge candidates for Weekly Flow; do not promote them merely because an assistant proposed them.
+
 ## Write the weekly capture
 
 Create or update `05 Weekly/YYYY-Www — Claude Conversation Capture.md` with:
@@ -85,12 +97,13 @@ updated: YYYY-MM-DD
 ## External resources reviewed
 ## Questions needing attention
 ## Wins and lessons
+## Knowledge and SOP candidates
 ## Updates made
 ## Not promoted
 ## Sources
 ```
 
-Summarise; do not paste raw transcripts. For every promoted item, record the destination note. In `Sources`, include the session ID, date and local source path, plus any original external URL. Label interpretations as `Agent analysis`.
+Summarise; do not paste raw transcripts. For every material lesson, record its disposition and destination. Under `Knowledge and SOP candidates`, list candidates that Weekly Flow should confirm, including `Observe again` items. In `Sources`, include the session ID, date and local source path, plus any original external URL. Label interpretations as `Agent analysis`.
 
 ## Maintain the checkpoint
 
