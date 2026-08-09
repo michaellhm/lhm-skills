@@ -10,7 +10,7 @@ Run an evidence-led weekly operating review for Local Health Marketing. Use the 
 ## Locate and load context
 
 1. Find the vault directory containing `.obsidian`. Prefer `/Users/michaelcolman/Documents/Obsidian/Local Health Marketing/Local Health Marketing` when accessible.
-2. Read `_System/Vault Conventions.md` and follow it.
+2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely and follow them.
 3. Detect the official Obsidian CLI. When available and Obsidian is running, use it for recent files, backlinks, unresolved links, open tasks and contextual search; otherwise use `rg` and direct Markdown reads without blocking the review.
 4. Read these notes completely:
    - `05 Weekly/Weekly Flow.md`

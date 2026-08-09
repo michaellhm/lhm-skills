@@ -18,7 +18,7 @@ Turn useful thinking from recent Claude Code conversations into structured LHM b
 ## Prepare
 
 1. Locate the vault directory containing `.obsidian`; prefer `/Users/michaelcolman/Documents/Obsidian/Local Health Marketing/Local Health Marketing`.
-2. Read `_System/Vault Conventions.md` completely.
+2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely.
 3. Read `_System/AI Conversation Capture State.md`. If only the legacy `_System/Claude Conversation Capture State.md` exists, migrate its coverage without losing processed session IDs.
 4. Read the relevant indexes and canonical notes before writing: `05 Weekly`, `10 Goals`, `25 Marketing`, `30 Projects`, `40 Ideas`, `60 Knowledge`, and the Attention Queue.
 5. Search for existing notes about each candidate topic so updates go to the canonical note rather than a duplicate.

@@ -35,7 +35,7 @@ Maintain an Obsidian vault as a coherent knowledge base and business operating s
 1. Identify the vault root by finding the nearest directory containing `.obsidian`.
 2. For Local Health Marketing, prefer `/Users/michaelcolman/Documents/Obsidian/Local Health Marketing/Local Health Marketing` when accessible.
 3. Treat the directory containing `.obsidian`, not its parent, as the vault root.
-4. Read `_System/Vault Conventions.md` completely before making structural or content changes. Follow it as the source of truth.
+4. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely before making structural or content changes. Follow them as the source of truth and shared agent-write contract.
 
 ## Inspect before changing
 

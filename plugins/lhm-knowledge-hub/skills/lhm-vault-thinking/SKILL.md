@@ -10,7 +10,7 @@ Use the LHM vault as a thinking partner. Distinguish evidence in the vault from 
 ## Load the vault safely
 
 1. Locate the directory containing `.obsidian`; prefer `/Users/michaelcolman/Documents/Obsidian/Local Health Marketing/Local Health Marketing`.
-2. Read `_System/Vault Conventions.md` completely.
+2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely.
 3. Detect the official Obsidian CLI with `command -v obsidian`. If unavailable, check `/Applications/Obsidian.app/Contents/MacOS/obsidian-cli` on macOS.
 4. Prefer CLI reads when it responds. Target the vault explicitly as the first parameter: `obsidian vault="Local Health Marketing" <command>`.
 5. If the CLI reports that Obsidian is not running or cannot be found, continue with `rg`, `rg --files` and direct Markdown reads. Do not launch a GUI or register the CLI without permission.
