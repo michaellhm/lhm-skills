@@ -19,7 +19,7 @@ Run an evidence-led weekly operating review for Local Health Marketing. Use the 
    - `30 Projects/Projects.md` and active project notes
    - `25 Marketing/Marketing.md` and current linked strategy notes
 5. Find and read the most recent completed weekly review, if one exists.
-6. Find and read every `Claude Conversation Capture` or other AI conversation-capture note created since the previous weekly review. Collect lessons marked `Needs Michael`, `Promote to Knowledge`, `Update SOP`, or `Observe again`.
+6. Find and read every AI conversation-capture note created since the previous weekly review, including legacy `Claude Conversation Capture` notes. Collect lessons marked `Needs Michael`, `Promote to Knowledge`, `Update SOP`, or `Observe again`, plus every unresolved recurrence or contradiction.
 7. Search the vault for unresolved checkboxes, explicit blockers, `Still to define`, `Open decisions`, `alignment issue`, and recent material changes. Do not automatically copy ordinary project tasks into the Attention Queue.
 8. Use Australia/Melbourne dates and ISO week numbers.
 

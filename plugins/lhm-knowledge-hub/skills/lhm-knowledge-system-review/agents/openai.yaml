@@ -1,0 +1,4 @@
+interface:
+  display_name: "LHM Knowledge System Review"
+  short_description: "Review LHM knowledge-system quality monthly"
+  default_prompt: "Use $lhm-knowledge-system-review to audit the last month of LHM captures, lesson dispositions, contradictions, stale items, and knowledge promotions."
