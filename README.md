@@ -169,7 +169,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
   agents/pm-orchestrator.md             # Main entry point — reads client state, flags cadence breaches, routes to the right skill
   skills/                               # All 17 skills
     sales-handover/                     # Hand a newly-closed client from sales to delivery
-    client-onboarding/                  # Tier 1 onboarding pipeline — 4 phases, resumable
+    client-onboarding/                  # Scope-aware Obsidian-first onboarding — 5 top-level BasicOps gates
     website-kickoff/                    # New website build kickoff (WordPress or Astro) → handoff to WordPress hub
     landing-page-kickoff/               # New PPC landing page campaign kickoff → handoff to WordPress hub
     seo-kickoff/                        # New SEO engagement kickoff → handoff to the SEO specialist
@@ -232,7 +232,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 **Website Build Pipeline** (23 skills): Project setup (with WordPress/Astro platform choice), Phase 0 client data collection (Drive folder, BasicOps access checklist, data-gathering email, weekly automated follow-up), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), Decap CMS setup for Astro on Cloudflare Pages (Git-backed editing, drafts, scheduled publishing, deploy previews), the pre-launch QA checklist (automated + guided, for both WordPress and Astro), Rank Math 301 redirect management, and the Phase 4 digital audit (automated GA4 checks — data, key events, Ads link — plus a manual GTM/Search Console checklist).
 
-**Git Repo Workflow** (2 skills): First-time client repo setup — creates GitHub repos, scaffolds docs/ context folder, commits initial scaffold (`repo-init`). Clones an existing client project onto a new machine or pulls the latest (`repo-install`).
+**Git Repo Workflow** (2 skills): First-time client repo setup — creates GitHub repos, scaffolds docs/ context folder, commits the initial scaffold, and invites confirmed default LHM collaborators with write access (`repo-init`). Clones an existing client project onto a new machine or pulls the latest (`repo-install`).
 
 **Landing Page Pipeline** (7 skills): Subsite setup for LP campaigns, landing page copywriting per ad group, HTML/CSS prototype generation (auto-pushed to prototype repo), WordPress deployment (HTML blocks), Gutenberg block conversion, multi-page deployment, and live server deployment via SSH.
 

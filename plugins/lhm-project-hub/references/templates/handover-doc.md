@@ -1,6 +1,6 @@
 # Internal Handover Document Template
 
-Save as: clients/<client>/project-management/handover-YYYY-MM-DD.md
+Save as: `20 Clients/<Client>/project-management/Handover YYYY-MM-DD.md`
 
     # <Client> — Handover: <from> → <to> (<date>)
 

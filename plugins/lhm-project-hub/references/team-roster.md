@@ -2,11 +2,11 @@
 
 | Person | Role | Routes to them |
 |---|---|---|
-| Michael | Owner / digital strategist | Strategy calls, final design/quality review, sitemaps, campaign plans, escalations, failed-payment client follow-up |
+| Michael | Owner / digital strategist | Strategic participation and decisions in onboarding calls as applicable; final design/quality review; sitemaps; campaign plans; escalations; failed-payment client follow-up |
 | Marlon | Sales | Discovery/sales calls; runs sales-handover after a close |
-| Kristalyn (KP) | Project manager / account manager | Onboarding Phases 2–4, client comms, monthly wrap, meeting follow-ups, feedback → tasks |
-| Josephine (Jo) | Billing & admin | Onboarding Phase 1 (GoCardless, Xero), invoicing, PR/GMB syndication support |
-| Jaimee (Jaimee-Lee) | SEO specialist | Local SEO/Maps checklist, technical SEO, QA reviews, GMB content |
+| Kristalyn (KP) | Project manager / account manager | Overall client-onboarding owner; schedules and coordinates the strategy call; client contact; access/assets coordination; service kickoffs; monthly wrap; meeting follow-ups |
+| Josephine (Jo) | Billing & admin | Immediate owner of Payment & Billing; invoicing; GoCardless when applicable; PR/GMB syndication support |
+| Jaimee (Jaimee-Lee) | SEO specialist | Scope-applicable tracking/configuration, Local SEO/Maps checklist, technical SEO, QA reviews, GMB content |
 | Aiya | Web designer/developer | Design, site builds, CPTs, CRO, staging |
 
 Notification channels: BasicOps task assignment (skills do this directly);

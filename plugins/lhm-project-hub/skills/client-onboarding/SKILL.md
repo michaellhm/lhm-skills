@@ -1,104 +1,121 @@
 ---
 name: client-onboarding
-description: "Run the Tier 1 client onboarding pipeline — resumable and phase-aware. Use this when the user says 'client onboarding', 'onboard [client]', 'continue onboarding', 'where is onboarding up to', 'billing setup', 'platform access', 'tracking setup', or 'first 30 days'. Four phases: Payment & Billing (Josephine), Platform Access (KP), Tracking & Config (Michael/Jaimee), First 30 Days (KP). Reads project-management/onboarding.md and resumes at the live phase; drafts every email; verifies access via MCPs; ticks items only on confirmation."
+description: "Run LHM's resumable new-client onboarding workflow. Use when the user says 'client onboarding', 'onboard [client]', 'continue onboarding', 'where is onboarding up to', 'billing setup', 'strategy call', 'client access', 'tracking setup', or 'service kickoff'. Reads and updates the detailed, scope-aware Obsidian onboarding checklist first, then mirrors only five top-level phases and seven top-level checks to the BasicOps *Client Onboarding board: Payment & Billing, Client Contact & Strategy, Access Assets & Config, Service Kickoff, and Onboarding Complete."
 ---
 
 # Client Onboarding
 
-Run the Tier 1 onboarding pipeline for a newly-handed-over client through its four phases — Payment & Billing, Platform Access, Tracking & Config, First 30 Days — picking up wherever it was left off. This skill is resumable by design: run it once and it initialises state; run it again next week and it continues from the first unresolved item in the live phase. It never advances a phase, ticks a checklist item, or sends a client-facing email on its own say-so — every irreversible step waits on either a successful MCP verification or explicit human confirmation.
+Resume a newly sold client's onboarding from canonical Obsidian state. This workflow is service-neutral: generate detailed checks from what the client purchased rather than assuming Google Ads, Maps, GoCardless or any other service applies.
 
-## Step 1: Load state
+## 1. Load canonical state
 
-Read `current-projects.md` in the client folder first (per `references/folder-convention.md`) to locate the Onboarding block and confirm the client folder path. Then read `project-management/onboarding.md`.
+Follow `references/folder-convention.md`. Read, in order:
 
-**If `onboarding.md` doesn't exist yet**, initialise it with this exact skeleton:
+1. `20 Clients/<Client>/Current Projects.md`.
+2. `20 Clients/<Client>/project-management/Handover YYYY-MM-DD.md`.
+3. `20 Clients/<Client>/project-management/Onboarding.md`.
+4. The relevant purchased-service project files.
 
-```markdown
-# Onboarding — <Client>
-Started: YYYY-MM-DD · Package: <from handover doc>
-## Phase status
-- [ ] Phase 1 — Payment & Billing (Josephine)
-- [ ] Phase 2 — Platform Access (KP)
-- [ ] Phase 3 — Tracking & Config (Michael/Jaimee)
-- [ ] Phase 4 — First 30 Days (KP)
-## Phase 1 checklist
-<copied from references/checklists/tier1-billing.md>
-## Phase 2 checklist
-<copied from references/checklists/platform-access.md>
-## Phase 3 checklist
-<copied from references/checklists/tracking-setup.md>
-## Phase 4 checklist
-<copied from references/checklists/first-30-days.md>
-## Tracking notes
-## Log
-- YYYY-MM-DD: <event>
-```
+If `Onboarding.md` does not exist, instantiate it from `references/checklists/client-onboarding.md`, the handover and purchased scope. Preserve the instantiated checklist as the client's detailed execution state; future reference changes must not silently rewrite it.
 
-Fill `<Client>` and `Started` (today's date) from `current-projects.md` / the handover doc; fill `Package` from the handover doc's Package & Commercials section (falling back to `client_profile.md` if no handover doc exists). Under each `## Phase N checklist` heading, copy the entire checklist body from the corresponding `references/checklists/*.md` file verbatim — item text, owner, and verify annotations, unmodified — as it reads right now. This copy is a **snapshot**, not a live reference; see the Rules section for what that means going forward.
+Obsidian is authoritative when detailed state disagrees with BasicOps. Report the mismatch and reconcile BasicOps only after confirming the Obsidian evidence.
 
-If `current-projects.md` has no Onboarding block yet (this skill run standalone rather than via `sales-handover`), create one now using the block format in `references/folder-convention.md`, with Phase 1 as the starting phase and Josephine as owner.
+## 2. Confirm the BasicOps parent card
 
-## Step 2: Resume at the first phase with unticked items
+Use `*Client Onboarding` (project ID `68921`). Find the client-level card and its subtasks. Search for and migrate an older `*Client Flow` onboarding card before creating a new one.
 
-The `## Phase status` boxes are the **authoritative** resume signal, not the individual checklist items — Step 4 keeps them in sync at every gate, so they're the only thing that needs scanning across phases. Scan them top to bottom (Phase 1 → 4); the **live phase** is the first one whose status box is still unchecked. A phase whose status box is already ticked is closed for good — never re-scan its checklist for lingering unticked items, even conditional ones nobody explicitly resolved (Step 3's N/A handling below exists precisely so this doesn't recur going forward).
+The parent card must:
 
-Within the live phase only, scan its checklist top to bottom for the first item that isn't yet **resolved** — resolved meaning ticked `[x]` or marked `[x] N/A — <reason>` per Step 3. If every item in the live phase is already resolved but its status box isn't ticked yet, don't re-present a finished checklist — go straight to Step 4 and run that phase's gate.
+- Be titled `[Client] — Client Onboarding`.
+- Be assigned to the owner of the immediate next gate while Kristalyn remains overall onboarding owner in Obsidian and the description.
+- Sit in the section matching the canonical Obsidian phase.
+- Contain one next action, one blocker or `none`, the Obsidian onboarding path and Google Drive client folder.
 
-Announce: the client, the live phase and its name, its owner, and the first unresolved item in it, e.g. "Onboarding — Acme Health. Phase 2 — Platform Access (Owner: KP). Next: Send Welcome & Access Request email."
+Create or reuse exactly seven top-level subtasks:
 
-If the person you're talking to isn't that phase's owner, say so plainly ("This phase belongs to KP") and offer to prepare the owner's materials anyway — draft the email, compose the BasicOps task, print the WhatsApp text — so the actual owner has everything ready to confirm rather than waiting on you to be re-run by the right person. Preparation is never owner-gated; only ticking a `human-confirm` item is.
+1. Michael handover and client introduction completed.
+2. Invoice and payment setup completed.
+3. Kristalyn welcome email and strategy call completed.
+4. Required access and assets confirmed.
+5. Tracking and configuration confirmed.
+6. Purchased services kicked off.
+7. Client onboarding completed.
 
-## Step 3: Work items in order
+Do not copy the detailed Obsidian checklist into BasicOps.
 
-Work the live phase's checklist items top to bottom. Some items are conditional on something that may not apply to this client — the tier1-billing "If details missing" item when details arrived complete, the platform-access "Wrong permission level anywhere" item when nothing came back wrong, the GSC item when GSC isn't in scope, the tracking-setup booking-platform item when the client has no booking platform. Never leave a conditional item silently blank or blocking — resolve it explicitly: confirm with the human that the condition genuinely doesn't apply (that confirmation is what satisfies the tick-only-on-confirmation guardrail for an N/A — never mark an item N/A without asking, that's just a different flavour of ticking without confirmation), then mark it `- [x] N/A — <one-line reason>` and log it in `## Log` exactly like a real tick. This is what lets a phase actually reach "everything resolved" instead of sitting on a permanently-unticked conditional item forever.
+## 3. Resume the first unresolved phase
 
-Phase 1's first item — create the BasicOps task "[Client] – Payment & Billing Setup" — may already exist: `sales-handover` creates this exact subtask on the client card as part of its own Step 7. Before creating it here, check the client card's subtasks (`list_tasks_in_project` / the card's task list) for a task with that title; if it's already there, locate and use it rather than creating a duplicate.
+Use the first incomplete canonical phase:
 
-For every item whose condition does apply, branch on its `verify:` field:
+### 1 — Payment & Billing
 
-**`verify: mcp:<tool>`** — Attempt the verification now, using the tool named in the item (e.g. `mcp:analytics-mcp (get_account_summaries shows the property)`, `mcp:GoogleAds (list_accessible_accounts)`). On success, tick the item immediately and log the result. On failure — the check comes back negative, or the MCP isn't connected/authenticated — do **not** tick it. Explain what the check would have confirmed, and either wait for the underlying condition to become true (e.g. access hasn't arrived yet — nothing to do but wait and re-check) or fall back to asking the human to confirm manually, exactly as the guardrails require. Never tick on a failed or skipped verification.
+Immediate owner: Josephine.
 
-**`verify: human-confirm`** — Do the preparable part first, then ask:
-- **Email items** — draft from `references/templates/welcome-access-email.md` (Phase 2) or `references/templates/billing-emails.md` (Phase 1), filling the template parameters from what's known; present the draft, never send it.
-- **BasicOps items** — compose the task or subtask via the BasicOps MCP now (see Step 4/5 for the exact card pattern); this is preparation, not the human-confirm itself, unless the checklist item's own `verify:` field says `mcp:basicops`.
-- **WhatsApp items** — print the message text for a human to send; WhatsApp isn't MCP-connected here, per `references/team-roster.md`.
-- Then ask explicitly: "Ready to tick '<item text>'? Confirm once it's actually done." Tick only on an unambiguous yes — never infer confirmation from the human moving on to the next topic.
+Work the applicable billing checks in Obsidian. GoCardless is conditional, not universal. Michael's handover/introduction check runs in parallel but is also required to leave Phase 1. Advance only when both top-level checks are verified, or an explicit Michael-approved exception is recorded.
 
-Append every tick — mcp-verified or human-confirmed — to `## Log` with the date and how it was verified: `- YYYY-MM-DD: <item text> — verified via <mcp:tool result | human-confirm>.`
+Kristalyn may work on her welcome and scheduling actions in parallel, but the parent card remains assigned to Josephine while billing is the immediate blocking gate.
 
-## Step 4: Phase gates
+### 2 — Client Contact & Strategy
 
-A phase only advances when its specific gate condition is met — not simply "every item ticked," since some items are conditional or don't block progress. "Ticked" below includes items resolved as `[x] N/A — <reason>` per Step 3; a resolved N/A counts the same as a real tick for gate purposes. Gate conditions, explicitly:
+Immediate owner: Kristalyn.
 
-- **Phase 1 → 2** — the billing handoff item (tier1-billing.md's last item: "Move GHL deal to 'Billing Complete – Ready for Platform Access Setup'; notify Michael + KP") is ticked. This item itself only ticks once the payment has cleared and Xero is set up, so it naturally waits on everything upstream of it.
-- **Phase 2 → 3** — all four access-verification items are resolved: GA4 Admin, Google Ads MCC, GSC (ticked if verified, or resolved N/A if out of scope for this client), and GTM/GBP/CMS admin. The permission-bump item only matters if one of those four came back wrong; when it doesn't apply, resolve it N/A per Step 3 rather than leaving it hanging. The closing BasicOps note ("All required access received and verified") is the record of the gate firing, not a precondition for it — write it as part of executing the gate.
-- **Phase 3 → 4** — specifically the GA4-collecting item (realtime hit confirmed) and the Ads-conversions item (GA4 conversions imported into Google Ads, conversion actions active) are ticked. These two are the hard gate per the brief. The remaining Phase 3 items — GTM audit, form/enquiry conversion events, phone-call tracking, GA4↔Ads account link, Clarity install, booking-platform goals — should still be worked through Step 3's ordering (resolving any that are conditional to N/A rather than leaving them open) and are expected to be done, but do **not** themselves block the Phase 3 → 4 transition. If any remain genuinely unresolved when this gate fires, flag them explicitly in the gate announcement and in `## Tracking notes` so they don't quietly fall off the list — don't just leave the gap unmentioned.
+Draft the welcome email for review. Kristalyn schedules and coordinates the strategy call; include Michael when strategic decisions require him. Complete the call, record decisions in Obsidian, and create or link the client campaign/project record—the canonical project brief or service record that converts those decisions into delivery scope. Mark the BasicOps top-level check complete only after these are verified.
 
-Since the live-phase scan in Step 2 never looks inside an already-gated phase again, resolving every item (tick or N/A) before or immediately after a gate fires is what keeps the state file clean — don't leave a phase behind with open conditional items just because the gate didn't strictly require them.
+### 3 — Access, Assets & Config
 
-On each gate firing:
-1. Tick the corresponding `## Phase status` box for the phase that just completed — this is the resume signal Step 2 relies on, so it must happen every time, without exception.
-2. Update the `current-projects.md` Onboarding block: `Phase` to the new live phase's name, `Owner` to its owner, `Next action` to that phase's first item, `Updated` to today.
-3. Post a BasicOps status note on the client card (`create_message_in_task` on the *Client Flow card, project ID `68655` — the same card `sales-handover` and `post-meeting-review` use; find it with `list_tasks_in_project`, `filter_title` set to the client's short name if you don't already have its id from this session): "Onboarding: Phase N complete → Phase N+1 (Owner: <next owner>)."
-4. Announce the transition to the user and immediately continue into the new live phase per Step 2/3 rather than stopping.
+Immediate owner: Kristalyn for coordination; Jaimee or the applicable specialist owns technical checks.
 
-## Step 5: Phase 4 extras
+Generate and work only the access, asset and configuration items required by purchased services. Verify access directly where connected tools allow. A request sent is not verified access. Record missing items with an owner and follow-up date. If no tracking/configuration branch applies, complete that top-level gate only after a human confirms and Obsidian records `N/A — no tracking/configuration required for purchased scope`.
 
-Phase 4 carries more setup than the others:
+### 4 — Service Kickoff
 
-- **30-day plan.** This item's `verify:` field is `mcp:basicops`, not human-confirm — the one unambiguous tick rule is: it ticks the moment `create_task` succeeds for "[Client] – 30-Day Project Plan" (`parentTaskId` set to the client card so it lives as a subtask, matching the `sales-handover` pattern, due `today + 30`), with the remaining first-30-days.md items created as its subtasks — computed due dates where the checklist specifies them (Local SEO/Maps subtask to Jaimee due `today + 10`; mid-point check-in around `today + 14` to `today + 16`; close-out at `today + 30`). The checklist item's own text also says "confirm plan with Michael before kickoff" — that's an action to perform, not the tick condition: print the plan summary as a WhatsApp/BasicOps message for Michael per the usual pattern, but the item is already ticked by the successful MCP creation regardless of whether Michael has replied yet.
-- **Cadence enforcement.** Apply `references/cadences.md` for the rest of the phase: chase outstanding client approvals (ad copy, LP copy, designs) every 48 hours; send a client progress update every 7 days; hold the Day 14–16 mid-point check-in (internal + client); run the Day 30 close-out.
-- **Delegate, don't do.** Route Google Ads campaign build work directly to `lhm-project-hub:google-ads-kickoff`. Route each weekly client update to `lhm-project-hub:client-update-email`.
+Immediate owner: Kristalyn.
 
-## Step 6: Completion
+For every purchased service:
 
-Once all four `## Phase status` boxes are ticked: mark the `current-projects.md` Onboarding block `Status: complete`, set `Next action` to "Moved to ongoing rhythm — monthly-review", and log the close-out event in `## Log` with today's date. Tell the user onboarding is complete and that the client now moves to the ongoing monthly rhythm (`monthly-review`, per `references/cadences.md`).
+- Run the applicable Project Hub kickoff skill.
+- Create or identify its destination-board task.
+- Confirm delivery owner, initial schedule and next action.
+- Connect Obsidian, BasicOps and Google Drive records.
+- Record an explicit deferral reason when a purchased service cannot start.
+
+The onboarding card may overlap with destination tasks during this gate, but it must not repeat their delivery checklist.
+
+### 5 — Onboarding Complete
+
+Immediate owner: Kristalyn.
+
+Complete only when every purchased service is underway or explicitly deferred and all earlier top-level gates are verified. Record the completion date in Obsidian, move the parent card to `5 — Onboarding Complete`, complete the final top-level subtask and parent card, and hand first-30-day client success to its follow-on checklist or recurring rhythm.
+
+## 4. Work detailed items safely
+
+For each detailed Obsidian item:
+
+- Prepare drafts or tool actions first.
+- Tick only on explicit human confirmation or successful system verification.
+- Mark conditional items `N/A — <reason>` only after applicability is confirmed.
+- Log the date, result and verification method.
+- If a tool fails, leave the item open, record the failed write or verification and name who must retry.
+
+Client-facing emails remain drafts until a human sends them.
+
+## 5. Mirror only top-level operational state
+
+After a verified gate change:
+
+1. Update `Onboarding.md` and `Current Projects.md` first.
+2. Update the matching BasicOps top-level subtask.
+3. Move the parent card to the new section.
+4. Reassign the parent to the immediate next owner.
+5. Update the parent description with the new phase, next action and blocker.
+
+If the BasicOps update fails, keep the canonical Obsidian state, record the pending reconciliation and tell Kristalyn.
 
 ## Rules
 
-- Client-facing emails are drafts only, never sent.
-- Checklist items tick only on explicit human confirmation or successful MCP verification.
-- Missing or unauthenticated MCP → print manual instructions, never silently skip.
-- Credentials by reference only (password manager pointer), never plaintext.
-- No fabricated metrics or client data.
-- The checklists embedded in `onboarding.md` are snapshots; if `references/checklists/` files have changed since initialisation, flag the diff rather than silently mixing versions.
+- Rule of thumb: detailed, conditional checklists, evidence and applicability decisions live in Obsidian; BasicOps holds top-level gates, current phase, immediate owner and next action.
+- Do not force Tier 1 Ads/Maps checks onto website-only or other differently scoped clients.
+- Do not create duplicate onboarding or destination tasks.
+- Credentials are references only, never plaintext.
+- Never fabricate data, access, dates or completion.
+- Instantiated client checklists are version-stable; propose reference improvements separately rather than silently rewriting active onboarding files.

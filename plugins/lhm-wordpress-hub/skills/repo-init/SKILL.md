@@ -1,6 +1,6 @@
 ---
 name: repo-init
-description: "Set up Git repositories for a new client project. Use this when the user says 'set up the repo', 'init the client repo', 'create the client repos', 'initialise the project repo', 'set up GitHub for this client', 'create repos for [client]', 'new client repo', 'repo-init', or is starting a new client project and needs Git set up. Creates both <client>-site and <client>-prototype repos on GitHub, scaffolds the code repo's docs/ folder with context documents pulled from existing client files, and commits the initial scaffold."
+description: "Set up Git repositories for a new client project. Use this when the user says 'set up the repo', 'init the client repo', 'create the client repos', 'initialise the project repo', 'set up GitHub for this client', 'create repos for a client', 'new client repo', 'repo-init', or is starting a new client project and needs Git set up. Creates both client-site and client-prototype repos on GitHub, scaffolds the code repo's docs/ folder with context documents pulled from existing client files, and commits the initial scaffold."
 ---
 
 # Repo Init
@@ -445,3 +445,27 @@ Tell the user:
 > Local clones are at `~/Documents/Projects/<client>/`. Anyone else joining the project runs `repo-install` to clone their copy."
 
 If you pulled content from existing `client_profile.md` or `playbook.md`, note which docs were populated vs which are stubs.
+
+## Step 10: Add Default Collaborators
+
+For every newly created or newly pushed LHM repository, add the standard project collaborators with **write** access:
+
+- `GrumpyGeorgie`
+- Kristalyn (`kristalyn@localhealthmarketing.com.au`)
+- Jaimee (`Jaimee@localhealthmarketing.com.au`)
+
+GitHub collaborator invitations require a GitHub username. Invite `GrumpyGeorgie` directly. For Kristalyn and Jaimee, resolve or ask for their confirmed GitHub usernames before inviting them; never guess a username from an email address. If either username is unavailable, record that invitation as an explicit follow-up rather than treating setup as complete.
+
+Run for each confirmed username and for both repositories:
+
+```bash
+gh api --method PUT repos/<destination>/<repo>/collaborators/<username> -f permission=push
+```
+
+Verify pending or active access:
+
+```bash
+gh api repos/<destination>/<repo>/collaborators/<username>/permission
+```
+
+Report which invitations were sent and which remain pending username confirmation.
