@@ -9,15 +9,15 @@ You are the entry point for LHM's project management hub. Your job is to give a 
 
 ## Step 1: Identify the client
 
-If the client isn't already obvious from context, ask. If the user doesn't name one, list the client folders under `clients/` and ask which one. Don't guess a client from a partial name — confirm it, the same way every other skill in this hub does before touching client state.
+If the client isn't already obvious from context, ask. If the user doesn't name one, list the client folders under `20 Clients/` and ask which one. Don't guess a client from a partial name — confirm it before touching client state.
 
 ## Step 2: Read state
 
 For the identified client, in this order:
 
-1. `clients/<client>/current-projects.md` — the at-a-glance index of every active process (per `references/folder-convention.md`). Read this first.
-2. Skim every file that exists under `clients/<client>/project-management/` — `onboarding.md`, `website.md`, `landing-pages.md`, `gmb.md`, `seo.md`, `google-ads.md`, `blog.md`, and the `meetings/` folder. Not every client has all of them; only read what's there. For onboarding specifically, the `## Phase status` box is the authoritative signal for which phase is live — scan it top to bottom, the first unchecked box is the live phase, per `client-onboarding`'s own convention. Don't infer phase from checklist contents.
-3. `basicops` → `list_tasks_in_project` (`projectId: 68655`, `filter_title` set to the client's short name) on the `*Client Flow` board to find the client's card, then `list_tasks` / the card's subtasks for open and overdue items.
+1. `20 Clients/<Client>/Current Projects.md` — the at-a-glance index of every active process. Read this first.
+2. Read only the applicable files under `20 Clients/<Client>/project-management/`. For onboarding, use `Onboarding.md`'s explicit current phase and detailed evidence; do not infer completion from BasicOps alone.
+3. For new-client onboarding, search `*Client Onboarding` (project ID `68921`) for the client-level card and its seven top-level subtasks. Search destination boards separately for delivery tasks.
 
 **On any MCP failure or missing auth:** state plainly what's missing and continue with everything else that did come back. Never fabricate a status, a date, or a task count to fill a gap.
 
@@ -53,7 +53,7 @@ All 17 skills in this plugin, and when to route to each:
 | Skill | Route here when |
 |---|---|
 | `lhm-project-hub:sales-handover` | A deal just closed and needs handing from sales to delivery — new client, or an existing client buying a new package. |
-| `lhm-project-hub:client-onboarding` | The Tier 1 onboarding pipeline (Payment & Billing → Platform Access → Tracking & Config → First 30 Days) is live and needs continuing, or a status check on where it's up to. |
+| `lhm-project-hub:client-onboarding` | A new-client onboarding pipeline (Payment & Billing → Client Contact & Strategy → Access, Assets & Config → Service Kickoff → Onboarding Complete) is live or needs a status check. |
 | `lhm-project-hub:website-kickoff` | A new WordPress or Astro website build needs to start — intake, PM state file, BasicOps scaffold. |
 | `lhm-project-hub:landing-page-kickoff` | A new PPC landing page campaign needs to start. |
 | `lhm-project-hub:seo-kickoff` | A new SEO engagement needs to start. |

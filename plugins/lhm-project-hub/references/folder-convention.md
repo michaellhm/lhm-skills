@@ -2,13 +2,13 @@
 
 Every PM skill reads/writes client state using this structure:
 
-    clients/<client>/
-    ├── client_profile.md            # root — who the client is (existing convention)
-    ├── current-projects.md          # root — at-a-glance index; EVERY PM skill updates it
-    ├── goals.md                     # root — goals & targets (existing convention)
+    20 Clients/<Client>/
+    ├── <Client>.md                  # canonical client overview
+    ├── Current Projects.md          # at-a-glance index; EVERY PM skill updates it
+    ├── Goals.md                     # goals and targets
     └── project-management/          # ALL process state lives here
-        ├── onboarding.md            # Tier 1 pipeline state (phase, ticks, owners, dates)
-        ├── handover-YYYY-MM-DD.md   # sales-handover output
+        ├── Onboarding.md            # scope-aware onboarding state, evidence and detailed checklist
+        ├── Handover YYYY-MM-DD.md   # sales-handover output
         ├── website.md               # website build PM state (wp-project-manager)
         ├── landing-pages.md         # LP campaign PM state (lp-project-manager)
         ├── gmb.md                   # GMB cycle PM state (gmb-project-manager)
@@ -17,11 +17,10 @@ Every PM skill reads/writes client state using this structure:
 
 ## Rules
 
-1. `current-projects.md` holds one block per active process:
+1. `Current Projects.md` holds one block per active process:
    status, phase, owner, next action, and a link into `project-management/`.
    Read the index first; then open only the file your skill owns.
-2. Per-process files are the source of truth for CONTEXT.
-   BasicOps is the source of truth for WHO does WHAT by WHEN.
+2. Per-process Obsidian files are canonical for detailed context, checklist state, evidence and decisions. BasicOps owns visible stage, assignment and due action. Google Drive owns assets, working files and deliverables.
 3. Lazy legacy migration: if your skill's state file exists at a legacy
    location (e.g. `wordpress/project-management.md`,
    `landing-pages/landing-page-project-management.md`, a GMB cycle file),
@@ -31,11 +30,12 @@ Every PM skill reads/writes client state using this structure:
 4. Never store credentials in any of these files — reference the password
    manager entry by name instead.
 
-## current-projects.md block format
+## Current Projects.md block format
 
     ## <Process name> — <Status: active | blocked | complete>
     - Phase: <phase name>
-    - Owner: <team member>
+    - Overall owner: <process owner>
+    - Immediate owner: <owner of next gate or action>
     - Next action: <one line>
     - Detail: project-management/<file>.md
     - Updated: YYYY-MM-DD

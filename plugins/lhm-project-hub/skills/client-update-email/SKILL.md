@@ -109,6 +109,19 @@ Present the draft email to the user. Ask:
 
 Save to: `client_updates/YYYY-MM/client-update-YYYY-MM-DD.md` inside the client folder.
 
+## Step 5: Draft Delivery
+
+Use Gmail as the default delivery path when the user asks to create a draft. A Gmail draft is the reliable option when the message must appear in the sender's own mailbox and be sent from their normal address.
+
+Only use a Mailgun/Zapier delivery path when the user explicitly requests it and the required connection is available. Before using it, make these constraints clear:
+
+- the integration requires a valid connection ID;
+- the `From` address must belong to the connected sending domain (currently `mail.patienthub.app`), so it cannot impersonate the user's normal mailbox address;
+- a message sent through Mailgun will not appear in the user's Gmail Sent folder; and
+- a `403` response is a connection or authorization failure. Report it and stop rather than silently retrying or switching delivery paths.
+
+Never send without the user's explicit approval of the final draft.
+
 ## Examples
 
 ### Good Example
