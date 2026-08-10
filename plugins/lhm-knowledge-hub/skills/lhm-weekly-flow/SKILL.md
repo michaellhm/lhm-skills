@@ -1,6 +1,6 @@
 ---
 name: lhm-weekly-flow
-description: Run Local Health Marketing's weekly review and planning interview using its Obsidian vault. Use when Michael says “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, or complete an LHM weekly planning session. Load goals, projects, marketing context, the Attention Queue and the previous weekly note; interview Michael; then update Obsidian with decisions, three weekly outcomes and commitments.
+description: Run Local Health Marketing's conversational weekly review and planning interview using its Obsidian vault, WeekFlow context and operating systems. Use when Michael says “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, improve or complete an LHM weekly planning session. Begin with a personal check-in, use evidence to help recall the week, review time and unfinished work, then update Obsidian with decisions, three weekly outcomes and commitments.
 ---
 
 # LHM Weekly Flow
@@ -13,6 +13,7 @@ Run an evidence-led weekly operating review for Local Health Marketing. Use the 
 2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely and follow them.
 3. Detect the official Obsidian CLI. When available and Obsidian is running, use it for recent files, backlinks, unresolved links, open tasks and contextual search; otherwise use `rg` and direct Markdown reads without blocking the review.
 4. Read these notes completely:
+   - `01 Inbox/Inbox.md` and every unprocessed capture in `01 Inbox`
    - `05 Weekly/Weekly Flow.md`
    - `05 Weekly/Attention Queue.md`
    - `10 Goals/Goals.md` and active goal notes
@@ -21,7 +22,8 @@ Run an evidence-led weekly operating review for Local Health Marketing. Use the 
 5. Find and read the most recent completed weekly review, if one exists.
 6. Find and read every AI conversation-capture note created since the previous weekly review, including legacy `Claude Conversation Capture` notes. Collect lessons marked `Needs Michael`, `Promote to Knowledge`, `Update SOP`, or `Observe again`, plus every unresolved recurrence or contradiction.
 7. Search the vault for unresolved checkboxes, explicit blockers, `Still to define`, `Open decisions`, `alignment issue`, and recent material changes. Do not automatically copy ordinary project tasks into the Attention Queue.
-8. Use Australia/Melbourne dates and ISO week numbers.
+8. When accessible, review the previous week's completed and unfinished WeekFlow tasks. Treat WeekFlow as evidence about Michael's time and work, not as the canonical home for business decisions.
+9. Use Australia/Melbourne dates and ISO week numbers.
 
 Do not ask Michael for information already available in the vault. Briefly surface relevant existing context and ask only for changes, results or judgments that cannot be discovered.
 
@@ -32,10 +34,17 @@ Do not ask Michael for information already available in the vault. Briefly surfa
 3. Otherwise create it in `05 Weekly` using `80 Templates/Weekly Review Template.md`.
 4. Set `status: draft`, the correct week, Monday start date, Sunday end date, and current `created` and `updated` dates.
 5. Prefill links to active goals and projects. Prefill verified facts only; never invent missing metrics.
+6. Do not pre-commit priority outcomes, commitments or commercial decisions before the interview. Existing suggestions must remain visibly provisional until Michael confirms them.
 
 ## Open the session
 
-Give a compact briefing before the first question:
+Start as a human conversation before presenting the operating briefing. Ask one natural check-in such as:
+
+> How are you doing coming into the week? How is your energy, and is anything sitting in your head that you want to get out first?
+
+Let the answer influence the tone, depth and ambition of the review. Record relevant capacity context without turning private reflection into an operational fact Michael did not approve.
+
+Then give a compact briefing:
 
 - The current week and date range
 - The most relevant unfinished outcomes from the previous week
@@ -44,13 +53,30 @@ Give a compact briefing before the first question:
 - New AI-captured lessons, knowledge candidates and operational blockers since the previous review
 - Missing scorecard data that may need to be supplied
 
+Before the wins review, route the Monday intake in this order:
+
+1. Review every unprocessed `01 Inbox` capture and decide whether to discard it, merge it into a canonical note, convert it into an action, or flesh it out into a structured Idea.
+2. Review structured `seed` ideas that are relevant now; do not force parked or unrelated ideas into the week.
+3. Review unresolved lessons, recurrences and contradictions from new AI conversation captures.
+4. Surface only urgent Michael-level decisions from the Attention Queue.
+
+When an Inbox thought is worth developing, ask focused questions one at a time. Move it to `40 Ideas` only after it states the problem or opportunity, potential value, evidence or rationale and smallest next test. Aim to leave no unclassified Inbox item older than seven days.
+
 Then run the interview one section at a time. Ask one main question per message; use up to three tightly related prompts only when they are naturally answered together. Do not dump the entire questionnaire on Michael.
 
 ## Interview sequence
 
 ### 1. Wins
 
-Ask what went well in the previous week. Probe for concrete outcomes, evidence and completed work rather than activity alone.
+Ask what went well in the previous week. Do not rely on unaided recall. Offer brief evidence-based memory prompts from the vault, campaign data and WeekFlow across:
+
+- Sales, leads and cash
+- Client launches, results and positive feedback
+- Marketing progress
+- Systems, AI tools and the LHM Brain
+- Team delegation and completed work
+
+Probe for concrete outcomes and evidence rather than activity alone.
 
 After the answer:
 
@@ -68,7 +94,21 @@ After the answer:
 - Extract lessons or operating changes.
 - Add a new Attention Queue item only if Michael's decision, approval or intervention is genuinely required.
 
-### 3. Knowledge and lessons
+### 3. Time and unfinished work
+
+Review the previous week's completed and unfinished WeekFlow tasks when accessible. Use the review to understand where Michael's time went, not to copy a task list into Obsidian.
+
+Workshop only material unfinished work using one disposition:
+
+- `Complete personally`
+- `Delegate`
+- `Systemise or outsource through a skill`
+- `Redesign the approach`
+- `Drop deliberately`
+
+Record decisions or operating lessons in the relevant project or weekly note. Keep executable personal tasks in WeekFlow or BasicOps.
+
+### 4. Knowledge and lessons
 
 Before the scorecard, review material lessons captured since the previous weekly review. Skip lessons already applied that require no validation; mention them briefly in the opening context instead.
 
@@ -82,9 +122,13 @@ For each unresolved lesson, ask Michael only when judgment is needed, then assig
 
 Record the decision under `Knowledge and lessons` in the weekly note. Immediately update the canonical Knowledge, SOP, project or Attention Queue note when the disposition requires it. Do not promote a one-off project fact into `60 Knowledge`.
 
-### 4. Scorecard
+Explain an unclear lesson in plain language before asking Michael for a disposition. Do not promote a lesson merely because its wording sounds generally useful.
 
-Review the template scorecard. State any values already known, then ask for missing values that are currently meaningful:
+### 5. Founder scorecard
+
+State the exact reporting period before discussing figures. The weekly review note is Monday–Sunday, while the company scorecard may use a different reporting week; never mix periods without labelling them.
+
+Review the founder-level scorecard. State values already known, then ask only for missing measures that help Michael steer the business:
 
 - Scheduled sales calls
 - First-paying clients
@@ -92,14 +136,23 @@ Review the template scorecard. State any values already known, then ask for miss
 - Marketing spend
 - Google Ads spend and scheduled calls
 - Organic and other-source scheduled calls
-- Websites launched and delivery time
-- Proactive client work completed
+- Cash or pipeline changes that materially affect the week
+- Michael's capacity, delegation and systemisation where meaningfully measurable
+- Whether the LHM Brain reduced manual coordination or revealed a blocker
+
+Website launches or delivery exceptions may be included when they are material business outcomes. Keep routine client-delivery activity and vague counts such as `proactive client work completed` in the service-delivery operating system, not the founder weekly review.
 
 Do not force meaningless zeros or collect metrics that are not yet measurable. Mark unavailable data as `not tracked` and flag tracking setup only when it merits attention.
 
-### 5. Attention Queue
+### 6. Attention Queue
 
-Work through urgent items first. For each selected item, ask for a decision, defer it with a reason/date, or identify what information is needed.
+Review only urgent or genuinely blocking items. Before discussing an item, apply this routing test:
+
+1. Does Michael need to decide, approve, authorise or intervene now? Keep it in the Attention Queue.
+2. Is it bounded implementation or definition work? Put it in BasicOps or the relevant project backlog.
+3. Is it an idea without a committed outcome and owner? Put it in `40 Ideas` or the parking lot.
+
+For each selected Attention item, ask for a decision, defer it with a reason/date, or identify what information is needed.
 
 When Michael resolves an item:
 
@@ -110,13 +163,15 @@ When Michael resolves an item:
 
 Do not treat every queue item as a priority for the current week.
 
-### 6. Active projects and opportunities
+When Michael asks an agent to create a personal BasicOps task, use the `Michael Tasks` board, `INBOX` section and Michael as assignee unless he explicitly requests different routing. Always return the task link.
+
+### 7. Active projects and opportunities
 
 Summarise the health and next milestone of each material active project. Ask what changed, what is blocked and whether any project should start, stop, continue or change scope.
 
-Capture new ideas in `40 Ideas` only when they are genuine opportunities rather than immediate actions. Capture new time-bound work as a project only after its outcome and owner are clear.
+Capture emerging ideas without letting them silently expand the week. Route each idea to this week's outcomes, a BasicOps task, a project backlog, `40 Ideas`, or the parking lot. Capture new time-bound work as a project only after its outcome and owner are clear.
 
-### 7. Plan the coming week
+### 8. Plan the coming week
 
 Ask what would make the coming week successful. Develop possible outcomes from goals, project milestones, attention items and Michael's answer.
 
@@ -128,11 +183,13 @@ Challenge:
 - Work that does not advance a goal, unblock delivery or protect a live campaign
 - Workload that exceeds known capacity
 
+Use Michael's opening energy and capacity check when judging workload. A free week permits deeper work, but still turn broad intentions such as `smash through the Brain` into one or more observable deliverables.
+
 Agree on no more than three primary outcomes. Each outcome must be observable by the end of the week.
 
-### 8. Commitments and final check
+### 9. Commitments and final check
 
-Turn each outcome into the minimum necessary commitments with owner and due date. Ask what could derail the week and what should deliberately not be worked on.
+Turn each outcome into the minimum necessary commitments with owner and due date. End conversationally by asking what could derail the week, what should deliberately not be worked on, and what Michael is most interested in starting first.
 
 Confirm the final plan with Michael before marking the review complete.
 

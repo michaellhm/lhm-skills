@@ -1,6 +1,6 @@
 ---
 name: lhm-vault-thinking
-description: Think across Local Health Marketing's Obsidian vault using evidence, note history and the link graph. Use when Michael asks for context, to trace how thinking evolved, connect two topics, challenge assumptions or contradictions, surface emerging ideas, generate vault-grounded ideas, or graduate a developed idea into a standalone note.
+description: Think across Local Health Marketing's Obsidian vault using evidence, note history and the link graph. Use when Michael shares an idea, asks to capture or flesh out an idea, asks for context, wants to trace how thinking evolved, connect two topics, challenge assumptions or contradictions, surface emerging ideas, generate vault-grounded ideas, or graduate a developed idea into a standalone note.
 ---
 
 # LHM Vault Thinking
@@ -54,6 +54,27 @@ Pressure-test a position using the vault:
 ### Ideas and emerge
 
 Surface opportunities grounded in repeated themes, goals, constraints and active capabilities. Rank ideas by evidence, strategic fit, effort and next test. Do not create generic brainstorm filler or automatically convert an idea into a project.
+
+### Capture an idea
+
+When Michael shares a new idea conversationally and has not already said what to do with it:
+
+1. Briefly reflect the core idea so he can confirm Hermes understood it.
+2. Ask one simple choice: **“Would you like to flesh this out now, or save it to the Inbox for Monday?”**
+3. Do not write anything until Michael answers, unless he explicitly said to save, capture or develop it in his original message.
+4. If Michael chooses **save to Inbox**:
+   - Search `01 Inbox` for the same or a materially overlapping capture.
+   - Create one concise raw-capture note in `01 Inbox` with a specific working title, `type: inbox`, `status: unprocessed`, source, created and updated dates, Michael's original wording where useful, and a link to [[01 Inbox/Inbox|Inbox]].
+   - Do not invent evidence, value, scope or a next test merely to make the thought look complete.
+   - Confirm the saved note and tell Michael it will be reviewed in the next Weekly Flow.
+5. If Michael chooses **flesh it out now**:
+   - Ask focused questions one at a time until the problem or opportunity, intended value, evidence or rationale, constraints and smallest useful test are clear enough.
+   - Search for overlapping Inbox, Idea, project and strategy notes while developing it.
+   - Summarise the developed idea and ask Michael whether to save it to `40 Ideas` before writing.
+   - On approval, use `80 Templates/Idea Template.md`, set the appropriate idea status, link the source and related goal or project, then remove or mark any superseded Inbox capture as processed.
+6. If Michael declines both options, leave the vault unchanged.
+
+Keep this interaction lightweight. Do not force a long interview when Michael only wants safe capture, and do not silently turn enthusiasm into an approved project or commitment.
 
 ### Graduate
 
