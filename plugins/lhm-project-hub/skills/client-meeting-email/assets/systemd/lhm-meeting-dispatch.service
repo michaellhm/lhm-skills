@@ -11,3 +11,5 @@ PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=read-only
 ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch /home/codexworker/.codex
+RuntimeDirectory=lhm-meeting-run lhm-meeting-snapshot
+RuntimeDirectoryMode=0755
