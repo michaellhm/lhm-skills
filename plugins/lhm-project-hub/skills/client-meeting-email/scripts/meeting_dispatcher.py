@@ -148,6 +148,7 @@ def process(path):
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source, destination)
         shutil.copytree(SKILL, skill_snapshot, symlinks=False)
+        atomic_text(snapshot_root / "request.json", json.dumps(data, indent=2) + "\n", 0o440, 0, WORKER_GID)
         readonly_tree(snapshot_root)
         atomic_text(run_dir / "request.json", json.dumps(data, indent=2) + "\n", 0o440, 0, WORKER_GID)
         atomic_text(run_dir / "client-profile.json", json.dumps(profile, indent=2) + "\n", 0o440, 0, WORKER_GID)
