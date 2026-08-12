@@ -1,6 +1,6 @@
 ---
 name: post-meeting-review
-description: "Work through a client meeting's follow-up: update client state files, sweep the client folder for stale artefacts, turn action items into assigned BasicOps subtasks, and draft a team update email. Use this after `lhm-project-hub:client-meeting-email` has run for a meeting, or when the user says 'meeting wrap', 'work through the follow-ups', 'post-meeting review'. Reads the saved meeting-notes and client-wrap-email files (falls back to a fresh Fathom pull if they don't exist yet) to update goals.md, current-projects.md, client_profile.md, and sweep the whole client folder for artefacts the meeting's decisions invalidate. Finds the client's BasicOps card (already created and moved to Follow Up by client-meeting-email) and creates one subtask per task. Then walks through every task one at a time — proposing an owner from the team roster or routing table, asking for agreement, and offering to run research or prepare a live-system handoff plan right there before moving to the next task. Client-owed items always route to Kristalyn without asking. Ends by drafting a team summary email. Triggers on: 'meeting wrap', 'work through the follow-ups', 'post-meeting review', 'meeting follow-ups', 'client call debrief'."
+description: "Work through a client meeting's follow-up: update client state files, sweep the client folder for stale artefacts, turn action items into linked standalone BasicOps tasks on their owners' boards, and draft a team update email. Use this after `lhm-project-hub:client-meeting-email` has run for a meeting, or when the user says 'meeting wrap', 'work through the follow-ups', 'post-meeting review'. Reads the saved meeting-notes and client-wrap-email files (falls back to a fresh Fathom pull if they don't exist yet) to update goals.md, current-projects.md, client_profile.md, and sweep the whole client folder for artefacts the meeting's decisions invalidate. Finds the client's BasicOps card (already created and moved to Follow Up by client-meeting-email), uses it as a compact mother-task register, and creates one linked task per action. Then walks through every task one at a time — proposing an owner from the team roster or routing table, asking for agreement, and offering to run research or prepare a live-system handoff plan right there before moving to the next task. Client-owed items always route to Kristalyn without asking. Ends by drafting a team summary email. Triggers on: 'meeting wrap', 'work through the follow-ups', 'post-meeting review', 'meeting follow-ups', 'client call debrief'."
 ---
 
 # Post-Meeting Review
@@ -135,7 +135,7 @@ Runs every time, regardless of whether anything else in the profile changed — 
 Check `client_profile.md` for an `Acronym:` field.
 
 - **Present:** use it as-is. No questions asked.
-- **Missing:** derive one from the client's display name (first letter of each significant word, uppercase — "Your Story Physio" → `YSP`, "Australian Sports Physio" → `ASP`). Confirm with the user before proceeding (e.g. "Use YSP as the BasicOps short-code for Your Story Physio?"), since a bad auto-derivation is annoying to unwind once it's on ten subtask titles. Once confirmed, or the user gives a different value, write `Acronym: <value>` to `client_profile.md` so every future run just reads it.
+- **Missing:** derive one from the client's display name (first letter of each significant word, uppercase — "Your Story Physio" → `YSP`, "Australian Sports Physio" → `ASP`). Confirm with the user before proceeding (e.g. "Use YSP as the BasicOps short-code for Your Story Physio?"), since a bad auto-derivation is annoying to unwind once it's on ten task titles. Once confirmed, or the user gives a different value, write `Acronym: <value>` to `client_profile.md` so every future run just reads it.
 - **`client_profile.md` doesn't exist yet:** derive an acronym for this run only, tell the user it wasn't saved because the profile doesn't exist, and don't block the rest of the skill on it.
 
 ## Step 3: Propagation sweep
@@ -162,11 +162,11 @@ This step **detects**. It does not edit. `client-update` owns the editing.
 
 Board: `*Client Flow` (project ID `68655`). Sections: `Follow Up` (ID `107750`), `Meeting Week` (ID `107749`).
 
-`client-meeting-email` already found or created the client card, moved it to Follow Up, and posted the meeting-summary discussion note during capture. This step only locates that card — Step 5 creates the actual subtasks as it works through each task.
+`client-meeting-email` already found or created the client card, moved it to Follow Up, and posted the meeting-summary discussion note during capture. This step locates that card and treats it as the mother task — Step 5 creates the linked standalone action tasks and writes their register back to the card. **Meeting-wrap trackers stay in Client Flow. Never create or move a meeting-wrap tracker onto Michael's personal task board.** Client Flow is the portfolio view for seeing each client's follow-up progress.
 
 Call `list_tasks_in_project` with `projectId: 68655` and `filter_title` set to the client's short/common name (e.g. "mhealth", not a long legal entity name). If nothing matches, call `list_tasks_in_project` again without `filter_title` and scan titles for a case-insensitive match.
 
-- **No match:** this means `client-meeting-email` was skipped for this meeting, not just that Step 1's fallback transcript path is being used. Tell the user "No client card found in *Client Flow for [Client]. Want me to create one, or should the follow-ups go in as standalone tasks?" Creating the card is usually right, because everything in this board hangs off it. If they decline, run Step 5 in **no-card mode**: drop `parentTaskId` and create every task directly in section `107750`.
+- **No match:** this means `client-meeting-email` was skipped for this meeting, not just that Step 1's fallback transcript path is being used. Tell the user "No client card found in *Client Flow for [Client]. Want me to create one as the meeting-wrap tracker, or should the follow-ups go in unlinked?" Creating the card is usually right, because it keeps the action register together. If they decline, run Step 5 in **no-card mode** and route every task directly to its owner's board.
 - **One match:** that's the card.
 - **Multiple matches:** list them (title + URL from `link_to_task`) and ask the user which one is the client's card.
 
@@ -176,9 +176,21 @@ If BasicOps MCP isn't authorized, skip this step and Step 5's BasicOps writes en
 
 Build one combined list before starting the loop: every action item from the meeting record (LHM-owned and client-owed), plus every follow-on task identified below (5a), plus anything Step 3 handed back from a `client-update` detour. Work through the combined list one task at a time, in whatever order it was identified — there's no separate pass for action items versus follow-on work.
 
+Before creating anything, run a **compactness gate** over the combined list:
+
+- Create a task only when there is a concrete next action, an owner, and a recognisable finish line. Keep observations, risks, parked ideas, and background in the saved meeting record; they are not tasks by themselves.
+- Merge items that are steps of the same deliverable. Put the steps into that task's short `Detail` bullets instead of creating one task per step.
+- Merge client inputs that one person will chase in the same conversation into one clearly named client-follow-up task, unless different due dates or owners make them genuinely independent.
+- Prefer 3–8 meaningful tasks. More than 10 is a warning that the meeting has been decomposed too finely; pause and consolidate before writing to BasicOps. Do not enforce an artificial maximum when the meeting truly produced more than 10 independent commitments.
+- Use plain-language titles that state the outcome. Avoid encoding meeting commentary, status, or a mini-brief in the title.
+
 ### BasicOps field rules (read before writing anything)
 
-- **Never put task detail in the `description` field.** All context, briefing detail, links, and "what done looks like" go into the task discussion via `create_message_in_task`. The description stays empty or holds a single line at most. This is a hard rule and applies to every write, every client, no exceptions.
+- **The client card is the meeting-wrap tracker (the "mother task").** Keep its description as a compact action register made from live BasicOps task record-links. Do not paste the meeting transcript, strategic analysis, or a second email into it.
+- **Action tasks are standalone linked tasks, not BasicOps subtasks.** The two reference meeting wraps (`2060773` and `2117845`) return no subtasks from `list_subtasks_in_task`; their task relationships are live BasicOps record-links. Create action tasks without `parentTaskId`, assign them, and move them to the owner's project/board when the owner is confirmed. Link them back to the mother task in their description. This lets the work live on the assignee's board without disappearing from the meeting wrap.
+- **Put the minimum useful brief in each action task's description.** Use a `Mother task` record-link, then `Detail` with 1–4 terse bullets. Add `Done when` only when the finish line is not obvious. Do not post a separate discussion message that merely repeats this description.
+- **Use discussions only for change over time:** research results, plan/resume prompts, judgment calls, blockers, or a short completion/update note. A newly created task should not arrive with a wall of commentary.
+- **Use BasicOps record-links, not ordinary URL links, for task-to-task relationships.** Record-links carry the task state in BasicOps, so completed work is crossed off in the mother task and the relationship survives moving the task between boards. Use task table id `3936` and the created task id. Do not copy the SVG/checkbox markup from an old task; BasicOps owns the status rendering.
 - **Discussion messages take raw HTML.** Do not escape it to entities, because `&lt;p&gt;` renders as literal text. If you get it wrong, `delete_message` with the returned id and repost.
 - **Task titles take a plain `&`,** not `&amp;`, which renders as the literal entity.
 
@@ -198,7 +210,7 @@ Structure every labeled message as short, scannable HTML — dot points, not par
 
 **Judgment calls get their own message, not a third field.** When there's a decision the assignee should surface rather than make alone, post it as a separate discussion message straight after the briefing — a plain bullet list under `<p><strong>Judgment calls:</strong></p>`, nothing else. Skip the message entirely when there's nothing to flag; don't manufacture one to fill the slot.
 
-This applies to every structured message this skill posts: Step 5's dispatch briefings, plan summaries, judgment-call flags, and Briefly Prep output. There's no separate meeting-briefing or session-trace message in this skill anymore — `client-meeting-email` already posted the one meeting-summary note to the card during capture, close to the client email itself.
+This applies to every structured message this skill posts: Step 5's research results, plan summaries, judgment-call flags, and Briefly Prep output. There's no separate meeting-briefing or session-trace message in this skill anymore — `client-meeting-email` already posted the one meeting-summary note during capture. Keep any new post-meeting material focused on the work, not a retelling of the meeting.
 
 ### 5a. Identify follow-on tasks
 
@@ -206,7 +218,7 @@ For everything in the meeting record's "Skill triggers" list, plus any downstrea
 
 ### 5a.5. Cross-check follow-on tasks against the meeting's action items
 
-Before adding a follow-on task to the combined list, check whether it describes the same underlying work as one of the meeting record's own action items. Action items and skill triggers come from two separate extraction buckets, and the same meeting decision can land in both — "we need a new blog post about the new service" is naturally both an action item and a content trigger. Skipping this check produces two subtasks for the same piece of work.
+Before adding a follow-on task to the combined list, check whether it describes the same underlying work as one of the meeting record's own action items. Action items and skill triggers come from two separate extraction buckets, and the same meeting decision can land in both — "we need a new blog post about the new service" is naturally both an action item and a content trigger. Skipping this check produces two tasks for the same piece of work.
 
 If a match is found, don't list it twice — treat it as one entry in the combined list, tagged with whatever Type 5b assigns it. If no match, it's a new entry in its own right.
 
@@ -241,19 +253,60 @@ Tiering is **per task, not per agent** — the same agent can produce both an Au
 1. **The proposed article topic** (informed by the keyword research when there was one).
 2. **Three questions to ask the client in the briefly** — the input only the client can supply that keyword data can't (their angle, patient stories or case specifics, service nuance, whatever this topic actually needs from them).
 
-Do not dispatch the `content` agent for this trigger. Writing the actual brief or draft happens after the client conversation, using what it surfaces, not before it. Post the topic and three questions to the subtask discussion in 5f exactly as produced (formatted per the discussion-message rule: the topic as its own paragraph, the three questions as a `<ul>`); this is the complete output, not a draft of one.
+Do not dispatch the `content` agent for this trigger. Writing the actual brief or draft happens after the client conversation, using what it surfaces, not before it. Post the topic and three questions to the task discussion in 5f exactly as produced (formatted per the discussion-message rule: the topic as its own paragraph, the three questions as a `<ul>`); this is the complete output, not a draft of one.
 
-**No match.** If a task doesn't cleanly fit the table or Direct, fall back to a plain-text recommendation line in the email (Step 6). No subtask, no dispatch. Do not force a task into a tier it doesn't belong in.
+**No match.** If a task doesn't cleanly fit the table or Direct, fall back to a plain-text recommendation line in the email (Step 6). No BasicOps task, no dispatch. Do not force a task into a tier it doesn't belong in.
 
-### 5c. Create the subtask
+### 5c. Create the linked action task
 
-For each entry in the combined list that doesn't already have a BasicOps subtask (action items almost never do yet; a 5a.5 match already does):
+For each entry in the combined list that doesn't already have a BasicOps task (action items almost never do yet; a 5a.5 match already does):
 
-`create_task` with `projectId: 68655`, `parentTaskId: <card id>` (omit in no-card mode), `section: 107750`, title `"<Acronym> - Action - <task>"` for an LHM-owned action item, `"<Acronym> - Client - <task>"` for a client-owed action item, or `"<Acronym> - <Type> - <task>"` (`<Type>` from 5b) for a follow-on task. `<Acronym>` per Step 2's acronym resolution. At most one line in `description`.
+Create the task **without `parentTaskId`**. Initially use `projectId: 68655` and `section: 107750` only while the owner is unresolved. Once 5d confirms the owner, move the task to that person's task project/board and specifically its **Inbox** section. Every staff task board has an Inbox; resolve its actual section ID via BasicOps rather than assuming one board's ID applies to another. Use title `"<Acronym> - Action - <task>"` for an LHM-owned action item, `"<Acronym> - Client - <task>"` for a client-owed action item, or `"<Acronym> - <Type> - <task>"` (`<Type>` from 5b) for a follow-on task. `<Acronym>` per Step 2's acronym resolution.
 
-No discussion message yet at creation time. The parent card already carries the full meeting-summary note from `client-meeting-email`; 5f posts to the subtask discussion only when there's something concrete to post (a research result, a plan file, a judgment call) — a plain assignment doesn't need one.
+Set the description to this compact shape (raw HTML):
 
-**If you mis-parent a task,** `update_task` with `parentTaskId` re-parents it and preserves the assignee, description, and discussion. No need to delete and recreate.
+```html
+<p><strong>Mother task:</strong> [BasicOps record-link to the client card]</p>
+<p><strong>Detail:</strong></p>
+<ul>
+<li>Essential context or instruction</li>
+<li>Second point only if needed</li>
+</ul>
+<p><em>Questions? Ask Hermes first — it can check the linked meeting wrap, Fathom notes, and client/LHM knowledge. If the answer is not recorded, flag whether Michael or the client needs to answer.</em></p>
+```
+
+If the finish line needs clarification, add one short `<p><strong>Done when:</strong> ...</p>`. Never add meeting-summary prose, routing rationale, or duplicated background.
+
+After every action task has been created, update the client card's description once with the meeting recording link followed by a numbered action register. Each item contains the live BasicOps record-link, up to 1–3 concise detail bullets, and the confirmed owner. Do not duplicate the entire task description. Target roughly 4–8 lines per action, and omit empty labels. This one register replaces both a forest of subtasks and a long task-dump discussion.
+
+```html
+<p><strong>Recording:</strong> [link]</p>
+<p><strong>Task 1:</strong> [BasicOps record-link]</p>
+<ul><li>Why/what, in one terse point</li></ul>
+<p>Assigned to: <strong>Name</strong></p>
+```
+
+If an existing card already has genuine deliverables in its description, preserve them under a short `Scope` heading and append/replace only the action-register portion. Do not destroy unrelated user-authored content.
+
+### 5c.5. Hermes context and knowledge-gap loop
+
+Keep each action task concise because Hermes is the context layer, not because context is disposable. The `Mother task` record-link is the route back to the meeting wrap; Hermes should use it to locate the client and meeting before answering a staff question.
+
+When staff ask Hermes about an action task, Hermes should check, in order:
+
+1. The action task and linked Client Flow mother task.
+2. The saved meeting notes and Fathom recording/transcript for the meeting.
+3. The client's current profile, goals, projects, and other client knowledge.
+4. LHM knowledge, SOPs, skills, and relevant historical decisions.
+
+If those sources answer the question, Hermes gives the answer with a short source pointer and does not create more BasicOps noise.
+
+If they do not, Hermes must classify the missing answer before escalating:
+
+- **Michael decision / LHM knowledge gap:** strategy, LHM process, scope interpretation, prioritisation, or a decision only Michael can make. Post one concise question on the action task for Michael, explicitly label it `LHM knowledge gap`, and say which LHM knowledge file or workflow should be updated once answered.
+- **Client fact / client knowledge gap:** facts, preferences, approvals, access, clinical/service nuance, or business information only the client can supply. Post one concise question on the action task, assign the follow-up to Kristalyn when a separate chase is needed, explicitly label it `Client knowledge gap`, and say which client knowledge file should be updated once answered.
+
+Do not guess, silently block the task, or ask both Michael and the client the same vague question. Capture the eventual answer in the identified knowledge source so Hermes can answer it next time, then add a short resolution note to the action task.
 
 ### 5d. Propose an owner and ask, one task at a time
 
@@ -261,21 +314,21 @@ For every task on the combined list, in turn:
 
 1. Propose a single owner: cross-reference `references/team-roster.md` (human specialties) and 5b's routing table (which specialist agent, if any, fits this task type) to land on one recommendation, not a list.
 2. Ask a single `AskUserQuestion`, scoped to this task alone: e.g. "I recommend Aiya for the web dev item — agree?" with the recommendation as the default option and room to override. Do not batch several tasks into one question — one task, one question, then move to the next.
-3. `update_task` with `taskId` and `assignee` set to whatever the answer resolves to. (`@mentions` inside task messages aren't confirmed to trigger real BasicOps notifications, so the `assignee` field is the reliable mechanism.)
+3. Resolve the owner's task project and its Inbox section, then `update_task` with `taskId`, `assignee`, `projectId`, and `section` set to those exact values. Assigned meeting actions always enter **Inbox**, including client-follow-up tasks routed to Kristalyn; the owner can triage them onward. The live record-link on the Client Flow card remains valid after this move. (`@mentions` inside task messages aren't confirmed to trigger real BasicOps notifications, so the `assignee` field is the reliable mechanism.)
 4. **Answers carry instruction beyond a name more often than not.** Real examples: "fold this into the landing page build", "X should be notified even though it isn't theirs", "they already have access, go through my account", "this one's urgent, the rest can wait". The `assignee` field loses all of that — post it as a follow-up discussion message on the task.
 
 **Direct tier:** skip the owner question — there's no one to assign, Claude answers now. Run the check immediately and hold the answer for 5f. If the tool this needs isn't connected, note "needs manual check" for Step 6's email instead of blocking the rest of this step.
 
-**Client-owed items** (the `<Acronym> - Client - <task>` subtasks from 5c): skip the owner question entirely. `update_task` with `assignee` set to Kristalyn (`kristalyn@localhealthmarketing.com.au`; if the `assignee` field needs a BasicOps user id rather than an email, resolve it via `list_users` first). Chasing clients for outstanding items is always Kristalyn's, every meeting — that was never a real choice, so it doesn't get a question.
+**Client-owed items** (the `<Acronym> - Client - <task>` tasks from 5c): skip the owner question entirely. `update_task` with `assignee` set to Kristalyn (`kristalyn@localhealthmarketing.com.au`; if the `assignee` field needs a BasicOps user id rather than an email, resolve it via `list_users` first) and move it to the **Inbox** section of Kristalyn's task board. Chasing clients for outstanding items is always Kristalyn's, every meeting — that was never a real choice, so it doesn't get a question.
 
-**No-card mode.** If Step 4 found no card and the user declined to create one, everything above still applies with `parentTaskId` omitted.
+**No-card mode.** If Step 4 found no card and the user declined to create one, create and route standalone tasks as above, but omit the `Mother task` link and action-register update.
 
 ### 5e. Offer research or a handoff plan, in the same turn as the assignment question
 
 Immediately after 5d's assignment question for an **Auto-run** task, ask whether to run the research now: e.g. "This needs keyword research before Aiya can start — want me to run that now?"
 
 - **Yes:** dispatch the specialist agent via the Agent tool with `run_in_background: false` (the Agent tool backgrounds by default, so this must be passed explicitly, not just omitted). Wait for it to return before moving to the next task — do not move on with it still running, and do not dispatch several tasks' research in parallel and come back for the answers later. One task's full cycle (assign, ask, research, post the result) completes before the next task starts.
-- **No:** leave the subtask assigned with no research attached. Nothing dispatches silently, ever.
+- **No:** leave the task assigned with no research attached. Nothing dispatches silently, ever.
 
 For a **Handoff-prompt** task, ask instead whether to prepare the plan now: e.g. "This changes a live Ads budget — want me to put together a plan and a resume prompt for whoever runs it?"
 
@@ -310,16 +363,16 @@ For a **Handoff-prompt** task, ask instead whether to prepare the plan now: e.g.
   Coach me through doing this myself, step by step — don't do it for me.
   ```
 
-- **No:** leave the subtask assigned with no plan attached.
+- **No:** leave the task assigned with no plan attached.
 
-**No match** tasks from 5b skip 5d and this step entirely — they get a plain-text recommendation line in Step 6's email instead, no subtask.
+**No match** tasks from 5b skip 5d and this step entirely — they get a plain-text recommendation line in Step 6's email instead, no BasicOps task.
 
 ### 5f. Post the result
 
-Whatever 5e produced, post it to the subtask discussion as soon as it's ready — before moving to the next task:
+Whatever 5e produced, post it to the action task's discussion as soon as it's ready — before moving to the next task:
 
-- **Direct:** post the answer to the subtask discussion. Nothing further to track.
-- **Auto-run, research run:** post the dispatch context first — **Why it matters** and **What done looks like**, each a short bullet list, formatted per the discussion-message rule above — then immediately post the agent's actual output as the next discussion message. If the agent failed instead of completing, put what was attempted and what broke into the result message. Attach any generated files (keyword CSVs, ad copy CSVs, content drafts) via `add_file_to_task`, save a copy to `[client-folder]/project-management/meetings/YYYY-MM-DD/`, and add a one-line pointer on the client card so the result is visible without opening every subtask.
+- **Direct:** post the answer to the action task discussion. Nothing further to track.
+- **Auto-run, research run:** the compact brief is already in the description, so post the agent's actual output as the next discussion message. If the agent failed instead of completing, put what was attempted and what broke into the result message. Attach any generated files (keyword CSVs, ad copy CSVs, content drafts) via `add_file_to_task`, save a copy to `[client-folder]/project-management/meetings/YYYY-MM-DD/`, and add a one-line result pointer beside that task in the client card's action register.
 
   Also judge whether the completed output implies a concrete, specific next live-system step: keyword research and ad copy drafting naturally continues into "push these live"; a pure research or competitive-analysis task usually doesn't have one. If it does, post one more discussion message with a Resume prompt in the same coaching-framed shape 5e uses for Handoff-prompt tasks, referencing the actual deliverable that just landed:
 
@@ -335,7 +388,7 @@ Whatever 5e produced, post it to the subtask discussion as soon as it's ready �
 
   Skip this entirely when there's no clear next step rather than inventing one.
 
-- **Auto-run, research declined:** nothing further to post — the subtask is assigned, that's it.
+- **Auto-run, research declined:** nothing further to post — the task is assigned, that's it.
 - **Handoff-prompt, plan prepared:** post up to three discussion messages. First, the plan summary — **Why it matters** and **What done looks like** only, each a short bullet list, plus the local path to the plan file. Second, if the plan flags a judgment call, a **Judgment calls** message — a plain bullet list under `<p><strong>Judgment calls:</strong></p>`, nothing else; skip it if there isn't one. Third, the Resume prompt built in 5e, wrapped in a `<pre>` block so the raw-HTML field preserves line breaks and spacing, with the plan's angle-bracket placeholders HTML-escaped first so they don't get swallowed as unrecognized tags. Keeping the prompt its own message means it can be selected and copied without scrolling past the rest.
 - **Handoff-prompt, plan declined:** nothing further to post.
 
