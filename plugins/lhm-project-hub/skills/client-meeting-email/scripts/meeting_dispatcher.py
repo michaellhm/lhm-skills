@@ -156,14 +156,20 @@ def process(path):
         os.chmod(run_dir / "output-schema.json", 0o440)
         atomic_text(run_dir / "events.jsonl", json.dumps({"event": "queued", "run_id": data["run_id"]}) + "\n", 0o640, WORKER_UID)
         unit_id = re.sub(r"[^A-Za-z0-9_.-]", "-", data["run_id"])
+        runtime_run = Path("/run/lhm-meeting-run")
+        runtime_snapshot = Path("/run/lhm-meeting-snapshot")
+        runtime_run.mkdir(mode=0o755, exist_ok=True)
+        runtime_snapshot.mkdir(mode=0o755, exist_ok=True)
         command = [
             "systemd-run", "--quiet", f"--unit=lhm-meeting-run-{unit_id}",
             "--uid=codexworker", "--gid=codexworker", "--property=Type=oneshot",
             "--property=NoNewPrivileges=yes", "--property=PrivateTmp=yes",
             "--property=ProtectSystem=strict", "--property=ProtectHome=read-only",
             "--property=RestrictSUIDSGID=yes", "--property=UMask=0027",
-            f"--property=ReadWritePaths={run_dir} /home/codexworker/.codex",
-            "/usr/local/libexec/lhm-meeting-worker", str(run_dir), str(snapshot_root), str(data["timeout_seconds"]),
+            f"--property=BindPaths={run_dir}:{runtime_run}",
+            f"--property=BindReadOnlyPaths={snapshot_root}:{runtime_snapshot}",
+            "--property=ReadWritePaths=/run/lhm-meeting-run /home/codexworker/.codex",
+            "/usr/local/libexec/lhm-meeting-worker", str(runtime_run), str(runtime_snapshot), str(data["timeout_seconds"]),
         ]
         subprocess.run(command, check=True)
         shutil.move(path, PROCESSED / path.name)

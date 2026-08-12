@@ -10,8 +10,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 CODEX = "/home/codexworker/.local/bin/codex"
-RUNS = Path("/home/hermes/.hermes/profiles/lhm_brain/dispatch/meeting-runs")
-SNAPSHOTS = Path("/home/hermes/.hermes/profiles/lhm_brain/dispatch/meeting-snapshots")
+RUNTIME_RUN = Path("/run/lhm-meeting-run")
+RUNTIME_SNAPSHOT = Path("/run/lhm-meeting-snapshot")
 
 
 def now():
@@ -25,9 +25,9 @@ def atomic(path, payload):
     os.replace(temp, path)
 
 
-def event(run_dir, name, summary):
+def event(run_dir, name, summary, run_id=None):
     with (run_dir / "events.jsonl").open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps({"timestamp": now(), "event": name, "run_id": run_dir.name, "summary": summary}) + "\n")
+        handle.write(json.dumps({"timestamp": now(), "event": name, "run_id": run_id or run_dir.name, "summary": summary}) + "\n")
 
 
 def finish(run_dir, request, status, summary, result=None, exit_code=0):
@@ -40,7 +40,7 @@ def finish(run_dir, request, status, summary, result=None, exit_code=0):
         final["content_hash"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
         final["result"] = result
     atomic(run_dir / "final.json", final)
-    event(run_dir, status, summary)
+    event(run_dir, status, summary, request["run_id"])
 
 
 def prompt(request):
@@ -84,10 +84,10 @@ def main():
     run_dir = Path(sys.argv[1]).resolve()
     snapshot = Path(sys.argv[2]).resolve()
     timeout = int(sys.argv[3])
-    if run_dir.parent != RUNS or snapshot != SNAPSHOTS / run_dir.name:
+    if run_dir != RUNTIME_RUN or snapshot != RUNTIME_SNAPSHOT:
         raise SystemExit("invalid run path")
     request = json.loads((run_dir / "request.json").read_text(encoding="utf-8"))
-    event(run_dir, "started", "Codex started review-only meeting preparation.")
+    event(run_dir, "started", "Codex started review-only meeting preparation.", request["run_id"])
     raw = run_dir / "worker-result.json"
     with (run_dir / "codex.jsonl").open("wb") as stdout, (run_dir / "codex.stderr").open("wb") as stderr:
         try:
