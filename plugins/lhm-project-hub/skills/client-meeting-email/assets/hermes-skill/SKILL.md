@@ -34,23 +34,18 @@ execution skill locally and do not analyse the transcript inside Hermes.
 
 ## Mutations
 
-Preparation authorises no mutations. After Michael explicitly approves the
-reviewed run and exact content hash, submit two independent operations.
+Preparation authorises no mutations. After Michael explicitly approves both
+the vault changes and Gmail draft for an exact reviewed run and content hash,
+run exactly one command:
 
-For vault approval, send a closed JSON request on stdin to
-`/opt/data/profiles/lhm_brain/bin/meeting-vault-approval submit` containing:
-`schema_version: 1`, unique `approval_id`, `source_run_id`, `content_hash`,
-`operation: apply_vault`, `approved_by: Michael`, and Michael's exact
-`approval_text`. Poll `meeting-vault-approval status <approval_id>`. Report
-success only for `vault_applied`, including the exact files.
+`/opt/data/profiles/lhm_brain/bin/meeting-approve approve-both '<run_id>' '<content_hash>' '<Michael exact approval text>'`
 
-For Gmail approval, send a separate closed JSON request to
-`/opt/data/profiles/lhm_brain/bin/meeting-gmail-approval submit` containing:
-`schema_version: 1`, unique `approval_id`, `source_run_id`, `content_hash`, a
-unique `gmail_run_id` matching `meeting-draft-YYYYMMDD-NN`,
-`operation: create_gmail_draft`, `approved_by: Michael`, and Michael's exact
-`approval_text`. Poll `meeting-gmail-approval status <approval_id>`, then poll
-`gmail-draft status <gmail_run_id>`. Report success only for `draft_created`.
+Do not inspect or reconstruct approval JSON schemas. The helper validates the
+request, creates both closed requests and returns three IDs plus exact status
+commands. Run those returned commands. Report vault success only for
+`vault_applied`, including the exact files. Report Gmail success only when the
+approval is `gmail_draft_queued` and the draft result is `draft_created`.
+If the helper or a status command fails, stop and report the exact error.
 
 Never accept email subject, body, recipients, file paths or file contents from
 the conversational request. The host retrieves the exact reviewed artifacts by
