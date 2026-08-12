@@ -94,6 +94,7 @@ def main():
             completed = subprocess.run([
                 CODEX, "exec", "--json", "--approve-for-me", "--ephemeral",
                 "--ignore-user-config", "--ignore-rules", "--cd", str(snapshot),
+                "--skip-git-repo-check",
                 "--output-schema", str(run_dir / "output-schema.json"),
                 "--output-last-message", str(raw), "-",
             ], input=prompt(request).encode(), stdout=stdout, stderr=stderr, timeout=timeout)
