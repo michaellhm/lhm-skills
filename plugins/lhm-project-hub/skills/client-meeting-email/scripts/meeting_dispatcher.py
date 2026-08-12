@@ -162,7 +162,6 @@ def process(path):
             "--property=NoNewPrivileges=yes", "--property=PrivateTmp=yes",
             "--property=ProtectSystem=strict", "--property=ProtectHome=read-only",
             "--property=RestrictSUIDSGID=yes", "--property=UMask=0027",
-            "--property=IPAddressDeny=any",
             f"--property=ReadWritePaths={run_dir} /home/codexworker/.codex",
             "/usr/local/libexec/lhm-meeting-worker", str(run_dir), str(snapshot_root), str(data["timeout_seconds"]),
         ]
