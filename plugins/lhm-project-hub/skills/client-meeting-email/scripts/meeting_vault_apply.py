@@ -18,6 +18,8 @@ RUNS = BASE / "meeting-runs"
 REGISTRY = Path("/etc/lhm-codex/clients")
 VAULT = Path("/home/hermes/.hermes/profiles/lhm_brain/vault")
 LOCK = BASE / "vault-apply.lock"
+VAULT_UID = 10000
+VAULT_GID = 10000
 SAFE_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$")
 HASH = re.compile(r"^[0-9a-f]{64}$")
 
@@ -114,9 +116,12 @@ def apply(path):
             fcntl.flock(lock, fcntl.LOCK_EX)
             staged = []
             for target, content, operation in plans:
-                target.parent.mkdir(parents=True, exist_ok=True)
+                if not target.parent.exists():
+                    target.parent.mkdir(parents=True, mode=0o755)
+                    os.chown(target.parent, VAULT_UID, VAULT_GID)
                 temp = target.with_name(f".{target.name}.{approval_id}.{secrets.token_hex(3)}")
                 temp.write_text(content, encoding="utf-8")
+                os.chown(temp, VAULT_UID, VAULT_GID)
                 os.chmod(temp, 0o640)
                 staged.append((temp, target, operation))
             for temp, target, _ in staged:

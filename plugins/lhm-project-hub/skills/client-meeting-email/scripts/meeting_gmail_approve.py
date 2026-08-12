@@ -81,7 +81,7 @@ def process(path):
                    "account": "michael@localhealthmarketing.com.au", "approved_by": "Michael",
                    "approval_text": approval, "to": recipients, "cc": [], "bcc": [],
                    "subject": email["subject"], "body": email["body"]}
-        atomic_json(GMAIL_INCOMING / f"{gmail_run}.json", payload, mode=0o600, uid=10000, gid=10000)
+        atomic_json(GMAIL_INCOMING / f"{gmail_run}.json", payload, mode=0o600, uid=1000, gid=1000)
         receipt = {"approval_id": approval_id, "source_run_id": source_run, "content_hash": content_hash,
                    "gmail_run_id": gmail_run, "status": "gmail_draft_queued", "to": recipients,
                    "subject": email["subject"]}
