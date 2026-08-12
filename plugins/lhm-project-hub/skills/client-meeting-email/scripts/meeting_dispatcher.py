@@ -134,7 +134,7 @@ def process(path):
         if run_dir.exists() or snapshot_root.exists():
             raise ValueError("duplicate run ID")
         run_dir.mkdir(mode=0o2750)
-        os.chown(run_dir, WORKER_UID, HERMES_GID)
+        os.chown(run_dir, WORKER_UID, WORKER_GID)
         snapshot_root.mkdir(mode=0o550)
         os.chown(snapshot_root, 0, WORKER_GID)
         client_snapshot = snapshot_root / "client"
