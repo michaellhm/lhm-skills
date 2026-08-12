@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "client_id": "dry-eye-solutions",
+  "enabled": true,
+  "vault_relative_root": "20 Clients/Dry Eye Solutions",
+  "allowed_context_files": [
+    "Dry Eye Solutions.md",
+    "Goals.md",
+    "Current Projects.md",
+    "project-management/Google Ads.md",
+    "project-management/Landing Pages.md",
+    "project-management/Local SEO and GMB.md",
+    "project-management/OSDI Quiz.md",
+    "project-management/Website Rebuild.md"
+  ]
+}

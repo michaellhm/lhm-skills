@@ -139,7 +139,14 @@ def process(path):
         os.chown(snapshot_root, 0, WORKER_GID)
         client_snapshot = snapshot_root / "client"
         skill_snapshot = snapshot_root / "skill"
-        shutil.copytree(client_root, client_snapshot, symlinks=False)
+        client_snapshot.mkdir(mode=0o550)
+        for relative in profile["allowed_context_files"]:
+            source = (client_root / relative).resolve()
+            if client_root not in source.parents or not source.is_file() or source.is_symlink():
+                raise ValueError(f"invalid registered context file: {relative}")
+            destination = client_snapshot / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
         shutil.copytree(SKILL, skill_snapshot, symlinks=False)
         readonly_tree(snapshot_root)
         atomic_text(run_dir / "request.json", json.dumps(data, indent=2) + "\n", 0o440, 0, WORKER_GID)
