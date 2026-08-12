@@ -34,6 +34,24 @@ execution skill locally and do not analyse the transcript inside Hermes.
 
 ## Mutations
 
-Preparation authorises no mutations. A future vault operation must cite the
-approved run ID and content hash and pass expected-version checks. Gmail draft
-creation is a separate approval. Never send. BasicOps is disabled.
+Preparation authorises no mutations. After Michael explicitly approves the
+reviewed run and exact content hash, submit two independent operations.
+
+For vault approval, send a closed JSON request on stdin to
+`/opt/data/profiles/lhm_brain/bin/meeting-vault-approval submit` containing:
+`schema_version: 1`, unique `approval_id`, `source_run_id`, `content_hash`,
+`operation: apply_vault`, `approved_by: Michael`, and Michael's exact
+`approval_text`. Poll `meeting-vault-approval status <approval_id>`. Report
+success only for `vault_applied`, including the exact files.
+
+For Gmail approval, send a separate closed JSON request to
+`/opt/data/profiles/lhm_brain/bin/meeting-gmail-approval submit` containing:
+`schema_version: 1`, unique `approval_id`, `source_run_id`, `content_hash`, a
+unique `gmail_run_id` matching `meeting-draft-YYYYMMDD-NN`,
+`operation: create_gmail_draft`, `approved_by: Michael`, and Michael's exact
+`approval_text`. Poll `meeting-gmail-approval status <approval_id>`, then poll
+`gmail-draft status <gmail_run_id>`. Report success only for `draft_created`.
+
+Never accept email subject, body, recipients, file paths or file contents from
+the conversational request. The host retrieves the exact reviewed artifacts by
+run ID and hash. Never send. BasicOps is disabled.

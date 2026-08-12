@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch for hash-bound meeting Gmail approvals
+
+[Path]
+DirectoryNotEmpty=/home/hermes/.hermes/profiles/lhm_brain/dispatch/gmail-approval-incoming
+Unit=lhm-meeting-gmail-approval.service
+
+[Install]
+WantedBy=multi-user.target
