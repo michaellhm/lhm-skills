@@ -4,6 +4,7 @@
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -75,8 +76,18 @@ def validate(result, request, profile):
     root = profile["vault_relative_root"].rstrip("/") + "/"
     for mutation in result["proposed_mutations"]:
         path = mutation["path"]
-        if path.startswith("/") or ".." in Path(path).parts or not path.startswith(root):
+        if path.startswith("/") or ".." in Path(path).parts:
             raise ValueError("mutation path escaped registered client namespace")
+        if path.startswith(root):
+            continue
+        allowed_existing = set(profile["allowed_context_files"])
+        allowed_meeting = re.fullmatch(
+            r"project-management/meetings/[0-9]{4}-[0-9]{2}-[0-9]{2}-(?:meeting-notes|client-wrap-email)\.md",
+            path,
+        )
+        if path not in allowed_existing and not allowed_meeting:
+            raise ValueError("mutation path is not allowlisted for this client")
+        mutation["path"] = root + path
 
 
 def main():
