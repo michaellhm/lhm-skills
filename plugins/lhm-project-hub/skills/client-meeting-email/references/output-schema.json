@@ -10,9 +10,9 @@
     "source_manifest": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["source", "retrieved_at", "sha256"], "properties": {"source": {"type": "string"}, "retrieved_at": {"type": "string"}, "sha256": {"type": ["string", "null"]}}}},
     "meeting": {"type": "object", "additionalProperties": false, "required": ["title", "date", "attendees", "recording_url", "call_id"], "properties": {"title": {"type": "string"}, "date": {"type": "string"}, "attendees": {"type": "array", "items": {"type": "string"}}, "recording_url": {"type": "string"}, "call_id": {"type": "string"}}},
     "email_draft": {"type": "object", "additionalProperties": false, "required": ["subject", "to_suggestions", "body"], "properties": {"subject": {"type": "string"}, "to_suggestions": {"type": "array", "items": {"type": "string"}}, "body": {"type": "string"}}},
-    "meeting_record": {"type": "object"},
+    "meeting_record": {"type": "string"},
     "proposed_mutations": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["path", "operation", "expected_sha256", "rationale", "content"], "properties": {"path": {"type": "string"}, "operation": {"enum": ["create", "replace"]}, "expected_sha256": {"type": ["string", "null"]}, "rationale": {"type": "string"}, "content": {"type": "string"}}}},
-    "delegation_pack": {"type": "array", "items": {"type": "object"}},
+    "delegation_pack": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["outcome", "proposed_owner", "due", "source_context", "dependencies", "acceptance_test", "judgement_calls"], "properties": {"outcome": {"type": "string"}, "proposed_owner": {"type": "string"}, "due": {"type": ["string", "null"]}, "source_context": {"type": "string"}, "dependencies": {"type": "array", "items": {"type": "string"}}, "acceptance_test": {"type": "string"}, "judgement_calls": {"type": "array", "items": {"type": "string"}}}}},
     "unresolved_questions": {"type": "array", "items": {"type": "string"}},
     "checks": {"type": "array", "items": {"type": "string"}},
     "warnings": {"type": "array", "items": {"type": "string"}}
