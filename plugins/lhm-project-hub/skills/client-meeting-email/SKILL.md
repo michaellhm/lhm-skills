@@ -284,8 +284,8 @@ Next Steps
 
 Our next meeting is scheduled for [date and time].
 
-For anyone who would like to revisit the discussion, the meeting recording is
-available below.
+If you would like to revisit the discussion, the meeting recording is available
+below.
 
 Meeting Recording: [link]
 
