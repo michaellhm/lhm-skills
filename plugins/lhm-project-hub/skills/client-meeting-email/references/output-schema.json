@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run_id", "workflow_version", "run_result", "work_state", "source_manifest", "meeting", "email_draft", "meeting_record", "proposed_mutations", "delegation_pack", "unresolved_questions", "checks", "warnings"],
+  "properties": {
+    "run_id": {"type": "string"}, "workflow_version": {"const": 1},
+    "run_result": {"enum": ["succeeded", "partially_succeeded", "failed"]},
+    "work_state": {"const": "needs_review"},
+    "source_manifest": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["source", "retrieved_at", "sha256"], "properties": {"source": {"type": "string"}, "retrieved_at": {"type": "string"}, "sha256": {"type": ["string", "null"]}}}},
+    "meeting": {"type": "object", "additionalProperties": false, "required": ["title", "date", "attendees", "recording_url", "call_id"], "properties": {"title": {"type": "string"}, "date": {"type": "string"}, "attendees": {"type": "array", "items": {"type": "string"}}, "recording_url": {"type": "string"}, "call_id": {"type": "string"}}},
+    "email_draft": {"type": "object", "additionalProperties": false, "required": ["subject", "to_suggestions", "body"], "properties": {"subject": {"type": "string"}, "to_suggestions": {"type": "array", "items": {"type": "string"}}, "body": {"type": "string"}}},
+    "meeting_record": {"type": "object"},
+    "proposed_mutations": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["path", "operation", "expected_sha256", "rationale", "content"], "properties": {"path": {"type": "string"}, "operation": {"enum": ["create", "replace"]}, "expected_sha256": {"type": ["string", "null"]}, "rationale": {"type": "string"}, "content": {"type": "string"}}}},
+    "delegation_pack": {"type": "array", "items": {"type": "object"}},
+    "unresolved_questions": {"type": "array", "items": {"type": "string"}},
+    "checks": {"type": "array", "items": {"type": "string"}},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  }
+}

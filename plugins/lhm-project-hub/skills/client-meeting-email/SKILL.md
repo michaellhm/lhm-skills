@@ -1,9 +1,28 @@
 ---
 name: client-meeting-email
-description: "Turn a Fathom meeting summary and transcript into a polished, client-ready follow-up email for Local Health Marketing, and capture the meeting for follow-up. Use this after a client meeting when the user says 'client meeting email', 'meeting follow-up email', 'post meeting client email', 'client wrap email', 'draft the client follow-up', or 'send the client the meeting summary'. Pulls the Fathom summary, transcript, and recording link, verifies decisions and action owners against the transcript, and produces one Gmail-ready email: meeting summary by topic, key decisions, action items grouped by owner, next steps, next meeting, and the recording link. Also saves a structured meeting-notes file, creates or moves the client's BasicOps card to Follow Up, and posts one meeting-summary discussion note close to the email. This is the capture step; the separate follow-up triage pass — state-file updates, the propagation sweep, and turning action items into assigned subtasks — is `lhm-project-hub:post-meeting-review`, which reads what this skill saves instead of re-pulling Fathom."
+description: "Prepare a review-only client meeting bundle from Fathom evidence. Use after a client meeting to draft the follow-up email, structured meeting record, and proposed client, goal, and project updates. This skill never writes the vault, creates Gmail drafts, sends email, or changes BasicOps; approved mutations run as separate operations."
 ---
 
 # Client Meeting Email
+
+## Safety contract: preparation only
+
+This skill is the authoritative **prepare** phase for a meeting capture. It may
+read the registered client context and read-only Fathom evidence. It must return
+a review bundle and proposed mutations only.
+
+It must never, in the same run:
+
+- create or edit vault/client files;
+- create a Gmail draft or send mail;
+- read or mutate BasicOps;
+- invent a client folder or accept an arbitrary path from the request;
+- treat the user's voice note as the complete meeting evidence when Fathom is available.
+
+An initial meeting-wrap request authorises preparation only. Vault application
+and Gmail draft creation require separate approvals bound to the reviewed
+`run_id`, `workflow_version`, and `content_hash`. BasicOps is disabled until a
+separate workflow explicitly replaces this rule.
 
 Turn a Fathom meeting transcript, meeting summary, or both into a polished client
 follow-up email for Local Health Marketing. The email must clearly explain what was
@@ -347,18 +366,14 @@ Before finalising the email, verify:
 - Action items with multiple parts use nested sub-bullets; Next Steps is a bullet list
 - Files will save into the client folder Step 0 resolved — not a new folder
 
-## Step 4: Deliver
+## Step 4: Return the review bundle
 
-1. Present the finished email in chat, ready to paste into Gmail.
-2. Offer to create a Gmail draft via the Gmail MCP `create_draft` (draft only —
-   never send). If Gmail MCP is unavailable, say so; the pasted version stands.
-3. Save a copy to `<client folder>/project-management/meetings/YYYY-MM-DD-client-wrap-email.md`
-   — the client folder Step 0 resolved, never a newly-invented path
-   so the follow-up trail lives with the meeting record. Create
-   `project-management/meetings/` if it doesn't exist yet — see
-   `references/folder-convention.md`.
-4. Save the Step 2.5 extraction to
-   `<client folder>/project-management/meetings/YYYY-MM-DD-meeting-notes.md`:
+Return one structured bundle. Do not apply it. The bundle contains:
+
+1. Meeting metadata and a source manifest (Fathom call ID/URL, retrieval time,
+   summary/transcript availability and source hashes where the dispatcher supplies them).
+2. The finished client email, ready for review.
+3. The proposed meeting record content using this template:
 
    ```markdown
    # Meeting Notes — [Client Name]
@@ -395,50 +410,33 @@ Before finalising the email, verify:
    -
    ```
 
-5. Find the client's BasicOps card: call `list_tasks_in_project` with
-   `projectId: 68655` (board `*Client Flow`) and `filter_title` set to the
-   client's short/common name. If nothing matches, call it again without
-   `filter_title` and scan titles for a case-insensitive match.
-   - **No match:** ask the user "No client card found in *Client Flow for
-     [Client]. Want me to create one?" If yes, `create_task` with
-     `projectId: 68655` and a title matching the client's short name. If no,
-     skip to step 9 and note that the BasicOps card step was skipped.
-   - **One match:** that's the card.
-   - **Multiple matches:** list them (title + URL from `link_to_task`) and ask
-     the user which one is the client's card.
-6. Check the card's existing discussion (`list_messages_in_task`) for a
-   meeting-summary note already posted for this meeting's date — this skill
-   may have already run for it, including under the pre-split workflow. If one
-   is found, don't move the card or post a second note; tell the user the card
-   is already up to date for this meeting and skip to step 9.
-7. `update_task` with `taskId: <card id>`, `section: 107750` (`Follow Up`),
-   moving the card to Follow Up.
-8. `create_message_in_task` on the client card with one discussion message,
-   close to the email itself: meeting summary by topic, key decisions, action
-   items grouped by owner, next steps, and the recording link — the email's own
-   content, minus the greeting and sign-off, not a separately-structured
-   internal briefing. Discussion messages take raw HTML — do not escape it to
-   entities, because `&lt;p&gt;` renders as literal text. If you get it wrong,
-   `delete_message` with the returned id and repost.
-9. Remind the user of the 24-hour SLA for meeting-wrap emails
-   (references/cadences.md) if the meeting was more than a day ago.
-10. Close with: "Meeting notes and BasicOps card are ready. Run
-    `lhm-project-hub:post-meeting-review` when you're ready to work through
-    follow-ups."
+4. `proposed_mutations[]` for the meeting note, wrap-email copy, client profile,
+   goals and current projects. Each item includes the canonical registered
+   relative path, operation, expected prior SHA-256 (or `null` only for an
+   allowed new file), rationale and complete proposed content or patch. Never
+   propose creating a client root.
+5. A delegation pack and unresolved questions. Do not create BasicOps tasks.
+6. Checks, warnings, `run_result`, and `work_state: needs_review`.
+7. A deterministic `content_hash` over the reviewable email, meeting record and
+   proposed mutations. If the host supplies an output schema, follow it exactly.
+
+Present the human-readable review bundle and stop. State explicitly: no vault
+files, Gmail drafts or BasicOps records were created or changed.
 
 ## Rules
 
-- Client-facing emails are drafts only — never send; the human sends.
+- This skill prepares email content only; it does not create a Gmail draft and never sends.
 - Checklist items and claims tick only on transcript evidence or the user's
   explicit confirmation — never invent action items, dates, or figures.
-- Missing or unauthenticated MCP (Fathom, Gmail, BasicOps): say what is missing
-  and fall back to pasted content or manual steps — never silently skip.
+- Missing or unauthenticated Fathom: say what is missing and stop at
+  `needs_context`; accept a dispatcher-supplied, hashed evidence package only
+  when it is explicitly labelled compatibility mode. Gmail and BasicOps are
+  outside this skill and must not be called.
 - Credentials by reference only — never reproduce passwords, access details, or
   provider numbers from a transcript.
 - No fabricated metrics or client data. The transcript outranks the summary;
   uncertainty is preserved, not resolved by guessing.
-- This skill produces the client email, saves the meeting record, and stands up
-  the BasicOps card with a meeting-summary note. `lhm-project-hub:post-meeting-review`
-  is the separate follow-up triage pass — it reads what this skill saves rather
-  than re-pulling Fathom, and turns action items into assigned subtasks.
+- This skill prepares the client email, meeting record, proposed state-file
+  changes and delegation pack. Separate, approval-bound operations apply vault
+  changes or create a Gmail draft. BasicOps remains disabled.
 - Folder contract: read references/folder-convention.md (lhm-project-hub).
