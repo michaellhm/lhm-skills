@@ -5,6 +5,8 @@ description: "Run LHM's resumable new-client onboarding workflow. Use when the u
 
 # Client Onboarding
 
+Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the onboarding-specific payload; the shared skill owns wording, approval, deduplication, mutation and verification.
+
 Resume a newly sold client's onboarding from canonical Obsidian state. This workflow is service-neutral: generate detailed checks from what the client purchased rather than assuming Google Ads, Maps, GoCardless or any other service applies.
 
 ## 1. Load canonical state

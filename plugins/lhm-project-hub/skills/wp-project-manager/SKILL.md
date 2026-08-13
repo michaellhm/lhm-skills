@@ -5,6 +5,8 @@ description: "Read, create, or update the project-management/website.md file for
 
 # Website Project Manager
 
+Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the website-project payload; the shared skill owns wording, approval, deduplication, mutation and verification.
+
 Manages the per-client `project-management/website.md` file that tracks the full state of a WordPress or Astro website build: phase, step, completed tasks, page inventory, approval log, environments, schedule changes, and the continuation prompt.
 
 ## Before Starting
@@ -57,7 +59,7 @@ Inputs:
 Generate `[client_root]/project-management/website.md` using the relevant template below, populating:
 - Client name from `client_profile.md`
 - Platform from `client_profile.md` YAML frontmatter `platform:` field (`wordpress` or `astro`)
-- Owner names from defaults: Aiya (build and launch), Kristalyn (PM and remaining-copy production), Jaimee (SEO and QA), Michael (strategy, sitemap sign-off, prototype selection and prototype copy). Confirm only if the kickoff brief says otherwise.
+- Owner names from defaults: Aiya (Astro/Decap implementation, technical review, merge and launch), Kristalyn (PM, copy workflow triggers/review, client approvals and internal-gate closure), Jaimee (SEO and formal QA), Michael (strategy, sitemap sign-off, homepage approval, five-template selection/approval and rendered-site review). Confirm only if the kickoff brief says otherwise.
 - Reference paths to the spec and plan files
 - Page inventory rows from `seo/sitemap.md` if it exists, otherwise leave empty
 - Kickoff brief fields: client relationship, strategy-call requirement, design scope, copy scope, deadline/constraint, special considerations, and Michael's approval-meeting attendance
@@ -157,7 +159,7 @@ Called by orchestrators at session end (or on user request). Logic:
 
 Use this template for `platform: astro`. Dates are scheduled from kickoff using seven weeks of active delivery time. Waiting for client feedback is not active delivery time. Every client delay moves all dependent dates by the same amount. Never compress QA or launch to recover client delay.
 
-At kickoff, Kristalyn places every client decision point in the calendar. The client may approve by email before the event and cancel the call, or attend the call to review and approve. The calendar event remains the deadline and alert. Its description must name the artefact, the decisions required, and the effect of late feedback.
+At kickoff, Kristalyn places every client decision point in the calendar. Strategy and prototype approval may occur by email. Copy approval occurs through Decap CMS once available. The client may approve before the event and cancel the call, or attend the call to review and approve. The calendar event remains the deadline and alert. Its description must name the artefact, the decisions required, the approval method and the effect of late feedback.
 
 ````markdown
 # Website Project Management — [Client Name]
@@ -170,7 +172,7 @@ At kickoff, Kristalyn places every client decision point in the calendar. The cl
 - **Copy scope:** [Rewrite | Selective rewrite | Migrate]
 - **Active delivery target:** 7 weeks
 - **Fixed deadline / constraint:** [value or None]
-- **Owners:** Aiya (build + launch), Kristalyn (PM + remaining copy), Jaimee (SEO + QA), Michael (strategy + sitemap/prototype decisions)
+- **Owners:** Aiya (Astro + Decap implementation, technical review, merge + launch), Kristalyn (PM, copy workflow + approvals), Jaimee (SEO + formal QA), Michael (strategy, sitemap, homepage + five-template decisions)
 - **Last Updated:** [date]
 - **Current Phase:** Phase 0 — Kickoff & Scheduling
 - **Current Step:** Step 0.1 — Confirm brief and book approval holds
@@ -180,7 +182,9 @@ At kickoff, Kristalyn places every client decision point in the calendar. The cl
 - **Reason:** [New client mandatory | Existing client decision]
 - **Special requirements / sensitivities:** [notes]
 - **Michael attending:** [approval meetings or case-by-case]
-- **Prototype pages:** To be chosen by Michael at sitemap sign-off
+- **Homepage prototype:** Michael-approved homepage copy; Aiya-built lightweight HTML mock
+- **Five-template batch:** To be chosen by Michael at sitemap sign-off; use materially different reusable page types, not five pages of one type
+- **BasicOps mode:** Prepare-only until Michael explicitly graduates routine task creation for this workflow
 
 ## Reference Documents
 - Client Profile: ../client_profile.md
@@ -189,6 +193,8 @@ At kickoff, Kristalyn places every client decision point in the calendar. The cl
 - Site Architecture: seo/sitemap.md
 - Prototype Copy: content/prototype/
 - Remaining Copy: content/remaining/
+- Client Copy Learning Guide: ../Copy Learning Guide.md
+- Decap Configuration: [repository path or TBD]
 - Design Spec: docs/superpowers/specs/[filename or TBD]
 - Implementation Plan: docs/superpowers/plans/[filename or TBD]
 
@@ -197,16 +203,17 @@ At kickoff, Kristalyn places every client decision point in the calendar. The cl
 | Target | Event / milestone | Required decision | Status |
 |---|---|---|---|
 | End Week 1 | Strategy sign-off hold | Approve playbook + website brief by email | Scheduled |
-| End Week 3 | Prototype sign-off hold | Approve design, selected-page copy, hierarchy and direction | Scheduled |
-| Post-prototype Week 2 | Full-site feedback hold | Give one consolidated feedback round | Scheduled after prototype approval |
-| Post-prototype Week 3 | Final site sign-off hold | Confirm feedback resolved and authorise QA + launch | Scheduled after prototype approval |
+| End Week 3 | Homepage prototype sign-off hold | Approve homepage design, copy, hierarchy and direction | Scheduled |
+| Post-prototype Week 1 | Five-template CMS review hold | Edit/approve the five representative pages through Decap | Scheduled after prototype approval |
+| Post-prototype Week 3 | Full-site Decap review hold | Edit/approve remaining copy and complete-site direction | Scheduled after five-template learning approval |
+| Post-prototype Week 4 | Final site sign-off hold | Confirm feedback resolved and authorise formal QA + launch | Scheduled after full-site review |
 
 **Scheduling rule:** Prototype approval starts a new four-week clock. Client delay moves every dependent date day-for-day. QA time is never compressed.
 
 ## Approval Log
 
-| Date | Artefact | Sent | Approved by email | Notes |
-|---|---|---|---|---|
+| Date | Artefact | Sent | Approval method | Evidence/version | Notes |
+|---|---|---|---|---|---|
 
 ## Phase 0 — Kickoff & Scheduling
 **Owner:** Kristalyn
@@ -218,6 +225,7 @@ At kickoff, Kristalyn places every client decision point in the calendar. The cl
 - [ ] Michael's meeting attendance decided case by case
 - [ ] Team tasks scheduled with dependencies
 - [ ] Client approval holds placed in calendar with sign-off requirements
+- [ ] BasicOps mode confirmed as prepare-only unless explicit workflow graduation is recorded
 
 ## Phase 1 — Week 1: Strategy
 **Owner:** Kristalyn, with Michael when a strategy call is required
@@ -233,47 +241,73 @@ At kickoff, Kristalyn places every client decision point in the calendar. The cl
 
 ## Phase 2 — Week 2: SEO Architecture
 **Owner:** Jaimee
-**Gate:** Michael approves sitemap internally and chooses prototype scope
+**Gate:** Michael approves sitemap and chooses the five-template validation set
 - [ ] Jaimee creates SEO sitemap from approved strategy documents
 - [ ] Sitemap saved to seo/sitemap.md
 - [ ] Michael reviews and approves sitemap
-- [ ] Michael chooses prototype pages and records the page set
-- [ ] Michael records any direction Aiya needs for those pages
+- [ ] Michael chooses five materially different reusable page types required by the sitemap (for example About, Service, Location, Condition and Practitioner/Contact/another required template)
+- [ ] Five-template set recorded; do not choose five examples of one page type
+- [ ] Michael records homepage and template direction Aiya needs
 
 ## Phase 3 — Week 3: Prototype
-**Owners:** Michael (copy), Aiya (prototype), Kristalyn (client communication)
-**Gate:** Client approves prototype by email
-- [ ] Michael creates copy for selected prototype pages
-- [ ] Aiya builds prototype from approved sitemap, copy, brief and playbook
+**Owners:** Kristalyn (workflow, review + client communication), Michael (homepage approval), Aiya (prototype)
+**Gate:** Client approves the homepage HTML prototype by email
+- [ ] Kristalyn triggers homepage copy preparation from approved strategy, brief, sitemap and client context
+- [ ] Kristalyn reviews the homepage copy
+- [ ] Michael reviews and approves the versioned homepage copy
+- [ ] Aiya builds a lightweight HTML homepage prototype from the approved sitemap, copy, brief and playbook
 - [ ] Aiya posts prototype to team WhatsApp
 - [ ] Team collectively reviews prototype
 - [ ] Aiya applies internal feedback
 - [ ] Kristalyn sends prototype to client
-- [ ] Client approves design, selected-page copy, hierarchy and direction by email
+- [ ] Client approves homepage design, copy, hierarchy and direction by email
 - [ ] Kristalyn schedules four-week post-prototype plan from approval date
 
-## Phase 4 — Post-Prototype Week 1: Remaining Copy & Astro Build
-**Owners:** Kristalyn (copy), Aiya (build)
-- [ ] Kristalyn generates remaining copy through Claude using all approved context
-- [ ] Aiya runs the astro-build skill and completes the full Astro build
+## Phase 4 — Post-Prototype Week 1: Astro, Decap & Five-Template Learning Batch
+**Owners:** Kristalyn (workflow + copy review), Michael (five-template approval), Aiya (manual Astro/Decap implementation during pilot)
+**Gates:** Five-template Markdown batch approved internally; client then approves/edits the rendered pages through Decap
+- [ ] Aiya builds the approved homepage direction in Astro
+- [ ] Aiya installs/configures Decap CMS using `lhm-wordpress-hub:decap-cms-astro`
+- [ ] Decap authentication, role/merge permissions, previews and approval control tested internally
+- [ ] Client approval cannot merge, deploy or publish the production site
+- [ ] Kristalyn triggers Markdown copy for Michael's five selected template pages
+- [ ] Kristalyn reviews the five-page Markdown batch first
+- [ ] Michael reviews and approves the versioned five-page Markdown batch
+- [ ] Aiya builds the five pages in Astro behind Decap
+- [ ] Internal Decap edit, preview, approval and GitHub evidence path passes
+- [ ] Kristalyn gives the client Decap access and concise direct-edit instructions
+- [ ] Client edits and approves the five pages through Decap
+- [ ] GitHub commit/PR evidence and approval event logged in this project record
+
+## Phase 5 — Post-Prototype Weeks 2–3: Copy Learning, Remaining Rollout & Final Approval
+**Owner:** Kristalyn, with Aiya applying/reviewing repository changes
+**Gate:** Kristalyn closes the team staging review; client approves the complete site/copy through Decap
+- [ ] Kristalyn deliberately triggers original-versus-approved GitHub comparison for the five-template batch
+- [ ] AI drafts client-specific Copy Learning Guide with evidence links
+- [ ] Kristalyn reviews and approves the guide
+- [ ] Approved guide saved at `../Copy Learning Guide.md`
+- [ ] Kristalyn chooses one remaining-page rollout or smaller batches based on client fit, complexity, guide confidence and output consistency
+- [ ] Kristalyn triggers remaining copy through the approved worker route using the Copy Learning Guide
+- [ ] Kristalyn reviews remaining Markdown before build; Michael is not a raw-Markdown gate
+- [ ] Aiya manually builds the remaining pages, or reviews worker-prepared registered-branch changes only where that route has been explicitly graduated
 - [ ] Forms, metadata, redirects, analytics and tracking implemented
 - [ ] Aiya self-tests throughout build
-- [ ] Full site posted to team WhatsApp for internal feedback
-- [ ] Aiya applies internal feedback
-
-## Phase 5 — Post-Prototype Weeks 2–3: Client Feedback & Final Approval
-**Owner:** Kristalyn, with Aiya applying changes
-**Gate:** Client approves complete site and copy by email; this authorises QA and launch
-- [ ] Kristalyn sends full Astro site to client for copy and website feedback
-- [ ] Client provides one consolidated feedback round
-- [ ] Aiya applies client feedback in Astro
-- [ ] Changes reviewed internally where needed
-- [ ] Client confirms final approval by email
+- [ ] Kristalyn posts the complete staging site to the team WhatsApp group
+- [ ] Team reviews desktop, mobile, rendered copy, page flow, design and usability
+- [ ] Aiya resolves agreed internal feedback
+- [ ] Kristalyn confirms feedback resolved and closes the internal review gate
+- [ ] Material strategy, scope or unresolved quality disagreements escalated to Michael; routine closure does not
+- [ ] Kristalyn sends the complete site to the client through Decap
+- [ ] Client edits and approves the remaining pages through Decap
+- [ ] Approval method, date and GitHub evidence/version logged
+- [ ] Kristalyn optionally triggers incremental learning comparison for later client edits
+- [ ] AI proposes only additions, refinements or contradictions to the current guide
+- [ ] Kristalyn approves the delta before `../Copy Learning Guide.md` changes
 - [ ] Any client delay recorded and downstream dates moved day-for-day
 
 ## Phase 6 — Post-Prototype Week 4: QA & Launch
 **Owners:** Jaimee (QA), Aiya (fixes + launch), Kristalyn (coordination)
-**Gate:** Jaimee QA passed + team final sanity check. No second client approval required.
+**Gate:** Client Decap approval logged + Jaimee QA passed + team final sanity check. No second client approval required.
 - [ ] Jaimee completes formal pre-launch QA
 - [ ] SEO: metadata, slugs, schema, sitemap and redirects verified
 - [ ] Technical: responsive layouts, speed, links, SSL, 404 and assets verified
@@ -287,15 +321,19 @@ At kickoff, Kristalyn places every client decision point in the calendar. The cl
 - [ ] Aiya resolves live issues
 - [ ] Kristalyn sends completion confirmation and closes project
 
-## Parallel R&D Task
-- [ ] Aiya investigates a lightweight SaaS or Chrome extension for on-page client feedback (page URL, selected element, screenshot, commenter and resolution status)
+## BasicOps Task Authority
+- **Current mode:** Prepare-only
+- Hermes prepares the exact task, owner, context, dependency, due date and acceptance test.
+- Kristalyn approves before task creation or assignment.
+- Routine in-scope task creation becomes automatic only after multiple clean handoffs and Michael's explicit dated graduation decision recorded here.
+- Graduation is reversible and never covers scope, strategy, client commitments, publishing, merge, deployment or launch.
 
 ## Notes & Decisions
-[date]: Project kicked off. Seven-week active-delivery schedule created. Client delays move dependent dates day-for-day.
+[date]: Project kicked off. Seven-week active-delivery schedule created. Client delays move dependent dates day-for-day. Astro uses the Decap five-template learning workflow and prepare-only BasicOps mode until explicitly graduated.
 
 ## Continuation Prompt
 ```text
-I'm continuing the [Client Name] Astro website build. Read client_profile.md, playbook.md, website-brief.md, project-management/website.md, seo/sitemap.md if present, and the current Astro repository. Report the current phase, outstanding gate, first incomplete task, owner and any schedule movement caused by client delay. Then ask whether to continue with that task or work elsewhere.
+I'm continuing the [Client Name] Astro website build. Read client_profile.md, playbook.md, website-brief.md, project-management/website.md, seo/sitemap.md if present, Copy Learning Guide.md if present, and the current Astro repository/Decap configuration. Report the current phase, outstanding gate, first incomplete task, owner, BasicOps authority mode and any schedule movement caused by client delay. Then ask whether to continue with that task or work elsewhere.
 ```
 ````
 

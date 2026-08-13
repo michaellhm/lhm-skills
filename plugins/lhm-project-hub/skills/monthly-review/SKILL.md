@@ -5,6 +5,8 @@ description: "Monthly per-client review engine with three modes. Use this when t
 
 # Monthly Review
 
+Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the review-specific payload; the shared skill owns wording, approval, deduplication, mutation and verification.
+
 Run the monthly per-client review cycle from `references/cadences.md`. This is the flagship client-success skill — it's what turns a month of delivery work into three things: KP's client-facing wrap, Michael's internal account check, and the pre-meeting brief that ties them together. `pm-orchestrator` triggers this automatically on cadence; it's also invoked directly at any point.
 
 All three modes share one data pull (Step 2) before branching into mode-specific work.

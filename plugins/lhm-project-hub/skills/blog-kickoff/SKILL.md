@@ -5,6 +5,8 @@ description: "Kick off a new blog/article content pipeline — intake, state fil
 
 # Blog Kickoff
 
+Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the blog-specific payload; the shared skill owns wording, approval, deduplication, mutation and verification.
+
 Turn a newly-sold or newly-scoped blog/article content engagement into a running process: a state file the rest of the agency can read, a BasicOps scaffold with real dates, and a drafted client email. Follows `references/kickoff-pattern.md`'s 5-step shape exactly. This skill never touches outlining, drafting, or publishing work itself — that's `lhm-content-engine`'s job, starting the moment Step 5 hands off.
 
 ## Step 1: Intake

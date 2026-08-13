@@ -5,6 +5,8 @@ description: "Kick off a new PPC landing page campaign — intake, state file, B
 
 # Landing Page Kickoff
 
+Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the landing-page-specific payload; the shared skill owns wording, approval, deduplication, mutation and verification.
+
 Turn a newly-sold or newly-scoped landing page campaign into a running process: a state file, a BasicOps scaffold with real dates, and a drafted client email. Follows `references/kickoff-pattern.md`'s 5-step shape exactly. This skill never touches copy, prototype, subsite, or deploy work itself — that's `lhm-wordpress-hub`'s job, starting the moment Step 5 hands off.
 
 ## Step 1: Intake

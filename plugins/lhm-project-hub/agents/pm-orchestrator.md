@@ -48,13 +48,16 @@ If the user has already named what they want to do instead (a specific skill, or
 
 ## Step 5: Routing table
 
-All 17 skills in this plugin, and when to route to each:
+All Project Hub skills, and when to route to each:
 
 | Skill | Route here when |
 |---|---|
+| `lhm-project-hub:basicops-task-manager` | Any workflow or user asks to create, edit, assign, discuss, move, complete or otherwise mutate a BasicOps task. This is the mandatory final write path even when another skill prepared the task context. |
+| `lhm-project-hub:team-work-brief` | Any team member needs to turn a rough request, client email or idea into a context-checked brief; or an assignee gives feedback about what a future brief should include. It resolves requester, client, assignee, access, dependencies, completion and next handoff before routing the approved task to BasicOps. |
 | `lhm-project-hub:sales-handover` | A deal just closed and needs handing from sales to delivery — new client, or an existing client buying a new package. |
 | `lhm-project-hub:client-onboarding` | A new-client onboarding pipeline (Payment & Billing → Client Contact & Strategy → Access, Assets & Config → Service Kickoff → Onboarding Complete) is live or needs a status check. |
 | `lhm-project-hub:website-kickoff` | A new WordPress or Astro website build needs to start — intake, PM state file, BasicOps scaffold. |
+| `lhm-project-hub:existing-client-website-handover` | Michael needs to brief a newly scoped website project for an existing LHM client to Kristalyn before website kickoff. |
 | `lhm-project-hub:landing-page-kickoff` | A new PPC landing page campaign needs to start. |
 | `lhm-project-hub:seo-kickoff` | A new SEO engagement needs to start. |
 | `lhm-project-hub:gmb-kickoff` | A new GMB/local SEO optimisation cycle needs to start. |
@@ -67,11 +70,14 @@ All 17 skills in this plugin, and when to route to each:
 | `lhm-project-hub:client-update-email` | A plain-language update email needs drafting after completing a piece of work, outside of monthly-review's own wrap flow. |
 | `lhm-project-hub:client-meeting-email` | A client meeting just happened and needs capturing — Fathom summary/transcript into a polished Gmail-ready client wrap, plus saved meeting notes and the BasicOps card. Run this first; `post-meeting-review` triages what it saves. |
 | `lhm-project-hub:wp-project-manager` | The `project-management/website.md` PM doc needs reading, creating, or updating for a WordPress/Astro build. |
+| `lhm-project-hub:website-project-cockpit` | Michael or Kristalyn needs a concise read-only website status, active gate, evidence, owner, blockers, or handoff-readiness view. |
 | `lhm-project-hub:lp-project-manager` | The `project-management/landing-pages.md` PM doc needs reading, creating, or updating for an LP campaign. |
 | `lhm-project-hub:gmb-project-manager` | The `project-management/gmb.md` PM doc needs reading, creating, or updating for a GMB cycle. |
 
 ## Rules
 
+- Never mutate BasicOps directly. Route every BasicOps write through `lhm-project-hub:basicops-task-manager`; the originating workflow supplies context and receives the verified handback.
+- Route rough delegation and handoff-readiness work through `lhm-project-hub:team-work-brief` before BasicOps. Do not expect an assistant or non-specialist requester to diagnose technical requirements unaided.
 - Client-facing emails are drafts only, never sent.
 - Follow-up items tick only on explicit human confirmation or successful MCP verification.
 - Missing or unauthenticated MCP → state plainly what's missing, never silently skip.

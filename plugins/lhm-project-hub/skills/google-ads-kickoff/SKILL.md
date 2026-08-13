@@ -5,6 +5,8 @@ description: "Kick off a new Google Ads campaign build — gates on conversion t
 
 # Google Ads Kickoff
 
+Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the Google Ads-specific payload; the shared skill owns wording, approval, deduplication, mutation and verification.
+
 Turn a newly-sold or newly-scoped Google Ads engagement into a running process: a state file the rest of the agency can read, a BasicOps scaffold with real dates, and a drafted client email. Follows `references/kickoff-pattern.md`'s 5-step shape exactly. This skill never touches account audits, campaign builds, or bid/budget work itself — that's the `lhm-marketing-hub` `google-ads` agent's job, starting the moment Step 5 hands off.
 
 This is the skill `client-onboarding`'s Phase 4 ("Delegate, don't do") routes Ads campaign build work to. It can also be run standalone for an existing client — the tracking gate below applies either way.

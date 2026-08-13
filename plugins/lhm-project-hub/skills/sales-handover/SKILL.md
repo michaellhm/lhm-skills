@@ -5,6 +5,8 @@ description: "Hand a newly closed client from Michael or Marlon into LHM deliver
 
 # Sales Handover
 
+Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the handover-specific payload; the shared skill owns wording, approval, deduplication, mutation and verification.
+
 Capture what sales knows and start the approved Obsidian-first client-onboarding flow. Ask interview questions one at a time.
 
 ## 1. Confirm the sale

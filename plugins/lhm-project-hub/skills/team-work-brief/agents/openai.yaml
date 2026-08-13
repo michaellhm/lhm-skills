@@ -1,0 +1,4 @@
+interface:
+  display_name: "Team Work Brief"
+  short_description: "Turn rough requests into ready team handoffs"
+  default_prompt: "Help me brief a team member by checking the requester, client, assignee, access, dependencies, completion test and next handoff before creating the BasicOps task."

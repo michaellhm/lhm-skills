@@ -5,6 +5,8 @@ description: "Kick off a new GMB/local SEO optimisation cycle — intake, state 
 
 # GMB Kickoff
 
+Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the GMB-specific payload; the shared skill owns wording, approval, deduplication, mutation and verification.
+
 Turn a newly-sold or newly-scoped GMB/local SEO engagement into a running process: a state file the rest of the agency can read, a BasicOps scaffold with real dates, and a drafted client email. Follows `references/kickoff-pattern.md`'s 5-step shape exactly. This skill never touches diagnostics, GBP optimisation, or content work itself — that's `lhm-gmb-hub`'s job, starting the moment Step 5 hands off.
 
 ## Step 1: Intake

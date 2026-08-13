@@ -5,6 +5,8 @@ description: "Work through a client meeting's follow-up: update client state fil
 
 # Post-Meeting Review
 
+Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the meeting-action payload; the shared skill owns wording, approval, deduplication, mutation and verification.
+
 Work through a client meeting's follow-up and keep all client state current:
 files, BasicOps, and the team. Run this after `lhm-project-hub:client-meeting-email`
 has captured the meeting.

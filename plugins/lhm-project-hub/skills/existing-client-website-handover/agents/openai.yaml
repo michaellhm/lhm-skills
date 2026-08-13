@@ -1,0 +1,4 @@
+interface:
+  display_name: "Existing Client Website Handover"
+  short_description: "Brief and accept an existing-client website project"
+  default_prompt: "Start an existing-client website handover and guide me through the brief one question at a time."

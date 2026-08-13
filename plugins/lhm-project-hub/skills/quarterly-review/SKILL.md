@@ -5,6 +5,8 @@ description: "Quarterly per-client strategy review: pulls three months of GA4/Ad
 
 # Quarterly Review
 
+Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the review-specific payload; the shared skill owns wording, approval, deduplication, mutation and verification.
+
 Run the quarterly per-client strategy cycle. Where `monthly-review` turns a month of delivery into a wrap, this skill turns a quarter of delivery into a forward plan: goal progress against `goals.md` targets, what worked and what didn't across the last three months, and a drafted campaign plan for the next 3–6 months that Michael signs off before anything moves.
 
 Confirm the client name if it isn't already obvious from context.
