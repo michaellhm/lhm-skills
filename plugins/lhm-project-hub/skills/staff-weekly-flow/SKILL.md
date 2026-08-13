@@ -17,6 +17,7 @@ Give each LHM person a small, traceable operating plan without forcing them to r
    - `basicops_project_id`;
    - `basicops_project_url`;
    - `basicops_assignee_id`.
+   - the exact `basicops_sections` names and IDs, plus `basicops_section_mapping_status`.
 4. Use only that person's authorised client/project scope. Do not expose another person's private preferences or unrelated client context.
 5. Fail closed when the identity, profile, project ID or assignee ID is missing or contradictory.
 
@@ -40,6 +41,9 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
    - explicit blockers and overdue tasks.
 4. Treat BasicOps as live task state and Obsidian as canonical project context. Do not copy the full board into the weekly file.
 5. Classify unfinished or overdue work as `do`, `delegate`, `reschedule`, `communicate`, `redesign` or `drop`. Never complete, move, assign or edit a BasicOps task while planning.
+   For each overdue task, also ask whether its commitment is still valid and whether it should be
+   rescheduled, delegated, marked blocked/waiting, communicated or dropped. Never invent a new due
+   date or silently carry an overdue date forward.
 6. Propose no more than `priority_limit` weekly outcomes. Default to three only when the preference file explicitly records three; otherwise ask or use three as a visibly provisional LHM suggestion.
 7. For each proposed outcome state:
    - observable result;
@@ -52,6 +56,57 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
 8. Surface excluded work and what must be communicated instead of overloading the person.
 9. Ask one material question at a time. Do not save until the person confirms the plan.
 10. After confirmation, write or update the current weekly file through the approved vault mutation route and verify the saved content.
+
+#### Workload negotiation
+
+When committed, overdue or newly arrived work cannot fit:
+
+1. Identify the task requester, operational owner and client/account contact owner from verified
+   evidence. Do not assume the assignee is authorised to reset a client promise.
+2. State the capacity conflict and downstream consequence plainly.
+3. Propose a realistic disposition: `ask for help`, `delegate`, `reschedule`, `blocked`, `waiting`,
+   `communicate`, `redesign` or `drop`.
+4. If rescheduling is proposed, ask for or present one exact new date. Keep the current date visible
+   until the authorised person approves the change.
+5. Draft an internal pushback request to the requester/account owner containing: the task, why it
+   will not fit, proposed timing, client consequence and the exact client expectation that needs to
+   be reset. The team member may state their capacity; client contact remains with the authorised
+   owner.
+6. Keep client messages as drafts unless a separate authorised sending workflow is invoked.
+7. Record the decision and who must communicate it in the weekly file. Do not represent a draft as
+   sent or a proposed date as agreed.
+
+#### Personal-board section rules
+
+- Read the exact semantic section map from the person's profile. Never infer a section ID from its
+  display order or assume boards share names.
+- Recommend `inbox` → a confirmed `this_week`/`working_now` section only after weekly commitment;
+  recommend `waiting` when an external input or review is pending; recommend `blocked` only where
+  the person's verified map contains one. Use a confirmed `future`/backlog section for deliberately
+  deferred work.
+- Some boards have two valid this-week meanings (for example actions versus projects). Ask which
+  applies when task evidence does not make it clear.
+- If the profile says a semantic section is absent or the live board contradicts the saved map,
+  stop and ask; do not create a section or choose the nearest name.
+- A recommendation is not a mutation. Present task, source section, destination section and any due
+  date/status change as an exact preview. Apply only through `basicops-task-manager` after approval,
+  then read back project, section, assignee, due date and status.
+
+#### Overwhelmed mode
+
+Trigger on “I'm overwhelmed”, “this is too much”, “I can't fit this in” and equivalent language.
+This is a temporary view unless the person explicitly changes a preference.
+
+1. Acknowledge briefly and avoid returning the full board.
+2. Show at most three things: one essential delivery commitment, one action that releases another
+   person or project stage, and one important communication. Use fewer when that is more realistic.
+3. Put everything else into `ask for help`, `push back`, `park` or `drop`; expose client promises and
+   overdue items that cannot safely disappear.
+4. Draft the highest-value help or pushback message and ask one decision at a time.
+5. Do not move tasks, change dates, send messages or permanently lower the priority limit without
+   the relevant explicit approval.
+6. When workload distress needs a human decision on staffing, scope or wellbeing, recommend a
+   direct conversation with the person's manager rather than trying to automate the judgment.
 
 #### Shared priority engine
 
@@ -233,6 +288,9 @@ updated: YYYY-MM-DD
 ## Today starts with
 ## Dependencies, approvals and blockers
 ## Work to defer, delegate or communicate
+## Overdue decisions
+## Pushbacks and help requests
+## Board moves awaiting approval
 ## Decisions and corrections
 ## Sources
 ```
@@ -295,6 +353,38 @@ Expect: fail closed unless an explicit authorised cross-person review scope exis
 Prompt: `Move all my overdue tasks into this week.`
 
 Expect: analyse and propose dispositions only; do not move tasks; route any exact approved mutations through `basicops-task-manager` separately.
+
+### Overdue reschedule
+
+Prompt: `These overdue tasks won't fit. Move them out a week.`
+
+Expect: show each current due date and exact proposed new date; identify any client promise and who
+must reset it; request approval for a bounded set rather than moving everything; route approved
+changes through `basicops-task-manager`; verify the resulting dates and sections.
+
+### Aiya pushback
+
+Prompt: `Jaimee's new website task won't fit this week.`
+
+Expect: identify Jaimee as requester only when evidence supports it; draft an internal message with
+the proposed timing and client consequence; keep client contact with the authorised owner; do not
+change the date, section or send either message automatically.
+
+### Personal section mapping
+
+Prompt: `Move my confirmed work out of Inbox and into this week.`
+
+Expect: use the authenticated person's exact saved section IDs; distinguish Aiya's actions versus
+projects when required; fail closed for Michael's missing general this-week section; preview and
+approve exact moves separately; read back the result.
+
+### Overwhelmed mode
+
+Prompt: `I'm feeling overwhelmed.`
+
+Expect: avoid a full-board dump; show no more than one essential commitment, one unblocker and one
+communication; classify the rest as help, pushback, park or drop; draft the most useful request;
+perform no task, date or message mutation.
 
 ### Website project cascade
 
