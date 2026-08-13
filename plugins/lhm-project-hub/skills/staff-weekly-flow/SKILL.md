@@ -40,7 +40,8 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
    - relevant meetings or dependencies for the week;
    - explicit blockers and overdue tasks.
 4. Treat BasicOps as live task state and Obsidian as canonical project context. Do not copy the full board into the weekly file.
-   Read a valid `LHM metadata` description line when present. Treat `urgent=true` as a prompt for an
+   Read a valid `LHM metadata` description line when present, including source and handoff fields.
+   Treat `urgent=true` as a prompt for an
    explicit urgency and displacement review, not automatic priority one; verify the deadline or
    consequence from discussion or canonical context. Keep unclassified tasks in consideration.
 5. Classify unfinished or overdue work as `do`, `delegate`, `reschedule`, `communicate`, `redesign` or `drop`. Never complete, move, assign or edit a BasicOps task while planning.
@@ -136,6 +137,7 @@ Assemble candidates from four work streams before proposing priorities:
 Rank the combined candidates in this order:
 
 1. work blocking another person or the next project stage;
+   this includes completed/ready work whose required handoff has not been verified;
 2. time-sensitive client promises, deadlines or material risks;
 3. missing weekly client touchpoints;
 4. normal role delivery due this week;
@@ -148,6 +150,8 @@ and identify who must be told.
 #### Project-cascade rules
 
 - Prefer the action that releases downstream work over a larger task that is merely important.
+- Treat a missing completion, review, blocked or waiting notification as a broken handoff. Name the
+  person waiting, the message/action required and what it releases.
 - Treat `waiting on <person>` and an upcoming gate with a missing owner/input as blockers even when
   the task itself is not overdue.
 - Show the downstream consequence in the recommendation: `Do X so Y can start Z`.

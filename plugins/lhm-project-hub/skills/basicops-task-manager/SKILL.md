@@ -23,7 +23,7 @@ For a new task, resolve:
 - next handoff after completion
 - due date only when explicitly supplied by a canonical source or authorised person
 - stable internal deduplication key
-- one valid LHM work type, service and urgency value
+- one valid classification and handoff contract from [classification-and-handoffs.md](references/classification-and-handoffs.md)
 
 If essential routing or ownership is missing, ask one concise question. Do not invent it.
 
@@ -50,20 +50,14 @@ Bad: `Select five materially different reusable page-template validation pages f
 
 ## Keep only machine metadata and working URLs in Description
 
-The human description of the work always belongs in **Discussions**. Put this exact first line in the
-description for governed new tasks:
+The human description of the work always belongs in **Discussions**. Read
+[classification-and-handoffs.md](references/classification-and-handoffs.md) before creating or
+classifying a task, changing urgency, or preparing a completion, review, blocked or waiting
+transition. Begin governed task descriptions with its exact metadata line.
 
-`LHM metadata: work_type=<value>; service=<value>; urgent=<true|false>`
-
-Allowed `work_type` values: `recurring-client-delivery`, `project-task`, `support-request`,
-`meeting-action`, `internal-business`. Allowed `service` values: `website`, `seo`, `google-ads`,
-`gmb`, `client-comms`, `admin`, `lhm-growth`, `none`.
-
-Infer work type and service only when the source context is decisive; otherwise ask one question.
-Set `urgent=true` only when an authorised person confirms urgency and a real deadline or consequence
-is recorded in Discussion. A due date alone is not proof of urgency. Useful working URLs may follow
-the metadata line. Never put the brief, task explanation, dependencies, acceptance test, handoff,
-deduplication key, status prose or `needs scheduling` in Description.
+Infer values only when source context is decisive; otherwise ask one question. Useful working URLs
+may follow the metadata line. Never put the brief, task explanation, dependencies, acceptance test,
+handoff prose, deduplication key, status prose or `needs scheduling` in Description.
 
 For `classify this task`, read the linked task and authorised context, preserve useful existing URLs,
 propose the exact metadata line, and update only after approval. Missing metadata never makes a task
@@ -79,6 +73,8 @@ Write directly to the assignee and keep it concise enough to scan. Include, to t
 4. Name any known inputs, dependencies or approvals.
 5. State the completion condition.
 6. End with the next handoff: who should receive it or what happens when it is complete.
+7. Add a labelled `Next handoff` sentence naming the trigger, next person, next action and channel
+   whenever another action follows completion, review, blocking or waiting.
 
 Example:
 
@@ -109,6 +105,7 @@ Before writing, prepare and, when approval is required, show:
 - destination project and parent/section
 - exact LHM metadata line and description URL(s)
 - discussion message
+- handoff trigger, next person/action and notification channel
 - due date, or `unset`
 - internal deduplication key
 
@@ -133,6 +130,10 @@ Use a stable key shaped like `basicops:<client-slug>:<workstream>:<outcome>`. Ke
 6. For a new task, write only the approved LHM metadata line and useful working URLs in Description. Put the complete human task explanation in the approved discussion message—always.
 7. Read the task back and verify title, project, parent/section, assignee, due date, metadata, URL description and discussion as applicable.
 8. Return the verified BasicOps URL. If any field differs, report the mismatch and do not claim success.
+
+For completion, ready-for-review, blocked or waiting transitions, never stop at the status change.
+Prepare the downstream comment/draft, obtain the relevant approval, verify who was notified and
+surface the newly released action. A task mutation and a message are separate operations.
 
 Michael's governed personal route:
 
@@ -159,6 +160,7 @@ Return:
 - verified BasicOps URL when one exists
 - final title and owner
 - next handoff
+- handoff notification result: `prepared`, `sent`, `not_required`, `blocked` or `not_approved`
 - any missing approval or routing input
 - when subtasks were created, the user's answer—or the still-outstanding question—about moving them to individual boards
 
