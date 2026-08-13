@@ -1,6 +1,6 @@
 ---
 name: staff-weekly-flow
-description: Plan and run a personalised LHM weekly-to-daily work flow for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use when an authorised person asks “what should I focus on this week?”, “what should I work on today?”, asks specifically for business-growth or client-work priorities, wants to review or save their weekly priorities, or wants to configure their weekly/daily reminder time, timezone, channel, delivery mode, focus mode or priority limit. Read the person’s canonical Obsidian profile, verified BasicOps personal-board mapping, authorised project context and current weekly file; prepare a small realistic plan; save only after confirmation; and keep BasicOps mutations behind the shared task-manager approval boundary.
+description: Plan and run a personalised LHM weekly-to-daily work flow for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use when an authorised person asks “what should I focus on this week?”, “what should I work on today?”, asks for a mini stand-up or WhatsApp-ready team update, asks specifically for business-growth or client-work priorities, wants to review or save their weekly priorities, or wants to configure their weekly/daily reminder time, timezone, channel, delivery mode, focus mode or priority limit. Read the person’s canonical Obsidian profile, verified BasicOps personal-board mapping, authorised project context and current weekly file; prepare a small realistic plan; save only after confirmation; and keep BasicOps mutations and outbound messages behind their approval boundaries.
 ---
 
 # Staff Weekly Flow
@@ -204,6 +204,51 @@ Trigger on “What should I work on today?” or equivalent requests.
 5. Explain any departure from the weekly file. Do not silently rebuild the week from the whole task universe.
 6. If the weekly file is missing, stale or still draft, stop and offer the weekly-planning flow.
 7. A material cross-project reprioritisation returns to weekly-planning analysis and requires the person's confirmation.
+8. After presenting the daily plan, offer the optional mini stand-up. Do not require it to receive a
+   daily answer and do not repeat the offer after the person declines in the same interaction.
+
+### Mini Hermes stand-up and WhatsApp draft
+
+Trigger after daily selection or when the person asks for a stand-up, check-in or team update. Keep
+it asynchronous and focused on coordinating the next working day, not reporting activity to a
+manager.
+
+1. Ask for or derive only confirmed, traceable information under four headings:
+   - **Progress since yesterday** — up to three meaningful wins or completions, especially work
+     that released another person. Use zero when none is confirmed; never manufacture wins.
+   - **Today's commitments** — up to three outcomes from the confirmed daily selection. These are
+     outcomes, not a list of every activity.
+   - **Blocks and help needed** — up to three blockers. For each name what is blocked, the person or
+     input needed, who should respond and whether a client expectation may need resetting.
+   - **Team impact** — one short statement naming who is released, waiting or needs an update.
+2. Treat “three” as a ceiling, never a quota. In overwhelmed mode prefer one commitment, one
+   unblocker and one communication.
+3. When a reported win would complete a task or a blocker would change the weekly plan, verify it
+   and seek the relevant approval before updating BasicOps or the weekly file.
+4. End with: `Would you like me to prepare a WhatsApp-ready team update?`
+5. If accepted, prepare a concise copy-ready draft in this structure, omitting empty headings:
+
+```text
+Morning team — my focus today:
+
+✅ Progress
+• <meaningful completion or handoff>
+
+🎯 Today
+• <outcome 1>
+• <outcome 2>
+
+🚧 Blocked / need help
+• <blocker> — need <person/input> by <confirmed timing>
+
+🔄 Team impact
+• <who this unblocks or who needs an update>
+```
+
+6. Preserve the person's natural voice and use only information they have confirmed or that is
+   traceable to the current weekly/daily plan. Do not expose client-sensitive detail unnecessarily.
+7. The output is a draft. Do not post to WhatsApp, send through another channel or claim it was sent
+   without a separate explicit approval and an authorised messaging route.
 
 ### Preference change
 
@@ -236,7 +281,7 @@ Hermes is the conversational manager. It must not imitate the worker by performi
 Accept a bounded request containing:
 
 - `run_id`;
-- `intent`: `weekly_plan`, `daily_select` or `preference_change`;
+- `intent`: `weekly_plan`, `daily_select`, `standup_draft` or `preference_change`;
 - verified requester/person identity;
 - authorised vault root and person folder;
 - BasicOps project and assignee IDs;
@@ -323,6 +368,29 @@ Expect: authenticate Aiya; read her preferences; confirm timezone and “Monday 
 Prompt: `What should I work on today?`
 
 Expect: read the current confirmed weekly file first; return a small ordered selection traceable to it; explain changes; do not rescan and silently replace the week.
+
+### Optional stand-up offer
+
+Prompt: `What should I work on today?`
+
+Expect: return the traceable daily selection first, then offer an optional mini stand-up and
+WhatsApp-ready draft; do not force the check-in, create filler or send a message.
+
+### Mini stand-up
+
+Prompt: `Run my mini stand-up: I finished the Alpha brief, today I am reviewing Ads and the DES
+handoff, and I am waiting on Kristalyn for approval.`
+
+Expect: preserve the confirmed win; select no more than three daily outcomes; state what approval is
+needed and the team impact; ask whether to prepare the WhatsApp draft; do not complete the Alpha
+task or mark the DES work blocked without separate verification and approval.
+
+### WhatsApp-ready update
+
+Prompt: `Yes, make the WhatsApp post.`
+
+Expect: return a concise copy-ready draft with only non-empty Progress, Today, Blocked/help and Team
+impact headings; protect client-sensitive detail; label it as a draft; do not send it.
 
 ### Michael balanced weekly view
 
