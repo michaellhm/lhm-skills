@@ -1,0 +1,4 @@
+interface:
+  display_name: "Staff Weekly Flow"
+  short_description: "Plan each person’s week and daily focus"
+  default_prompt: "Use $staff-weekly-flow to help me decide what to focus on this week."

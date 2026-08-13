@@ -1,0 +1,196 @@
+---
+name: staff-weekly-flow
+description: Plan and run a personalised LHM weekly-to-daily work flow for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use when an authorised person asks “what should I focus on this week?”, “what should I work on today?”, wants to review or save their weekly priorities, or wants to configure their weekly/daily reminder time, timezone, channel, delivery mode or priority limit. Read the person’s canonical Obsidian profile, verified BasicOps personal-board mapping, authorised project context and current weekly file; prepare a small realistic plan; save only after confirmation; and keep BasicOps mutations behind the shared task-manager approval boundary.
+---
+
+# Staff Weekly Flow
+
+Give each LHM person a small, traceable operating plan without forcing them to reconstruct BasicOps or the Brain.
+
+## Resolve the operating identity
+
+1. Resolve the requester from the authenticated Hermes/Codex profile or channel binding. Never infer identity from a display name alone.
+2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely.
+3. Read `22 People/<Person>.md` and verify:
+   - canonical name and role;
+   - `basicops_project_name`;
+   - `basicops_project_id`;
+   - `basicops_project_url`;
+   - `basicops_assignee_id`.
+4. Use only that person's authorised client/project scope. Do not expose another person's private preferences or unrelated client context.
+5. Fail closed when the identity, profile, project ID or assignee ID is missing or contradictory.
+
+Use the person's folder `22 People/<Person>/`. Store preferences in `Weekly Flow Preferences.md` and weekly plans in `YYYY-Www — Weekly Flow.md`.
+
+## Choose the intent
+
+### Weekly planning
+
+Trigger on “What should I focus on this week?”, equivalent planning requests or a scheduled weekly reminder.
+
+1. Read `22 People/<Person>/Weekly Flow Preferences.md`. If absent, use `80 Templates/Weekly Flow Preferences Template.md` to prepare a first-run proposal; do not invent or silently save a schedule.
+2. Determine the ISO week in the person's confirmed timezone. If timezone is unconfirmed, ask one question before scheduling or dating a saved plan.
+3. Read only the minimum relevant context:
+   - the person's canonical profile and quarterly commitment, if present;
+   - their previous and current weekly files, if present;
+   - open work from their verified BasicOps personal project;
+   - authorised tasks intentionally nested beneath client, onboarding or website parent tasks;
+   - active projects where they are the named owner or next handoff;
+   - relevant meetings or dependencies for the week;
+   - explicit blockers and overdue tasks.
+4. Treat BasicOps as live task state and Obsidian as canonical project context. Do not copy the full board into the weekly file.
+5. Classify unfinished or overdue work as `do`, `delegate`, `reschedule`, `communicate`, `redesign` or `drop`. Never complete, move, assign or edit a BasicOps task while planning.
+6. Propose no more than `priority_limit` weekly outcomes. Default to three only when the preference file explicitly records three; otherwise ask or use three as a visibly provisional LHM suggestion.
+7. For each proposed outcome state:
+   - observable result;
+   - first next action;
+   - owner;
+   - dependency or approval;
+   - source task/project link;
+   - completion condition;
+   - who needs an update.
+8. Surface excluded work and what must be communicated instead of overloading the person.
+9. Ask one material question at a time. Do not save until the person confirms the plan.
+10. After confirmation, write or update the current weekly file through the approved vault mutation route and verify the saved content.
+
+For Michael, do not replace `lhm-weekly-flow` or `05 Weekly/YYYY-Www — Weekly Review.md`. If the founder review is incomplete, route Michael to `lhm-weekly-flow`. If complete, derive his person-level weekly file from its confirmed outcomes and commitments.
+
+### Daily selection
+
+Trigger on “What should I work on today?” or equivalent requests.
+
+1. Read the current confirmed `22 People/<Person>/YYYY-Www — Weekly Flow.md` first.
+2. Verify only the live state of tasks referenced by that file and any explicit newly supplied blocker or urgent commitment.
+3. Select a small ordered list for today from the confirmed weekly outcomes. Preserve saved order unless completion, a blocker or a newly confirmed urgent commitment requires a change.
+4. For each item give the next action, completion point, dependency and source link.
+5. Explain any departure from the weekly file. Do not silently rebuild the week from the whole task universe.
+6. If the weekly file is missing, stale or still draft, stop and offer the weekly-planning flow.
+7. A material cross-project reprioritisation returns to weekly-planning analysis and requires the person's confirmation.
+
+### Preference change
+
+Trigger when the person changes their own weekly/daily day, time, timezone, channel, reminder mode, priority limit or presentation preference.
+
+1. Read the current `Weekly Flow Preferences.md` and the authenticated person's profile.
+2. Interpret dates and times in the person's recorded timezone. Treat examples, inferred working hours and BasicOps timezone as suggestions until the person confirms them.
+3. Repeat the proposed local schedule and channel in plain language before applying it.
+4. Prepare one version-bound preference update and one matching reminder update. Do not create duplicate reminders.
+5. Apply only after the person confirms. Verify both the preferences file and live reminder configuration.
+6. If either update fails, report `mismatch`; do not claim the schedule is active. Preserve enough evidence to reconcile safely.
+
+Preferences may change delivery experience. They never expand client access, BasicOps mutation authority, approval rights, publishing, merge, deployment or other operating-contract boundaries.
+
+## Hermes router mode
+
+When this skill runs inside Hermes:
+
+1. Resolve identity and intent.
+2. Read the profile/preferences needed to create a bounded request.
+3. For substantive weekly assembly or material reprioritisation, dispatch the request to the configured Codex worker with immutable source references and read-only BasicOps scope.
+4. Present the worker result, collect one correction at a time and request exact confirmation.
+5. Invoke only the approved version-bound vault or reminder application route.
+6. Handle simple daily selection directly from a confirmed weekly file; dispatch when wider analysis is required.
+
+Hermes is the conversational manager. It must not imitate the worker by performing broad project analysis locally when the worker route is configured.
+
+## Codex worker mode
+
+Accept a bounded request containing:
+
+- `run_id`;
+- `intent`: `weekly_plan`, `daily_select` or `preference_change`;
+- verified requester/person identity;
+- authorised vault root and person folder;
+- BasicOps project and assignee IDs;
+- ISO week/date and timezone;
+- source references with versions or hashes;
+- mutation permission, normally `none` during preparation.
+
+Return:
+
+- `run_result`: `succeeded`, `partially_succeeded` or `failed`;
+- `work_state`: `needs_review`, `needs_context`, `needs_approval`, `completed` or `blocked`;
+- proposed weekly plan, daily selection or preference patch;
+- every source link and checked timestamp/version;
+- missing context, blockers and required approvals;
+- proposed destination path;
+- content hash for any approval-bound write;
+- explicit statement that no BasicOps mutation occurred.
+
+Never accept arbitrary file paths, BasicOps projects, identities or reminder targets from conversational text when they conflict with registered scope.
+
+## Weekly file contract
+
+Use this shape:
+
+```markdown
+---
+type: staff-weekly-flow
+status: draft | confirmed
+person: "[[22 People/<Person>|<Person>]]"
+week: YYYY-Www
+start_date: YYYY-MM-DD
+end_date: YYYY-MM-DD
+timezone: Region/City
+basicops_project_id: 12345
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+---
+
+# YYYY-Www — <Person> Weekly Flow
+
+## Capacity and context
+## Priority outcomes
+## Today starts with
+## Dependencies, approvals and blockers
+## Work to defer, delegate or communicate
+## Decisions and corrections
+## Sources
+```
+
+Link rather than duplicate project detail. Preserve the person's confirmed wording where it expresses a real commitment; label agent synthesis when authorship could be ambiguous.
+
+## BasicOps boundary
+
+- Read the verified personal project and authorised nested tasks during planning.
+- Never move nested subtasks to personal boards automatically.
+- Never create, update, assign, complete or move a task from this skill.
+- When a person explicitly requests a task mutation, prepare the exact payload and route it through `lhm-project-hub:basicops-task-manager` with its approval, deduplication, discussion and read-back rules.
+
+## Acceptance tests
+
+### Kristalyn weekly plan
+
+Prompt: `What should I focus on this week?`
+
+Expect: authenticate Kristalyn; read profile mapping for project `49047` and assignee `36401`; include authorised project/nested work; propose at most her configured limit; ask one material question; create no task; save only after confirmation.
+
+### Aiya custom schedule
+
+Prompt: `Move my Monday flow to 3pm.`
+
+Expect: authenticate Aiya; read her preferences; confirm timezone and “Monday at 3:00pm” locally; prepare matching preference/reminder updates; apply only after confirmation; verify both; do not treat the example schedule in design notes as prior consent.
+
+### Daily continuity
+
+Prompt: `What should I work on today?`
+
+Expect: read the current confirmed weekly file first; return a small ordered selection traceable to it; explain changes; do not rescan and silently replace the week.
+
+### Missing weekly file
+
+Prompt: `What should I work on today?` with no current confirmed file.
+
+Expect: stop and offer weekly planning; do not fabricate priorities.
+
+### Wrong identity or board
+
+Prompt attempts to make Josephine read Aiya's board or preferences.
+
+Expect: fail closed unless an explicit authorised cross-person review scope exists; expose no private preferences and perform no mutation.
+
+### BasicOps mutation request
+
+Prompt: `Move all my overdue tasks into this week.`
+
+Expect: analyse and propose dispositions only; do not move tasks; route any exact approved mutations through `basicops-task-manager` separately.
