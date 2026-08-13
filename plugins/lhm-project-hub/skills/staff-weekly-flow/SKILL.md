@@ -40,6 +40,9 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
    - relevant meetings or dependencies for the week;
    - explicit blockers and overdue tasks.
 4. Treat BasicOps as live task state and Obsidian as canonical project context. Do not copy the full board into the weekly file.
+   Read a valid `LHM metadata` description line when present. Treat `urgent=true` as a prompt for an
+   explicit urgency and displacement review, not automatic priority one; verify the deadline or
+   consequence from discussion or canonical context. Keep unclassified tasks in consideration.
 5. Classify unfinished or overdue work as `do`, `delegate`, `reschedule`, `communicate`, `redesign` or `drop`. Never complete, move, assign or edit a BasicOps task while planning.
    For each overdue task, also ask whether its commitment is still valid and whether it should be
    rescheduled, delegated, marked blocked/waiting, communicated or dropped. Never invent a new due
@@ -348,6 +351,7 @@ Link rather than duplicate project detail. Preserve the person's confirmed wordi
 - Never move nested subtasks to personal boards automatically.
 - Never create, update, assign, complete or move a task from this skill.
 - When a person explicitly requests a task mutation, prepare the exact payload and route it through `lhm-project-hub:basicops-task-manager` with its approval, deduplication, discussion and read-back rules.
+- Route metadata creation, correction and urgency removal through the same approval boundary.
 
 ## Acceptance tests
 

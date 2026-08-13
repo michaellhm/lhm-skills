@@ -1,6 +1,6 @@
 ---
 name: basicops-task-manager
-description: Create, update, assign, discuss, complete, move, or otherwise mutate LHM BasicOps tasks. Use whenever a user or another LHM Project Hub workflow asks to write anything in BasicOps, including "create a task", "add this to BasicOps", "assign this", "update the task", "mark it complete", or "add a discussion note". This is the mandatory shared BasicOps mutation boundary for all Project Hub skills; other skills may prepare project context but must route the final task payload and write through this skill.
+description: Create, classify, update, assign, discuss, complete, move, or otherwise mutate LHM BasicOps tasks. Use whenever a user or another LHM Project Hub workflow asks to write anything in BasicOps, including "create a task", "classify this task", "add this to BasicOps", "assign this", "update the task", "mark it complete", or "add a discussion note". This is the mandatory shared BasicOps mutation boundary for all Project Hub skills; other skills may prepare project context but must route the final task payload and write through this skill.
 ---
 
 # BasicOps Task Manager
@@ -23,6 +23,7 @@ For a new task, resolve:
 - next handoff after completion
 - due date only when explicitly supplied by a canonical source or authorised person
 - stable internal deduplication key
+- one valid LHM work type, service and urgency value
 
 If essential routing or ownership is missing, ask one concise question. Do not invent it.
 
@@ -47,11 +48,26 @@ Good: `Alpha: Website - Create content for five pages`
 
 Bad: `Select five materially different reusable page-template validation pages from sitemap v5`
 
-## Keep task context out of Description — always
+## Keep only machine metadata and working URLs in Description
 
-The human description of the work always belongs in **Discussions**, for every BasicOps task and every workflow. This is an LHM-wide invariant; a calling skill cannot override it.
+The human description of the work always belongs in **Discussions**. Put this exact first line in the
+description for governed new tasks:
 
-Leave the BasicOps `description` field blank unless it contains only useful working URLs, such as a Fathom recording, website, prototype, staging page, working document or repository. Never put the brief, task explanation, dependencies, acceptance test, handoff, deduplication metadata, status prose or `needs scheduling` in Description. Put all of that in Discussions.
+`LHM metadata: work_type=<value>; service=<value>; urgent=<true|false>`
+
+Allowed `work_type` values: `recurring-client-delivery`, `project-task`, `support-request`,
+`meeting-action`, `internal-business`. Allowed `service` values: `website`, `seo`, `google-ads`,
+`gmb`, `client-comms`, `admin`, `lhm-growth`, `none`.
+
+Infer work type and service only when the source context is decisive; otherwise ask one question.
+Set `urgent=true` only when an authorised person confirms urgency and a real deadline or consequence
+is recorded in Discussion. A due date alone is not proof of urgency. Useful working URLs may follow
+the metadata line. Never put the brief, task explanation, dependencies, acceptance test, handoff,
+deduplication key, status prose or `needs scheduling` in Description.
+
+For `classify this task`, read the linked task and authorised context, preserve useful existing URLs,
+propose the exact metadata line, and update only after approval. Missing metadata never makes a task
+invisible or non-actionable.
 
 ## Add one human discussion message
 
@@ -75,7 +91,7 @@ Do not fabricate missing detail. Make confirmation of an unknown input, dependen
 When a workflow creates subtasks:
 
 1. Create the parent and subtasks in the governed project route.
-2. Put each task's actionable explanation in its own Discussion; keep Description blank except for approved working URLs.
+2. Put each task's actionable explanation in its own Discussion; keep Description to valid LHM metadata and approved working URLs.
 3. After the subtask IDs are verified, add a clearly labelled `Linked subtasks` message to the **parent task's Discussion** using native BasicOps task record links for every subtask.
 4. Do not put the linked-subtasks list in the parent Description.
 5. Preserve the parent's linked-subtasks discussion if subtasks are later moved to other projects.
@@ -91,7 +107,7 @@ Before writing, prepare and, when approval is required, show:
 - title
 - assignee
 - destination project and parent/section
-- description URL(s), or `blank`
+- exact LHM metadata line and description URL(s)
 - discussion message
 - due date, or `unset`
 - internal deduplication key
@@ -114,8 +130,8 @@ Use a stable key shaped like `basicops:<client-slug>:<workstream>:<outcome>`. Ke
 3. Before creating, search the intended destination and parent for both the stable key when available and a materially equivalent open title.
 4. If an equivalent task exists, return its URL instead of creating a duplicate.
 5. Perform only the approved mutation.
-6. For a new task, leave the description blank unless useful working URLs were approved. Put the complete human task explanation in the approved discussion message—always.
-7. Read the task back and verify title, project, parent/section, assignee, due date, URL description and discussion as applicable.
+6. For a new task, write only the approved LHM metadata line and useful working URLs in Description. Put the complete human task explanation in the approved discussion message—always.
+7. Read the task back and verify title, project, parent/section, assignee, due date, metadata, URL description and discussion as applicable.
 8. Return the verified BasicOps URL. If any field differs, report the mismatch and do not claim success.
 
 Michael's governed personal route:
