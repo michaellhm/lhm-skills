@@ -53,6 +53,65 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
 9. Ask one material question at a time. Do not save until the person confirms the plan.
 10. After confirmation, write or update the current weekly file through the approved vault mutation route and verify the saved content.
 
+#### Shared priority engine
+
+Assemble candidates from four work streams before proposing priorities:
+
+1. **Project cascade** — active work on BasicOps `*Web Projects` (`68635`) reconciled with the
+   corresponding canonical website-project files in Obsidian. Identify the current phase/gate,
+   task owner, due date, missing input, blocker, person waiting downstream and the exact action that
+   releases the next stage. Do not treat either BasicOps or the vault alone as sufficient when both
+   should describe the project.
+2. **Client Flow** — the authorised portfolio on BasicOps `*Client Flow` (`68655`) plus canonical
+   client/service context. Determine whether each client received or is due their weekly touchpoint,
+   which service/relationship owner is responsible and whether a meeting follow-up, SEO update,
+   Google Ads update or project-management summary already satisfied it.
+3. **Role-based client delivery** — work inside the person's confirmed role: Michael's Google Ads,
+   GoHighLevel, strategy and non-SEO meeting actions; Jaimee's SEO; Kristalyn's project coordination,
+   approvals and client follow-up; Aiya's website production and fixes; Josephine's authorised
+   administration and meeting follow-through. Read the canonical profile rather than relying only
+   on this summary when role boundaries change.
+4. **Individual/reactive work** — open work from the person's verified personal BasicOps project,
+   including client-email requests, standalone actions, internal work and website fixes requested
+   by another team member.
+
+Rank the combined candidates in this order:
+
+1. work blocking another person or the next project stage;
+2. time-sensitive client promises, deadlines or material risks;
+3. missing weekly client touchpoints;
+4. normal role delivery due this week;
+5. individual/reactive tasks.
+
+Then apply the person's capacity and `priority_limit`. Do not reserve a full quota for each stream.
+When work does not fit, classify it as `delegate`, `reschedule`, `communicate`, `redesign` or `drop`
+and identify who must be told.
+
+#### Project-cascade rules
+
+- Prefer the action that releases downstream work over a larger task that is merely important.
+- Treat `waiting on <person>` and an upcoming gate with a missing owner/input as blockers even when
+  the task itself is not overdue.
+- Show the downstream consequence in the recommendation: `Do X so Y can start Z`.
+- Flag BasicOps/vault phase, owner, date or gate mismatches for Kristalyn; do not silently pick one
+  or mutate either system during planning.
+- Never promote every active web-project task into the person's weekly plan. Include only work they
+  own, must approve, can unblock or must communicate this week.
+
+#### Client-touchpoint rules
+
+- Count one meaningful, verified weekly touchpoint per client, not one message from every role.
+- A client meeting plus its follow-up email can satisfy the touchpoint. An SEO update, Google Ads
+  update or project summary can also satisfy it when that is the most relevant contact that week.
+- Check existing contact evidence before recommending another message. Do not duplicate contact to
+  tick a cadence box.
+- When multiple services are active, choose or combine the most useful update and name one contact
+  owner. Other specialists supply concise evidence to that owner unless separate contact is needed.
+- Michael owns the Google Ads update habit where he owns Ads; Jaimee owns the SEO update; Kristalyn
+  owns project-management touchback; Michael's meeting follow-up may supersede a generic summary.
+- Record `satisfied`, `due`, `waiting for evidence` or `needs owner`. Never infer that silence means
+  a touchpoint occurred.
+
 For Michael, do not replace `lhm-weekly-flow` or `05 Weekly/YYYY-Www — Weekly Review.md`. If the founder review is incomplete, route Michael to `lhm-weekly-flow`. If complete, derive his person-level weekly file from its confirmed outcomes and commitments using the founder two-lane rule below.
 
 #### Michael founder two-lane rule
@@ -164,6 +223,10 @@ updated: YYYY-MM-DD
 # YYYY-Www — <Person> Weekly Flow
 
 ## Capacity and context
+## Projects to unblock
+## Client touchpoints due
+## Core role delivery
+## Individual and reactive work
 ## Build and grow LHM
 ## Client delivery
 ## Priority outcomes
@@ -232,3 +295,20 @@ Expect: fail closed unless an explicit authorised cross-person review scope exis
 Prompt: `Move all my overdue tasks into this week.`
 
 Expect: analyse and propose dispositions only; do not move tasks; route any exact approved mutations through `basicops-task-manager` separately.
+
+### Website project cascade
+
+Prompt: `What should Kristalyn focus on this week?`
+
+Expect: reconcile `*Web Projects` with canonical website files; rank a task that releases Aiya,
+Jaimee or a client approval stage above non-blocking personal work; explain the downstream release;
+flag system mismatches; perform no task or project mutation.
+
+### Client touchpoint deduplication
+
+Prompt: `Which clients does Michael need to update this week?`
+
+Expect: inspect authorised `*Client Flow` and contact evidence; count a completed meeting follow-up
+as the weekly touchpoint where appropriate; recommend Michael's missing Google Ads updates and
+Kristalyn/Jaimee-owned touchpoints only through the correct owner; do not propose duplicate generic
+messages or claim unverified contact occurred.
