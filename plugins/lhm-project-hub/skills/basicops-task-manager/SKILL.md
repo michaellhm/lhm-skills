@@ -55,18 +55,34 @@ Leave the BasicOps `description` field blank unless it contains only useful work
 
 ## Add one human discussion message
 
-Write directly to the assignee and normally stay under 100 words:
+Write directly to the assignee and keep it concise enough to scan. Include, to the best of the available information:
 
 1. Start with `<First name>, we need to…`
-2. Give only enough client/project context to understand the requested outcome.
-3. State what to do in plain language.
-4. End with the next handoff: who should receive it or what happens when it is complete.
+2. State the intended outcome and only enough client/project context to understand it.
+3. Give practical next steps in the order they should happen.
+4. Name any known inputs, dependencies or approvals.
+5. State the completion condition.
+6. End with the next handoff: who should receive it or what happens when it is complete.
 
 Example:
 
 > Michael, we need to confirm whether Alpha's new Hawthorn location is included in the current website scope and what needs to change in the sitemap. Once you've decided, let Kristalyn know so she can coordinate the website update.
 
-Do not turn the discussion into a full brief. When the assignee asks for more detail, Hermes should read the canonical client/project notes and answer in conversation.
+Do not fabricate missing detail. Make confirmation of an unknown input, dependency, owner or approval the first next step. Do not turn the discussion into a full brief when the canonical project context can supply the detail; when the assignee asks, Hermes should read those notes and answer in conversation.
+
+## Handle parent tasks and subtasks
+
+When a workflow creates subtasks:
+
+1. Create the parent and subtasks in the governed project route.
+2. Put each task's actionable explanation in its own Discussion; keep Description blank except for approved working URLs.
+3. After the subtask IDs are verified, add a clearly labelled `Linked subtasks` message to the **parent task's Discussion** using native BasicOps task record links for every subtask.
+4. Do not put the linked-subtasks list in the parent Description.
+5. Preserve the parent's linked-subtasks discussion if subtasks are later moved to other projects.
+6. After creation and verification, always ask the user in the current interface—Hermes, Chat, Codex or Claude: **Would you like me to move the subtasks to each assignee's individual board?**
+7. Never move subtasks automatically. Wait for explicit user confirmation, then resolve each person's actual board and destination section through BasicOps before moving anything.
+
+The question is mandatory even when the subtasks already have assignees. Creating subtasks and moving them to personal boards are separate mutations with separate authority.
 
 ## Prepare the exact payload
 
@@ -110,6 +126,15 @@ Michael's governed personal route:
 
 For team client work, prefer the client's mother task on `*Client Flow` (`68655`) when that is the established route, and resolve the actual assignee through BasicOps.
 
+Existing-client website projects use this governed exception:
+
+- Project: `*Web Projects` (`68635`)
+- Initial section: `Onboarding & Briefing` (`107719`)
+- Create or reuse a dedicated website parent task and place its milestones beneath it.
+- Never leave the parent or newly created website subtasks in `None`.
+- Add the verified native subtask links to the parent Discussion, not Description.
+- Then ask whether the user wants the subtasks moved to the individual assignees' boards.
+
 ## Hand back to the calling workflow
 
 Return:
@@ -119,5 +144,6 @@ Return:
 - final title and owner
 - next handoff
 - any missing approval or routing input
+- when subtasks were created, the user's answer—or the still-outstanding question—about moving them to individual boards
 
 Do not update Obsidian merely because a task was created. Let the owning Project Hub workflow record only the appropriate canonical project-state change under its own authority.

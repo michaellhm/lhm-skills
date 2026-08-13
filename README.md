@@ -168,7 +168,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
   .claude-plugin/plugin.json            # Plugin manifest
   agents/pm-orchestrator.md             # Main entry point — reads client state, flags cadence breaches, routes to the right skill
   skills/                               # All 21 skills
-    basicops-task-manager/              # Mandatory shared BasicOps task-writing, approval, deduplication and verification boundary
+    basicops-task-manager/              # Shared BasicOps boundary — discussion-first briefs, routing, linked subtasks, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
     sales-handover/                     # Hand a newly-closed client from sales to delivery
     client-onboarding/                  # Scope-aware Obsidian-first onboarding — 5 top-level BasicOps gates
@@ -258,7 +258,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 ### Project Hub
 
-**Team Handoffs** (2 skills): A universal team-work briefing flow reads requester, client, assignee and project context; checks access, dependencies, authority, completion and review; asks one material question at a time; and learns carefully from assignee feedback. The shared BasicOps task manager then applies LHM naming, sparse descriptions, human discussion, approval, deduplication and read-back verification to every task mutation.
+**Team Handoffs** (2 skills): A universal team-work briefing flow reads requester, client, assignee and project context; checks access, dependencies, authority, completion and review; asks one material question at a time; and learns carefully from assignee feedback. The shared BasicOps task manager then applies LHM naming, discussion-first actionable next steps, existing-client website routing, parent-discussion subtask links, personal-board confirmation, approval, deduplication and read-back verification to every task mutation.
 
 **Client Lifecycle** (3 skills): Sales-to-delivery handover; Tier 1 client onboarding; and an existing-client website handover that transfers a newly scoped website project from Michael to Kristalyn without restarting general onboarding.
 
