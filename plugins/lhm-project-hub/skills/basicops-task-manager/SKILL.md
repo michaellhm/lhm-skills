@@ -47,11 +47,11 @@ Good: `Alpha: Website - Create content for five pages`
 
 Bad: `Select five materially different reusable page-template validation pages from sitemap v5`
 
-## Keep the description sparse
+## Keep task context out of Description — always
 
-Leave the description blank by default.
+The human description of the work always belongs in **Discussions**, for every BasicOps task and every workflow. This is an LHM-wide invariant; a calling skill cannot override it.
 
-Put only useful working URLs in the description, such as a Fathom recording, website, prototype, staging page, working document or repository. Do not put internal context, dependencies, acceptance tests, deduplication metadata, status prose or `needs scheduling` in the description.
+Leave the BasicOps `description` field blank unless it contains only useful working URLs, such as a Fathom recording, website, prototype, staging page, working document or repository. Never put the brief, task explanation, dependencies, acceptance test, handoff, deduplication metadata, status prose or `needs scheduling` in Description. Put all of that in Discussions.
 
 ## Add one human discussion message
 
@@ -98,7 +98,7 @@ Use a stable key shaped like `basicops:<client-slug>:<workstream>:<outcome>`. Ke
 3. Before creating, search the intended destination and parent for both the stable key when available and a materially equivalent open title.
 4. If an equivalent task exists, return its URL instead of creating a duplicate.
 5. Perform only the approved mutation.
-6. For a new task, leave the description blank unless useful URLs were approved; then add the approved discussion message.
+6. For a new task, leave the description blank unless useful working URLs were approved. Put the complete human task explanation in the approved discussion message—always.
 7. Read the task back and verify title, project, parent/section, assignee, due date, URL description and discussion as applicable.
 8. Return the verified BasicOps URL. If any field differs, report the mismatch and do not claim success.
 
@@ -121,4 +121,3 @@ Return:
 - any missing approval or routing input
 
 Do not update Obsidian merely because a task was created. Let the owning Project Hub workflow record only the appropriate canonical project-state change under its own authority.
-

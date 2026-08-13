@@ -1,6 +1,6 @@
 ---
 name: post-meeting-review
-description: "Work through a client meeting's follow-up: update client state files, sweep the client folder for stale artefacts, turn action items into linked standalone BasicOps tasks on their owners' boards, and draft a team update email. Use this after `lhm-project-hub:client-meeting-email` has run for a meeting, or when the user says 'meeting wrap', 'work through the follow-ups', 'post-meeting review'. Reads the saved meeting-notes and client-wrap-email files (falls back to a fresh Fathom pull if they don't exist yet) to update goals.md, current-projects.md, client_profile.md, and sweep the whole client folder for artefacts the meeting's decisions invalidate. Finds the client's BasicOps card (already created and moved to Follow Up by client-meeting-email), uses it as a compact mother-task register, and creates one linked task per action. Explicit meeting owners are assigned automatically; otherwise the skill sweeps the canonical Obsidian staff profiles and assigns a clear role match, asking only when ownership is genuinely ambiguous or conflicts with the meeting. Client-owed items always route to Kristalyn. Ends by drafting a team summary email. Triggers on: 'meeting wrap', 'work through the follow-ups', 'post-meeting review', 'meeting follow-ups', 'client call debrief'."
+description: "Process a client meeting's follow-up after client-meeting-email: update client state files, detect stale artefacts, create a compact Client Flow action register, route linked BasicOps tasks to owners' Inbox sections, and draft the team update. Reads saved meeting notes and wrap email, with Fathom/manual fallback. Explicit meeting owners win; otherwise current Obsidian staff profiles resolve a clear role match, with questions only for genuine ambiguity. Client-owed items route to Kristalyn. Use when the user says meeting wrap, process the meeting follow-up, work through the actions, post-meeting review, meeting follow-ups, or client call debrief. All BasicOps writes route through basicops-task-manager."
 ---
 
 # Post-Meeting Review
@@ -188,10 +188,10 @@ Before creating anything, run a **compactness gate** over the combined list:
 
 ### BasicOps field rules (read before writing anything)
 
-- **The client card is the meeting-wrap tracker (the "mother task").** Keep its description as a compact action register made from live BasicOps task record-links. Do not paste the meeting transcript, strategic analysis, or a second email into it.
-- **Action tasks are standalone linked tasks, not BasicOps subtasks.** The two reference meeting wraps (`2060773` and `2117845`) return no subtasks from `list_subtasks_in_task`; their task relationships are live BasicOps record-links. Create action tasks without `parentTaskId`, assign them, and move them to the owner's project/board when the owner is confirmed. Link them back to the mother task in their description. This lets the work live on the assignee's board without disappearing from the meeting wrap.
-- **Put the minimum useful brief in each action task's description.** Use a `Mother task` record-link, then `Detail` with 1–4 terse bullets. Add `Done when` only when the finish line is not obvious. Do not post a separate discussion message that merely repeats this description.
-- **Use discussions only for change over time:** research results, plan/resume prompts, judgment calls, blockers, or a short completion/update note. A newly created task should not arrive with a wall of commentary.
+- **The client card is the meeting-wrap tracker (the "mother task").** Post its compact action register as a discussion message made from live BasicOps task record-links. Keep Description blank except for useful working URLs. Do not paste the meeting transcript, strategic analysis, or a second email into either field.
+- **Action tasks are standalone linked tasks, not BasicOps subtasks.** The two reference meeting wraps (`2060773` and `2117845`) return no subtasks from `list_subtasks_in_task`; their task relationships are live BasicOps record-links. Create action tasks without `parentTaskId`, assign them, and move them to the owner's project/board when the owner is confirmed. Link them back to the mother task in the first discussion message. This lets the work live on the assignee's board without disappearing from the meeting wrap.
+- **Put every action task's human brief in Discussions—always.** The first discussion message contains the `Mother task` record-link, then `Detail` with 1–4 terse bullets. Add `Done when` only when the finish line is not obvious. Keep Description blank except for useful working URLs.
+- **Keep later discussions for change over time:** research results, plan/resume prompts, judgment calls, blockers, or a short completion/update note. A newly created task gets one concise briefing discussion, not a wall of commentary.
 - **Use BasicOps record-links, not ordinary URL links, for task-to-task relationships.** Record-links carry the task state in BasicOps, so completed work is crossed off in the mother task and the relationship survives moving the task between boards. Use task table id `3936` and the created task id. Do not copy the SVG/checkbox markup from an old task; BasicOps owns the status rendering.
 - **Discussion messages take raw HTML.** Do not escape it to entities, because `&lt;p&gt;` renders as literal text. If you get it wrong, `delete_message` with the returned id and repost.
 - **Task titles take a plain `&`,** not `&amp;`, which renders as the literal entity.
@@ -265,7 +265,7 @@ For each entry in the combined list that doesn't already have a BasicOps task (a
 
 Create the task **without `parentTaskId`**. Initially use `projectId: 68655` and `section: 107750` only while the owner is unresolved. Once 5d confirms the owner, move the task to that person's task project/board and specifically its **Inbox** section. Every staff task board has an Inbox; resolve its actual section ID via BasicOps rather than assuming one board's ID applies to another. Use title `"<Acronym> - Action - <task>"` for an LHM-owned action item, `"<Acronym> - Client - <task>"` for a client-owed action item, or `"<Acronym> - <Type> - <task>"` (`<Type>` from 5b) for a follow-on task. `<Acronym>` per Step 2's acronym resolution.
 
-Set the description to this compact shape (raw HTML):
+After creation, post this compact first discussion message (raw HTML):
 
 ```html
 <p><strong>Mother task:</strong> [BasicOps record-link to the client card]</p>
@@ -277,9 +277,9 @@ Set the description to this compact shape (raw HTML):
 <p><em>Questions? Ask Hermes first — it can check the linked meeting wrap, Fathom notes, and client/LHM knowledge. If the answer is not recorded, flag whether Michael or the client needs to answer.</em></p>
 ```
 
-If the finish line needs clarification, add one short `<p><strong>Done when:</strong> ...</p>`. Never add meeting-summary prose, routing rationale, or duplicated background.
+If the finish line needs clarification, add one short `<p><strong>Done when:</strong> ...</p>`. Never add meeting-summary prose, routing rationale, or duplicated background. The BasicOps Description remains blank unless it contains only useful working URLs.
 
-After every action task has been created, update the client card's description once with the meeting recording link followed by a numbered action register. Each item contains the live BasicOps record-link, up to 1–3 concise detail bullets, and the confirmed owner. Do not duplicate the entire task description. Target roughly 4–8 lines per action, and omit empty labels. This one register replaces both a forest of subtasks and a long task-dump discussion.
+After every action task has been created, post one numbered action-register discussion message on the client card. Each item contains the live BasicOps record-link, up to 1–3 concise detail bullets, and the confirmed owner. Do not duplicate the entire action-task discussion. Target roughly 4–8 lines per action, and omit empty labels. This one register replaces both a forest of subtasks and a long task dump.
 
 ```html
 <p><strong>Recording:</strong> [link]</p>
@@ -288,7 +288,7 @@ After every action task has been created, update the client card's description o
 <p>Assigned to: <strong>Name</strong></p>
 ```
 
-If an existing card already has genuine deliverables in its description, preserve them under a short `Scope` heading and append/replace only the action-register portion. Do not destroy unrelated user-authored content.
+If the client card already has an action-register discussion for this meeting, update that message rather than posting a duplicate. Preserve unrelated user-authored content. Do not move existing contextual prose into Description.
 
 ### 5c.5. Hermes context and knowledge-gap loop
 
@@ -385,7 +385,7 @@ For a **Handoff-prompt** task, ask instead whether to prepare the plan now: e.g.
 Whatever 5e produced, post it to the action task's discussion as soon as it's ready — before moving to the next task:
 
 - **Direct:** post the answer to the action task discussion. Nothing further to track.
-- **Auto-run, research run:** the compact brief is already in the description, so post the agent's actual output as the next discussion message. If the agent failed instead of completing, put what was attempted and what broke into the result message. Attach any generated files (keyword CSVs, ad copy CSVs, content drafts) via `add_file_to_task`, save a copy to `[client-folder]/project-management/meetings/YYYY-MM-DD/`, and add a one-line result pointer beside that task in the client card's action register.
+- **Auto-run, research run:** the compact brief is already the task's first discussion, so post the agent's actual output as the next discussion message. If the agent failed instead of completing, put what was attempted and what broke into the result message. Attach any generated files (keyword CSVs, ad copy CSVs, content drafts) via `add_file_to_task`, save a copy to `[client-folder]/project-management/meetings/YYYY-MM-DD/`, and add a one-line result pointer beside that task in the client card's action register.
 
   Also judge whether the completed output implies a concrete, specific next live-system step: keyword research and ad copy drafting naturally continues into "push these live"; a pure research or competitive-analysis task usually doesn't have one. If it does, post one more discussion message with a Resume prompt in the same coaching-framed shape 5e uses for Handoff-prompt tasks, referencing the actual deliverable that just landed:
 

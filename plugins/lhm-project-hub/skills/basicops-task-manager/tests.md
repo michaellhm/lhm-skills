@@ -42,3 +42,9 @@ Expected: inspect canonical client context or existing BasicOps tasks; never inv
 Prompt includes a Fathom or staging URL.
 
 Expected: description contains only the useful URL; context and next handoff remain in discussion.
+
+## Universal discussion invariant
+
+Calling workflow supplies a detailed brief, dependencies, completion test and mother-task relationship inside the proposed Description.
+
+Expected: reject that field placement; keep Description blank except for approved working URLs and move every human explanation, relationship, dependency, completion test and handoff into Discussions before writing.
