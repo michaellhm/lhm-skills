@@ -39,6 +39,10 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
    - active projects where they are the named owner or next handoff;
    - relevant meetings or dependencies for the week;
    - explicit blockers and overdue tasks.
+   - for Michael, Jaimee or Kristalyn, the canonical
+     `60 Knowledge/Client Monthly Delivery Rhythm.md`; then read
+     [client-monthly-delivery-rhythm.md](references/client-monthly-delivery-rhythm.md) and select
+     only the active role stage, meeting follow-ups and missing evidence.
 4. Treat BasicOps as live task state and Obsidian as canonical project context. Do not copy the full board into the weekly file.
    Read a valid `LHM metadata` description line when present, including source and handoff fields.
    Treat `urgent=true` as a prompt for an
@@ -133,6 +137,12 @@ Assemble candidates from four work streams before proposing priorities:
 4. **Individual/reactive work** — open work from the person's verified personal BasicOps project,
    including client-email requests, standalone actions, internal work and website fixes requested
    by another team member.
+
+For Michael, Jaimee and Kristalyn, assemble the recurring role-delivery candidates from
+`60 Knowledge/Client Monthly Delivery Rhythm.md`. The matrix replaces generic Week 1–4 reminder
+cards as the recurring calendar. Actual saved meetings independently trigger a seven-day Michael
+follow-up review. Require dated completion evidence and surface missed monthly passes using
+[client-monthly-delivery-rhythm.md](references/client-monthly-delivery-rhythm.md).
 
 Rank the combined candidates in this order:
 
@@ -337,6 +347,7 @@ updated: YYYY-MM-DD
 ## Build and grow LHM
 ## Client delivery
 ## Priority outcomes
+## Monthly client-delivery passes
 ## Today starts with
 ## Dependencies, approvals and blockers
 ## Work to defer, delegate or communicate
