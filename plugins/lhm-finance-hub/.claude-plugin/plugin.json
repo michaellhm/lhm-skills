@@ -1,7 +1,7 @@
 {
   "name": "lhm-finance-hub",
   "description": "Weekly financial management hub combining Gavin Smith's CFO System (cash flow forecasting, profit formula, 5-year planning) with Profit First allocations. Runs a Monday rhythm for cash flow updates, profit analysis, and strategic reviews.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": {
     "name": "LHM Digital"
   },

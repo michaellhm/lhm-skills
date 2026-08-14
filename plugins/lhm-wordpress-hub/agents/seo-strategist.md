@@ -39,9 +39,9 @@ Offer the marketing hub's research skills for deeper analysis:
 > "I can use the marketing hub's research tools for deeper keyword and competitive analysis. Want me to run those?"
 
 If yes, load in order:
-1. `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/keyword-research/SKILL.md`
-2. `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/competitive-analysis/SKILL.md`
-3. `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/content-strategy/SKILL.md`
+1. `lhm-marketing-hub:keyword-research`
+2. `lhm-marketing-hub:competitive-analysis`
+3. `lhm-marketing-hub:content-strategy`
 
 ### Step 3: Approval Gate — Sitemap
 

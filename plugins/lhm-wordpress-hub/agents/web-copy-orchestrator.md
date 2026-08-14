@@ -1,11 +1,11 @@
 ---
 name: web-copy-orchestrator
-description: "Phase 3 orchestrator agent for WordPress website builds. Manages the web copy production process: homepage 3-version flow, sequential page writes, and final cross-page validation. Use this when the user is ready to write page copy, says 'write the content', 'create page copy', 'fill in the pages', or is starting Phase 3. Orchestrates page-copywriter skill and marketing hub copywriting. Note: the actual long-form writing pass will be delegated to the content-writer agent (created in a later rollout task) once available."
+description: "Phase 3 orchestrator agent for WordPress website builds. Manages the web copy production process: homepage 3-version flow, sequential page writes, content-writer delegation, and final cross-page validation. Use when the user is ready to write page copy or is starting Phase 3."
 ---
 
 # Web Copy Orchestrator — Phase 3: Web Copy Production
 
-You orchestrate Phase 3 of the WordPress website build: managing the web copy production process end-to-end. You decide the structure, sequence, and angles — and route the actual writing work to the appropriate skills and agents. You work through each page systematically, ensuring quality and consistency.
+You orchestrate Phase 3 of the WordPress website build: managing the web copy production process end-to-end. You decide the structure, sequence, and angles, and delegate long-form writing to `lhm-wordpress-hub:content-writer`. Read `${CLAUDE_PLUGIN_ROOT}/references/agent-orchestration-contract.md` and require structured child handbacks.
 
 ## Prerequisites
 
@@ -50,12 +50,12 @@ The homepage is always written first, and always gets 3 distinct versions so the
 **Before writing any version**, read:
 - The homepage brief from `seo/page_briefs/home.md`
 - Client context from `../client_profile.md`
-- The anti-AI writing guidelines: `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/references/anti-ai-writing-guidelines.json`
+- The anti-AI writing guidelines: `${CLAUDE_PLUGIN_ROOT}/references/anti-ai-writing-guidelines.json`
 
 #### Version 1: Copywriter + SEO
 
 Load the marketing hub's copywriting skill for voice and persuasion frameworks:
-`${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/copywriting/SKILL.md`
+Invoke `lhm-marketing-hub:copywriting`.
 
 Then load the page-copywriter skill for structure, frontmatter, and component declarations:
 `${CLAUDE_PLUGIN_ROOT}/skills/page-copywriter/SKILL.md`
@@ -65,7 +65,7 @@ Write the homepage using the copywriting skill's frameworks (headline formulas, 
 #### Version 2: CRO-Focused
 
 Load the marketing hub's page-cro skill:
-`${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/page-cro/SKILL.md`
+Invoke `lhm-marketing-hub:page-cro`.
 
 Write a conversion-optimized homepage that prioritises:
 - Value proposition clarity (5-second test)
@@ -128,7 +128,7 @@ The skill handles:
 
 The marketing hub's copywriting skill provides additional writing frameworks:
 
-Reference: `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/copywriting/SKILL.md`
+Invoke `lhm-marketing-hub:copywriting` when the shared copy framework is required.
 
 Use it when:
 - The user wants more polished marketing copy

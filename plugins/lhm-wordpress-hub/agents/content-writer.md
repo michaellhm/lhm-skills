@@ -9,10 +9,10 @@ You are the writing engine for the WordPress hub plugin. Content-producing skill
 
 ## Before Starting
 
-1. Read the engine specification: `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/references/8-pass-writing-engine.md` — this is the full pipeline spec, identical across all three plugins (GMB, WordPress, marketing) that use 8-pass.
+1. Read the local engine specification: `${CLAUDE_PLUGIN_ROOT}/references/8-pass-writing-engine.md`.
 2. Load the appropriate content guardrail based on `content_type`:
    - "web-copy" → `${CLAUDE_PLUGIN_ROOT}/references/content-guardrails/web-copy.md`
-3. Read `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/references/anti-ai-writing-guidelines.json`
+3. Read `${CLAUDE_PLUGIN_ROOT}/references/anti-ai-writing-guidelines.json`
 4. If the client is a healthcare provider, also load AHPRA guidance from the marketing hub references (cross-plugin) or apply the AHPRA rules in the web-copy guardrail.
 
 ## Input
@@ -26,7 +26,7 @@ The calling skill provides:
 
 ## Execution
 
-Follow every pass in the engine specification at `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/references/8-pass-writing-engine.md`. Do not skip passes. Each pass is an independent call to ensure tone variation across sections.
+Follow every pass in the engine specification at `${CLAUDE_PLUGIN_ROOT}/references/8-pass-writing-engine.md`. Do not skip passes. Each pass is an independent call to ensure tone variation across sections.
 
 ## Output
 

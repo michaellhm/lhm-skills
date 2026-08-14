@@ -22,11 +22,11 @@ Use `/start` to begin a session, or just describe what you need.
 .claude-plugin/marketplace.json         # Marketplace manifest
 plugins/lhm-marketing-hub/             # The plugin
   .claude-plugin/plugin.json            # Plugin manifest
-  agents/start.md                       # Main entry point — client context, routing, session management
-  agents/google-ads.md                  # Self-sufficient Google Ads specialist
-  agents/seo.md                         # Self-sufficient SEO specialist
-  agents/content.md                     # Self-sufficient content specialist
-  agents/wordpress.md                   # Self-sufficient WordPress specialist
+  agents/start.md                       # General/cross-domain marketing orchestrator
+  agents/google-ads.md                  # Direct Google Ads specialist entry
+  agents/seo.md                         # Direct SEO specialist entry
+  agents/content.md                     # Direct content specialist entry
+  agents/wordpress.md                   # Direct WordPress content specialist entry
   agents/marketing-assistant.md         # (legacy alias) — routes to start agent
   skills/                              # All 52 skills
     client-onboarding/                 # Client profile setup
@@ -61,14 +61,17 @@ plugins/lhm-marketing-hub/             # The plugin
     ... and 20 more
 plugins/lhm-wordpress-hub/             # WordPress build plugin
   .claude-plugin/plugin.json            # Plugin manifest
-  agents/                               # 8 phase agents
-    wordpress-orchestrator.md           # Main entry point and phase router
+  agents/                               # 11 orchestrator and phase agents
+    website-orchestrator.md             # Front door — classifies full build, LP, post-launch, or content-only work
+    website-build-orchestrator.md       # Full WordPress/Astro build phase router
+    landing-page-orchestrator.md        # PPC landing-page lifecycle router
     client-intake.md                    # Phase A — client context extraction
     seo-strategist.md                   # Phase B — sitemap and briefs
     content-writer.md                   # Phase C — page copywriting
+    web-copy-orchestrator.md            # Phase C copy-production coordinator
     design-system.md                    # Phase D — brand, design, prototype
     wordpress-builder.md                # Phase E — theme scaffold and page build
-    site-ops.md                         # Phase F — performance and security
+    qa-and-launch.md                    # Phase F — QA, performance, security and launch
     site-extension.md                   # Post-launch page management
   skills/                               # All 36 skills
     wp-start/                           # Entry point — /wp-start command
@@ -154,6 +157,14 @@ plugins/lhm-content-engine/            # Content pipeline plugin
     publish-google-doc/                 # Create formatted Google Doc for review
     update-csv/                         # Update tracking CSV with results
     run-batch/                          # Orchestrate full pipeline for all rows
+plugins/lhm-finance-hub/               # Financial operating rhythm
+  .claude-plugin/plugin.json            # Plugin manifest
+  agents/finance-orchestrator.md        # Weekly/monthly/quarterly finance entry point
+  skills/                               # Cashflow, profit, allocation, overhead and planning workflows
+plugins/lhm-knowledge-hub/             # Knowledge and operating-rhythm hub
+  .claude-plugin/plugin.json            # Plugin manifest
+  agents/knowledge-orchestrator.md      # Weekly Flow, vault thinking, capture and review entry point
+  skills/                               # Knowledge-system workflows
 plugins/lhm-learn/                    # Session learning capture plugin
   .claude-plugin/plugin.json            # Plugin manifest
   skills/                               # All 1 skill
@@ -166,7 +177,7 @@ plugins/lhm-client-updates-hub/       # (deprecated — skills migrated to lhm-p
     client-update-email/                # Plain-language client-facing update emails
 plugins/lhm-project-hub/              # Agency process hub — sales handover through monthly/quarterly reviews
   .claude-plugin/plugin.json            # Plugin manifest
-  agents/pm-orchestrator.md             # Main entry point — reads client state, flags cadence breaches, routes to the right skill
+  agents/pm-orchestrator.md             # Main entry point — status, cadence checks and governed multi-skill coordination
   skills/                               # All 22 skills
     basicops-task-manager/              # Shared BasicOps boundary — discussion-first briefs, routing, linked subtasks, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback

@@ -53,7 +53,7 @@ After the basic intake, offer the Campaign Playbook Generator for deeper brand e
 
 > "The basic client intake is done. The marketing hub has a Campaign Playbook Generator that can extract deeper brand messaging, positioning, and tone-of-voice from these same transcripts. Want me to run that too?"
 
-If yes: `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/campaign-playbook-generator/SKILL.md`
+If yes: invoke `lhm-marketing-hub:campaign-playbook-generator`.
 
 ### Step 5: Phase Completion
 

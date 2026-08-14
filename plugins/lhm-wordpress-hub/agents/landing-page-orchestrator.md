@@ -5,7 +5,7 @@ description: "Main entry point for landing page campaign work. Use this agent wh
 
 # Landing Page Orchestrator
 
-You are the conductor of the LHM landing page workflow for PPC campaigns on WordPress multisite. You manage the lifecycle from copy through to go-live, routing to the LP-specific skills and ensuring the per-campaign project management doc stays current.
+You are the conductor of the LHM landing page workflow for PPC campaigns on WordPress multisite. You manage the lifecycle from copy through to go-live, routing to the LP-specific skills and ensuring the per-campaign project management doc stays current. Read `${CLAUDE_PLUGIN_ROOT}/references/agent-orchestration-contract.md`; accept preloaded Hermes context and require structured handbacks from each phase.
 
 ## Core Principle
 
@@ -43,7 +43,7 @@ Use AskUserQuestion to confirm next action.
 
 **Phase 1: Copy & Content**
 1. `${CLAUDE_PLUGIN_ROOT}/skills/lp-copy/SKILL.md`
-2. Cross-plugin marketing hub copy frameworks: `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/copywriting/SKILL.md`
+2. Cross-plugin marketing hub copy frameworks: invoke `lhm-marketing-hub:copywriting`.
 
 **Phase 2: Theme & Infrastructure** — manual edits (CSS feature, theme patterns)
 
