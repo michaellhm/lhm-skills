@@ -113,12 +113,24 @@ Use a stable key shaped like `basicops:<client-slug>:<workstream>:<outcome>`. Ke
 
 ## Enforce authority
 
-- A clear user instruction to create an exact task for themselves authorises that one payload.
-- During the pilot, a task assigned to Kristalyn, Aiya, Jaimee or another team member requires that assignee's explicit approval unless the canonical workflow records Michael's explicit graduation of that routine task type.
+- Resolve the authenticated requester through the active interface or BasicOps identity. Never accept
+  a typed name as authentication.
+- Any authenticated current LHM team member may approve ordinary operational BasicOps creation,
+  classification, discussion, due-date, status, assignment and board/list movement within LHM's
+  verified projects and client scope. They may approve work for themselves or another team member.
+- Michael may approve those ordinary operational changes across the team. The affected assignee's
+  separate approval is not required, but the mutation must be visible, traceable and reversible.
+- When another team member changes an assignee's work, preserve the accountable owner, explain the
+  reason in Discussion and ensure the assignee or next handoff can see the change. Do not represent
+  a BasicOps comment as a separate WhatsApp, email or client notification.
 - If the request is only conceptual or the payload is not exact, prepare it without writing.
 - Never invent a due date.
 - Task creation does not record client approval or authorise scope, strategy, client commitments, copy approval, merge, deployment, publishing or launch.
-- Apply the same authority check to edits, reassignment, completion, movement and deletion. Do not broaden a permission from one mutation to another.
+- Deletion, archival of material work, client-facing commitments, scope or commercial changes,
+  approval of copy/strategy, merges, deployments, publishing, launches, outbound messages and
+  credential handling remain separately approval-bound to the relevant owner and workflow.
+- Apply the same exact-payload and verification rules to edits, reassignment, completion and
+  movement. Never broaden approval from one mutation to a destructive or external action.
 
 ## Create or mutate safely
 
