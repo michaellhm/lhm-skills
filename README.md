@@ -170,7 +170,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
   skills/                               # All 22 skills
     basicops-task-manager/              # Shared BasicOps boundary — discussion-first briefs, routing, linked subtasks, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
-    staff-weekly-flow/                  # Personal weekly plan, daily focus and configurable reminder preferences
+    staff-weekly-flow/                  # Personal weekly/daily focus, full BasicOps inbox triage/write-back and reminder preferences
     sales-handover/                     # Hand a newly-closed client from sales to delivery
     client-onboarding/                  # Scope-aware Obsidian-first onboarding — 5 top-level BasicOps gates
     website-kickoff/                    # New website build kickoff (WordPress or Astro) → handoff to WordPress hub
@@ -258,6 +258,8 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 **Client Communication** (3 skills, shims only): All three skills now live in `lhm-project-hub`; the entries here route straight there. See the Project Hub catalog below for current descriptions. Kept in place so existing muscle memory and any external references to `lhm-client-updates-hub:*` keep working.
 
 ### Project Hub
+
+**Personal Work Flow** (1 skill): Personal weekly planning and daily selection for Michael and the team, with overwhelmed mode, project/client priority ranking, optional mini stand-ups and a full BasicOps inbox review. The inbox flow presents client-risk rescue, stale/likely closure, delegate, keep and needs-decision groups, then applies only confirmed mutations through the shared BasicOps task manager with read-back verification.
 
 **Team Handoffs** (2 skills): A universal team-work briefing flow reads requester, client, assignee and project context; checks access, dependencies, authority, completion and review; asks one material question at a time; and learns carefully from assignee feedback. The shared BasicOps task manager then applies LHM naming, discussion-first actionable next steps, existing-client website routing, parent-discussion subtask links, personal-board confirmation, approval, deduplication and read-back verification to every task mutation.
 

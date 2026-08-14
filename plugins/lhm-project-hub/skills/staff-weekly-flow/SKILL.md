@@ -1,6 +1,6 @@
 ---
 name: staff-weekly-flow
-description: Plan and run a personalised LHM weekly-to-daily work flow for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use when an authorised person asks “what should I focus on this week?”, “what should I work on today?”, asks for a mini stand-up or WhatsApp-ready team update, asks specifically for business-growth or client-work priorities, wants to review or save their weekly priorities, or wants to configure their weekly/daily reminder time, timezone, channel, delivery mode, focus mode or priority limit. Read the person’s canonical Obsidian profile, verified BasicOps personal-board mapping, authorised project context and current weekly file; prepare a small realistic plan; save only after confirmation; and keep BasicOps mutations and outbound messages behind their approval boundaries.
+description: Plan and run a personalised LHM weekly-to-daily work flow for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use when an authorised person asks “what should I focus on this week?”, “what should I work on today?”, asks to review, clean up or triage all their BasicOps tasks or inbox, asks for a mini stand-up or WhatsApp-ready team update, asks specifically for business-growth or client-work priorities, wants to review or save their weekly priorities, or wants to configure their weekly/daily reminder time, timezone, channel, delivery mode, focus mode or priority limit. Read the person’s canonical Obsidian profile, verified BasicOps personal-board mapping, authorised project context and current weekly file; prepare a small realistic plan; save only after confirmation; and apply approved BasicOps mutations through basicops-task-manager with read-back verification.
 ---
 
 # Staff Weekly Flow
@@ -224,6 +224,62 @@ Trigger on “What should I work on today?” or equivalent requests.
 8. After presenting the daily plan, offer the optional mini stand-up. Do not require it to receive a
    daily answer and do not repeat the offer after the person declines in the same interaction.
 
+### Full BasicOps inbox review
+
+Trigger when the authenticated person asks to review, clean up, prioritise or work through all
+tasks in their BasicOps inbox or personal board. Also offer this flow when daily planning reveals a
+large mixed backlog that is itself causing overwhelm. Do not run it merely because one overdue task
+exists.
+
+1. Resolve the person's verified project, assignee and semantic section IDs from their profile.
+   Read every open task in the requested inbox or board, following pagination until complete. Exclude
+   completed, cancelled and declined tasks from the active count, but retain enough evidence to spot
+   duplicates or already-resolved work.
+2. Read the valid `LHM metadata` line, task discussion, useful URLs, status, due date, section and
+   recent activity. Cross-check canonical client/project context only where needed to judge a live
+   risk, dependency, apparent completion, duplication or safe routing. Do not infer urgency from an
+   old due date alone.
+3. Lead with a compact overview and use these evidence-labelled groups:
+   - **Client-risk rescue** — broken live journeys, payment/access failures, live ad or tracking
+     risk, explicit client promises, or work blocking another person/project stage;
+   - **Stale / likely closure candidates** — old, silent, superseded, duplicated or apparently
+     completed work that needs confirmation before closure;
+   - **Suggested delegate** — bounded work that fits another confirmed role, with assignee approval
+     or a graduated route still required;
+   - **Suggested keep** — valid strategic, current or personally owned work that should remain;
+   - **Needs a decision** — insufficient or contradictory evidence.
+4. For every recommendation include the task link, why it is in that group and a proposed
+   disposition: `do`, `close`, `delegate`, `reschedule`, `waiting`, `blocked`, `communicate`,
+   `redesign` or `drop`. Say `likely` or `confirm first` when the evidence is not decisive.
+5. Work through one group at a time. Prefer this sequence unless the person chooses another:
+   client-risk rescue → stale/closure → delegate → keep/reschedule → needs decision. Accept natural
+   language or voice feedback and reflect it back as an exact decision register before writing.
+6. Translate each confirmed decision into an exact mutation preview containing task, current state,
+   proposed status/section/assignee/due date, required discussion message, downstream handoff and
+   any separate communication draft. Never invent a date, owner, completion claim or client
+   communication. A direction such as “next week” is not an exact due date; ask one concise question.
+7. A clear authenticated instruction about the person's own tasks authorises only the exact stated
+   mutations. Reassignment to another team member still requires that assignee's approval unless a
+   canonical graduated route applies. Closing a task requires the person to confirm it is completed,
+   deliberately abandoned, duplicated or superseded; silence and age are not completion evidence.
+8. Route every approved task mutation through `basicops-task-manager`. Apply changes in small,
+   recoverable batches. Add the approved discussion message when the decision or handoff would
+   otherwise be unclear. Read each task back and verify project, section, assignee, due date, status,
+   metadata and discussion. Return the BasicOps link and report any mismatch without claiming
+   success.
+9. After each batch, show `applied`, `unchanged`, `needs approval` and `failed/mismatch`. Continue to
+   the next group unless a failed write makes further mutations unsafe. If write tools are
+   unavailable, preserve an exact pending mutation register and say plainly that BasicOps remains
+   unchanged; do not treat a vault note as completion.
+10. Finish with a reduced active count, today's rescue list, deliberately retained backlog,
+    delegated/approval-pending work and the next review date if the person supplied one. Update the
+    weekly file only when the triage materially changes the confirmed plan; keep detailed task state
+    in BasicOps.
+
+Use the presentation pattern `client-risk rescue`, `stale / likely closure`, `suggested delegate`,
+`suggested keep` and `needs a decision` consistently, but omit empty groups and keep the first view
+scannable. Never dump the full raw task payload into chat.
+
 ### Mini Hermes stand-up and WhatsApp draft
 
 Trigger after daily selection or when the person asks for a stand-up, check-in or team update. Keep
@@ -298,7 +354,7 @@ Hermes is the conversational manager. It must not imitate the worker by performi
 Accept a bounded request containing:
 
 - `run_id`;
-- `intent`: `weekly_plan`, `daily_select`, `standup_draft` or `preference_change`;
+- `intent`: `weekly_plan`, `daily_select`, `basicops_inbox_review`, `standup_draft` or `preference_change`;
 - verified requester/person identity;
 - authorised vault root and person folder;
 - BasicOps project and assignee IDs;

@@ -53,6 +53,7 @@ All Project Hub skills, and when to route to each:
 | Skill | Route here when |
 |---|---|
 | `lhm-project-hub:basicops-task-manager` | Any workflow or user asks to create, edit, assign, discuss, move, complete or otherwise mutate a BasicOps task. This is the mandatory final write path even when another skill prepared the task context. |
+| `lhm-project-hub:staff-weekly-flow` | Michael or a team member asks what to focus on this week/today, feels overloaded, wants a mini stand-up, or wants to review and clean up their full personal BasicOps inbox. The skill prepares priorities and routes confirmed inbox mutations through `basicops-task-manager`. |
 | `lhm-project-hub:team-work-brief` | Any team member needs to turn a rough request, client email or idea into a context-checked brief; or an assignee gives feedback about what a future brief should include. It resolves requester, client, assignee, access, dependencies, completion and next handoff before routing the approved task to BasicOps. |
 | `lhm-project-hub:sales-handover` | A deal just closed and needs handing from sales to delivery — new client, or an existing client buying a new package. |
 | `lhm-project-hub:client-onboarding` | A new-client onboarding pipeline (Payment & Billing → Client Contact & Strategy → Access, Assets & Config → Service Kickoff → Onboarding Complete) is live or needs a status check. |
