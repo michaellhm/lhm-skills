@@ -5,7 +5,7 @@ description: "Main entry point for full WordPress and Astro website builds. Use 
 
 # Website Build Orchestrator
 
-You are the conductor of the LHM full-website workflow for WordPress and Astro. You manage the project from kickoff through launch, routing to platform-appropriate skills and enforcing dependencies, approval gates and schedule movement.
+You are the conductor of the LHM full-website workflow for WordPress and Astro. You manage the project from kickoff through launch, routing to platform-appropriate skills and enforcing dependencies, approval gates and schedule movement. Read `${CLAUDE_PLUGIN_ROOT}/references/agent-orchestration-contract.md`; accept preloaded Hermes context and require structured handbacks from phase agents.
 
 ## Core Principle
 
@@ -80,20 +80,20 @@ Do not use WordPress-only Phase 5 skills for Astro.
 
 **Phase 1: Client Onboarding & Strategy**
 1. Load `${CLAUDE_PLUGIN_ROOT}/skills/client-context-intake/SKILL.md` for Steps 1.1–1.4
-2. For Step 1.5 (Superpowers): load `${CLAUDE_PLUGIN_ROOT}/../superpowers/skills/brainstorming/SKILL.md` then `superpowers:writing-plans`
+2. For Step 1.5 (Superpowers): invoke `superpowers:brainstorming`, then `superpowers:writing-plans`.
 3. After Step 1.5, invoke `lhm-project-hub:wp-project-manager` Mode 1 (Create) to generate the PM doc
 
-Cross-plugin: `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/campaign-playbook-generator/SKILL.md` for the Step 1.3 Campaign Playbook.
+Cross-plugin: invoke `lhm-marketing-hub:campaign-playbook-generator` for the Step 1.3 Campaign Playbook.
 
 **Phase 2: SEO Architecture & Content Planning**
 1. Load `${CLAUDE_PLUGIN_ROOT}/skills/sitemap-architect/SKILL.md`
 2. Then `${CLAUDE_PLUGIN_ROOT}/skills/page-brief-generator/SKILL.md`
 
 Cross-plugin SEO depth:
-- `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/seo-audit/SKILL.md`
-- `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/competitive-analysis/SKILL.md`
-- `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/keyword-research/SKILL.md`
-- `${CLAUDE_PLUGIN_ROOT}/../lhm-marketing-hub/skills/taya-question-discovery/SKILL.md`
+- `lhm-marketing-hub:seo-audit`
+- `lhm-marketing-hub:competitive-analysis`
+- `lhm-marketing-hub:keyword-research`
+- `lhm-marketing-hub:taya-question-discovery`
 
 **Phase 3: Web Copy Production**
 Route through the web-copy-orchestrator agent (`agents/web-copy-orchestrator.md`) which manages the homepage 3-version flow and sequential page writes. The orchestrator routes long-form writing through the content-writer agent (8-pass).

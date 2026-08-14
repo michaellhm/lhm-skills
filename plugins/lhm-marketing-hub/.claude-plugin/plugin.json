@@ -1,7 +1,7 @@
 {
   "name": "lhm-marketing-hub",
-  "description": "LHM Marketing Hub - five self-sufficient specialist agents (Google Ads, SEO, Content, WordPress, Start) with shared client context, LHM philosophy, multi-model writing pipeline, and agency-level learning.",
-  "version": "2.0.6",
+  "description": "LHM Marketing Hub - a general marketing orchestrator plus direct Google Ads, SEO, Content, and WordPress specialists with governed delegation, shared client context, LHM philosophy, and agency-level learning.",
+  "version": "2.0.7",
   "author": {
     "name": "LHM Digital"
   },
