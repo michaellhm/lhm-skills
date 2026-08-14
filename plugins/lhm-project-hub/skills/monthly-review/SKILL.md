@@ -146,8 +146,10 @@ Every metric line gets a plain-English one-liner — write it the way `client-up
 ### 4a. Hermes-prepared overnight handoff
 
 When internal mode is run by Hermes as an overnight or on-demand marketing review, prepare one
-BasicOps review parent through `lhm-project-hub:basicops-task-manager` after the report artefact has
-been saved and its URL verified.
+review-delivery handoff after the report content is complete. Hermes sends it to the configured
+ChatGPT/Codex delivery worker, which saves and verifies the Drive artefact and invokes
+`lhm-project-hub:basicops-task-manager` for the BasicOps parent. Hermes does not need either
+connector directly.
 
 - Reuse the client's existing monthly-review parent for the same service and month when one exists;
   dedupe key: `basicops:<client-slug>:<service>:monthly-review:<yyyy-mm>`.
@@ -167,8 +169,9 @@ been saved and its URL verified.
   creates approved subtasks and governs one-at-a-time specialist dispatch, evidence updates and
   final verification.
 
-If BasicOps is unavailable, return the exact prepared payload and mark the handoff pending; never
-claim the overnight review is queued for Michael.
+If dispatch, Drive or BasicOps is unavailable, preserve the exact payload and delivery run ID,
+return `analysis complete; delivery incomplete`, and mark the handoff pending. Never ask Michael to
+paste the payload and never claim the review is queued for him without both verified URLs.
 
 ## Step 5: Pre-meeting mode
 

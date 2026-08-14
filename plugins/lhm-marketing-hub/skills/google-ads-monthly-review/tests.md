@@ -24,6 +24,10 @@ Saving Drive and creating BasicOps must not approve Ads mutations. Proposed acti
 
 Given Michael approves GA-02 and GA-04 later, Hermes must preserve those IDs, dispatch only one action, record its evidence in Obsidian and BasicOps, then dispatch the other. Rejected/deferred actions remain explicit.
 
+## Delivery bridge acceptance
+
+Given Hermes has neither a Drive nor BasicOps connector, a completed review must automatically dispatch the configured ChatGPT/Codex delivery worker. It must not ask Michael whether to save the report or offer a pasteable BasicOps payload. `waiting_michael_hermes` and “review complete” are invalid until the worker returns verified Drive and BasicOps URLs. A pending or failed worker returns `analysis complete; delivery incomplete` plus its resumable run ID.
+
 ## 7. Specialist approval gate
 
 If an approved analysis action discovers a consequential live change, the worker must return `waiting_approval`; Hermes must update BasicOps and stop rather than infer permission.

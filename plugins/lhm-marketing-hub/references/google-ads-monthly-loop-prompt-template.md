@@ -46,7 +46,7 @@ Never make changes in Google Ads directly. Finish with:
 
 1. **Save and verify the report before any notification or decision handoff.** The Google Ads worker owns this artefact. Read the exact Google Drive destination from the client's canonical service file, save the one-pager to `google_ads/YYYY-MM/monthly-review-YYYY-MM.md`, and include the matched zone's checklist with items marked off based on what this cycle covered. Read the file or metadata back and return the observed Drive URL. Do not use an inferred local path or claim completion without readback. If Drive saving or verification fails, return the report content with `needs review` and the exact blocker; do not silently save elsewhere.
 
-2. **BasicOps review task** (BasicOps MCP — if not authorized, say so in the completion summary):
+2. **BasicOps review task** — route this mutation through the configured ChatGPT/Codex delivery worker and `lhm-project-hub:basicops-task-manager`; Hermes does not require a direct BasicOps connector:
    - Project id `{{BASICOPS_PROJECT_ID}}`, section id `{{BASICOPS_SECTION_ID}}`
    - Task title: "{{CLIENT_NAME}} - Month Flow"
    - Task **description**: use the exact semicolon-delimited `LHM metadata:` line required by `lhm-project-hub:basicops-task-manager`. For this handoff set `handoff_trigger=waiting; next_handoff=Michael via Hermes; handoff_channel=basicops; orchestration_owner=hermes; workflow_state=waiting-on-michael-via-hermes; approval_status=pending-michael`, then add only useful report/workflow URLs. Do not create a second metadata format.
@@ -55,7 +55,7 @@ Never make changes in Google Ads directly. Finish with:
 
 3. **Optional email** — only when this loop was explicitly configured to send one. Keep it to the performance zone, measurement confidence, key findings, and links. Say that proposals await Michael's direction through Hermes; do not claim a decision has been made.
 
-4. **Hermes record and handoff** — after the worker returns the verified Drive URL, Hermes records the structured handback in the canonical Obsidian service file, sets `waiting_michael_hermes`, links the BasicOps task, presents the decision brief and stops. When Michael later approves actions through Hermes, dispatch exactly one approved specialist action at a time. After each handback, update Obsidian and BasicOps before starting another.
+4. **Hermes record and handoff** — after the delivery worker returns verified Drive and BasicOps URLs, Hermes records the structured handback in the canonical Obsidian service file, sets `waiting_michael_hermes`, presents the decision brief and stops. If either URL is missing, say `analysis complete; delivery incomplete` and preserve the delivery run ID for resumption. When Michael later approves actions through Hermes, dispatch exactly one approved specialist action at a time. After each handback, update Obsidian and BasicOps before starting another.
 
 ## Constraints
 - Data-driven, profitability-first — not activity for its own sake.

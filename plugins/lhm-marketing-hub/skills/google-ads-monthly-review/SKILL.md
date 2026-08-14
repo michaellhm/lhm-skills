@@ -91,26 +91,26 @@ Based on the evidence, provide no more than five prioritised action items. Each 
 - Owning specialist skill
 - Whether it is read-only or requires approval for a live mutation
 
-### Step 6: Save and verify the report
+### Step 6: Dispatch, save and verify delivery
 
-Saving the read-only monthly report is part of completing the analysis, not a consequential Google Ads action. Do this **before** asking for approval.
+Saving the read-only monthly report and creating its review record are part of delivery, not consequential Google Ads actions. Do this **before** asking for approval.
 
 1. Read the client's canonical service file and use its exact Google Drive destination for Google Ads deliverables. Do not infer a folder from the client name when a destination is recorded.
-2. Save the one-page report as `google_ads/YYYY-MM/monthly-review-YYYY-MM.md` in that client Drive destination. Create the `YYYY-MM` folder when it does not exist and the worker has permission.
-3. Use the configured Google Drive write route. Do not treat an unverified local path, synced-folder assumption or chat output as a saved Drive artefact.
-4. Read the saved file or its metadata back. Capture the observed Drive file ID/URL and confirm the filename and parent folder.
-5. Return the verified Drive URL to the calling agent or Hermes so it can link the artefact from the canonical service file and run history.
+2. Return the completed one-page report to Hermes. Hermes submits one bounded monthly-review delivery job to the configured ChatGPT/Codex bridge; it must not require a direct Drive or BasicOps connector in the Hermes session.
+3. The delivery worker saves `google_ads/YYYY-MM/monthly-review-YYYY-MM.md`, reads it back, and captures the observed Drive file ID/URL and parent folder.
+4. In the same job, the worker invokes `lhm-project-hub:basicops-task-manager`, deduplicates and creates or updates the review parent, writes the discussion and reads it back.
+5. Hermes polls the recorded delivery run ID and resumes it rather than submitting duplicates. It may proceed to the approval gate only after receiving verified Drive and BasicOps URLs.
 
-If the destination is missing, Drive write access is unavailable, or readback fails:
+If the destination is missing, dispatch is unavailable, either connector is unavailable, or either readback fails:
 
 - preserve the completed report content in the worker result;
 - set the business work state to `needs review` (or `failed` when no report was produced);
 - state the exact missing destination, permission or verification problem;
-- do not claim the monthly review is complete and do not silently save somewhere else.
+- say `analysis complete; delivery incomplete`, preserve the delivery run ID and do not silently save somewhere else.
 
 ### Step 7: Hermes overview, BasicOps record and approval gate
 
-Return the compact overview and structured handback defined in the operating model. Create or update one BasicOps parent review task when the connector is available. Put the report URL, overview, top five and approval question in the discussion; do not create execution subtasks yet. Set BasicOps `workflow_state=waiting-on-michael-via-hermes` and `approval_status=pending-michael`; use internal handback `status=waiting_michael_hermes` only in the YAML state block.
+Return the compact overview and structured handback defined in the operating model after the delivery worker returns both verified links. Put the report URL, overview, top five and approval question in the BasicOps discussion; do not create execution subtasks yet. Set BasicOps `workflow_state=waiting-on-michael-via-hermes` and `approval_status=pending-michael`; use internal handback `status=waiting_michael_hermes` only after both readbacks succeed.
 
 **APPROVAL REQUIRED** — Hermes presents recommendations and waits for Michael. Ask:
 - Which actions would you like to tackle?
