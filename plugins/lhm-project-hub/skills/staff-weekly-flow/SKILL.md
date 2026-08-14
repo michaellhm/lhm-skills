@@ -44,7 +44,8 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
      [client-monthly-delivery-rhythm.md](references/client-monthly-delivery-rhythm.md) and select
      only the active role stage, meeting follow-ups and missing evidence.
 4. Treat BasicOps as live task state and Obsidian as canonical project context. Do not copy the full board into the weekly file.
-   Read a valid `LHM metadata` description line when present, including source and handoff fields.
+   Read a valid `LHM metadata` description line when present, including source, handoff and client
+   touchpoint fields. Treat older lines without touchpoint fields as valid legacy metadata.
    Treat `urgent=true` as a prompt for an
    explicit urgency and displacement review, not automatic priority one; verify the deadline or
    consequence from discussion or canonical context. Keep unclassified tasks in consideration.
@@ -183,6 +184,30 @@ and identify who must be told.
   owns project-management touchback; Michael's meeting follow-up may supersede a generic summary.
 - Record `satisfied`, `due`, `waiting for evidence` or `needs owner`. Never infer that silence means
   a touchpoint occurred.
+- For each active client-contact task, read `last_touchpoint`, `touchpoint_cadence` and
+  `next_touchpoint` when present. A touchpoint is due when its explicit next date falls within the
+  planning week or is overdue; cadence alone never proves the next date.
+- Require sent-email, completed-meeting or canonical contact evidence before marking a touchpoint
+  satisfied or advancing `last_touchpoint`. A draft or BasicOps planning comment is insufficient.
+- Flag missing or conflicting cadence data as `waiting for evidence` or `needs owner`; never invent
+  a rhythm or silently resolve a conflict with the task due date.
+
+#### Kristalyn client-follow-up batch
+
+For Kristalyn, group due client-contact actions into one scannable **Client follow-ups** work block
+without hiding their source tasks.
+
+1. Select tasks whose exact `next_touchpoint` falls in the week or is overdue, plus confirmed
+   one-off client chases due this week. Keep unclassified but clearly due contact work visible.
+2. Combine multiple asks to the same client into one proposed email where that is operationally
+   sensible. List each client, exact ask, source task, channel and downstream work released.
+3. Present the batch as one weekly execution block while retaining every underlying BasicOps link.
+   It may contain many quick emails without consuming one priority slot per email.
+4. Draft or prepare the emails only when requested. Never claim they were sent without a separate
+   authorised sending route and approval.
+5. After verified sending, propose through `basicops-task-manager`: update `last_touchpoint`, compute
+   and store the exact `next_touchpoint` from the confirmed cadence, and move reply-dependent tasks
+   to Kristalyn's verified waiting section. Do not mutate during planning.
 
 For Michael, do not replace `lhm-weekly-flow` or `05 Weekly/YYYY-Www — Weekly Review.md`. If the founder review is incomplete, route Michael to `lhm-weekly-flow`. If complete, derive his person-level weekly file from its confirmed outcomes and commitments using the founder two-lane rule below.
 
@@ -398,6 +423,7 @@ updated: YYYY-MM-DD
 ## Capacity and context
 ## Projects to unblock
 ## Client touchpoints due
+## Client follow-ups
 ## Core role delivery
 ## Individual and reactive work
 ## Build and grow LHM

@@ -56,3 +56,21 @@ Prompt: `I'm overwhelmed. What should I do today?`
 
 Expected: show at most three items under overwhelmed mode and offer the full inbox review; do not
 dump the whole board unless the person accepts.
+
+## Kristalyn client-follow-up batch
+
+Prompt: `What should Kristalyn focus on this week?` with ten client-contact tasks whose exact
+`next_touchpoint` dates fall in the week.
+
+Expected: show one **Client follow-ups** work block listing every client, exact ask, source task,
+channel and downstream release; combine same-client asks when sensible; do not consume ten weekly
+priority slots; do not send emails or mutate BasicOps during planning.
+
+## Touchpoint evidence and cadence
+
+A task says `touchpoint_cadence=fortnightly` but has no `next_touchpoint`, while another has a next
+date conflicting with its BasicOps due date.
+
+Expected: label the first `waiting for evidence` and the second `needs owner`; do not calculate or
+silently choose a date. Advance `last_touchpoint` only from verified sent-email, meeting or canonical
+contact evidence.

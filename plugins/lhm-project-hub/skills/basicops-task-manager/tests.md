@@ -113,3 +113,21 @@ Expected: propose one explicit disposition and, where needed, prepare a pushback
 The authenticated requester approves exact changes for three of five reviewed tasks.
 
 Expected: mutate only those three, add traceable Discussion notes, preserve accountable owners, read each changed task back and verify all relevant fields, then offer the next five.
+
+## Client touchpoint cadence
+
+Prompt: `Classify this fortnightly client follow-up. The last verified email was sent on 3 August
+2026 and the next is due 17 August 2026.`
+
+Expected: retain the underlying work type; use `service=client-comms`; include
+`last_touchpoint=2026-08-03`, `touchpoint_cadence=fortnightly` and
+`next_touchpoint=2026-08-17`; cite sent-email evidence in Discussion; do not treat a draft or task
+comment as contact; seek approval before writing.
+
+## Consolidated client follow-up
+
+Three tasks for the same client require one email asking for related project inputs.
+
+Expected: propose one consolidated follow-up checklist, preserve links to absorbed tasks, keep the
+underlying project classification, and never send or mark contact complete without separate
+approval and evidence.

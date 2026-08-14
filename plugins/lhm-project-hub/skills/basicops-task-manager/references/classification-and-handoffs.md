@@ -7,7 +7,7 @@ review, blocked or waiting transition.
 
 Use this exact first description line:
 
-`LHM metadata: work_type=<type>; service=<service>; source=<source>; urgent=<true|false>; handoff_trigger=<trigger>; next_handoff=<person-or-role>; handoff_channel=<channel>`
+`LHM metadata: work_type=<type>; service=<service>; source=<source>; urgent=<true|false>; handoff_trigger=<trigger>; next_handoff=<person-or-role>; handoff_channel=<channel>; last_touchpoint=<YYYY-MM-DD|unknown|none>; touchpoint_cadence=<cadence>; next_touchpoint=<YYYY-MM-DD|unknown|none>`
 
 Allowed values:
 
@@ -16,10 +16,29 @@ Allowed values:
 - `source`: `meeting`, `email`, `client-request`, `recurring`, `internal`, `team-request`, `unknown`
 - `handoff_trigger`: `complete`, `ready-for-review`, `blocked`, `waiting`, `none`
 - `handoff_channel`: `basicops`, `whatsapp`, `client-email`, `none`
+- `touchpoint_cadence`: `weekly`, `fortnightly`, `monthly`, `quarterly`, `one-off`, `custom`, `none`
 
 Use a canonical person name or confirmed role for `next_handoff`. Use `unknown` or `none` when the
 source does not establish a value; do not invent one. Preserve approved working URLs beneath the
 metadata line.
+
+Existing lines without the touchpoint extension remain valid legacy metadata. Backfill active
+client-communication tasks progressively. For work that is not a client touchpoint, use
+`last_touchpoint=none; touchpoint_cadence=none; next_touchpoint=none`.
+
+## Client touchpoint contract
+
+- Set `last_touchpoint` only from verified sent-email, completed-meeting or canonical contact
+  evidence. A draft or BasicOps planning comment does not prove contact.
+- Record the confirmed rhythm in `touchpoint_cadence`. Use `one-off` plus an exact date for a
+  particular follow-up. Use `custom` only when Discussion states the rule.
+- Store an exact `next_touchpoint` date whenever another contact is expected, including when the
+  date can be calculated from a cadence. This prevents guesswork after missed weeks or across
+  unequal month lengths.
+- Flag a conflict between `next_touchpoint`, task due date and canonical client commitments; do not
+  silently choose one.
+- After verified contact, prepare the metadata update and the next exact date, then move a
+  reply-dependent task to the person's verified waiting section only after approval.
 
 ## Classification
 
@@ -30,6 +49,9 @@ metadata line.
 - Meeting origin belongs in `source=meeting`; it does not replace the work type.
 - `urgent=true` requires an authorised confirmation plus a real deadline or consequence in
   Discussion. A due date alone is insufficient.
+- Client follow-up is an action/state, not a separate work type. Keep the underlying work type;
+  normally use `service=client-comms`. Use `recurring-client-delivery` only for a genuinely
+  scheduled client-contact commitment.
 
 When classifying an existing task, return the proposed line, confidence and short reason. Seek
 approval before writing. A low-confidence classification must ask one material question.

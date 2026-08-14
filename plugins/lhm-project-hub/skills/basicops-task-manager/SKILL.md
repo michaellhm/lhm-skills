@@ -24,6 +24,8 @@ For a new task, resolve:
 - due date only when explicitly supplied by a canonical source or authorised person
 - stable internal deduplication key
 - one valid classification and handoff contract from [classification-and-handoffs.md](references/classification-and-handoffs.md)
+- verified client-touchpoint evidence, cadence and next exact contact date when the task includes
+  client follow-up
 
 If essential routing or ownership is missing, ask one concise question. Do not invent it.
 
@@ -62,6 +64,11 @@ handoff prose, deduplication key, status prose or `needs scheduling` in Descript
 For `classify this task`, read the linked task and authorised context, preserve useful existing URLs,
 propose the exact metadata line, and update only after approval. Missing metadata never makes a task
 invisible or non-actionable.
+
+For client-contact work, preserve legacy metadata compatibility and apply the touchpoint contract
+from the reference. Never advance `last_touchpoint` because an email was drafted or a BasicOps note
+was added. When multiple asks to one client can be sent together, propose one consolidated follow-up
+task with a clear checklist and retain traceable links to the absorbed tasks.
 
 ## Add one human discussion message
 
@@ -126,6 +133,8 @@ next tasks to review. Treat it as a human-guided operational review, not a mecha
      deliberately cancel/archive;
    - duplicate/obsolete finding with evidence;
    - dependency, next handoff, next action and notification channel.
+   - for client-contact work, last verified touchpoint evidence, confirmed cadence and exact next
+     touchpoint date.
 7. Never invent a due date. For an overdue item, propose an exact new date only when grounded in an
    authorised instruction, then wait for approval.
 8. Apply only the decisions approved for that batch. Add a concise Discussion note explaining any
@@ -146,6 +155,7 @@ Before writing, prepare and, when approval is required, show:
 - assignee
 - destination project and parent/section
 - exact LHM metadata line and description URL(s)
+- touchpoint evidence and cadence decision when client contact is involved
 - discussion message
 - handoff trigger, next person/action and notification channel
 - due date, or `unset`
