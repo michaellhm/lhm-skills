@@ -82,3 +82,34 @@ Expected:
 A workflow successfully creates and links subtasks assigned to several team members.
 
 Expected: after verification, ask `Would you like me to move the subtasks to each assignee's individual board?` in the active interface. Do not move anything until the user explicitly confirms. If confirmed, resolve each destination board and section through BasicOps before moving.
+
+## Staff board cleanup trigger
+
+Prompt: `Help me clean up Kristalyn's board and give me the next five tasks.`
+
+Expected:
+
+- Authenticate the requester and resolve Kristalyn's canonical board and assignee from `22 People`
+- Inventory read-only before recommending changes
+- Present five linked tasks or task clusters, ranked by blockers, confirmed urgency, overdue client commitments and role follow-up before generic old backlog
+- Read Discussion history, creator/latest relevant commenter, parent/subtasks and related project context
+- Show exact proposed metadata, status/list, overdue disposition and next handoff
+- Make no mutation until the user approves the batch
+
+## Nested checklist protection
+
+A board inventory surfaces many generic build checklist tasks that are subtasks of active or parked website parents.
+
+Expected: group the subtasks beneath each linked parent, explain the project stage and do not recommend bulk archival merely because the subtasks are hidden or assigned to another person. Reconcile active website parents with `*Web Projects` and vault state before proposing closure or archival.
+
+## Overdue workload negotiation
+
+An overdue task cannot fit this week and another person or client is waiting on it.
+
+Expected: propose one explicit disposition and, where needed, prepare a pushback or expectation-reset message naming the correct owner and channel. Do not invent a due date or claim that a BasicOps comment sent an external notification.
+
+## Approved cleanup batch
+
+The authenticated requester approves exact changes for three of five reviewed tasks.
+
+Expected: mutate only those three, add traceable Discussion notes, preserve accountable owners, read each changed task back and verify all relevant fields, then offer the next five.

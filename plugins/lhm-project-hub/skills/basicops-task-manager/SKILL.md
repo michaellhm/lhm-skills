@@ -1,6 +1,6 @@
 ---
 name: basicops-task-manager
-description: Create, classify, update, assign, discuss, complete, move, or otherwise mutate LHM BasicOps tasks. Use whenever a user or another LHM Project Hub workflow asks to write anything in BasicOps, including "create a task", "classify this task", "add this to BasicOps", "assign this", "update the task", "mark it complete", or "add a discussion note". This is the mandatory shared BasicOps mutation boundary for all Project Hub skills; other skills may prepare project context but must route the final task payload and write through this skill.
+description: Create, classify, clean up, update, assign, discuss, complete, move, or otherwise mutate LHM BasicOps tasks. Use whenever a user or another LHM Project Hub workflow asks to write anything in BasicOps, including "create a task", "classify my tasks", "clean up Kristalyn's board", "give me the next five tasks to review", "add this to BasicOps", "assign this", "update the task", "mark it complete", or "add a discussion note". This is the mandatory shared BasicOps mutation boundary for all Project Hub skills; other skills may prepare project context but must route the final task payload and write through this skill.
 ---
 
 # BasicOps Task Manager
@@ -95,6 +95,48 @@ When a workflow creates subtasks:
 7. Never move subtasks automatically. Wait for explicit user confirmation, then resolve each person's actual board and destination section through BasicOps before moving anything.
 
 The question is mandatory even when the subtasks already have assignees. Creating subtasks and moving them to personal boards are separate mutations with separate authority.
+
+## Clean up and classify an existing board
+
+Use this mode when someone asks to clean up, analyse or classify a person's board, or asks for the
+next tasks to review. Treat it as a human-guided operational review, not a mechanical backlog edit.
+
+1. Authenticate the requester and read the person's canonical `22 People` profile to resolve the
+   exact BasicOps board and assignee. Do not infer a board from a person's name.
+2. Inventory the board without mutating it. Read enough pages to avoid presenting a partial count as
+   the whole board; state clearly when pagination remains.
+3. Rank review candidates in this order:
+   - work blocking another person or project stage;
+   - confirmed urgent work;
+   - overdue client commitments;
+   - work awaiting the person's role-specific follow-up;
+   - older Inbox, waiting and review work.
+   Do not default to the oldest client or largest cluster merely because it is easy to count.
+4. Present five tasks at a time unless the user requests another batch size. For every candidate,
+   read its full Discussion, identify the creator and latest relevant commenter, and inspect its
+   parent, children and materially related tasks. Reconcile website work with `*Web Projects` and
+   canonical vault project state when relevant.
+5. Treat a subtask tree as one cluster. Show the linked parent and project stage; do not describe
+   nested checklist items as unexplained standalone board clutter. Never archive or close a set of
+   subtasks without checking whether their active or parked parent still needs them.
+6. Propose, for each task or cluster:
+   - exact classification metadata and confidence;
+   - correct status and existing destination section;
+   - overdue disposition: complete, reschedule, delegate, blocked/waiting, communicate delay, or
+     deliberately cancel/archive;
+   - duplicate/obsolete finding with evidence;
+   - dependency, next handoff, next action and notification channel.
+7. Never invent a due date. For an overdue item, propose an exact new date only when grounded in an
+   authorised instruction, then wait for approval.
+8. Apply only the decisions approved for that batch. Add a concise Discussion note explaining any
+   cross-person, status, due-date, list, completion or archival change. A BasicOps comment does not
+   prove that a WhatsApp, email or client notification was sent.
+9. Read every changed task back and verify project, parent, assignee, section, status, due date,
+   metadata, Discussion and URL as applicable. Then offer the next five.
+
+When work will not fit, identify the requester or account owner and prepare the pushback or client
+expectation-reset message. Do not send it without separate approval. Missing metadata never hides a
+task from review; backfill it only as part of an approved task decision.
 
 ## Prepare the exact payload
 

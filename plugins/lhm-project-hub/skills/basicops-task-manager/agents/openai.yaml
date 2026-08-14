@@ -1,4 +1,4 @@
 interface:
   display_name: "BasicOps Task Manager"
-  short_description: "Create consistent, verified LHM BasicOps tasks"
-  default_prompt: "Create or update this BasicOps task using LHM naming, discussion, approval, deduplication and verification rules."
+  short_description: "Create, classify and clean up verified LHM BasicOps tasks"
+  default_prompt: "Create, classify, update or clean up these BasicOps tasks using LHM parent/subtask, metadata, handoff, approval and verification rules."
