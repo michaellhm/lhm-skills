@@ -1,0 +1,4 @@
+interface:
+  display_name: "Adopt Existing Google Ads Client"
+  short_description: "Prepare an existing Ads client for monthly review"
+  default_prompt: "Adopt this existing Google Ads client into the LHM monthly review system, preserving current account state and stopping for real decisions only."
