@@ -8,7 +8,7 @@ license: MIT
 
 ## Purpose
 
-Analyse Google Ads account performance, determine the AdPulse zone, and recommend 3-5 prioritised actions. This is the lightweight skill version — it analyses and recommends but does not chain into other skills automatically.
+Analyse Google Ads account performance, determine the performance zone and measurement confidence, and recommend no more than five prioritised actions. This is the lightweight skill version — it analyses and recommends but does not execute actions automatically.
 
 For a full review that executes recommended actions across skills, use the **google-ads-monthly-review agent** instead.
 
@@ -19,6 +19,8 @@ For a full review that executes recommended actions across skills, use the **goo
 - **Start of month** — Lightweight analysis without full execution
 - **After major changes** — Reassess zone after budget or performance shifts
 
+Read and follow `${CLAUDE_PLUGIN_ROOT}/references/google-ads-monthly-operating-model.md` before starting.
+
 ## Prerequisites
 
 - Client name and account details
@@ -28,25 +30,23 @@ For a full review that executes recommended actions across skills, use the **goo
 
 ## How It Works
 
-### Step 1: Data Access
+### Step 1: Load canonical context
+
+Use the canonical Obsidian context envelope supplied by Hermes. It must cover objectives, conversion definitions, service area, budget/targets, campaign strategy, open issues, prior decisions and commitments, Drive destination and any existing BasicOps task. Do not create blank local context files. Report precise gaps.
+
+### Step 2: Data access and comparison
 
 **Option A: Google Ads MCP (Preferred)**
-If Google Ads MCP is available, fetch campaign performance data automatically. All accounts live under **MCC 394-736-1921**.
+If Google Ads MCP is available, fetch campaign performance data automatically. All accounts live under **MCC 394-736-1921**. Pull the current 30 days and immediately preceding 30 days using aligned definitions.
 
 **Option B: CSV Export (Fallback)**
 If MCP isn't available, ask the user to provide a campaign performance CSV with columns: Campaign, Cost, Conversions, Conv. Value, CPA, ROAS, Budget. Date range: last 30 days.
 
 **Zone data specifically: use AdPulse MCP directly, don't hand-calculate it.** Read `${CLAUDE_PLUGIN_ROOT}/references/adpulse-integration.md` and pull `pacing`/`kpiPercentage` straight from AdPulse for Step 3-4 below instead of computing budget pacing % / performance variance % from raw Google Ads numbers. That reference also covers a known gap in the zone matrix (Under-pacing + Poor performance) and how to handle it.
 
-### Step 2: Gather Context
+Also reconcile every open commitment from the previous review against live settings. When Ads conversions are zero, falling, inconsistent or suspicious, query GA4 for the same date windows before diagnosing demand or tracking.
 
-Ask for:
-1. **Client Name**: Which client/account?
-2. **Monthly Budget**: Target monthly spend
-3. **Performance Target**: Target CPA or ROAS
-4. **Observations**: What have you noticed recently?
-
-### Step 3: Calculate Metrics
+### Step 3: Calculate metrics
 
 If AdPulse MCP is connected, pull `pacing` and `kpiPercentage` directly (see `references/adpulse-integration.md`) and skip the manual math below. Only calculate by hand if AdPulse isn't available for this account:
 
@@ -55,7 +55,9 @@ If AdPulse MCP is connected, pull `pacing` and `kpiPercentage` directly (see `re
 - **Remaining Budget**: Monthly Budget - Actual Spend
 - **Required Daily Spend**: Remaining Budget / Days Remaining
 
-### Step 4: Determine Zone
+### Step 4: Determine performance zone and measurement confidence
+
+Judge `Good` or `Poor` against the canonical business target CPA/ROAS. Show current-versus-prior movement separately as trend context; do not use a worsening prior-period comparison to redefine an otherwise on-target result as Poor.
 
 | Budget Pacing | Performance | Zone |
 |--------------|-------------|------|
@@ -65,17 +67,29 @@ If AdPulse MCP is connected, pull `pacing` and `kpiPercentage` directly (see `re
 | >110% | Good | Blue — Low |
 | 90-110% | Good | Green — Maintain |
 
-**Gap: Under-pacing (<90%) + Poor performance has no defined cell.** Do not default this to Yellow — see `references/adpulse-integration.md` for why, and treat it as Red-severity (performance overrides pacing when they disagree).
+**Gap: Under-pacing (<90%) + Poor performance has no defined cell.** Follow `references/adpulse-integration.md` and state the rationale. Keep this performance judgement separate from measurement confidence.
+
+Assign measurement confidence independently:
+
+- `high` — core conversion definitions reconcile and Ads/GA4 evidence is consistent
+- `medium` — a bounded discrepancy exists but directional performance remains usable
+- `low` — missing or conflicting evidence materially affects CPA or action selection
+
+A tracking concern does not by itself make the performance zone Red. Use `unclassified` if evidence cannot support a zone.
+
+If the mechanical matrix produces Yellow but unfinished commitments or a negative trend make scaling unwise, retain `performance_zone=yellow` and add an operational caution such as `treat as orange`. Do not replace the mechanical classification.
 
 See the **Zone Reference** section below for full zone decision trees and execution checklists.
 
-### Step 5: Generate Recommendations
+### Step 5: Generate the top five proposed actions
 
-Based on the zone, provide 3-5 prioritised action items. Each recommendation must include:
+Based on the evidence, provide no more than five prioritised action items. Each recommendation must include:
 - Action title and urgency
 - Estimated impact
 - Specific metrics to target
 - Reasoning
+- Owning specialist skill
+- Whether it is read-only or requires approval for a live mutation
 
 ### Step 6: Save and verify the report
 
@@ -94,9 +108,11 @@ If the destination is missing, Drive write access is unavailable, or readback fa
 - state the exact missing destination, permission or verification problem;
 - do not claim the monthly review is complete and do not silently save somewhere else.
 
-### Step 7: Approval Gate
+### Step 7: Hermes overview, BasicOps record and approval gate
 
-**APPROVAL REQUIRED** — Present recommendations and wait for user confirmation before proceeding. Ask:
+Return the compact overview and structured handback defined in the operating model. Create or update one BasicOps parent review task when the connector is available. Put the report URL, overview, top five and approval question in the discussion; do not create execution subtasks yet. Set BasicOps `workflow_state=waiting-on-michael-via-hermes` and `approval_status=pending-michael`; use internal handback `status=waiting_michael_hermes` only in the YAML state block.
+
+**APPROVAL REQUIRED** — Hermes presents recommendations and waits for Michael. Ask:
 - Which actions would you like to tackle?
 - Any actions to skip or modify?
 - Questions about any recommendations?
@@ -114,13 +130,13 @@ Based on approved actions, suggest which skills to run next:
 
 Include specific parameters to pass to the next skill.
 
-### Step 9: Guided Task Execution
+### Step 9: Sequential specialist execution
 
-Once the report is saved and the user has approved which actions matter, hand off to the shared guided task execution protocol:
+Once the report is saved and Michael has approved which actions matter through Hermes, hand off to the shared guided task execution protocol:
 
 `${CLAUDE_PLUGIN_ROOT}/references/guided-task-execution.md`
 
-Read it and follow it. It writes the approved actions to the chat as a numbered task list ("Here are the N tasks"), asks if the user wants to work through them one at a time, walks them one task at a time asking "Is that one done?" before moving on, then closes the session by writing learnings and always asking whether to schedule a follow-up.
+Read it and follow it. Hermes dispatches exactly one approved action at a time. After every worker handback, record evidence and status in Obsidian and BasicOps before dispatching another action.
 
 ## Report format
 
@@ -136,11 +152,19 @@ Include the **Execution Checklist for the matched zone only** (see Zone Referenc
 # Google Ads Monthly Review: [Client Name]
 Date: [Today's Date]
 
-## Zone: [Emoji] [Zone] — [Priority]
+## Performance Zone: [Emoji] [Zone] — [Priority]
+
+Measurement confidence: [High/Medium/Low] — [one-line reason]
 
 ### Key Metrics
 - Monthly Budget: $X,XXX | Actual Spend: $X,XXX (XX% of month elapsed)
 - Budget Pacing: XXX% | Target CPA: $XX | Actual CPA: $XX | Performance vs Target: XX%
+- Prior 30d CPA: $XX | Change: XX%
+
+### Prior Commitments
+| Commitment | Live verification | Status |
+|------------|-------------------|--------|
+| ... | ... | Applied/Partial/Not applied/Unknown |
 
 ### Campaign Breakdown
 | Campaign | Spend | Conv | CPA | vs Target | Status |

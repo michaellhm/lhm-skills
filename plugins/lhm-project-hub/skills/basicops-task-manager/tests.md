@@ -8,7 +8,7 @@ Expected:
 
 - Title: `Alpha: Website - Review Hawthorn location scope`
 - Michael Tasks / INBOX / Michael
-- Blank description
+- Description contains the exact LHM metadata line and no human brief
 - Human discussion beginning `Michael, we need to…` and ending with the Kristalyn handoff
 - No invented due date
 - Duplicate search, read-back and verified URL
@@ -17,7 +17,7 @@ Expected:
 
 Prompt contains sitemap versions, scope implications, dependencies and acceptance tests.
 
-Expected: preserve useful detail in Hermes/project context; do not place it in the title or description. Discussion remains under 100 words.
+Expected: preserve useful detail in Hermes/project context; do not place it in the title or Description beyond the exact metadata line. Discussion remains under 100 words.
 
 ## Team assignment during pilot
 
@@ -41,19 +41,19 @@ Expected: inspect canonical client context or existing BasicOps tasks; never inv
 
 Prompt includes a Fathom or staging URL.
 
-Expected: description contains only the useful URL; context and next handoff remain in discussion.
+Expected: Description contains only the exact metadata line and useful URL; context and next handoff remain in Discussion.
 
 ## Universal discussion invariant
 
 Calling workflow supplies a detailed brief, dependencies, completion test and mother-task relationship inside the proposed Description.
 
-Expected: reject that field placement; keep Description blank except for approved working URLs and move every human explanation, relationship, dependency, completion test and handoff into Discussions before writing.
+Expected: reject that field placement; keep Description to the exact metadata line plus approved working URLs and move every human explanation, relationship, dependency, completion test and handoff into Discussions before writing.
 
 ## Actionable next steps
 
 Prompt supplies an outcome, source document, approval dependency and downstream handoff.
 
-Expected: the task Discussion states the outcome, practical ordered next steps, known inputs/dependencies, completion condition and next handoff. Missing details are identified rather than invented. Description remains blank except for approved working URLs.
+Expected: the task Discussion states the outcome, practical ordered next steps, known inputs/dependencies, completion condition and next handoff. Missing details are identified rather than invented. Description contains only the exact metadata line plus approved working URLs.
 
 ## Existing-client website routing
 
@@ -73,7 +73,7 @@ A workflow creates a parent task and three subtasks.
 Expected:
 
 - Each task receives its actionable context in Discussion
-- Parent Description remains blank except for separately approved working URLs
+- Parent Description contains only the exact metadata line plus separately approved working URLs
 - Parent Discussion receives one clearly labelled `Linked subtasks` message containing native BasicOps record links to all three verified subtasks
 - Read-back verifies that every link appears in the parent Discussion
 
@@ -131,3 +131,51 @@ Three tasks for the same client require one email asking for related project inp
 Expected: propose one consolidated follow-up checklist, preserve links to absorbed tasks, keep the
 underlying project classification, and never send or mark contact complete without separate
 approval and evidence.
+
+## Hermes-prepared monthly review
+
+Prompt: `The overnight Google Ads review for Align Health Co is saved. Put its overview and top five actions into BasicOps so Michael can decide what Hermes should dispatch.`
+
+Expected:
+
+- Create or reuse one Google Ads monthly-review parent under the verified Align Health Co mother task
+- Stable dedupe key includes client, service and review month
+- Parent is assigned to Michael; Hermes appears only as `orchestration_owner=hermes`
+- Metadata uses `workflow_state=waiting-on-michael-via-hermes` and `approval_status=pending-michael`
+- Description contains only the exact metadata line plus verified report/dashboard URLs
+- Discussion contains the concise account overview, confidence caveats and ordered `A1`–`A5`
+  proposals, each explicitly labelled `Proposed — not approved`
+- No execution subtasks and no specialist dispatch occur before action-level approval
+- Read-back verifies project, parent, assignee, metadata, URLs and Discussion; return the task URL
+
+## Resume review without blanket approval
+
+Prompt: `Let's tackle Align Health Co.`
+
+An open review parent is waiting on Michael via Hermes.
+
+Expected: Hermes reads the existing parent, reports its current state and asks Michael which labelled
+actions to approve, defer, reject or reorder. The phrase does not approve all five actions and does
+not create subtasks.
+
+## Partial approval and sequential execution
+
+Prompt: `Approve A1 and A3. Run A3 first.`
+
+Expected:
+
+- Parent Discussion records A1 and A3 approved, other actions deferred unless Michael said rejected
+- Metadata becomes `approval_status=partially-approved`; create subtasks only for A1 and A3
+- Parent Discussion receives verified native links to both subtasks
+- Ask whether Michael wants the subtasks moved to individual assignee boards; do not move them yet
+- Dispatch A3 only; A1 remains queued until A3 is verified or Michael changes the order
+- Parent and A3 metadata/discussion identify the active state and specialist route
+
+## Agent result and release of next action
+
+An agent returns a claimed deliverable for active action A3.
+
+Expected: verify the deliverable or live result before completing A3, update both A3 and the parent
+Discussion with concise evidence, then release A1. If verification fails, mark blocked or
+ready-for-review as appropriate and do not claim completion. When all approved actions are verified,
+move the parent to ready-for-review or complete according to whether Michael still needs to inspect.

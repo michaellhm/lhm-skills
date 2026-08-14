@@ -143,6 +143,33 @@ Every metric line gets a plain-English one-liner — write it the way `client-up
 
 **Keyword brief for Jaimee, when relevant.** If an opportunity was found, draft a short brief (the keyword, why it converts, the organic gap) and include it in the report above. Ask Michael whether to also push it to BasicOps as a subtask assigned to Jaimee (per `references/team-roster.md`, Jaimee owns local SEO/technical SEO/content) — don't assume the assignment, ask first, same as every other assignment decision in this hub.
 
+### 4a. Hermes-prepared overnight handoff
+
+When internal mode is run by Hermes as an overnight or on-demand marketing review, prepare one
+BasicOps review parent through `lhm-project-hub:basicops-task-manager` after the report artefact has
+been saved and its URL verified.
+
+- Reuse the client's existing monthly-review parent for the same service and month when one exists;
+  dedupe key: `basicops:<client-slug>:<service>:monthly-review:<yyyy-mm>`.
+- For Google Ads, assign the parent to Michael in `Michael Tasks` (`49020`) / `Google Ads Flow`
+  (`106309`). For other services, use the client's established `*Client Flow` mother task unless a
+  governed approval queue is recorded. Record Hermes as `orchestration_owner=hermes`, not as a
+  BasicOps assignee.
+- Put only the exact LHM metadata line and verified report/dashboard URLs in Description.
+- In Discussion, put a short human overview, data-confidence caveats and the five highest-priority
+  proposed actions in order, labelled `A1`–`A5` and `Proposed — not approved`. End by asking Michael
+  to approve, defer, reject or reorder specific labels through Hermes.
+- Initial state is `workflow_state=waiting-on-michael-via-hermes` and
+  `approval_status=pending-michael`. Do not create execution subtasks or dispatch execution agents
+  during review preparation.
+- When Michael later says to tackle the client, Hermes reads this parent and tells him exactly what
+  is waiting. Only explicit action-level approval releases work. The shared task manager then
+  creates approved subtasks and governs one-at-a-time specialist dispatch, evidence updates and
+  final verification.
+
+If BasicOps is unavailable, return the exact prepared payload and mark the handoff pending; never
+claim the overnight review is queued for Michael.
+
 ## Step 5: Pre-meeting mode
 
 Brief + timed agenda ahead of the monthly client meeting. Produces `project-management/meetings/YYYY-MM-DD-meeting-brief.md`.

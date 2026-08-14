@@ -126,7 +126,7 @@ The JTBD Four Forces:
 
 ## Step 3: Create the Document
 
-After gathering information, create `client_profile.md` with this structure:
+After gathering information, update the product-marketing section of the resolved canonical Obsidian `client_profile.md` with this structure. If the canonical profile does not exist, route the structured facts through the owning Project Hub onboarding/client-update workflow; do not create a local profile.
 
 ```markdown
 # Product Marketing Context

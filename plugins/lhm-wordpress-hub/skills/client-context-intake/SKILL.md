@@ -11,7 +11,7 @@ Extract structured facts from raw client input (call transcripts, meeting notes,
 
 1. Check if `/client/client_profile.md` already exists and has content
    - If yes: read it, note what's already captured, only fill gaps
-   - If no: create it from the template in `${CLAUDE_PLUGIN_ROOT}/references/folder-structure.md`
+   - If no: report the missing canonical client profile and route its creation through the owning Project Hub onboarding/client-update workflow. Preserve extracted facts for that handoff; do not create a profile inside the website repository.
 
 2. Ask the user for source material using the `AskUserQuestion` tool:
    - "What source material do you have?" (options: "Call transcript / Fathom notes", "Meeting notes", "Uploaded documents", "I'll answer questions directly")

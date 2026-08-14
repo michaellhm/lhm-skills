@@ -1,17 +1,17 @@
 ---
 name: client-onboarding
-description: "Establish client context by creating or enriching client_profile.md. Use this when a new client folder is created, client_profile.md is missing or empty, or the user wants to update client context."
+description: "Gather client marketing context and enrich the canonical Obsidian client profile through its owning Project Hub workflow. Use when context is missing, incomplete, or needs updating."
 ---
 
 # Client Onboarding
 
-Create or enrich the `client_profile.md` file in the client's folder.
+Gather or enrich client marketing context in the canonical Obsidian client profile. Resolve that profile under the Obsidian-first context contract. If it does not exist, prepare the gathered facts and route creation through the owning Project Hub onboarding/client-update workflow; do not create a profile in the current working directory.
 
 ## Rules
 
 - **Never overwrite** existing content in `client_profile.md`
 - If the file exists and has content, read it first and only ask about missing fields
-- If the file does not exist or is empty, gather all fields below
+- If the canonical file does not exist or is empty, gather the fields below for an explicit Project Hub handoff; do not create a local substitute
 
 ## Fields to Gather
 

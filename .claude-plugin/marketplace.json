@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "2.0.7"
+    "version": "2.0.8"
   },
   "plugins": [
     {
       "name": "lhm-wordpress-hub",
       "source": "./plugins/lhm-wordpress-hub",
       "description": "Guided WordPress and Astro website build system - phased delivery from client intake through SEO, content, design, build, and ops hardening.",
-      "version": "1.2.19",
+      "version": "1.2.20",
       "category": "wordpress",
       "tags": [
         "wordpress",
@@ -26,7 +26,7 @@
       "name": "lhm-content-engine",
       "source": "./plugins/lhm-content-engine",
       "description": "Automated multi-asset content pipeline for allied health clinics - CSV-driven batch processing, blog generation, GMB social posts, anti-AI refinement, Google Doc publishing, and tracking updates.",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "category": "content",
       "tags": [
         "content",
@@ -54,7 +54,7 @@
       "name": "lhm-gmb-hub",
       "source": "./plugins/lhm-gmb-hub",
       "description": "Google Business Profile optimisation system - repeating 3-month cycle of GBP foundation, service page optimisation, content expansion, and strategic link building with per-client project management tracking.",
-      "version": "1.4.3",
+      "version": "1.4.4",
       "category": "local-seo",
       "tags": [
         "gmb",
@@ -68,7 +68,7 @@
       "name": "lhm-finance-hub",
       "source": "./plugins/lhm-finance-hub",
       "description": "Weekly financial management hub combining cash flow forecasting, profit formula analysis, and Profit First allocations. Monday rhythm with weekly, monthly, and quarterly review cadences.",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "category": "finance",
       "tags": [
         "finance",
@@ -82,7 +82,7 @@
       "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
       "description": "General marketing orchestration plus direct Google Ads, SEO, Content, and WordPress specialists with governed delegation and shared client context.",
-      "version": "2.0.7",
+      "version": "2.0.8",
       "category": "utilities",
       "tags": [
         "marketing",
@@ -139,7 +139,7 @@
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
       "description": "LHM project management hub — sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
-      "version": "0.1.65",
+      "version": "0.1.66",
       "category": "utilities",
       "tags": [
         "project-management",

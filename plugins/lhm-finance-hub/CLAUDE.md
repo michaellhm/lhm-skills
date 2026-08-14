@@ -2,6 +2,10 @@
 
 These rules apply to EVERY skill and agent in this plugin, without exception.
 
+## Mandatory: Obsidian-First Client Context
+
+Before client-specific work, read and follow `${CLAUDE_PLUGIN_ROOT}/references/obsidian-context-contract.md`. Resolve legacy context filenames only inside the canonical Obsidian client root, subject to finance confidentiality rules. Never create blank or parallel client context in a working directory.
+
 ## Mandatory: Delivery Artefact and Handoff Contract
 
 Before executing work that may produce a material deliverable, read and follow `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md`. Use only the configured governed finance destination and never silently fall back to a less protected store. Save and verify required artefacts before reporting completion.

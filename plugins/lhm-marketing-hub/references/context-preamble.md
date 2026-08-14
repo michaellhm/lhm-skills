@@ -7,14 +7,13 @@ description: Standard client context loading sequence. Run at the top of every s
 
 Every specialist agent runs these steps in order before doing anything else. Do not skip steps. Do not start work until the 4-line state summary is displayed.
 
-## Step 1 — Find client folder
+## Step 1 — Resolve canonical Obsidian client
 
-Scan the current working directory for client-named folders. A folder is a client folder if it contains a `client_profile.md` file, or if it was explicitly named by the user. Ignore folders like `assets/`, `scripts/`, `references/`, `node_modules/`, or any folder starting with `.`
+Read `${CLAUDE_PLUGIN_ROOT}/references/obsidian-context-contract.md`, then resolve the named client in the configured Local Health Marketing Obsidian vault. Do not scan the current working directory and infer a client from repository or temporary folder names.
 
 - If multiple folders exist, ask: "Which client are we working on today?"
 - If one folder matches what the user mentioned, confirm it and proceed
-- If no folder is found, say: "I can't see any client folders. Please navigate to your Clients directory." and stop
-- If the client folder doesn't exist, create it and run `${CLAUDE_PLUGIN_ROOT}/skills/client-onboarding/SKILL.md` before continuing
+- If no canonical client is found, name that exact gap and route to the owning Project Hub onboarding workflow. Do not create a folder here.
 
 ## Step 2 — Load client profile
 
@@ -24,64 +23,19 @@ Read `[client-folder]/client_profile.md`.
 - Set `is_health_client = true` if the profile's industry, business type, or notes field indicates health, medical, allied health, psychology, physiotherapy, chiropractic, dental, or any other regulated health profession. Set `false` for all other businesses. AHPRA rules apply only when `is_health_client = true`.
 - Check that conversion economics are defined: profitable CPA threshold, average revenue per conversion, margin/overhead structure.
   - If any of these are missing AND the session involves Google Ads work: flag the gap and ask before proceeding with any Ads analysis.
-- If `client_profile.md` does not exist or is empty: run the client-onboarding skill first.
+- If `client_profile.md` does not exist or is empty: report the missing canonical profile and route to the owning Project Hub onboarding/client-update workflow. Do not create a local substitute.
 
 ## Step 3 — Load client goals
 
 Read `[client-folder]/goals.md`.
 
-- If the file does not exist: create it with this template and ask the user to fill it in before proceeding. If the file exists but conversion economics fields are blank or show only `$` placeholders, treat it the same as a missing file for the purpose of flagging gaps to the user — do not silently proceed with empty economics data.
-
-```
-# Goals — [Client Name]
-
-## Conversion Economics
-- Average revenue per conversion/booking: $
-- Estimated margin after overheads (%):
-- Profitable CPA threshold: $
-- Profitable ROAS threshold:
-
-## Channel KPIs
-### Google Ads
-- Monthly lead target:
-- CPA target: $
-- Monthly budget: $
-
-### SEO
-- Primary keyword targets:
-- Organic traffic target (monthly sessions):
-- Ranking targets (keyword → position by date):
-
-### Content
-- Monthly content output target:
-
-## Benchmarks
-- Last 90 days vs prior 90 days summary:
-- Last year vs this year:
-
-## Annual targets:
--
-```
+- If the canonical record does not exist, or required economics fields are blank, report the exact missing record or fields and route the update through the owning Project Hub workflow. Do not create a template in this preamble and do not silently proceed with empty economics data.
 
 ## Step 4 — Load active projects
 
 Read `[client-folder]/current-projects.md`.
 
-- If the file does not exist: create it with this template. After creating the file, note to the user: "current-projects.md not found — created a template. Please populate it with active work when you get a chance."
-
-```
-# Current Projects — [Client Name]
-Last updated: YYYY-MM-DD
-
-## Active
-- [Project name] — [Brief description] — Started: YYYY-MM-DD
-
-## Completed this quarter
--
-
-## Backlog
--
-```
+- If the canonical active-project record does not exist, report that exact gap and route its creation through the owning Project Hub kickoff or project-manager workflow. Do not create a template in this preamble.
 
 ## Step 5 — Scan discipline folder
 
@@ -121,6 +75,6 @@ If any data is missing (no goals.md, no prior discipline folder work), say what'
 ```
 Client: Bayside Physio | Health: yes | AHPRA: applies
 State: No prior Google Ads data on file | CPA target: not set
-Goals: goals.md not found — created template, please fill in
+Goals: canonical goals record not found — routed to Project Hub; not created here
 Active: No active projects on file
 ```

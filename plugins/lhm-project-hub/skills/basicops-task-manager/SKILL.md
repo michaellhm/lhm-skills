@@ -24,6 +24,8 @@ For a new task, resolve:
 - due date only when explicitly supplied by a canonical source or authorised person
 - stable internal deduplication key
 - one valid classification and handoff contract from [classification-and-handoffs.md](references/classification-and-handoffs.md)
+- orchestration owner, workflow state and approval status when this is a Hermes-managed review or
+  sequential agent handoff
 - verified client-touchpoint evidence, cadence and next exact contact date when the task includes
   client follow-up
 
@@ -103,6 +105,16 @@ When a workflow creates subtasks:
 
 The question is mandatory even when the subtasks already have assignees. Creating subtasks and moving them to personal boards are separate mutations with separate authority.
 
+### Handle a Hermes-prepared marketing review
+
+Read and apply the **Hermes-prepared review contract** in
+[classification-and-handoffs.md](references/classification-and-handoffs.md). The safe default is one
+monthly-review parent assigned to the human approver, with Hermes recorded only as orchestration
+owner. Keep the account overview and up to five ordered proposals in Discussion. Do not create
+execution subtasks until Michael explicitly approves action labels through Hermes. After approval,
+create only the approved subtasks and release them to specialist agents sequentially, recording and
+verifying every transition on the parent and active subtask.
+
 ## Clean up and classify an existing board
 
 Use this mode when someone asks to clean up, analyse or classify a person's board, or asks for the
@@ -155,6 +167,7 @@ Before writing, prepare and, when approval is required, show:
 - assignee
 - destination project and parent/section
 - exact LHM metadata line and description URL(s)
+- orchestration owner, workflow state, approval status and approved action labels when applicable
 - touchpoint evidence and cadence decision when client contact is involved
 - discussion message
 - handoff trigger, next person/action and notification channel
@@ -227,5 +240,7 @@ Return:
 - handoff notification result: `prepared`, `sent`, `not_required`, `blocked` or `not_approved`
 - any missing approval or routing input
 - when subtasks were created, the user's answer—or the still-outstanding question—about moving them to individual boards
+- for a Hermes-managed review: parent URL, current workflow state, approval status, action register,
+  active action (or `none`) and the next conversational prompt Hermes should present
 
 Do not update Obsidian merely because a task was created. Let the owning Project Hub workflow record only the appropriate canonical project-state change under its own authority.

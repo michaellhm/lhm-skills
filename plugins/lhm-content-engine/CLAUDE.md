@@ -2,6 +2,10 @@
 
 These rules apply to EVERY skill and agent in this plugin, without exception.
 
+## Mandatory: Obsidian-First Client Context
+
+Before client-specific work, read and follow `${CLAUDE_PLUGIN_ROOT}/references/obsidian-context-contract.md`. Resolve legacy context filenames only inside the canonical Obsidian client root. Never create blank or parallel client context in a working directory.
+
 ## Mandatory: Delivery Artefact and Handoff Contract
 
 Before executing work that may produce a material deliverable, read and follow `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md`. The content worker must save and read back the reviewed draft or published document and return its observed URL/ID. Do not claim completion from chat output alone.

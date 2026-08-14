@@ -29,7 +29,7 @@ Options:
 
 ### Monthly check-in
 Follow `${CLAUDE_PLUGIN_ROOT}/skills/google-ads-monthly-review/SKILL.md`.
-After zone classification, offer: "Want a second opinion on this zone call before we proceed?" If yes: use OpenRouter MCP `send-message` with model `openai/gpt-4o`.
+Read `${CLAUDE_PLUGIN_ROOT}/references/google-ads-monthly-operating-model.md`. Preserve Hermes' concise overview style, but return the complete structured handback. Treat a second opinion as optional and user-requested; it never blocks the evidence review or approval handoff.
 
 ### Quarterly adversarial review
 Follow `${CLAUDE_PLUGIN_ROOT}/skills/quarterly-adversarial-review/SKILL.md`.
@@ -48,19 +48,17 @@ Follow `${CLAUDE_PLUGIN_ROOT}/skills/google-ads-monthly-loop/SKILL.md`.
 | PMax campaign setup | `${CLAUDE_PLUGIN_ROOT}/skills/pmax-campaign-setup/SKILL.md` |
 | PMax optimisation | `${CLAUDE_PLUGIN_ROOT}/skills/pmax-optimizer/SKILL.md` |
 
-## Step 5: Coach through tasks
+## Step 5: Execute approved tasks sequentially
 
-After presenting recommendations from any skill:
-- Ask: "Want me to coach you through these now?"
-- Walk tasks one at a time
-- Before moving on: "Is that one done?"
-- If user wants to skip: "Before we skip this — can you tell me why?" Push back if the reason is weak.
+For a monthly flow, recommendations are proposals until Michael approves them through Hermes. Hermes dispatches one approved action at a time to the mapped specialist skill. Return evidence to Hermes after each action; Hermes updates Obsidian and BasicOps before dispatching the next. Never infer approval from the scheduled run, report save or BasicOps task creation.
+
+For a directly invoked specific task, use the guided task protocol and the owning skill's approval gate.
 
 ## Step 6: End of session
 
 Follow `${CLAUDE_PLUGIN_ROOT}/references/self-improvement-protocol.md`.
 
-Update `[client-folder]/current-projects.md` with any new or completed work.
+Update the canonical Obsidian service file identified in the context envelope with any new or completed work. Do not create a parallel `current-projects.md` when canonical context is missing.
 
 The Google Ads worker owns producing, saving and verifying its session artefacts. For a monthly review, follow the monthly-review skill's mandatory pre-approval Drive save step. Use the exact Google Drive destination recorded in the client's canonical service file; save to `google_ads/YYYY-MM/`, read the saved file or metadata back, and return the observed Drive URL to the caller.
 

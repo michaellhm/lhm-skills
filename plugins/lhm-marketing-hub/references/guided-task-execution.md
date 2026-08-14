@@ -6,7 +6,7 @@ Keep the tone plain and direct throughout. The point of this loop is to make the
 
 ## When this runs
 
-Run this after, not instead of, the review's own analysis and approval gate. The review decides *what* matters; this protocol drives *getting it done*. It applies whether the review was run standalone (skill) or as the full agent.
+Run this after, not instead of, the review's own analysis and approval gate. The review decides *what* matters; this protocol drives *getting it done*. For a Hermes monthly flow, also follow `references/google-ads-monthly-operating-model.md` and resume from its structured handback.
 
 ## Step 1: Lay out the task list in chat
 
@@ -40,6 +40,8 @@ Ask one question, plainly:
 
 Walk the list in priority order. For each task:
 
+Hermes must dispatch only one approved action at a time. Before dispatch, mark that action `running` and the parent `specialist_running`. After the worker returns, record its evidence and outcome in canonical Obsidian context and the BasicOps discussion before choosing the next action. If the worker reaches a live-mutation approval gate, set `waiting_approval` and stop.
+
 1. **Present only that task.** Keep it simple and straightforward: what to do, where to do it, and the exact change or values. A few short lines, not a wall of text. Show progress like "Task 3 of 7".
 2. **If the task maps to an execution skill, run it scoped to just this task**, carrying forward the client profile, the AdPulse zone, and the relevant campaign data:
    - Budget or bid strategy change → `bid-budget-optimizer`
@@ -49,7 +51,7 @@ Walk the list in priority order. For each task:
    - PMax-specific issue → `pmax-optimizer`
    - **"Conversion actions are firing"** → don't ask the client to check. Query GA4 directly via `analytics-mcp` for the booking event, per "Conversion quality before volume" in `references/lhm-philosophy/google-ads.md`. Present what GA4 shows as the task result; only fall back to asking the client if no GA4 property is on file or GA4 itself shows the event isn't firing.
    Run only the slice that this task needs. Do not run the whole skill end to end if a single change is all that is required.
-3. **Ask if it is done.** After presenting (or executing) the task:
+3. **Verify and ask if it is done.** A dispatched worker must return observed evidence, mutations performed (or `none`) and verification. After presenting the result:
 
    > "Is that one done?"
 
@@ -86,4 +88,4 @@ End every session with this question, without exception:
 
 - This loop never replaces the review's approval gate. The user still approves *which* actions matter before any of this starts.
 - Keep each task self-contained. The whole value is that the user only ever looks at one small thing at a time.
-- Never fabricate completion. A task is only done when the user says so.
+- Never fabricate completion. A specialist action is complete only when its returned evidence verifies the expected outcome; a manual action is complete only when the user confirms it.

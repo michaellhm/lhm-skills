@@ -62,63 +62,18 @@ produced) rather than a live transcript.
 
 ### Update `goals.md`
 
-**If the file doesn't exist,** create it first, then continue below. Tell the user inline: "`goals.md` didn't exist for this client — created it from the template."
+Resolve this as the canonical goals record inside the Obsidian client root. **If it doesn't exist, do not create a blank template in this workflow.** Record the precise missing record, preserve goals explicitly evidenced by the meeting, and route creation through the owning client-onboarding/client-update workflow before a write. Continue the remaining review without inventing targets.
 
-```markdown
-# Goals — [Client Name]
-
-## Conversion Economics
-- Average revenue per conversion/booking: $
-- Estimated margin after overheads (%):
-- Profitable CPA threshold: $
-- Profitable ROAS threshold:
-
-## Channel KPIs
-### Google Ads
-- Monthly lead target:
-- CPA target: $
-- Monthly budget: $
-
-### SEO
-- Primary keyword targets:
-- Organic traffic target (monthly sessions):
-- Ranking targets (keyword → position by date):
-
-### Content
-- Monthly content output target:
-
-## Benchmarks
-- Last 90 days vs prior 90 days summary:
-- Last year vs this year:
-
-## Annual targets:
--
-```
-
-If any KPIs, budgets, or targets changed (or this is a freshly created file and the meeting mentioned any): update the relevant sections. Leave anything the meeting didn't cover as the template's blank placeholder, don't invent figures. Add a dated note:
+If any KPIs, budgets, or targets changed and the canonical file exists: update the relevant sections. Do not add placeholders for anything the meeting did not cover. Add a dated note:
 ```
 <!-- Updated YYYY-MM-DD from meeting: [one-line summary of what changed] -->
 ```
 
 ### Update `current-projects.md`
 
-**If the file doesn't exist,** create it first, then continue below. Tell the user inline: "`current-projects.md` didn't exist for this client — created it from the template."
+Resolve this as the canonical active-project record inside the Obsidian client root. **If it doesn't exist, do not create a blank template in this workflow.** Preserve projects explicitly evidenced by the meeting and route creation through the owning kickoff/project-manager workflow. Continue the remaining review and report the gap.
 
-```markdown
-# Current Projects — [Client Name]
-Last updated: YYYY-MM-DD
-
-## Active
-- [Project name] — [Brief description] — Started: YYYY-MM-DD
-
-## Completed this quarter
--
-
-## Backlog
--
-```
-
-Replace the sample Active row with real projects from this meeting, or clear it if none were raised. Don't leave the placeholder text in place.
+When the canonical file exists, update it with real projects from this meeting. Do not add placeholder rows.
 
 - Mark completed projects as completed (with date)
 - Add new projects from action items
@@ -441,7 +396,7 @@ Three things to offer at the end of the run:
 
 1. **Client facts.** If the meeting revealed anything about how this client works that isn't in `client_profile.md` (systems they use, who does what, standing constraints, compliance posture), offer to add it.
 2. **Skill learnings.** If anything went wrong in this run, or the user corrected you, offer to run `/lhm-learn:learn` so it lands in this skill's `LEARNED.md` rather than being lost. Tool quirks, output format corrections, workflow steps that needed adjusting, and anything the user had to tell you twice all belong there.
-3. **New state files.** If `goals.md` or `current-projects.md` were created for the first time this run (Step 2), remind the user to review them and fill any gaps the meeting didn't cover.
+3. **Canonical context gaps.** If `goals.md` or `current-projects.md` was missing, remind the user which owning Project Hub workflow it was routed to; do not claim a blank state file was created.
 
 ## Rules
 
