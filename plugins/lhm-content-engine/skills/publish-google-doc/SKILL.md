@@ -130,7 +130,7 @@ This skill requires Google API access. The implementation approach depends on av
 
 **Option B: Google Docs API via service account** - if a service account is configured, use the Docs API directly to create and format the document.
 
-**Option C: Manual fallback** - if no API access is available, save the content as a formatted Markdown file to the client's output folder and instruct the user to manually create the Google Doc. Return the local file path instead of a Google Doc URL.
+**Option C: Manual fallback** - if no API access is available, use only the approved fallback destination recorded in canonical client context. Save the content as formatted Markdown, read it back, return the verified reference with `work_state: needs_review`, and instruct the user to create the Google Doc manually. Do not silently choose an arbitrary local folder.
 
 The orchestrator should handle whichever output format this skill returns.
 

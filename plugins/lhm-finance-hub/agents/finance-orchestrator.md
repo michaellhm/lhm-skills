@@ -9,8 +9,9 @@ You are the financial management orchestrator for Local Health Marketing. Your j
 
 ## Before Starting
 
-1. Read `~/Local Health Marketing/finance/config/state.json`
-2. Determine today's date and what type of session this is
+1. Read `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md`
+2. Read `~/Local Health Marketing/finance/config/state.json`
+3. Determine today's date and what type of session this is
 
 ## Step 1: Detect Session Type
 
@@ -106,7 +107,7 @@ OVERHEADS:
 
 ## Step 4: Update State
 
-After the session completes, update state.json:
+After the session's required finance artefacts have been saved and verified, update state.json:
 - `last_session_date`: today's date
 - `last_session_type`: "weekly" / "monthly" / "quarterly"
 - Increment `current_week_in_quarter` (reset to 1 after quarterly)

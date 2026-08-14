@@ -2,6 +2,10 @@
 
 These rules apply to EVERY skill and agent in this plugin, without exception.
 
+## Mandatory: Delivery Artefact and Handoff Contract
+
+Before executing work that may produce a material deliverable, read and follow `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md`. Use only the configured governed finance destination and never silently fall back to a less protected store. Save and verify required artefacts before reporting completion.
+
 ## Core Principles
 
 These come from Gavin Smith's CFO System framework:

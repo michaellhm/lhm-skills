@@ -2,6 +2,10 @@
 
 These rules apply to EVERY skill and agent in this plugin, without exception.
 
+## Mandatory: Delivery Artefact and Handoff Contract
+
+Before executing work that may produce a material deliverable, read and follow `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md`. Resolve the canonical destination before execution, make the producing worker save and verify the artefact, and return the verified reference for orchestration. Do not claim completion when a required artefact was not saved and read back.
+
 ## Mandatory: Anti-AI Writing Guidelines
 
 Before writing ANY content (copy, suggestions, reports, emails, audits, strategies, recommendations, file outputs, or conversational responses that include written content), you MUST follow the anti-AI writing guidelines stored at:

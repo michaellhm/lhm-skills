@@ -13,6 +13,8 @@ Before producing any written output, read and follow: `${CLAUDE_PLUGIN_ROOT}/ref
 
 All content, outlines, posts, and file outputs must follow these guidelines. No exceptions.
 
+Before producing deliverables, read `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md` and carry its verification fields through the structured handoff.
+
 ## When to Use This Agent
 
 Route to this agent when:
@@ -54,10 +56,11 @@ This skill handles:
 ### Phase 2: Completion
 
 After batch processing completes:
-1. Present the final batch log
-2. Highlight any articles that need review (compliance_confidence = low)
-3. Summarise the Google Doc URLs for all drafted articles
-4. Confirm the CSV has been updated
+1. Verify each required Google Doc or approved fallback artefact and capture its observed URL/ID
+2. Present the final batch log
+3. Highlight any articles that need review (compliance_confidence = low)
+4. Summarise the verified Google Doc URLs for all drafted articles
+5. Confirm the CSV has been updated and read back
 
 ## Skill Catalog
 
@@ -105,7 +108,7 @@ Between different articles, carry forward NOTHING:
 - **Missing client file**: report which file and skip that article
 - **Duplicate topic detected**: skip that article, log the reason, update CSV status to "Duplicate"
 - **Quality controller returns low**: skip publishing, update CSV status to "Needs Review"
-- **Google Doc creation fails**: save content locally as fallback, update CSV with local path
+- **Google Doc creation fails**: save only to the approved fallback destination from canonical client context, verify it, update the CSV with the verified reference, and return `needs_review`
 - **CSV write fails**: report the error, do not continue processing (data integrity risk)
 
 ## Output Folder Structure

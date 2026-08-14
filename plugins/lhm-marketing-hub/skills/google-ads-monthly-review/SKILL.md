@@ -77,14 +77,31 @@ Based on the zone, provide 3-5 prioritised action items. Each recommendation mus
 - Specific metrics to target
 - Reasoning
 
-### Step 6: Approval Gate
+### Step 6: Save and verify the report
+
+Saving the read-only monthly report is part of completing the analysis, not a consequential Google Ads action. Do this **before** asking for approval.
+
+1. Read the client's canonical service file and use its exact Google Drive destination for Google Ads deliverables. Do not infer a folder from the client name when a destination is recorded.
+2. Save the one-page report as `google_ads/YYYY-MM/monthly-review-YYYY-MM.md` in that client Drive destination. Create the `YYYY-MM` folder when it does not exist and the worker has permission.
+3. Use the configured Google Drive write route. Do not treat an unverified local path, synced-folder assumption or chat output as a saved Drive artefact.
+4. Read the saved file or its metadata back. Capture the observed Drive file ID/URL and confirm the filename and parent folder.
+5. Return the verified Drive URL to the calling agent or Hermes so it can link the artefact from the canonical service file and run history.
+
+If the destination is missing, Drive write access is unavailable, or readback fails:
+
+- preserve the completed report content in the worker result;
+- set the business work state to `needs review` (or `failed` when no report was produced);
+- state the exact missing destination, permission or verification problem;
+- do not claim the monthly review is complete and do not silently save somewhere else.
+
+### Step 7: Approval Gate
 
 **APPROVAL REQUIRED** — Present recommendations and wait for user confirmation before proceeding. Ask:
 - Which actions would you like to tackle?
 - Any actions to skip or modify?
 - Questions about any recommendations?
 
-### Step 7: Recommend Next Skills
+### Step 8: Recommend Next Skills
 
 Based on approved actions, suggest which skills to run next:
 
@@ -97,7 +114,7 @@ Based on approved actions, suggest which skills to run next:
 
 Include specific parameters to pass to the next skill.
 
-### Step 8: Guided Task Execution
+### Step 9: Guided Task Execution
 
 Once the report is saved and the user has approved which actions matter, hand off to the shared guided task execution protocol:
 
@@ -105,9 +122,9 @@ Once the report is saved and the user has approved which actions matter, hand of
 
 Read it and follow it. It writes the approved actions to the chat as a numbered task list ("Here are the N tasks"), asks if the user wants to work through them one at a time, walks them one task at a time asking "Is that one done?" before moving on, then closes the session by writing learnings and always asking whether to schedule a follow-up.
 
-## Output
+## Report format
 
-Save the zone assessment to the client folder:
+Save and verify the zone assessment through Step 6:
 
 **File**: `google_ads/YYYY-MM/monthly-review-YYYY-MM.md`
 

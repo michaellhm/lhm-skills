@@ -48,7 +48,7 @@ Synthesize analysis + zone/checklist + suggestions + panel feedback into a final
 ## Step 5 — Output
 Never make changes in Google Ads directly. Finish with:
 
-1. **Email** — via Gmail (Zapier MCP: check `list_enabled_zapier_actions` first). To: `{{EMAIL_TO}}`. Subject: "{{CLIENT_NAME}} — Google Ads Monthly Review [Month Year]". Body: concise — zone/checklist headline, key findings, what you decided and why, pointer to BasicOps for the rest.
+1. **Save and verify the report before any notification or decision handoff.** The Google Ads worker owns this artefact. Read the exact Google Drive destination from the client's canonical service file, save the one-pager to `google_ads/YYYY-MM/monthly-review-YYYY-MM.md`, and include the matched zone's checklist with items marked off based on what this cycle covered. Read the file or metadata back and return the observed Drive URL. Do not use an inferred local path or claim completion without readback. If Drive saving or verification fails, return the report content with `needs review` and the exact blocker; do not silently save elsewhere.
 
 2. **BasicOps task** (BasicOps MCP — if not authorized, say so in the completion summary):
    - Project id `{{BASICOPS_PROJECT_ID}}`, section id `{{BASICOPS_SECTION_ID}}`
@@ -57,7 +57,9 @@ Never make changes in Google Ads directly. Finish with:
    - Post the full report (zone, findings, panel synthesis, decision) as a **discussion message** via `create_message_in_task` — that's where the report content belongs.
    - One **subtask per action item**, each with a direct, actionable instruction assuming the account owner already knows how to execute it in the Google Ads UI (e.g. "Upload these negative keywords: [list]"). Include exact specifics (keywords, bid/budget numbers, ad copy lines).
 
-3. **Save the report** to `google_ads/YYYY-MM/monthly-review-YYYY-MM.md` in the client folder (one-pager per the skill's format), including the matched zone's checklist with items marked off based on what this cycle covered.
+3. **Email** — via Gmail (Zapier MCP: check `list_enabled_zapier_actions` first). To: `{{EMAIL_TO}}`. Subject: "{{CLIENT_NAME}} — Google Ads Monthly Review [Month Year]". Body: concise — zone/checklist headline, key findings, what you decided and why, pointer to the verified Drive report and BasicOps for the rest.
+
+4. **Hermes record and handoff** — after the worker returns the verified Drive URL, Hermes records the run, evidence, work state, proposed actions, artefact link and next owner in the canonical Obsidian service file. Hermes then sends the decision brief and stops for Michael's approval. Hermes does not recreate the report or become its primary Drive writer when the worker has Drive access.
 
 ## Constraints
 - Data-driven, profitability-first — not activity for its own sake.

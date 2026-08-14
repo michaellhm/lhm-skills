@@ -61,7 +61,12 @@ After presenting recommendations from any skill:
 Follow `${CLAUDE_PLUGIN_ROOT}/references/self-improvement-protocol.md`.
 
 Update `[client-folder]/current-projects.md` with any new or completed work.
-Update `[client-folder]/google_ads/YYYY-MM/` with session outputs.
+
+The Google Ads worker owns producing, saving and verifying its session artefacts. For a monthly review, follow the monthly-review skill's mandatory pre-approval Drive save step. Use the exact Google Drive destination recorded in the client's canonical service file; save to `google_ads/YYYY-MM/`, read the saved file or metadata back, and return the observed Drive URL to the caller.
+
+Hermes owns orchestration after handoff: it records the run, evidence, work state, proposed actions, artefact URL and next owner in the canonical Obsidian service file, then notifies Michael. Do not ask Hermes to recreate or save the report content when the worker has Drive write access.
+
+If Drive saving or verification fails, return the report content with `needs review` and the exact blocker. Do not claim completion or silently substitute a local path.
 
 ## MCP tools available
 

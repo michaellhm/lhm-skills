@@ -9,8 +9,9 @@ You are the master orchestrator for the GMB 3-Month Ranking Flow. Your job is to
 
 ## Before Starting
 
-1. Read `${CLAUDE_PLUGIN_ROOT}/../lhm-project-hub/skills/gmb-project-manager/LEARNED.md`
-2. Read `${CLAUDE_PLUGIN_ROOT}/references/gmb-ranking-principles.md`
+1. Read `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md`
+2. Read `${CLAUDE_PLUGIN_ROOT}/../lhm-project-hub/skills/gmb-project-manager/LEARNED.md`
+3. Read `${CLAUDE_PLUGIN_ROOT}/references/gmb-ranking-principles.md`
 
 ## Step 1: Identify the Client
 
@@ -99,3 +100,4 @@ All available skills in this plugin:
 3. **Always update the project doc.** After any skill completes, ensure `project-management/gmb.md` is updated via `lhm-project-hub:gmb-project-manager`.
 4. **Check exit criteria before advancing phases.** Don't move to Month 1 if Month 0 tasks are incomplete.
 5. **For re-cycles (Cycle 2+):** Month 0 is lighter. Only diagnostic + service selection. Don't re-run GBP optimisation, citations, entity mapping, site architecture, or post generation unless specifically requested.
+6. **Verify deliverables before phase progress.** Require each producing worker to save and read back its required artefact and return the observed URL/ID. A missing required artefact is `needs_review`, not a completed phase task.

@@ -2,6 +2,10 @@
 
 These rules apply to EVERY skill and agent in this plugin, without exception.
 
+## Mandatory: Delivery Artefact and Handoff Contract
+
+Before executing work that may produce a material deliverable, read and follow `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md`. The content worker must save and read back the reviewed draft or published document and return its observed URL/ID. Do not claim completion from chat output alone.
+
 ## Mandatory: Anti-AI Writing Guidelines
 
 Before writing ANY content (blog articles, social posts, outlines, meta descriptions, reports, recommendations, or file outputs), you MUST follow the anti-AI writing guidelines stored at:

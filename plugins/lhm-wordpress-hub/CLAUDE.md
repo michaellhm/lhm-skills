@@ -2,6 +2,10 @@
 
 These rules apply to EVERY skill and agent in this plugin, without exception.
 
+## Mandatory: Delivery Artefact and Handoff Contract
+
+Before executing work that may produce a material deliverable, read and follow `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md`. Use Drive for client-facing files, the registered repository/branch for code, and the registered staging/preview environment for reviewable implementation. Save and verify before handoff; keep publish, merge and deployment approvals separate.
+
 ## Mandatory: Workflow Detection
 
 Every session in this plugin operates on one of two workflows: **Full Website Build** or **Landing Page Campaign**. Before invoking any skill that produces output, you MUST know which workflow is active.

@@ -77,6 +77,8 @@ All Project Hub skills, and when to route to each:
 
 ## Rules
 
+- Read `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md` before recording or routing material work. Require verified specialist artefact references and preserve `needs_review` when a required artefact is missing.
+
 - Never mutate BasicOps directly. Route every BasicOps write through `lhm-project-hub:basicops-task-manager`; the originating workflow supplies context and receives the verified handback.
 - Route rough delegation and handoff-readiness work through `lhm-project-hub:team-work-brief` before BasicOps. Do not expect an assistant or non-specialist requester to diagnose technical requirements unaided.
 - Client-facing emails are drafts only, never sent.
