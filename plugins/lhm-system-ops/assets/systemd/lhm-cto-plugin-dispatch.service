@@ -3,6 +3,7 @@ Description=Validate and run governed CTO Codex plugin work
 
 [Service]
 Type=oneshot
+Environment=PATH=/home/ctoworker/.local/bin:/usr/bin:/bin
 ExecStart=/usr/local/libexec/lhm-cto-plugin-dispatcher
 User=root
 Group=root

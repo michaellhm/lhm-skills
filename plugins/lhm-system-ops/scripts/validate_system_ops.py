@@ -20,7 +20,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.1.4':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.1.5':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -49,6 +49,8 @@ def main():
     service = (PLUGIN / 'assets/systemd/lhm-cto-plugin-dispatch.service').read_text(encoding='utf-8')
     if 'setfacl' in service:
         errors.append('dispatcher service must not grant ctoworker traversal into the Hermes home tree')
+    if 'Environment=PATH=/home/ctoworker/.local/bin:/usr/bin:/bin' not in service:
+        errors.append('dispatcher service is missing the bounded CTO runtime PATH')
     dispatcher = (PLUGIN / 'assets/host/lhm-cto-plugin-dispatcher').read_text(encoding='utf-8')
     if "WORKER_RUNS = WORKSPACES / '.runs'" not in dispatcher:
         errors.append('dispatcher is missing the private CTO run-control directory')
