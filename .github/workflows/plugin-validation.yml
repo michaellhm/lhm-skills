@@ -1,0 +1,25 @@
+name: Validate LHM plugins
+
+on:
+  pull_request:
+    paths:
+      - 'plugins/**'
+      - '.claude-plugin/marketplace.json'
+      - 'scripts/**'
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 scripts/validate-plugin-versions.py
+      - run: python3 plugins/lhm-system-ops/scripts/validate_system_ops.py
+      - run: python3 -m unittest discover -s plugins/lhm-system-ops/tests -v

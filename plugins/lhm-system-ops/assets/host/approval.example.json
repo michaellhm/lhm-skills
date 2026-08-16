@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "approval_id": "CAP-XXX-LHM-SYSTEM-OPS",
+  "repository": "michaellhm/lhm-skills",
+  "commit": "FULL_40_CHARACTER_GIT_COMMIT",
+  "plugin": "lhm-system-ops",
+  "archive_sha256": "FULL_64_CHARACTER_SHA256",
+  "profile": "lhm_brain",
+  "issued_at": "2026-08-17T00:00:00+00:00",
+  "expires_at": "2026-08-18T23:59:59+10:00",
+  "used": false
+}
