@@ -11,6 +11,7 @@ BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/cto-plugin')
 INCOMING, PROCESSED, FAILED, RUNS = (BASE / name for name in ('incoming', 'processed', 'failed', 'runs'))
 REPO = Path('/srv/lhm-plugin-source')
 WORKSPACES = Path('/home/ctoworker/workspaces')
+WORKER_RUNS = WORKSPACES / '.runs'
 CODEX = '/home/ctoworker/.local/bin/codex'
 SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
 HERMES_GROUP = 10000
@@ -78,13 +79,16 @@ def process(path):
     if git('rev-parse', 'main') != git('rev-parse', 'origin/main'):
         git('checkout', 'main')
         git('merge', '--ff-only', 'origin/main')
-    run_dir = RUNS / request['request_id']
-    run_dir.mkdir(mode=0o750)
-    os.chown(run_dir, 10003, HERMES_GROUP)
-    schema = run_dir / 'output-schema.json'
+    audit_dir = RUNS / request['request_id']
+    audit_dir.mkdir(mode=0o750)
+    os.chown(audit_dir, 10003, HERMES_GROUP)
+    worker_run = WORKER_RUNS / request['request_id']
+    worker_run.mkdir(mode=0o700)
+    os.chown(worker_run, 10003, 10003)
+    schema = worker_run / 'output-schema.json'
     schema.write_text(json.dumps(output_schema(), indent=2) + '\n', encoding='utf-8')
-    os.chown(schema, 10003, HERMES_GROUP)
-    os.chmod(schema, 0o640)
+    os.chown(schema, 10003, 10003)
+    os.chmod(schema, 0o600)
     mode = request['mode']
     workspace = REPO
     branch = None
@@ -97,8 +101,8 @@ def process(path):
     tests = '\n'.join(f'- {item}' for item in request['acceptance_tests'])
     role_sequence = 'Capability Researcher only; do not modify files.' if mode == 'research' else 'Capability Researcher, Platform Engineer, QA Tester, Security/Reliability Reviewer, then Plugin Release Manager as separate recorded passes.'
     prompt = f'''You are the governed LHM CTO Codex lane.\nParent: {request['parent_run_id']}\nIncident: {request['capability_incident_id']}\nReturn point: {request['return_point']}\nMode: {mode}\nRole sequence: {role_sequence}\n\nObjective:\n{request['objective']}\n\nAcceptance tests:\n{tests}\n\nUse the lhm-system-ops contracts in this repository. Research native Hermes and existing LHM capability before third-party or custom work. In change mode work only on branch `{branch}`, run validators/tests, commit, and push only that branch. Never push or merge main, edit live Hermes, deploy, use host root, or copy credentials. Return the required structured result. A successful repair must still return through capability_restored to the original parent.'''
-    final = run_dir / 'final.json'
-    events = run_dir / 'codex.jsonl'
+    final = worker_run / 'final.json'
+    events = worker_run / 'codex.jsonl'
     command = [CODEX, '--ask-for-approval', 'never', '--search', 'exec', '--sandbox', 'read-only' if mode == 'research' else 'workspace-write', '--cd', str(workspace), '--output-schema', str(schema), '--output-last-message', str(final), '--json', prompt]
     completed = run_worker(['timeout', str(request['timeout_seconds']), *command])
     events.write_text(completed.stdout, encoding='utf-8')
@@ -106,14 +110,21 @@ def process(path):
     result = json.loads(final.read_text(encoding='utf-8'))
     result.update({'request_id': request['request_id'], 'parent_run_id': request['parent_run_id'], 'capability_incident_id': request['capability_incident_id'], 'return_point': request['return_point'], 'resume_token': request['resume_token'], 'finished_at': datetime.now(timezone.utc).isoformat()})
     final.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
-    os.chown(final, 10003, HERMES_GROUP)
-    os.chmod(final, 0o640)
+    audit_final = audit_dir / 'final.json'
+    audit_events = audit_dir / 'codex.jsonl'
+    shutil.copy2(final, audit_final)
+    shutil.copy2(events, audit_events)
+    for artifact in (audit_final, audit_events):
+        os.chown(artifact, 10003, HERMES_GROUP)
+        os.chmod(artifact, 0o640)
     shutil.move(str(path), PROCESSED / path.name)
 
 
 def main():
-    for directory in (INCOMING, PROCESSED, FAILED, RUNS, WORKSPACES):
+    for directory in (INCOMING, PROCESSED, FAILED, RUNS, WORKSPACES, WORKER_RUNS):
         directory.mkdir(parents=True, exist_ok=True)
+    os.chown(WORKER_RUNS, 10003, 10003)
+    os.chmod(WORKER_RUNS, 0o700)
     for path in sorted(INCOMING.glob('*.json')):
         try:
             process(path)

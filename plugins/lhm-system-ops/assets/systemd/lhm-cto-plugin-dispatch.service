@@ -3,7 +3,6 @@ Description=Validate and run governed CTO Codex plugin work
 
 [Service]
 Type=oneshot
-ExecStartPre=/usr/bin/setfacl -m u:ctoworker:--x /home/hermes/.hermes/profiles/lhm_brain/dispatch/cto-plugin/runs
 ExecStart=/usr/local/libexec/lhm-cto-plugin-dispatcher
 User=root
 Group=root
