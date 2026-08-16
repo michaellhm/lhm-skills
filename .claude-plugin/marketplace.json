@@ -125,7 +125,7 @@
       "name": "lhm-system-ops",
       "source": "./plugins/lhm-system-ops",
       "description": "Governed CTO capability research, engineering, QA, security review, GitHub delivery, and approved Hermes plugin deployment.",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "category": "utilities",
       "tags": [
         "cto",

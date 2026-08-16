@@ -20,7 +20,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.1.2':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.1.3':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -46,6 +46,9 @@ def main():
     for relative in required_assets:
         if not (PLUGIN / relative).is_file():
             errors.append(f'missing runtime asset: {relative}')
+    service = (PLUGIN / 'assets/systemd/lhm-cto-plugin-dispatch.service').read_text(encoding='utf-8')
+    if 'setfacl -m u:ctoworker:--x ' not in service:
+        errors.append('dispatcher service does not grant execute-only run traversal to ctoworker')
     if errors:
         print('\n'.join(f'ERROR: {item}' for item in errors), file=sys.stderr)
         return 1

@@ -29,6 +29,14 @@ def reject(path, reason):
     (FAILED / f'{path.stem}.error').write_text(reason + '\n', encoding='utf-8')
 
 
+def failure_reason(exc):
+    if isinstance(exc, subprocess.CalledProcessError):
+        detail = (exc.stderr or exc.stdout or '').strip()
+        if detail:
+            return detail[-4000:]
+    return str(exc)
+
+
 def validate(request, path):
     required = {'schema_version', 'request_id', 'parent_run_id', 'capability_incident_id', 'objective', 'acceptance_tests', 'mode', 'timeout_seconds', 'return_point', 'resume_token'}
     if not isinstance(request, dict) or set(request) != required or request.get('schema_version') != 1:
@@ -110,7 +118,7 @@ def main():
         try:
             process(path)
         except Exception as exc:
-            reject(path, str(exc))
+            reject(path, failure_reason(exc))
 
 
 if __name__ == '__main__':
