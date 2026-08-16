@@ -23,3 +23,4 @@ jobs:
       - run: python3 scripts/validate-plugin-versions.py
       - run: python3 plugins/lhm-system-ops/scripts/validate_system_ops.py
       - run: python3 -m unittest discover -s plugins/lhm-system-ops/tests -v
+      - run: python3 -m py_compile plugins/lhm-system-ops/scripts/*.py plugins/lhm-system-ops/assets/host/cto-dispatch plugins/lhm-system-ops/assets/host/lhm-cto-plugin-dispatcher plugins/lhm-system-ops/assets/host/lhm-approved-plugin-deployer

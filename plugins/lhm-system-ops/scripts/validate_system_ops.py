@@ -20,7 +20,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.1.0':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.1.1':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -36,6 +36,16 @@ def main():
     for path in PLUGIN.rglob('*'):
         if path.is_file() and path.name in prohibited:
             errors.append(f'prohibited sensitive filename: {path.relative_to(PLUGIN)}')
+    required_assets = {
+        'assets/host/cto-dispatch',
+        'assets/host/lhm-cto-plugin-dispatcher',
+        'assets/host/lhm-approved-plugin-deployer',
+        'assets/systemd/lhm-cto-plugin-dispatch.path',
+        'assets/systemd/lhm-cto-plugin-dispatch.service',
+    }
+    for relative in required_assets:
+        if not (PLUGIN / relative).is_file():
+            errors.append(f'missing runtime asset: {relative}')
     if errors:
         print('\n'.join(f'ERROR: {item}' for item in errors), file=sys.stderr)
         return 1

@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+import argparse
+import json
+import os
+import re
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+BASE = Path('/opt/data/profiles/lhm_brain/dispatch/cto-plugin')
+SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
+
+
+def submit(args):
+    request = json.load(__import__('sys').stdin)
+    required = {'schema_version', 'request_id', 'parent_run_id', 'capability_incident_id', 'objective', 'acceptance_tests', 'mode', 'timeout_seconds', 'return_point', 'resume_token'}
+    if not isinstance(request, dict) or set(request) != required or request.get('schema_version') != 1:
+        raise SystemExit('invalid CTO request schema')
+    for key in ('request_id', 'parent_run_id', 'capability_incident_id'):
+        if not isinstance(request[key], str) or not SAFE_ID.fullmatch(request[key]):
+            raise SystemExit(f'invalid {key}')
+    if request['mode'] not in {'research', 'change'}:
+        raise SystemExit('invalid mode')
+    if not isinstance(request['timeout_seconds'], int) or not 300 <= request['timeout_seconds'] <= 1800:
+        raise SystemExit('invalid timeout')
+    if not isinstance(request['objective'], str) or not 1 <= len(request['objective']) <= 3000:
+        raise SystemExit('invalid objective')
+    if not isinstance(request['acceptance_tests'], list) or not 1 <= len(request['acceptance_tests']) <= 20:
+        raise SystemExit('invalid acceptance tests')
+    if not isinstance(request['resume_token'], str) or len(request['resume_token']) < 16:
+        raise SystemExit('invalid resume token')
+    incoming = BASE / 'incoming'
+    fd, temporary = tempfile.mkstemp(prefix=f'.{request["request_id"]}.', dir=incoming)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(request, handle, indent=2)
+            handle.write('\n')
+        os.chmod(temporary, 0o600)
+        os.replace(temporary, incoming / f'{request["request_id"]}.json')
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    print(json.dumps({'request_id': request['request_id'], 'status': 'queued_for_validation'}))
+
+
+def status(args):
+    if not SAFE_ID.fullmatch(args.request_id):
+        raise SystemExit('invalid request_id')
+    for directory, state in (('runs', 'accepted'), ('failed', 'rejected'), ('incoming', 'queued')):
+        root = BASE / directory
+        final = root / args.request_id / 'final.json' if directory == 'runs' else root / f'{args.request_id}.json'
+        if final.is_file():
+            print(final.read_text(encoding='utf-8') if directory == 'runs' else json.dumps({'request_id': args.request_id, 'status': state}))
+            return
+    print(json.dumps({'request_id': args.request_id, 'status': 'unknown'}))
+
+
+def main():
+    parser = argparse.ArgumentParser(prog='cto-dispatch')
+    commands = parser.add_subparsers(dest='command', required=True)
+    submit_parser = commands.add_parser('submit')
+    submit_parser.set_defaults(func=submit)
+    status_parser = commands.add_parser('status')
+    status_parser.add_argument('request_id')
+    status_parser.set_defaults(func=status)
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()
