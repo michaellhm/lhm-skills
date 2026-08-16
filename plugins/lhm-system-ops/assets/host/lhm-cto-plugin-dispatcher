@@ -13,6 +13,7 @@ REPO = Path('/srv/lhm-plugin-source')
 WORKSPACES = Path('/home/ctoworker/workspaces')
 CODEX = '/home/ctoworker/.local/bin/codex'
 SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
+HERMES_GROUP = 10000
 
 
 def run_worker(args, **kwargs):
@@ -71,10 +72,11 @@ def process(path):
         git('merge', '--ff-only', 'origin/main')
     run_dir = RUNS / request['request_id']
     run_dir.mkdir(mode=0o750)
-    os.chown(run_dir, 10003, 10003)
+    os.chown(run_dir, 10003, HERMES_GROUP)
     schema = run_dir / 'output-schema.json'
     schema.write_text(json.dumps(output_schema(), indent=2) + '\n', encoding='utf-8')
-    os.chown(schema, 10003, 10003)
+    os.chown(schema, 10003, HERMES_GROUP)
+    os.chmod(schema, 0o640)
     mode = request['mode']
     workspace = REPO
     branch = None
@@ -96,6 +98,8 @@ def process(path):
     result = json.loads(final.read_text(encoding='utf-8'))
     result.update({'request_id': request['request_id'], 'parent_run_id': request['parent_run_id'], 'capability_incident_id': request['capability_incident_id'], 'return_point': request['return_point'], 'resume_token': request['resume_token'], 'finished_at': datetime.now(timezone.utc).isoformat()})
     final.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
+    os.chown(final, 10003, HERMES_GROUP)
+    os.chmod(final, 0o640)
     shutil.move(str(path), PROCESSED / path.name)
 
 

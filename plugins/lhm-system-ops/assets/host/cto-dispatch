@@ -46,11 +46,19 @@ def submit(args):
 def status(args):
     if not SAFE_ID.fullmatch(args.request_id):
         raise SystemExit('invalid request_id')
-    for directory, state in (('runs', 'accepted'), ('failed', 'rejected'), ('incoming', 'queued')):
+    for directory, state in (('failed', 'rejected'), ('runs', 'accepted'), ('incoming', 'queued')):
         root = BASE / directory
         final = root / args.request_id / 'final.json' if directory == 'runs' else root / f'{args.request_id}.json'
-        if final.is_file():
-            print(final.read_text(encoding='utf-8') if directory == 'runs' else json.dumps({'request_id': args.request_id, 'status': state}))
+        try:
+            exists = final.is_file()
+        except PermissionError:
+            exists = False
+        if exists:
+            response = {'request_id': args.request_id, 'status': state}
+            error = root / f'{args.request_id}.error'
+            if directory == 'failed' and error.is_file():
+                response['reason'] = error.read_text(encoding='utf-8').strip()
+            print(final.read_text(encoding='utf-8') if directory == 'runs' else json.dumps(response))
             return
     print(json.dumps({'request_id': args.request_id, 'status': 'unknown'}))
 
