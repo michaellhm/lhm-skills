@@ -40,7 +40,7 @@ plugins/lhm-marketing-hub/             # The plugin
     keyword-research/                  # Keyword discovery, intent analysis, topic clusters
     content-gap-analysis/              # Keyword, topic, and content gap identification
     prospect-sitemap-opportunity/      # Prospect pitch: proposed sitemap + interactive impressions-to-leads widget
-    client-sitemap-plan/               # Existing client: same architecture as a phased content plan, no widget
+    client-sitemap-plan/               # Existing client: same architecture as a phased content plan, no widget, --since progress view
     seo-content-writer/                # SEO-optimized blog posts and articles
     geo-content-optimizer/             # AI citation and GEO optimization
     meta-tags-optimizer/               # Title tags, meta descriptions, OG tags
@@ -227,7 +227,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 **Strategy & Research** (3 skills): Competitive analysis with Porter's 5 Forces, keyword research with intent analysis and topic clustering, They Ask You Answer question discovery.
 
-**SEO & Content** (11 skills): Proposed sitemap and opportunity model for prospect pitches (live site crawl, demand research, interactive HTML sitemap with an editable impressions-to-leads widget and ongoing-SEO slider, optional workbook), phased website content plan for existing clients (same architecture, build-order grouping, no sales widget), content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, meta tags optimization, site-wide meta tag refresh (Ads conversion + GSC decline data, slug audit, Rank Math REST push with 301 redirects), CORE-EEAT content quality auditing, PR content rewriting for rejected distributions, content refresh planning.
+**SEO & Content** (11 skills): Proposed sitemap and opportunity model for prospect pitches (live site crawl, demand research, interactive HTML sitemap with an editable impressions-to-leads widget and ongoing-SEO slider, optional workbook), phased website content plan for existing clients (same architecture, build-order grouping, no sales widget, and a `--since` mode that renders a progress band and per-page change chips against a previous version so monthly reviews show what moved), content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, meta tags optimization, site-wide meta tag refresh (Ads conversion + GSC decline data, slug audit, Rank Math REST push with 301 redirects), CORE-EEAT content quality auditing, PR content rewriting for rejected distributions, content refresh planning.
 
 **Analytics & Reporting** (2 skills): GA4 event discovery and conversion classification, analytics dashboard artifact with period comparison and visual output.
 

@@ -4,6 +4,7 @@ Build the interactive proposed-sitemap HTML page from a JSON spec.
 
 Usage:
     python build_sitemap_html.py sitemap.json output.html
+    python build_sitemap_html.py sitemap.json output.html --since previous.json
 
 The JSON spec is documented in references/sitemap-schema.md. A complete worked
 example is in assets/example-sitemap.json. Nothing about the design is hard-coded
@@ -19,15 +20,22 @@ Two modes, chosen by the JSON:
     (key absent or null)   -> client mode. Renders the page tree only. No widget,
                               no calculator JavaScript, no lead estimates.
 
+--since adds a progress band above the tree and a change chip on every page that
+moved since the previous spec. Pages are matched on their normalised name, so a
+page that changes section is reported as moved rather than as a delete plus an
+add. Use it when regenerating a client plan, so the deliverable answers "what
+changed" and not only "what is planned".
+
 Status values on pages / nav items:
     "have"  -> green  (client already has this page)
     "enh"   -> yellow (exists, should be rebuilt/expanded)
     "new"   -> red    (does not exist yet, the opportunity)
 
 NOTE: this file is duplicated in the client-sitemap-plan skill. The two copies are
-identical by design. If you change one, change both.
+identical by design, and scripts/validate-script-parity.py fails the commit if they
+diverge. If you change one, change both.
 """
-import json, sys, html
+import argparse, json, re, sys, html
 
 def esc(s):
     return html.escape(str(s), quote=True)
@@ -91,6 +99,20 @@ CSS = """
   .seed{font-size:12.5px;color:#CFE3D4;margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.14)}
   .seed b{color:#F0DDB0}
   .fine{font-size:10.5px;color:#9FC0A8;margin-top:9px;line-height:1.45}
+  .delta{background:linear-gradient(180deg,#12351f 0%, var(--green-d) 100%);border-radius:16px;padding:20px 24px;color:#fff;margin-bottom:24px;box-shadow:0 12px 34px rgba(18,53,31,.28)}
+  .delta h2{font-size:19px;letter-spacing:-.01em;margin-bottom:3px}
+  .delta .sub{color:#BFE0C8;font-size:13px;max-width:820px}
+  .dstats{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .dstat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:12px 16px;min-width:118px;flex:0 1 auto}
+  .dstat b{display:block;font-size:30px;font-weight:800;line-height:1.1;letter-spacing:-.02em}
+  .dstat span{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:#CFE3D4;font-weight:700}
+  .dstat.win b{color:#9FE0AF} .dstat.warn b{color:#F0DDB0} .dstat.bad b{color:#F3A9A9}
+  .pbar{height:10px;background:rgba(0,0,0,.28);border-radius:20px;overflow:hidden;margin-top:18px}
+  .pbar>i{display:block;height:100%;background:linear-gradient(90deg,#7AC18C,var(--gold));border-radius:20px}
+  .pbarlab{display:flex;justify-content:space-between;font-size:12px;color:#CFE3D4;margin-top:7px}
+  .pbarlab b{color:#fff}
+  .removed{font-size:12.5px;color:#CFE3D4;margin-top:14px;padding-top:11px;border-top:1px solid rgba(255,255,255,.14)}
+  .removed b{color:#F0DDB0}
   .intro{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-bottom:22px}
   .intro h1{font-size:20px;color:var(--green-d);margin-bottom:5px;letter-spacing:-.01em}
   .intro p{color:var(--grey);font-size:14px;max-width:960px}
@@ -114,6 +136,13 @@ CSS = """
   .vol.na{color:#93A499;background:#EFF2EF;font-weight:600}
   .tag{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:5px;align-self:flex-start;margin-top:1px;white-space:nowrap}
   .tag.new{background:var(--new-bg);color:var(--new)} .tag.enh{background:var(--enh-bg);color:var(--enh-txt)} .tag.have{background:var(--have-bg);color:var(--have)}
+  .chg{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:1px 6px;border-radius:5px;align-self:flex-start;margin-top:2px;white-space:nowrap;border:1px solid}
+  .chg.shipped{color:#1B5E20;background:#DCF0DD;border-color:#9CCFA2}
+  .chg.built{color:#8A5A00;background:#FBF0D2;border-color:#E3C878}
+  .chg.flagged{color:#8A5A00;background:#FBF0D2;border-color:#E3C878}
+  .chg.regressed{color:#B71C1C;background:#FBE3E3;border-color:#E8A0A0}
+  .chg.added{color:#1A4C7A;background:#DEEBF6;border-color:#9BC2DF}
+  .chg.moved{color:#5B6B60;background:#EFF2EF;border-color:#CFD8CF}
   .note{font-size:12.5px;color:var(--grey);background:#fff;border:1px dashed var(--line);border-radius:10px;padding:12px 15px;margin-top:12px}
   footer{max-width:1240px;margin:0 auto;padding:0 22px 40px;color:var(--grey);font-size:12px}
   .pill{display:inline-block;background:var(--new);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;margin-left:8px;vertical-align:middle}
@@ -122,6 +151,16 @@ CSS = """
 STATUS_TAG = {"have": ("have", "Existing"), "enh": ("enh", "Enhance"), "new": ("new", "New")}
 
 NEWDOT = ' <span class="dot new"></span>'
+
+# (previous status, current status) -> (chip class, chip label)
+STATUS_CHANGE = {
+    ("new", "have"): ("shipped",    "Shipped"),
+    ("enh", "have"): ("shipped",    "Rebuilt"),
+    ("new", "enh"):  ("built",      "Built"),
+    ("have", "enh"): ("flagged",    "Flagged"),
+    ("have", "new"): ("regressed",  "Reopened"),
+    ("enh", "new"):  ("regressed",  "Reopened"),
+}
 
 def _link(i):
     """A single dropdown link, with a red dot if the item is new."""
@@ -158,7 +197,94 @@ def nav_item(item):
     # plain link
     return f'<li><a href="#">{label}{newdot}</a></li>'
 
-def page_li(p):
+# ------------------------------------------------------------------------ diffing
+
+def page_key(name):
+    """Match pages across runs on their name, ignoring case, punctuation and spacing.
+
+    Name is a better key than slug: slugs in these specs are often annotations
+    ("re-cluster ~40 posts") rather than URLs, and a page that moves section keeps
+    its name. Duplicate names within one spec collapse to a single entry, which is
+    why the schema asks for distinct page names.
+    """
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s&]", "", str(name).lower())).strip()
+
+def index_pages(spec):
+    """Flatten a spec to {key: {name, status, section, card}}."""
+    out = {}
+    for sec in spec.get("sections", []):
+        for card in sec.get("cards", []):
+            for p in card.get("items", []):
+                out[page_key(p["name"])] = {
+                    "name": p["name"],
+                    "status": p.get("status", "new"),
+                    "section": sec.get("title", ""),
+                    "card": card.get("head", ""),
+                }
+    return out
+
+def diff_specs(cur, prev):
+    """Compare two specs. Returns (changes_by_key, summary)."""
+    c, p = index_pages(cur), index_pages(prev)
+    changes, counts = {}, {"shipped": 0, "built": 0, "flagged": 0,
+                           "regressed": 0, "added": 0, "moved": 0}
+    for k, v in c.items():
+        if k not in p:
+            changes[k] = ("added", "Added")
+            counts["added"] += 1
+            continue
+        was, now = p[k]["status"], v["status"]
+        if was != now:
+            cls, label = STATUS_CHANGE.get((was, now), ("moved", "Changed"))
+            changes[k] = (cls, label)
+            counts[cls] = counts.get(cls, 0) + 1
+        elif p[k]["section"] != v["section"]:
+            changes[k] = ("moved", "Moved")
+            counts["moved"] += 1
+    removed = [p[k]["name"] for k in p if k not in c]
+    total = len(c)
+    live = sum(1 for v in c.values() if v["status"] == "have")
+    prev_live = sum(1 for v in p.values() if v["status"] == "have")
+    summary = dict(counts, removed=removed, total=total, live=live,
+                   prev_live=prev_live, prev_total=len(p))
+    return changes, summary
+
+def delta_html(summary, prev_label):
+    """The progress band. Sits where the opportunity widget sits in prospect mode."""
+    pct = (summary["live"] / summary["total"] * 100) if summary["total"] else 0
+    gained = summary["live"] - summary["prev_live"]
+    tiles = [
+        ("win",  summary["shipped"],   "shipped"),
+        ("warn", summary["built"] + summary["flagged"], "in progress"),
+        ("",     summary["added"],     "added to plan"),
+        ("bad",  summary["regressed"], "reopened"),
+        ("",     len(summary["removed"]), "removed"),
+    ]
+    tile_html = "".join(
+        f'<div class="dstat {cls}"><b>{n}</b><span>{esc(lab)}</span></div>'
+        for cls, n, lab in tiles
+    )
+    removed = ""
+    if summary["removed"]:
+        names = ", ".join(esc(n) for n in summary["removed"])
+        removed = f'<div class="removed"><b>Removed since {esc(prev_label)}:</b> {names}</div>'
+    return f"""
+  <section class="delta">
+    <h2>Progress since {esc(prev_label)}</h2>
+    <div class="sub">What has moved on the plan since the last version. Pages are matched by name, so a page that changed section is shown as moved rather than removed and re-added.</div>
+    <div class="dstats">{tile_html}</div>
+    <div class="pbar"><i style="width:{pct:.1f}%"></i></div>
+    <div class="pbarlab">
+      <span><b>{summary['live']}</b> of <b>{summary['total']}</b> pages live ({pct:.0f}%)</span>
+      <span>{'+' if gained >= 0 else ''}{gained} since {esc(prev_label)}</span>
+    </div>
+    {removed}
+  </section>
+"""
+
+# ------------------------------------------------------------------------- render
+
+def page_li(p, changes=None):
     status = p.get("status", "new")
     cls, word = STATUS_TAG.get(status, ("new", "New"))
     name = esc(p["name"])
@@ -173,18 +299,23 @@ def page_li(p):
             volhtml = f'<span class="vol">{int(vol):,}</span>'
         except (ValueError, TypeError):
             volhtml = f'<span class="vol">{esc(vol)}</span>'
+    chg = ""
+    if changes:
+        hit = changes.get(page_key(p["name"]))
+        if hit:
+            chg = f'<span class="chg {hit[0]}">{esc(hit[1])}</span>'
     return (f'<li><span class="dot {cls}"></span>'
             f'<span class="t">{name} {slug}</span>'
-            f'{volhtml}<span class="tag {cls}">{word}</span></li>')
+            f'{volhtml}{chg}<span class="tag {cls}">{word}</span></li>')
 
-def card_html(c):
+def card_html(c, changes=None):
     head_u = f' <span class="u">{esc(c["url"])}</span>' if c.get("url") else ""
-    items = "".join(page_li(p) for p in c["items"])
+    items = "".join(page_li(p, changes) for p in c["items"])
     return f'<div class="card"><div class="head">{esc(c["head"])}{head_u}</div><ul>{items}</ul></div>'
 
-def section_html(s):
+def section_html(s, changes=None):
     pill = f' <span class="pill">{esc(s["pill"])}</span>' if s.get("pill") else ""
-    cards = "".join(card_html(c) for c in s["cards"])
+    cards = "".join(card_html(c, changes) for c in s["cards"])
     note = f'<div class="note">{s["note"]}</div>' if s.get("note") else ""
     return f'<h2 class="sec">{esc(s["title"])}{pill}</h2><div class="cols">{cards}</div>{note}'
 
@@ -258,7 +389,7 @@ def opportunity_js(o):
   calc();
 </script>"""
 
-def build(spec):
+def build(spec, prev=None):
     b = spec["brand"]
     primary = b.get("primary", "#2E6B3E")
     css = (CSS.replace("__PRIMARY__", primary)
@@ -276,12 +407,22 @@ def build(spec):
     opp_script = opportunity_js(o) if o else ""
     title_suffix = " &amp; Opportunity" if o else ""
 
+    # Progress band and per-page change chips, when a previous spec was supplied.
+    changes, delta_section, summary = None, "", None
+    if prev is not None:
+        prev_label = prev.get("brand", {}).get("date") or "the previous plan"
+        changes, summary = diff_specs(spec, prev)
+        delta_section = delta_html(summary, prev_label)
+
+    legend_chg = ('<span>🔄 Change chips compare against the previous plan</span>'
+                  if changes else "")
+
     stats = "".join(f'<div><b>{esc(s["n"])}</b> {esc(s["label"])}</div>' for s in spec.get("stats", []))
-    sections = "".join(section_html(s) for s in spec["sections"])
+    sections = "".join(section_html(s, changes) for s in spec["sections"])
     intro = spec.get("intro", {})
     footer = spec.get("footer", "")
 
-    return f"""<!DOCTYPE html>
+    doc = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -298,7 +439,7 @@ def build(spec):
   </div>
 </header>
 <div class="wrap">
-{opp_section}
+{opp_section}{delta_section}
   <section class="intro">
     <h1>{esc(intro.get('title','Proposed website sitemap'))}</h1>
     <p>{intro.get('paragraph','')}</p>
@@ -308,6 +449,7 @@ def build(spec):
       <span><span class="dot enh"></span> <b style="color:var(--enh-txt)">Enhance</b>&nbsp;— exists, rebuild to rank &amp; convert</span>
       <span><span class="dot new"></span> <b style="color:var(--new)">New</b>&nbsp;— doesn't exist yet</span>
       <span>🔎 Green number = monthly searches · "n/a" = no volume recorded</span>
+      {legend_chg}
     </div>
   </section>
 
@@ -318,18 +460,38 @@ def build(spec):
 </body>
 </html>
 """
+    return doc, summary
 
 def main():
-    if len(sys.argv) < 3:
-        print("Usage: python build_sitemap_html.py <sitemap.json> <output.html>")
-        sys.exit(1)
-    with open(sys.argv[1], encoding="utf-8") as f:
+    ap = argparse.ArgumentParser(description="Build the proposed-sitemap HTML page.")
+    ap.add_argument("spec", help="sitemap.json")
+    ap.add_argument("output", help="output .html")
+    ap.add_argument("--since", metavar="PREVIOUS.JSON",
+                    help="a previous sitemap.json; adds the progress band and change chips")
+    a = ap.parse_args()
+
+    with open(a.spec, encoding="utf-8") as f:
         spec = json.load(f)
-    out = build(spec)
-    with open(sys.argv[2], "w", encoding="utf-8") as f:
+    prev = None
+    if a.since:
+        try:
+            with open(a.since, encoding="utf-8") as f:
+                prev = json.load(f)
+        except FileNotFoundError:
+            sys.exit(f"--since file not found: {a.since}")
+
+    out, summary = build(spec, prev)
+    with open(a.output, "w", encoding="utf-8") as f:
         f.write(out)
+
     mode = "prospect (with opportunity widget)" if spec.get("opportunity") else "client (no widget)"
-    print(f"Wrote {sys.argv[2]} — {mode}")
+    print(f"Wrote {a.output} — {mode}")
+    if summary:
+        print(f"  vs {a.since}: {summary['shipped']} shipped, "
+              f"{summary['built'] + summary['flagged']} in progress, "
+              f"{summary['added']} added, {summary['regressed']} reopened, "
+              f"{len(summary['removed'])} removed")
+        print(f"  live: {summary['prev_live']} → {summary['live']} of {summary['total']} pages")
 
 if __name__ == "__main__":
     main()

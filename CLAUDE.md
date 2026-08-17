@@ -55,7 +55,17 @@ Before pushing, check every LEARNED.md file across all skills for accumulated le
 
 The goal: learnings get baked into the skill permanently, LEARNED.md files go to git clean, and skills get smarter with every push.
 
-### 6. Clean Up Scaffolding
+### 6. Keep Duplicated Scripts in Sync
+
+A few skills ship a byte-identical copy of the same script so each skill folder stays self-contained. `prospect-sitemap-opportunity` and `client-sitemap-plan` both carry `build_sitemap_html.py` and `build_workbook.py`.
+
+If you change one copy, change every copy, and stage them all.
+
+**This is enforced.** `scripts/validate-script-parity.py` runs in both the pre-commit hook (against the staged blobs, so fixing both but staging one still fails) and the pre-push hook. When it blocks a commit it names the diverged files and prints the `cp` command that fixes them.
+
+To register a new set of files that must stay identical, add a group to `PARITY_GROUPS` in that script. Run `python3 scripts/validate-script-parity.py` manually any time to check the current state.
+
+### 7. Clean Up Scaffolding
 
 Remove any placeholder/boilerplate files before committing:
 
@@ -65,7 +75,7 @@ Remove any placeholder/boilerplate files before committing:
 
 Only commit files with real content.
 
-### 7. Don't Commit Personal Files
+### 8. Don't Commit Personal Files
 
 Never stage or commit files like `to-do.md`, `.env`, or other personal/local files.
 

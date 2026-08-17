@@ -97,6 +97,10 @@ Both are pure Python. Never hand-edit an output file. If something needs to chan
 
 The HTML generator switches mode on the presence of the `opportunity` key. This skill always includes it. `client-sitemap-plan` omits it, which drops the widget and its JavaScript entirely.
 
+`--since previous.json` adds a progress band and per-page change chips. It exists for `client-sitemap-plan`, but it works here too, which is useful in one case: re-pitching a prospect you quoted months ago, to show what they have and have not moved on since. Keep it off a first pitch, where there is nothing to compare against.
+
+The scripts here are identical copies of the ones in `client-sitemap-plan`. If you fix one, fix both. `scripts/validate-script-parity.py` runs in the pre-commit and pre-push hooks and blocks the commit if they diverge.
+
 ---
 
 ## Related skills

@@ -105,13 +105,40 @@ Do not report this as complete until you have checked all five:
 
 Both are pure Python. Never hand-edit an output file. Change the JSON and re-run, so the plan stays regenerable as pages get delivered.
 
-The scripts in this skill are identical copies of the ones in `prospect-sitemap-opportunity`. If you fix one, fix both.
+The scripts in this skill are identical copies of the ones in `prospect-sitemap-opportunity`. If you fix one, fix both. This is enforced: `scripts/validate-script-parity.py` runs in the pre-commit and pre-push hooks and blocks the commit if the copies diverge, or if you fix both but stage only one.
 
 ---
 
 ## Keeping it current
 
-This deliverable is worth regenerating. As pages go live, flip their `status` from `new` to `have` in the JSON and re-run the script. The same file then works as a progress view in a monthly or quarterly review, which is where most of its value sits after the first hand-over.
+This deliverable is worth regenerating, and the regenerated version is where most of its value sits after the first hand-over.
+
+Keep every version of `sitemap.json`, dated. As pages go live, flip their `status` from `new` to `have` and re-run against the previous file:
+
+```bash
+python scripts/build_sitemap_html.py sitemap.json "‹Client›-Website-Content-Plan.html" --since sitemap-2026-04.json
+```
+
+That adds a **progress band** where the prospect version puts its widget, plus a change chip on every page that moved:
+
+| Chip | Meaning |
+|---|---|
+| Shipped | was `new`, now live |
+| Rebuilt | was `enh`, now live |
+| Built | was `new`, now `enh` (exists, still weak) |
+| Flagged | was live, now marked for rebuild |
+| Reopened | was live, now `new` again |
+| Added | not in the previous plan |
+| Moved | same status, different section |
+
+Pages removed since the previous version are listed in the band, and the bar shows how many of the planned pages are live.
+
+Pages are matched on their **name**, not their slug, because slugs in these specs are often annotations rather than URLs, and a page that moves section keeps its name. Two consequences worth knowing:
+
+- Give every page a distinct name. Duplicates collapse into one entry in the comparison.
+- Renaming a page reads as a delete plus an add. If you rename one, say so in the review rather than letting the band imply churn that did not happen.
+
+For a monthly or quarterly review, `--since` the version you presented last time. That answers "what changed" instead of re-presenting the whole tree.
 
 ## Related skills
 

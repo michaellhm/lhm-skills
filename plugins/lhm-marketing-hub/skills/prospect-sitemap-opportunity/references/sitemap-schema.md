@@ -111,7 +111,7 @@ Keep the nav to what fits on one row. The header does not wrap, and a wrapped na
 
 | Field | Meaning |
 |---|---|
-| `name` | Page title shown to the client |
+| `name` | Page title shown to the client. Must be **distinct within the spec** — `--since` matches pages across versions on the name, so duplicates collapse into one entry |
 | `slug` | Small mono URL or label under the name (optional) |
 | `status` | `"have"` (green, exists) · `"enh"` (yellow, rebuild) · `"new"` (red) |
 | `vol` | Monthly searches (int). Use `null` or `0` when there is no measured volume, which renders "n/a" |
@@ -129,3 +129,13 @@ Cards are just labelled groups, so they can carry sequencing as well as taxonomy
 ```
 
 `client-sitemap-plan` leans on this to express build order, since it has no widget to carry the narrative.
+
+## Comparing versions
+
+Keep each dated version of the spec. Passing an older one as `--since` renders a progress band and a change chip on every page that moved:
+
+```bash
+python scripts/build_sitemap_html.py sitemap.json out.html --since sitemap-2026-04.json
+```
+
+Nothing in the schema changes for this. The comparison reads `sections` → `cards` → `items` from both files and matches on `name`. `brand.date` from the older spec labels the band, so keep it filled in and accurate.
