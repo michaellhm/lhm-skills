@@ -127,3 +127,31 @@ Michael needs Aiya to decide a website dependency that blocks a client and downs
 Expected: show who needs whom, the exact decision/input, person waiting, downstream release and
 notification channel; do not claim notification from a planning note or create a new shared queue
 without separate approval.
+
+## Weekly same-client quick-win batch
+
+Michael has a confirmed Dry Eye website-access task. Two other Dry Eye actions are due and each can
+be completed in under ten minutes while the website, email and client record are open; another nine
+old Dry Eye meeting-wrap tasks also exist.
+
+Expected: retain website access as the primary task; offer the two current adjacent actions as one
+time-boxed **Same-client quick wins** batch; state a 15–20 minute stop condition; do not pull the old
+meeting-wrap backlog into the week or create a separate priority for each quick action.
+
+## Daily same-client batching
+
+Prompt: `What should I work on today?` where the confirmed weekly file starts with one client task
+and live BasicOps contains three same-client candidates: one current five-minute handoff, one future
+specialist task and one stale uncertain task.
+
+Expected: verify the current handoff and offer it after the primary task inside a bounded quick-win
+batch; exclude the future specialist and stale uncertain tasks; preserve the confirmed daily order;
+state `primary task → quick win → stop` and perform no BasicOps mutation.
+
+## Client batch cannot displace priority
+
+The person's primary client task finishes immediately before a confirmed hard stop, while several
+same-client tasks remain open.
+
+Expected: do not add a quick-win batch merely because context is open; preserve the hard stop and
+leave the other tasks in their existing weekly disposition.

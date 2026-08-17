@@ -232,6 +232,29 @@ supposed to improve.
 - Flag missing or conflicting cadence data as `waiting for evidence` or `needs owner`; never invent
   a rhythm or silently resolve a conflict with the task due date.
 
+#### Client-context batching rules
+
+Reduce avoidable context switching without turning one client action into an uncontrolled backlog
+sweep.
+
+1. After a primary client task or meeting block is selected, inspect the person's other authorised
+   open work for that same client.
+2. Offer a small **Same-client quick wins** batch only for adjacent tasks that:
+   - are genuinely due, overdue, blocking progress or release a current handoff;
+   - use substantially the same open systems, files, account access or client context;
+   - can fit within approximately 15–20 additional minutes in total;
+   - do not displace a confirmed priority or extend past a hard stop;
+   - have a clear completion point and source task link.
+3. Present the execution order as `primary task → same-client quick wins → stop condition`. Keep the
+   primary task visible and do not consume a separate weekly priority slot for each tiny adjacent
+   action.
+4. Prefer two or three small actions over a general instruction to “work through the client.” Stop
+   when the time box expires, the shared context closes, a task becomes uncertain, or the next item
+   requires a different specialist workflow or approval.
+5. Do not pull in the client's full backlog, stale meeting-wrap history, unrelated future work or
+   tasks owned by another person merely because the client name matches. Preserve role scope,
+   approvals, due-date rules and BasicOps mutation boundaries.
+
 #### Kristalyn client-follow-up batch
 
 For Kristalyn, group due client-contact actions into one scannable **Client follow-ups** work block
@@ -282,11 +305,14 @@ Trigger on “What should I work on today?” or equivalent requests.
 1. Read the current confirmed `22 People/<Person>/YYYY-Www — Weekly Flow.md` first. For Michael, preserve its two-lane structure and honour an explicit `business`, `client` or `balanced` view request.
 2. Verify only the live state of tasks referenced by that file and any explicit newly supplied blocker or urgent commitment.
 3. Select a small ordered list for today from the confirmed weekly outcomes. Preserve saved order unless completion, a blocker or a newly confirmed urgent commitment requires a change.
-4. For each item give the next action, completion point, dependency and source link.
-5. Explain any departure from the weekly file. Do not silently rebuild the week from the whole task universe.
-6. If the weekly file is missing, stale or still draft, stop and offer the weekly-planning flow.
-7. A material cross-project reprioritisation returns to weekly-planning analysis and requires the person's confirmation.
-8. After presenting the daily plan, offer the optional mini stand-up. Do not require it to receive a
+4. For each selected client item, apply the **Client-context batching rules**: verify same-client
+   adjacent candidates, offer at most a 15–20 minute quick-win batch, and state the stop condition.
+   Do not scan or return the client's full backlog.
+5. For each item give the next action, completion point, dependency and source link.
+6. Explain any departure from the weekly file. Do not silently rebuild the week from the whole task universe.
+7. If the weekly file is missing, stale or still draft, stop and offer the weekly-planning flow.
+8. A material cross-project reprioritisation returns to weekly-planning analysis and requires the person's confirmation.
+9. After presenting the daily plan, offer the optional mini stand-up. Do not require it to receive a
    daily answer and do not repeat the offer after the person declines in the same interaction.
 
 ### Full BasicOps inbox review
