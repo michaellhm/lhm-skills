@@ -23,11 +23,12 @@ SENSITIVE_NAMES = {'.env', 'credentials.json', 'id_rsa', 'id_ed25519', 'approval
 SENSITIVE_CONTENT = re.compile(r'(BEGIN [A-Z ]*PRIVATE KEY|github_pat_[A-Za-z0-9_]{20,}|ghp_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,})')
 
 
-def run(args, *, user=None, env=None):
+def run(args, *, user=None, env=None, strip=True):
     command = list(args)
     if user:
         command = ['/usr/sbin/runuser', '-u', user, '--', *command]
-    return subprocess.run(command, check=True, capture_output=True, text=True, env=env).stdout.strip()
+    output = subprocess.run(command, check=True, capture_output=True, text=True, env=env).stdout
+    return output.strip() if strip else output
 
 
 def git(workspace, *args, user='ctoworker'):
@@ -43,7 +44,11 @@ def allowed_path(value):
 
 
 def changed_paths(workspace):
-    values = git(workspace, 'status', '--porcelain=v1', '-z').split('\0')
+    output = run(
+        ['git', '-c', f'safe.directory={workspace}', '-C', str(workspace), 'status', '--porcelain=v1', '-z'],
+        user='ctoworker', strip=False,
+    )
+    values = output.split('\0')
     paths = []
     for value in values:
         if not value:

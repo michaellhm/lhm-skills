@@ -29,6 +29,20 @@ def request(branch='cto/incident-001-fix'):
 
 
 class PublisherBoundaryTests(unittest.TestCase):
+    def test_changed_paths_preserves_first_porcelain_status_prefix(self):
+        output = (
+            ' M .claude-plugin/marketplace.json\0'
+            ' M plugins/lhm-project-hub/.claude-plugin/plugin.json\0'
+        )
+        with mock.patch.object(publisher, 'run', return_value=output):
+            self.assertEqual(
+                publisher.changed_paths(Path('/bounded/workspace')),
+                [
+                    '.claude-plugin/marketplace.json',
+                    'plugins/lhm-project-hub/.claude-plugin/plugin.json',
+                ],
+            )
+
     def test_accepts_generated_cto_branch(self):
         publisher.validate_request(request())
 
