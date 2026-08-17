@@ -18,7 +18,7 @@ HERMES_GROUP = 10000
 
 
 def run_worker(args, **kwargs):
-    return subprocess.run(['runuser', '-u', 'ctoworker', '--', *args], check=True, capture_output=True, text=True, **kwargs)
+    return subprocess.run(['/usr/sbin/runuser', '-u', 'ctoworker', '--', *args], check=True, capture_output=True, text=True, **kwargs)
 
 
 def git(*args):
