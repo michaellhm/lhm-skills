@@ -1,0 +1,16 @@
+{
+  "name": "lhm-system-ops",
+  "version": "0.4.0",
+  "description": "Governed CTO capability repair and durable source-to-production handoffs.",
+  "author": { "name": "LHM Digital" },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "LHM System Ops",
+    "shortDescription": "Fail-closed source and capability handoffs.",
+    "longDescription": "Preserve source-required work, route capability incidents, resume exactly once, and verify production delivery.",
+    "developerName": "LHM Digital",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Route this source or capability incident through the durable LHM handoff contract."
+  }
+}

@@ -122,6 +122,21 @@
       ]
     },
     {
+      "name": "lhm-system-ops",
+      "source": "./plugins/lhm-system-ops",
+      "description": "Governed CTO capability repair and durable source-to-production handoffs.",
+      "version": "0.4.0",
+      "category": "utilities",
+      "tags": [
+        "cto",
+        "hermes",
+        "source-policy",
+        "production",
+        "qa",
+        "security"
+      ]
+    },
+    {
       "name": "lhm-knowledge-hub",
       "source": "./plugins/lhm-knowledge-hub",
       "description": "LHM knowledge system for Obsidian vault management, Claude and Hermes conversation capture, strategic thinking, weekly planning, and monthly quality review.",

@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "route": "bounded-claude-research",
+  "accepted_source_kinds": ["google_drive_file", "fathom_transcript"],
+  "identifier_policy": "exact_manifest_allowlist",
+  "output": ["redacted_content_reference", "retrieval_receipt", "content_sha256"],
+  "denied_to_hermes": ["credential_files", "raw_tokens", "ssh", "docker", "unrestricted_filesystem", "arbitrary_drive_ids", "basicops_mutation"]
+}

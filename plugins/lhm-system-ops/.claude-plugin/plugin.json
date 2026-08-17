@@ -1,0 +1,7 @@
+{
+  "name": "lhm-system-ops",
+  "description": "Governed CTO capability repair and durable source-to-production handoffs.",
+  "version": "0.4.0",
+  "author": { "name": "LHM Digital" },
+  "keywords": ["cto", "hermes", "capability", "source-policy", "production", "qa", "security"]
+}
