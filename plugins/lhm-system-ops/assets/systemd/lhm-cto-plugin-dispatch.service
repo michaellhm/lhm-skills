@@ -8,6 +8,7 @@ ExecStart=/usr/local/libexec/lhm-cto-plugin-dispatcher
 User=root
 Group=root
 NoNewPrivileges=yes
+PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=read-only
 ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/cto-plugin /home/ctoworker/workspaces /srv/lhm-plugin-source /home/ctoworker/.codex
