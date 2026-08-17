@@ -44,4 +44,21 @@ The root-owned deployer accepts only an allowlisted repository, plugin, clean ex
 
 ## Completion
 
+## Evidence loop
+
+Missing authoritative operational evidence is not automatically a failed CTO incident. Return
+`needs_evidence` with up to ten precise `questions_for_chief` when the Chief of Staff may be able
+to answer from governed Obsidian context, an authorised BasicOps read or another installed LHM
+skill. Preserve the parent, incident, return point and resume token.
+
+The durable CTO-result callback wakes the Chief of Staff. The Chief answers from the smallest
+authorised source and submits one fresh request carrying `prior_request_id`, `chief_answers` and
+the incremented iteration. Never request passwords, secrets, full credentials, unrelated private
+content or unrestricted vault/system access. Stop after three total iterations. Route to Michael
+only for unavailable authoritative judgment, sensitive evidence or consequential authority.
+
+Do not treat an evidence request as `capability_restored`. A completed research result returns to
+the original Chief of Staff parent; a verified deployed repair follows the existing
+`capability_restored` contract.
+
 After deployment, verify the installed commit and capability regression. Emit an idempotent `capability_restored` event containing parent, incident, return point, resume token and evidence. Remain `resume_pending` until Production consumes the event. The incident completes only when the original parent resumes or returns a new durable next wake.

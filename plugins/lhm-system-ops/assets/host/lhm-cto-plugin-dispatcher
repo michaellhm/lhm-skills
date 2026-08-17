@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import hashlib
 import os
 import re
 import shutil
@@ -9,12 +10,15 @@ from pathlib import Path
 
 BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/cto-plugin')
 INCOMING, PROCESSED, FAILED, RUNS = (BASE / name for name in ('incoming', 'processed', 'failed', 'runs'))
+CALLBACK_INCOMING = BASE / 'callback-incoming'
 REPO = Path('/srv/lhm-plugin-source')
 WORKSPACES = Path('/home/ctoworker/workspaces')
 WORKER_RUNS = WORKSPACES / '.runs'
 CODEX = '/home/ctoworker/.local/bin/codex'
 SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
 HERMES_GROUP = 10000
+BASE_FIELDS = {'schema_version', 'request_id', 'parent_run_id', 'capability_incident_id', 'objective', 'acceptance_tests', 'mode', 'timeout_seconds', 'return_point', 'resume_token'}
+LOOP_FIELDS = {'iteration', 'max_iterations', 'prior_request_id', 'chief_answers'}
 
 
 def run_worker(args, **kwargs):
@@ -38,9 +42,21 @@ def failure_reason(exc):
     return str(exc)
 
 
+def atomic_json(path, value):
+    fd, temporary = __import__('tempfile').mkstemp(prefix=f'.{path.name}.', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(value, handle, indent=2)
+            handle.write('\n')
+        os.chmod(temporary, 0o640)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
 def validate(request, path):
-    required = {'schema_version', 'request_id', 'parent_run_id', 'capability_incident_id', 'objective', 'acceptance_tests', 'mode', 'timeout_seconds', 'return_point', 'resume_token'}
-    if not isinstance(request, dict) or set(request) != required or request.get('schema_version') != 1:
+    if not isinstance(request, dict) or set(request) not in (BASE_FIELDS, BASE_FIELDS | LOOP_FIELDS) or request.get('schema_version') != 1:
         raise ValueError('invalid CTO request schema')
     for key in ('request_id', 'parent_run_id', 'capability_incident_id'):
         if not isinstance(request[key], str) or not SAFE_ID.fullmatch(request[key]):
@@ -51,14 +67,21 @@ def validate(request, path):
         raise ValueError('timeout outside ceiling')
     if not isinstance(request['resume_token'], str) or len(request['resume_token']) < 16:
         raise ValueError('invalid resume token')
+    if LOOP_FIELDS.issubset(request):
+        if not isinstance(request['iteration'], int) or not isinstance(request['max_iterations'], int) or not 2 <= request['iteration'] <= request['max_iterations'] <= 3:
+            raise ValueError('invalid evidence-loop iteration')
+        if not isinstance(request['prior_request_id'], str) or not SAFE_ID.fullmatch(request['prior_request_id']):
+            raise ValueError('invalid prior_request_id')
+        if not isinstance(request['chief_answers'], list) or not 1 <= len(request['chief_answers']) <= 20:
+            raise ValueError('invalid chief_answers')
 
 
 def output_schema():
     return {
         'type': 'object', 'additionalProperties': False,
-        'required': ['status', 'summary', 'decision', 'sources', 'branch', 'commit', 'changed_files', 'tests', 'qa', 'security', 'approval_required', 'next_action'],
+        'required': ['status', 'summary', 'decision', 'sources', 'branch', 'commit', 'changed_files', 'tests', 'qa', 'security', 'approval_required', 'questions_for_chief', 'next_action'],
         'properties': {
-            'status': {'enum': ['completed', 'needs_approval', 'failed']},
+            'status': {'enum': ['completed', 'needs_evidence', 'needs_approval', 'failed']},
             'summary': {'type': 'string'}, 'decision': {'type': 'string'},
             'sources': {'type': 'array', 'items': {'type': 'string'}},
             'branch': {'type': ['string', 'null']}, 'commit': {'type': ['string', 'null']},
@@ -66,6 +89,7 @@ def output_schema():
             'tests': {'type': 'array', 'items': {'type': 'string'}},
             'qa': {'type': 'string'}, 'security': {'type': 'string'},
             'approval_required': {'type': 'boolean'}, 'next_action': {'type': 'string'},
+            'questions_for_chief': {'type': 'array', 'maxItems': 10, 'items': {'type': 'string'}},
         },
     }
 
@@ -99,8 +123,11 @@ def process(path):
             raise ValueError('CTO workspace already exists')
         run_worker(['git', '-C', str(REPO), 'worktree', 'add', '-b', branch, str(workspace), 'origin/main'])
     tests = '\n'.join(f'- {item}' for item in request['acceptance_tests'])
+    iteration = request.get('iteration', 1)
+    max_iterations = request.get('max_iterations', 3)
+    chief_answers = '\n'.join(f'- {item}' for item in request.get('chief_answers', [])) or '- None supplied on the first iteration.'
     role_sequence = 'Capability Researcher only; do not modify files.' if mode == 'research' else 'Capability Researcher, Platform Engineer, QA Tester, Security/Reliability Reviewer, then Plugin Release Manager as separate recorded passes.'
-    prompt = f'''You are the governed LHM CTO Codex lane.\nParent: {request['parent_run_id']}\nIncident: {request['capability_incident_id']}\nReturn point: {request['return_point']}\nMode: {mode}\nRole sequence: {role_sequence}\n\nObjective:\n{request['objective']}\n\nAcceptance tests:\n{tests}\n\nUse the lhm-system-ops contracts in this repository. Research native Hermes and existing LHM capability before third-party or custom work. In change mode work only on branch `{branch}`, run validators/tests, commit, and push only that branch. Never push or merge main, edit live Hermes, deploy, use host root, or copy credentials. Return the required structured result. A successful repair must still return through capability_restored to the original parent.'''
+    prompt = f'''You are the governed LHM CTO Codex lane.\nParent: {request['parent_run_id']}\nIncident: {request['capability_incident_id']}\nReturn point: {request['return_point']}\nMode: {mode}\nEvidence-loop iteration: {iteration} of {max_iterations}\nRole sequence: {role_sequence}\n\nObjective:\n{request['objective']}\n\nAcceptance tests:\n{tests}\n\nChief of Staff answers from the prior iteration:\n{chief_answers}\n\nUse the lhm-system-ops contracts in this repository. Research native Hermes and existing LHM capability before third-party or custom work. If authoritative operational evidence is missing but the Chief of Staff may be able to access it, return status `needs_evidence` and put up to ten precise answerable questions in `questions_for_chief`; do not mark the incident failed. Never request passwords, secrets, full credential material or unrestricted vault/system access. On the final iteration, return `needs_approval` only for consequential human authority or `failed` with the exact remaining blocker. In change mode work only on branch `{branch}`, run validators/tests, commit, and push only that branch. Never push or merge main, edit live Hermes, deploy, use host root, or copy credentials. Return the required structured result. A successful repair must still return through capability_restored to the original parent.'''
     final = worker_run / 'final.json'
     events = worker_run / 'codex.jsonl'
     command = [CODEX, '--ask-for-approval', 'never', '--search', 'exec', '--sandbox', 'read-only' if mode == 'research' else 'workspace-write', '--cd', str(workspace), '--output-schema', str(schema), '--output-last-message', str(final), '--json', prompt]
@@ -117,11 +144,27 @@ def process(path):
     for artifact in (audit_final, audit_events):
         os.chown(artifact, 10003, HERMES_GROUP)
         os.chmod(artifact, 0o640)
+    result_digest = hashlib.sha256(audit_final.read_bytes()).hexdigest()
+    callback = {
+        'schema_version': 1,
+        'event': 'cto_result_ready',
+        'event_id': f"{request['request_id']}:result",
+        'request_id': request['request_id'],
+        'parent_run_id': request['parent_run_id'],
+        'capability_incident_id': request['capability_incident_id'],
+        'return_point': request['return_point'],
+        'resume_token': request['resume_token'],
+        'iteration': iteration,
+        'max_iterations': max_iterations,
+        'result_sha256': result_digest,
+        'created_at': datetime.now(timezone.utc).isoformat(),
+    }
     shutil.move(str(path), PROCESSED / path.name)
+    atomic_json(CALLBACK_INCOMING / f"{request['request_id']}.json", callback)
 
 
 def main():
-    for directory in (INCOMING, PROCESSED, FAILED, RUNS, WORKSPACES, WORKER_RUNS):
+    for directory in (INCOMING, PROCESSED, FAILED, RUNS, CALLBACK_INCOMING, WORKSPACES, WORKER_RUNS):
         directory.mkdir(parents=True, exist_ok=True)
     os.chown(WORKER_RUNS, 10003, 10003)
     os.chmod(WORKER_RUNS, 0o700)
