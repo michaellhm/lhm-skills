@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Last-resort safety net in case a commit landed without the pre-commit hook
-# (e.g. --no-verify). Confirms plugin.json / marketplace.json versions match
-# before anything is pushed to the remote.
+# (e.g. --no-verify). Confirms plugin.json / marketplace.json versions match,
+# and that files meant to be byte-identical across skills still are, before
+# anything is pushed to the remote.
 set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel)"
 python3 "$ROOT/scripts/validate-plugin-versions.py"
+python3 "$ROOT/scripts/validate-script-parity.py"

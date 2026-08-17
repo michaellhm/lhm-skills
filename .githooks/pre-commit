@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Blocks a commit if any plugin's staged changes don't come with a version
-# bump, or if plugin.json / marketplace.json versions are inconsistent.
+# bump, if plugin.json / marketplace.json versions are inconsistent, or if
+# files that must stay byte-identical across skills have diverged.
 set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel)"
 python3 "$ROOT/scripts/validate-plugin-versions.py" --bump-check
+python3 "$ROOT/scripts/validate-script-parity.py" --staged
