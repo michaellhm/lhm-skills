@@ -7,7 +7,16 @@ description: Package and deliver an exact tested LHM plugin commit through GitHu
 
 ## GitHub handoff
 
-Verify the working tree, base commit, branch naming, plugin version bump, marketplace parity and validation evidence. Push only the feature branch and create or update one pull request. Never push protected `main` or merge without separate authority.
+Verify the working tree, base commit, branch naming, plugin version bump, marketplace parity and
+validation evidence. Hand the persisted workspace to the bounded host publisher. It must verify
+the exact changed paths, reject unsafe or sensitive files, create the commit, push only the
+generated `cto/*` feature branch and verify the remote SHA. The CTO worker never receives the
+publisher credential. Never push protected `main` or merge without separate authority.
+
+After successful remote verification, create one idempotent Obsidian review note under
+`01 Inbox/Hermes Reviews`. Include the incident and parent IDs, outcome summary, branch, exact
+commit, changed files, test/QA/security evidence, GitHub comparison link and Michael's checklist.
+Return `needs_approval` to the Chief of Staff. Publication is not capability restoration.
 
 The pull request must contain incident and parent IDs, outcome, changed plugins, tests, QA disposition, security disposition, permissions, rollout, rollback and the commit SHA intended for deployment.
 

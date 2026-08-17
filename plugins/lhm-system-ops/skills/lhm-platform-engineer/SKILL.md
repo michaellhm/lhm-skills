@@ -12,7 +12,11 @@ Implement the smallest reusable capability that satisfies the accepted brief.
 - Work only in the allowlisted `michaellhm/lhm-skills` checkout.
 - Fetch and branch from the verified remote default branch.
 - Use `cto/<incident-id>-<slug>` branch names.
-- Never push or merge protected `main`.
+- Leave the completed, tested changes uncommitted in the supplied isolated workspace. The bounded
+  root-owned publisher reconciles the persisted paths, creates the commit and pushes the exact
+  generated feature branch. This prevents sandbox-only Git objects from being mistaken for a
+  durable commit.
+- Never invoke GitHub credentials, push or merge protected `main`.
 - Preserve unrelated work and existing plugin boundaries.
 - Prefer configuration and plugin-layer changes over host changes.
 - Add or update tests with every behaviour change.
@@ -21,4 +25,7 @@ Implement the smallest reusable capability that satisfies the accepted brief.
 
 ## Handoff
 
-Return repository, base commit, branch, commit, changed files, behaviour, tests, known risks, rollback and exact QA commands. If the implementation expands permissions, stop with a version-bound approval proposal rather than applying it.
+Return repository, base commit, branch, exact persisted changed files, behaviour, tests, known
+risks, rollback and exact QA commands. Report `completed` only when the workspace contains the
+tested files and is ready for the bounded publisher. If the implementation expands permissions,
+stop with a version-bound approval proposal rather than applying it.
