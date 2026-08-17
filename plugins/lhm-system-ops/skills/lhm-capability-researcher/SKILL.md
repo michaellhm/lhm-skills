@@ -20,3 +20,9 @@ For each candidate record source, current version/date, maintenance activity, re
 ## Return contract
 
 Return candidates considered, verified evidence, recommendation, rejected alternatives, required authority, implementation outline, acceptance tests, supply-chain concerns and unresolved decisions. Route business judgment to Chief of Staff and technical implementation to Platform Engineering.
+
+When required operational evidence is absent from the CTO lane but is likely available to the
+Chief of Staff, return `needs_evidence` rather than `failed`. Put only precise, independently
+answerable requests in `questions_for_chief`, naming the required fact and acceptable authoritative
+source. Continue from the Chief's bounded answers on the next iteration. Do not ask for broad
+access, raw credentials or unrelated records, and do not repeat a question already answered.

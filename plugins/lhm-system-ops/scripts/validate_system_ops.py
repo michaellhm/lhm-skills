@@ -20,7 +20,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.1.7':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.2.1':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -42,6 +42,10 @@ def main():
         'assets/host/lhm-approved-plugin-deployer',
         'assets/systemd/lhm-cto-plugin-dispatch.path',
         'assets/systemd/lhm-cto-plugin-dispatch.service',
+        'assets/host/lhm-cto-result-resumer',
+        'assets/systemd/lhm-cto-result-resumer.path',
+        'assets/systemd/lhm-cto-result-resumer.service',
+        'assets/systemd/lhm-cto-result-resumer.timer',
     }
     for relative in required_assets:
         if not (PLUGIN / relative).is_file():
@@ -58,6 +62,9 @@ def main():
         errors.append('dispatcher is missing the private CTO run-control directory')
     if "subprocess.run(['/usr/sbin/runuser'" not in dispatcher:
         errors.append('dispatcher must use the absolute restricted-worker launcher path')
+    callback = (PLUGIN / 'assets/host/lhm-cto-result-resumer').read_text(encoding='utf-8')
+    if 'max_iterations' not in callback or 'questions_for_chief' not in callback:
+        errors.append('CTO result resumer is missing the bounded evidence-loop contract')
     if errors:
         print('\n'.join(f'ERROR: {item}' for item in errors), file=sys.stderr)
         return 1
