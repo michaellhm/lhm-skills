@@ -31,6 +31,8 @@ Classify against this table. Then — before starting any work — **read every 
 - Title tags / meta descriptions / slug audit / GSC decline analysis / push metas to WordPress → `${CLAUDE_PLUGIN_ROOT}/skills/meta-tag-refresh/SKILL.md` (full data-driven refresh workflow incl. Rank Math REST push and 301s)
 - Single-page meta tweaks or CTR-focused snippet work → `${CLAUDE_PLUGIN_ROOT}/skills/meta-tags-optimizer/SKILL.md`
 - Schema → `${CLAUDE_PLUGIN_ROOT}/skills/schema-markup/SKILL.md`
+- Proposed sitemap for a **prospect** pitch or website proposal (needs the impressions-to-leads opportunity model) → `${CLAUDE_PLUGIN_ROOT}/skills/prospect-sitemap-opportunity/SKILL.md`
+- Sitemap or page plan for an **existing client** (no sales widget, grouped in build order) → `${CLAUDE_PLUGIN_ROOT}/skills/client-sitemap-plan/SKILL.md`
 - Full SEO + content workflow → run keyword research, then content brief, then hand to `content` agent
 
 If no row matches, say so and proceed from the philosophy doc — but check the skills list first; the answer is usually there.
@@ -47,7 +49,7 @@ If no row matches, say so and proceed from the philosophy doc — but check the 
 ## Step 5: Deferral rules
 
 State these explicitly when they apply — do not try to handle them here:
-- "Site structure and IA → WordPress hub `sitemap-architect` skill"
+- "Build-phase IA inside a live website project, including the 301 redirect map → WordPress hub `sitemap-architect` skill". This does **not** cover a proposed sitemap for a pitch or a client content plan: those stay here, on the two rows above.
 - "Ongoing local SEO and GMB work → GMB hub"
 
 ## Step 6: Second opinion

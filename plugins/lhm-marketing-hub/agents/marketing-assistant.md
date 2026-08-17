@@ -12,3 +12,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 ## Skill Catalog
 
 `playbook-strategy-session` — Prepare and coach theme-led client strategy calls for campaign playbooks.
+
+`prospect-sitemap-opportunity` — Proposed sitemap and interactive opportunity model for a prospect website pitch.
+
+`client-sitemap-plan` — Phased website content plan for an existing client, same architecture without the sales widget.

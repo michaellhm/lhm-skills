@@ -1,0 +1,172 @@
+{
+  "brand": {
+    "name": "My Garden Therapy",
+    "logo_url": "https://www.mygardentherapy.com.au/wp-content/uploads/2024/09/my-garden-therapy.svg",
+    "phone": "03 5215 9400",
+    "primary": "#2E6B3E",
+    "primary_dark": "#1F4D2C",
+    "primary_light": "#E4EFE7",
+    "accent": "#C8A44D",
+    "prepared_by": "Local Health Marketing",
+    "date": "July 2026"
+  },
+  "nav": [
+    {"label": "About Us"},
+    {"label": "What We Do", "mega": true, "groups": [
+      {"title": "Garden Care", "items": [
+        {"label": "Garden Maintenance"},
+        {"label": "Lawn Mowing & Lawn Care", "new": true},
+        {"label": "Hedge Trimming & Pruning", "new": true},
+        {"label": "Weeding & Mulching", "new": true},
+        {"label": "Planting & Accessible Garden Beds", "new": true},
+        {"label": "Green Waste Removal", "new": true}
+      ]},
+      {"title": "Outdoor & Handyman", "items": [
+        {"label": "Outdoor Cleaning & Handyman"},
+        {"label": "Gutter Cleaning", "new": true},
+        {"label": "Window Cleaning", "new": true},
+        {"label": "Pressure Washing", "new": true},
+        {"label": "Home & Garden Repairs", "new": true},
+        {"label": "Fencing & Gates", "new": true}
+      ]},
+      {"title": "Safety & Wellbeing", "items": [
+        {"label": "Safety & Accessibility"},
+        {"label": "Accessible Paths & Ramps", "new": true},
+        {"label": "Grab Rails & Home Safety", "new": true},
+        {"label": "Therapeutic Gardening"},
+        {"label": "Horticultural Therapy", "new": true},
+        {"label": "Social & Companion Gardening", "new": true}
+      ]}
+    ]},
+    {"label": "Who We Help", "new": true, "items": [
+      {"label": "Gardening for Seniors", "new": true},
+      {"label": "Gardening for People with Disability", "new": true},
+      {"label": "Aged Care Gardening", "new": true}
+    ]},
+    {"label": "Getting Started", "groups": [
+      {"title": "Funding Pathways", "items": [
+        {"label": "Support at Home Program", "new": true},
+        {"label": "NDIS Gardening & Home Maintenance", "new": true},
+        {"label": "Home Care Packages", "new": true},
+        {"label": "Privately Funded"},
+        {"label": "Fully Managed Home Care Package"},
+        {"label": "Self Managed Home Care Package"},
+        {"label": "Healthcare Professional Referrals"}
+      ]}
+    ]},
+    {"label": "Areas We Serve", "new": true, "items": [
+      {"label": "Geelong", "new": true},
+      {"label": "Geelong West", "new": true},
+      {"label": "Newtown", "new": true},
+      {"label": "Belmont", "new": true},
+      {"label": "Highton", "new": true},
+      {"label": "Grovedale & Waurn Ponds", "new": true},
+      {"label": "Armstrong Creek", "new": true},
+      {"label": "Ocean Grove", "new": true},
+      {"label": "Torquay", "new": true},
+      {"label": "Bellarine Peninsula", "new": true},
+      {"label": "Ballarat", "new": true}
+    ]},
+    {"label": "News & Insights"},
+    {"label": "Contact Us"}
+  ],
+  "opportunity": {
+    "imp_now": 1200,
+    "imp_new": 6000,
+    "ctr": 4,
+    "conv": 4,
+    "seo_max": 10,
+    "seo_step_pct": 10,
+    "seed": "Drag the SEO slider to see how ongoing optimisation compounds the result. <b>The website gets you the structure; SEO keeps growing what it captures.</b>",
+    "composition_note": "Illustrative model. \"Searches\" = average monthly Australian search volume for the terms each structure is built to rank for (Keywords Everywhere, Jul 2026). Current ≈ 1,200 (head terms the bundled pages target today). New ≈ 6,000 = local Geelong &amp; Ballarat service terms (~3,900) + NDIS / aged-care funding &amp; audience terms (~1,800) + just 1% of the large national \"near me\" volume (~270), since only a local slice is realistically capturable via the map pack. The big informational terms (support at home 3,600/mo, home care packages 6,600/mo) sit on top of this as additional upside."
+  },
+  "intro": {
+    "title": "Proposed website sitemap",
+    "paragraph": "A working map of the expanded website, laid out as the client would experience it. Hover the navigation above to preview the proposed menus, or scan the full page tree below. The current site has 18 pages across four bundled service pages, with no location pages. The plan takes it to roughly 55 structured pages."
+  },
+  "stats": [
+    {"n": "18", "label": "pages today"},
+    {"n": "~55", "label": "pages proposed"},
+    {"n": "+16", "label": "service pages"},
+    {"n": "11", "label": "location pages"},
+    {"n": "2", "label": "new funding pillars"}
+  ],
+  "sections": [
+    {"title": "Core pages", "cards": [
+      {"head": "Home & key pages", "items": [
+        {"name": "Home", "slug": "/ · refresh + link to new pillars", "status": "enh", "vol": 140},
+        {"name": "About Us", "slug": "/about-us/", "status": "have", "vol": null},
+        {"name": "Contact Us", "slug": "/contact-us/", "status": "have", "vol": null},
+        {"name": "News & Insights", "slug": "re-cluster ~40 posts", "status": "enh", "vol": null}
+      ]}
+    ]},
+    {"title": "What We Do — services", "cards": [
+      {"head": "Garden Care", "items": [
+        {"name": "Garden Maintenance", "slug": "/how-can-we-help/garden-maintenance/", "status": "have", "vol": 140},
+        {"name": "Lawn Mowing & Lawn Care", "slug": "/services/lawn-mowing/", "status": "new", "vol": 210},
+        {"name": "Hedge Trimming & Pruning", "slug": "/services/hedge-trimming-pruning/", "status": "new", "vol": 30},
+        {"name": "Weeding & Mulching", "slug": "/services/weeding-mulching/", "status": "new", "vol": null},
+        {"name": "Planting & Accessible Garden Beds", "slug": "/services/raised-garden-beds/", "status": "new", "vol": null},
+        {"name": "Green Waste Removal", "slug": "/services/green-waste-removal/", "status": "new", "vol": null}
+      ]},
+      {"head": "Outdoor & Handyman", "items": [
+        {"name": "Outdoor Cleaning & Handyman (hub)", "slug": "/how-can-we-help/outdoor-cleaning.../", "status": "have", "vol": 390},
+        {"name": "Gutter Cleaning", "slug": "/services/gutter-cleaning/", "status": "new", "vol": 320},
+        {"name": "Window Cleaning", "slug": "/services/window-cleaning/", "status": "new", "vol": 320},
+        {"name": "Pressure Washing", "slug": "/services/pressure-washing/", "status": "new", "vol": 260},
+        {"name": "Home & Garden Repairs", "slug": "/services/handyman/", "status": "new", "vol": 390},
+        {"name": "Fencing & Gates", "slug": "/services/fencing-gates/", "status": "new", "vol": null}
+      ]},
+      {"head": "Safety & Accessibility", "items": [
+        {"name": "Safety & Accessibility (hub)", "slug": "/how-can-we-help/safety-accessibility/", "status": "have", "vol": null},
+        {"name": "Accessible Paths & Ramps", "slug": "/services/accessible-paths-ramps/", "status": "new", "vol": null},
+        {"name": "Grab Rails & Home Safety Mods", "slug": "/services/grab-rails-home-safety/", "status": "new", "vol": null},
+        {"name": "Fall-Prevention Garden Audit", "slug": "/services/fall-prevention-audit/", "status": "new", "vol": null}
+      ]},
+      {"head": "Therapeutic & Wellbeing", "items": [
+        {"name": "Therapeutic Gardening (hub)", "slug": "/how-can-we-help/therapeutic-gardening/", "status": "have", "vol": 90},
+        {"name": "Horticultural Therapy", "slug": "/services/horticultural-therapy/", "status": "new", "vol": 260},
+        {"name": "Social & Companion Gardening", "slug": "/services/companion-gardening/", "status": "new", "vol": null}
+      ]}
+    ]},
+    {"title": "Who We Help — audience pages", "cards": [
+      {"head": "Who We Help", "url": "/who-we-help/", "items": [
+        {"name": "Gardening for Seniors", "slug": "/who-we-help/seniors/", "status": "new", "vol": 50},
+        {"name": "Gardening for People with Disability", "slug": "/who-we-help/disability-ndis/", "status": "new", "vol": 320},
+        {"name": "Aged Care Gardening", "slug": "/who-we-help/aged-care/", "status": "new", "vol": 140}
+      ]}
+    ]},
+    {"title": "Getting Started — funding pathways", "cards": [
+      {"head": "Funding & Access", "url": "/getting-started/", "items": [
+        {"name": "Support at Home Program", "slug": "/getting-started/support-at-home/", "status": "new", "vol": 3600, "bold": true},
+        {"name": "NDIS Gardening & Home Maintenance", "slug": "/getting-started/ndis/", "status": "new", "vol": 590, "bold": true},
+        {"name": "Home Care Packages (transition)", "slug": "/getting-started/home-care-packages/", "status": "new", "vol": 6600},
+        {"name": "Privately Funded", "slug": "/getting-started/privately-funded/", "status": "have", "vol": null},
+        {"name": "Fully Managed Home Care Package", "slug": "/getting-started/fully-managed.../", "status": "have", "vol": null},
+        {"name": "Self Managed Home Care Package", "slug": "/getting-started/self-managed.../", "status": "have", "vol": null},
+        {"name": "Healthcare Professional Referrals", "slug": "/getting-started/healthcare-professional-referrals/", "status": "have", "vol": null}
+      ]}
+    ]},
+    {"title": "Areas We Serve — location pages", "pill": "All new", "cards": [
+      {"head": "Tier 1 — build first", "items": [
+        {"name": "Geelong", "slug": "/areas-we-serve/geelong/", "status": "new", "vol": 260},
+        {"name": "Geelong West", "slug": "/areas-we-serve/geelong-west/", "status": "new", "vol": null},
+        {"name": "Ballarat", "slug": "/areas-we-serve/ballarat/", "status": "new", "vol": 320},
+        {"name": "Newtown", "slug": "/areas-we-serve/newtown/", "status": "new", "vol": null},
+        {"name": "Belmont", "slug": "/areas-we-serve/belmont/", "status": "new", "vol": null},
+        {"name": "Highton", "slug": "/areas-we-serve/highton/", "status": "new", "vol": null}
+      ]},
+      {"head": "Tier 2 — expand after Tier 1", "items": [
+        {"name": "Grovedale & Waurn Ponds", "slug": "/areas-we-serve/grovedale-waurn-ponds/", "status": "new", "vol": null},
+        {"name": "Armstrong Creek", "slug": "/areas-we-serve/armstrong-creek/", "status": "new", "vol": null},
+        {"name": "Ocean Grove", "slug": "/areas-we-serve/ocean-grove/", "status": "new", "vol": null},
+        {"name": "Torquay", "slug": "/areas-we-serve/torquay/", "status": "new", "vol": 10},
+        {"name": "Bellarine Peninsula", "slug": "/areas-we-serve/bellarine/", "status": "new", "vol": null}
+      ]},
+      {"head": "Backlog — once proven", "items": [
+        {"name": "Lara, Corio, Leopold, Drysdale, Bannockburn, Colac, Winchelsea, Surf Coast towns", "slug": "rolled out over time", "status": "new", "vol": null}
+      ]}
+    ], "note": "<b>On location pages:</b> individual suburb searches are small on their own. These pages aren't built to win suburb head terms; they win the Google map pack and the large \"near me\" long tail (handyman near me 9,900/mo, gardener near me 6,600/mo, lawn mowing near me 4,400/mo) and localise every service. Build Tier 1, prove it, then expand."}
+  ],
+  "footer": "My Garden Therapy — proposed website sitemap &amp; opportunity model. Prepared by Local Health Marketing, July 2026. Search volumes: Keywords Everywhere (Australia, average monthly), retrieved July 2026. The opportunity model is illustrative and editable; adjust assumptions to suit the conversation."
+}
