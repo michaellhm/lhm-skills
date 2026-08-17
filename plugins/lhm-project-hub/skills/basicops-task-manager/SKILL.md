@@ -18,6 +18,9 @@ For a new task, resolve:
 - plain action/outcome
 - accountable human owner
 - correct BasicOps project, client mother task or section
+- route basis and canonical personal project/Inbox/assignee names and IDs for direct-person work
+- originating project, parent and work-context names, IDs and URLs when work is retained from a
+  shared project
 - useful reference URLs, if any
 - one short human discussion message
 - next handoff after completion
@@ -123,7 +126,11 @@ When a workflow creates subtasks:
 6. After creation and verification, always ask the user in the current interface—Hermes, Chat, Codex or Claude: **Would you like me to move the subtasks to each assignee's individual board?**
 7. Never move subtasks automatically. Wait for explicit user confirmation, then resolve each person's actual board and destination section through BasicOps before moving anything.
 
-The question is mandatory even when the subtasks already have assignees. Creating subtasks and moving them to personal boards are separate mutations with separate authority.
+The question is mandatory even when the subtasks already have assignees. Creating subtasks and
+moving them to personal boards are separate mutations with separate authority. This rule applies
+to any separately authorised personal-board move, not only a multi-assignee batch: read the
+assignee's canonical profile route, preview the exact personal project/Inbox/assignee IDs and
+retain the originating project, parent and context before moving.
 
 ### Handle a Hermes-prepared marketing review
 
@@ -186,6 +193,8 @@ Before writing, prepare and, when approval is required, show:
 - title
 - assignee
 - destination project and parent/section
+- route basis; canonical personal project, Inbox section and assignee names/IDs when applicable
+- originating project/parent/context names, IDs and URLs to preserve when applicable
 - exact LHM metadata line and description URL(s)
 - orchestration owner, workflow state, approval status and approved action labels when applicable
 - touchpoint evidence and cadence decision when client contact is involved
@@ -225,7 +234,8 @@ Use a stable key shaped like `basicops:<client-slug>:<workstream>:<outcome>`. Ke
 4. If an equivalent task exists, return its URL instead of creating a duplicate.
 5. Perform only the approved mutation.
 6. For a new task, write only the approved LHM metadata line and useful working URLs in Description. Put the complete human task explanation in the approved discussion message—always.
-7. Read the task back and verify title, project, parent/section, assignee, due date, metadata, URL description and discussion as applicable.
+7. Read the task back and verify title, project, section, assignee, urgent flag, due date, metadata,
+   URL description, Discussion and originating parent/context as applicable.
 8. Return the verified BasicOps URL. If any field differs, report the mismatch and do not claim success.
 
 For completion, ready-for-review, blocked or waiting transitions, never stop at the status change.
@@ -248,6 +258,39 @@ Existing-client website projects use this governed exception:
 - Never leave the parent or newly created website subtasks in `None`.
 - Add the verified native subtask links to the parent Discussion, not Description.
 - Then ask whether the user wants the subtasks moved to the individual assignees' boards.
+
+### Direct-person and personal-board route contract
+
+For an approved direct-person brief or separately authorised personal-board move:
+
+1. Read the assignee's canonical `22 People/<Person>.md` profile and record it as the route basis.
+2. Resolve and live-verify the exact personal project, semantic `inbox` section and assignee against
+   the profile's names and IDs. The destination must be that canonical personal Inbox.
+3. Record the originating shared project, native parent and work context by name, ID and URL before
+   creation or movement. Preserve the native parent relationship when BasicOps supports it; also
+   preserve traceability in Discussion/verified URLs where applicable. Moving the action must not
+   detach it from its project topology.
+4. Show the destination and retained origin together in the exact payload and obtain authority for
+   that exact creation or move under the plugin-wide authority contract.
+5. After the mutation, read back and verify project, section, assignee, urgent flag, metadata,
+   working URLs, Discussion and originating parent/context. A partial read-back is not success.
+
+Fail closed on a missing or ambiguous profile route, profile/live mismatch, missing authority,
+unclear originating parent/context, a destination other than the canonical Inbox, or preservation
+that cannot be verified. Do not choose a similarly named board/section, drop the parent or report
+success from assignment alone.
+
+#### Governed Aiya personal route
+
+The canonical route source is Aiya's `22 People/Aiya.md` profile:
+
+- Project: `Aiya Tasks` (`49049`)
+- Section: `Inbox` (`80530`)
+- Assignee: Aiya (`36402`)
+
+These fixed IDs may be used only when the canonical profile still records them and the live lookup
+matches. Any missing field or profile/live disagreement fails closed; do not repair or substitute
+the route inside this workflow.
 
 ## Hand back to the calling workflow
 

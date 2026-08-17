@@ -80,7 +80,10 @@ For an attention-across-projects request, scan only active website blocks in cli
 
 ## BasicOps handoffs and authority
 
-BasicOps owns assigned work; Obsidian remains the durable project and approval record.
+BasicOps owns assigned work; Obsidian remains the durable project and approval record. `*Web Projects`
+remains the home for shared website project state, dedicated parents and milestones. A
+direct-person website action is distinct from that shared state: once approved, it may live in the
+assignee's canonical personal Inbox while retaining its native website-parent link and context.
 
 Every BasicOps creation or mutation must route through `lhm-project-hub:basicops-task-manager`. This cockpit prepares the website-specific context, readiness, blockers and next handoff; the shared skill owns the final wording, approval check, deduplication, mutation and read-back verification. Do not write to BasicOps directly from this skill.
 
@@ -124,7 +127,8 @@ Keep the message conversational and normally under 100 words. The task is an act
 
 - Show the exact payload before creation unless the user's current message already clearly authorises that exact task.
 - Michael may approve a task assigned to Michael. A clear request such as “create a task in Michael's BasicOps to select the five pages” is approval for that one payload.
-- A task assigned to Kristalyn, Aiya, Jaimee, or anyone else requires their explicit approval during the pilot. Michael asking to prepare it is not permission to assign it to them.
+- Use `basicops-task-manager`'s plugin-wide authority contract for every exact task creation or move.
+  Do not add a cockpit-specific assignee-approval rule or infer authority from preparation.
 - Never invent a due date. Leave it unset when none is recorded.
 - Task creation never records project approval or authorises copy, merge, deployment, publishing, or launch.
 
@@ -138,7 +142,16 @@ Michael's personal route is fixed:
 - Section: `INBOX` (`74627`)
 - Assignee: Michael (`36398`)
 
-For team website tasks, prefer the client's mother task on `*Client Flow` (`68655`) and confirm the actual assignee ID through BasicOps before creating.
+For shared team website state, keep the dedicated parent and milestones in `*Web Projects`
+(`68635`). For an approved direct-person website brief, read the assignee's canonical profile and
+pass its personal project/Inbox/assignee route plus the originating website parent name/ID/URL to
+the shared skill. The action may route to that personal Inbox only when the native website-parent
+link and context remain attached and can be verified.
+
+Fail closed when the website parent is unresolved, the personal route is absent or ambiguous, the
+profile and live route disagree, the destination is not the canonical Inbox, or the move would
+detach the action from the `*Web Projects` topology. Do not substitute `*Client Flow`, `None` or a
+similarly named personal section.
 
 ### Still prohibited
 

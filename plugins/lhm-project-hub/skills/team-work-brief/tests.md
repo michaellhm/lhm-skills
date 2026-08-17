@@ -35,3 +35,20 @@ Expected: identify mismatch with Josephine's role, recommend Aiya or Michael bas
 Prompt supplies client, assignee, outcome, URL, confirmed access, approval, completion test, reviewer and timing.
 
 Expected: do not interview again; present the approval bundle directly.
+
+## Approved direct brief uses Aiya's Inbox
+
+Prompt: `Brief Aiya to implement the approved Alpha website change under the existing website parent.`
+
+Expected: read Aiya's canonical profile route; distinguish Alpha/website parent as retained work
+context from Aiya Tasks / Inbox / Aiya as action destination; show both with names/IDs in the exact
+approval bundle; after authority, route only through `basicops-task-manager`; preserve the native
+website parent/context and require full read-back.
+
+## Direct brief routing fails closed
+
+Prompt supplies an assignee whose profile route is missing, ambiguous, conflicts with live
+BasicOps, or resolves to a section other than the canonical Inbox.
+
+Expected: identify the exact route mismatch, create or move nothing, do not choose the nearest
+board/section and do not treat the shared client or website project as the action destination.

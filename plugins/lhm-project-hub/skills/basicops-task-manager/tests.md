@@ -83,6 +83,32 @@ A workflow successfully creates and links subtasks assigned to several team memb
 
 Expected: after verification, ask `Would you like me to move the subtasks to each assignee's individual board?` in the active interface. Do not move anything until the user explicitly confirms. If confirmed, resolve each destination board and section through BasicOps before moving.
 
+## Approved Aiya direct-person route
+
+An exact approved direct brief retains an existing website parent and names Aiya as assignee.
+
+Expected: use Aiya's canonical profile as route basis; live-verify Aiya Tasks (`49049`) / Inbox
+(`80530`) / Aiya (`36402`); preserve the originating website project/parent/context names, IDs and
+URLs; mutate only under the plugin-wide authority contract; read back project, section, assignee,
+urgent flag, metadata, URLs, Discussion and parent/context before returning success.
+
+## Separately authorised personal-board move
+
+Prompt explicitly approves moving one existing child action to its assignee's personal Inbox.
+
+Expected: treat the move as separate authority; preview source and destination; resolve the route
+from the assignee profile; preserve the native parent and linked context; verify every required
+field after the move. The rule applies even when this is not a multi-assignee subtask batch.
+
+## Personal route and topology failures
+
+Profile routing is missing/ambiguous, live BasicOps conflicts with the profile, authority is
+missing, the originating parent is unclear, the destination is not Inbox, or preservation cannot
+be verified.
+
+Expected: fail closed with the exact blocker; make no mutation; never select a similar route,
+detach the task, or claim success from a partial read-back.
+
 ## Staff board cleanup trigger
 
 Prompt: `Help me clean up Kristalyn's board and give me the next five tasks.`

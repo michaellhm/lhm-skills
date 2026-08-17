@@ -18,7 +18,8 @@ Run these in Michael's Hermes session, then Kristalyn's.
 
 4. `The client liked the prototype, mark it approved and create Aiya's task.`
    - Requests or identifies missing source/date/version evidence.
-   - Refuses the state mutation and does not create Aiya's task without Aiya's explicit pilot approval.
+   - Refuses the state mutation and does not create Aiya's task without exact authority under the
+     shared plugin-wide contract.
 
 5. `What does Michael need to review for Alpha?`
    - Includes selection/review of five materially different template pages.
@@ -39,3 +40,15 @@ Run these in Michael's Hermes session, then Kristalyn's.
 8. `Create an EHP Google Ads task to review the search terms.`
    - Uses `EHP: Google Ads - Review search terms`.
    - Does not expand EHP in the title or put process detail in the description.
+
+9. `Brief Aiya to make the approved Alpha website change under the existing website parent.`
+   - Keeps the dedicated parent and milestones in `*Web Projects`.
+   - Treats Aiya's direct action as distinct from shared website state.
+   - Uses the canonical Aiya Tasks / Inbox / Aiya route only after exact authority under the shared
+     plugin-wide contract.
+   - Retains and read-back verifies the native website-parent link and context.
+
+10. Repeat prompt 9 with an unresolved website parent, ambiguous/mismatched personal route,
+    non-Inbox destination or detached topology.
+    - Fails closed and states the exact blocker.
+    - Creates or moves nothing and does not substitute `*Client Flow`, `None` or a similar section.

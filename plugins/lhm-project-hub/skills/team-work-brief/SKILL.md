@@ -42,6 +42,13 @@ For an external contractor or client contact, prefer the client's `People.md`, o
 
 Never expose unrelated protected information from a person or client profile. Use context only to improve the handoff.
 
+For a direct-person brief, read the assignee profile's canonical BasicOps personal route: project
+name/ID, semantic `inbox` section name/ID and assignee name/ID. The profile is the route basis; do
+not infer a board or section from the person's name, another person's route or display order. Treat
+the live BasicOps lookup as verification, not as permission to substitute a different route. If the
+profile route is absent, incomplete, ambiguous, conflicts with another canonical source or does not
+resolve live to that person's Inbox, stop before approval and report the exact routing mismatch.
+
 ## 3. Build the readiness model
 
 Determine:
@@ -49,7 +56,11 @@ Determine:
 - **Outcome:** what must be true when the work is finished?
 - **Owner fit:** is this inside the assignee's role and capability?
 - **Scope:** what should change, and what must remain unchanged?
-- **Destination:** which website, page, account, system, document or environment?
+- **Work context:** which client, website project, parent task or workstream supplies the reason and
+  durable project state?
+- **Action destination:** which canonical BasicOps personal project and Inbox will hold this
+  person's approved action?
+- **Target:** which website, page, account, system, document or environment must change?
 - **References:** current URL, staging link, source email, prototype, design, document or repository.
 - **Access:** what login, permission or system access is required, and is access actually confirmed?
 - **Dependencies:** approvals, assets, answers, upstream work or client decisions required first.
@@ -101,6 +112,8 @@ Show a compact bundle:
 
 - Task: <LHM BasicOps title>
 - Assignee: <person>
+- Action destination: <canonical personal project / Inbox / assignee, with IDs>
+- Retained work context: <client/workstream and originating parent name/ID/URL, or none>
 - Outcome: <one sentence>
 - References: <URLs or none>
 - Access: <confirmed / missing / verification owner>
@@ -115,7 +128,10 @@ Show a compact bundle:
 <none, or explicit non-blocking item>
 ```
 
-Ask for approval of this exact brief. A requester may approve their proposed brief, but BasicOps assignment authority still belongs to `basicops-task-manager`. During the pilot, an assignee's explicit approval may still be required before assigning the task.
+Ask for approval of this exact brief, including both the action destination and retained work
+context. A requester may approve their proposed brief, but BasicOps assignment authority still
+belongs to `basicops-task-manager` under its plugin-wide authority contract. Approval is invalid if
+the personal route, Inbox destination or originating parent/context is unresolved.
 
 ## 7. Create through the shared boundary
 
@@ -124,7 +140,9 @@ After the required approval, invoke `lhm-project-hub:basicops-task-manager` with
 - approved title
 - client and workstream
 - assignee
-- destination project/parent/section when known
+- route basis from the assignee's canonical profile
+- canonical personal project, Inbox section and assignee names/IDs
+- originating project/parent/context name, ID and URL (or an explicit `none` when no parent exists)
 - useful URLs only for the description
 - approved discussion
 - due date or unset
@@ -132,6 +150,13 @@ After the required approval, invoke `lhm-project-hub:basicops-task-manager` with
 - stable deduplication key
 
 Never create or mutate BasicOps directly from this skill. Return the shared skill's verified URL and result.
+
+An approved direct-person brief routes to the assignee's canonical personal **Inbox** while
+retaining the originating parent/context through BasicOps' native parent relationship and verified
+links/Discussion as applicable. A client, website or shared project remains work context; it is not
+the action destination for a direct-person brief. Fail closed rather than creating or moving when
+the route is absent, missing, ambiguous or conflicting, when the destination is not the canonical
+Inbox, or when parent/context preservation cannot be stated exactly.
 
 ## 8. Learn from handoff feedback
 
@@ -155,4 +180,3 @@ Use the authorised Obsidian workflow for durable writes. Re-read the target imme
 - unresolved contradiction or authority decision → retain both positions and route to Michael only when his decision is genuinely required
 
 After learning, tell the person what was updated, what is only being observed, and what Hermes will ask next time.
-
