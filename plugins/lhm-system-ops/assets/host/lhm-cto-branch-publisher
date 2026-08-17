@@ -1,0 +1,215 @@
+#!/usr/bin/env python3
+import argparse
+import json
+import os
+import re
+import subprocess
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import quote
+
+REPO = Path('/srv/lhm-plugin-source')
+WORKSPACES = Path('/home/ctoworker/workspaces')
+VAULT = Path('/home/hermes/.hermes/profiles/lhm_brain/vault')
+REVIEWS = VAULT / '01 Inbox' / 'Hermes Reviews'
+SSH_KEY = Path('/etc/lhm-github-publisher/id_ed25519')
+KNOWN_HOSTS = Path('/etc/lhm-github-publisher/known_hosts')
+REMOTE = 'ssh://git@ssh.github.com:443/michaellhm/lhm-skills.git'
+BRANCH = re.compile(r'^cto/[a-z0-9][a-z0-9-]{1,98}$')
+SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
+ALLOWED_TOP = {'.claude-plugin/marketplace.json', 'README.md'}
+SENSITIVE_NAMES = {'.env', 'credentials.json', 'id_rsa', 'id_ed25519', 'approval.json'}
+SENSITIVE_CONTENT = re.compile(r'(BEGIN [A-Z ]*PRIVATE KEY|github_pat_[A-Za-z0-9_]{20,}|ghp_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,})')
+
+
+def run(args, *, user=None, env=None, strip=True):
+    command = list(args)
+    if user:
+        command = ['/usr/sbin/runuser', '-u', user, '--', *command]
+    output = subprocess.run(command, check=True, capture_output=True, text=True, env=env).stdout
+    return output.strip() if strip else output
+
+
+def git(workspace, *args, user='ctoworker'):
+    return run(['git', '-c', f'safe.directory={workspace}', '-C', str(workspace), *args], user=user)
+
+
+def allowed_path(value):
+    path = Path(value)
+    if path.is_absolute() or '..' in path.parts or not path.parts:
+        return False
+    text = path.as_posix()
+    return text in ALLOWED_TOP or text.startswith('plugins/')
+
+
+def changed_paths(workspace):
+    output = run(
+        ['git', '-c', f'safe.directory={workspace}', '-C', str(workspace), 'status', '--porcelain=v1', '-z'],
+        user='ctoworker', strip=False,
+    )
+    values = output.split('\0')
+    paths = []
+    for value in values:
+        if not value:
+            continue
+        entry = value[3:]
+        if ' -> ' in entry:
+            raise ValueError('renames are not supported by the bounded publisher')
+        paths.append(entry)
+    return sorted(set(paths))
+
+
+def validate_request(request):
+    required = {'schema_version', 'request_id', 'parent_run_id', 'capability_incident_id', 'branch', 'summary', 'reported_changed_files', 'tests', 'qa', 'security'}
+    if not isinstance(request, dict) or set(request) != required or request.get('schema_version') != 1:
+        raise ValueError('invalid publication request schema')
+    for key in ('request_id', 'parent_run_id', 'capability_incident_id'):
+        if not isinstance(request[key], str) or not SAFE_ID.fullmatch(request[key]):
+            raise ValueError(f'invalid {key}')
+    if not isinstance(request['branch'], str) or not BRANCH.fullmatch(request['branch']):
+        raise ValueError('publication is limited to generated cto feature branches')
+    for key in ('reported_changed_files', 'tests'):
+        if not isinstance(request[key], list) or not all(isinstance(item, str) for item in request[key]):
+            raise ValueError(f'invalid {key}')
+
+
+def inspect_workspace(request):
+    workspace = (WORKSPACES / request['request_id']).resolve()
+    if workspace.parent != WORKSPACES.resolve() or not workspace.is_dir() or workspace.is_symlink():
+        raise ValueError('invalid CTO workspace')
+    if git(workspace, 'branch', '--show-current') != request['branch']:
+        raise ValueError('workspace branch mismatch')
+    base = git(workspace, 'merge-base', 'HEAD', 'origin/main')
+    head = git(workspace, 'rev-parse', 'HEAD')
+    existing_commit = None
+    if head == base:
+        paths = changed_paths(workspace)
+    else:
+        if git(workspace, 'status', '--porcelain') or git(workspace, 'rev-list', '--count', f'{base}..{head}') != '1':
+            raise ValueError('publisher permits only one clean retryable feature commit above origin/main')
+        existing_commit = head
+        paths = sorted(filter(None, git(workspace, 'diff', '--name-only', base, head).splitlines()))
+    if not paths:
+        raise ValueError('no persisted changes to publish')
+    if paths != sorted(set(request['reported_changed_files'])):
+        raise ValueError('reported changed files do not match the persisted workspace')
+    for value in paths:
+        path = workspace / value
+        if not allowed_path(value) or path.is_symlink() or path.name in SENSITIVE_NAMES:
+            raise ValueError(f'unsafe publication path: {value}')
+        if path.exists() and path.stat().st_size > 2_000_000:
+            raise ValueError(f'publication file too large: {value}')
+        if path.exists() and SENSITIVE_CONTENT.search(path.read_text(encoding='utf-8', errors='ignore')):
+            raise ValueError(f'sensitive content detected: {value}')
+    git(workspace, 'diff', '--check', base)
+    return workspace, paths, existing_commit
+
+
+def commit_changes(workspace, request, paths, existing_commit=None):
+    if existing_commit:
+        return existing_commit
+    git(workspace, 'add', '--', *paths)
+    staged = sorted(filter(None, git(workspace, 'diff', '--cached', '--name-only').splitlines()))
+    if staged != paths:
+        raise ValueError('staged files do not match reviewed paths')
+    message = f"cto: {request['capability_incident_id']}"
+    git(workspace, '-c', 'user.name=LHM Hermes CTO', '-c', 'user.email=hermes-cto@localhealthmarketing.com.au', 'commit', '-m', message)
+    commit = git(workspace, 'rev-parse', 'HEAD')
+    if git(workspace, 'status', '--porcelain'):
+        raise ValueError('workspace is not clean after commit')
+    return commit
+
+
+def push_and_verify(workspace, branch, commit):
+    if not SSH_KEY.is_file() or not KNOWN_HOSTS.is_file():
+        raise ValueError('branch publisher credential is not configured')
+    ssh = f'/usr/bin/ssh -i {SSH_KEY} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile={KNOWN_HOSTS}'
+    env = os.environ.copy()
+    env['GIT_SSH_COMMAND'] = ssh
+    run(['git', '-c', f'safe.directory={workspace}', '-C', str(workspace), 'push', REMOTE, f'{commit}:refs/heads/{branch}'], env=env)
+    remote = run(['git', 'ls-remote', '--heads', REMOTE, f'refs/heads/{branch}'], env=env).split()
+    if len(remote) != 2 or remote[0] != commit or remote[1] != f'refs/heads/{branch}':
+        raise ValueError('remote branch verification failed')
+
+
+def write_review(request, commit, paths):
+    REVIEWS.mkdir(parents=True, exist_ok=True)
+    slug = re.sub(r'[^a-z0-9-]+', '-', request['capability_incident_id'].lower()).strip('-')
+    note = REVIEWS / f'CTO Review - {slug} - {commit[:8]}.md'
+    compare = f'https://github.com/michaellhm/lhm-skills/compare/main...{quote(request["branch"], safe="")}'
+    changed = '\n'.join(f'- `{item}`' for item in paths)
+    tests = '\n'.join(f'- {item}' for item in request['tests']) or '- No test evidence reported; do not merge.'
+    body = f'''---
+type: hermes-code-review
+status: needs-michael-review
+owner: Michael
+created: {datetime.now(timezone.utc).date().isoformat()}
+incident_id: {request['capability_incident_id']}
+parent_run_id: {request['parent_run_id']}
+branch: {request['branch']}
+commit: {commit}
+---
+
+# Michael review - {request['capability_incident_id']}
+
+## What Hermes changed
+
+{request['summary']}
+
+## Files changed
+
+{changed}
+
+## Checks reported
+
+{tests}
+
+- QA: {request['qa']}
+- Security: {request['security']}
+
+## Michael's review
+
+- [ ] Open the [GitHub comparison]({compare}).
+- [ ] Confirm the outcome and changed files match the incident.
+- [ ] Confirm tests, QA and security evidence are sufficient.
+- [ ] Merge the feature branch through GitHub only if satisfied.
+- [ ] After merge, authorise any separate Hermes installation or production release required.
+- [ ] Mark this note `reviewed-merged` or `reviewed-declined` with the resulting merge or decision evidence.
+
+Hermes pushed only the feature branch. It did not push `main`, merge, release or deploy.
+'''
+    fd, temporary = tempfile.mkstemp(prefix=f'.{note.name}.', dir=REVIEWS)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            handle.write(body)
+        os.chmod(temporary, 0o640)
+        os.chown(temporary, 10000, 10000)
+        os.replace(temporary, note)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    return note
+
+
+def publish(request):
+    validate_request(request)
+    workspace, paths, existing_commit = inspect_workspace(request)
+    commit = commit_changes(workspace, request, paths, existing_commit)
+    push_and_verify(workspace, request['branch'], commit)
+    note = write_review(request, commit, paths)
+    return {'status': 'published_for_review', 'branch': request['branch'], 'commit': commit, 'remote_ref': f'refs/heads/{request["branch"]}', 'review_note': str(note), 'changed_files': paths}
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--request', required=True)
+    args = parser.parse_args()
+    request_path = Path(args.request)
+    if not request_path.is_file() or request_path.is_symlink():
+        raise SystemExit('invalid publication request')
+    print(json.dumps(publish(json.loads(request_path.read_text(encoding='utf-8')))))
+
+
+if __name__ == '__main__':
+    main()

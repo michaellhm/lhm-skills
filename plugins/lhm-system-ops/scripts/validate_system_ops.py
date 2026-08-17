@@ -20,7 +20,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.2.1':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.3.2':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -43,6 +43,7 @@ def main():
         'assets/systemd/lhm-cto-plugin-dispatch.path',
         'assets/systemd/lhm-cto-plugin-dispatch.service',
         'assets/host/lhm-cto-result-resumer',
+        'assets/host/lhm-cto-branch-publisher',
         'assets/systemd/lhm-cto-result-resumer.path',
         'assets/systemd/lhm-cto-result-resumer.service',
         'assets/systemd/lhm-cto-result-resumer.timer',
@@ -57,6 +58,11 @@ def main():
         errors.append('dispatcher service is missing the bounded CTO runtime PATH')
     if 'PrivateTmp=yes' not in service:
         errors.append('dispatcher service is missing its private writable sandbox temporary directory')
+    expected_review_path = 'ReadWritePaths="/home/hermes/.hermes/profiles/lhm_brain/vault/01 Inbox/Hermes Reviews"'
+    if expected_review_path not in service:
+        errors.append('dispatcher service is missing the correctly quoted Obsidian review-note write path')
+    if '\\x20Inbox' in service or '\\x20Reviews' in service:
+        errors.append('dispatcher service contains unsupported systemd path-space escaping')
     dispatcher = (PLUGIN / 'assets/host/lhm-cto-plugin-dispatcher').read_text(encoding='utf-8')
     if "WORKER_RUNS = WORKSPACES / '.runs'" not in dispatcher:
         errors.append('dispatcher is missing the private CTO run-control directory')
@@ -65,6 +71,10 @@ def main():
     callback = (PLUGIN / 'assets/host/lhm-cto-result-resumer').read_text(encoding='utf-8')
     if 'max_iterations' not in callback or 'questions_for_chief' not in callback:
         errors.append('CTO result resumer is missing the bounded evidence-loop contract')
+    publisher = (PLUGIN / 'assets/host/lhm-cto-branch-publisher').read_text(encoding='utf-8')
+    for required in ('refs/heads/{branch}', 'StrictHostKeyChecking=yes', "branch publisher credential is not configured", "'Hermes Reviews'"):
+        if required not in publisher:
+            errors.append(f'branch publisher is missing control: {required}')
     if errors:
         print('\n'.join(f'ERROR: {item}' for item in errors), file=sys.stderr)
         return 1

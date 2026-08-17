@@ -38,7 +38,12 @@ A missing web or YouTube capability is a CTO incident. Do not tell Michael merel
 
 ## Authority
 
-The development worker may inspect, branch, edit, test, commit, push a generated feature branch and open a pull request in the allowlisted LHM plugin repository. It may not push protected `main`, merge, modify the live Hermes install or use unrestricted host shell.
+The development worker may inspect, branch, edit and test in an isolated generated feature-branch
+workspace. After QA and security pass, the root-owned bounded publisher may reconcile those exact
+persisted files, commit them, push only the generated `cto/*` branch and verify its remote SHA in
+the allowlisted LHM repository. The credential is never readable by the CTO worker. The publisher
+then writes Michael's Obsidian review note and returns `needs_approval`. Neither component may push
+protected `main`, merge, modify the live Hermes install or use unrestricted host shell.
 
 The root-owned deployer accepts only an allowlisted repository, plugin, clean exact commit, passing validation and an unexpired one-use approval record bound to that commit and package digest.
 

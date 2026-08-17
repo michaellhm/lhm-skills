@@ -15,6 +15,7 @@ REPO = Path('/srv/lhm-plugin-source')
 WORKSPACES = Path('/home/ctoworker/workspaces')
 WORKER_RUNS = WORKSPACES / '.runs'
 CODEX = '/home/ctoworker/.local/bin/codex'
+PUBLISHER = '/usr/local/libexec/lhm-cto-branch-publisher'
 SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
 HERMES_GROUP = 10000
 BASE_FIELDS = {'schema_version', 'request_id', 'parent_run_id', 'capability_incident_id', 'objective', 'acceptance_tests', 'mode', 'timeout_seconds', 'return_point', 'resume_token'}
@@ -27,6 +28,15 @@ def run_worker(args, **kwargs):
 
 def git(*args):
     return run_worker(['git', '-C', str(REPO), *args]).stdout.strip()
+
+
+def workspace_changes(workspace):
+    output = run_worker(['git', '-C', str(workspace), 'status', '--porcelain=v1', '-z']).stdout
+    paths = []
+    for value in output.split('\0'):
+        if value:
+            paths.append(value[3:].split(' -> ')[-1])
+    return sorted(set(paths))
 
 
 def reject(path, reason):
@@ -127,7 +137,7 @@ def process(path):
     max_iterations = request.get('max_iterations', 3)
     chief_answers = '\n'.join(f'- {item}' for item in request.get('chief_answers', [])) or '- None supplied on the first iteration.'
     role_sequence = 'Capability Researcher only; do not modify files.' if mode == 'research' else 'Capability Researcher, Platform Engineer, QA Tester, Security/Reliability Reviewer, then Plugin Release Manager as separate recorded passes.'
-    prompt = f'''You are the governed LHM CTO Codex lane.\nParent: {request['parent_run_id']}\nIncident: {request['capability_incident_id']}\nReturn point: {request['return_point']}\nMode: {mode}\nEvidence-loop iteration: {iteration} of {max_iterations}\nRole sequence: {role_sequence}\n\nObjective:\n{request['objective']}\n\nAcceptance tests:\n{tests}\n\nChief of Staff answers from the prior iteration:\n{chief_answers}\n\nUse the lhm-system-ops contracts in this repository. Research native Hermes and existing LHM capability before third-party or custom work. If authoritative operational evidence is missing but the Chief of Staff may be able to access it, return status `needs_evidence` and put up to ten precise answerable questions in `questions_for_chief`; do not mark the incident failed. Never request passwords, secrets, full credential material or unrestricted vault/system access. On the final iteration, return `needs_approval` only for consequential human authority or `failed` with the exact remaining blocker. In change mode work only on branch `{branch}`, run validators/tests, commit, and push only that branch. Never push or merge main, edit live Hermes, deploy, use host root, or copy credentials. Return the required structured result. A successful repair must still return through capability_restored to the original parent.'''
+    prompt = f'''You are the governed LHM CTO Codex lane.\nParent: {request['parent_run_id']}\nIncident: {request['capability_incident_id']}\nReturn point: {request['return_point']}\nMode: {mode}\nEvidence-loop iteration: {iteration} of {max_iterations}\nRole sequence: {role_sequence}\n\nObjective:\n{request['objective']}\n\nAcceptance tests:\n{tests}\n\nChief of Staff answers from the prior iteration:\n{chief_answers}\n\nUse the lhm-system-ops contracts in this repository. Research native Hermes and existing LHM capability before third-party or custom work. If authoritative operational evidence is missing but the Chief of Staff may be able to access it, return status `needs_evidence` and put up to ten precise answerable questions in `questions_for_chief`; do not mark the incident failed. Never request passwords, secrets, full credential material or unrestricted vault/system access. On the final iteration, return `needs_approval` only for consequential human authority or `failed` with the exact remaining blocker. In change mode work only in the supplied feature-branch workspace, edit and test the persisted files, then return `completed` with the exact changed files and evidence. Do not commit, push or create another branch: the root-owned bounded publisher reconciles the real workspace, commits, pushes only the generated `cto/*` branch, verifies GitHub and writes Michael's Obsidian review note. Never push or merge main, edit live Hermes, deploy, use host root, or copy credentials. Return the required structured result. Publication is not capability restoration; Michael retains merge, release and deployment authority.'''
     final = worker_run / 'final.json'
     events = worker_run / 'codex.jsonl'
     command = [CODEX, '--ask-for-approval', 'never', '--search', 'exec', '--sandbox', 'read-only' if mode == 'research' else 'workspace-write', '--cd', str(workspace), '--output-schema', str(schema), '--output-last-message', str(final), '--json', prompt]
@@ -135,6 +145,29 @@ def process(path):
     events.write_text(completed.stdout, encoding='utf-8')
     os.chown(events, 10003, 10003)
     result = json.loads(final.read_text(encoding='utf-8'))
+    if mode == 'change' and result.get('status') == 'completed':
+        actual_changes = workspace_changes(workspace)
+        publication_request = {
+            'schema_version': 1,
+            'request_id': request['request_id'],
+            'parent_run_id': request['parent_run_id'],
+            'capability_incident_id': request['capability_incident_id'],
+            'branch': branch,
+            'summary': result.get('summary', ''),
+            'reported_changed_files': actual_changes,
+            'tests': result.get('tests', []),
+            'qa': result.get('qa', ''),
+            'security': result.get('security', ''),
+        }
+        publication_path = worker_run / 'publication-request.json'
+        publication_path.write_text(json.dumps(publication_request, indent=2) + '\n', encoding='utf-8')
+        published = subprocess.run([PUBLISHER, '--request', str(publication_path)], check=True, capture_output=True, text=True)
+        publication = json.loads(published.stdout)
+        result.update(publication)
+        result['status'] = 'needs_approval'
+        result['approval_required'] = True
+        result['decision'] = f"Feature branch {publication['branch']} was published and verified at {publication['commit']}. Michael retains merge, release and deployment authority."
+        result['next_action'] = f"Michael reviews {publication['review_note']} and the GitHub branch, then merges or declines it. No production change has occurred."
     result.update({'request_id': request['request_id'], 'parent_run_id': request['parent_run_id'], 'capability_incident_id': request['capability_incident_id'], 'return_point': request['return_point'], 'resume_token': request['resume_token'], 'finished_at': datetime.now(timezone.utc).isoformat()})
     final.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
     audit_final = audit_dir / 'final.json'
