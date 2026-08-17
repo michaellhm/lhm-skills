@@ -1,0 +1,4 @@
+interface:
+  display_name: "Playbook Strategy Session"
+  short_description: "Prepare and coach themed client strategy calls"
+  default_prompt: "Use $playbook-strategy-session to prepare a themed campaign-playbook strategy session for this client."

@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-148 skills across nine Claude Code plugins (52 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 22 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+149 skills across nine Claude Code plugins (53 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 22 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -28,7 +28,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/content.md                     # Direct content specialist entry
   agents/wordpress.md                   # Direct WordPress content specialist entry
   agents/marketing-assistant.md         # (legacy alias) — routes to start agent
-  skills/                              # All 52 skills
+  skills/                              # All 53 skills
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
     bid-budget-optimizer/              # Budget and bid strategy
@@ -49,6 +49,7 @@ plugins/lhm-marketing-hub/             # The plugin
     ga-event-config/                   # GA4 event discovery and conversion classification
     ga-dashboard-artifact/             # Analytics dashboard artifact with period comparison
     campaign-playbook-generator/       # Campaign & sales playbooks from transcripts
+    playbook-strategy-session/         # Theme-led strategy meeting preparation and live coaching
     pmax-banner-generator/             # Performance Max creative assets (CSV)
     pmax-campaign-setup/               # Performance Max campaign build spec for local businesses
     pmax-optimizer/                    # Performance Max monthly + 90-day optimisation passes
@@ -218,7 +219,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 ## Skills Catalog
 
-**Client Management** (2 skills): Client onboarding and profile setup, campaign playbook generation from transcripts.
+**Client Management** (3 skills): Client onboarding and profile setup, theme-led campaign-playbook strategy session preparation and coaching, and campaign playbook generation from transcripts.
 
 **Google Ads & PPC** (9 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), quarterly adversarial 90-day review, PMax banner creative, PMax campaign setup for local businesses, PMax monthly + 90-day optimisation.
 

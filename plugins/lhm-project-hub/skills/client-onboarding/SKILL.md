@@ -61,7 +61,23 @@ Kristalyn may work on her welcome and scheduling actions in parallel, but the pa
 
 Immediate owner: Kristalyn.
 
-Draft the welcome email for review. Kristalyn schedules and coordinates the strategy call; include Michael when strategic decisions require him. Complete the call, record decisions in Obsidian, and create or link the client campaign/project record—the canonical project brief or service record that converts those decisions into delivery scope. Mark the BasicOps top-level check complete only after these are verified.
+Draft the welcome email for review. Kristalyn schedules and coordinates the strategy call; include Michael when strategic decisions require him.
+
+Before the call, create or reuse one nested BasicOps preparation task beneath `Kristalyn welcome email and strategy call completed`:
+
+- Title: `<CLIENT LABEL>: Onboarding - Prepare playbook strategy session`.
+- Invoke `lhm-marketing-hub:playbook-strategy-session` to read the client context and create the tailored themed meeting pack and ChatGPT/Hermes meeting-coach prompt.
+- Assign Michael when the handover or canonical client record says he owns strategy or will lead the session.
+- Assign Kristalyn when preparation or facilitation has been explicitly delegated to her.
+- If ownership is not evidenced, do not guess. Make confirming whether Michael or Kristalyn owns preparation the first next step and leave the task uncreated until the owner is resolved.
+- Use a confirmed internal preparation deadline when one exists. If only the meeting date is known, do not invent a due date; record that the pack must be reviewed before the call and leave the BasicOps due date unset pending an authorised date.
+- Put the meeting pack, coach prompt and useful canonical source links in the task Description only as working URLs. Put the outcome, ordered steps, owner/handoff, dependencies and completion condition in Discussion.
+- Treat the task as complete only when the tailored pack and prompt are saved, linked and ready for the session owner to review.
+- On completion, hand off to the person leading the strategy call through the confirmed team channel.
+
+Route the task through `lhm-project-hub:basicops-task-manager`. Use stable key `basicops:<client-slug>:onboarding:prepare-playbook-strategy-session`, deduplicate before creating, add its verified native BasicOps link to a clearly labelled linked-subtasks list in the strategy subtask's Discussion, verify the complete record, and ask whether the user wants it moved to the assignee's individual board. Never move it automatically.
+
+Complete the call, record decisions in Obsidian, and create or link the client campaign/project record—the canonical project brief or service record that converts those decisions into delivery scope. Mark the BasicOps top-level check complete only after the preparation task, strategy call, recorded decisions and campaign/project record are verified.
 
 ### 3 — Access, Assets & Config
 
@@ -118,6 +134,7 @@ If the BasicOps update fails, keep the canonical Obsidian state, record the pend
 - Rule of thumb: detailed, conditional checklists, evidence and applicability decisions live in Obsidian; BasicOps holds top-level gates, current phase, immediate owner and next action.
 - Do not force Tier 1 Ads/Maps checks onto website-only or other differently scoped clients.
 - Do not create duplicate onboarding or destination tasks.
+- Keep the playbook strategy-session preparation task nested beneath the existing strategy-call top-level subtask; never add it as an eighth top-level onboarding gate.
 - Credentials are references only, never plaintext.
 - Never fabricate data, access, dates or completion.
 - Instantiated client checklists are version-stable; propose reference improvements separately rather than silently rewriting active onboarding files.
