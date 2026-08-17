@@ -1,0 +1,18 @@
+{
+  "name": "lhm-system-ops",
+  "version": "0.4.0",
+  "description": "Governed CTO capability research, engineering, QA, security review, GitHub delivery, and approved Hermes plugin deployment.",
+  "author": {
+    "name": "LHM Digital"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "LHM System Ops",
+    "shortDescription": "Governed CTO delivery for Hermes and LHM plugins.",
+    "longDescription": "Research missing capabilities, engineer reusable plugin changes, run QA and security review, deliver GitHub pull requests, and deploy only approved immutable commits to Hermes.",
+    "developerName": "LHM Digital",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "Route this capability incident through the LHM CTO team and return the repaired capability to the original Hermes parent workflow."
+  }
+}

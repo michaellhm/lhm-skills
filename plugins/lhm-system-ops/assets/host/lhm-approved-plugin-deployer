@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+import argparse
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+import tempfile
+import zipfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+REPO = Path('/srv/lhm-plugin-source')
+APPROVALS = Path('/etc/lhm-plugin-approvals')
+PROFILE = Path('/home/hermes/.hermes/profiles/lhm_brain')
+BACKUPS = Path('/var/backups/lhm-plugin-deployments')
+ALLOWED_REPOSITORY = 'michaellhm/lhm-skills'
+ALLOWED_PLUGIN = 'lhm-system-ops'
+
+
+def now():
+    return datetime.now(timezone.utc)
+
+
+def git(*args):
+    return subprocess.run(['git', '-C', str(REPO), *args], check=True, capture_output=True, text=True).stdout.strip()
+
+
+def safe_id(value):
+    return isinstance(value, str) and value and all(ch.isalnum() or ch in '._:-' for ch in value)
+
+
+def atomic_json(path, value):
+    fd, temporary = tempfile.mkstemp(prefix=f'.{path.name}.', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(value, handle, indent=2)
+            handle.write('\n')
+        os.chmod(temporary, 0o600)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def validate_archive(archive, staging):
+    with zipfile.ZipFile(archive) as bundle:
+        members = bundle.infolist()
+        if len(members) > 250 or sum(item.file_size for item in members) > 5_000_000:
+            raise ValueError('plugin archive exceeds size or file-count ceiling')
+        if any((item.external_attr >> 16) & 0o170000 == 0o120000 for item in members):
+            raise ValueError('plugin archive symlink is prohibited')
+        names = bundle.namelist()
+        prefix = f'{ALLOWED_PLUGIN}/'
+        if not names or any(not name.startswith(prefix) or '..' in Path(name).parts or Path(name).is_absolute() for name in names):
+            raise ValueError('unsafe plugin archive path')
+        bundle.extractall(staging)
+    plugin = staging / ALLOWED_PLUGIN
+    subprocess.run(['python3', str(plugin / 'scripts/validate_system_ops.py')], check=True)
+    return plugin
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('approval_id')
+    parser.add_argument('archive')
+    args = parser.parse_args()
+    if not safe_id(args.approval_id):
+        raise SystemExit('invalid approval_id')
+    approval_path = APPROVALS / f'{args.approval_id}.json'
+    if not approval_path.is_file() or approval_path.is_symlink():
+        raise SystemExit('approval record unavailable')
+    approval = json.loads(approval_path.read_text(encoding='utf-8'))
+    required = {'schema_version', 'approval_id', 'repository', 'commit', 'plugin', 'archive_sha256', 'profile', 'issued_at', 'expires_at', 'used'}
+    allowed_fields = required | {'used_at', 'backup'}
+    if not required.issubset(approval) or not set(approval).issubset(allowed_fields) or approval['schema_version'] != 1 or approval['approval_id'] != args.approval_id:
+        raise SystemExit('invalid approval schema')
+    if approval['used'] is not False:
+        raise SystemExit('approval already consumed')
+    if approval['repository'] != ALLOWED_REPOSITORY or approval['plugin'] != ALLOWED_PLUGIN or approval['profile'] != 'lhm_brain':
+        raise SystemExit('approval scope mismatch')
+    if now() > datetime.fromisoformat(approval['expires_at']):
+        raise SystemExit('approval expired')
+    archive = Path(args.archive).resolve()
+    if archive.parent != Path('/var/lib/lhm-plugin-releases') or not archive.is_file() or archive.is_symlink():
+        raise SystemExit('unapproved archive location')
+    if hashlib.sha256(archive.read_bytes()).hexdigest() != approval['archive_sha256']:
+        raise SystemExit('archive digest mismatch')
+    if git('status', '--porcelain'):
+        raise SystemExit('source checkout is dirty')
+    if git('rev-parse', 'HEAD') != approval['commit']:
+        raise SystemExit('source commit mismatch')
+
+    with tempfile.TemporaryDirectory(prefix='lhm-plugin-deploy.') as temporary:
+        plugin = validate_archive(archive, Path(temporary))
+        skills = sorted((plugin / 'skills').glob('*/SKILL.md'))
+        if not skills:
+            raise SystemExit('plugin contains no skills')
+        stamp = now().strftime('%Y%m%dT%H%M%SZ')
+        backup = BACKUPS / f'{ALLOWED_PLUGIN}-{stamp}-{approval["commit"][:12]}'
+        backup.mkdir(parents=True, exist_ok=False)
+        live_skills = PROFILE / 'skills'
+        for skill_file in skills:
+            name = skill_file.parent.name
+            target = live_skills / name
+            if target.exists():
+                shutil.copytree(target, backup / name)
+            staged = live_skills / f'.{name}.{stamp}.new'
+            if staged.exists():
+                raise SystemExit('staging target already exists')
+            shutil.copytree(skill_file.parent, staged)
+            for item in staged.rglob('*'):
+                if item.is_symlink():
+                    raise SystemExit('plugin skill symlink is prohibited')
+            old = live_skills / f'.{name}.{stamp}.old'
+            if target.exists():
+                os.replace(target, old)
+            os.replace(staged, target)
+            if old.exists():
+                shutil.rmtree(old)
+        source_target = PROFILE / 'plugin-sources' / ALLOWED_PLUGIN
+        source_target.parent.mkdir(parents=True, exist_ok=True)
+        staged_source = source_target.parent / f'.{ALLOWED_PLUGIN}.{stamp}.new'
+        shutil.copytree(plugin, staged_source)
+        if source_target.exists():
+            shutil.rmtree(source_target)
+        os.replace(staged_source, source_target)
+
+    approval['used'] = True
+    approval['used_at'] = now().isoformat()
+    approval['backup'] = str(backup)
+    atomic_json(approval_path, approval)
+    print(json.dumps({'status': 'installed', 'plugin': ALLOWED_PLUGIN, 'commit': approval['commit'], 'backup': str(backup)}))
+
+
+if __name__ == '__main__':
+    main()

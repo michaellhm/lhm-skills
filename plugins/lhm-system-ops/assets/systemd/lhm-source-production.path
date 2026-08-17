@@ -1,0 +1,8 @@
+[Unit]
+Description=Watch governed source-to-production requests
+[Path]
+DirectoryNotEmpty=/home/hermes/.hermes/profiles/lhm_brain/dispatch/source-production/incoming
+PathChanged=/home/hermes/.hermes/profiles/lhm_brain/dispatch/source-production/events
+Unit=lhm-source-production.service
+[Install]
+WantedBy=multi-user.target

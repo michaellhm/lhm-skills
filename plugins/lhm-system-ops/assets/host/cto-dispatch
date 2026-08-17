@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+import argparse
+import json
+import os
+import re
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+BASE = Path('/opt/data/profiles/lhm_brain/dispatch/cto-plugin')
+SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
+BASE_FIELDS = {'schema_version', 'request_id', 'parent_run_id', 'capability_incident_id', 'objective', 'acceptance_tests', 'mode', 'timeout_seconds', 'return_point', 'resume_token'}
+LOOP_FIELDS = {'iteration', 'max_iterations', 'prior_request_id', 'chief_answers'}
+
+
+def submit(args):
+    request = json.load(__import__('sys').stdin)
+    if not isinstance(request, dict) or set(request) not in (BASE_FIELDS, BASE_FIELDS | LOOP_FIELDS) or request.get('schema_version') != 1:
+        raise SystemExit('invalid CTO request schema')
+    for key in ('request_id', 'parent_run_id', 'capability_incident_id'):
+        if not isinstance(request[key], str) or not SAFE_ID.fullmatch(request[key]):
+            raise SystemExit(f'invalid {key}')
+    if request['mode'] not in {'research', 'change'}:
+        raise SystemExit('invalid mode')
+    if not isinstance(request['timeout_seconds'], int) or not 300 <= request['timeout_seconds'] <= 1800:
+        raise SystemExit('invalid timeout')
+    if not isinstance(request['objective'], str) or not 1 <= len(request['objective']) <= 3000:
+        raise SystemExit('invalid objective')
+    if not isinstance(request['acceptance_tests'], list) or not 1 <= len(request['acceptance_tests']) <= 20:
+        raise SystemExit('invalid acceptance tests')
+    if not isinstance(request['resume_token'], str) or len(request['resume_token']) < 16:
+        raise SystemExit('invalid resume token')
+    if LOOP_FIELDS.issubset(request):
+        if not isinstance(request['iteration'], int) or not isinstance(request['max_iterations'], int) or not 2 <= request['iteration'] <= request['max_iterations'] <= 3:
+            raise SystemExit('invalid evidence-loop iteration')
+        if not isinstance(request['prior_request_id'], str) or not SAFE_ID.fullmatch(request['prior_request_id']):
+            raise SystemExit('invalid prior_request_id')
+        if not isinstance(request['chief_answers'], list) or not 1 <= len(request['chief_answers']) <= 20 or not all(isinstance(item, str) and 1 <= len(item) <= 3000 for item in request['chief_answers']):
+            raise SystemExit('invalid chief_answers')
+    incoming = BASE / 'incoming'
+    fd, temporary = tempfile.mkstemp(prefix=f'.{request["request_id"]}.', dir=incoming)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(request, handle, indent=2)
+            handle.write('\n')
+        os.chmod(temporary, 0o600)
+        os.replace(temporary, incoming / f'{request["request_id"]}.json')
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    print(json.dumps({'request_id': request['request_id'], 'status': 'queued_for_validation'}))
+
+
+def status(args):
+    if not SAFE_ID.fullmatch(args.request_id):
+        raise SystemExit('invalid request_id')
+    for directory, state in (('failed', 'rejected'), ('runs', 'accepted'), ('incoming', 'queued')):
+        root = BASE / directory
+        final = root / args.request_id / 'final.json' if directory == 'runs' else root / f'{args.request_id}.json'
+        try:
+            exists = final.is_file()
+        except PermissionError:
+            exists = False
+        if exists:
+            response = {'request_id': args.request_id, 'status': state}
+            error = root / f'{args.request_id}.error'
+            if directory == 'failed' and error.is_file():
+                response['reason'] = error.read_text(encoding='utf-8').strip()
+            print(final.read_text(encoding='utf-8') if directory == 'runs' else json.dumps(response))
+            return
+    print(json.dumps({'request_id': args.request_id, 'status': 'unknown'}))
+
+
+def main():
+    parser = argparse.ArgumentParser(prog='cto-dispatch')
+    commands = parser.add_subparsers(dest='command', required=True)
+    submit_parser = commands.add_parser('submit')
+    submit_parser.set_defaults(func=submit)
+    status_parser = commands.add_parser('status')
+    status_parser.add_argument('request_id')
+    status_parser.set_defaults(func=status)
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()
