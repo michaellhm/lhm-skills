@@ -1,0 +1,9 @@
+[Unit]
+Description=Wake the Chief of Staff when a durable CTO result arrives
+
+[Path]
+PathExistsGlob=/home/hermes/.hermes/profiles/lhm_brain/dispatch/cto-plugin/callback-incoming/*.json
+Unit=lhm-cto-result-resumer.service
+
+[Install]
+WantedBy=multi-user.target

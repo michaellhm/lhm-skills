@@ -1,0 +1,13 @@
+[Unit]
+Description=Return durable CTO results to the Hermes Chief of Staff
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/lhm-cto-result-resumer
+User=root
+Group=root
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/cto-plugin
