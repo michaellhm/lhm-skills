@@ -140,6 +140,10 @@ verifying every transition on the parent and active subtask.
 Use this mode when someone asks to clean up, analyse or classify a person's board, or asks for the
 next tasks to review. Treat it as a human-guided operational review, not a mechanical backlog edit.
 
+### Board review fast-path (efficiency default)
+
+For "what can we tick off / review / clean up", pull a filtered task list in one call (`list_tasks_in_project(projectId, filter_section=<actionable sections>, filter_status=[New, Accepted, Under Review], limit=100)`) and fetch all Discussions in one bulk call (`list_messages_in_project(projectId, include_task_messages=true)`) before reading anything else. Reserve full-board reads for tasks where the whole board genuinely matters. Tick is always the user's confirmed decision.
+
 1. Authenticate the requester and read the person's canonical `22 People` profile to resolve the
    exact BasicOps board and assignee. Do not infer a board from a person's name.
 2. Inventory the board without mutating it. Read enough pages to avoid presenting a partial count as

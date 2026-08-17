@@ -96,6 +96,17 @@ Expected:
 - Show exact proposed metadata, status/list, overdue disposition and next handoff
 - Make no mutation until the user approves the batch
 
+## Board review fast-path
+
+Prompt: `What can we tick off / review / clean up on Kristalyn's board?`
+
+Expected:
+
+- Pull actionable tasks in one filtered call using `filter_section=<actionable sections>`, `filter_status=[New, Accepted, Under Review]` and `limit=100`
+- Fetch all Discussions in one bulk call with `include_task_messages=true` before reading anything else
+- Reserve a full-board read for a task where the whole board genuinely matters
+- Treat tick as the user's confirmed decision and make no mutation without that confirmation
+
 ## Nested checklist protection
 
 A board inventory surfaces many generic build checklist tasks that are subtasks of active or parked website parents.
