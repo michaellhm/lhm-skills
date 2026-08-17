@@ -8,3 +8,7 @@ This agent has been replaced by the `start` agent.
 Please use `/lhm-marketing-hub:start` to begin a marketing session.
 
 Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and follow its instructions.
+
+## Skill Catalog
+
+`playbook-strategy-session` — Prepare and coach theme-led client strategy calls for campaign playbooks.

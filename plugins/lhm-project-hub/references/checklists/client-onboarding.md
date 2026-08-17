@@ -29,6 +29,9 @@ Instantiate this structure into `20 Clients/<Client>/project-management/Onboardi
 - Verify Michael's client introduction was sent.
 - Draft and confirm Kristalyn's welcome email.
 - Kristalyn schedules and coordinates the strategy call; include Michael when strategic decisions require him.
+- Create or reuse the nested `Prepare playbook strategy session` BasicOps task beneath the strategy-call top-level subtask. Assign Michael when he owns strategy/session leadership or Kristalyn when preparation has been explicitly delegated; confirm rather than guess when ownership is unclear.
+- Run `lhm-marketing-hub:playbook-strategy-session` and save/link the tailored themed meeting pack and ChatGPT/Hermes meeting-coach prompt before the call.
+- Verify the preparation task's discussion, parent, owner, due date or explicit unset state, linked artefacts and handoff to the session leader. Ask whether it should be moved to the assignee's personal board; never move it automatically.
 - Complete the strategy call and record its decisions.
 - Create or link the client campaign/project record: the canonical project brief or service record that turns the call decisions into delivery scope.
 
