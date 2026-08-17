@@ -151,6 +151,19 @@
         "kickoff",
         "monthly-review"
       ]
+    },
+    {
+      "name": "lhm-system-ops",
+      "source": "./plugins/lhm-system-ops",
+      "description": "Governed CTO operations and executable source-to-production recovery.",
+      "version": "0.4.0",
+      "category": "utilities",
+      "tags": [
+        "cto",
+        "source-retrieval",
+        "production",
+        "reliability"
+      ]
     }
   ]
 }

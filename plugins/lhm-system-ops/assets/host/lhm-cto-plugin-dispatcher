@@ -1,0 +1,214 @@
+#!/usr/bin/env python3
+import json
+import hashlib
+import os
+import re
+import shutil
+import subprocess
+from datetime import datetime, timezone
+from pathlib import Path
+
+BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/cto-plugin')
+INCOMING, PROCESSED, FAILED, RUNS = (BASE / name for name in ('incoming', 'processed', 'failed', 'runs'))
+CALLBACK_INCOMING = BASE / 'callback-incoming'
+REPO = Path('/srv/lhm-plugin-source')
+WORKSPACES = Path('/home/ctoworker/workspaces')
+WORKER_RUNS = WORKSPACES / '.runs'
+CODEX = '/home/ctoworker/.local/bin/codex'
+PUBLISHER = '/usr/local/libexec/lhm-cto-branch-publisher'
+SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
+HERMES_GROUP = 10000
+BASE_FIELDS = {'schema_version', 'request_id', 'parent_run_id', 'capability_incident_id', 'objective', 'acceptance_tests', 'mode', 'timeout_seconds', 'return_point', 'resume_token'}
+LOOP_FIELDS = {'iteration', 'max_iterations', 'prior_request_id', 'chief_answers'}
+
+
+def run_worker(args, **kwargs):
+    return subprocess.run(['/usr/sbin/runuser', '-u', 'ctoworker', '--', *args], check=True, capture_output=True, text=True, **kwargs)
+
+
+def git(*args):
+    return run_worker(['git', '-C', str(REPO), *args]).stdout.strip()
+
+
+def workspace_changes(workspace):
+    output = run_worker(['git', '-C', str(workspace), 'status', '--porcelain=v1', '-z', '--untracked-files=all']).stdout
+    paths = []
+    for value in output.split('\0'):
+        if value:
+            paths.append(value[3:].split(' -> ')[-1])
+    return sorted(set(paths))
+
+
+def reject(path, reason):
+    shutil.move(str(path), FAILED / path.name)
+    (FAILED / f'{path.stem}.error').write_text(reason + '\n', encoding='utf-8')
+
+
+def failure_reason(exc):
+    if isinstance(exc, subprocess.CalledProcessError):
+        detail = (exc.stderr or exc.stdout or '').strip()
+        if detail:
+            return detail[-4000:]
+    return str(exc)
+
+
+def atomic_json(path, value):
+    fd, temporary = __import__('tempfile').mkstemp(prefix=f'.{path.name}.', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(value, handle, indent=2)
+            handle.write('\n')
+        os.chmod(temporary, 0o640)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def validate(request, path):
+    if not isinstance(request, dict) or set(request) not in (BASE_FIELDS, BASE_FIELDS | LOOP_FIELDS) or request.get('schema_version') != 1:
+        raise ValueError('invalid CTO request schema')
+    for key in ('request_id', 'parent_run_id', 'capability_incident_id'):
+        if not isinstance(request[key], str) or not SAFE_ID.fullmatch(request[key]):
+            raise ValueError(f'invalid {key}')
+    if path.stem != request['request_id'] or request['mode'] not in {'research', 'change'}:
+        raise ValueError('request identity or mode mismatch')
+    if not isinstance(request['timeout_seconds'], int) or not 300 <= request['timeout_seconds'] <= 1800:
+        raise ValueError('timeout outside ceiling')
+    if not isinstance(request['resume_token'], str) or len(request['resume_token']) < 16:
+        raise ValueError('invalid resume token')
+    if LOOP_FIELDS.issubset(request):
+        if not isinstance(request['iteration'], int) or not isinstance(request['max_iterations'], int) or not 2 <= request['iteration'] <= request['max_iterations'] <= 3:
+            raise ValueError('invalid evidence-loop iteration')
+        if not isinstance(request['prior_request_id'], str) or not SAFE_ID.fullmatch(request['prior_request_id']):
+            raise ValueError('invalid prior_request_id')
+        if not isinstance(request['chief_answers'], list) or not 1 <= len(request['chief_answers']) <= 20:
+            raise ValueError('invalid chief_answers')
+
+
+def output_schema():
+    return {
+        'type': 'object', 'additionalProperties': False,
+        'required': ['status', 'summary', 'decision', 'sources', 'branch', 'commit', 'changed_files', 'tests', 'qa', 'security', 'approval_required', 'questions_for_chief', 'next_action'],
+        'properties': {
+            'status': {'enum': ['completed', 'needs_evidence', 'needs_approval', 'failed']},
+            'summary': {'type': 'string'}, 'decision': {'type': 'string'},
+            'sources': {'type': 'array', 'items': {'type': 'string'}},
+            'branch': {'type': ['string', 'null']}, 'commit': {'type': ['string', 'null']},
+            'changed_files': {'type': 'array', 'items': {'type': 'string'}},
+            'tests': {'type': 'array', 'items': {'type': 'string'}},
+            'qa': {'type': 'string'}, 'security': {'type': 'string'},
+            'approval_required': {'type': 'boolean'}, 'next_action': {'type': 'string'},
+            'questions_for_chief': {'type': 'array', 'maxItems': 10, 'items': {'type': 'string'}},
+        },
+    }
+
+
+def process(path):
+    request = json.loads(path.read_text(encoding='utf-8'))
+    validate(request, path)
+    if git('status', '--porcelain'):
+        raise ValueError('CTO source checkout is dirty')
+    git('fetch', '--prune', 'origin', 'main')
+    if git('rev-parse', 'main') != git('rev-parse', 'origin/main'):
+        git('checkout', 'main')
+        git('merge', '--ff-only', 'origin/main')
+    audit_dir = RUNS / request['request_id']
+    audit_dir.mkdir(mode=0o750)
+    os.chown(audit_dir, 10003, HERMES_GROUP)
+    worker_run = WORKER_RUNS / request['request_id']
+    worker_run.mkdir(mode=0o700)
+    os.chown(worker_run, 10003, 10003)
+    schema = worker_run / 'output-schema.json'
+    schema.write_text(json.dumps(output_schema(), indent=2) + '\n', encoding='utf-8')
+    os.chown(schema, 10003, 10003)
+    os.chmod(schema, 0o600)
+    mode = request['mode']
+    workspace = REPO
+    branch = None
+    if mode == 'change':
+        branch = 'cto/' + re.sub(r'[^a-z0-9-]+', '-', request['capability_incident_id'].lower()).strip('-')
+        workspace = WORKSPACES / request['request_id']
+        if workspace.exists():
+            raise ValueError('CTO workspace already exists')
+        run_worker(['git', '-C', str(REPO), 'worktree', 'add', '-b', branch, str(workspace), 'origin/main'])
+    tests = '\n'.join(f'- {item}' for item in request['acceptance_tests'])
+    iteration = request.get('iteration', 1)
+    max_iterations = request.get('max_iterations', 3)
+    chief_answers = '\n'.join(f'- {item}' for item in request.get('chief_answers', [])) or '- None supplied on the first iteration.'
+    role_sequence = 'Capability Researcher only; do not modify files.' if mode == 'research' else 'Capability Researcher, Platform Engineer, QA Tester, Security/Reliability Reviewer, then Plugin Release Manager as separate recorded passes.'
+    prompt = f'''You are the governed LHM CTO Codex lane.\nParent: {request['parent_run_id']}\nIncident: {request['capability_incident_id']}\nReturn point: {request['return_point']}\nMode: {mode}\nEvidence-loop iteration: {iteration} of {max_iterations}\nRole sequence: {role_sequence}\n\nObjective:\n{request['objective']}\n\nAcceptance tests:\n{tests}\n\nChief of Staff answers from the prior iteration:\n{chief_answers}\n\nUse the lhm-system-ops contracts in this repository. Research native Hermes and existing LHM capability before third-party or custom work. If authoritative operational evidence is missing but the Chief of Staff may be able to access it, return status `needs_evidence` and put up to ten precise answerable questions in `questions_for_chief`; do not mark the incident failed. Never request passwords, secrets, full credential material or unrestricted vault/system access. On the final iteration, return `needs_approval` only for consequential human authority or `failed` with the exact remaining blocker. In change mode work only in the supplied feature-branch workspace, edit and test the persisted files, then return `completed` with the exact changed files and evidence. Do not commit, push or create another branch: the root-owned bounded publisher reconciles the real workspace, commits, pushes only the generated `cto/*` branch, verifies GitHub and writes Michael's Obsidian review note. Never push or merge main, edit live Hermes, deploy, use host root, or copy credentials. Return the required structured result. Publication is not capability restoration; Michael retains merge, release and deployment authority.'''
+    final = worker_run / 'final.json'
+    events = worker_run / 'codex.jsonl'
+    command = [CODEX, '--ask-for-approval', 'never', '--search', 'exec', '--sandbox', 'read-only' if mode == 'research' else 'workspace-write', '--cd', str(workspace), '--output-schema', str(schema), '--output-last-message', str(final), '--json', prompt]
+    completed = run_worker(['timeout', str(request['timeout_seconds']), *command])
+    events.write_text(completed.stdout, encoding='utf-8')
+    os.chown(events, 10003, 10003)
+    result = json.loads(final.read_text(encoding='utf-8'))
+    if mode == 'change' and result.get('status') == 'completed':
+        actual_changes = workspace_changes(workspace)
+        publication_request = {
+            'schema_version': 1,
+            'request_id': request['request_id'],
+            'parent_run_id': request['parent_run_id'],
+            'capability_incident_id': request['capability_incident_id'],
+            'branch': branch,
+            'summary': result.get('summary', ''),
+            'reported_changed_files': actual_changes,
+            'tests': result.get('tests', []),
+            'qa': result.get('qa', ''),
+            'security': result.get('security', ''),
+        }
+        publication_path = worker_run / 'publication-request.json'
+        publication_path.write_text(json.dumps(publication_request, indent=2) + '\n', encoding='utf-8')
+        published = subprocess.run([PUBLISHER, '--request', str(publication_path)], check=True, capture_output=True, text=True)
+        publication = json.loads(published.stdout)
+        result.update(publication)
+        result['status'] = 'needs_approval'
+        result['approval_required'] = True
+        result['decision'] = f"Feature branch {publication['branch']} was published and verified at {publication['commit']}. Michael retains merge, release and deployment authority."
+        result['next_action'] = f"Michael reviews {publication['review_note']} and the GitHub branch, then merges or declines it. No production change has occurred."
+    result.update({'request_id': request['request_id'], 'parent_run_id': request['parent_run_id'], 'capability_incident_id': request['capability_incident_id'], 'return_point': request['return_point'], 'resume_token': request['resume_token'], 'finished_at': datetime.now(timezone.utc).isoformat()})
+    final.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
+    audit_final = audit_dir / 'final.json'
+    audit_events = audit_dir / 'codex.jsonl'
+    shutil.copy2(final, audit_final)
+    shutil.copy2(events, audit_events)
+    for artifact in (audit_final, audit_events):
+        os.chown(artifact, 10003, HERMES_GROUP)
+        os.chmod(artifact, 0o640)
+    result_digest = hashlib.sha256(audit_final.read_bytes()).hexdigest()
+    callback = {
+        'schema_version': 1,
+        'event': 'cto_result_ready',
+        'event_id': f"{request['request_id']}:result",
+        'request_id': request['request_id'],
+        'parent_run_id': request['parent_run_id'],
+        'capability_incident_id': request['capability_incident_id'],
+        'return_point': request['return_point'],
+        'resume_token': request['resume_token'],
+        'iteration': iteration,
+        'max_iterations': max_iterations,
+        'result_sha256': result_digest,
+        'created_at': datetime.now(timezone.utc).isoformat(),
+    }
+    shutil.move(str(path), PROCESSED / path.name)
+    callback_path = CALLBACK_INCOMING / f"{request['request_id']}.json"
+    atomic_json(callback_path, callback)
+    os.chown(callback_path, HERMES_GROUP, HERMES_GROUP)
+
+
+def main():
+    for directory in (INCOMING, PROCESSED, FAILED, RUNS, CALLBACK_INCOMING, WORKSPACES, WORKER_RUNS):
+        directory.mkdir(parents=True, exist_ok=True)
+    os.chown(WORKER_RUNS, 10003, 10003)
+    os.chmod(WORKER_RUNS, 0o700)
+    for path in sorted(INCOMING.glob('*.json')):
+        try:
+            process(path)
+        except Exception as exc:
+            reject(path, failure_reason(exc))
+
+
+if __name__ == '__main__':
+    main()

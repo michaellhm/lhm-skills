@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+import fcntl
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/cto-plugin')
+INCOMING = BASE / 'callback-incoming'
+CLAIMS = BASE / 'callback-claims'
+PROCESSED = BASE / 'callback-processed'
+FAILED = BASE / 'callback-failed'
+CONSUMED = BASE / 'callback-consumed'
+RUNS = BASE / 'runs'
+REQUESTS = BASE / 'processed'
+LOCK = BASE / '.callback-resumer.lock'
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def load(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def atomic_json(path, value):
+    fd, temporary = tempfile.mkstemp(prefix=f'.{path.name}.', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(value, handle, indent=2)
+            handle.write('\n')
+        os.chmod(temporary, 0o640)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def validate(event):
+    required = {
+        'schema_version', 'event', 'event_id', 'request_id', 'parent_run_id',
+        'capability_incident_id', 'return_point', 'resume_token', 'iteration',
+        'max_iterations', 'result_sha256', 'created_at',
+    }
+    if set(event) != required or event['schema_version'] != 1 or event['event'] != 'cto_result_ready':
+        raise ValueError('invalid CTO callback schema')
+    if not 1 <= event['iteration'] <= event['max_iterations'] <= 3:
+        raise ValueError('invalid CTO callback iteration')
+    result = RUNS / event['request_id'] / 'final.json'
+    request = REQUESTS / f"{event['request_id']}.json"
+    if not result.is_file() or result.is_symlink() or not request.is_file() or request.is_symlink():
+        raise ValueError('CTO callback artefacts unavailable')
+    if hashlib.sha256(result.read_bytes()).hexdigest() != event['result_sha256']:
+        raise ValueError('CTO callback result digest mismatch')
+    original = load(request)
+    for key in ('request_id', 'parent_run_id', 'capability_incident_id', 'return_point', 'resume_token'):
+        if original[key] != event[key]:
+            raise ValueError(f'CTO callback mismatch: {key}')
+    return result, request
+
+
+def invoke(event_path, result_path, request_path):
+    def container(path):
+        return str(path).replace('/home/hermes/.hermes/profiles/lhm_brain', '/opt/data/profiles/lhm_brain')
+    prompt = (
+        'Use LHM Chief of Staff as the outcome owner. Consume the durable CTO result callback at '
+        f'{container(event_path)}, the structured result at {container(result_path)}, and the original request at {container(request_path)}. '
+        'Verify request ID, parent, incident, return point, resume token and result digest before acting. '
+        'If status is needs_evidence and iteration remains below max_iterations, answer every questions_for_chief item using the smallest authorised source: '
+        'canonical Obsidian context, governed BasicOps read, or an existing LHM skill. Do not send passwords, secrets, health data or unrelated private content. '
+        'Submit one fresh CTO request through cto-dispatch with the same parent, incident, objective, acceptance tests, return point and resume token; '
+        'set iteration+1, max_iterations, prior_request_id and concise chief_answers with source references. Do not ask Michael for facts the Chief can retrieve. '
+        'If evidence is unavailable, sensitive, conflicting or requires consequential authority, return one exact researched question or approval boundary to Michael. '
+        'If status is completed, consume the result into the original parent and route the next authorised role. If needs_approval, return the exact approval. '
+        'If failed, create or continue the owned capability recovery; do not merely say you will wait. '
+        'Record the callback event as consumed and route the learning to Learning Steward. Never exceed max_iterations or start a duplicate request.'
+    )
+    command = [
+        'timeout', '1800', 'docker', 'exec', '-u', '10000:10000', 'hermes',
+        '/opt/hermes/.venv/bin/hermes', '-p', 'lhm_brain', '-z', prompt,
+        '--skills', 'lhm-chief-of-staff,lhm-cto,lhm-context-research,basicops-task-manager,lhm-learning-steward',
+    ]
+    return subprocess.run(command, capture_output=True, text=True)
+
+
+def process(path, runner=invoke):
+    claim = CLAIMS / path.name
+    os.replace(path, claim)
+    try:
+        event = load(claim)
+        result_path, request_path = validate(event)
+        key = hashlib.sha256(f"{event['event_id']}\0{event['result_sha256']}".encode()).hexdigest()
+        marker = CONSUMED / f'{key}.json'
+        if marker.exists():
+            shutil.move(str(claim), PROCESSED / claim.name)
+            return 'duplicate'
+        result = runner(claim, result_path, request_path)
+        if result.returncode != 0:
+            raise ValueError(f'Chief of Staff callback failed: {(result.stderr or result.stdout)[-2000:]}')
+        marker_value = {
+            'idempotency_key': key, 'event_id': event['event_id'],
+            'request_id': event['request_id'], 'parent_run_id': event['parent_run_id'],
+            'consumed_at': now(), 'exit_code': result.returncode,
+        }
+        shutil.move(str(claim), PROCESSED / claim.name)
+        atomic_json(marker, marker_value)
+        atomic_json(PROCESSED / f'{claim.stem}.result.json', {
+            **marker_value, 'stdout': result.stdout[-12000:],
+        })
+        return 'consumed'
+    except Exception as exc:
+        if claim.exists():
+            shutil.move(str(claim), FAILED / claim.name)
+        (FAILED / f'{claim.stem}.error').write_text(str(exc) + '\n', encoding='utf-8')
+        return 'failed'
+
+
+def main():
+    for directory in (INCOMING, CLAIMS, PROCESSED, FAILED, CONSUMED):
+        directory.mkdir(parents=True, exist_ok=True)
+    with LOCK.open('a+') as handle:
+        try:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return
+        outcomes = {'consumed': 0, 'duplicate': 0, 'failed': 0}
+        for path in sorted(INCOMING.glob('*.json')):
+            outcomes[process(path)] += 1
+        if any(outcomes.values()):
+            print(json.dumps(outcomes))
+
+
+if __name__ == '__main__':
+    main()
