@@ -160,7 +160,9 @@ def process(path):
         'created_at': datetime.now(timezone.utc).isoformat(),
     }
     shutil.move(str(path), PROCESSED / path.name)
-    atomic_json(CALLBACK_INCOMING / f"{request['request_id']}.json", callback)
+    callback_path = CALLBACK_INCOMING / f"{request['request_id']}.json"
+    atomic_json(callback_path, callback)
+    os.chown(callback_path, HERMES_GROUP, HERMES_GROUP)
 
 
 def main():
