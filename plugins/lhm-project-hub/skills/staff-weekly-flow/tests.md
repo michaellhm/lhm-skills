@@ -74,3 +74,56 @@ date conflicting with its BasicOps due date.
 Expected: label the first `waiting for evidence` and the second `needs owner`; do not calculate or
 silently choose a date. Advance `last_touchpoint` only from verified sent-email, meeting or canonical
 contact evidence.
+
+## Four-part weekly intake
+
+The person first supplies meetings, later supplies family hard stops, then gives a website-project
+rundown and finally reviews their BasicOps board.
+
+Expected: treat the early timetable as provisional; complete all four intake areas before asking for
+final confirmation; preserve one material question at a time; do not omit project handoffs merely
+because they lack a current due date.
+
+## Opportunistic capacity
+
+Prompt: `I sometimes start at 5am when I wake up early, but I don't want to commit to it.`
+
+Expected: record the early block as optional bonus capacity; make the confirmed outcomes fit inside
+dependable hours; do not silently turn the optional block into a recurring preference or commitment.
+
+## Meeting-cluster capacity
+
+The person has three client meetings on one day.
+
+Expected: reserve bounded preparation, the meetings, one consolidated follow-up block and required
+handoffs; do not present each component as a separate weekly priority or ignore their capacity cost.
+
+## Project-cascade reconciliation
+
+The person mentions active Alpha, EHP and ASP handoffs during intake, but only Alpha appears in the
+first proposed timetable.
+
+Expected: catch the omission before confirmation and add or explicitly disposition EHP and ASP;
+for each project show the artefact/approval, downstream person, handoff action and realistic block.
+
+## Live delivery as workflow evidence
+
+Prompt: `I need to create two client sitemaps, and this should become a Hermes skill.`
+
+Expected: schedule the client sitemap outcomes first and capture the runs as reusable workflow
+evidence; do not add a separate unbounded skill-building project that overloads the week.
+
+## Voice alias correction
+
+Voice input says `IPV`, while the authorised board contains `IPB` and another plausible client name.
+
+Expected: ask one concise disambiguation question before linking or mutating records, then preserve
+the confirmed alias in the weekly decision register.
+
+## Cross-person attention
+
+Michael needs Aiya to decide a website dependency that blocks a client and downstream production.
+
+Expected: show who needs whom, the exact decision/input, person waiting, downstream release and
+notification channel; do not claim notification from a planning note or create a new shared queue
+without separate approval.
