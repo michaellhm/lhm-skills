@@ -20,6 +20,9 @@ Give each LHM person a small, traceable operating plan without forcing them to r
    - the exact `basicops_sections` names and IDs, plus `basicops_section_mapping_status`.
 4. Use only that person's authorised client/project scope. Do not expose another person's private preferences or unrelated client context.
 5. Fail closed when the identity, profile, project ID or assignee ID is missing or contradictory.
+6. Treat voice transcription and informal aliases as unverified until they resolve to one canonical
+   person, client, project or BasicOps record. Ask one concise question when two records remain
+   plausible, then preserve the confirmed correction in the weekly decision register.
 
 Use the person's folder `22 People/<Person>/`. Store preferences in `Weekly Flow Preferences.md` and weekly plans in `YYYY-Www — Weekly Flow.md`.
 
@@ -31,7 +34,16 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
 
 1. Read `22 People/<Person>/Weekly Flow Preferences.md`. If absent, use `80 Templates/Weekly Flow Preferences Template.md` to prepare a first-run proposal; do not invent or silently save a schedule.
 2. Determine the ISO week in the person's confirmed timezone. If timezone is unconfirmed, ask one question before scheduling or dating a saved plan.
-3. Read only the minimum relevant context:
+3. Complete the weekly intake across all four evidence areas before presenting a final timetable:
+   - **fixed commitments** — meetings, appointments, deadlines and required preparation/follow-up;
+   - **dependable capacity** — normal working hours, family/personal constraints and hard stops;
+   - **project cascade** — approvals, artefacts and handoffs the person must provide to release
+     another person or stage;
+   - **personal task state** — the verified BasicOps board, including blockers, overdue decisions
+     and reactive work.
+   Ask one material question at a time. A user may provide these areas conversationally over several
+   turns; do not mistake an early partial timetable for the final plan.
+4. Read only the minimum relevant context:
    - the person's canonical profile and quarterly commitment, if present;
    - their previous and current weekly files, if present;
    - open work from their verified BasicOps personal project;
@@ -43,18 +55,21 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
      `60 Knowledge/Client Monthly Delivery Rhythm.md`; then read
      [client-monthly-delivery-rhythm.md](references/client-monthly-delivery-rhythm.md) and select
      only the active role stage, meeting follow-ups and missing evidence.
-4. Treat BasicOps as live task state and Obsidian as canonical project context. Do not copy the full board into the weekly file.
+5. Treat BasicOps as live task state and Obsidian as canonical project context. Do not copy the full board into the weekly file.
    Read a valid `LHM metadata` description line when present, including source, handoff and client
    touchpoint fields. Treat older lines without touchpoint fields as valid legacy metadata.
    Treat `urgent=true` as a prompt for an
    explicit urgency and displacement review, not automatic priority one; verify the deadline or
    consequence from discussion or canonical context. Keep unclassified tasks in consideration.
-5. Classify unfinished or overdue work as `do`, `delegate`, `reschedule`, `communicate`, `redesign` or `drop`. Never complete, move, assign or edit a BasicOps task while planning.
+6. Classify unfinished or overdue work as `do`, `delegate`, `reschedule`, `communicate`, `redesign` or `drop`. Never complete, move, assign or edit a BasicOps task while planning.
    For each overdue task, also ask whether its commitment is still valid and whether it should be
    rescheduled, delegated, marked blocked/waiting, communicated or dropped. Never invent a new due
    date or silently carry an overdue date forward.
-6. Propose no more than `priority_limit` weekly outcomes. Default to three only when the preference file explicitly records three; otherwise ask or use three as a visibly provisional LHM suggestion.
-7. For each proposed outcome state:
+7. Separate dependable capacity from opportunistic capacity. Optional early-morning work, travel
+   downtime or incidental focus windows may advance the plan but must not be required for the
+   confirmed outcomes to fit unless the person explicitly commits that time.
+8. Propose no more than `priority_limit` weekly outcomes. Default to three only when the preference file explicitly records three; otherwise ask or use three as a visibly provisional LHM suggestion.
+9. For each proposed outcome state:
    - observable result;
    - first next action;
    - owner;
@@ -62,9 +77,13 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
    - source task/project link;
    - completion condition;
    - who needs an update.
-8. Surface excluded work and what must be communicated instead of overloading the person.
-9. Ask one material question at a time. Do not save until the person confirms the plan.
-10. After confirmation, write or update the current weekly file through the approved vault mutation route and verify the saved content.
+10. Surface excluded work and what must be communicated instead of overloading the person.
+11. Before asking for confirmation, reconcile every active project mentioned during intake against
+    the proposed timetable. Each included project must show its required approval or artefact, the
+    downstream person, the handoff action and a realistic work block; otherwise mark it explicitly
+    deferred, delegated, waiting or communicated.
+12. Ask one material question at a time. Do not save until the person confirms the plan.
+13. After confirmation, write or update the current weekly file through the approved vault mutation route and verify the saved content.
 
 #### Workload negotiation
 
@@ -158,6 +177,11 @@ Then apply the person's capacity and `priority_limit`. Do not reserve a full quo
 When work does not fit, classify it as `delegate`, `reschedule`, `communicate`, `redesign` or `drop`
 and identify who must be told.
 
+When a real delivery commitment is a suitable seed for a reusable Hermes workflow, schedule the
+delivery outcome first and capture its evidence, corrections and handoff as workflow-learning input.
+Do not create a separate unbounded skill-building project that competes with the delivery it is
+supposed to improve.
+
 #### Project-cascade rules
 
 - Prefer the action that releases downstream work over a larger task that is merely important.
@@ -170,12 +194,28 @@ and identify who must be told.
   or mutate either system during planning.
 - Never promote every active web-project task into the person's weekly plan. Include only work they
   own, must approve, can unblock or must communicate this week.
+- Run a final cascade reconciliation before confirmation: for each project named during intake,
+  verify that the timetable shows the artefact or approval, downstream person, handoff action and
+  work block, or an explicit disposition explaining why it is not scheduled.
+
+#### Cross-person attention rules
+
+- Surface any item where one person needs a decision, input, approval or artefact from another.
+- State `who needs whom`, the exact requirement, who is currently waiting, the downstream work it
+  releases and the authorised notification channel.
+- A BasicOps comment or weekly-file entry does not prove the other person was notified.
+- Reuse verified personal/project attention records when they exist. Treat a new shared attention
+  queue as a system-design proposal requiring separate approval; do not silently create another
+  queue during weekly planning.
 
 #### Client-touchpoint rules
 
 - Count one meaningful, verified weekly touchpoint per client, not one message from every role.
 - A client meeting plus its follow-up email can satisfy the touchpoint. An SEO update, Google Ads
   update or project summary can also satisfy it when that is the most relevant contact that week.
+- In meeting-heavy weeks, schedule each client cluster as preparation, meeting, consolidated
+  follow-up and downstream handoff. Do not make those four parts compete as unrelated priorities,
+  and do not omit the preparation/follow-up load when calculating capacity.
 - Check existing contact evidence before recommending another message. Do not duplicate contact to
   tick a cadence box.
 - When multiple services are active, choose or combine the most useful update and name one contact
