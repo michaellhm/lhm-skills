@@ -11,4 +11,6 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/cto-plugin /home/hermes/.hermes/profiles/lhm_brain/vault/01\x20Inbox/Hermes\x20Reviews /home/ctoworker/workspaces /srv/lhm-plugin-source /home/ctoworker/.codex
+ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/cto-plugin
+ReadWritePaths="/home/hermes/.hermes/profiles/lhm_brain/vault/01 Inbox/Hermes Reviews"
+ReadWritePaths=/home/ctoworker/workspaces /srv/lhm-plugin-source /home/ctoworker/.codex
