@@ -29,7 +29,27 @@ For a new task, resolve:
 - verified client-touchpoint evidence, cadence and next exact contact date when the task includes
   client follow-up
 
-If essential routing or ownership is missing, ask one concise question. Do not invent it.
+If essential routing, ownership or next-handoff context is missing, ask one concise question. Do not
+invent it.
+
+### Run the final next-handoff check
+
+Before presenting or writing a new task brief, make the next handoff the final intake checkpoint.
+Establish whether completing the task:
+
+- releases another internal team member to act;
+- requires a client update or client action; or
+- ends the workflow with no further handoff.
+
+When the source context does not decisively establish that outcome, ask the user:
+
+> What happens next when this task is done—should we notify someone on the internal team, update the
+> client, or is there no further handoff?
+
+Do not create the task until this gap is resolved. For a required handoff, capture the trigger, next
+person or role, next action and notification channel in the LHM metadata, the labelled `Next
+handoff` sentence in Discussion and the workflow handback. Use `none` only when the user or canonical
+source confirms that completion ends the workflow.
 
 ## Write the title
 
