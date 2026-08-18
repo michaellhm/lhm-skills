@@ -1,0 +1,11 @@
+[Unit]
+Description=Reconcile missed CTO result callbacks
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+Persistent=true
+Unit=lhm-cto-result-resumer.service
+
+[Install]
+WantedBy=timers.target

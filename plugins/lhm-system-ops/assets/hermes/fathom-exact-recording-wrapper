@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+"""Hermes-profile wrapper: OAuth stays owned by Hermes; only exact recording_id is accepted."""
+import json, os, subprocess, sys
+from pathlib import Path
+
+SKILL=Path("/opt/data/profiles/lhm_brain/skills/fathom-meeting-lookup/SKILL.md")
+HERMES=Path("/usr/local/bin/hermes")
+def main():
+    request=json.load(sys.stdin)
+    if set(request)!={"schema_version","run_id","profile","agent_id","client","recording_id","timeout_seconds"} or request.get("profile")!="fathom_exact_recording_read" or not isinstance(request.get("recording_id"),int):
+        raise SystemExit("invalid exact-recording request")
+    if not SKILL.is_file() or not HERMES.is_file() or not os.access(HERMES,os.X_OK): raise SystemExit("registered Fathom route absent")
+    bounded={"tool":"mcp__fathom__get_meeting_transcript","arguments":{"recording_id":request["recording_id"]}}
+    done=subprocess.run([str(HERMES),"mcp","call","fathom"],input=json.dumps(bounded).encode(),stdout=subprocess.PIPE,
+                        stderr=subprocess.DEVNULL,timeout=request["timeout_seconds"],check=False)
+    if done.returncode: raise SystemExit("Fathom MCP invocation failed")
+    sys.stdout.buffer.write(done.stdout)
+if __name__=="__main__": main()
