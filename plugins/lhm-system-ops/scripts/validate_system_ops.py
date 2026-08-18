@@ -67,9 +67,9 @@ def main():
         'assets/systemd/lhm-source-production.service',
         'assets/install/install-source-production.sh',
         'assets/install/preflight-evidence-bridge.py',
-        'assets/gateways/lhm-claude-dispatcher',
-        'assets/gateways/lhm-claude-worker',
-        'assets/hermes/fathom-exact-recording-wrapper',
+        'assets/gateways/lhm-evidence-claude-dispatcher',
+        'assets/gateways/lhm-evidence-claude-worker',
+        'assets/gateways/lhm-evidence-fathom-backend',
     }
     for relative in required_assets:
         if not (PLUGIN / relative).is_file():
