@@ -10,13 +10,13 @@ spec=importlib.util.spec_from_loader('source_runtime',SourceFileLoader('source_r
 runtime=importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
 
 def manifest(run='wellness-run'):
-    return {'schema_version':1,'run_id':run,'parent_run_id':'campaign-playbook-flow-20260818-01','saved_role':'Context and Research','return_point':'context_research.acquire_required_sources','source_policy':'all_required','sources':[{'source_id':'wellness-drive','kind':'google_drive_file','allowlisted_identifier':'drive-wellness-exact','required':True},{'source_id':'strategy-call','kind':'fathom_transcript','allowlisted_identifier':'fathom-call-exact','required':True}],'production':{'packaged_worker':'campaign_playbook_production','publisher':'registered_google_drive_publisher','destination_allowlisted_identifier':'drive-output-exact'}}
+    return {'schema_version':1,'run_id':run,'parent_run_id':'campaign-playbook-flow-20260818-01','saved_role':'Context and Research','return_point':'context_research.acquire_required_sources','source_policy':'all_required','sources':[{'source_id':'wellness-drive','kind':'google_drive_file','allowlisted_identifier':'drive-wellness-exact','required':True},{'source_id':'strategy-call','kind':'fathom_transcript','allowlisted_identifier':12345,'required':True}],'production':{'packaged_worker':'campaign_playbook_production','publisher':'registered_google_drive_publisher','destination_allowlisted_identifier':'drive-output-exact'}}
 
 def setup(tmp_path,m):
     base=tmp_path/'dispatch'; incoming=base/'incoming'; incoming.mkdir(parents=True)
     for name in ('processed','failed','runs','events','consumed'): (base/name).mkdir()
     registry=tmp_path/'registry'; registry.mkdir()
-    (registry/(m['run_id']+'.json')).write_text(json.dumps({'schema_version':1,'run_id':m['run_id'],'sources':[{'kind':'google_drive_file','identifier':'drive-wellness-exact'},{'kind':'fathom_transcript','identifier':'fathom-call-exact'}],'destination_identifier':'drive-output-exact'}))
+    (registry/(m['run_id']+'.json')).write_text(json.dumps({'schema_version':1,'run_id':m['run_id'],'sources':[{'kind':'google_drive_file','identifier':'drive-wellness-exact'},{'kind':'fathom_transcript','identifier':12345}],'destination_identifier':'drive-output-exact'}))
     path=incoming/(m['run_id']+'.json'); path.write_text(json.dumps(m))
     values={'BASE':base,'INCOMING':incoming,'PROCESSED':base/'processed','FAILED':base/'failed','RUNS':base/'runs','EVENTS':base/'events'}
     return registry,path,values

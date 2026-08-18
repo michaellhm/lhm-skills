@@ -62,14 +62,16 @@ def main():
         'assets/container/source-dispatch',
         'assets/host/lhm-source-production-runtime',
         'assets/host/lhm-source-adapter',
+        'assets/host/lhm-evidence-fathom-backend',
+        'assets/sudoers/lhm-evidence-fathom-backend',
         'assets/worker/source-production-worker-profile.json',
         'assets/systemd/lhm-source-production.path',
         'assets/systemd/lhm-source-production.service',
         'assets/install/install-source-production.sh',
         'assets/install/preflight-evidence-bridge.py',
-        'assets/gateways/lhm-claude-dispatcher',
-        'assets/gateways/lhm-claude-worker',
-        'assets/hermes/fathom-exact-recording-wrapper',
+        'assets/gateways/lhm-evidence-claude-dispatcher',
+        'assets/gateways/lhm-evidence-claude-worker',
+        'assets/gateways/lhm-evidence-fathom-backend',
     }
     for relative in required_assets:
         if not (PLUGIN / relative).is_file():

@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""Root-only, fixed-command bridge from sourceworker to Hermes Fathom lookup."""
+import json, re, subprocess, sys
+from pathlib import Path
+
+REGISTRY = Path("/etc/lhm-source-production/registrations")
+DOCKER = "/usr/bin/docker"
+RUN_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$")
+REQUEST_FIELDS = {"action", "identifier", "run_id"}
+
+def fail(message):
+    print(message, file=sys.stderr); raise SystemExit(1)
+
+def load_request(stream):
+    try: request = json.load(stream)
+    except Exception: fail("invalid JSON request")
+    if not isinstance(request, dict) or set(request) != REQUEST_FIELDS: fail("invalid request schema")
+    if request.get("action") not in ("probe", "read"): fail("invalid action")
+    if not isinstance(request.get("run_id"), str) or not RUN_ID.fullmatch(request["run_id"]): fail("invalid run_id")
+    recording_id = request.get("identifier")
+    if isinstance(recording_id, bool) or not isinstance(recording_id, int) or recording_id < 1:
+        fail("recording_id must be a positive integer")
+    return request
+
+def registered(request):
+    path = REGISTRY / (request["run_id"] + ".json")
+    try:
+        stat = path.stat(); registration = json.loads(path.read_text(encoding="utf-8"))
+    except Exception: fail("registration unavailable")
+    if stat.st_uid != 0 or stat.st_mode & 0o022: fail("registration ownership or mode is unsafe")
+    if registration.get("run_id") != request["run_id"]: fail("registration run_id mismatch")
+    if not any(source == {"kind":"fathom_transcript", "identifier":request["identifier"]}
+               for source in registration.get("sources", [])): fail("recording is not registered")
+
+def command(request):
+    prompt = ("You are a bounded evidence reader. Use exactly mcp__fathom__get_meeting_transcript once with the registered "
+              f"numeric recording_id {request['identifier']}. Use no other tools. If that exact tool is unavailable or fails, fail. "
+              "Return JSON only with exactly recording_id (integer) and transcript (string); do not use a markdown fence.")
+    return [DOCKER, "exec", "-i", "-u", "hermes", "hermes", "/opt/hermes/.venv/bin/hermes",
+            "-p", "lhm_brain", "-z", prompt, "--skills", "fathom-meeting-lookup"]
+
+def main():
+    if len(sys.argv) != 1: fail("helper accepts no arguments")
+    request = load_request(sys.stdin); registered(request)
+    try:
+        done = subprocess.run(command(request), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                              stderr=subprocess.DEVNULL, timeout=120, check=False)
+    except Exception: fail("bounded Fathom command failed")
+    if done.returncode or not done.stdout: fail("bounded Fathom command failed")
+    try: value = json.loads(done.stdout)
+    except Exception: fail("Hermes Fathom result is invalid JSON")
+    if (not isinstance(value, dict) or set(value) != {"recording_id", "transcript"}
+            or value["recording_id"] != request["identifier"]
+            or not isinstance(value["transcript"], str) or not value["transcript"].strip()):
+        fail("Hermes Fathom result schema mismatch")
+    if request["action"] == "probe":
+        print('{"authenticated":true,"capability":"read","identifier_accessible":true}'); return
+    sys.stdout.write(value["transcript"])
+
+if __name__ == "__main__": main()

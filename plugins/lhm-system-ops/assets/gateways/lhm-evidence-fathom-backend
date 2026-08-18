@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+"""Host-side Fathom action translator into Hermes lhm_brain one-shot mode."""
+import json
+import re
+import subprocess
+import sys
+
+DOCKER = "/usr/bin/docker"
+HERMES = "/opt/hermes/.venv/bin/hermes"
+CONTAINER_SKILL = "/opt/data/profiles/lhm_brain/skills/fathom-meeting-lookup/SKILL.md"
+SAFE_RUN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$")
+
+
+def fail(message):
+    print(message, file=sys.stderr)
+    raise SystemExit(1)
+
+
+def main():
+    try: request = json.load(sys.stdin)
+    except Exception: fail("invalid Fathom backend JSON")
+    if not isinstance(request, dict) or set(request) != {"action", "identifier", "run_id"}:
+        fail("Fathom action fields do not match contract")
+    if request["action"] not in {"probe", "read"} or not isinstance(request["identifier"], int) or request["identifier"] < 1 or not SAFE_RUN.fullmatch(str(request["run_id"])):
+        fail("invalid Fathom action")
+    recording_id = request["identifier"]
+    prompt = ("You are a bounded evidence reader. Use exactly mcp__fathom__get_meeting_transcript once with the registered "
+              f"numeric recording_id {recording_id}. Use no other tools. If that exact tool is unavailable or fails, fail. "
+              "Return JSON only with exactly recording_id (integer) and transcript (string); do not use a markdown fence.")
+    command = [DOCKER, "exec", "-i", "-u", "hermes", "hermes", HERMES, "-p", "lhm_brain", "-z", prompt,
+               "--skills", "fathom-meeting-lookup"]
+    try:
+        done = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=600)
+    except (OSError, subprocess.TimeoutExpired): fail("Hermes Fathom invocation failed")
+    if done.returncode: fail("Hermes Fathom invocation failed")
+    try: value = json.loads(done.stdout)
+    except Exception: fail("Hermes Fathom result is invalid JSON")
+    if not isinstance(value, dict) or set(value) != {"recording_id", "transcript"} or value["recording_id"] != recording_id or not isinstance(value["transcript"], str) or not value["transcript"].strip():
+        fail("Hermes Fathom result schema mismatch")
+    if request["action"] == "probe":
+        print('{"authenticated":true,"capability":"read","identifier_accessible":true}')
+    else:
+        sys.stdout.write(value["transcript"])
+
+
+if __name__ == "__main__":
+    main()

@@ -12,18 +12,37 @@ test "$(stat -c %u "$routes")" -eq 0 || { echo 'route registration must be root-
 test "$(( $(stat -c %a "$config") % 10 ))" -eq 0 || { echo 'adapter config must not be world accessible' >&2; exit 1; }
 test "$(( $(stat -c %a "$routes") % 10 ))" -eq 0 || { echo 'route registration must not be world accessible' >&2; exit 1; }
 
+# These shared live gateways are immutable inputs, never installation targets.
+shared_dispatcher=/usr/local/libexec/lhm-claude-dispatcher
+shared_worker=/usr/local/libexec/lhm-claude-worker
+expected_dispatcher=dbcb320cbb0b3f6fd036e7129c2cc4d37b688ac4d4af50bae5470e497d487f95
+expected_worker=ec28d515a37bd3f10e2a2dedf5080a3eb3529065da4b4bc0445ce080a705a531
+verify_shared() {
+  test "$(sha256sum "$shared_dispatcher" | cut -d' ' -f1)" = "$expected_dispatcher" || { echo 'shared Claude dispatcher differs from verified inventory' >&2; exit 1; }
+  test "$(sha256sum "$shared_worker" | cut -d' ' -f1)" = "$expected_worker" || { echo 'shared Claude worker differs from verified inventory' >&2; exit 1; }
+  test "$(stat -c '%U:%G %a %s' "$shared_dispatcher")" = 'root:root 755 20336' || { echo 'shared Claude dispatcher metadata differs from verified inventory' >&2; exit 1; }
+  test "$(stat -c '%U:%G %a %s' "$shared_worker")" = 'root:root 755 13999' || { echo 'shared Claude worker metadata differs from verified inventory' >&2; exit 1; }
+}
+verify_shared
+
 if getent passwd sourceworker >/dev/null; then
   test "$(id -u sourceworker)" -ne 0 || { echo 'sourceworker cannot be root' >&2; exit 1; }
   test "$(getent passwd sourceworker | cut -d: -f7)" = /usr/sbin/nologin || { echo 'sourceworker shell must be nologin' >&2; exit 1; }
 else
   useradd --system --home-dir /var/lib/lhm-source-production --create-home --shell /usr/sbin/nologin sourceworker
 fi
+case " $(id -nG sourceworker) " in
+  *" docker "*) echo 'sourceworker must not have docker-group membership' >&2; exit 1 ;;
+esac
 install -D -m 0755 assets/container/source-dispatch /opt/data/profiles/lhm_brain/bin/source-dispatch
 install -D -m 0755 assets/host/lhm-source-production-runtime /usr/local/libexec/lhm-source-production-runtime
 install -D -m 0755 assets/host/lhm-source-adapter /usr/local/libexec/lhm-source-adapter
-install -D -m 0755 assets/gateways/lhm-claude-dispatcher /usr/local/libexec/lhm-claude-dispatcher
-install -D -m 0755 assets/gateways/lhm-claude-worker /usr/local/libexec/lhm-claude-worker
-install -D -m 0755 -o hermes -g hermes assets/hermes/fathom-exact-recording-wrapper /home/hermes/.hermes/profiles/lhm_brain/bin/fathom-exact-recording-wrapper
+install -D -m 0755 assets/gateways/lhm-evidence-claude-dispatcher /usr/local/libexec/lhm-evidence-claude-dispatcher
+install -D -m 0755 assets/gateways/lhm-evidence-claude-worker /usr/local/libexec/lhm-evidence-claude-worker
+install -D -o root -g root -m 0755 assets/host/lhm-evidence-fathom-backend /usr/local/libexec/lhm-evidence-fathom-backend
+install -D -o root -g root -m 0440 assets/sudoers/lhm-evidence-fathom-backend /etc/sudoers.d/lhm-evidence-fathom-backend
+test "$(stat -c '%U:%G %a' /etc/sudoers.d/lhm-evidence-fathom-backend)" = 'root:root 440' || { echo 'Fathom sudoers policy metadata is unsafe' >&2; exit 1; }
+/usr/sbin/visudo -cf /etc/sudoers.d/lhm-evidence-fathom-backend >/dev/null
 install -D -m 0755 assets/install/preflight-evidence-bridge.py /usr/local/libexec/lhm-evidence-bridge-preflight
 for name in lhm-claude-drive-read lhm-fathom-transcript-read lhm-campaign-production-worker lhm-registered-drive-publisher; do
   ln -sfn lhm-source-adapter "/usr/local/libexec/$name"
@@ -42,5 +61,8 @@ for command in /usr/local/libexec/lhm-source-adapter /usr/local/libexec/lhm-clau
   test -x "$command" || { echo "unresolved executable: $command" >&2; exit 1; }
 done
 /usr/sbin/runuser -u sourceworker -- /usr/local/libexec/lhm-source-adapter --validate-config >/dev/null
+/usr/sbin/runuser -u sourceworker -- /usr/bin/sudo -n -l /usr/local/libexec/lhm-evidence-fathom-backend >/dev/null
 /usr/local/libexec/lhm-evidence-bridge-preflight /etc/lhm-source-production/evidence-routes.json >/dev/null
+verify_shared
+systemctl is-enabled lhm-source-production.path >/dev/null 2>&1 && { echo 'source production path unexpectedly enabled' >&2; exit 1; } || :
 echo 'Installed and validated static assets; path remains disabled. Run manifest-scoped preflight before separately approved enablement.'
