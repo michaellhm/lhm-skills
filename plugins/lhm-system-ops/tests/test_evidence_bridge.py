@@ -95,18 +95,35 @@ def test_contracts_are_strict_and_secret_free():
         text=path.read_text().lower(); assert not any(word in text for word in ("password","oauth_token","api_key","secret"))
 
 def test_gateway_assets_pin_verified_paths_and_tools():
-    dispatcher=(ROOT/"assets/gateways/lhm-claude-dispatcher").read_text()
-    worker=(ROOT/"assets/gateways/lhm-claude-worker").read_text()
-    fathom=(ROOT/"assets/hermes/fathom-exact-recording-wrapper").read_text()
-    assert "/usr/local/libexec/lhm-claude-worker" in dispatcher
+    dispatcher=(ROOT/"assets/gateways/lhm-evidence-claude-dispatcher").read_text()
+    worker=(ROOT/"assets/gateways/lhm-evidence-claude-worker").read_text()
+    fathom=(ROOT/"assets/gateways/lhm-evidence-fathom-backend").read_text()
+    assert "/usr/local/libexec/lhm-evidence-claude-worker" in dispatcher
     assert "/home/claudeworker/.local/bin/claude" in worker
-    assert "mcp__fathom__get_meeting_transcript" in fathom and "recording_id" in fathom
+    assert 'invoke(prompt, "content"' in worker and 'payload.get("result")' in worker
+    assert '"HOME": HOME' in worker and "/home/claudeworker-repair" in worker
+    assert "mcp__fathom__get_meeting_transcript" in fathom and '"exec", "-i", "-u", "hermes", "hermes"' in fathom
+    assert '"-p", "lhm_brain", "-z"' in fathom and '"--skills", "fathom-meeting-lookup"' in fathom
 
 def test_installer_fails_closed_and_does_not_enable_service():
     text=(ROOT/"assets/install/install-source-production.sh").read_text()
     assert "lhm-evidence-bridge-preflight" in text and "evidence-routes.json" in text
     assert "systemctl enable" not in text
+    assert "install -D -m 0755 assets/gateways/lhm-claude-dispatcher" not in text
+    assert "install -D -m 0755 assets/gateways/lhm-claude-worker" not in text
+    assert text.count("verify_shared") >= 3 and "systemctl is-enabled lhm-source-production.path" in text
+    assert "dbcb320cbb0b3f6fd036e7129c2cc4d37b688ac4d4af50bae5470e497d487f95" in text
+    assert "ec28d515a37bd3f10e2a2dedf5080a3eb3529065da4b4bc0445ce080a705a531" in text
 
 def test_rollback_preserves_registrations_and_evidence():
     text=(ROOT/"references/source-production-release.md").read_text()
-    assert "do not remove registrations or run records" in text
+    assert "Exact rollback inventory" in text
+    assert "Never restore, remove, or otherwise mutate `/usr/local/libexec/lhm-claude-dispatcher`" in text
+    assert "remove each path recorded absent" in text and "Reject an inventory with any other path" in text
+
+def test_host_and_container_preflights_are_separate():
+    preflight=(ROOT/"assets/install/preflight-evidence-bridge.py").read_text()
+    release=(ROOT/"references/source-production-release.md").read_text()
+    assert "/home/hermes/.hermes/profiles/lhm_brain/skills/fathom-meeting-lookup/SKILL.md" in preflight
+    assert "/opt/data/profiles/lhm_brain/skills/fathom-meeting-lookup/SKILL.md" not in preflight
+    assert "docker exec -i -u hermes hermes test -r /opt/data/profiles" in release

@@ -9,6 +9,7 @@ NAMES = {"lhm-claude-drive-read": "drive_read", "lhm-fathom-transcript-read": "f
          "lhm-campaign-production-worker": "production", "lhm-registered-drive-publisher": "drive_publish"}
 ALLOWED_CONFIG = {"schema_version", "backends"}
 ALLOWED_BACKENDS = set(NAMES.values())
+FATHOM_BACKEND = ["/usr/bin/sudo", "-n", "/usr/local/libexec/lhm-evidence-fathom-backend"]
 
 def fail(message):
     print(message, file=sys.stderr)
@@ -26,6 +27,9 @@ def config():
         if not isinstance(command, list) or not command or any(not isinstance(x, str) or not x for x in command): fail(f"invalid {name} backend command")
         executable = Path(command[0])
         if not executable.is_absolute() or not executable.is_file() or not os.access(executable, os.X_OK): fail(f"unresolved {name} backend executable")
+        if executable.name in NAMES or executable.name == "lhm-source-adapter": fail(f"recursive {name} backend command")
+    if value["backends"]["fathom_read"] != FATHOM_BACKEND:
+        fail("fathom_read must use the registered privilege bridge")
     return value
 
 def call(command, payload):
@@ -56,7 +60,9 @@ def main():
             kind, identifier = source.get("kind"), source.get("allowlisted_identifier")
             registered_source(reg, kind, identifier)
             backend = "drive_read" if kind == "google_drive_file" else "fathom_read" if kind == "fathom_transcript" else fail("unsupported source kind")
-            response = json.loads(call(cfg["backends"][backend], {"action":"probe", "identifier":identifier, "run_id":payload["run_id"]}))
+            backend_identifier = int(identifier) if backend == "fathom_read" and str(identifier).isdigit() else identifier
+            if backend == "fathom_read" and not isinstance(backend_identifier, int): fail("Fathom identifier must be numeric")
+            response = json.loads(call(cfg["backends"][backend], {"action":"probe", "identifier":backend_identifier, "run_id":payload["run_id"]}))
             if response != {"authenticated": True, "capability": "read", "identifier_accessible": True}: fail(f"{backend} capability probe failed")
         destination = payload.get("production", {}).get("destination_allowlisted_identifier")
         if destination != reg.get("destination_identifier"): fail("destination is not registered")
@@ -70,7 +76,11 @@ def main():
     cfg = config(); payload = json.load(sys.stdin); route = NAMES[name]
     if route in ("drive_read", "fathom_read"):
         reg = registration(payload.get("run_id")); kind = "google_drive_file" if route == "drive_read" else "fathom_transcript"
-        registered_source(reg, kind, payload.get("identifier")); sys.stdout.buffer.write(call(cfg["backends"][route], {"action":"read", **payload})); return
+        registered_source(reg, kind, payload.get("identifier"))
+        if route == "fathom_read":
+            if not str(payload.get("identifier", "")).isdigit(): fail("Fathom identifier must be numeric")
+            payload = {**payload, "identifier":int(payload["identifier"])}
+        sys.stdout.buffer.write(call(cfg["backends"][route], {"action":"read", **payload})); return
     if route == "production":
         if payload.get("package_type") != "verified_evidence" or not payload.get("package_sha256"): fail("unverified evidence package")
         sys.stdout.buffer.write(call(cfg["backends"][route], {"action":"produce", "package":payload})); return

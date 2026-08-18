@@ -23,7 +23,7 @@ PROFILE_COMMANDS={'lhm-source-adapter','lhm-claude-drive-read','lhm-fathom-trans
 
 def now(): return datetime.now(timezone.utc).isoformat()
 def digest_bytes(value): return hashlib.sha256(value).hexdigest()
-def digest_text(value): return digest_bytes(value.encode())
+def digest_text(value): return digest_bytes(str(value).encode())
 def atomic(path,value):
     path.parent.mkdir(parents=True,exist_ok=True)
     fd,tmp=tempfile.mkstemp(prefix='.'+path.name+'.',dir=path.parent)
