@@ -1,0 +1,2 @@
+Cmnd_Alias LHM_FATHOM_BACKEND = /usr/local/libexec/lhm-evidence-fathom-backend ""
+sourceworker ALL=(root) NOPASSWD: LHM_FATHOM_BACKEND

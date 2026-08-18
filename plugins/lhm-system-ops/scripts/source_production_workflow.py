@@ -70,7 +70,7 @@ def validate_retrieval_receipt(receipt, source):
         raise ValueError("invalid retrieval receipt")
     if receipt["verified"] is not True or receipt["source_id"] != source["source_id"] or receipt["kind"] != source["kind"]:
         raise ValueError("unverified or mismatched retrieval receipt")
-    expected = hashlib.sha256(source["allowlisted_identifier"].encode()).hexdigest()
+    expected = hashlib.sha256(str(source["allowlisted_identifier"]).encode()).hexdigest()
     if receipt["identifier_sha256"] != expected or len(receipt["content_sha256"]) != 64:
         raise ValueError("retrieval receipt digest mismatch")
     return receipt

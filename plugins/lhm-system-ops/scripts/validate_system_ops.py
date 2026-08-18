@@ -62,6 +62,8 @@ def main():
         'assets/container/source-dispatch',
         'assets/host/lhm-source-production-runtime',
         'assets/host/lhm-source-adapter',
+        'assets/host/lhm-evidence-fathom-backend',
+        'assets/sudoers/lhm-evidence-fathom-backend',
         'assets/worker/source-production-worker-profile.json',
         'assets/systemd/lhm-source-production.path',
         'assets/systemd/lhm-source-production.service',

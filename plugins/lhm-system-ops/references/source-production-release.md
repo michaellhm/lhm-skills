@@ -4,7 +4,7 @@ No step here grants deployment authority. Michael approves merge, release and ea
 
 ## Operational inputs
 
-Before installation, the operator creates a root-owned, non-world-readable JSON file with exactly `schema_version` and `backends`. `backends` has exactly `drive_read`, `fathom_read`, `production`, and `drive_publish`; each value is a non-empty argv array whose first item is the verified absolute executable of the existing authenticated route. Use the proven Claude dispatch/Drive connector, Fathom MCP profile command, campaign production worker and registered Drive publisher on that host. Do not use shell strings, inline environment variables, secrets, fixture programs, or speculative paths.
+Before installation, the operator creates a root-owned, non-world-readable JSON file with exactly `schema_version` and `backends`. `backends` has exactly `drive_read`, `fathom_read`, `production`, and `drive_publish`; each value is a non-empty argv array whose first item is the verified absolute executable of the existing authenticated route. `fathom_read` is fixed to `["/usr/bin/sudo","-n","/usr/local/libexec/lhm-evidence-fathom-backend"]`; the sudo policy permits sourceworker to invoke only that root-owned helper with no arguments. Use the proven Claude dispatch/Drive connector, bounded Fathom bridge, campaign production worker and registered Drive publisher on that host. Do not use shell strings, inline environment variables, secrets, fixture programs, or speculative paths.
 
 Each backend implements JSON stdin/stdout actions:
 
@@ -31,6 +31,6 @@ Use the approved manifest and its matching registration; do not print content. R
 ## Rollback
 
 1. Stop and disable only `lhm-source-production.path`; wait for any oneshot service to finish and retain its run directory and journal evidence.
-2. Restore the previously recorded plugin archive/config and unit files, including the Claude dispatcher/worker and Hermes wrapper. Then run `systemctl daemon-reload`. If there was no prior version, remove only the explicitly recorded installed adapter/runtime/gateway paths and the two source-production units after copying audit evidence; do not remove registrations or run records.
+2. Restore the previously recorded plugin archive/config and unit files, including the Claude dispatcher/worker, Hermes wrapper, `/usr/local/libexec/lhm-evidence-fathom-backend`, and `/etc/sudoers.d/lhm-evidence-fathom-backend`. Validate any restored sudoers file with `visudo -cf`, then run `systemctl daemon-reload`. If there was no prior version, remove only the explicitly recorded installed adapter/runtime/gateway/helper paths, the privilege-policy file, and the two source-production units after copying audit evidence; do not remove registrations or run records.
 3. Re-run `systemd-analyze verify`. Confirm the path is disabled and inactive. Do not delete `sourceworker`, connector profiles, credentials, registrations, or durable run evidence as part of rollback.
 4. Re-enable a previous version only with Michael's separate approval. Publication of this branch or archive is not permission to install, enable, or mutate Drive.

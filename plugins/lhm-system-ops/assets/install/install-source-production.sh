@@ -21,6 +21,9 @@ fi
 install -D -m 0755 assets/container/source-dispatch /opt/data/profiles/lhm_brain/bin/source-dispatch
 install -D -m 0755 assets/host/lhm-source-production-runtime /usr/local/libexec/lhm-source-production-runtime
 install -D -m 0755 assets/host/lhm-source-adapter /usr/local/libexec/lhm-source-adapter
+install -D -o root -g root -m 0755 assets/host/lhm-evidence-fathom-backend /usr/local/libexec/lhm-evidence-fathom-backend
+install -D -o root -g root -m 0440 assets/sudoers/lhm-evidence-fathom-backend /etc/sudoers.d/lhm-evidence-fathom-backend
+/usr/sbin/visudo -cf /etc/sudoers.d/lhm-evidence-fathom-backend >/dev/null
 install -D -m 0755 assets/gateways/lhm-claude-dispatcher /usr/local/libexec/lhm-claude-dispatcher
 install -D -m 0755 assets/gateways/lhm-claude-worker /usr/local/libexec/lhm-claude-worker
 install -D -m 0755 -o hermes -g hermes assets/hermes/fathom-exact-recording-wrapper /home/hermes/.hermes/profiles/lhm_brain/bin/fathom-exact-recording-wrapper
@@ -42,5 +45,6 @@ for command in /usr/local/libexec/lhm-source-adapter /usr/local/libexec/lhm-clau
   test -x "$command" || { echo "unresolved executable: $command" >&2; exit 1; }
 done
 /usr/sbin/runuser -u sourceworker -- /usr/local/libexec/lhm-source-adapter --validate-config >/dev/null
+/usr/sbin/runuser -u sourceworker -- /usr/bin/sudo -n -l /usr/local/libexec/lhm-evidence-fathom-backend >/dev/null
 /usr/local/libexec/lhm-evidence-bridge-preflight /etc/lhm-source-production/evidence-routes.json >/dev/null
 echo 'Installed and validated static assets; path remains disabled. Run manifest-scoped preflight before separately approved enablement.'

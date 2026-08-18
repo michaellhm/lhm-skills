@@ -9,6 +9,7 @@ NAMES = {"lhm-claude-drive-read": "drive_read", "lhm-fathom-transcript-read": "f
          "lhm-campaign-production-worker": "production", "lhm-registered-drive-publisher": "drive_publish"}
 ALLOWED_CONFIG = {"schema_version", "backends"}
 ALLOWED_BACKENDS = set(NAMES.values())
+FATHOM_BACKEND = ["/usr/bin/sudo", "-n", "/usr/local/libexec/lhm-evidence-fathom-backend"]
 
 def fail(message):
     print(message, file=sys.stderr)
@@ -26,6 +27,7 @@ def config():
         if not isinstance(command, list) or not command or any(not isinstance(x, str) or not x for x in command): fail(f"invalid {name} backend command")
         executable = Path(command[0])
         if not executable.is_absolute() or not executable.is_file() or not os.access(executable, os.X_OK): fail(f"unresolved {name} backend executable")
+    if value["backends"]["fathom_read"] != FATHOM_BACKEND: fail("fathom backend is not the bounded privilege bridge")
     return value
 
 def call(command, payload):
