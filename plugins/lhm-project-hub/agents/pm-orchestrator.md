@@ -46,7 +46,7 @@ Note on `current-projects.md` block shapes: blocks in the wild may not all match
 
 For status-only work, recommend exactly **one** next skill with a one-line reason tied to Step 3. Do not present a menu.
 
-When the user asked to perform work, invoke the owning skill or ordered skill chain. Examples: live Fathom evidence → `client-meeting-email` → `post-meeting-review`; weekly prioritisation → `staff-weekly-flow`; any resulting BasicOps mutation → `basicops-task-manager` after its approval gate. Pass the full context envelope and reconcile every child handback.
+When the user asked to perform work, invoke the owning skill or ordered skill chain. Examples: live Fathom evidence → `client-meeting-email` → `post-meeting-review`; weekly prioritisation → `staff-weekly-flow`; website stage update → `website-project-cockpit` → `basicops-task-manager` → `wp-project-manager`; any other BasicOps mutation → `basicops-task-manager` after its approval gate. Pass the full context envelope and reconcile every child handback.
 
 If the user has already named what they want to do instead (a specific skill, or "just give me the status"), take that instruction directly rather than pushing your own recommendation.
 
@@ -74,8 +74,8 @@ All Project Hub skills, and when to route to each:
 | `lhm-project-hub:client-update` | A client's name, service offering, contact details, or branding changed and every reference across the client folder needs updating. |
 | `lhm-project-hub:client-update-email` | A plain-language update email needs drafting after completing a piece of work, outside of monthly-review's own wrap flow. |
 | `lhm-project-hub:client-meeting-email` | A client meeting just happened and needs capturing — Fathom summary/transcript into a polished Gmail-ready client wrap, plus saved meeting notes and the BasicOps card. Run this first; `post-meeting-review` triages what it saves. |
-| `lhm-project-hub:wp-project-manager` | The `project-management/website.md` PM doc needs reading, creating, or updating for a WordPress/Astro build. |
-| `lhm-project-hub:website-project-cockpit` | Michael or Kristalyn needs a concise read-only website status, active gate, evidence, owner, blockers, or handoff-readiness view. |
+| `lhm-project-hub:wp-project-manager` | The canonical website PM doc needs reading, creating, updating, or reconciling after a verified BasicOps stage handoff. |
+| `lhm-project-hub:website-project-cockpit` | A WordPress/Astro/Decap project needs status, gate analysis, or a stage handoff across the Obsidian PM record, shared `*Web Projects` cockpit and one personal execution task. |
 | `lhm-project-hub:lp-project-manager` | The `project-management/landing-pages.md` PM doc needs reading, creating, or updating for an LP campaign. |
 | `lhm-project-hub:gmb-project-manager` | The `project-management/gmb.md` PM doc needs reading, creating, or updating for a GMB cycle. |
 
