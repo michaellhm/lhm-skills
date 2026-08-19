@@ -1,11 +1,21 @@
 ---
 name: website-project-cockpit
-description: Use for website status, gates and BasicOps handoffs.
+description: Coordinate website project status and stage handoffs across Obsidian and BasicOps. Use when a user asks where a website project is at, what happens next, or asks to brief, assign or hand off Astro, WordPress, Decap, design, copy, development, SEO, QA or go-live work.
 ---
 
 # Website Project Cockpit
 
-Turn the client's canonical website project record into one operational answer. The user should not need to hunt through Obsidian, GitHub, BasicOps, WhatsApp, or email to understand the next move. Website status is read-only; the only pilot mutation is approval-gated BasicOps task creation under the rules below.
+Turn the client's canonical website project record into one operational answer or verified stage handoff. The user should not need to hunt through Obsidian and BasicOps to understand the next move.
+
+## Operating model
+
+Use three distinct layers:
+
+1. **Obsidian project record** — durable source of truth for phases, evidence, approvals, completed work, decisions, blockers and the next action.
+2. **Shared `*Web Projects` cockpit task** — one enduring project overview and dated transition trail. Its section and assignee show the current delivery stage and immediate owner.
+3. **Personal-board task** — one current actionable brief in the verified owner's `Inbox`, linked from the shared cockpit.
+
+Do not reproduce the full project plan in BasicOps. Do not create one BasicOps subtask per checklist item. Keep the checklist inside the personal task's Discussion. Create separate tasks only when work has a different owner, an independently trackable deliverable or a real approval gate.
 
 ## Resolve the client
 
@@ -22,7 +32,7 @@ Read, when present:
 3. `<client>/Copy Learning Guide.md` only when the current or next gate concerns scaled copy
 4. A specifically linked evidence file only when needed to verify the active gate
 
-Do not inspect the website repository, GitHub, BasicOps, WhatsApp, email, CMS, or live site unless the user explicitly asks for verification and an authorised tool is available. Report those states as unverified when the project note lacks evidence.
+Read BasicOps when a status question requires reconciling the current owner/task, or when preparing a handoff. Do not inspect the website repository, GitHub, WhatsApp, email, CMS, or live site unless the user explicitly asks for verification and an authorised tool is available. Report those states as unverified when the project note lacks evidence.
 
 ## Determine operational state
 
@@ -78,24 +88,51 @@ For an attention-across-projects request, scan only active website blocks in cli
 3. external approval waiting without evidence
 4. dependency that unlocks multiple downstream tasks
 
-## BasicOps handoffs and authority
+## Execute a website stage handoff
+
+Follow this order:
+
+1. Read the canonical Obsidian website project record and `Current Projects.md`.
+2. Reconcile the user's update against recorded evidence. Tick or close only work supported by the update or a linked source; keep uncertain items open and name the gap.
+3. Read or resolve the client's one enduring task on `*Web Projects`.
+4. Determine the next stage, shared-board section, immediate human owner, one execution outcome and final handoff.
+5. Reuse or create one overview task in that owner's verified personal-board `Inbox`. Keep it related to the shared cockpit task when BasicOps supports the cross-project parent relationship.
+6. Put the outcome, ordered top-level checklist, dependencies, completion condition and next handoff in the personal task's Discussion.
+7. Update the shared cockpit task's section and assignee. Add a short dated Discussion entry stating what finished, what starts now and a native link to the personal task.
+8. Read both BasicOps tasks back and verify project, section, assignee, status, relationship, due date and Discussion link.
+9. Route the durable Obsidian update through `lhm-project-hub:wp-project-manager`: record the stage transition, task links, immediate owner, evidence-backed completions, blockers and next action. Keep `Current Projects.md` aligned.
+
+If the user requests only status or a prepared brief, stay read-only. A clear instruction from an authorised current team member to create or update the handoff authorises ordinary operational BasicOps and Obsidian project-state changes within the named client scope. It does not authorise scope, client commitments, copy approval, merge, deployment, publishing or launch.
+
+## BasicOps payloads
 
 BasicOps owns assigned work; Obsidian remains the durable project and approval record.
 
 Every BasicOps creation or mutation must route through `lhm-project-hub:basicops-task-manager`. This cockpit prepares the website-specific context, readiness, blockers and next handoff; the shared skill owns the final wording, approval check, deduplication, mutation and read-back verification. Do not write to BasicOps directly from this skill.
 
-Before offering or creating a task, prepare this exact payload:
+Prepare two coordinated payloads:
+
+**Shared cockpit transition**
+
+- existing `*Web Projects` task ID and URL
+- destination stage section
+- immediate assignee
+- short dated Discussion update
+- native personal-task link
+
+**Personal execution task**
 
 - stable deduplication key using `website:<client-slug>:<phase-or-gate>:<outcome>`
 - concise outcome-based title using the LHM naming convention below
 - accountable human owner
 - source Obsidian note
 - one short human discussion message containing the context and next handoff
-- description only when a useful working URL belongs on the task
+- verified personal project and `Inbox` section
+- description containing only governed metadata and useful working URLs
 - readiness and blockers
 - due date, or `needs scheduling`
 
-Do not bundle different owners or outcomes into one task. For Alpha's five-page learning batch, Michael's selection of five materially different template pages is a separate prerequisite from Kristalyn's copy-production task and Aiya's build task.
+Do not bundle different owners or outcomes into one task. Once prerequisites are evidenced as complete, their result can be summarised in the next owner's overview task rather than retained as open execution subtasks.
 
 ### Website payload guidance
 
@@ -110,7 +147,7 @@ Use this title shape:
 - Write the action as the shortest natural summary of what the person must do. Avoid process language such as “materially different template-validation pages from sitemap v5” in the title.
 - Example: `Alpha: Website - Create content for five pages`.
 
-Keep the BasicOps description blank by default. Put only useful reference links there, such as a Fathom recording, website, prototype, staging page, working document or repository URL. Do not put internal context, dependencies, acceptance tests, deduplication metadata or `needs scheduling` prose in the description.
+Keep the BasicOps description limited to the governed `LHM metadata` line and useful reference links such as a Fathom recording, website, prototype, staging page, working document or repository URL. Do not put internal context, dependencies, acceptance tests, deduplication keys or `needs scheduling` prose in the description.
 
 After creation, add one discussion message written directly to the assignee:
 
@@ -118,13 +155,13 @@ After creation, add one discussion message written directly to the assignee:
 2. Give only enough project context to understand the outcome.
 3. End with what happens next and who receives the handoff.
 
-Keep the message conversational and normally under 100 words. The task is an action prompt, not the full project brief. If the assignee asks for more context, use Hermes to read the client project note, approved client context and relevant LHM knowledge, then answer in conversation without bloating the task.
+Keep the message conversational and scannable. A short top-level checklist is appropriate; the task is still an action prompt, not a copy of the full project plan. If the assignee asks for more context, read the client project note and relevant approved source material rather than bloating the task.
 
 ### Approval
 
 - Show the exact payload before creation unless the user's current message already clearly authorises that exact task.
 - Michael may approve a task assigned to Michael. A clear request such as “create a task in Michael's BasicOps to select the five pages” is approval for that one payload.
-- A task assigned to Kristalyn, Aiya, Jaimee, or anyone else requires their explicit approval during the pilot. Michael asking to prepare it is not permission to assign it to them.
+- Apply the shared BasicOps authority model: Michael and authenticated current LHM team members may authorise ordinary operational work for a verified teammate within client scope. Keep the cross-person change visible and reversible in Discussion.
 - Never invent a due date. Leave it unset when none is recorded.
 - Task creation never records project approval or authorises copy, merge, deployment, publishing, or launch.
 
@@ -138,12 +175,13 @@ Michael's personal route is fixed:
 - Section: `INBOX` (`74627`)
 - Assignee: Michael (`36398`)
 
-For team website tasks, prefer the client's mother task on `*Client Flow` (`68655`) and confirm the actual assignee ID through BasicOps before creating.
+For existing-client website work, use the enduring parent on `*Web Projects` (`68635`) as the shared cockpit and the current owner's verified personal-board `Inbox` for the execution task. Do not route the execution task to `*Client Flow`.
 
 ### Still prohibited
 
-- Do not edit the Obsidian project note or record approval as part of task creation.
-- Do not contact the client/team, alter CMS content, commit, merge, deploy, publish, launch, complete, reassign or delete tasks.
-- When an action exceeds the pilot, say what is prepared and name the approval or authorised workflow needed next.
+- Do not record approval merely because a task was created. After a verified handoff, update only the evidence-backed project state through `wp-project-manager`.
+- Do not contact the client/team, alter CMS content, commit, merge, deploy, publish or launch through this workflow.
+- Complete or reassign tasks only when the user's instruction and verified stage evidence authorise that exact transition. Do not delete material task history.
+- When an action exceeds the recorded authority, say what is prepared and name the approval or authorised workflow needed next.
 
 End status answers with one natural prompt such as: `Want me to prepare that handoff for review?` Do not offer several competing next steps.

@@ -37,13 +37,14 @@ block in current-projects.md using this format (see references/folder-convention
 
 ## Modes
 
-This skill operates in five modes:
+This skill operates in six modes:
 
 1. **Kickoff Create** — generate a new PM doc immediately after project setup
 2. **Read/Status** — display current phase, step, completed tasks, next action
 3. **Mark Complete** — tick off a specific task with today's date (called by phase agents)
 4. **Phase Gate-Check** — before any phase advance, scan earlier phases for unresolved items
 5. **Session-End Sweep** — scan recent conversation, surface drift, batch user prompts
+6. **Website Handoff Reconciliation** — record a verified BasicOps stage transition in the PM file and `Current Projects.md`
 
 ## Mode 1: Create
 
@@ -155,6 +156,33 @@ Called by orchestrators at session end (or on user request). Logic:
 
 5. Apply the user's response
 
+## Mode 6: Website Handoff Reconciliation
+
+Use this mode after `website-project-cockpit` and `basicops-task-manager` have verified a website stage handoff.
+
+Inputs:
+
+- shared `*Web Projects` cockpit URL, section and assignee
+- personal execution-task URL, owner and outcome
+- source update or evidence for completed work
+- unresolved dependencies and approvals
+
+Action:
+
+1. Re-read the current PM file after any user edits; never overwrite fresher user changes from an earlier read.
+2. Update the frontmatter date, current phase/step, current state, immediate owner and next action.
+3. Tick only tasks supported by the user's explicit update or linked evidence. A created task proves a handoff, not completion or approval of the underlying deliverable.
+4. Record the dated handoff and both BasicOps links in the appropriate systems/decision section.
+5. Preserve open blockers, distinguishing staging placeholders from blockers to client approval, production or launch.
+6. Update the website block in `Current Projects.md` with the same phase, immediate owner, next action, blockers, detail link and date.
+7. Read both files back and report exactly what changed.
+
+Use the operating sequence:
+
+`read PM state → reconcile evidence → verified BasicOps handoff → update PM file → align Current Projects`
+
+Do not edit a website repository, CMS, client content or approval evidence in this mode.
+
 ## Astro PM Doc Template
 
 Use this template for `platform: astro`. Dates are scheduled from kickoff using seven weeks of active delivery time. Waiting for client feedback is not active delivery time. Every client delay moves all dependent dates by the same amount. Never compress QA or launch to recover client delay.
@@ -184,7 +212,7 @@ At kickoff, Kristalyn places every client decision point in the calendar. Strate
 - **Michael attending:** [approval meetings or case-by-case]
 - **Homepage prototype:** Michael-approved homepage copy; Aiya-built lightweight HTML mock
 - **Five-template batch:** To be chosen by Michael at sitemap sign-off; use materially different reusable page types, not five pages of one type
-- **BasicOps mode:** Prepare-only until Michael explicitly graduates routine task creation for this workflow
+- **BasicOps mode:** Website cockpit handoff — one shared `*Web Projects` task plus one current personal-board execution task
 
 ## Reference Documents
 - Client Profile: ../client_profile.md
@@ -225,7 +253,7 @@ At kickoff, Kristalyn places every client decision point in the calendar. Strate
 - [ ] Michael's meeting attendance decided case by case
 - [ ] Team tasks scheduled with dependencies
 - [ ] Client approval holds placed in calendar with sign-off requirements
-- [ ] BasicOps mode confirmed as prepare-only unless explicit workflow graduation is recorded
+- [ ] BasicOps website cockpit mode confirmed and personal-board mappings verified
 
 ## Phase 1 — Week 1: Strategy
 **Owner:** Kristalyn, with Michael when a strategy call is required
@@ -322,14 +350,15 @@ At kickoff, Kristalyn places every client decision point in the calendar. Strate
 - [ ] Kristalyn sends completion confirmation and closes project
 
 ## BasicOps Task Authority
-- **Current mode:** Prepare-only
-- Hermes prepares the exact task, owner, context, dependency, due date and acceptance test.
-- Kristalyn approves before task creation or assignment.
-- Routine in-scope task creation becomes automatic only after multiple clean handoffs and Michael's explicit dated graduation decision recorded here.
-- Graduation is reversible and never covers scope, strategy, client commitments, publishing, merge, deployment or launch.
+- **Current mode:** Website cockpit handoff
+- Read this project record before every handoff.
+- Keep one enduring project task on `*Web Projects`; its section and assignee show the current stage and immediate owner.
+- Keep one current outcome-based task in the verified owner's personal `Inbox`; put its checklist in Discussion rather than creating checklist subtasks.
+- Link every personal task from a dated Discussion update on the shared cockpit.
+- Authenticated current LHM team members may authorise ordinary operational task creation and assignment within verified client scope. Scope, strategy, client commitments, publishing, merge, deployment and launch remain separately approval-bound.
 
 ## Notes & Decisions
-[date]: Project kicked off. Seven-week active-delivery schedule created. Client delays move dependent dates day-for-day. Astro uses the Decap five-template learning workflow and prepare-only BasicOps mode until explicitly graduated.
+[date]: Project kicked off. Seven-week active-delivery schedule created. Client delays move dependent dates day-for-day. Astro uses the Decap five-template learning workflow and the shared-cockpit plus personal-execution-task BasicOps model.
 
 ## Continuation Prompt
 ```text

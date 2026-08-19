@@ -182,7 +182,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
   .claude-plugin/plugin.json            # Plugin manifest
   agents/pm-orchestrator.md             # Main entry point — status, cadence checks and governed multi-skill coordination
   skills/                               # All 22 skills
-    basicops-task-manager/              # Shared BasicOps boundary — discussion-first briefs, routing, linked subtasks, approvals and verification
+    basicops-task-manager/              # Shared BasicOps boundary — discussion-first briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
     staff-weekly-flow/                  # Personal weekly/daily focus, full BasicOps inbox triage/write-back and reminder preferences
     sales-handover/                     # Hand a newly-closed client from sales to delivery
@@ -200,8 +200,8 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     post-meeting-review/                # Post-meeting follow-up triage — state files, BasicOps subtasks, team email (migrated from client updates hub; shim remains)
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
-    wp-project-manager/                 # Website build PM doc (migrated from WordPress hub; shim remains)
-    website-project-cockpit/            # Read-only website status, gates, owners, blockers and prepared handoffs
+    wp-project-manager/                 # Website PM state plus verified BasicOps handoff reconciliation
+    website-project-cockpit/            # Website status and three-layer Obsidian/Web Projects/personal-task stage handoffs
     lp-project-manager/                 # Landing page campaign PM doc (migrated from WordPress hub; shim remains)
     gmb-project-manager/                # GMB optimisation cycle PM doc (migrated from GMB hub; shim remains)
   references/                           # 5 reference files + checklists/ + templates/

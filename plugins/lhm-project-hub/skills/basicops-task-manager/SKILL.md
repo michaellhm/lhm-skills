@@ -113,6 +113,8 @@ Do not fabricate missing detail. Make confirmation of an unknown input, dependen
 
 ## Handle parent tasks and subtasks
 
+Before creating subtasks for website work, apply the website cockpit exception below. A checklist is not a reason to create BasicOps subtasks.
+
 When a workflow creates subtasks:
 
 1. Create the parent and subtasks in the governed project route.
@@ -124,6 +126,21 @@ When a workflow creates subtasks:
 7. Never move subtasks automatically. Wait for explicit user confirmation, then resolve each person's actual board and destination section through BasicOps before moving anything.
 
 The question is mandatory even when the subtasks already have assignees. Creating subtasks and moving them to personal boards are separate mutations with separate authority.
+
+## Handle website project stage handoffs
+
+For an existing-client website project, use two records by default:
+
+1. **Shared cockpit:** reuse the client's one enduring task on `*Web Projects` (`68635`). Keep it on the section matching the current stage and assign it to the immediate human owner. Add a short dated Discussion entry for every transition, including what finished, what starts next and a native link to the personal task.
+2. **Personal execution task:** create or reuse one outcome-based task in the verified owner's personal-board `Inbox`. Preserve a relationship to the shared cockpit when BasicOps supports it. Put the ordered top-level checklist, dependencies, completion condition and next handoff in Discussion.
+
+Do not create one subtask per page, component or checklist line. Create additional tasks only when an item has a different owner, an independent deliverable or a distinct approval gate. If an accidental checklist tree exists, consolidate it into the overview task; cancel rather than delete redundant items, explain the reason in Discussion and preserve the history.
+
+The website handoff sequence is:
+
+`read Obsidian → reconcile evidence → update shared cockpit → create/update one personal task → link and verify → update Obsidian`
+
+The calling website workflow owns the final Obsidian update. This skill returns both verified BasicOps URLs and the exact transition evidence; it does not write the vault itself.
 
 ### Handle a Hermes-prepared marketing review
 
@@ -238,16 +255,17 @@ Michael's governed personal route:
 - Section: `INBOX` (`74627`)
 - Assignee: Michael (`36398`)
 
-For team client work, prefer the client's mother task on `*Client Flow` (`68655`) when that is the established route, and resolve the actual assignee through BasicOps.
+For team client work, prefer the client's mother task on `*Client Flow` (`68655`) when that is the established route, and resolve the actual assignee through BasicOps. Existing-client website stage handoffs are the exception: use the enduring `*Web Projects` cockpit plus one personal-board execution task.
 
 Existing-client website projects use this governed exception:
 
 - Project: `*Web Projects` (`68635`)
 - Initial section: `Onboarding & Briefing` (`107719`)
-- Create or reuse a dedicated website parent task and place its milestones beneath it.
-- Never leave the parent or newly created website subtasks in `None`.
-- Add the verified native subtask links to the parent Discussion, not Description.
-- Then ask whether the user wants the subtasks moved to the individual assignees' boards.
+- Create or reuse one dedicated website cockpit task.
+- Move the cockpit task through the governed stage sections and change its assignee to the immediate owner at each verified handoff.
+- Create or reuse one current overview task in that owner's verified personal-board `Inbox` and link it from the cockpit Discussion.
+- Keep the working checklist inside the overview task Discussion. Do not create checklist subtasks by default.
+- Never leave the cockpit or execution task in `None`.
 
 ## Hand back to the calling workflow
 
@@ -255,6 +273,7 @@ Return:
 
 - result: `created`, `existing`, `updated`, `prepared`, `blocked` or `mismatch`
 - verified BasicOps URL when one exists
+- for website handoffs: shared cockpit URL and personal execution-task URL
 - final title and owner
 - next handoff
 - handoff notification result: `prepared`, `sent`, `not_required`, `blocked` or `not_approved`
