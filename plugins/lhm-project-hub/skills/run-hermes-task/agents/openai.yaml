@@ -1,0 +1,4 @@
+interface:
+  display_name: "Run Hermes Task"
+  short_description: "Run governed LHM work through Hermes"
+  default_prompt: "Use $run-hermes-task to execute this task through Hermes end to end."
