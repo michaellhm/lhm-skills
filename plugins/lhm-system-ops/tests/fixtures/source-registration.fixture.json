@@ -1,0 +1,1 @@
+{"schema_version":1,"run_id":"fixture-wellness-run","sources":[{"kind":"google_drive_file","identifier":"fixture-drive-wellness-exact"},{"kind":"fathom_transcript","identifier":12345}],"destination_identifier":"fixture-drive-output-exact"}

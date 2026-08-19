@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+"""Host validator/dispatcher for authenticated retrieval, production and Drive publishing."""
+import fcntl, hashlib, json, os, re, shutil, subprocess, sys, tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+BASE=Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/source-production')
+INCOMING,PROCESSED,FAILED,RUNS,EVENTS=(BASE/x for x in ('incoming','processed','failed','runs','events'))
+REGISTRY=Path('/etc/lhm-source-production/registrations')
+PROFILE=Path('/etc/lhm-source-production/worker-profile.json')
+SAFE=re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
+SOURCE_FIELDS={'source_id','kind','allowlisted_identifier','required'}
+MANIFEST_FIELDS={'schema_version','run_id','parent_run_id','saved_role','return_point','source_policy','sources','production'}
+PRODUCTION_FIELDS={'packaged_worker','publisher','destination_allowlisted_identifier'}
+CONNECTORS={'google_drive_file':'/usr/local/libexec/lhm-claude-drive-read','fathom_transcript':'/usr/local/libexec/lhm-fathom-transcript-read'}
+WORK_CONTROL='/usr/local/libexec/cto-dispatch'
+PACKAGED_WORKER='/usr/local/libexec/lhm-campaign-production-worker'
+PUBLISHER='/usr/local/libexec/lhm-registered-drive-publisher'
+PREFLIGHT='/usr/local/libexec/lhm-source-adapter'
+RUNUSER='/usr/sbin/runuser'
+WORKER_USER='sourceworker'
+PROFILE_COMMANDS={'lhm-source-adapter','lhm-claude-drive-read','lhm-fathom-transcript-read','lhm-campaign-production-worker','lhm-registered-drive-publisher'}
+
+def now(): return datetime.now(timezone.utc).isoformat()
+def digest_bytes(value): return hashlib.sha256(value).hexdigest()
+def digest_text(value): return digest_bytes(str(value).encode())
+def atomic(path,value):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    fd,tmp=tempfile.mkstemp(prefix='.'+path.name+'.',dir=path.parent)
+    try:
+        with os.fdopen(fd,'w',encoding='utf-8') as h: json.dump(value,h,indent=2,sort_keys=True); h.write('\n')
+        os.chmod(tmp,0o640); os.replace(tmp,path)
+    finally:
+        if os.path.exists(tmp): os.unlink(tmp)
+def load(path): return json.loads(path.read_text(encoding='utf-8'))
+
+def validate_manifest(m, filename, registry_root=REGISTRY):
+    if not isinstance(m,dict) or set(m)!=MANIFEST_FIELDS or m.get('schema_version')!=1: raise ValueError('invalid source manifest schema')
+    if not SAFE.fullmatch(m.get('run_id','')) or filename != m['run_id']+'.json' or not SAFE.fullmatch(m.get('parent_run_id','')): raise ValueError('invalid run identity')
+    if m['source_policy']!='all_required' or not isinstance(m['sources'],list) or not m['sources']: raise ValueError('all_required sources required')
+    registration=load(registry_root/(m['run_id']+'.json'))
+    allowed={(x['kind'],x['identifier']) for x in registration['sources']}
+    seen=set()
+    for s in m['sources']:
+        if not isinstance(s,dict) or set(s)!=SOURCE_FIELDS or s.get('kind') not in CONNECTORS or s.get('required') is not True: raise ValueError('invalid required source')
+        if not SAFE.fullmatch(s.get('source_id','')) or s['source_id'] in seen: raise ValueError('invalid source_id')
+        if (s['kind'],s.get('allowlisted_identifier')) not in allowed: raise ValueError('source identifier is not registered for this run')
+        seen.add(s['source_id'])
+    p=m['production']
+    if not isinstance(p,dict) or set(p)!=PRODUCTION_FIELDS or p['packaged_worker']!='campaign_playbook_production' or p['publisher']!='registered_google_drive_publisher': raise ValueError('unregistered production route')
+    if p['destination_allowlisted_identifier'] != registration['destination_identifier']: raise ValueError('destination is not registered for this run')
+    return registration
+
+def receipt(source, content, worker):
+    return {'schema_version':1,'receipt_type':'retrieval','source_id':source['source_id'],'kind':source['kind'],'identifier_sha256':digest_text(source['allowlisted_identifier']),'content_sha256':digest_bytes(content),'retrieved_at':now(),'worker':worker,'verified':True}
+
+def invoke_json(command,payload,runner=subprocess.run,bounded_worker=True):
+    if bounded_worker:
+        if Path(command).name not in PROFILE_COMMANDS: raise ValueError('command is outside the worker profile')
+        argv=[RUNUSER,'-u',WORKER_USER,'--',command]
+    else:
+        argv=[command]
+    done=runner(argv,input=json.dumps(payload).encode(),capture_output=True,timeout=300)
+    if done.returncode: raise RuntimeError((done.stderr or done.stdout).decode(errors='replace')[-1000:])
+    return done.stdout
+
+def block(run_dir,m,source,reason,runner=subprocess.run):
+    kind='google_drive_read_unavailable' if source['kind']=='google_drive_file' else 'fathom_read_unavailable'
+    incident=m['run_id']+':'+source['source_id']
+    blocker={'schema_version':1,'type':'capability_blocker','blocker_kind':kind,'capability_incident_id':incident,'parent_run_id':m['parent_run_id'],'saved_role':m['saved_role'],'return_point':m['return_point'],'source_id':source['source_id'],'route':'lhm-cto','reason':reason[-500:],'created_at':now()}
+    atomic(run_dir/'blocker.json',blocker); atomic(run_dir/'public-status.json',{'run_id':m['run_id'],'parent_run_id':m['parent_run_id'],'status':'blocked','blocker_kind':kind})
+    request={'schema_version':1,'request_id':incident.replace(':','-'),'parent_run_id':m['parent_run_id'],'capability_incident_id':incident,'objective':'Restore the registered '+source['kind']+' read route.','acceptance_tests':['Registered source can be read without exposing credentials to Hermes.'],'mode':'change','timeout_seconds':1800,'return_point':m['return_point'],'resume_token':digest_text(incident+m['parent_run_id'])}
+    invoke_json(WORK_CONTROL,request,runner,False); return blocker
+
+def process(path,runner=subprocess.run,registry_root=REGISTRY):
+    m=load(path); validate_manifest(m,path.name,registry_root)
+    invoke_json(PREFLIGHT,m,runner)
+    run_dir=RUNS/m['run_id']
+    if run_dir.exists(): raise ValueError('duplicate run_id')
+    run_dir.mkdir(parents=True,mode=0o750); atomic(run_dir/'manifest.json',m)
+    evidence=[]; receipts=[]
+    for source in m['sources']:
+        try: content=invoke_json(CONNECTORS[source['kind']],{'identifier':source['allowlisted_identifier'],'run_id':m['run_id']},runner)
+        except Exception as exc: block(run_dir,m,source,str(exc),runner); shutil.move(path,PROCESSED/path.name); return 'blocked'
+        (run_dir/(source['source_id']+'.content')).write_bytes(content); os.chmod(run_dir/(source['source_id']+'.content'),0o600)
+        r=receipt(source,content,Path(CONNECTORS[source['kind']]).name); receipts.append(r); atomic(run_dir/(source['source_id']+'.receipt.json'),r)
+        evidence.append({'source_id':source['source_id'],'kind':source['kind'],'content_sha256':r['content_sha256'],'content':content.decode('utf-8')})
+    package={'schema_version':1,'package_type':'verified_evidence','parent_run_id':m['parent_run_id'],'sources':evidence,'receipt_sha256':[digest_text(json.dumps(x,sort_keys=True,separators=(',',':'))) for x in receipts]}
+    package['package_sha256']=digest_text(json.dumps(package,sort_keys=True,separators=(',',':'))); atomic(run_dir/'evidence-package.json',package)
+    produced=invoke_json(PACKAGED_WORKER,package,runner)
+    child={'schema_version':1,'parent_run_id':m['parent_run_id'],'role':'Head of Production','worker':m['production']['packaged_worker'],'evidence_package_sha256':package['package_sha256'],'content_sha256':digest_bytes(produced),'created_at':now()}; atomic(run_dir/'production-child.json',child)
+    published=invoke_json(PUBLISHER,{'run_id':m['run_id'],'destination_identifier':m['production']['destination_allowlisted_identifier'],'content':produced.decode()},runner)
+    readback=json.loads(published.decode())
+    if readback.get('full_content') != produced.decode(): raise ValueError('Drive full-content read-back mismatch')
+    delivery={'schema_version':1,'receipt_type':'drive_delivery','parent_run_id':m['parent_run_id'],'publisher':'registered_google_drive_publisher','destination_identifier_sha256':digest_text(m['production']['destination_allowlisted_identifier']),'published_content_sha256':digest_bytes(produced),'read_back_content_sha256':digest_text(readback['full_content']),'full_content_read_back':True,'verified_at':now()}; atomic(run_dir/'delivery-receipt.json',delivery)
+    atomic(run_dir/'public-status.json',{'run_id':m['run_id'],'parent_run_id':m['parent_run_id'],'status':'delivered','retrieval_receipts':len(receipts),'production_child':True,'delivery_verified':True})
+    shutil.move(path,PROCESSED/path.name); return 'delivered'
+
+def consume_restored(path,runner=subprocess.run):
+    e=load(path); required={'schema_version','event','event_id','capability_incident_id','parent_run_id','saved_role','return_point','created_at'}
+    if set(e)!=required or e['schema_version']!=1 or e['event']!='capability_restored': raise ValueError('invalid capability_restored event')
+    marker=BASE/'consumed'/digest_text(e['event_id'])
+    if marker.exists(): return 'duplicate'
+    matches=[]
+    for blocker in RUNS.glob('*/blocker.json'):
+        b=load(blocker)
+        if all(e[k]==b[k] for k in ('capability_incident_id','parent_run_id','saved_role','return_point')): matches.append(blocker)
+    if len(matches)!=1: raise ValueError('restoration does not match exactly one blocker')
+    payload={'schema_version':1,'event':'resume_saved_role','parent_run_id':e['parent_run_id'],'role':e['saved_role'],'return_point':e['return_point'],'capability_incident_id':e['capability_incident_id']}
+    invoke_json('/usr/local/libexec/lhm-work-control-resume',payload,runner,False); atomic(marker,{**e,'consumed_at':now()}); return 'resumed'
+
+def main():
+    for d in (INCOMING,PROCESSED,FAILED,RUNS,EVENTS,BASE/'consumed'): d.mkdir(parents=True,exist_ok=True)
+    for p in sorted(EVENTS.glob('*.json')):
+        try: consume_restored(p); shutil.move(p,PROCESSED/('event-'+p.name))
+        except Exception as exc: shutil.move(p,FAILED/('event-'+p.name)); (FAILED/('event-'+p.stem+'.error')).write_text(str(exc)+'\n')
+    for p in sorted(INCOMING.glob('*.json')):
+        try: process(p)
+        except Exception as exc: shutil.move(p,FAILED/p.name); (FAILED/(p.stem+'.error')).write_text(str(exc)+'\n')
+if __name__=='__main__': main()

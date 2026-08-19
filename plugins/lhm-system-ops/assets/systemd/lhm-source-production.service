@@ -1,0 +1,20 @@
+[Unit]
+Description=Validate and dispatch governed source-to-production work
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/local/libexec/lhm-source-production-runtime
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/source-production "/home/hermes/.hermes/profiles/lhm_brain/vault/01 Inbox/Hermes Reviews"
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+UMask=0027

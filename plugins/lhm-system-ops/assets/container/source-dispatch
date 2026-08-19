@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+"""Hermes-side closed queue/status helper for source-to-production runs."""
+import argparse, json, os, re, tempfile
+from pathlib import Path
+
+BASE = Path('/opt/data/profiles/lhm_brain/dispatch/source-production')
+SAFE = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
+FIELDS = {'schema_version','run_id','parent_run_id','saved_role','return_point','source_policy','sources','production'}
+
+def validate(value):
+    if not isinstance(value, dict) or set(value) != FIELDS or value.get('schema_version') != 1:
+        raise SystemExit('invalid source manifest schema')
+    if not SAFE.fullmatch(value.get('run_id','')) or not SAFE.fullmatch(value.get('parent_run_id','')):
+        raise SystemExit('invalid run identity')
+    if value.get('source_policy') != 'all_required':
+        raise SystemExit('source_policy must be all_required')
+    if not isinstance(value.get('sources'), list) or not value['sources']:
+        raise SystemExit('required sources missing')
+
+def submit(_):
+    value = json.load(__import__('sys').stdin); validate(value)
+    incoming = BASE / 'incoming'
+    fd, temporary = tempfile.mkstemp(prefix='.' + value['run_id'] + '.', dir=incoming)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(value, handle, indent=2); handle.write('\n')
+        os.chmod(temporary, 0o600); os.replace(temporary, incoming / (value['run_id'] + '.json'))
+    finally:
+        if os.path.exists(temporary): os.unlink(temporary)
+    print(json.dumps({'run_id': value['run_id'], 'status': 'queued_for_host_validation'}))
+
+def status(args):
+    if not SAFE.fullmatch(args.run_id): raise SystemExit('invalid run_id')
+    for folder, state in [('failed','failed'),('runs','accepted'),('incoming','queued')]:
+        path = BASE / folder / (args.run_id + '.json')
+        if folder == 'runs': path = BASE / folder / args.run_id / 'public-status.json'
+        if path.is_file(): print(path.read_text() if folder == 'runs' else json.dumps({'run_id':args.run_id,'status':state})); return
+    print(json.dumps({'run_id':args.run_id,'status':'unknown'}))
+
+def main():
+    parser=argparse.ArgumentParser(); commands=parser.add_subparsers(required=True)
+    p=commands.add_parser('submit'); p.set_defaults(func=submit)
+    p=commands.add_parser('status'); p.add_argument('run_id'); p.set_defaults(func=status)
+    args=parser.parse_args(); args.func(args)
+if __name__ == '__main__': main()

@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+"""Evidence-only Claude action translator; authentication stays in the repair HOME."""
+import json
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+CLAUDE = "/home/claudeworker/.local/bin/claude"
+HOME = "/home/claudeworker-repair"
+DRIVE_TOOLS = {
+    "read": ["mcp__claude_ai_Google_Drive__get_file_metadata", "mcp__claude_ai_Google_Drive__read_file_content", "mcp__claude_ai_Google_Drive__download_file_content"],
+    "publish": ["mcp__claude_ai_Google_Drive__search_files", "mcp__claude_ai_Google_Drive__create_file", "mcp__claude_ai_Google_Drive__get_file_metadata", "mcp__claude_ai_Google_Drive__read_file_content", "mcp__claude_ai_Google_Drive__download_file_content"],
+}
+SAFE_ID = re.compile(r"^[A-Za-z0-9_-]+$")
+SAFE_RUN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$")
+
+
+def fail(message):
+    print(message, file=sys.stderr)
+    raise SystemExit(1)
+
+
+def exact(value, keys):
+    if not isinstance(value, dict) or set(value) != set(keys):
+        fail("evidence action fields do not match contract")
+    if "run_id" in keys and not SAFE_RUN.fullmatch(str(value.get("run_id", ""))):
+        fail("invalid run_id")
+
+
+def result_envelope(raw):
+    try:
+        payload = json.loads(raw)
+    except Exception:
+        fail("Claude result envelope is invalid")
+    result = payload.get("result") if isinstance(payload, dict) else None
+    if not isinstance(result, str) or not result.strip():
+        fail("Claude result envelope has no non-empty result")
+    return result.strip()
+
+
+def result_object(result):
+    fenced = re.fullmatch(r"\s*```(?:json)?\s*\n?(.*?)\n?```\s*", result, re.S | re.I)
+    if fenced:
+        result = fenced.group(1)
+    try:
+        value = json.loads(result)
+    except Exception:
+        fail("Claude profile result is not JSON")
+    if not isinstance(value, dict):
+        fail("Claude profile result is not an object")
+    return value
+
+
+def invoke(prompt, agent, tools, timeout):
+    if not Path(CLAUDE).is_file() or not os.access(CLAUDE, os.X_OK):
+        fail("Claude 2.1.232 executable absent")
+    command = [CLAUDE, "--print", "--output-format", "json", "--agent", agent]
+    command += ["--allowedTools", ",".join(tools)]
+    env = {"HOME": HOME, "PATH": "/home/claudeworker/.local/bin:/usr/bin:/bin"}
+    try:
+        done = subprocess.run(command, input=prompt.encode(), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                              env=env, timeout=timeout)
+    except (OSError, subprocess.TimeoutExpired):
+        fail("bounded Claude invocation failed")
+    if done.returncode:
+        fail("bounded Claude invocation failed")
+    return result_envelope(done.stdout)
+
+
+def drive_read(req):
+    action = req.get("action")
+    exact(req, {"action", "identifier", "run_id"})
+    if action not in {"probe", "read"} or not SAFE_ID.fullmatch(str(req["identifier"])):
+        fail("invalid Drive read action")
+    wanted = {"authenticated": True, "capability": "read", "identifier_accessible": True}
+    prompt = ("Use only the allowed Google Drive tools. Verify the exact file identifier and return JSON only. "
+              "For probe return exactly the requested capability object. For read return exactly "
+              "{\"full_content\":<string>}. Request: " + json.dumps(req, separators=(",", ":")))
+    value = result_object(invoke(prompt, "lhm-connector-repair", DRIVE_TOOLS["read"], 120))
+    if action == "probe":
+        if value != wanted: fail("Drive read probe result mismatch")
+        print(json.dumps(value, separators=(",", ":")))
+    else:
+        if set(value) != {"full_content"} or not isinstance(value["full_content"], str): fail("Drive read result mismatch")
+        sys.stdout.write(value["full_content"])
+
+
+def production(req):
+    action = req.get("action")
+    if action == "probe":
+        exact(req, {"action", "run_id"})
+        print('{"capability":"campaign_playbook_production","ready":true}')
+        return
+    exact(req, {"action", "package"})
+    package = req["package"]
+    if action != "produce" or not isinstance(package, dict) or package.get("package_type") != "verified_evidence":
+        fail("invalid campaign production action")
+    # The installed plugin selector is `content`; the external request id is intentionally not passed through.
+    prompt = "Produce the requested campaign playbook from this verified evidence package. Return only the final artifact. " + json.dumps(package, separators=(",", ":"))
+    sys.stdout.write(invoke(prompt, "content", [], 1200))
+
+
+def drive_publish(req):
+    action = req.get("action")
+    keys = {"action", "identifier", "run_id"} if action in {"probe", "read"} else {"action", "identifier", "content", "idempotency_key", "run_id"}
+    exact(req, keys)
+    if action not in {"probe", "read", "upsert"} or not SAFE_ID.fullmatch(str(req["identifier"])):
+        fail("invalid Drive publish action")
+    prompt = ("Use only the allowed Google Drive tools and the exact destination identifier. Never alter a differing existing file. "
+              "Return JSON only. Probe schema is {authenticated:true,capability:'publish_readback',identifier_accessible:true}; "
+              "upsert schema is {status:'created'|'already_existed'}; read schema is {full_content:<string>}. Request: "
+              + json.dumps(req, separators=(",", ":")))
+    value = result_object(invoke(prompt, "lhm-connector-repair", DRIVE_TOOLS["publish"], 600))
+    if action == "probe" and value != {"authenticated": True, "capability": "publish_readback", "identifier_accessible": True}:
+        fail("Drive publish probe result mismatch")
+    if action == "upsert" and (set(value) != {"status"} or value["status"] not in {"created", "already_existed"}):
+        fail("Drive upsert result mismatch")
+    if action == "read" and (set(value) != {"full_content"} or not isinstance(value["full_content"], str)):
+        fail("Drive read-back result mismatch")
+    print(json.dumps(value, separators=(",", ":")))
+
+
+def main():
+    try: req = json.load(sys.stdin)
+    except Exception: fail("invalid evidence worker JSON")
+    profile = req.pop("profile", None)
+    if req.pop("schema_version", None) != 1: fail("unsupported schema_version")
+    if profile == "google_drive_exact_file_read": drive_read(req)
+    elif profile == "campaign_playbook_production": production(req)
+    elif profile == "google_drive_exact_folder_publish": drive_publish(req)
+    else: fail("unregistered evidence worker profile")
+
+
+if __name__ == "__main__":
+    main()
