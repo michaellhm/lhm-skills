@@ -80,6 +80,20 @@ def test_matching_restoration_resumes_exactly_once(tmp_path):
         assert runtime.consume_restored(ep,runner)=='duplicate'
     assert len(calls)==1 and calls[0]['role']==m['saved_role'] and calls[0]['return_point']==m['return_point']
 
+def test_capability_restored_producer_consumer_and_parent_transition_e2e(tmp_path):
+    m=manifest('contract-e2e'); registry,path,values=setup(tmp_path,m)
+    run=values['RUNS']/m['run_id']; run.mkdir()
+    blocker={'schema_version':1,'type':'capability_blocker','blocker_kind':'google_drive_read_unavailable','capability_incident_id':'contract-e2e:wellness-drive','parent_run_id':m['parent_run_id'],'saved_role':m['saved_role'],'return_point':m['return_point'],'source_id':'wellness-drive','route':'lhm-cto','reason':'x','created_at':'now'}
+    (run/'blocker.json').write_text(json.dumps(blocker))
+    emitted=runtime.capability_restored_event(blocker,'restore-contract-e2e','2026-08-20T00:00:00+00:00')
+    schema=json.loads((ROOT/'references/capability-restored.schema.json').read_text())
+    assert set(emitted)==set(schema['required'])
+    event_path=tmp_path/'emitted-capability-restored.json'; event_path.write_text(json.dumps(emitted)); transitions=[]
+    def runner(argv,**kwargs): transitions.append(json.loads(kwargs['input'])); return Result(out=b'{}')
+    with mock.patch.multiple(runtime,**values):
+        assert runtime.consume_restored(event_path,runner)=='resumed'
+    assert transitions==[{'schema_version':1,'event':'resume_saved_role','parent_run_id':m['parent_run_id'],'role':m['saved_role'],'return_point':m['return_point'],'capability_incident_id':blocker['capability_incident_id']}]
+
 def test_security_profile_and_role_skills_fail_closed():
     profile=json.loads((ROOT/'assets/worker/source-production-worker-profile.json').read_text())
     assert all(command.startswith('/usr/local/libexec/') for command in profile['commands'])

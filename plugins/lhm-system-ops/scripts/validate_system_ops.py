@@ -10,6 +10,7 @@ REQUIRED_SKILLS = {
     'lhm-qa-tester', 'lhm-security-reviewer', 'lhm-plugin-release-manager',
     'lhm-chief-of-staff-source-handoff', 'lhm-context-research-source-handoff',
     'lhm-cto-source-handoff', 'lhm-head-of-production-source-handoff',
+    'release-publishing-engineer',
 }
 
 
@@ -32,7 +33,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.6.2':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.7.0':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -116,6 +117,12 @@ def main():
         schema = json.loads((PLUGIN / 'references' / name).read_text(encoding='utf-8'))
         if schema.get('additionalProperties') is not False:
             errors.append(f'{name}: schema must fail closed')
+    profiles=json.loads((PLUGIN/'references/destination-profiles.json').read_text(encoding='utf-8'))
+    enabled=[profile for profile in profiles.get('profiles',[]) if profile.get('enabled')]
+    if [profile.get('profile_id') for profile in enabled] != ['prototype-main-v1']:
+        errors.append('only prototype-main-v1 may be enabled')
+    if any(profile.get('credential_reference') and profile.get('credential_reference') == enabled[0].get('credential_reference') for profile in profiles['profiles'] if not profile.get('enabled')):
+        errors.append('disabled profiles must not inherit the prototype credential')
     source_service = (PLUGIN / 'assets/systemd/lhm-source-production.service').read_text(encoding='utf-8')
     if '"/home/hermes/.hermes/profiles/lhm_brain/vault/01 Inbox/Hermes Reviews"' not in source_service:
         errors.append('source service must quote the ReadWritePaths folder containing spaces')

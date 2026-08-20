@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release & Publishing Engineer"
+  short_description: "Govern sealed release publication and review."
+  default_prompt: "Use $release-publishing-engineer to publish this sealed QA-approved package through its enabled destination profile and prepare verified review handoffs."

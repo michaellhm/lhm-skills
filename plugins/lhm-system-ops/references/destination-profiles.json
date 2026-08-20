@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "schema_version": 1,
+      "profile_id": "prototype-main-v1",
+      "enabled": true,
+      "destination_kind": "prototype_git",
+      "repository": "michaellhm/lhm-prototype",
+      "site_identity": "lhmstaging-prototypes",
+      "branch": "main",
+      "allowed_operations": ["publish_homepage", "publish_sitemap"],
+      "allowed_path_patterns": ["<client-slug>/homepage/**", "<client-slug>/sitemap/**", "README.md", "<client-slug>/README.md"],
+      "allowed_resources": ["Deploy to lhmstaging#289562388", "https://lhmstaging.net/prototypes/**"],
+      "credential_reference": "LHM_PROTOTYPE_MAIN_DEPLOY_KEY",
+      "required_qa_checks": ["independent_qa_approved", "sealed_manifest_hash", "exact_public_content_readback"],
+      "authority": "MICHAEL-PROTOTYPE-PUBLISH-STANDING-20260820",
+      "rollback": {"mode": "revert_exact_release_commit", "requires_separate_authority": true},
+      "handoff": {"independent_qa": true, "canonical_client_state": true, "basicops_native_review": true, "client_contact": false},
+      "prohibitions": ["workflow_changes", "credential_changes", "dns", "production_launch", "live_site", "unrelated_paths", "client_contact", "arbitrary_command", "arbitrary_refspec"]
+    },
+    {"schema_version":1,"profile_id":"lhm-astro-v1","enabled":false,"destination_kind":"lhm_astro","repository":null,"site_identity":"unregistered-lhm-astro","branch":null,"allowed_operations":["none"],"allowed_path_patterns":[],"allowed_resources":[],"credential_reference":null,"required_qa_checks":["separate_profile_required"],"authority":null,"rollback":{"mode":"unconfigured","requires_separate_authority":true},"handoff":{"independent_qa":true,"canonical_client_state":true,"basicops_native_review":true,"client_contact":false},"prohibitions":["all_mutations"]},
+    {"schema_version":1,"profile_id":"client-astro-v1","enabled":false,"destination_kind":"client_astro","repository":null,"site_identity":"unregistered-client-astro","branch":null,"allowed_operations":["none"],"allowed_path_patterns":[],"allowed_resources":[],"credential_reference":null,"required_qa_checks":["separate_profile_required"],"authority":null,"rollback":{"mode":"unconfigured","requires_separate_authority":true},"handoff":{"independent_qa":true,"canonical_client_state":true,"basicops_native_review":true,"client_contact":false},"prohibitions":["all_mutations"]},
+    {"schema_version":1,"profile_id":"wordpress-rest-content-v1","enabled":false,"destination_kind":"wordpress_rest_content","repository":null,"site_identity":"unregistered-wordpress-rest","branch":null,"allowed_operations":["none"],"allowed_path_patterns":[],"allowed_resources":[],"credential_reference":null,"required_qa_checks":["separate_profile_required"],"authority":null,"rollback":{"mode":"unconfigured","requires_separate_authority":true},"handoff":{"independent_qa":true,"canonical_client_state":true,"basicops_native_review":true,"client_contact":false},"prohibitions":["all_mutations"]},
+    {"schema_version":1,"profile_id":"wordpress-code-v1","enabled":false,"destination_kind":"wordpress_code","repository":null,"site_identity":"unregistered-wordpress-code","branch":null,"allowed_operations":["none"],"allowed_path_patterns":[],"allowed_resources":[],"credential_reference":null,"required_qa_checks":["separate_profile_required"],"authority":null,"rollback":{"mode":"unconfigured","requires_separate_authority":true},"handoff":{"independent_qa":true,"canonical_client_state":true,"basicops_native_review":true,"client_contact":false},"prohibitions":["all_mutations"]},
+    {"schema_version":1,"profile_id":"hosting-route-v1","enabled":false,"destination_kind":"hosting_route","repository":null,"site_identity":"unregistered-hosting-route","branch":null,"allowed_operations":["none"],"allowed_path_patterns":[],"allowed_resources":[],"credential_reference":null,"required_qa_checks":["separate_profile_required"],"authority":null,"rollback":{"mode":"unconfigured","requires_separate_authority":true},"handoff":{"independent_qa":true,"canonical_client_state":true,"basicops_native_review":true,"client_contact":false},"prohibitions":["all_mutations"]}
+  ]
+}

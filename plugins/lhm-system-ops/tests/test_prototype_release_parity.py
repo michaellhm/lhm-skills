@@ -61,7 +61,7 @@ def test_packaged_asset_validates_staged_asp_request_with_desk_worker_html_witho
 
 def test_packaged_schema_drift_breaks_asp_fixture(tmp_path):
     drifted = tmp_path / 'lhm-prototype-publisher'
-    drifted.write_text(ASSET.read_text(encoding='utf-8').replace("r.get('schema_version')!=2", "r.get('schema_version')!=1"), encoding='utf-8')
+    drifted.write_text(ASSET.read_text(encoding='utf-8').replace("r.get('schema_version')!=3", "r.get('schema_version')!=1"), encoding='utf-8')
     publisher = load_asset(drifted)
     request = json.loads(FIXTURE.read_text(encoding='utf-8'))
     try:
