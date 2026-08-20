@@ -1,21 +1,25 @@
 {
   "schema_version": 1,
+  "capability_id": "CAP-015",
+  "release_version": "0.8.1",
   "captured_at": "2026-08-20",
   "source": "verified deployed Hermes host inventory",
   "assets": {
     "dispatcher": {
       "source": "assets/gateways/lhm-shared-claude-dispatcher",
       "destination": "/usr/local/libexec/lhm-claude-dispatcher",
-      "sha256": "fc633fa3afa017a230b48ed1a62b67aa50b9e87db252b500f4c6fe88f06de531",
+      "sha256": "bce9e18d81dde77b4073e00a217bad9b22ff72b8e052947144f30bff0d04920d",
+      "previous_sha256": "fc633fa3afa017a230b48ed1a62b67aa50b9e87db252b500f4c6fe88f06de531",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 24410
+      "size_bytes": 27621
     },
     "worker": {
       "source": "assets/gateways/lhm-shared-claude-worker",
       "destination": "/usr/local/libexec/lhm-claude-worker",
       "sha256": "afe2d7655ec2b3699958bb82c23a59cf97c0ab850878ee3351dab9e9a75e9590",
+      "previous_sha256": "afe2d7655ec2b3699958bb82c23a59cf97c0ab850878ee3351dab9e9a75e9590",
       "owner": "root",
       "group": "root",
       "mode": "0755",
@@ -24,6 +28,8 @@
     "dispatch_unit": {
       "source": "assets/systemd/lhm-claude-dispatch.service",
       "destination": "/etc/systemd/system/lhm-claude-dispatch.service",
+      "sha256": "db8d69be657eae486d7229164310d3c1a66284019d967ba7032a632ab832e263",
+      "previous_sha256": "db8d69be657eae486d7229164310d3c1a66284019d967ba7032a632ab832e263",
       "owner": "root",
       "group": "root",
       "mode": "0644"
@@ -31,6 +37,8 @@
     "gateway_acl_dropin": {
       "source": "assets/systemd/lhm-brain-gateway-acl.conf",
       "destination": "/etc/systemd/system/lhm-brain-gateway.service.d/acl.conf",
+      "sha256": "41016cd894ae65033b5ac8103821f8d297f3ba9f00892aeff1d5cc0e2b374b8a",
+      "previous_sha256": "2821b8b749586a8e152b14cdd18a38a612df4aa0e0a3f9ec990200fe9f1ddad6",
       "owner": "root",
       "group": "root",
       "mode": "0644"
