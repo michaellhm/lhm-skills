@@ -39,6 +39,34 @@ def workspace_changes(workspace):
     return sorted(set(paths))
 
 
+def change_branch(request):
+    base = 'cto/' + re.sub(r'[^a-z0-9-]+', '-', request['capability_incident_id'].lower()).strip('-')
+    iteration = request.get('iteration', 1)
+    return base if iteration == 1 else f'{base}-i{iteration}'
+
+
+def prepare_change_workspace(request):
+    """Create once, or safely reuse the exact request/iteration worktree on retry."""
+    branch = change_branch(request)
+    workspace = WORKSPACES / request['request_id']
+    if workspace.exists():
+        if workspace.is_symlink() or not workspace.is_dir():
+            raise ValueError('invalid existing CTO workspace')
+        actual = run_worker(['git', '-C', str(workspace), 'branch', '--show-current']).stdout.strip()
+        if actual != branch:
+            raise ValueError('existing CTO workspace branch mismatch')
+        return branch, workspace
+    local_ref = f'refs/heads/{branch}'
+    exists = subprocess.run(
+        ['/usr/sbin/runuser', '-u', 'ctoworker', '--', 'git', '-C', str(REPO),
+         'show-ref', '--verify', '--quiet', local_ref]
+    ).returncode == 0
+    args = ['git', '-C', str(REPO), 'worktree', 'add']
+    args.extend([str(workspace), branch] if exists else ['-b', branch, str(workspace), 'origin/main'])
+    run_worker(args)
+    return branch, workspace
+
+
 def reject(path, reason):
     shutil.move(str(path), FAILED / path.name)
     (FAILED / f'{path.stem}.error').write_text(reason + '\n', encoding='utf-8')
@@ -114,10 +142,10 @@ def process(path):
         git('checkout', 'main')
         git('merge', '--ff-only', 'origin/main')
     audit_dir = RUNS / request['request_id']
-    audit_dir.mkdir(mode=0o750)
+    audit_dir.mkdir(mode=0o750, exist_ok=True)
     os.chown(audit_dir, 10003, HERMES_GROUP)
     worker_run = WORKER_RUNS / request['request_id']
-    worker_run.mkdir(mode=0o700)
+    worker_run.mkdir(mode=0o700, exist_ok=True)
     os.chown(worker_run, 10003, 10003)
     schema = worker_run / 'output-schema.json'
     schema.write_text(json.dumps(output_schema(), indent=2) + '\n', encoding='utf-8')
@@ -127,11 +155,7 @@ def process(path):
     workspace = REPO
     branch = None
     if mode == 'change':
-        branch = 'cto/' + re.sub(r'[^a-z0-9-]+', '-', request['capability_incident_id'].lower()).strip('-')
-        workspace = WORKSPACES / request['request_id']
-        if workspace.exists():
-            raise ValueError('CTO workspace already exists')
-        run_worker(['git', '-C', str(REPO), 'worktree', 'add', '-b', branch, str(workspace), 'origin/main'])
+        branch, workspace = prepare_change_workspace(request)
     tests = '\n'.join(f'- {item}' for item in request['acceptance_tests'])
     iteration = request.get('iteration', 1)
     max_iterations = request.get('max_iterations', 3)

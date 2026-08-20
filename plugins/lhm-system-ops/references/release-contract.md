@@ -20,3 +20,19 @@ GitHub transport uses its documented SSH-over-HTTPS endpoint on port 443 with th
 Ed25519 host key, avoiding general outbound-network expansion and interactive host-key trust.
 
 Deployment approval binds approval ID, repository, commit, plugin name, package SHA-256, target profile, issue/expiry time and unused state. The deployer consumes it atomically and records the result.
+
+## ASP sitemap publication route
+
+`lhm-asp-sitemap-publisher` is a separate root-owned capability. Its closed request schema accepts
+only `michaellhm/lhm-prototype`, branch `main`, an exact expected base commit, files below
+`australian-sports-physio/sitemap/`, and at most one minimum README link update. There are no fields
+for commands, refspecs, DNS, client contact, unrelated repositories or prototype paths, or the live
+ASP production site. Its repository-scoped credential and GitHub CLI session remain root-only.
+Source packages are accepted only from the exact root-controlled request staging directory.
+
+The route fails closed if main moved, the checkout contains an unapproved path, the exact remote
+commit cannot be read back, the exact-commit GitHub Actions run is absent or unsuccessful, or the
+staging sitemap URL does not return a bounded non-empty HTTP 200 response. A commit or push alone is
+never success. Installation records prior executable metadata and digest; rollback restores or
+removes only that executable and its bounded trigger/config, never credentials or published content.
+A separately recorded, base-bound human authority is required before invoking the installed route.
