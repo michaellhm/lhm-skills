@@ -3,11 +3,12 @@
   "producer_executable_container": "/opt/data/profiles/lhm_brain/bin/work-control",
   "producer_executable_host": "/home/hermes/.hermes/profiles/lhm_brain/bin/work-control",
   "producer_sha256": "7814ccfba1670b389764222b6d2bfa108b3bdd30af22f2f4a9b40f4a6d9cc35a",
+  "producer_restore_path_expression": "BASE / 'incoming' / f'{event_id}.json'",
   "restore_idempotency_input": "f\"{parent_run_id}\\0{resume_token}\".encode()",
   "producer_store_container": "/opt/data/profiles/lhm_brain/dispatch/work-control",
   "store_host": "/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control",
   "resumer_executable_host": "/usr/local/libexec/lhm-work-resumer",
-  "watch_glob_host": "/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control/events/*.json",
+  "watch_glob_host": "/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control/incoming/*.json",
   "handoff_host": "/run/lhm-work-resumer",
   "handoff_container": "/opt/run/lhm-work-resumer"
 }

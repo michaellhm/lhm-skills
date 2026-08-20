@@ -2,7 +2,7 @@
 Description=Watch the authoritative LHM work-control event store
 
 [Path]
-PathExistsGlob=/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control/events/*.json
+PathExistsGlob=/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control/incoming/*.json
 Unit=lhm-work-resumer.service
 
 [Install]

@@ -15,7 +15,7 @@ from pathlib import Path
 # work-control producer writes the same tree inside the container and the path
 # unit watches it on the host; do not introduce a second state store here.
 BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control')
-INCOMING = BASE / 'events'
+INCOMING = BASE / 'incoming'
 CLAIMS = BASE / 'claims'
 PARENTS = BASE / 'parents'
 PROCESSED = BASE / 'processed'
