@@ -5,7 +5,9 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -21,6 +23,11 @@ VAULT = Path('/home/hermes/.hermes/profiles/lhm_brain/vault')
 PRODUCER_REGISTRY = Path('/home/hermes/.hermes/profiles/lhm_brain/config/claude-producer-artifacts.json')
 WORKER_UID = 10002
 HERMES_GID = 10000
+ACL_POLL_SECONDS = 0.25
+WORKER_TRAVERSAL_ANCESTORS = (
+    Path('/home/hermes/.hermes'),
+    Path('/home/hermes/.hermes/profiles/lhm_brain'),
+)
 SPECIALIST_ROUTES = {
     'marketing': ('lhm-marketing-hub:start', 'start'),
     'seo': ('lhm-marketing-hub:seo', 'seo'),
@@ -186,9 +193,78 @@ def ensure_worker_traversal():
     subprocess.run([
         'systemd-run', '--quiet', '--wait', '--collect',
         f'--unit=lhm-dispatch-acl-{os.getpid()}',
-        '/usr/bin/setfacl', '-m', 'm::x,u:claudeworker:--x,u:codexworker:--x',
-        '/home/hermes/.hermes', '/home/hermes/.hermes/profiles/lhm_brain'
+        '/usr/bin/setfacl', '-m', 'm::--x,u:claudeworker:--x,u:codexworker:--x',
+        *(str(path) for path in WORKER_TRAVERSAL_ANCESTORS)
     ], check=True)
+
+
+def durable_supervisor_failure(run_dir, reason):
+    """Persist an honest terminal state even when the worker loses traversal."""
+    final_file = run_dir / 'final.json'
+    if final_file.exists():
+        return
+    try:
+        prompt = json.loads((run_dir / 'prompt.json').read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError, TypeError):
+        prompt = {}
+    final = {
+        'run_id': run_dir.name,
+        'status': 'failed',
+        'profile': prompt.get('profile', 'unknown'),
+        'agent_id': prompt.get('agent_id', 'unknown'),
+        'completed_at': datetime.now(timezone.utc).isoformat(),
+        'error': reason,
+    }
+    final_file.write_text(json.dumps(final, indent=2) + '\n', encoding='utf-8')
+    events = run_dir / 'events.jsonl'
+    with events.open('a', encoding='utf-8') as handle:
+        handle.write(json.dumps({
+            'event': 'failed', 'run_id': run_dir.name,
+            'summary': reason,
+        }, separators=(',', ':')) + '\n')
+    for item in (final_file, events):
+        os.chown(item, WORKER_UID, HERMES_GID)
+        os.chmod(item, 0o640)
+
+
+def supervise_worker(run_dir, timeout_seconds):
+    """Maintain the exact traversal ACL for the complete unprivileged worker run."""
+    resolved = run_dir.resolve()
+    try:
+        resolved.relative_to(RUNS.resolve())
+    except ValueError:
+        raise SystemExit('supervisor run directory escapes the runs root')
+    if resolved != run_dir or not run_dir.is_dir() or run_dir.is_symlink():
+        raise SystemExit('supervisor requires an existing non-linked canonical run directory')
+    ensure_worker_traversal()
+    process = subprocess.Popen([
+        '/usr/sbin/runuser', '--user', 'claudeworker', '--group', 'claudeworker', '--',
+        '/usr/local/libexec/lhm-claude-worker', str(run_dir), str(timeout_seconds),
+    ])
+    acl_failure = None
+    while process.poll() is None:
+        try:
+            ensure_worker_traversal()
+        except subprocess.CalledProcessError:
+            acl_failure = 'worker traversal ACL could not be maintained; run failed closed'
+            process.terminate()
+            break
+        time.sleep(ACL_POLL_SECONDS)
+    try:
+        return_code = process.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        return_code = process.wait()
+    if acl_failure:
+        durable_supervisor_failure(run_dir, acl_failure)
+        return 1
+    if return_code != 0:
+        durable_supervisor_failure(run_dir, f'worker exited without a terminal artifact (exit {return_code})')
+        return 1
+    if not (run_dir / 'final.json').is_file():
+        durable_supervisor_failure(run_dir, 'worker exited without a terminal artifact')
+        return 1
+    return 0
 
 
 def configure_worker_run_dir(run_dir):
@@ -488,16 +564,22 @@ def process(path):
     os.chown(events, WORKER_UID, HERMES_GID)
     os.chmod(events, 0o640)
     unit = f'lhm-claude-run-{run_id}'
-    ensure_worker_traversal()
     subprocess.run([
-        'systemd-run', '--quiet', '--no-block', f'--unit={unit}', '--uid=claudeworker', '--gid=claudeworker',
+        'systemd-run', '--quiet', '--no-block', f'--unit={unit}',
         '--property=Type=oneshot', '--property=KillMode=process',
-        '/usr/local/libexec/lhm-claude-worker', str(run_dir), str(request['timeout_seconds'])
+        '/usr/local/libexec/lhm-claude-dispatcher', '--supervise', str(run_dir), str(request['timeout_seconds'])
     ], check=True)
     shutil.move(str(path), PROCESSED / path.name)
 
 
 def main():
+    if len(sys.argv) == 4 and sys.argv[1] == '--supervise':
+        timeout_seconds = int(sys.argv[3])
+        if timeout_seconds not in {300, 600, 1200}:
+            raise SystemExit('invalid supervisor timeout')
+        raise SystemExit(supervise_worker(Path(sys.argv[2]), timeout_seconds))
+    if len(sys.argv) != 1:
+        raise SystemExit('unexpected arguments')
     for path in sorted(INCOMING.glob('*.json')):
         process(path)
 
