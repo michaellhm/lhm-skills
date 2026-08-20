@@ -70,16 +70,31 @@ def atomic_json(path, value, mode=0o600):
 
 def validate_event(event):
     required = {'schema_version', 'event', 'event_id', 'capability_incident_id',
-                'parent_run_id', 'saved_role', 'return_point', 'created_at'}
+                'parent_run_id', 'return_role', 'return_point', 'resume_token',
+                'evidence_refs', 'timestamp', 'idempotency_key'}
     if not isinstance(event, dict) or set(event) != required:
         raise ValueError('invalid capability_restored event schema')
     if event.get('schema_version') != 1 or event.get('event') != 'capability_restored':
         raise ValueError('invalid capability_restored event type')
-    if any(not isinstance(event[key], str) or not event[key] for key in required - {'schema_version'}):
+    string_fields = required - {'schema_version', 'evidence_refs'}
+    if any(not isinstance(event[key], str) or not event[key] for key in string_fields):
         raise ValueError('invalid capability_restored event value')
+    if (not isinstance(event['evidence_refs'], list) or not event['evidence_refs']
+            or any(not isinstance(item, str) or not item for item in event['evidence_refs'])):
+        raise ValueError('invalid capability_restored evidence_refs')
     for key in ('event_id', 'capability_incident_id', 'parent_run_id'):
         if not SAFE_ID.fullmatch(event[key]):
             raise ValueError(f'invalid capability_restored {key}')
+    expected = hashlib.sha256(
+        f"{event['parent_run_id']}\0{event['resume_token']}".encode()).hexdigest()
+    if event['idempotency_key'] != expected:
+        raise ValueError('invalid capability_restored idempotency_key')
+    try:
+        timestamp = datetime.fromisoformat(event['timestamp'])
+    except ValueError as exc:
+        raise ValueError('invalid capability_restored timestamp') from exc
+    if timestamp.tzinfo is None or timestamp.utcoffset().total_seconds() != 0:
+        raise ValueError('capability_restored timestamp is not timezone-aware UTC')
     return event
 
 
@@ -90,11 +105,15 @@ def validate_parent(parent, event):
         raise ValueError('parent is not waiting_on_capability')
     if parent.get('capability_incident_id') != event['capability_incident_id']:
         raise ValueError('event incident does not match canonical parent')
+    if parent.get('return_point') != event['return_point']:
+        raise ValueError('event return point does not match canonical parent')
+    if parent.get('resume_token') != event['resume_token']:
+        raise ValueError('event resume token does not match canonical parent')
     return parent
 
 
 def marker_key(event):
-    return hashlib.sha256(event['event_id'].encode()).hexdigest()
+    return event['idempotency_key']
 
 
 def make_handoff(event, parent):
@@ -152,7 +171,8 @@ def _failure(claim, message):
 
 
 def success_marker(event, record, parent):
-    return {'schema_version': 1, 'event_id': event['event_id'],
+    return {'schema_version': 1, 'idempotency_key': event['idempotency_key'],
+            'event_id': event['event_id'],
             'parent_run_id': event['parent_run_id'], 'agent_consumed_sha256': digest(record),
             'parent_sha256': digest(parent), 'consumed_at': now()}
 
@@ -239,7 +259,12 @@ def reconcile_false_marker(marker_path, processed_event_path):
         })
         return 'recovered_reconciliation'
     marker = load(marker_path)
-    if marker_path.name != f'{key}.json' or marker.get('event_id') != event['event_id']:
+    marker_fields = {'idempotency_key', 'event_id', 'parent_run_id', 'consumed_at', 'exit_code'}
+    if (marker_path.name != f'{key}.json' or not isinstance(marker, dict)
+            or set(marker) != marker_fields or marker.get('idempotency_key') != key
+            or marker.get('event_id') != event['event_id']
+            or marker.get('parent_run_id') != event['parent_run_id']
+            or marker.get('exit_code') != 0):
         raise ValueError('marker and event do not match')
     validate_parent(load(PARENTS / f"{event['parent_run_id']}.json"), event)
     if (AGENT_CONSUMED / f'{key}.json').exists():

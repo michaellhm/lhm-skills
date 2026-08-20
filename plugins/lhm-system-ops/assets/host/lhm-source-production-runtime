@@ -34,18 +34,23 @@ def atomic(path,value):
         if os.path.exists(tmp): os.unlink(tmp)
 def load(path): return json.loads(path.read_text(encoding='utf-8'))
 
-def capability_restored_event(blocker,event_id,created_at=None):
+def capability_restored_event(blocker,event_id,timestamp=None,evidence_refs=None):
     """Producer contract shared with the durable-handoff consumer."""
-    return {'schema_version':1,'event':'capability_restored','event_id':event_id,
-            'capability_incident_id':blocker['capability_incident_id'],'parent_run_id':blocker['parent_run_id'],
-            'saved_role':blocker['saved_role'],'return_point':blocker['return_point'],
-            'created_at':created_at or now()}
+    parent_run_id,resume_token=blocker['parent_run_id'],blocker['resume_token']
+    return {'event_id':event_id,'parent_run_id':parent_run_id,
+            'capability_incident_id':blocker['capability_incident_id'],
+            'return_role':blocker['saved_role'],'return_point':blocker['return_point'],
+            'resume_token':resume_token,'evidence_refs':evidence_refs or ['verified capability regression'],
+            'schema_version':1,'event':'capability_restored','timestamp':timestamp or now(),
+            'idempotency_key':digest_bytes(f'{parent_run_id}\0{resume_token}'.encode())}
 
 def validate_capability_restored(e):
-    required={'schema_version','event','event_id','capability_incident_id','parent_run_id','saved_role','return_point','created_at'}
+    required={'event_id','parent_run_id','capability_incident_id','return_role','return_point','resume_token','evidence_refs','schema_version','event','timestamp','idempotency_key'}
     if not isinstance(e,dict) or set(e)!=required or e.get('schema_version')!=1 or e.get('event')!='capability_restored': raise ValueError('invalid capability_restored event')
-    for key in required-{'schema_version'}:
+    for key in required-{'schema_version','evidence_refs'}:
         if not isinstance(e[key],str) or not e[key]: raise ValueError('invalid capability_restored event')
+    if not isinstance(e['evidence_refs'],list) or not e['evidence_refs'] or not all(isinstance(x,str) and x for x in e['evidence_refs']): raise ValueError('invalid capability_restored event')
+    if e['idempotency_key'] != digest_bytes(f"{e['parent_run_id']}\0{e['resume_token']}".encode()): raise ValueError('invalid capability_restored event')
     return e
 
 def validate_manifest(m, filename, registry_root=REGISTRY):
@@ -81,9 +86,10 @@ def invoke_json(command,payload,runner=subprocess.run,bounded_worker=True):
 def block(run_dir,m,source,reason,runner=subprocess.run):
     kind='google_drive_read_unavailable' if source['kind']=='google_drive_file' else 'fathom_read_unavailable'
     incident=m['run_id']+':'+source['source_id']
-    blocker={'schema_version':1,'type':'capability_blocker','blocker_kind':kind,'capability_incident_id':incident,'parent_run_id':m['parent_run_id'],'saved_role':m['saved_role'],'return_point':m['return_point'],'source_id':source['source_id'],'route':'lhm-cto','reason':reason[-500:],'created_at':now()}
+    resume_token=digest_text(incident+m['parent_run_id'])
+    blocker={'schema_version':1,'type':'capability_blocker','blocker_kind':kind,'capability_incident_id':incident,'parent_run_id':m['parent_run_id'],'saved_role':m['saved_role'],'return_point':m['return_point'],'resume_token':resume_token,'source_id':source['source_id'],'route':'lhm-cto','reason':reason[-500:],'created_at':now()}
     atomic(run_dir/'blocker.json',blocker); atomic(run_dir/'public-status.json',{'run_id':m['run_id'],'parent_run_id':m['parent_run_id'],'status':'blocked','blocker_kind':kind})
-    request={'schema_version':1,'request_id':incident.replace(':','-'),'parent_run_id':m['parent_run_id'],'capability_incident_id':incident,'objective':'Restore the registered '+source['kind']+' read route.','acceptance_tests':['Registered source can be read without exposing credentials to Hermes.'],'mode':'change','timeout_seconds':1800,'return_point':m['return_point'],'resume_token':digest_text(incident+m['parent_run_id'])}
+    request={'schema_version':1,'request_id':incident.replace(':','-'),'parent_run_id':m['parent_run_id'],'capability_incident_id':incident,'objective':'Restore the registered '+source['kind']+' read route.','acceptance_tests':['Registered source can be read without exposing credentials to Hermes.'],'mode':'change','timeout_seconds':1800,'return_point':m['return_point'],'resume_token':resume_token}
     invoke_json(WORK_CONTROL,request,runner,False); return blocker
 
 def process(path,runner=subprocess.run,registry_root=REGISTRY):
@@ -112,14 +118,15 @@ def process(path,runner=subprocess.run,registry_root=REGISTRY):
 
 def consume_restored(path,runner=subprocess.run):
     e=validate_capability_restored(load(path))
-    marker=BASE/'consumed'/digest_text(e['event_id'])
+    marker=BASE/'consumed'/e['idempotency_key']
     if marker.exists(): return 'duplicate'
     matches=[]
     for blocker in RUNS.glob('*/blocker.json'):
         b=load(blocker)
-        if all(e[k]==b[k] for k in ('capability_incident_id','parent_run_id','saved_role','return_point')): matches.append(blocker)
+        if (all(e[k]==b[k] for k in ('capability_incident_id','parent_run_id','return_point','resume_token'))
+                and e['return_role']==b['saved_role']): matches.append(blocker)
     if len(matches)!=1: raise ValueError('restoration does not match exactly one blocker')
-    payload={'schema_version':1,'event':'resume_saved_role','parent_run_id':e['parent_run_id'],'role':e['saved_role'],'return_point':e['return_point'],'capability_incident_id':e['capability_incident_id']}
+    payload={'schema_version':1,'event':'resume_saved_role','parent_run_id':e['parent_run_id'],'role':e['return_role'],'return_point':e['return_point'],'capability_incident_id':e['capability_incident_id']}
     invoke_json('/usr/local/libexec/lhm-work-control-resume',payload,runner,False); atomic(marker,{**e,'consumed_at':now()}); return 'resumed'
 
 def main():

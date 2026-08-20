@@ -22,12 +22,6 @@ resumer = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(resumer)
 INSTALLED_BASE = resumer.BASE
 INSTALLED_INCOMING = resumer.INCOMING
-PRODUCER_SCRIPT = ROOT / 'assets/host/lhm-source-production-runtime'
-producer_spec = importlib.util.spec_from_loader('source_producer', SourceFileLoader('source_producer', str(PRODUCER_SCRIPT)))
-source_producer = importlib.util.module_from_spec(producer_spec)
-producer_spec.loader.exec_module(source_producer)
-
-
 class WorkResumerIntegrationTests(unittest.TestCase):
     def test_installed_producer_watcher_consumer_and_bind_mapping_are_one_store(self):
         deployment = json.loads(DEPLOYMENT.read_text())
@@ -59,20 +53,11 @@ class WorkResumerIntegrationTests(unittest.TestCase):
             path = base / name.lower()
             setattr(resumer, name, path)
             path.mkdir()
-        blocker = {
-            'capability_incident_id': 'release-publishing-resume-permissions-20260820',
-            'parent_run_id': 'RELEASE-PUBLISHING-ENGINEER-20260820',
-            'saved_role': 'Release & Publishing Engineer', 'return_point': 'desktop control',
-        }
-        self.event = source_producer.capability_restored_event(
-            blocker, 'release-publishing-engineer-installed-20260820',
-            '2026-08-20T00:00:00+00:00')
+        self.event = {"event_id":"release-publishing-engineer-installed-20260820","parent_run_id":"RELEASE-PUBLISHING-ENGINEER-20260820","capability_incident_id":"release-publishing-engineer-capability-20260820","return_role":"head_of_production","return_point":"desktop control; review CTO branch, merge and install only after exact approval","resume_token":"release-publishing-engineer-20260820-resume","evidence_refs":["https://github.com/michaellhm/lhm-skills/pull/18","merge:fb07cf96ae20289323ecb4790ee04913fa5a6a13","tests:83-passed-19-subtests","publisher-sha256:980301020ddc5125421437f9af18c81e02af95cfbbce0226ec756434029876d7","runtime-sha256:9b7766da09b7c276aea91b1af00fa1e46c576db2da373c1bb25a6afa8758e5ca"],"schema_version":1,"event":"capability_restored","timestamp":"2026-08-20T05:24:42.929856+00:00","idempotency_key":"ae2501bfb959119b7154e096f639c517d15f1551a6297d7625695b7563551648"}
         self.parent = {
-            'schema_version': 1, 'parent_run_id': self.event['parent_run_id'],
-            'capability_incident_id': self.event['capability_incident_id'],
-            'status': 'waiting_on_capability', 'private_context': 'bounded parent content',
+            "parent_run_id":"RELEASE-PUBLISHING-ENGINEER-20260820","capability_incident_id":"release-publishing-engineer-capability-20260820","return_point":"desktop control; review CTO branch, merge and install only after exact approval","resume_token":"release-publishing-engineer-20260820-resume","objective":"Create a governed Release & Publishing Engineer under Head of Production. It must publish sealed, approved releases through destination-specific profiles, beginning with the existing lhm-prototype main-branch route, and later support separately approved Astro, WordPress API and hosting routes without universal credentials.","acceptance_test":"A reviewed feature branch registers the employee and prototype destination profile; repairs publisher preflight and post-push recovery; aligns capability-restored durable resume schemas; produces durable release receipts and canonical-state/BasicOps handoff contracts; passes independent security and regression QA without mutating any live site, repository, BasicOps task or credential.","permission_ceiling":"amber","schema_version":1,"status":"waiting_on_capability","updated_at":"2026-08-20T05:11:35.845440+00:00"
         }
-        self.event_path = resumer.INCOMING / 'event.json'
+        self.event_path = resumer.INCOMING / 'release-publishing-engineer-installed-20260820.json'
         self.parent_path = resumer.PARENTS / f"{self.event['parent_run_id']}.json"
         self.event_path.write_text(json.dumps(self.event))
         self.parent_path.write_text(json.dumps(self.parent))
@@ -96,6 +81,9 @@ class WorkResumerIntegrationTests(unittest.TestCase):
             return SimpleNamespace(returncode=returncode, stdout=stdout, stderr='')
         return run
 
+    def legacy_marker(self):
+        return {"idempotency_key":"ae2501bfb959119b7154e096f639c517d15f1551a6297d7625695b7563551648","event_id":"release-publishing-engineer-installed-20260820","parent_run_id":"RELEASE-PUBLISHING-ENGINEER-20260820","consumed_at":"2026-08-20T05:28:56.519434+00:00","exit_code":0}
+
     def test_real_producer_contract_bounded_handoff_and_success(self):
         """Exercise the production capability_restored schema and real resumer contract."""
         observed = {}
@@ -115,9 +103,18 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         updated = json.loads(self.parent_path.read_text())
         self.assertEqual(updated['status'], 'continued')
         self.assertEqual(updated['resume_event_id'], self.event['event_id'])
-        key = hashlib.sha256(self.event['event_id'].encode()).hexdigest()
+        key = self.event['idempotency_key']
         self.assertEqual(json.loads((resumer.CONSUMED / f'{key}.json').read_text())['event_id'], self.event['event_id'])
         self.assertTrue((resumer.AGENT_CONSUMED / f'{key}.json').is_file())
+
+    def test_authoritative_general_restore_digest_and_deployment_evidence(self):
+        deployment = json.loads(DEPLOYMENT.read_text())
+        byte_input = f"{self.event['parent_run_id']}\0{self.event['resume_token']}".encode()
+        self.assertEqual(hashlib.sha256(byte_input).hexdigest(), self.event['idempotency_key'])
+        self.assertEqual(resumer.marker_key(self.event), self.event['idempotency_key'])
+        self.assertEqual(deployment['producer_executable_container'], '/opt/data/profiles/lhm_brain/bin/work-control')
+        self.assertEqual(deployment['producer_executable_host'], '/home/hermes/.hermes/profiles/lhm_brain/bin/work-control')
+        self.assertEqual(deployment['producer_sha256'], '7814ccfba1670b389764222b6d2bfa108b3bdd30af22f2f4a9b40f4a6d9cc35a')
 
     def test_worker_has_no_unrelated_store_access(self):
         unrelated_paths = [
@@ -171,6 +168,46 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         self.assertEqual(resumer.process(self.event_path, self.runner(self.record())), 'failed')
         self.assertEqual(list(resumer.CONSUMED.iterdir()), [])
 
+    def test_event_parent_identity_return_point_and_token_mismatches_fail_closed(self):
+        for field in ('parent_run_id', 'capability_incident_id', 'return_point', 'resume_token'):
+            with self.subTest(field=field):
+                event = dict(self.event)
+                event[field] += '-mismatch'
+                if field in ('parent_run_id', 'resume_token'):
+                    event['idempotency_key'] = hashlib.sha256(
+                        f"{event['parent_run_id']}\0{event['resume_token']}".encode()).hexdigest()
+                self.event_path.write_text(json.dumps(event))
+                self.assertEqual(resumer.process(self.event_path, self.runner(self.record())), 'failed')
+                self.assertEqual(json.loads(self.parent_path.read_text())['status'], 'waiting_on_capability')
+                self.event_path = resumer.INCOMING / self.event_path.name
+                self.event_path.write_text(json.dumps(self.event))
+
+    def test_digest_timestamp_and_evidence_mismatches_fail_closed(self):
+        for field, value in (
+                ('idempotency_key', '0' * 64), ('timestamp', '2026-08-20T05:24:42'),
+                ('evidence_refs', [])):
+            with self.subTest(field=field):
+                event = dict(self.event)
+                event[field] = value
+                candidate = resumer.INCOMING / f'{field}.json'
+                candidate.write_text(json.dumps(event))
+                self.assertEqual(resumer.process(candidate, self.runner(self.record())), 'failed')
+
+    def test_legacy_marker_identity_or_exit_mismatch_is_not_requeued(self):
+        processed = resumer.PROCESSED / self.event_path.name
+        os.replace(self.event_path, processed)
+        for field, value in (('parent_run_id', 'OTHER'), ('exit_code', 1),
+                             ('idempotency_key', '0' * 64)):
+            with self.subTest(field=field):
+                marker = resumer.CONSUMED / f"{self.event['idempotency_key']}.json"
+                bad = self.legacy_marker()
+                bad[field] = value
+                marker.write_text(json.dumps(bad))
+                with self.assertRaises(ValueError):
+                    resumer.reconcile_false_marker(marker, processed)
+                marker.unlink()
+                self.assertFalse((resumer.INCOMING / processed.name).exists())
+
     def test_explicit_wait_requires_evidence_and_is_successful(self):
         record = self.record('waiting_on_evidence')
         record['evidence'] = ['Chief must supply authoritative branch-protection readback']
@@ -181,9 +218,9 @@ class WorkResumerIntegrationTests(unittest.TestCase):
     def test_false_marker_reconciliation_preserves_audit_and_is_idempotent(self):
         processed = resumer.PROCESSED / self.event_path.name
         os.replace(self.event_path, processed)
-        key = hashlib.sha256(self.event['event_id'].encode()).hexdigest()
+        key = self.event['idempotency_key']
         marker = resumer.CONSUMED / f'{key}.json'
-        marker.write_text(json.dumps({'event_id': self.event['event_id'], 'legacy': True}))
+        marker.write_text(json.dumps(self.legacy_marker()))
         self.assertEqual(resumer.reconcile_false_marker(marker, processed), 'requeued')
         self.assertEqual(resumer.reconcile_false_marker(marker, processed), 'already_requeued')
         self.assertFalse(marker.exists())
@@ -195,9 +232,9 @@ class WorkResumerIntegrationTests(unittest.TestCase):
     def test_legacy_false_marker_processed_event_and_waiting_parent_transition_once(self):
         processed = resumer.PROCESSED / self.event_path.name
         os.replace(self.event_path, processed)
-        key = hashlib.sha256(self.event['event_id'].encode()).hexdigest()
+        key = self.event['idempotency_key']
         marker = resumer.CONSUMED / f'{key}.json'
-        marker.write_text(json.dumps({'event_id': self.event['event_id'], 'legacy': True}))
+        marker.write_text(json.dumps(self.legacy_marker()))
 
         self.assertEqual(resumer.reconcile_false_marker(marker, processed), 'requeued')
         calls = []
@@ -224,7 +261,7 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         self.assertEqual(calls, [])
 
     def test_durable_agent_record_recovers_interrupted_parent_apply_without_reinvocation(self):
-        key = hashlib.sha256(self.event['event_id'].encode()).hexdigest()
+        key = self.event['idempotency_key']
         (resumer.AGENT_CONSUMED / f'{key}.json').write_text(json.dumps(self.record()))
         calls = []
         self.assertEqual(resumer.process(self.event_path, lambda *_: calls.append(1)), 'consumed')
@@ -234,16 +271,16 @@ class WorkResumerIntegrationTests(unittest.TestCase):
     def test_interrupted_false_marker_audit_finalisation_recovers_idempotently(self):
         processed = resumer.PROCESSED / self.event_path.name
         os.replace(self.event_path, processed)
-        key = hashlib.sha256(self.event['event_id'].encode()).hexdigest()
+        key = self.event['idempotency_key']
         marker = resumer.CONSUMED / f'{key}.json'
-        marker.write_text(json.dumps({'event_id': self.event['event_id'], 'legacy': True}))
+        marker.write_text(json.dumps(self.legacy_marker()))
         (resumer.INCOMING / processed.name).write_text(processed.read_text())
         os.replace(marker, resumer.RECONCILIATIONS / f'{key}.false-marker.json')
         self.assertEqual(resumer.reconcile_false_marker(marker, processed), 'recovered_reconciliation')
         self.assertTrue((resumer.RECONCILIATIONS / f'{key}.json').is_file())
 
     def test_interrupted_success_marker_write_recovers_without_agent_reinvocation(self):
-        key = hashlib.sha256(self.event['event_id'].encode()).hexdigest()
+        key = self.event['idempotency_key']
         record = self.record()
         (resumer.AGENT_CONSUMED / f'{key}.json').write_text(json.dumps(record))
         transitioned = {**self.parent, 'status': record['next_status'],
