@@ -23,11 +23,11 @@ FAILED = BASE / 'failed'
 CONSUMED = BASE / 'consumed'
 AGENT_CONSUMED = BASE / 'agent-consumed'
 RECONCILIATIONS = BASE / 'reconciliations'
-HANDOFFS = Path('/run/lhm-work-resumer')
+HANDOFFS = BASE / 'handoffs'
 LOCK = BASE / '.resumer.lock'
 HERMES_UID = 10000
 HERMES_GID = 10000
-HERMES_HANDOFFS = Path('/opt/run/lhm-work-resumer')
+HERMES_HANDOFFS = Path('/opt/data/profiles/lhm_brain/dispatch/work-control/handoffs')
 ALLOWED_STATES = {'running', 'continued', 'completed', 'waiting_on_evidence', 'waiting_on_approval'}
 SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$')
 
@@ -122,13 +122,18 @@ def make_handoff(event, parent):
     handoff = HANDOFFS / key
     if handoff.exists():
         shutil.rmtree(handoff)
-    handoff.mkdir(parents=True, mode=0o700)
-    atomic_json(handoff / 'event.json', event, 0o400)
-    atomic_json(handoff / 'parent.json', parent, 0o400)
-    (handoff / 'response').mkdir(mode=0o700)
-    for path in (handoff, handoff / 'event.json', handoff / 'parent.json', handoff / 'response'):
-        os.chown(path, HERMES_UID, HERMES_GID)
-    return handoff
+    try:
+        handoff.mkdir(parents=True, mode=0o700)
+        atomic_json(handoff / 'event.json', event, 0o400)
+        atomic_json(handoff / 'parent.json', parent, 0o400)
+        (handoff / 'response').mkdir(mode=0o700)
+        for path in (handoff, handoff / 'event.json', handoff / 'parent.json', handoff / 'response'):
+            os.chown(path, HERMES_UID, HERMES_GID)
+        return handoff
+    except Exception:
+        if handoff.exists():
+            shutil.rmtree(handoff)
+        raise
 
 
 def invoke(handoff):

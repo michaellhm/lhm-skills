@@ -9,6 +9,6 @@
   "store_host": "/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control",
   "resumer_executable_host": "/usr/local/libexec/lhm-work-resumer",
   "watch_glob_host": "/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control/incoming/*.json",
-  "handoff_host": "/run/lhm-work-resumer",
-  "handoff_container": "/opt/run/lhm-work-resumer"
+  "handoff_host": "/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control/handoffs",
+  "handoff_container": "/opt/data/profiles/lhm_brain/dispatch/work-control/handoffs"
 }

@@ -19,7 +19,7 @@ capability is needed.
 The resumer BASE now names the established root-owned host store. Persisted path and service units
 bind the watcher and service sandbox to that exact store. A closed deployment contract records the
 native producer executable, both sides of the profile bind, the watcher glob, consumer executable,
-and `/run/lhm-work-resumer` to `/opt/run/lhm-work-resumer` handoff mapping. No producer, live state,
+and the handoff mapping through the existing `/home/hermes/.hermes` to `/opt/data` bind. No producer, live state,
 systemd instance, installation, credential, BasicOps record, client system, or external repository
 was mutated.
 

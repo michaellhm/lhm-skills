@@ -26,6 +26,8 @@ validator = importlib.util.module_from_spec(validator_spec)
 validator_spec.loader.exec_module(validator)
 INSTALLED_BASE = resumer.BASE
 INSTALLED_INCOMING = resumer.INCOMING
+INSTALLED_HANDOFFS = resumer.HANDOFFS
+INSTALLED_HERMES_HANDOFFS = resumer.HERMES_HANDOFFS
 class WorkResumerIntegrationTests(unittest.TestCase):
     def test_installed_producer_watcher_consumer_and_bind_mapping_are_one_store(self):
         deployment = json.loads(DEPLOYMENT.read_text())
@@ -47,9 +49,13 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         self.assertEqual(INSTALLED_INCOMING, Path(deployment['store_host']) / producer_name)
         self.assertEqual(deployment['watch_glob_host'], str(INSTALLED_INCOMING / '*.json'))
         self.assertIn(f"PathExistsGlob={deployment['watch_glob_host']}", path_unit)
-        self.assertIn(f"ReadWritePaths={deployment['store_host']} {deployment['handoff_host']}", service_unit)
-        self.assertEqual(deployment['handoff_host'], '/run/lhm-work-resumer')
-        self.assertEqual(deployment['handoff_container'], '/opt/run/lhm-work-resumer')
+        self.assertIn(f"ReadWritePaths={deployment['store_host']}", service_unit)
+        self.assertEqual(deployment['handoff_host'], f"{deployment['store_host']}/handoffs")
+        self.assertEqual(deployment['handoff_container'],
+                         f"{deployment['producer_store_container']}/handoffs")
+        self.assertEqual(INSTALLED_HANDOFFS, INSTALLED_BASE / 'handoffs')
+        self.assertEqual(INSTALLED_HERMES_HANDOFFS, Path(deployment['handoff_container']))
+        self.assertNotIn('/opt/run', SCRIPT.read_text() + json.dumps(deployment) + service_unit)
         self.assertNotIn('/var/lib/lhm-work-control', SCRIPT.read_text() + path_unit + service_unit)
 
     def test_deployment_parity_rejects_nonexistent_events_alternate(self):
@@ -122,6 +128,7 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         key = self.event['idempotency_key']
         self.assertEqual(json.loads((resumer.CONSUMED / f'{key}.json').read_text())['event_id'], self.event['event_id'])
         self.assertTrue((resumer.AGENT_CONSUMED / f'{key}.json').is_file())
+        self.assertFalse((resumer.HANDOFFS / key).exists())
 
     def test_authoritative_general_restore_digest_and_deployment_evidence(self):
         deployment = json.loads(DEPLOYMENT.read_text())
@@ -137,6 +144,9 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         handoff = resumer.HANDOFFS / self.event['idempotency_key']
         with mock.patch.object(resumer.os, 'chown'):
             handoff = resumer.make_handoff(self.event, self.parent)
+        canonical_sibling = resumer.HANDOFFS.parent / 'parents-private-fixture.json'
+        canonical_sibling.write_text('{"private":"canonical"}')
+        canonical_sibling.chmod(0)
         fixture_bin = Path(self.temp.name) / 'bin'
         fixture_bin.mkdir()
         docker = fixture_bin / 'docker'
@@ -153,11 +163,16 @@ parser.add_argument("-p", "--profile", required=True)
 parser.add_argument("--in", dest="working_directory", required=True)
 parser.add_argument("-z", "--oneshot", required=True)
 args = parser.parse_args(cli)
-expected = "/opt/run/lhm-work-resumer/" + os.environ["EXPECTED_KEY"]
+expected = "/opt/data/profiles/lhm_brain/dispatch/work-control/handoffs/" + os.environ["EXPECTED_KEY"]
 if args.profile != "lhm_brain" or args.working_directory != expected:
     raise SystemExit("wrong Hermes profile or container working directory")
 handoff = pathlib.Path(os.environ["HOST_HANDOFF"])
 os.chdir(handoff)
+canonical_sibling = pathlib.Path(os.environ["HOST_CANONICAL_SIBLING"])
+if canonical_sibling.is_file() and os.access(canonical_sibling, os.R_OK):
+    raise SystemExit("canonical sibling state is readable")
+if sorted(str(path) for path in pathlib.Path(".").iterdir()) != ["event.json", "parent.json", "response"]:
+    raise SystemExit("handoff exposed unexpected state")
 event = json.loads(pathlib.Path("event.json").read_text())
 parent = json.loads(pathlib.Path("parent.json").read_text())
 record = {"schema_version": 1, "event_id": event["event_id"],
@@ -171,6 +186,7 @@ print(json.dumps({"cwd": str(pathlib.Path.cwd()), "requested_identity": argv[2]}
         environment = {
             **os.environ, 'PATH': f'{fixture_bin}:{os.environ["PATH"]}',
             'EXPECTED_KEY': self.event['idempotency_key'], 'HOST_HANDOFF': str(handoff),
+            'HOST_CANONICAL_SIBLING': str(canonical_sibling),
         }
         with mock.patch.dict(resumer.os.environ, environment, clear=True):
             result = resumer.invoke(handoff)
@@ -201,10 +217,28 @@ print(json.dumps({"cwd": str(pathlib.Path.cwd()), "requested_identity": argv[2]}
         self.assertEqual(stat.S_IMODE(handoff.stat().st_mode), 0o700)
         self.assertEqual(stat.S_IMODE((handoff / 'event.json').stat().st_mode), 0o400)
         self.assertEqual(stat.S_IMODE((handoff / 'parent.json').stat().st_mode), 0o400)
+        self.assertEqual(stat.S_IMODE((handoff / 'response').stat().st_mode), 0o700)
         self.assertFalse((handoff / 'UNRELATED.json').exists())
         for unrelated in unrelated_paths:
             probe = subprocess.run(['sh', '-c', 'test -r "$1"', 'probe', str(unrelated)])
             self.assertNotEqual(probe.returncode, 0)
+
+    def test_failed_resume_removes_handoff_and_preserves_canonical_state(self):
+        key = self.event['idempotency_key']
+        with mock.patch.object(resumer.os, 'chown'):
+            outcome = resumer.process(self.event_path, self.runner(None, 1, 'fixture failure'))
+        self.assertEqual(outcome, 'failed')
+        self.assertFalse((resumer.HANDOFFS / key).exists())
+        self.assertEqual(json.loads(self.parent_path.read_text()), self.parent)
+        self.assertEqual(list(resumer.CONSUMED.iterdir()), [])
+        self.assertEqual(list(resumer.AGENT_CONSUMED.iterdir()), [])
+
+    def test_partial_handoff_creation_failure_is_cleaned_up(self):
+        key = self.event['idempotency_key']
+        with mock.patch.object(resumer.os, 'chown', side_effect=PermissionError('fixture')):
+            with self.assertRaises(PermissionError):
+                resumer.make_handoff(self.event, self.parent)
+        self.assertFalse((resumer.HANDOFFS / key).exists())
 
     def test_parent_path_traversal_and_symlink_fail_closed(self):
         traversal = dict(self.event)
