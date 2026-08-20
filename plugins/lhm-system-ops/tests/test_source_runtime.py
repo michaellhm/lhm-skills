@@ -69,10 +69,9 @@ def test_registration_rejects_arbitrary_identifier(tmp_path):
 def test_matching_restoration_resumes_exactly_once(tmp_path):
     m=manifest('resume-run'); registry,path,values=setup(tmp_path,m)
     run=values['RUNS']/m['run_id']; run.mkdir()
-    blocker={'schema_version':1,'type':'capability_blocker','blocker_kind':'google_drive_read_unavailable','capability_incident_id':'resume-run:wellness-drive','parent_run_id':m['parent_run_id'],'saved_role':m['saved_role'],'return_point':m['return_point'],'source_id':'wellness-drive','route':'lhm-cto','reason':'x','created_at':'now'}
+    blocker={'schema_version':1,'type':'capability_blocker','blocker_kind':'google_drive_read_unavailable','capability_incident_id':'resume-run:wellness-drive','parent_run_id':m['parent_run_id'],'saved_role':m['saved_role'],'return_point':m['return_point'],'resume_token':'resume-token-0001','source_id':'wellness-drive','route':'lhm-cto','reason':'x','created_at':'now'}
     (run/'blocker.json').write_text(json.dumps(blocker))
-    event={k:blocker[k] for k in ('capability_incident_id','parent_run_id','saved_role','return_point')}
-    event.update(schema_version=1,event='capability_restored',event_id='restore-one',created_at='now')
+    event=runtime.capability_restored_event(blocker,'restore-one','2026-08-20T00:00:00+00:00')
     ep=tmp_path/'event.json'; ep.write_text(json.dumps(event)); calls=[]
     def runner(argv,**kwargs): calls.append(json.loads(kwargs['input'])); return Result(out=b'{}')
     with mock.patch.multiple(runtime,**values):
@@ -83,7 +82,7 @@ def test_matching_restoration_resumes_exactly_once(tmp_path):
 def test_capability_restored_producer_consumer_and_parent_transition_e2e(tmp_path):
     m=manifest('contract-e2e'); registry,path,values=setup(tmp_path,m)
     run=values['RUNS']/m['run_id']; run.mkdir()
-    blocker={'schema_version':1,'type':'capability_blocker','blocker_kind':'google_drive_read_unavailable','capability_incident_id':'contract-e2e:wellness-drive','parent_run_id':m['parent_run_id'],'saved_role':m['saved_role'],'return_point':m['return_point'],'source_id':'wellness-drive','route':'lhm-cto','reason':'x','created_at':'now'}
+    blocker={'schema_version':1,'type':'capability_blocker','blocker_kind':'google_drive_read_unavailable','capability_incident_id':'contract-e2e:wellness-drive','parent_run_id':m['parent_run_id'],'saved_role':m['saved_role'],'return_point':m['return_point'],'resume_token':'resume-token-0001','source_id':'wellness-drive','route':'lhm-cto','reason':'x','created_at':'now'}
     (run/'blocker.json').write_text(json.dumps(blocker))
     emitted=runtime.capability_restored_event(blocker,'restore-contract-e2e','2026-08-20T00:00:00+00:00')
     schema=json.loads((ROOT/'references/capability-restored.schema.json').read_text())
