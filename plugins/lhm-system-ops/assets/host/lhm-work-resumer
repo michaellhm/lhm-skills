@@ -11,7 +11,10 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-BASE = Path('/var/lib/lhm-work-control')
+# This is the host side of Hermes' /opt/data/profiles bind mount.  The native
+# work-control producer writes the same tree inside the container and the path
+# unit watches it on the host; do not introduce a second state store here.
+BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control')
 INCOMING = BASE / 'events'
 CLAIMS = BASE / 'claims'
 PARENTS = BASE / 'parents'
