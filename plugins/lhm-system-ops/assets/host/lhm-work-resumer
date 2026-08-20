@@ -27,6 +27,7 @@ HANDOFFS = Path('/run/lhm-work-resumer')
 LOCK = BASE / '.resumer.lock'
 HERMES_UID = 10000
 HERMES_GID = 10000
+HERMES_HANDOFFS = Path('/opt/run/lhm-work-resumer')
 ALLOWED_STATES = {'running', 'continued', 'completed', 'waiting_on_evidence', 'waiting_on_approval'}
 SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$')
 
@@ -131,6 +132,10 @@ def make_handoff(event, parent):
 
 
 def invoke(handoff):
+    try:
+        container_handoff = HERMES_HANDOFFS / handoff.relative_to(HANDOFFS)
+    except ValueError as exc:
+        raise ValueError('handoff is outside the configured handoff root') from exc
     prompt = (
         'Read only event.json and parent.json in the supplied handoff. Resume the exact saved role '
         'and return point. Write response/agent-consumed.json with schema_version 1, the exact '
@@ -139,8 +144,8 @@ def invoke(handoff):
     )
     return subprocess.run([
         'timeout', '1800', 'docker', 'exec', '-u', f'{HERMES_UID}:{HERMES_GID}', 'hermes',
-        '/opt/hermes/.venv/bin/hermes', '-p', 'lhm_brain', '-z', prompt,
-        '--attachment', str(handoff).replace('/run/', '/opt/run/'),
+        '/opt/hermes/.venv/bin/hermes', '-p', 'lhm_brain', '--in', str(container_handoff),
+        '-z', prompt,
     ], capture_output=True, text=True)
 
 

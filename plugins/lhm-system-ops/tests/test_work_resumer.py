@@ -132,6 +132,62 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         self.assertEqual(deployment['producer_executable_host'], '/home/hermes/.hermes/profiles/lhm_brain/bin/work-control')
         self.assertEqual(deployment['producer_sha256'], '7814ccfba1670b389764222b6d2bfa108b3bdd30af22f2f4a9b40f4a6d9cc35a')
 
+    def test_live_cli_contract_uses_in_handoff_and_writes_exact_response(self):
+        """A captured live argparse contract exercises the complete subprocess boundary."""
+        handoff = resumer.HANDOFFS / self.event['idempotency_key']
+        with mock.patch.object(resumer.os, 'chown'):
+            handoff = resumer.make_handoff(self.event, self.parent)
+        fixture_bin = Path(self.temp.name) / 'bin'
+        fixture_bin.mkdir()
+        docker = fixture_bin / 'docker'
+        docker.write_text('''#!/usr/bin/env python3
+import argparse, json, os, pathlib, sys
+argv = sys.argv[1:]
+if argv[:2] != ["exec", "-u"] or argv[2] != "10000:10000" or argv[3] != "hermes":
+    raise SystemExit("unexpected docker identity or container")
+cli = argv[4:]
+if not cli or cli.pop(0) != "/opt/hermes/.venv/bin/hermes":
+    raise SystemExit("unexpected Hermes executable")
+parser = argparse.ArgumentParser()
+parser.add_argument("-p", "--profile", required=True)
+parser.add_argument("--in", dest="working_directory", required=True)
+parser.add_argument("-z", "--oneshot", required=True)
+args = parser.parse_args(cli)
+expected = "/opt/run/lhm-work-resumer/" + os.environ["EXPECTED_KEY"]
+if args.profile != "lhm_brain" or args.working_directory != expected:
+    raise SystemExit("wrong Hermes profile or container working directory")
+handoff = pathlib.Path(os.environ["HOST_HANDOFF"])
+os.chdir(handoff)
+event = json.loads(pathlib.Path("event.json").read_text())
+parent = json.loads(pathlib.Path("parent.json").read_text())
+record = {"schema_version": 1, "event_id": event["event_id"],
+          "parent_run_id": parent["parent_run_id"], "parent_sha256": "fixture",
+          "transitioned": True, "next_status": "continued",
+          "evidence": ["captured Hermes CLI fixture"]}
+pathlib.Path("response/agent-consumed.json").write_text(json.dumps(record))
+print(json.dumps({"cwd": str(pathlib.Path.cwd()), "requested_identity": argv[2]}))
+''')
+        docker.chmod(0o755)
+        environment = {
+            **os.environ, 'PATH': f'{fixture_bin}:{os.environ["PATH"]}',
+            'EXPECTED_KEY': self.event['idempotency_key'], 'HOST_HANDOFF': str(handoff),
+        }
+        with mock.patch.dict(resumer.os.environ, environment, clear=True):
+            result = resumer.invoke(handoff)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        observed = json.loads(result.stdout)
+        self.assertEqual(observed, {'cwd': str(handoff), 'requested_identity': '10000:10000'})
+        response = handoff / 'response' / 'agent-consumed.json'
+        self.assertTrue(response.is_file())
+        self.assertEqual(json.loads(response.read_text())['event_id'], self.event['event_id'])
+        release_text = SCRIPT.read_text()
+        self.assertNotIn('attachment', release_text)
+        self.assertIn("'--in', str(container_handoff),\n        '-z', prompt", release_text)
+
+    def test_invoke_rejects_handoff_outside_configured_root(self):
+        with self.assertRaisesRegex(ValueError, 'outside the configured handoff root'):
+            resumer.invoke(Path(self.temp.name) / 'outside')
+
     def test_worker_has_no_unrelated_store_access(self):
         unrelated_paths = [
             resumer.PARENTS / 'UNRELATED.json', resumer.CLAIMS / 'UNRELATED.json',
