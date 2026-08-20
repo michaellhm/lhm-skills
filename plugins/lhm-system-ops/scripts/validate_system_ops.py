@@ -87,7 +87,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.7.2':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.8.1':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -132,6 +132,12 @@ def main():
         'assets/gateways/lhm-evidence-claude-dispatcher',
         'assets/gateways/lhm-evidence-claude-worker',
         'assets/gateways/lhm-evidence-fathom-backend',
+        'assets/gateways/lhm-shared-claude-dispatcher',
+        'assets/gateways/lhm-shared-claude-worker',
+        'assets/systemd/lhm-claude-dispatch.service',
+        'assets/systemd/lhm-brain-gateway-acl.conf',
+        'references/shared-claude-gateway-release.json',
+        'references/shared-claude-gateway-release.md',
     }
     for relative in required_assets:
         if not (PLUGIN / relative).is_file():
