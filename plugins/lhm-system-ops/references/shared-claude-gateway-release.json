@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.8.2",
+  "release_version": "0.8.3",
   "captured_at": "2026-08-20",
   "source": "verified deployed Hermes host inventory",
   "assets": {
