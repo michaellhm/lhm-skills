@@ -56,6 +56,7 @@ def main():
         'assets/systemd/lhm-cto-plugin-dispatch.service',
         'assets/host/lhm-cto-result-resumer',
         'assets/host/lhm-cto-branch-publisher',
+        'assets/host/lhm-asp-sitemap-publisher',
         'assets/systemd/lhm-cto-result-resumer.path',
         'assets/systemd/lhm-cto-result-resumer.service',
         'assets/systemd/lhm-cto-result-resumer.timer',
@@ -106,6 +107,10 @@ def main():
             errors.append(f'branch publisher is missing control: {required}')
     if '--untracked-files=all' not in dispatcher or '--untracked-files=all' not in publisher:
         errors.append('dispatcher and publisher must enumerate individual untracked files')
+    asp_publisher = (PLUGIN / 'assets/host/lhm-asp-sitemap-publisher').read_text(encoding='utf-8')
+    for required in ("REPOSITORY='michaellhm/lhm-prototype'", "BRANCH='main'", "PATH_PREFIX='australian-sports-physio/sitemap/'", 'StrictHostKeyChecking=yes', 'actions/runs?head_sha=', 'PUBLIC_URL'):
+        if required not in asp_publisher:
+            errors.append(f'ASP publisher is missing bounded control: {required}')
     source_service = (PLUGIN / 'assets/systemd/lhm-source-production.service').read_text(encoding='utf-8')
     if '"/home/hermes/.hermes/profiles/lhm_brain/vault/01 Inbox/Hermes Reviews"' not in source_service:
         errors.append('source service must quote the ReadWritePaths folder containing spaces')

@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,6 +49,24 @@ class FailureReasonTests(unittest.TestCase):
             path = Path(temporary) / 'request-004.json'
             with self.assertRaisesRegex(ValueError, 'iteration'):
                 cto_dispatcher.validate(request, path)
+
+    def test_evidence_iterations_use_deterministic_distinct_branches(self):
+        first = {'capability_incident_id': 'ASP-PROTO-PUBLISH-ROUTE-20260820'}
+        second = {**first, 'iteration': 2}
+        self.assertEqual(cto_dispatcher.change_branch(first), 'cto/asp-proto-publish-route-20260820')
+        self.assertEqual(cto_dispatcher.change_branch(second), 'cto/asp-proto-publish-route-20260820-i2')
+
+    def test_existing_exact_workspace_is_reused_without_deletion(self):
+        request = {'request_id': 'request-002', 'capability_incident_id': 'incident-001', 'iteration': 2}
+        with tempfile.TemporaryDirectory() as temporary:
+            cto_dispatcher.WORKSPACES = Path(temporary)
+            workspace = Path(temporary) / 'request-002'
+            workspace.mkdir()
+            completed = mock.Mock(stdout='cto/incident-001-i2\n')
+            with mock.patch.object(cto_dispatcher, 'run_worker', return_value=completed) as worker:
+                branch, selected = cto_dispatcher.prepare_change_workspace(request)
+            self.assertEqual((branch, selected), ('cto/incident-001-i2', workspace))
+            worker.assert_called_once()
 
 
 if __name__ == '__main__':
