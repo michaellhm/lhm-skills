@@ -34,6 +34,20 @@ def atomic(path,value):
         if os.path.exists(tmp): os.unlink(tmp)
 def load(path): return json.loads(path.read_text(encoding='utf-8'))
 
+def capability_restored_event(blocker,event_id,created_at=None):
+    """Producer contract shared with the durable-handoff consumer."""
+    return {'schema_version':1,'event':'capability_restored','event_id':event_id,
+            'capability_incident_id':blocker['capability_incident_id'],'parent_run_id':blocker['parent_run_id'],
+            'saved_role':blocker['saved_role'],'return_point':blocker['return_point'],
+            'created_at':created_at or now()}
+
+def validate_capability_restored(e):
+    required={'schema_version','event','event_id','capability_incident_id','parent_run_id','saved_role','return_point','created_at'}
+    if not isinstance(e,dict) or set(e)!=required or e.get('schema_version')!=1 or e.get('event')!='capability_restored': raise ValueError('invalid capability_restored event')
+    for key in required-{'schema_version'}:
+        if not isinstance(e[key],str) or not e[key]: raise ValueError('invalid capability_restored event')
+    return e
+
 def validate_manifest(m, filename, registry_root=REGISTRY):
     if not isinstance(m,dict) or set(m)!=MANIFEST_FIELDS or m.get('schema_version')!=1: raise ValueError('invalid source manifest schema')
     if not SAFE.fullmatch(m.get('run_id','')) or filename != m['run_id']+'.json' or not SAFE.fullmatch(m.get('parent_run_id','')): raise ValueError('invalid run identity')
@@ -97,8 +111,7 @@ def process(path,runner=subprocess.run,registry_root=REGISTRY):
     shutil.move(path,PROCESSED/path.name); return 'delivered'
 
 def consume_restored(path,runner=subprocess.run):
-    e=load(path); required={'schema_version','event','event_id','capability_incident_id','parent_run_id','saved_role','return_point','created_at'}
-    if set(e)!=required or e['schema_version']!=1 or e['event']!='capability_restored': raise ValueError('invalid capability_restored event')
+    e=validate_capability_restored(load(path))
     marker=BASE/'consumed'/digest_text(e['event_id'])
     if marker.exists(): return 'duplicate'
     matches=[]

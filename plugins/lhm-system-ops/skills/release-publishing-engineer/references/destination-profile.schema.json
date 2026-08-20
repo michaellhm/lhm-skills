@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lhm.local/schemas/destination-profile-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "profile_id", "enabled", "destination_kind", "repository", "site_identity", "branch", "allowed_operations", "allowed_path_patterns", "allowed_resources", "credential_reference", "required_qa_checks", "authority", "rollback", "handoff", "prohibitions"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "profile_id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-v[0-9]+$"},
+    "enabled": {"type": "boolean"},
+    "destination_kind": {"enum": ["prototype_git", "lhm_astro", "client_astro", "wordpress_rest_content", "wordpress_code", "hosting_route"]},
+    "repository": {"type": ["string", "null"]},
+    "site_identity": {"type": "string", "minLength": 1},
+    "branch": {"type": ["string", "null"]},
+    "allowed_operations": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "allowed_path_patterns": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "allowed_resources": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "credential_reference": {"type": ["string", "null"], "pattern": "^[A-Z][A-Z0-9_-]+$"},
+    "required_qa_checks": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "authority": {"type": ["string", "null"]},
+    "rollback": {"type": "object", "additionalProperties": false, "required": ["mode", "requires_separate_authority"], "properties": {"mode": {"type": "string"}, "requires_separate_authority": {"const": true}}},
+    "handoff": {"type": "object", "additionalProperties": false, "required": ["independent_qa", "canonical_client_state", "basicops_native_review", "client_contact"], "properties": {"independent_qa": {"const": true}, "canonical_client_state": {"const": true}, "basicops_native_review": {"const": true}, "client_contact": {"const": false}}},
+    "prohibitions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}}
+  }
+}

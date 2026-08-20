@@ -1,5 +1,8 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
+  "destination_profile_id": "prototype-main-v1",
+  "operation": "publish_sitemap",
+  "credential_reference": "LHM_PROTOTYPE_MAIN_DEPLOY_KEY",
   "request_id": "asp-sitemap-v2-publish-20260820",
   "source_basicops_task": "2191545",
   "governed_parent": "ASP-SITEMAP-V2-PUBLISH-20260820",

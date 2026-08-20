@@ -16,7 +16,7 @@ class PrototypePublisherTests(unittest.TestCase):
             path=root/client/kind/relative; path.parent.mkdir(parents=True,exist_ok=True); path.write_bytes(data)
             manifest.append({'path':f'{client}/{kind}/{relative}','sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)})
         manifest.sort(key=lambda x:x['path']); request_id=root.name
-        value={'schema_version':2,'request_id':request_id,'source_basicops_task':'task-123','governed_parent':'parent-123','client_slug':client,'project_slug':kind,'prototype_kind':kind,'repository':publisher.REPOSITORY,'branch':'main','expected_base_commit':'a'*40,'source_directory':str(root),'source_package_sha256':publisher.package_digest(manifest),'file_manifest':manifest,'qa_evidence_reference':'qa-123','idempotency_key':request_id,'standing_authority_reference':'authority-prototype-2026','commit_message':f'prototype: {client}/{kind} approved static package'}
+        value={'schema_version':3,'request_id':request_id,'source_basicops_task':'task-123','governed_parent':'parent-123','destination_profile_id':publisher.PROFILE_ID,'operation':'publish_'+kind,'credential_reference':publisher.CREDENTIAL_REFERENCE,'client_slug':client,'project_slug':kind,'prototype_kind':kind,'repository':publisher.REPOSITORY,'branch':'main','expected_base_commit':'a'*40,'source_directory':str(root),'source_package_sha256':publisher.package_digest(manifest),'file_manifest':manifest,'qa_evidence_reference':'qa-123','idempotency_key':request_id,'standing_authority_reference':publisher.STANDING_AUTHORITY,'commit_message':f'prototype: {client}/{kind} approved static package'}
         value.update(updates); return value
 
     def test_two_clients_and_both_prototype_kinds_with_static_assets(self):
@@ -88,7 +88,7 @@ class PrototypePublisherTests(unittest.TestCase):
     def test_moved_main_fails_before_reset_or_push(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary)/'source'; root.mkdir(); request=self.request(root)
-            with mock.patch.object(publisher,'ssh_env',return_value={}), mock.patch.object(publisher,'git',side_effect=['','b'*40]) as git:
+            with mock.patch.object(publisher,'ssh_env',return_value={}), mock.patch.object(publisher,'preflight_post_publish_dependencies'), mock.patch.object(publisher,'git',side_effect=['','b'*40]) as git:
                 with self.assertRaisesRegex(ValueError,'main moved'): publisher.publish(request)
                 self.assertEqual(git.call_count,2)
 
@@ -100,6 +100,7 @@ class PrototypePublisherTests(unittest.TestCase):
             status='\0'.join(f'?? {path}' for path in paths)+'\0'
             git_results=['',request['expected_base_commit'],'','',status,'','', 'b'*40, '']
             with mock.patch.object(publisher,'ssh_env',return_value={}), \
+                 mock.patch.object(publisher,'preflight_post_publish_dependencies'), \
                  mock.patch.object(publisher,'git',side_effect=git_results) as git, \
                  mock.patch.object(publisher,'run',return_value=f"{'b'*40}\trefs/heads/main"), \
                  mock.patch.object(publisher,'verify_deploy',return_value={'id':7}), \
@@ -141,10 +142,10 @@ class PrototypePublisherTests(unittest.TestCase):
 
     def test_exact_named_actions_and_bounded_http_are_success_gates(self):
         completed={'workflow_runs':[{'id':7,'name':'Deploy to lhmstaging','path':'.github/workflows/deploy.yml','head_sha':'a'*40,'status':'completed','conclusion':'success'}]}
-        with mock.patch.object(publisher,'run',return_value=json.dumps(completed)):
+        with mock.patch.object(publisher,'github_cli',return_value='/available/gh'), mock.patch.object(publisher,'run',return_value=json.dumps(completed)):
             self.assertEqual(publisher.verify_deploy('a'*40)['id'],7)
         wrong={'workflow_runs':[{'id':8,'name':'Other','head_sha':'a'*40,'status':'completed','conclusion':'success'}]}
-        with mock.patch.object(publisher,'run',return_value=json.dumps(wrong)), mock.patch.object(publisher.time,'sleep'):
+        with mock.patch.object(publisher,'github_cli',return_value='/available/gh'), mock.patch.object(publisher,'run',return_value=json.dumps(wrong)), mock.patch.object(publisher.time,'sleep'):
             with self.assertRaisesRegex(ValueError,'not observed'): publisher.verify_deploy('a'*40)
 
     def test_public_readback_requires_exact_index_bytes_and_hash(self):
@@ -159,5 +160,40 @@ class PrototypePublisherTests(unittest.TestCase):
             response.read.return_value=b'changed'
             with mock.patch.object(publisher.urllib.request,'urlopen',return_value=response):
                 with self.assertRaisesRegex(ValueError,'does not match'): publisher.verify_public_url(request,'a'*40)
+
+    def test_profile_operation_credential_authority_and_launch_negatives(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)/'source'; root.mkdir(); good=self.request(root)
+            cases=[
+                ({'destination_profile_id':'hosting-route-v1'},'profile'),
+                ({'operation':'production_launch'},'operation'),
+                ({'credential_reference':'UNIVERSAL_GITHUB_TOKEN'},'credential'),
+                ({'standing_authority_reference':'UNRELATED_AUTHORITY'},'authority'),
+            ]
+            for update,message in cases:
+                with self.subTest(update=update), self.assertRaisesRegex(ValueError,message): publisher.validate({**good,**update})
+
+    def test_preflight_requires_post_publish_cli_before_mutation(self):
+        with mock.patch.object(publisher.shutil,'which',side_effect=lambda name: None if name=='gh' else '/bin/'+name):
+            with self.assertRaisesRegex(ValueError,'GitHub CLI'): publisher.preflight_post_publish_dependencies()
+
+    def test_interrupted_exact_push_resumes_verification_and_one_receipt_without_commit(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            base=Path(temporary); root=base/'incoming'/'source'; root.mkdir(parents=True)
+            request=self.request(root); publisher.STATE_ROOT=base/'receipts'; publisher.CHECKOUT=base/'checkout'; publisher.CHECKOUT.mkdir()
+            publisher.STATE_ROOT.mkdir(); commit='b'*40
+            publisher.pending_path(request['idempotency_key']).write_text(json.dumps({'request_digest':publisher.request_digest(request),'commit':commit,'base_commit':request['expected_base_commit']}))
+            with mock.patch.object(publisher,'ssh_env',return_value={}), mock.patch.object(publisher,'preflight_post_publish_dependencies'), \
+                 mock.patch.object(publisher,'git',side_effect=['',commit]) as git, \
+                 mock.patch.object(publisher,'verify_deploy',return_value={'id':7}), \
+                 mock.patch.object(publisher,'verify_public_url',return_value={'url':'https://example.test','status':200,'bytes':1,'sha256':'0'*64,'commit':commit}):
+                first=publisher.publish(request); second=publisher.publish(request)
+            self.assertEqual(first,second)
+            self.assertEqual(len(list(publisher.STATE_ROOT.glob('source.json'))),1)
+            self.assertFalse(publisher.pending_path(request['idempotency_key']).exists())
+            self.assertFalse(any(call.args and call.args[0] in {'commit','push'} for call in git.call_args_list))
+            self.assertFalse(first['review_handoff']['complete'])
+            self.assertTrue(first['review_handoff']['human_task_open'])
+            self.assertFalse(first['review_handoff']['client_contact'])
 
 if __name__=='__main__': unittest.main()
