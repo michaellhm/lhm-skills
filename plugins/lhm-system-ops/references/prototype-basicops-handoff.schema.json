@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "event", "event_id", "source_task_id", "source_task_url", "parent_run_id", "publication_request_id", "prototype_url", "prototype_commit", "package_manifest_sha256", "qa_reference", "workflow_state", "reviewer", "next_handoff", "created_at"],
+  "properties": {
+    "schema_version": {"const": 1}, "event": {"const": "prototype_regression_verified"},
+    "event_id": {"type": "string"}, "source_task_id": {"const": "2191545"},
+    "source_task_url": {"const": "https://app.basicops.com/481630853364967730?l=_805_31C_1AZ09FC34BD"},
+    "parent_run_id": {"const": "ASP-SITEMAP-V2-PUBLISH-20260820"},
+    "publication_request_id": {"type": "string"}, "prototype_url": {"type": "string", "format": "uri"},
+    "prototype_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "package_manifest_sha256": {"const": "b52a6de06e5e30a20b24e8e5b5a3c8c1703ffef04c93df2dde4d3026305f5115"},
+    "qa_reference": {"const": "claude-producer-20260819-94/final.json"},
+    "workflow_state": {"const": "Under Review"}, "reviewer": {"const": "Michael"},
+    "next_handoff": {"const": "Kristalyn for David"}, "created_at": {"type": "string"}
+  }
+}

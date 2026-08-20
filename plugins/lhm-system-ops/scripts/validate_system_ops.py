@@ -32,7 +32,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.5.0':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.6.0':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -57,6 +57,7 @@ def main():
         'assets/host/lhm-cto-result-resumer',
         'assets/host/lhm-cto-branch-publisher',
         'assets/host/lhm-asp-sitemap-publisher',
+        'assets/host/lhm-prototype-publisher',
         'assets/systemd/lhm-cto-result-resumer.path',
         'assets/systemd/lhm-cto-result-resumer.service',
         'assets/systemd/lhm-cto-result-resumer.timer',
@@ -107,10 +108,14 @@ def main():
             errors.append(f'branch publisher is missing control: {required}')
     if '--untracked-files=all' not in dispatcher or '--untracked-files=all' not in publisher:
         errors.append('dispatcher and publisher must enumerate individual untracked files')
-    asp_publisher = (PLUGIN / 'assets/host/lhm-asp-sitemap-publisher').read_text(encoding='utf-8')
-    for required in ("REPOSITORY='michaellhm/lhm-prototype'", "BRANCH='main'", "PATH_PREFIX='australian-sports-physio/sitemap/'", 'StrictHostKeyChecking=yes', 'actions/runs?head_sha=', 'PUBLIC_URL'):
-        if required not in asp_publisher:
-            errors.append(f'ASP publisher is missing bounded control: {required}')
+    prototype_publisher = (PLUGIN / 'assets/host/lhm-prototype-publisher').read_text(encoding='utf-8')
+    for required in ("REPOSITORY='michaellhm/lhm-prototype'", "BRANCH='main'", "SOURCE_ROOT=Path('/var/lib/lhm-prototype-publication/incoming')", "SSH_KEY=Path('/etc/lhm-prototype-publisher/id_ed25519')", 'StrictHostKeyChecking=yes', 'actions/workflows/{WORKFLOW["id"]}/runs?', 'package_manifest_sha256'):
+        if required not in prototype_publisher:
+            errors.append(f'prototype publisher is missing bounded control: {required}')
+    for name in ('prototype-publication.request.schema.json','prototype-publication.result.schema.json','prototype-basicops-handoff.schema.json','capability-restored.schema.json'):
+        schema = json.loads((PLUGIN / 'references' / name).read_text(encoding='utf-8'))
+        if schema.get('additionalProperties') is not False:
+            errors.append(f'{name}: schema must fail closed')
     source_service = (PLUGIN / 'assets/systemd/lhm-source-production.service').read_text(encoding='utf-8')
     if '"/home/hermes/.hermes/profiles/lhm_brain/vault/01 Inbox/Hermes Reviews"' not in source_service:
         errors.append('source service must quote the ReadWritePaths folder containing spaces')
