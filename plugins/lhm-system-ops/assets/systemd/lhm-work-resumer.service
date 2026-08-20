@@ -1,0 +1,16 @@
+[Unit]
+Description=Resume LHM work-control parents through a bounded Hermes handoff
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/lhm-work-resumer
+User=root
+Group=root
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control /run/lhm-work-resumer

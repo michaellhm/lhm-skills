@@ -33,7 +33,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.7.1':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.7.2':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -57,6 +57,8 @@ def main():
         'assets/systemd/lhm-cto-plugin-dispatch.service',
         'assets/host/lhm-cto-result-resumer',
         'assets/host/lhm-work-resumer',
+        'assets/systemd/lhm-work-resumer.path',
+        'assets/systemd/lhm-work-resumer.service',
         'assets/host/lhm-cto-branch-publisher',
         'assets/host/lhm-asp-sitemap-publisher',
         'assets/host/lhm-prototype-publisher',
@@ -104,6 +106,16 @@ def main():
     callback = (PLUGIN / 'assets/host/lhm-cto-result-resumer').read_text(encoding='utf-8')
     if 'max_iterations' not in callback or 'questions_for_chief' not in callback:
         errors.append('CTO result resumer is missing the bounded evidence-loop contract')
+    work_contract = json.loads((PLUGIN / 'references/work-control-deployment.json').read_text(encoding='utf-8'))
+    work_resumer = (PLUGIN / 'assets/host/lhm-work-resumer').read_text(encoding='utf-8')
+    work_path = (PLUGIN / 'assets/systemd/lhm-work-resumer.path').read_text(encoding='utf-8')
+    host_store = work_contract.get('store_host')
+    if not host_store or f"BASE = Path('{host_store}')" not in work_resumer:
+        errors.append('work resumer BASE does not match the authoritative host store')
+    if f"PathExistsGlob={work_contract.get('watch_glob_host')}" not in work_path:
+        errors.append('work resumer path unit does not watch the authoritative host store')
+    if '/var/lib/lhm-work-control' in work_resumer or '/var/lib/lhm-work-control' in work_path:
+        errors.append('work resumer release contains the empty alternate store')
     publisher = (PLUGIN / 'assets/host/lhm-cto-branch-publisher').read_text(encoding='utf-8')
     for required in ('refs/heads/{branch}', 'StrictHostKeyChecking=yes', "branch publisher credential is not configured", "'Hermes Reviews'"):
         if required not in publisher:

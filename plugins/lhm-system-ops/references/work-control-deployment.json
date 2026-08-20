@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "producer_executable_container": "/opt/data/profiles/lhm_brain/bin/work-control",
+  "producer_store_container": "/opt/data/profiles/lhm_brain/dispatch/work-control",
+  "store_host": "/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control",
+  "resumer_executable_host": "/usr/local/libexec/lhm-work-resumer",
+  "watch_glob_host": "/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control/events/*.json",
+  "handoff_host": "/run/lhm-work-resumer",
+  "handoff_container": "/opt/run/lhm-work-resumer"
+}

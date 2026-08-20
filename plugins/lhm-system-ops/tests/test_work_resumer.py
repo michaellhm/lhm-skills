@@ -14,9 +14,14 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / 'assets/host/lhm-work-resumer'
+DEPLOYMENT = ROOT / 'references/work-control-deployment.json'
+PATH_UNIT = ROOT / 'assets/systemd/lhm-work-resumer.path'
+SERVICE_UNIT = ROOT / 'assets/systemd/lhm-work-resumer.service'
 spec = importlib.util.spec_from_loader('work_resumer', SourceFileLoader('work_resumer', str(SCRIPT)))
 resumer = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(resumer)
+INSTALLED_BASE = resumer.BASE
+INSTALLED_INCOMING = resumer.INCOMING
 PRODUCER_SCRIPT = ROOT / 'assets/host/lhm-source-production-runtime'
 producer_spec = importlib.util.spec_from_loader('source_producer', SourceFileLoader('source_producer', str(PRODUCER_SCRIPT)))
 source_producer = importlib.util.module_from_spec(producer_spec)
@@ -24,6 +29,28 @@ producer_spec.loader.exec_module(source_producer)
 
 
 class WorkResumerIntegrationTests(unittest.TestCase):
+    def test_installed_producer_watcher_consumer_and_bind_mapping_are_one_store(self):
+        deployment = json.loads(DEPLOYMENT.read_text())
+        path_unit = PATH_UNIT.read_text()
+        service_unit = SERVICE_UNIT.read_text()
+        container_profile = '/opt/data/profiles/lhm_brain'
+        host_profile = '/home/hermes/.hermes/profiles/lhm_brain'
+
+        self.assertEqual(deployment['producer_executable_container'],
+                         f'{container_profile}/bin/work-control')
+        self.assertEqual(deployment['producer_store_container'],
+                         f'{container_profile}/dispatch/work-control')
+        self.assertEqual(deployment['store_host'],
+                         deployment['producer_store_container'].replace(container_profile, host_profile, 1))
+        self.assertEqual(INSTALLED_BASE, Path(deployment['store_host']))
+        self.assertEqual(INSTALLED_INCOMING, Path(deployment['store_host']) / 'events')
+        self.assertEqual(deployment['watch_glob_host'], str(INSTALLED_INCOMING / '*.json'))
+        self.assertIn(f"PathExistsGlob={deployment['watch_glob_host']}", path_unit)
+        self.assertIn(f"ReadWritePaths={deployment['store_host']} {deployment['handoff_host']}", service_unit)
+        self.assertEqual(deployment['handoff_host'], '/run/lhm-work-resumer')
+        self.assertEqual(deployment['handoff_container'], '/opt/run/lhm-work-resumer')
+        self.assertNotIn('/var/lib/lhm-work-control', SCRIPT.read_text() + path_unit + service_unit)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         base = Path(self.temp.name)
@@ -164,6 +191,28 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         audit = json.loads((resumer.RECONCILIATIONS / f'{key}.json').read_text())
         self.assertEqual(audit['action'], 'requeued')
         self.assertTrue((resumer.INCOMING / processed.name).is_file())
+
+    def test_legacy_false_marker_processed_event_and_waiting_parent_transition_once(self):
+        processed = resumer.PROCESSED / self.event_path.name
+        os.replace(self.event_path, processed)
+        key = hashlib.sha256(self.event['event_id'].encode()).hexdigest()
+        marker = resumer.CONSUMED / f'{key}.json'
+        marker.write_text(json.dumps({'event_id': self.event['event_id'], 'legacy': True}))
+
+        self.assertEqual(resumer.reconcile_false_marker(marker, processed), 'requeued')
+        calls = []
+        runner = self.runner(self.record())
+        def counted(handoff):
+            calls.append(self.event['event_id'])
+            return runner(handoff)
+        with mock.patch.object(resumer.os, 'chown'):
+            self.assertEqual(resumer.process(resumer.INCOMING / processed.name, counted), 'consumed')
+        self.assertEqual(calls, [self.event['event_id']])
+        self.assertEqual(json.loads(self.parent_path.read_text())['status'], 'continued')
+        replay = resumer.INCOMING / 'legacy-replay.json'
+        replay.write_text(json.dumps(self.event))
+        self.assertEqual(resumer.process(replay, lambda *_: calls.append('unexpected')), 'duplicate')
+        self.assertEqual(calls, [self.event['event_id']])
 
     def test_completed_event_is_idempotent_without_second_agent_invocation(self):
         with mock.patch.object(resumer.os, 'chown'):
