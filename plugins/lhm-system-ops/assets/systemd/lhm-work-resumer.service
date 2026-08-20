@@ -13,4 +13,4 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control /run/lhm-work-resumer
+ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/work-control

@@ -4,8 +4,9 @@ Incident: `work-resumer-hermes-invocation-20260820`
 
 ## Capability Researcher pass
 
-The repository's native deployment contract maps the host handoff root
-`/run/lhm-work-resumer` to `/opt/run/lhm-work-resumer` in Hermes. The captured live CLI contract
+The corrected native deployment contract uses the proven `/home/hermes/.hermes` to `/opt/data`
+bind: the host handoff root is `profiles/lhm_brain/dispatch/work-control/handoffs` beneath that
+mount and maps to the same relative path beneath `/opt/data`. The captured live CLI contract
 supports the global `--in DIR` option and `-z/--oneshot`; the prior unsupported option is not part
 of that contract. No third-party capability is required.
 
@@ -13,7 +14,7 @@ of that contract. No third-party capability is required.
 
 The release asset now derives the container handoff from the configured host handoff root, rejects
 paths outside that root, and invokes Hermes as `-p lhm_brain --in
-/opt/run/lhm-work-resumer/<idempotency_key> -z <prompt>`. Docker continues to request uid/gid
+/opt/data/profiles/lhm_brain/dispatch/work-control/handoffs/<idempotency_key> -z <prompt>`. Docker continues to request uid/gid
 `10000:10000`. No schema, state transition, store, reconciliation, permission, or systemd wiring was
 changed.
 

@@ -59,8 +59,8 @@ attempt, and contains no credential path. Event, parent, response and transition
 digest-bound. Parent writes and success markers remain privileged, atomic and ordered. False
 markers are preserved as audit evidence, not deleted or trusted as proof.
 
-Residual deployment risk: the bounded installer must map `/run/lhm-work-resumer` into the Hermes
-container at `/opt/run/lhm-work-resumer`, install the executable root-owned, and attest uid/gid
+Residual deployment requirement: the bounded installer must retain the proven `/home/hermes/.hermes`
+to `/opt/data` bind, install the executable root-owned, and attest uid/gid
 10000 before the live regression. Michael's approval is required for merge and installation.
 
 ## 5. Plugin Release Manager — bounded publication handoff only

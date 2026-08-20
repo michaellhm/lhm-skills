@@ -52,6 +52,19 @@ def validate_work_control_parity(contract, work_resumer, work_path):
         errors.append('deployment watch glob does not match the producer restore path literal')
     if f'PathExistsGlob={expected_glob}' not in work_path:
         errors.append('work resumer path unit does not watch the producer restore path literal')
+    handoff_host = contract.get('handoff_host')
+    handoff_container = contract.get('handoff_container')
+    expected_handoff_host = f'{host_store}/handoffs'
+    container_store = contract.get('producer_store_container')
+    expected_handoff_container = f'{container_store}/handoffs'
+    if handoff_host != expected_handoff_host:
+        errors.append('deployment handoff host is not inside the authoritative host store')
+    if handoff_container != expected_handoff_container:
+        errors.append('deployment handoff container path does not use the authoritative /opt/data bind')
+    if "HANDOFFS = BASE / 'handoffs'" not in work_resumer:
+        errors.append('work resumer handoff root is not derived from the authoritative host store')
+    if f"HERMES_HANDOFFS = Path('{expected_handoff_container}')" not in work_resumer:
+        errors.append('work resumer container handoff root does not match deployment')
     return errors
 
 
@@ -150,7 +163,12 @@ def main():
     work_contract = json.loads((PLUGIN / 'references/work-control-deployment.json').read_text(encoding='utf-8'))
     work_resumer = (PLUGIN / 'assets/host/lhm-work-resumer').read_text(encoding='utf-8')
     work_path = (PLUGIN / 'assets/systemd/lhm-work-resumer.path').read_text(encoding='utf-8')
+    work_service = (PLUGIN / 'assets/systemd/lhm-work-resumer.service').read_text(encoding='utf-8')
     errors.extend(validate_work_control_parity(work_contract, work_resumer, work_path))
+    if f"ReadWritePaths={work_contract['store_host']}" not in work_service:
+        errors.append('work resumer service is missing its authoritative store write boundary')
+    if '/opt/run' in work_resumer or '/opt/run' in json.dumps(work_contract) or '/opt/run' in work_service:
+        errors.append('work resumer release contains an unsupported /opt/run mount assumption')
     if '/var/lib/lhm-work-control' in work_resumer or '/var/lib/lhm-work-control' in work_path:
         errors.append('work resumer release contains the empty alternate store')
     publisher = (PLUGIN / 'assets/host/lhm-cto-branch-publisher').read_text(encoding='utf-8')
