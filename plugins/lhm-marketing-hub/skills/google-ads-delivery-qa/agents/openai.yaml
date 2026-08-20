@@ -1,0 +1,4 @@
+interface:
+  display_name: "Google Ads Delivery QA"
+  short_description: "Verify Google Ads action evidence and handbacks"
+  default_prompt: "Use $google-ads-delivery-qa to verify this completed Google Ads action before the Lead advances."

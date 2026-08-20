@@ -5,7 +5,9 @@ description: The review, approval, dispatch and resumable handback contract shar
 
 # Google Ads Monthly Operating Model
 
-Hermes is the control tower. A specialist worker gathers evidence and performs approved work. Obsidian is canonical context and workflow memory; Google Drive holds the human-readable report; BasicOps exposes the review and action queue.
+Hermes is the control tower. The `google-ads` agent is the departmental Lead. Bounded workers execute specialist skills, Google Ads Delivery QA checks every returned action, Head of Production accepts the completed dossier, and Learning Steward routes verified learning. Obsidian is canonical context and workflow memory; Google Drive holds the human-readable report; BasicOps exposes the review and action queue.
+
+Read `references/google-ads-departmental-delivery.md` before approved execution. This monthly model decides what matters; the departmental contract governs how approved work is prepared, checked, accepted and learned from.
 
 ## Review sequence
 
@@ -18,8 +20,8 @@ Run these stages in order:
 5. **Hermes overview** — Hermes presents the compact state summary, headline findings, performance zone, measurement confidence and no more than five proposed actions. Each action names the evidence, expected outcome, specialist skill and whether a live mutation would require a further approval.
 6. **BasicOps review record** — the delivery worker creates or updates one parent monthly-review task. Keep only the governed metadata line and useful URLs in its description. Put the overview, top five and approval question in the discussion. Do not create execution subtasks before approval. Set the workflow state to waiting for Michael through Hermes.
 7. **Approval gate** — stop. Michael may approve, modify, defer or reject any subset through Hermes. A report save, BasicOps write or recommendation is never approval for a Google Ads mutation.
-8. **Sequential dispatch** — after approval, Hermes dispatches exactly one approved action to its specialist skill. Do not start the next action until the current worker has returned evidence and Hermes has recorded its outcome. Every live mutation observes the owning skill's approval gate.
-9. **Completion loop** — after each action, Hermes updates the canonical Obsidian service file and the BasicOps parent discussion (and approved subtask, if one was created), then either dispatches the next approved action or returns to a waiting state.
+8. **Sequential dispatch** — after approval, the Google Ads Lead dispatches exactly one approved action using the departmental action packet. Do not start the next action until the worker has returned evidence, Google Ads Delivery QA has passed it, and the Lead has recorded the outcome. Every live mutation observes the owning skill's approval gate.
+9. **Completion loop** — after each QA-passed action, update the canonical Obsidian service file and BasicOps parent/action before selecting the next. When all actions are terminal, return the completion dossier to Head of Production for acceptance and then send the accepted evidence to Learning Steward. Chief of Staff is not a routine completion stop.
 
 ## Delivery ownership and completion gate
 
@@ -95,3 +97,5 @@ google_ads_monthly_handback:
 ```
 
 After an action completes, return its before/after values, tool evidence, Drive artefact if applicable, mutations performed, and verification result. Never mark an action complete from an instruction alone.
+
+The action handback is not accepted until `google-ads-delivery-qa` returns `pass`. A prepared implementation file may pass artefact QA while execution remains `waiting_approval` or `waiting_on_michael`; only observed live readback or explicit manual confirmation plus the defined verification closes the action.

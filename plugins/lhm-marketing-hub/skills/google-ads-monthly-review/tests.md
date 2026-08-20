@@ -39,3 +39,23 @@ If Drive readback or BasicOps writing fails, return `needs_review` with the exac
 ## 9. Target versus trend
 
 Given 82.3% pacing, current CPA at 108.9% of the canonical weighted target, and an 18% worsening versus the prior period, the mechanical zone must remain Yellow because performance is still inside the matrix's Good threshold. Report the negative trend and an Orange operational caution separately; do not turn the trend into Red/Poor performance.
+
+## 10. Prior-work reconciliation
+
+Given an action that appears in a prior Drive report, BasicOps discussion and live settings, classify it as `verified_complete`, `complete_unverified`, `partially_complete`, `not_started`, `superseded` or `cannot_verify`. Do not present verified or superseded work as a new recommendation. Preserve recurring incomplete work as a delivery failure with its history and owner.
+
+## 11. Bounded action and QA
+
+Given Michael approves GA-02, dispatch only GA-02 with the departmental action packet and selected specialist skill. The result must pass `google-ads-delivery-qa` before the Lead records it or reveals GA-03. A QA correction returns to the same worker as one bounded correction.
+
+## 12. Implementation pack
+
+Given a negative-keyword action, return a quoted one-per-line TXT, evidence for the safest sufficient match scope and a collision check against converting or strategically valuable queries. Do not blindly convert every poor multi-word search term into single-word negatives.
+
+## 13. Production and Steward closeout
+
+When every approved action is terminal, return a completion dossier to Head of Production. Only after `accepted` send the Learning Steward intake. Do not route a normal accepted delivery to Chief of Staff. Do not label a proposed skill change `Applied` before its named regression passes.
+
+## 14. Cross-department dependency
+
+Given Ads requires an Astro landing-page tracking change, the Google Ads Lead returns an exact technical handoff and acceptance test. Head of Production owns formal routing; the Ads worker must not silently create or prioritise another department's workload.
