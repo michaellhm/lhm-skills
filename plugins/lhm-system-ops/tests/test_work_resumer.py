@@ -187,7 +187,8 @@ captured = [expected_event, expected_parent, expected_response]
 event = json.loads((handoff / pathlib.Path(expected_event).relative_to(expected)).read_text())
 parent = json.loads((handoff / pathlib.Path(expected_parent).relative_to(expected)).read_text())
 record = {"schema_version": 1, "event_id": event["event_id"],
-          "parent_run_id": parent["parent_run_id"], "parent_sha256": "fixture",
+          "parent_run_id": parent["parent_run_id"],
+          "parent_sha256": os.environ["EXPECTED_PARENT_SHA256"],
           "transitioned": True, "next_status": "continued",
           "evidence": ["captured Hermes CLI fixture"]}
 (handoff / pathlib.Path(expected_response).relative_to(expected)).write_text(json.dumps(record))
@@ -199,6 +200,7 @@ print(json.dumps({"cwd": str(pathlib.Path.cwd()), "requested_identity": argv[2],
             **os.environ, 'PATH': f'{fixture_bin}:{os.environ["PATH"]}',
             'EXPECTED_KEY': self.event['idempotency_key'], 'HOST_HANDOFF': str(handoff),
             'HOST_CANONICAL_SIBLING': str(canonical_sibling),
+            'EXPECTED_PARENT_SHA256': resumer.digest(self.parent),
         }
         with mock.patch.dict(resumer.os.environ, environment, clear=True):
             result = resumer.invoke(handoff)
@@ -216,10 +218,45 @@ print(json.dumps({"cwd": str(pathlib.Path.cwd()), "requested_identity": argv[2],
         response = handoff / 'response' / 'agent-consumed.json'
         self.assertTrue(response.is_file())
         self.assertEqual(json.loads(response.read_text())['event_id'], self.event['event_id'])
+        self.assertEqual(json.loads(response.read_text())['parent_sha256'], resumer.digest(self.parent))
         release_text = SCRIPT.read_text()
         self.assertNotIn('attachment', release_text)
         self.assertNotIn('supplied handoff', release_text)
         self.assertIn("'--in', str(container_handoff),\n        '-z', prompt", release_text)
+
+    def test_prompt_and_validator_share_exact_seven_field_contract_and_digest(self):
+        handoff = resumer.HANDOFFS / self.event['idempotency_key']
+        with mock.patch.object(resumer.os, 'chown'):
+            handoff = resumer.make_handoff(self.event, self.parent)
+        captured = {}
+        def run(argv, **kwargs):
+            captured['prompt'] = argv[-1]
+            return SimpleNamespace(returncode=0, stdout='', stderr='')
+        with mock.patch.object(resumer.subprocess, 'run', run):
+            resumer.invoke(handoff)
+        fields = ', '.join(resumer.AGENT_RESPONSE_FIELDS)
+        self.assertEqual(set(resumer.AGENT_RESPONSE_FIELDS), {
+            'schema_version', 'event_id', 'parent_run_id', 'parent_sha256',
+            'transitioned', 'next_status', 'evidence',
+        })
+        self.assertIn(f'exactly these seven fields: {fields}', captured['prompt'])
+        self.assertIn(f'parent_sha256 to exactly {resumer.digest(self.parent)}', captured['prompt'])
+
+    def test_wrong_parent_digest_is_rejected_and_privately_preserved_before_cleanup(self):
+        wrong = self.record()
+        wrong['parent_sha256'] = '0' * 64
+        key = self.event['idempotency_key']
+        with mock.patch.object(resumer.os, 'chown'):
+            self.assertEqual(resumer.process(self.event_path, self.runner(wrong)), 'failed')
+        audits = list(resumer.FAILED.glob('*.error.json'))
+        self.assertEqual(len(audits), 1)
+        audit = json.loads(audits[0].read_text())
+        raw = json.dumps(wrong).encode()
+        self.assertEqual(audit['agent_response']['sha256'], hashlib.sha256(raw).hexdigest())
+        self.assertEqual(json.loads(audit['agent_response']['content']), wrong)
+        self.assertEqual(stat.S_IMODE(audits[0].stat().st_mode), 0o600)
+        self.assertFalse((resumer.HANDOFFS / key).exists())
+        self.assertEqual(json.loads(self.parent_path.read_text()), self.parent)
 
     def test_invoke_rejects_handoff_outside_configured_root(self):
         with self.assertRaisesRegex(ValueError, 'outside the configured handoff root'):
@@ -269,6 +306,8 @@ print(json.dumps({"cwd": str(pathlib.Path.cwd()), "requested_identity": argv[2],
         self.assertEqual(json.loads(self.parent_path.read_text()), self.parent)
         self.assertEqual(list(resumer.CONSUMED.iterdir()), [])
         self.assertEqual(list(resumer.AGENT_CONSUMED.iterdir()), [])
+        audit = json.loads(next(resumer.FAILED.glob('*.error.json')).read_text())
+        self.assertEqual(audit['agent_response'], {'present': False})
 
     def test_partial_handoff_creation_failure_is_cleaned_up(self):
         key = self.event['idempotency_key']
