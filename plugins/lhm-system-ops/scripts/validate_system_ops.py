@@ -87,7 +87,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.8.1':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.8.2':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -139,6 +139,7 @@ def main():
         'assets/systemd/lhm-brain-gateway-acl.conf',
         'references/shared-claude-gateway-release.json',
         'references/shared-claude-gateway-release.md',
+        'references/google-ads-evidence-pack.md',
     }
     for relative in required_assets:
         if not (PLUGIN / relative).is_file():
