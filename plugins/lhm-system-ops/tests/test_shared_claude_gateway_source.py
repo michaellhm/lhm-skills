@@ -18,7 +18,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.8.1"
+    assert MANIFEST["release_version"] == "0.8.3"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -48,6 +48,10 @@ def test_dispatcher_contains_current_bounded_worker_contract():
     assert "Path('/home/hermes/.hermes/profiles/lhm_brain')," in text
     assert "'u:claudeworker:rwx', str(run_dir)" in text
     assert "setfacl', '-R'" not in text
+    assert "def load_google_ads_evidence(client):" in text
+    assert "expected_prefix = f'20 Clients/{client[\"name\"]}/'" in text
+    assert "registered evidence pack exceeds total limit" in text
+    assert "prompt['evidence_pack'] = load_google_ads_evidence(client)" in text
 
 
 def test_worker_persists_terminal_artifacts_inside_supplied_run_directory():
@@ -56,6 +60,46 @@ def test_worker_persists_terminal_artifacts_inside_supplied_run_directory():
     assert "(run_dir / 'result.md').write_text" in text
     assert "(run_dir / 'final.json').write_text" in text
     assert "--strict-mcp-config" in text
+    assert "The evidence pack is host-validated reference material" in text
+    assert "Canonical reconciliation evidence supplied by Hermes" in text
+    assert "provisioned_tools = 'Agent,Skill' if is_marketing else 'Skill'" in text
+
+
+def test_google_ads_evidence_pack_is_bounded_hashed_and_client_scoped(tmp_path, monkeypatch):
+    dispatcher = load_dispatcher()
+    vault = tmp_path / "vault"
+    allowed = vault / "20 Clients/Any Stage Physio/project-management/Google Ads.md"
+    allowed.parent.mkdir(parents=True)
+    allowed.write_text("canonical commitments\n")
+    monkeypatch.setattr(dispatcher, "VAULT", vault)
+    client = {
+        "name": "Any Stage Physio",
+        "evidence_files": ["20 Clients/Any Stage Physio/project-management/Google Ads.md"],
+    }
+    pack = dispatcher.load_google_ads_evidence(client)
+    assert pack == [{
+        "path": "20 Clients/Any Stage Physio/project-management/Google Ads.md",
+        "sha256": hashlib.sha256(b"canonical commitments\n").hexdigest(),
+        "content": "canonical commitments\n",
+    }]
+
+    client["evidence_files"] = ["20 Clients/Another Client/project-management/Google Ads.md"]
+    other = vault / client["evidence_files"][0]
+    other.parent.mkdir(parents=True)
+    other.write_text("wrong client\n")
+    # Registry validation is the first scope boundary; the loader independently
+    # remains confined to the vault root for already validated registrations.
+    monkeypatch.setattr(dispatcher, "CLIENT_REGISTRY", tmp_path / "clients.json")
+    dispatcher.CLIENT_REGISTRY.write_text(json.dumps({"clients": {"any-stage-physio": {
+        "name": "Any Stage Physio", "customer_id": "5308308105", "manager_id": "3947361921",
+        "evidence_files": client["evidence_files"],
+    }}}))
+    try:
+        dispatcher.load_clients()
+    except SystemExit as exc:
+        assert "outside registered scope" in str(exc)
+    else:
+        raise AssertionError("cross-client evidence registration was accepted")
 
 
 def test_release_mapping_tracks_current_units_without_live_install_side_effects():
