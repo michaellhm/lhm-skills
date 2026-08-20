@@ -137,13 +137,31 @@ def make_handoff(event, parent):
 
 
 def invoke(handoff):
+    host_root = HANDOFFS.resolve()
+    supplied = Path(handoff)
+    if not supplied.is_absolute() or supplied != supplied.resolve():
+        raise ValueError('handoff is outside the configured handoff root')
     try:
-        container_handoff = HERMES_HANDOFFS / handoff.relative_to(HANDOFFS)
+        relative = supplied.relative_to(host_root)
     except ValueError as exc:
         raise ValueError('handoff is outside the configured handoff root') from exc
+    if len(relative.parts) != 1 or not SAFE_ID.fullmatch(relative.name):
+        raise ValueError('handoff is outside the configured handoff root')
+    container_root = HERMES_HANDOFFS
+    try:
+        container_relative = container_root.relative_to('/opt/data')
+    except ValueError as exc:
+        raise ValueError('configured container handoff root is outside /opt/data') from exc
+    if (not container_root.is_absolute() or container_root != container_root.resolve()
+            or container_root != Path('/opt/data') / container_relative):
+        raise ValueError('configured container handoff root is outside /opt/data')
+    container_handoff = container_root / relative
+    event_path = container_handoff / 'event.json'
+    parent_path = container_handoff / 'parent.json'
+    response_path = container_handoff / 'response' / 'agent-consumed.json'
     prompt = (
-        'Read only event.json and parent.json in the supplied handoff. Resume the exact saved role '
-        'and return point. Write response/agent-consumed.json with schema_version 1, the exact '
+        f'Read only {event_path} and {parent_path}. Resume the exact saved role and return point. '
+        f'Write {response_path} with schema_version 1, the exact '
         'event_id and parent_run_id, transitioned true, next_status, and non-empty evidence. '
         'If anything is unreadable or you refuse, do not claim transitioned.'
     )
