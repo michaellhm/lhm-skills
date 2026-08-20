@@ -32,7 +32,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.6.0':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.6.1':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -109,7 +109,7 @@ def main():
     if '--untracked-files=all' not in dispatcher or '--untracked-files=all' not in publisher:
         errors.append('dispatcher and publisher must enumerate individual untracked files')
     prototype_publisher = (PLUGIN / 'assets/host/lhm-prototype-publisher').read_text(encoding='utf-8')
-    for required in ("REPOSITORY='michaellhm/lhm-prototype'", "BRANCH='main'", "SOURCE_ROOT=Path('/var/lib/lhm-prototype-publication/incoming')", "SSH_KEY=Path('/etc/lhm-prototype-publisher/id_ed25519')", 'StrictHostKeyChecking=yes', 'actions/workflows/{WORKFLOW["id"]}/runs?', 'package_manifest_sha256'):
+    for required in ("REPOSITORY = 'michaellhm/lhm-prototype'", "BRANCH = 'main'", "SOURCE_ROOT = Path('/var/lib/lhm-prototype-publication/incoming')", "SSH_KEY = Path('/etc/lhm-prototype-publisher/id_ed25519')", 'schema_version', 'source_basicops_task', 'governed_parent', 'source_package_sha256', 'file_manifest', 'idempotency_key', 'standing_authority_reference', 'StrictHostKeyChecking=yes', 'actions/workflows/{WORKFLOW["id"]}/runs?', 'public prototype content does not match approved index.html'):
         if required not in prototype_publisher:
             errors.append(f'prototype publisher is missing bounded control: {required}')
     for name in ('prototype-publication.request.schema.json','prototype-publication.result.schema.json','prototype-basicops-handoff.schema.json','capability-restored.schema.json'):

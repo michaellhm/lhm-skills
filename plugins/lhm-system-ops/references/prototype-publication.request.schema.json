@@ -2,40 +2,24 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "request_id", "repository", "branch", "expected_base_commit", "source_directory", "manifest", "package_manifest_sha256", "commit_message", "workflow"],
+  "required": ["schema_version", "request_id", "source_basicops_task", "governed_parent", "client_slug", "project_slug", "prototype_kind", "repository", "branch", "expected_base_commit", "source_directory", "source_package_sha256", "file_manifest", "qa_evidence_reference", "idempotency_key", "standing_authority_reference", "commit_message"],
   "properties": {
-    "schema_version": {"const": 1},
-    "request_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$"},
+    "schema_version": {"const": 2},
+    "request_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "source_basicops_task": {"type": "string", "minLength": 1},
+    "governed_parent": {"type": "string", "minLength": 1},
+    "client_slug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "project_slug": {"enum": ["sitemap", "homepage"]},
+    "prototype_kind": {"enum": ["sitemap", "homepage"]},
     "repository": {"const": "michaellhm/lhm-prototype"},
     "branch": {"const": "main"},
     "expected_base_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-    "source_directory": {"type": "string"},
-    "manifest": {
-      "type": "array",
-      "minItems": 1,
-      "maxItems": 100,
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["path", "sha256", "bytes"],
-        "properties": {
-          "path": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}/(?:sitemap|homepage)/index\\.html$"},
-          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-          "bytes": {"type": "integer", "minimum": 1, "maximum": 2000000}
-        }
-      }
-    },
-    "package_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "commit_message": {"type": "string", "pattern": "^prototype: [A-Za-z0-9][A-Za-z0-9 ._:/()-]{0,120}$"},
-    "workflow": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["name", "id", "path"],
-      "properties": {
-        "name": {"const": "Deploy to lhmstaging"},
-        "id": {"const": 289562388},
-        "path": {"const": ".github/workflows/deploy.yml"}
-      }
-    }
+    "source_directory": {"type": "string", "minLength": 1},
+    "source_package_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "file_manifest": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["path", "sha256", "bytes"], "properties": {"path": {"type": "string"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "bytes": {"type": "integer", "minimum": 0, "maximum": 10000000}}}},
+    "qa_evidence_reference": {"type": "string", "minLength": 1},
+    "idempotency_key": {"type": "string", "minLength": 1},
+    "standing_authority_reference": {"type": "string", "minLength": 1},
+    "commit_message": {"type": "string", "minLength": 1}
   }
 }

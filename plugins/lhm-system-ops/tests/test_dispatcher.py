@@ -56,6 +56,27 @@ class FailureReasonTests(unittest.TestCase):
         self.assertEqual(cto_dispatcher.change_branch(first), 'cto/asp-proto-publish-route-20260820')
         self.assertEqual(cto_dispatcher.change_branch(second), 'cto/asp-proto-publish-route-20260820-i2')
 
+    def test_iterations_two_and_three_start_from_prior_iteration(self):
+        base = {'request_id': 'request-003', 'capability_incident_id': 'incident-001', 'iteration': 3}
+        self.assertEqual(cto_dispatcher.prior_change_branch(base), 'cto/incident-001-i2')
+        with tempfile.TemporaryDirectory() as temporary:
+            cto_dispatcher.WORKSPACES = Path(temporary)
+            completed = mock.Mock(stdout='')
+            with mock.patch.object(cto_dispatcher.subprocess, 'run', side_effect=[mock.Mock(returncode=1), mock.Mock(returncode=0)]), \
+                 mock.patch.object(cto_dispatcher, 'run_worker', return_value=completed) as worker:
+                branch, workspace = cto_dispatcher.prepare_change_workspace(base)
+            self.assertEqual(branch, 'cto/incident-001-i3')
+            self.assertEqual(workspace, Path(temporary) / 'request-003')
+            self.assertEqual(worker.call_args.args[0][-2:], [str(workspace), 'cto/incident-001-i2'])
+
+    def test_stale_iteration_branch_collision_fails_closed(self):
+        request = {'request_id': 'request-002', 'capability_incident_id': 'incident-001', 'iteration': 2}
+        with tempfile.TemporaryDirectory() as temporary:
+            cto_dispatcher.WORKSPACES = Path(temporary)
+            with mock.patch.object(cto_dispatcher.subprocess, 'run', return_value=mock.Mock(returncode=0)):
+                with self.assertRaisesRegex(ValueError, 'stale CTO iteration branch'):
+                    cto_dispatcher.prepare_change_workspace(request)
+
     def test_existing_exact_workspace_is_reused_without_deletion(self):
         request = {'request_id': 'request-002', 'capability_incident_id': 'incident-001', 'iteration': 2}
         with tempfile.TemporaryDirectory() as temporary:
