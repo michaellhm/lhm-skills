@@ -18,7 +18,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.8.3"
+    assert MANIFEST["release_version"] == "0.8.4"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -49,7 +49,7 @@ def test_dispatcher_contains_current_bounded_worker_contract():
     assert "'u:claudeworker:rwx', str(run_dir)" in text
     assert "setfacl', '-R'" not in text
     assert "def load_google_ads_evidence(client):" in text
-    assert "expected_prefix = f'20 Clients/{client[\"name\"]}/'" in text
+    assert "expected_prefix = client['evidence_prefix']" in text
     assert "registered evidence pack exceeds total limit" in text
     assert "prompt['evidence_pack'] = load_google_ads_evidence(client)" in text
 
@@ -74,6 +74,7 @@ def test_google_ads_evidence_pack_is_bounded_hashed_and_client_scoped(tmp_path, 
     monkeypatch.setattr(dispatcher, "VAULT", vault)
     client = {
         "name": "Any Stage Physio",
+        "evidence_prefix": "20 Clients/Any Stage Physio/",
         "evidence_files": ["20 Clients/Any Stage Physio/project-management/Google Ads.md"],
     }
     pack = dispatcher.load_google_ads_evidence(client)
@@ -92,6 +93,7 @@ def test_google_ads_evidence_pack_is_bounded_hashed_and_client_scoped(tmp_path, 
     monkeypatch.setattr(dispatcher, "CLIENT_REGISTRY", tmp_path / "clients.json")
     dispatcher.CLIENT_REGISTRY.write_text(json.dumps({"clients": {"any-stage-physio": {
         "name": "Any Stage Physio", "customer_id": "5308308105", "manager_id": "3947361921",
+        "evidence_prefix": "20 Clients/Any Stage Physio/",
         "evidence_files": client["evidence_files"],
     }}}))
     try:
@@ -100,6 +102,18 @@ def test_google_ads_evidence_pack_is_bounded_hashed_and_client_scoped(tmp_path, 
         assert "outside registered scope" in str(exc)
     else:
         raise AssertionError("cross-client evidence registration was accepted")
+
+
+def test_evidence_prefix_is_independent_of_client_display_name(tmp_path, monkeypatch):
+    dispatcher = load_dispatcher()
+    registry = tmp_path / "clients.json"
+    registry.write_text(json.dumps({"clients": {"mhealth": {
+        "name": "mhealth", "customer_id": "2228366786", "manager_id": "3947361921",
+        "evidence_prefix": "20 Clients/Mhealth/",
+        "evidence_files": ["20 Clients/Mhealth/project-management/Google Ads.md"],
+    }}}))
+    monkeypatch.setattr(dispatcher, "CLIENT_REGISTRY", registry)
+    assert dispatcher.load_clients()["mhealth"]["evidence_prefix"] == "20 Clients/Mhealth/"
 
 
 def test_release_mapping_tracks_current_units_without_live_install_side_effects():
