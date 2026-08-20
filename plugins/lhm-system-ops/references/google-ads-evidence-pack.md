@@ -2,7 +2,7 @@
 
 Hermes assembles the Google Ads reconciliation evidence pack before dispatch. The Claude worker remains filesystem-isolated and receives only the contents of explicitly registered canonical Markdown files plus their source paths and SHA-256 receipts.
 
-Each Google Ads client registry entry must contain `evidence_files`, with one to eight unique paths beneath that client's exact `20 Clients/<Client Name>/` vault folder. The dispatcher rejects links, missing files, path traversal, non-Markdown files, files larger than 40 KB and packs larger than 120 KB.
+Each Google Ads client registry entry must contain an explicit `evidence_prefix` and `evidence_files`, with one to eight unique paths beneath that registered vault folder. The vault prefix is deliberately independent of the display name so brand casing and folder casing cannot break or broaden the boundary. The dispatcher rejects links, missing files, path traversal, non-Markdown files, files larger than 40 KB and packs larger than 120 KB.
 
 The minimum useful pack is:
 

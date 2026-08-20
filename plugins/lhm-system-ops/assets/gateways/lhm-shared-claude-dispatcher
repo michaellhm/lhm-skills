@@ -169,7 +169,7 @@ def load_clients():
     clients = payload.get('clients')
     if not isinstance(clients, dict) or not clients:
         raise SystemExit('invalid client registry')
-    required = {'name', 'customer_id', 'manager_id', 'evidence_files'}
+    required = {'name', 'customer_id', 'manager_id', 'evidence_prefix', 'evidence_files'}
     for slug, client in clients.items():
         if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', slug) or not required.issubset(client):
             raise SystemExit('invalid client registry entry')
@@ -179,7 +179,10 @@ def load_clients():
         if (not isinstance(evidence_files, list) or not 1 <= len(evidence_files) <= 8
                 or len(set(evidence_files)) != len(evidence_files)):
             raise SystemExit('invalid client evidence file list')
-        expected_prefix = f'20 Clients/{client["name"]}/'
+        expected_prefix = client['evidence_prefix']
+        if (not isinstance(expected_prefix, str) or not expected_prefix.startswith('20 Clients/')
+                or not expected_prefix.endswith('/') or '..' in Path(expected_prefix).parts):
+            raise SystemExit('invalid client evidence prefix')
         for relative in evidence_files:
             if (not isinstance(relative, str) or not relative.startswith(expected_prefix)
                     or not relative.endswith('.md') or '..' in Path(relative).parts):
