@@ -30,6 +30,10 @@ HERMES_GID = 10000
 HERMES_HANDOFFS = Path('/opt/data/profiles/lhm_brain/dispatch/work-control/handoffs')
 ALLOWED_STATES = {'running', 'continued', 'completed', 'waiting_on_evidence', 'waiting_on_approval'}
 SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$')
+AGENT_RESPONSE_FIELDS = (
+    'schema_version', 'event_id', 'parent_run_id', 'parent_sha256',
+    'transitioned', 'next_status', 'evidence',
+)
 
 
 def now():
@@ -159,10 +163,14 @@ def invoke(handoff):
     event_path = container_handoff / 'event.json'
     parent_path = container_handoff / 'parent.json'
     response_path = container_handoff / 'response' / 'agent-consumed.json'
+    parent_digest = digest(load(supplied / 'parent.json'))
+    response_fields = ', '.join(AGENT_RESPONSE_FIELDS)
     prompt = (
         f'Read only {event_path} and {parent_path}. Resume the exact saved role and return point. '
-        f'Write {response_path} with schema_version 1, the exact '
-        'event_id and parent_run_id, transitioned true, next_status, and non-empty evidence. '
+        f'Write {response_path} as one JSON object with exactly these seven fields: '
+        f'{response_fields}. Set schema_version to 1, event_id and parent_run_id to the exact '
+        f'input values, parent_sha256 to exactly {parent_digest}, transitioned to true, next_status '
+        'to the resulting state, and evidence to a non-empty array of non-empty strings. '
         'If anything is unreadable or you refuse, do not claim transitioned.'
     )
     return subprocess.run([
@@ -173,8 +181,7 @@ def invoke(handoff):
 
 
 def validate_agent_record(record, event, parent_digest):
-    required = {'schema_version', 'event_id', 'parent_run_id', 'parent_sha256',
-                'transitioned', 'next_status', 'evidence'}
+    required = set(AGENT_RESPONSE_FIELDS)
     if not isinstance(record, dict) or set(record) != required or record.get('schema_version') != 1:
         raise ValueError('invalid agent-consumed schema')
     if record.get('event_id') != event['event_id'] or record.get('parent_run_id') != event['parent_run_id']:
@@ -189,12 +196,23 @@ def validate_agent_record(record, event, parent_digest):
     return record
 
 
-def _failure(claim, message):
+def _failure(claim, message, handoff=None):
     attempt = f'{claim.stem}.attempt-{os.getpid()}-{now().replace(":", "-")}'
     target = FAILED / f'{attempt}.json'
     if claim.exists():
         os.replace(claim, target)
-    atomic_json(FAILED / f'{attempt}.error.json', {'failed_at': now(), 'error': message})
+    audit = {'failed_at': now(), 'error': message}
+    if handoff is not None:
+        response = handoff / 'response' / 'agent-consumed.json'
+        if response.is_file() and not response.is_symlink():
+            payload = response.read_bytes()
+            audit['agent_response'] = {
+                'present': True, 'sha256': hashlib.sha256(payload).hexdigest(),
+                'size_bytes': len(payload), 'content': payload.decode('utf-8', errors='replace'),
+            }
+        else:
+            audit['agent_response'] = {'present': False}
+    atomic_json(FAILED / f'{attempt}.error.json', audit, 0o600)
     return 'failed'
 
 
@@ -259,7 +277,7 @@ def process(path, runner=invoke):
         os.replace(claim, PROCESSED / claim.name)
         return 'consumed'
     except Exception as exc:
-        return _failure(claim, str(exc))
+        return _failure(claim, str(exc), handoff)
     finally:
         if handoff and handoff.exists():
             shutil.rmtree(handoff)
