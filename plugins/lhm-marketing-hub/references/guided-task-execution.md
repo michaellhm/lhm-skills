@@ -6,7 +6,7 @@ Keep the tone plain and direct throughout. The point of this loop is to make the
 
 ## When this runs
 
-Run this after, not instead of, the review's own analysis and approval gate. The review decides *what* matters; this protocol drives *getting it done*. For a Hermes monthly flow, also follow `references/google-ads-monthly-operating-model.md` and resume from its structured handback.
+Run this after, not instead of, the review's own analysis and approval gate. The review decides *what* matters; this protocol drives *getting it done*. For every governed Google Ads flow, also follow `references/google-ads-departmental-delivery.md`. For a Hermes monthly flow, resume the monthly structured handback rather than regenerating discovery.
 
 ## Step 1: Lay out the task list in chat
 
@@ -40,7 +40,7 @@ Ask one question, plainly:
 
 Walk the list in priority order. For each task:
 
-Hermes must dispatch only one approved action at a time. Before dispatch, mark that action `running` and the parent `specialist_running`. After the worker returns, record its evidence and outcome in canonical Obsidian context and the BasicOps discussion before choosing the next action. If the worker reaches a live-mutation approval gate, set `waiting_approval` and stop.
+The Google Ads Lead must dispatch only one approved action at a time. Before dispatch, mark that action `running` and the parent `specialist_running`. After the worker returns, send the result to `google-ads-delivery-qa`. Record a QA-passed outcome in canonical Obsidian context and BasicOps before choosing the next action. If the worker or QA reaches a live-mutation approval gate, set `waiting_approval` and stop.
 
 1. **Present only that task.** Keep it simple and straightforward: what to do, where to do it, and the exact change or values. A few short lines, not a wall of text. Show progress like "Task 3 of 7".
 2. **If the task maps to an execution skill, run it scoped to just this task**, carrying forward the client profile, the AdPulse zone, and the relevant campaign data:
@@ -51,7 +51,7 @@ Hermes must dispatch only one approved action at a time. Before dispatch, mark t
    - PMax-specific issue → `pmax-optimizer`
    - **"Conversion actions are firing"** → don't ask the client to check. Query GA4 directly via `analytics-mcp` for the booking event, per "Conversion quality before volume" in `references/lhm-philosophy/google-ads.md`. Present what GA4 shows as the task result; only fall back to asking the client if no GA4 property is on file or GA4 itself shows the event isn't firing.
    Run only the slice that this task needs. Do not run the whole skill end to end if a single change is all that is required.
-3. **Verify and ask if it is done.** A dispatched worker must return observed evidence, mutations performed (or `none`) and verification. After presenting the result:
+3. **QA, verify and ask if it is done.** A dispatched worker must return observed evidence, mutations performed (or `none`) and verification. QA must return `pass`, `correction_required`, `waiting_approval`, `needs_evidence` or `blocked`. After a pass, present only the current result:
 
    > "Is that one done?"
 
@@ -65,9 +65,9 @@ Stop the loop early if the user asks to. Whatever is left becomes "deferred" in 
 
 When every task is handled, or the user decides to stop, close the session in this order.
 
-### 4a. Write what you learned
+### 4a. Production acceptance and Learning Steward
 
-Capture anything reusable from this session into the skill's `LEARNED.md` (per the plugin's Self-Learning Protocol — reusable rules only, not session-specific data). If new client facts surfaced (a changed budget, a new target CPA/ROAS, a recurring constraint), offer to save those to `client_profile.md`.
+Return the departmental completion dossier to Head of Production. After acceptance, send the structured Learning Steward intake. Learning Steward decides whether evidence belongs in client context, Knowledge, an SOP, a skill improvement, a capability incident or `Observe again`. Do not append directly to a generic `LEARNED.md` merely because the session ended.
 
 Update the review's session output with what was actually done: actions executed, actions deferred and why, and any concrete before/after values.
 

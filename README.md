@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-151 skills across nine Claude Code plugins (55 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 22 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+152 skills across nine Claude Code plugins (56 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 22 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -28,13 +28,14 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/content.md                     # Direct content specialist entry
   agents/wordpress.md                   # Direct WordPress content specialist entry
   agents/marketing-assistant.md         # (legacy alias) — routes to start agent
-  skills/                              # All 55 skills
+  skills/                              # All 56 skills
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
     bid-budget-optimizer/              # Budget and bid strategy
     keyword-optimizer/                 # Keyword and wasted spend analysis
     landing-page-optimizer/            # Landing page audits
     google-ads-monthly-review/          # Account health check and zone analysis
+    google-ads-delivery-qa/             # Independent action-level evidence, artefact and completion gate
     quarterly-adversarial-review/       # 90-day red-team review: reconstructs prior work, tests assumptions, assigns AdPulse zone
     competitive-analysis/               # Competitor evaluation and market positioning
     keyword-research/                  # Keyword discovery, intent analysis, topic clusters
@@ -223,7 +224,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 **Client Management** (3 skills): Client onboarding and profile setup, theme-led campaign-playbook strategy session preparation and coaching, and campaign playbook generation from transcripts.
 
-**Google Ads & PPC** (9 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), quarterly adversarial 90-day review, PMax banner creative, PMax campaign setup for local businesses, PMax monthly + 90-day optimisation.
+**Google Ads & PPC** (10 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), independent action-level delivery QA, quarterly adversarial 90-day review, PMax banner creative, PMax campaign setup for local businesses, PMax monthly + 90-day optimisation.
 
 **Strategy & Research** (3 skills): Competitive analysis with Porter's 5 Forces, keyword research with intent analysis and topic clustering, They Ask You Answer question discovery.
 
