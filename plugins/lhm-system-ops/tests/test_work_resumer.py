@@ -166,6 +166,14 @@ args = parser.parse_args(cli)
 expected = "/opt/data/profiles/lhm_brain/dispatch/work-control/handoffs/" + os.environ["EXPECTED_KEY"]
 if args.profile != "lhm_brain" or args.working_directory != expected:
     raise SystemExit("wrong Hermes profile or container working directory")
+expected_event = expected + "/event.json"
+expected_parent = expected + "/parent.json"
+expected_response = expected + "/response/agent-consumed.json"
+for exact_path in (expected_event, expected_parent, expected_response):
+    if args.oneshot.count(exact_path) != 1:
+        raise SystemExit("prompt does not contain exact absolute handoff path once: " + exact_path)
+if "supplied handoff" in args.oneshot:
+    raise SystemExit("prompt retains vague supplied-handoff dependency")
 handoff = pathlib.Path(os.environ["HOST_HANDOFF"])
 os.chdir(handoff)
 canonical_sibling = pathlib.Path(os.environ["HOST_CANONICAL_SIBLING"])
@@ -173,14 +181,18 @@ if canonical_sibling.is_file() and os.access(canonical_sibling, os.R_OK):
     raise SystemExit("canonical sibling state is readable")
 if sorted(str(path) for path in pathlib.Path(".").iterdir()) != ["event.json", "parent.json", "response"]:
     raise SystemExit("handoff exposed unexpected state")
-event = json.loads(pathlib.Path("event.json").read_text())
-parent = json.loads(pathlib.Path("parent.json").read_text())
+# The fixture captures the container's absolute-path file operations and maps
+# them to the host bind-mount paths used by this non-live test.
+captured = [expected_event, expected_parent, expected_response]
+event = json.loads((handoff / pathlib.Path(expected_event).relative_to(expected)).read_text())
+parent = json.loads((handoff / pathlib.Path(expected_parent).relative_to(expected)).read_text())
 record = {"schema_version": 1, "event_id": event["event_id"],
           "parent_run_id": parent["parent_run_id"], "parent_sha256": "fixture",
           "transitioned": True, "next_status": "continued",
           "evidence": ["captured Hermes CLI fixture"]}
-pathlib.Path("response/agent-consumed.json").write_text(json.dumps(record))
-print(json.dumps({"cwd": str(pathlib.Path.cwd()), "requested_identity": argv[2]}))
+(handoff / pathlib.Path(expected_response).relative_to(expected)).write_text(json.dumps(record))
+print(json.dumps({"cwd": str(pathlib.Path.cwd()), "requested_identity": argv[2],
+                  "absolute_paths": captured, "container_handoff": args.working_directory}))
 ''')
         docker.chmod(0o755)
         environment = {
@@ -192,17 +204,42 @@ print(json.dumps({"cwd": str(pathlib.Path.cwd()), "requested_identity": argv[2]}
             result = resumer.invoke(handoff)
         self.assertEqual(result.returncode, 0, result.stderr)
         observed = json.loads(result.stdout)
-        self.assertEqual(observed, {'cwd': str(handoff), 'requested_identity': '10000:10000'})
+        container_handoff = str(resumer.HERMES_HANDOFFS / self.event['idempotency_key'])
+        self.assertEqual(observed, {
+            'cwd': str(handoff), 'requested_identity': '10000:10000',
+            'container_handoff': container_handoff,
+            'absolute_paths': [
+                f'{container_handoff}/event.json', f'{container_handoff}/parent.json',
+                f'{container_handoff}/response/agent-consumed.json',
+            ],
+        })
         response = handoff / 'response' / 'agent-consumed.json'
         self.assertTrue(response.is_file())
         self.assertEqual(json.loads(response.read_text())['event_id'], self.event['event_id'])
         release_text = SCRIPT.read_text()
         self.assertNotIn('attachment', release_text)
+        self.assertNotIn('supplied handoff', release_text)
         self.assertIn("'--in', str(container_handoff),\n        '-z', prompt", release_text)
 
     def test_invoke_rejects_handoff_outside_configured_root(self):
         with self.assertRaisesRegex(ValueError, 'outside the configured handoff root'):
             resumer.invoke(Path(self.temp.name) / 'outside')
+
+    def test_invoke_rejects_relative_traversal_and_nested_handoff_paths(self):
+        for unsafe in (
+                Path('relative-handoff'),
+                resumer.HANDOFFS / '..' / 'injected',
+                resumer.HANDOFFS / self.event['idempotency_key'] / 'nested'):
+            with self.subTest(unsafe=unsafe):
+                with self.assertRaisesRegex(ValueError, 'outside the configured handoff root'):
+                    resumer.invoke(unsafe)
+
+    def test_invoke_rejects_container_root_outside_opt_data(self):
+        handoff = resumer.HANDOFFS / self.event['idempotency_key']
+        handoff.mkdir()
+        with mock.patch.object(resumer, 'HERMES_HANDOFFS', Path('/tmp/handoffs')):
+            with self.assertRaisesRegex(ValueError, 'outside /opt/data'):
+                resumer.invoke(handoff)
 
     def test_worker_has_no_unrelated_store_access(self):
         unrelated_paths = [
