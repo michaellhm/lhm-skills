@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""Hermes-side closed submission/status helper for prototype publication."""
+import argparse, hashlib, json, os, re, shutil, tempfile
+from pathlib import Path, PurePosixPath
+
+BASE = Path('/opt/data/profiles/lhm_brain/dispatch/prototype-publication')
+SEALED_ROOT = BASE / 'sealed'
+SAFE = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
+SLUG = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
+SHA = re.compile(r'^[0-9a-f]{40}$'); SHA256 = re.compile(r'^[0-9a-f]{64}$')
+FIELDS = {'schema_version','request_id','source_basicops_task','governed_parent','destination_profile_id','operation','credential_reference','client_slug','project_slug','prototype_kind','repository','branch','expected_base_commit','source_directory','source_package_sha256','file_manifest','qa_evidence_reference','idempotency_key','standing_authority_reference','commit_message'}
+
+def package_digest(manifest):
+    return hashlib.sha256((json.dumps(manifest,sort_keys=True,separators=(',',':'))+'\n').encode()).hexdigest()
+
+def validate(value):
+    if not isinstance(value,dict) or set(value)!=FIELDS or value.get('schema_version')!=3: raise SystemExit('invalid prototype publication schema_v3')
+    if not SAFE.fullmatch(value.get('request_id','')) or value['idempotency_key']!=value['request_id']: raise SystemExit('invalid request identity')
+    if not all(SAFE.fullmatch(value.get(field,'')) for field in ('source_basicops_task','governed_parent','qa_evidence_reference')): raise SystemExit('invalid governed reference')
+    fixed=(value.get('destination_profile_id')=='prototype-main-v1' and value.get('repository')=='michaellhm/lhm-prototype' and value.get('branch')=='main' and value.get('credential_reference')=='LHM_PROTOTYPE_MAIN_DEPLOY_KEY' and value.get('standing_authority_reference')=='MICHAEL-PROTOTYPE-PUBLISH-STANDING-20260820')
+    if not fixed: raise SystemExit('request is outside the prototype-main-v1 route')
+    if not SLUG.fullmatch(value.get('client_slug','')) or value.get('project_slug') not in {'sitemap','homepage'} or value.get('prototype_kind')!=value['project_slug'] or value.get('operation')!='publish_'+value['project_slug']: raise SystemExit('invalid prototype operation')
+    if not SHA.fullmatch(value.get('expected_base_commit','')): raise SystemExit('invalid expected_base_commit')
+    manifest=value.get('file_manifest'); paths=[x.get('path') for x in manifest or [] if isinstance(x,dict)]
+    if not manifest or len(paths)!=len(manifest) or paths!=sorted(set(paths)): raise SystemExit('file_manifest must be exact, sorted and unique')
+    source=Path(value.get('source_directory',''))
+    try: source.resolve().relative_to(SEALED_ROOT.resolve())
+    except (ValueError,OSError): raise SystemExit('source_directory is outside the sealed package root')
+    if not source.is_dir() or source.is_symlink() or source.resolve().parent!=SEALED_ROOT.resolve(): raise SystemExit('invalid sealed source_directory')
+    for item in manifest:
+        path=PurePosixPath(item.get('path',''))
+        if set(item)!={'path','sha256','bytes'} or path.is_absolute() or '..' in path.parts or any(p.startswith('.') for p in path.parts): raise SystemExit('invalid manifest path')
+        if not SHA256.fullmatch(str(item['sha256'])) or not isinstance(item['bytes'],int) or not 0<=item['bytes']<=10_000_000: raise SystemExit('invalid manifest entry')
+        candidate=source.joinpath(*path.parts)
+        try: candidate.resolve().relative_to(source.resolve())
+        except (ValueError,OSError): raise SystemExit('manifest path escapes sealed package')
+        if not candidate.is_file() or candidate.is_symlink() or candidate.stat().st_size!=item['bytes'] or hashlib.sha256(candidate.read_bytes()).hexdigest()!=item['sha256']: raise SystemExit('sealed file does not match manifest')
+    if package_digest(manifest)!=value.get('source_package_sha256') or not SHA256.fullmatch(value.get('source_package_sha256','')): raise SystemExit('package digest mismatch')
+    return source
+
+def submit(_):
+    value=json.load(__import__('sys').stdin); source=validate(value); incoming=BASE/'incoming'; incoming.mkdir(parents=True,exist_ok=True)
+    temporary=Path(tempfile.mkdtemp(prefix='.'+value['request_id']+'.',dir=incoming)); target=incoming/value['request_id']
+    try:
+        (temporary/'source').mkdir()
+        for item in value['file_manifest']:
+            relative=PurePosixPath(item['path']); destination=(temporary/'source').joinpath(*relative.parts); destination.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(source.joinpath(*relative.parts),destination)
+        queued={**value,'source_directory':'source'}
+        (temporary/'request.json').write_text(json.dumps(queued,indent=2,sort_keys=True)+'\n',encoding='utf-8')
+        for path in temporary.rglob('*'):
+            if path.is_file(): path.chmod(0o600)
+        os.replace(temporary,target)
+    finally:
+        if temporary.exists(): shutil.rmtree(temporary)
+    print(json.dumps({'request_id':value['request_id'],'status':'queued_for_host_validation'}))
+
+def status(args):
+    if not SAFE.fullmatch(args.request_id): raise SystemExit('invalid request_id')
+    receipt=BASE/'processed'/args.request_id/'receipt.json'; error=BASE/'failed'/args.request_id/'error.json'
+    if receipt.is_file(): print(receipt.read_text(encoding='utf-8'),end=''); return
+    if error.is_file(): print(error.read_text(encoding='utf-8'),end=''); return
+    state='queued' if (BASE/'incoming'/args.request_id).is_dir() else 'unknown'
+    print(json.dumps({'request_id':args.request_id,'status':state}))
+
+def main():
+    parser=argparse.ArgumentParser(); commands=parser.add_subparsers(required=True)
+    commands.add_parser('submit').set_defaults(func=submit)
+    p=commands.add_parser('status'); p.add_argument('request_id'); p.set_defaults(func=status)
+    args=parser.parse_args(); args.func(args)
+if __name__=='__main__': main()
