@@ -19,7 +19,7 @@ SHA = re.compile(r'^[0-9a-f]{40}$')
 SHA256 = re.compile(r'^[0-9a-f]{64}$')
 STATIC_EXTENSIONS = {'.html', '.css', '.js', '.json', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.ico', '.avif', '.woff', '.woff2', '.ttf', '.otf'}
 TEXT_EXTENSIONS = {'.html', '.css', '.js', '.json', '.svg', '.md'}
-SENSITIVE = re.compile(rb'(BEGIN [A-Z ]*PRIVATE KEY|github_pat_|ghp_|sk-[A-Za-z0-9]|AKIA[0-9A-Z]{16}|password\s*[:=]|client_secret\s*[:=])', re.I)
+SENSITIVE = re.compile(rb'(BEGIN [A-Z ]*PRIVATE KEY|github_pat_|ghp_|(?<![A-Za-z0-9])sk-[A-Za-z0-9]|AKIA[0-9A-Z]{16}|password\s*[:=]|client_secret\s*[:=])', re.I)
 MAX_FILE = 10_000_000
 MAX_HTTP = 2_000_000
 FIELDS = {'schema_version','request_id','source_basicops_task','governed_parent','client_slug','project_slug','prototype_kind','repository','branch','expected_base_commit','source_directory','source_package_sha256','file_manifest','qa_evidence_reference','idempotency_key','standing_authority_reference','commit_message'}

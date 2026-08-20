@@ -56,6 +56,26 @@ class PrototypePublisherTests(unittest.TestCase):
             for update in ({'repository':'other/repo'},{'branch':'cto/test'},{'client_slug':'../alpha'}):
                 with self.assertRaises(ValueError): publisher.validate({**good,**update})
 
+    def test_allows_desk_worker_audience_slugs(self):
+        html=b'<a href="/audiences/desk-worker">desk-worker</a><p>desk-workers</p>'
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)/'source'; root.mkdir()
+            self.assertEqual(publisher.validate(self.request(root,files={'index.html':html})),['alpha-health/sitemap/index.html'])
+
+    def test_rejects_standalone_provider_tokens_and_existing_secret_patterns(self):
+        provider_token=b'sk-'+b'providerToken1234567890'
+        cases=[
+            provider_token, b'prefix '+provider_token+b' suffix', b'token='+provider_token,
+            b'{"api_key":"'+provider_token+b'"}', b'BEGIN PRIVATE'+b' KEY',
+            b'github_pat_'+b'abcdefghijklmnopqrstuvwxyz', b'ghp_'+b'abcdefghijklmnopqrst',
+            b'AKIA1234567890ABCDEF', b'password = value', b'client_secret: value',
+        ]
+        for secret in cases:
+            with self.subTest(secret=secret), tempfile.TemporaryDirectory() as temporary:
+                root=Path(temporary)/'source'; root.mkdir()
+                with self.assertRaisesRegex(ValueError,'sensitive content detected'):
+                    publisher.validate(self.request(root,files={'index.html':secret}))
+
     def test_rejects_symlink_and_manifest_or_package_mismatch(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary)/'source'; root.mkdir(); good=self.request(root)
