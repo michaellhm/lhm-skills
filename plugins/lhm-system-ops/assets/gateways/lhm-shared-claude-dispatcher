@@ -1,0 +1,506 @@
+#!/usr/bin/env python3
+import json
+import hashlib
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import urlsplit
+
+BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/claude')
+INCOMING = BASE / 'incoming'
+PROCESSED = BASE / 'processed'
+FAILED = BASE / 'failed'
+RUNS = BASE / 'runs'
+CLIENT_REGISTRY = Path('/home/hermes/.hermes/profiles/lhm_brain/config/google-ads-clients.json')
+HANDBACK_REGISTRY = Path('/home/hermes/.hermes/profiles/lhm_brain/config/client-handback-targets.json')
+VAULT = Path('/home/hermes/.hermes/profiles/lhm_brain/vault')
+PRODUCER_REGISTRY = Path('/home/hermes/.hermes/profiles/lhm_brain/config/claude-producer-artifacts.json')
+WORKER_UID = 10002
+HERMES_GID = 10000
+SPECIALIST_ROUTES = {
+    'marketing': ('lhm-marketing-hub:start', 'start'),
+    'seo': ('lhm-marketing-hub:seo', 'seo'),
+    'content': ('lhm-marketing-hub:content', 'content'),
+    'project': ('lhm-project-hub:pm-orchestrator', 'pm-orchestrator'),
+    'gmb': ('lhm-gmb-hub:gmb-orchestrator', 'gmb-orchestrator'),
+    'finance': ('lhm-finance-hub:finance-orchestrator', 'finance-orchestrator'),
+    'website': ('lhm-wordpress-hub:website-orchestrator', 'website-orchestrator'),
+    'knowledge': ('lhm-knowledge-hub:knowledge-orchestrator', 'knowledge-orchestrator'),
+}
+GSC_SITES = {
+    'lhm-main': {
+        'name': 'Local Health Marketing',
+        'property': 'https://localhealthmarketing.com/',
+        'host': 'localhealthmarketing.com',
+    },
+}
+
+
+def complete_registration(path, request):
+    run_id = request['run_id']
+    run_dir = RUNS / run_id
+    if run_dir.exists():
+        reject(path, 'run_id already exists')
+        return
+    run_dir.mkdir(mode=0o2750)
+    os.chown(run_dir, 0, HERMES_GID)
+    request_file = run_dir / 'request.json'
+    request_file.write_text(json.dumps(request, indent=2) + '\n', encoding='utf-8')
+    os.chown(request_file, 0, HERMES_GID)
+    os.chmod(request_file, 0o640)
+
+    def finish(status, action, error=None, target=None):
+        final = {
+            'run_id': run_id,
+            'status': status,
+            'profile': 'handback_target_registration',
+            'agent_id': request['agent_id'],
+            'completed_at': datetime.now(timezone.utc).isoformat(),
+            'verification': {'verification': 'passed' if status == 'completed' else 'failed', 'action': action},
+        }
+        if target is not None:
+            final['verification']['target'] = target
+        if error:
+            final['verification']['error'] = error
+        final_file = run_dir / 'final.json'
+        final_file.write_text(json.dumps(final, indent=2) + '\n', encoding='utf-8')
+        os.chown(final_file, 0, HERMES_GID)
+        os.chmod(final_file, 0o640)
+        shutil.move(str(path), PROCESSED / path.name)
+
+    target_type = request.get('target_type')
+    slug = request.get('client')
+    name = request.get('name')
+    vault_prefix = request.get('vault_prefix')
+    folder_id = request.get('drive_folder_id')
+    task_ids = request.get('basicops_task_ids')
+    if target_type not in {'client', 'opportunity'}:
+        finish('failed', 'refused', 'target_type must be client or opportunity')
+        return
+    if not isinstance(slug, str) or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', slug):
+        finish('failed', 'refused', 'invalid target slug')
+        return
+    if not isinstance(name, str) or not 2 <= len(name) <= 120 or any(ord(c) < 32 for c in name):
+        finish('failed', 'refused', 'invalid target name')
+        return
+    allowed_root = '20 Clients/' if target_type == 'client' else '01 Inbox/Sales Opportunities/'
+    if (not isinstance(vault_prefix, str) or not vault_prefix.startswith(allowed_root)
+            or not vault_prefix.endswith('/') or '..' in Path(vault_prefix).parts):
+        finish('failed', 'refused', f'vault prefix must be beneath {allowed_root}')
+        return
+    vault_dir = (VAULT / vault_prefix).resolve()
+    try:
+        vault_dir.relative_to(VAULT.resolve())
+    except ValueError:
+        finish('failed', 'refused', 'vault prefix escapes vault')
+        return
+    if not vault_dir.is_dir() or vault_dir.is_symlink():
+        finish('failed', 'refused', 'vault folder does not exist or is linked')
+        return
+    if not isinstance(folder_id, str) or not re.fullmatch(r'[A-Za-z0-9_-]{10,100}', folder_id):
+        finish('failed', 'refused', 'invalid Drive folder ID')
+        return
+    if (not isinstance(task_ids, list) or len(task_ids) > 20
+            or any(not isinstance(value, str) or not re.fullmatch(r'[0-9]{1,20}', value) for value in task_ids)
+            or len(set(task_ids)) != len(task_ids)):
+        finish('failed', 'refused', 'invalid BasicOps task IDs')
+        return
+    try:
+        payload = json.loads(HANDBACK_REGISTRY.read_text(encoding='utf-8'))
+        targets = payload['clients']
+    except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+        finish('failed', 'refused', f'handback registry unavailable: {exc}')
+        return
+    target = {
+        'type': target_type,
+        'name': name,
+        'vault_prefix': vault_prefix,
+        'drive_folder_query': f'exact folder with folder ID {folder_id}',
+        'basicops_task_ids': task_ids,
+    }
+    existing = targets.get(slug)
+    legacy_target = {key: value for key, value in target.items() if key != 'type'}
+    if existing == target or existing == legacy_target:
+        finish('completed', 'already_existed', target=target)
+        return
+    if existing is not None:
+        finish('failed', 'refused', 'slug is already registered with different details')
+        return
+    for other_slug, other in targets.items():
+        if other.get('vault_prefix') == vault_prefix:
+            finish('failed', 'refused', f'vault prefix already belongs to {other_slug}')
+            return
+        if folder_id in other.get('drive_folder_query', ''):
+            finish('failed', 'refused', f'Drive folder already belongs to {other_slug}')
+            return
+    backup = Path('/root') / f'client-handback-targets.json.backup-{datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")}'
+    shutil.copy2(HANDBACK_REGISTRY, backup)
+    targets[slug] = target
+    fd, temp_name = tempfile.mkstemp(prefix='.client-handback-targets.', dir=HANDBACK_REGISTRY.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(payload, handle, indent=2)
+            handle.write('\n')
+        os.chown(temp_name, 0, HERMES_GID)
+        os.chmod(temp_name, 0o640)
+        os.replace(temp_name, HANDBACK_REGISTRY)
+    finally:
+        if os.path.exists(temp_name):
+            os.unlink(temp_name)
+    finish('completed', 'registered', target=target)
+
+
+def load_clients():
+    try:
+        payload = json.loads(CLIENT_REGISTRY.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f'client registry unavailable: {exc}')
+    clients = payload.get('clients')
+    if not isinstance(clients, dict) or not clients:
+        raise SystemExit('invalid client registry')
+    required = {'name', 'customer_id', 'manager_id'}
+    for slug, client in clients.items():
+        if not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', slug) or not required.issubset(client):
+            raise SystemExit('invalid client registry entry')
+        if not all(isinstance(client[key], str) and re.fullmatch(r'[0-9]{10}', client[key]) for key in ('customer_id', 'manager_id')):
+            raise SystemExit('invalid client account id')
+    return clients
+
+
+def load_handback_targets():
+    try:
+        payload = json.loads(HANDBACK_REGISTRY.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f'handback registry unavailable: {exc}')
+    targets = payload.get('clients')
+    if not isinstance(targets, dict) or not targets:
+        raise SystemExit('invalid handback registry')
+    return targets
+
+
+def ensure_worker_traversal():
+    subprocess.run([
+        'systemd-run', '--quiet', '--wait', '--collect',
+        f'--unit=lhm-dispatch-acl-{os.getpid()}',
+        '/usr/bin/setfacl', '-m', 'm::x,u:claudeworker:--x,u:codexworker:--x',
+        '/home/hermes/.hermes', '/home/hermes/.hermes/profiles/lhm_brain'
+    ], check=True)
+
+
+def configure_worker_run_dir(run_dir):
+    """Keep the worker's private write access if the gateway re-owns the profile."""
+    os.chown(run_dir, WORKER_UID, HERMES_GID)
+    subprocess.run([
+        '/usr/bin/setfacl', '-m', 'u:claudeworker:rwx', str(run_dir)
+    ], check=True)
+
+
+def reject(path, reason):
+    target = FAILED / path.name
+    shutil.move(str(path), target)
+    error = FAILED / f'{path.stem}.error'
+    error.write_text(reason + '\n', encoding='utf-8')
+    os.chown(target, 0, HERMES_GID)
+    os.chown(error, 0, HERMES_GID)
+    os.chmod(target, 0o640)
+    os.chmod(error, 0o640)
+
+
+def process(path):
+    try:
+        request = json.loads(path.read_text(encoding='utf-8'))
+    except Exception as exc:
+        reject(path, f'invalid JSON: {exc}')
+        return
+    profile = request.get('profile')
+    handback_profiles = {'google_drive_client_file_create', 'basicops_task_discussion_update'}
+    expected_fields = ({'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_name', 'objective', 'output_name', 'input_artifacts', 'timeout_seconds'}
+                       if profile == 'html_artifact_producer' else
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'artifact_path', 'file_name', 'timeout_seconds'}
+                       if profile == 'google_drive_client_file_create' else
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'task_id', 'discussion', 'timeout_seconds'}
+                       if profile == 'basicops_task_discussion_update' else
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'target_type', 'client', 'name', 'vault_prefix', 'drive_folder_id', 'basicops_task_ids', 'timeout_seconds'}
+                       if profile == 'handback_target_registration' else
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_type', 'subject_name', 'objective', 'approval_state', 'timeout_seconds'}
+                       if profile == 'specialist_readonly' else
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'site', 'urls', 'objective', 'timeout_seconds'}
+                       if profile == 'seo_gsc_readonly' else
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'objective', 'timeout_seconds'})
+    if set(request) != expected_fields:
+        reject(path, 'unexpected request fields')
+        return
+    expected_schema = 2 if profile == 'html_artifact_producer' else 1
+    if request.get('schema_version') != expected_schema:
+        reject(path, 'unsupported schema_version')
+        return
+    if profile not in {'google_ads_readonly', 'seo_gsc_readonly', 'marketing_orchestrator_readonly', 'handback_target_registration', 'specialist_readonly', 'html_artifact_producer'} | handback_profiles:
+        reject(path, 'disallowed profile')
+        return
+    required_agent = (SPECIALIST_ROUTES.get(request.get('route'), (None, None))[0]
+                      if profile in {'specialist_readonly', 'html_artifact_producer'} else {
+        'google_ads_readonly': 'lhm-marketing-hub:google-ads',
+        'seo_gsc_readonly': 'lhm-marketing-hub:seo',
+        'marketing_orchestrator_readonly': 'lhm-marketing-hub:start',
+        'google_drive_client_file_create': 'lhm-connector-repair',
+        'basicops_task_discussion_update': 'lhm-connector-repair',
+        'handback_target_registration': 'lhm-connector-repair',
+    }[profile])
+    if request.get('agent_id') != required_agent:
+        reject(path, 'disallowed or missing plugin agent')
+        return
+    required_timeout = 30 if profile == 'handback_target_registration' else 300 if profile == 'google_ads_readonly' else 1200 if profile == 'html_artifact_producer' else 600
+    if request.get('timeout_seconds') != required_timeout:
+        reject(path, 'disallowed timeout_seconds')
+        return
+    run_id = request.get('run_id', '')
+    prefix = {'google_ads_readonly': 'claude-gads', 'marketing_orchestrator_readonly': 'claude-mktg',
+              'seo_gsc_readonly': 'claude-gsc',
+              'google_drive_client_file_create': 'claude-gdrive',
+              'basicops_task_discussion_update': 'claude-basicops',
+              'handback_target_registration': 'claude-register',
+              'specialist_readonly': 'claude-delegate',
+              'html_artifact_producer': 'claude-producer'}[profile]
+    if not re.fullmatch(prefix + r'-[0-9]{8}-[0-9]{2}', run_id):
+        reject(path, 'invalid run_id')
+        return
+    if profile == 'handback_target_registration':
+        complete_registration(path, request)
+        return
+    if profile == 'html_artifact_producer':
+        if request.get('route') != 'content':
+            reject(path, 'producer route must be content')
+            return
+        subject_name = request.get('subject_name')
+        objective = request.get('objective')
+        output_name = request.get('output_name')
+        artifacts = request.get('input_artifacts')
+        if not isinstance(subject_name, str) or not 2 <= len(subject_name) <= 120:
+            reject(path, 'invalid subject_name')
+            return
+        if not isinstance(objective, str) or not 50 <= len(objective) <= 6000:
+            reject(path, 'invalid objective length')
+            return
+        if not isinstance(output_name, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,119}\.html', output_name):
+            reject(path, 'invalid output_name')
+            return
+        if not isinstance(artifacts, list) or len(artifacts) != 1 or not isinstance(artifacts[0], dict):
+            reject(path, 'exactly one input artifact is required')
+            return
+        supplied = artifacts[0]
+        if set(supplied) != {'artifact_id', 'logical_name', 'media_type', 'size_bytes', 'sha256', 'purpose'}:
+            reject(path, 'invalid input artifact fields')
+            return
+        try:
+            registry = json.loads(PRODUCER_REGISTRY.read_text(encoding='utf-8')).get('artifacts', {})
+        except (OSError, json.JSONDecodeError, TypeError):
+            reject(path, 'producer artifact registry unavailable')
+            return
+        registered = registry.get(supplied.get('artifact_id'))
+        if not isinstance(registered, dict):
+            reject(path, 'unknown input artifact')
+            return
+        for key in ('logical_name', 'media_type', 'size_bytes', 'sha256', 'purpose'):
+            if supplied.get(key) != registered.get(key):
+                reject(path, f'input artifact {key} mismatch')
+                return
+        source = Path(registered.get('source_path', '')).resolve()
+        allowed_root = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/claude/registered-artifacts').resolve()
+        try:
+            source.relative_to(allowed_root)
+        except ValueError:
+            reject(path, 'input artifact path outside protected prefix')
+            return
+        if not source.is_file() or source.is_symlink() or source.stat().st_size != supplied['size_bytes'] or source.stat().st_size > 200000:
+            reject(path, 'input artifact unavailable, linked, wrong size, or too large')
+            return
+        if hashlib.sha256(source.read_bytes()).hexdigest() != supplied['sha256']:
+            reject(path, 'input artifact digest mismatch')
+            return
+        if supplied['media_type'] != 'text/html' or supplied['purpose'] != 'source_copy':
+            reject(path, 'disallowed input artifact type or purpose')
+            return
+        client = None
+    elif profile == 'specialist_readonly':
+        subject_type = request.get('subject_type')
+        subject_name = request.get('subject_name')
+        objective = request.get('objective')
+        if request.get('route') not in SPECIALIST_ROUTES:
+            reject(path, 'disallowed specialist route')
+            return
+        if subject_type not in {'client', 'opportunity', 'internal', 'general'}:
+            reject(path, 'invalid subject_type')
+            return
+        if not isinstance(subject_name, str) or not 2 <= len(subject_name) <= 120 or any(ord(c) < 32 for c in subject_name):
+            reject(path, 'invalid subject_name')
+            return
+        if request.get('approval_state') != 'review_only':
+            reject(path, 'specialist route must be review_only')
+            return
+        if not isinstance(objective, str) or not 10 <= len(objective) <= 6000:
+            reject(path, 'invalid objective length')
+            return
+        if any(ord(char) < 32 and char not in '\n\t' for char in objective):
+            reject(path, 'invalid objective characters')
+            return
+        client = None
+    elif profile == 'seo_gsc_readonly':
+        site = GSC_SITES.get(request.get('site'))
+        urls = request.get('urls')
+        objective = request.get('objective')
+        if site is None:
+            reject(path, 'unregistered Search Console site')
+            return
+        if not isinstance(urls, list) or not 1 <= len(urls) <= 100 or len(set(urls)) != len(urls):
+            reject(path, 'invalid URL list')
+            return
+        for url in urls:
+            if not isinstance(url, str) or len(url) > 500:
+                reject(path, 'invalid URL')
+                return
+            parsed = urlsplit(url)
+            if parsed.scheme != 'https' or parsed.hostname != site['host'] or parsed.username or parsed.password or parsed.port or parsed.query or parsed.fragment:
+                reject(path, 'URL is outside registered Search Console site or contains disallowed components')
+                return
+        if not isinstance(objective, str) or not 10 <= len(objective) <= 6000:
+            reject(path, 'invalid objective length')
+            return
+        if any(ord(char) < 32 and char not in '\n\t' for char in objective):
+            reject(path, 'invalid objective characters')
+            return
+        client = None
+    else:
+        clients = load_clients() if profile not in handback_profiles else load_handback_targets()
+        if request.get('client') not in clients:
+            reject(path, 'unregistered client')
+            return
+        client = clients[request['client']]
+    if profile not in handback_profiles and profile not in {'specialist_readonly', 'seo_gsc_readonly', 'html_artifact_producer'}:
+        objective = request.get('objective')
+        if not isinstance(objective, str) or not 10 <= len(objective) <= 4000:
+            reject(path, 'invalid objective length')
+            return
+        if any(ord(char) < 32 and char not in '\n\t' for char in objective):
+            reject(path, 'invalid objective characters')
+            return
+    run_dir = RUNS / run_id
+    if run_dir.exists():
+        reject(path, 'run_id already exists')
+        return
+    run_dir.mkdir(mode=0o2750)
+    configure_worker_run_dir(run_dir)
+    if profile == 'html_artifact_producer':
+        prompt = {
+            'profile': profile,
+            'agent_id': request['agent_id'],
+            'claude_agent': 'content',
+            'subject_name': subject_name,
+            'objective': objective,
+            'output_name': output_name,
+            'source_sha256': supplied['sha256'],
+            'source_html': source.read_text(encoding='utf-8'),
+        }
+    elif profile == 'specialist_readonly':
+        prompt = {
+            'profile': profile,
+            'agent_id': request['agent_id'],
+            'claude_agent': SPECIALIST_ROUTES[request['route']][1],
+            'route': request['route'],
+            'subject_type': subject_type,
+            'subject_name': subject_name,
+            'objective': objective,
+            'approval_state': 'review_only',
+        }
+    elif profile == 'seo_gsc_readonly':
+        prompt = {
+            'profile': profile,
+            'agent_id': request['agent_id'],
+            'site': request['site'],
+            'site_name': site['name'],
+            'site_property': site['property'],
+            'urls': urls,
+            'objective': objective,
+            'approval_state': 'review_only',
+        }
+    else:
+        prompt = {
+            'profile': request['profile'],
+            'agent_id': request['agent_id'],
+            'client': request['client'],
+            'client_name': client['name'],
+        }
+    if profile in {'specialist_readonly', 'seo_gsc_readonly', 'html_artifact_producer'}:
+        pass
+    elif profile not in handback_profiles:
+        prompt.update(customer_id=client['customer_id'], manager_id=client['manager_id'], objective=objective)
+    elif profile == 'google_drive_client_file_create':
+        artifact_path = request.get('artifact_path')
+        file_name = request.get('file_name')
+        allowed_prefix = client.get('vault_prefix', '')
+        if not isinstance(artifact_path, str) or not artifact_path.startswith(allowed_prefix) or '..' in Path(artifact_path).parts:
+            reject(path, 'artifact path is outside registered client scope')
+            return
+        source = (VAULT / artifact_path).resolve()
+        try:
+            source.relative_to(VAULT.resolve())
+        except ValueError:
+            reject(path, 'artifact path escapes vault')
+            return
+        if not source.is_file() or source.is_symlink() or source.stat().st_size > 200000:
+            reject(path, 'artifact unavailable, linked, or too large')
+            return
+        if not isinstance(file_name, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9 ._()&-]{0,119}', file_name):
+            reject(path, 'invalid file name')
+            return
+        prompt.update(artifact_path=artifact_path, file_name=file_name,
+                      artifact_content=source.read_text(encoding='utf-8'),
+                      drive_folder_query=client['drive_folder_query'])
+    else:
+        task_id = str(request.get('task_id', ''))
+        discussion = request.get('discussion')
+        if task_id not in {str(value) for value in client.get('basicops_task_ids', [])}:
+            reject(path, 'task is outside registered client scope')
+            return
+        if not isinstance(discussion, str) or not 20 <= len(discussion) <= 20000:
+            reject(path, 'invalid discussion length')
+            return
+        prompt.update(task_id=task_id, discussion=discussion)
+    for name, payload in (('request.json', request), ('prompt.json', prompt)):
+        item = run_dir / name
+        item.write_text(json.dumps(payload, indent=2) + '\n', encoding='utf-8')
+        os.chown(item, WORKER_UID, HERMES_GID)
+        os.chmod(item, 0o640)
+    events = run_dir / 'events.jsonl'
+    summary = {
+        'google_ads_readonly': 'Validated Google Ads read-only request queued for Claude.',
+        'seo_gsc_readonly': 'Validated Search Console read-only request queued for Claude.',
+        'marketing_orchestrator_readonly': 'Validated general marketing request queued for the Claude start orchestrator.',
+        'google_drive_client_file_create': 'Validated scoped Google Drive file repair queued for Claude.',
+        'basicops_task_discussion_update': 'Validated scoped BasicOps discussion repair queued for Claude.',
+        'specialist_readonly': 'Validated delegate-first specialist request queued for Claude.',
+        'html_artifact_producer': 'Validated bounded HTML producer request queued for Claude.',
+    }[profile]
+    events.write_text(json.dumps({'event': 'queued', 'run_id': run_id, 'summary': summary}) + '\n', encoding='utf-8')
+    os.chown(events, WORKER_UID, HERMES_GID)
+    os.chmod(events, 0o640)
+    unit = f'lhm-claude-run-{run_id}'
+    ensure_worker_traversal()
+    subprocess.run([
+        'systemd-run', '--quiet', '--no-block', f'--unit={unit}', '--uid=claudeworker', '--gid=claudeworker',
+        '--property=Type=oneshot', '--property=KillMode=process',
+        '/usr/local/libexec/lhm-claude-worker', str(run_dir), str(request['timeout_seconds'])
+    ], check=True)
+    shutil.move(str(path), PROCESSED / path.name)
+
+
+def main():
+    for path in sorted(INCOMING.glob('*.json')):
+        process(path)
+
+
+if __name__ == '__main__':
+    main()
