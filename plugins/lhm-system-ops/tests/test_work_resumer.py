@@ -20,6 +20,10 @@ SERVICE_UNIT = ROOT / 'assets/systemd/lhm-work-resumer.service'
 spec = importlib.util.spec_from_loader('work_resumer', SourceFileLoader('work_resumer', str(SCRIPT)))
 resumer = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(resumer)
+validator_spec = importlib.util.spec_from_file_location(
+    'validate_system_ops', ROOT / 'scripts/validate_system_ops.py')
+validator = importlib.util.module_from_spec(validator_spec)
+validator_spec.loader.exec_module(validator)
 INSTALLED_BASE = resumer.BASE
 INSTALLED_INCOMING = resumer.INCOMING
 class WorkResumerIntegrationTests(unittest.TestCase):
@@ -37,13 +41,25 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         self.assertEqual(deployment['store_host'],
                          deployment['producer_store_container'].replace(container_profile, host_profile, 1))
         self.assertEqual(INSTALLED_BASE, Path(deployment['store_host']))
-        self.assertEqual(INSTALLED_INCOMING, Path(deployment['store_host']) / 'events')
+        producer_name = validator.producer_incoming_name(
+            deployment['producer_restore_path_expression'])
+        self.assertEqual(producer_name, 'incoming')
+        self.assertEqual(INSTALLED_INCOMING, Path(deployment['store_host']) / producer_name)
         self.assertEqual(deployment['watch_glob_host'], str(INSTALLED_INCOMING / '*.json'))
         self.assertIn(f"PathExistsGlob={deployment['watch_glob_host']}", path_unit)
         self.assertIn(f"ReadWritePaths={deployment['store_host']} {deployment['handoff_host']}", service_unit)
         self.assertEqual(deployment['handoff_host'], '/run/lhm-work-resumer')
         self.assertEqual(deployment['handoff_container'], '/opt/run/lhm-work-resumer')
         self.assertNotIn('/var/lib/lhm-work-control', SCRIPT.read_text() + path_unit + service_unit)
+
+    def test_deployment_parity_rejects_nonexistent_events_alternate(self):
+        deployment = json.loads(DEPLOYMENT.read_text())
+        deployment['watch_glob_host'] = f"{deployment['store_host']}/events/*.json"
+        errors = validator.validate_work_control_parity(
+            deployment, SCRIPT.read_text(),
+            PATH_UNIT.read_text().replace('/incoming/*.json', '/events/*.json'))
+        self.assertTrue(errors)
+        self.assertTrue(any('producer restore path literal' in error for error in errors))
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -237,6 +253,8 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         marker.write_text(json.dumps(self.legacy_marker()))
 
         self.assertEqual(resumer.reconcile_false_marker(marker, processed), 'requeued')
+        self.assertEqual(resumer.INCOMING.name, 'incoming')
+        self.assertTrue((resumer.INCOMING / processed.name).is_file())
         calls = []
         runner = self.runner(self.record())
         def counted(handoff):

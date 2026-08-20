@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import ast
 import json
 import re
 import sys
@@ -12,6 +13,46 @@ REQUIRED_SKILLS = {
     'lhm-cto-source-handoff', 'lhm-head-of-production-source-handoff',
     'release-publishing-engineer',
 }
+
+
+def producer_incoming_name(expression):
+    """Extract the literal directory selected by the native restore expression."""
+    try:
+        tree = ast.parse(expression, mode='eval')
+    except SyntaxError as exc:
+        raise ValueError('invalid producer restore path expression') from exc
+    nodes = []
+    node = tree.body
+    while isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
+        nodes.append(node.right)
+        node = node.left
+    nodes.reverse()
+    if (not isinstance(node, ast.Name) or node.id != 'BASE' or len(nodes) != 2
+            or not isinstance(nodes[0], ast.Constant) or not isinstance(nodes[0].value, str)
+            or not isinstance(nodes[1], ast.JoinedStr)):
+        raise ValueError('producer restore path must be BASE / literal / event filename')
+    return nodes[0].value
+
+
+def validate_work_control_parity(contract, work_resumer, work_path):
+    errors = []
+    host_store = contract.get('store_host')
+    try:
+        incoming_name = producer_incoming_name(contract.get('producer_restore_path_expression', ''))
+    except ValueError as exc:
+        errors.append(str(exc))
+        return errors
+    incoming_host = f'{host_store}/{incoming_name}' if host_store else None
+    if not host_store or f"BASE = Path('{host_store}')" not in work_resumer:
+        errors.append('work resumer BASE does not match the authoritative host store')
+    if f"INCOMING = BASE / '{incoming_name}'" not in work_resumer:
+        errors.append('work resumer INCOMING does not match the producer restore path literal')
+    expected_glob = f'{incoming_host}/*.json'
+    if contract.get('watch_glob_host') != expected_glob:
+        errors.append('deployment watch glob does not match the producer restore path literal')
+    if f'PathExistsGlob={expected_glob}' not in work_path:
+        errors.append('work resumer path unit does not watch the producer restore path literal')
+    return errors
 
 
 def generated_bytecode_paths(root):
@@ -109,11 +150,7 @@ def main():
     work_contract = json.loads((PLUGIN / 'references/work-control-deployment.json').read_text(encoding='utf-8'))
     work_resumer = (PLUGIN / 'assets/host/lhm-work-resumer').read_text(encoding='utf-8')
     work_path = (PLUGIN / 'assets/systemd/lhm-work-resumer.path').read_text(encoding='utf-8')
-    host_store = work_contract.get('store_host')
-    if not host_store or f"BASE = Path('{host_store}')" not in work_resumer:
-        errors.append('work resumer BASE does not match the authoritative host store')
-    if f"PathExistsGlob={work_contract.get('watch_glob_host')}" not in work_path:
-        errors.append('work resumer path unit does not watch the authoritative host store')
+    errors.extend(validate_work_control_parity(work_contract, work_resumer, work_path))
     if '/var/lib/lhm-work-control' in work_resumer or '/var/lib/lhm-work-control' in work_path:
         errors.append('work resumer release contains the empty alternate store')
     publisher = (PLUGIN / 'assets/host/lhm-cto-branch-publisher').read_text(encoding='utf-8')
