@@ -45,6 +45,11 @@ def change_branch(request):
     return base if iteration == 1 else f'{base}-i{iteration}'
 
 
+def prior_change_branch(request):
+    prior = {**request, 'iteration': request.get('iteration', 1) - 1}
+    return change_branch(prior)
+
+
 def prepare_change_workspace(request):
     """Create once, or safely reuse the exact request/iteration worktree on retry."""
     branch = change_branch(request)
@@ -61,8 +66,19 @@ def prepare_change_workspace(request):
         ['/usr/sbin/runuser', '-u', 'ctoworker', '--', 'git', '-C', str(REPO),
          'show-ref', '--verify', '--quiet', local_ref]
     ).returncode == 0
-    args = ['git', '-C', str(REPO), 'worktree', 'add']
-    args.extend([str(workspace), branch] if exists else ['-b', branch, str(workspace), 'origin/main'])
+    if exists:
+        raise ValueError('stale CTO iteration branch exists without its exact workspace')
+    start = 'origin/main'
+    if request.get('iteration', 1) > 1:
+        start = prior_change_branch(request)
+        prior_ref = f'refs/heads/{start}'
+        prior_exists = subprocess.run(
+            ['/usr/sbin/runuser', '-u', 'ctoworker', '--', 'git', '-C', str(REPO),
+             'show-ref', '--verify', '--quiet', prior_ref]
+        ).returncode == 0
+        if not prior_exists:
+            raise ValueError('prior evidence-loop iteration branch is unavailable')
+    args = ['git', '-C', str(REPO), 'worktree', 'add', '-b', branch, str(workspace), start]
     run_worker(args)
     return branch, workspace
 

@@ -1,108 +1,178 @@
 #!/usr/bin/env python3
-"""Root-owned, repository-scoped HTML prototype publisher."""
-import argparse, hashlib, json, os, re, shutil, subprocess, time, urllib.request
-from pathlib import Path
+"""Root-owned, repository-scoped LHM static prototype publisher."""
+import argparse, fcntl, hashlib, json, os, re, shutil, subprocess, time, urllib.request
+from pathlib import Path, PurePosixPath
 
-REPOSITORY='michaellhm/lhm-prototype'; BRANCH='main'
-REMOTE='ssh://git@ssh.github.com:443/michaellhm/lhm-prototype.git'
-PUBLIC_ROOT='https://lhmstaging.net/prototypes/'
-SSH_KEY=Path('/etc/lhm-prototype-publisher/id_ed25519')
-KNOWN_HOSTS=Path('/etc/lhm-prototype-publisher/known_hosts')
-CHECKOUT=Path('/srv/lhm-prototype-publisher/lhm-prototype')
-SOURCE_ROOT=Path('/var/lib/lhm-prototype-publication/incoming')
-WORKFLOW={'name':'Deploy to lhmstaging','id':289562388,'path':'.github/workflows/deploy.yml'}
-SAFE_ID=re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$'); SHA40=re.compile(r'^[0-9a-f]{40}$'); SHA256=re.compile(r'^[0-9a-f]{64}$')
-PUBLISH_PATH=re.compile(r'^[a-z0-9][a-z0-9-]{0,62}/(?:sitemap|homepage)/index\.html$')
-SENSITIVE=re.compile(r'(BEGIN [A-Z ]*PRIVATE KEY|github_pat_|ghp_|sk-)')
+REPOSITORY = 'michaellhm/lhm-prototype'
+BRANCH = 'main'
+REMOTE = 'ssh://git@ssh.github.com:443/michaellhm/lhm-prototype.git'
+PUBLIC_ROOT = 'https://lhmstaging.net/prototypes'
+SSH_KEY = Path('/etc/lhm-prototype-publisher/id_ed25519')
+KNOWN_HOSTS = Path('/etc/lhm-prototype-publisher/known_hosts')
+CHECKOUT = Path('/srv/lhm-prototype-publisher/lhm-prototype')
+SOURCE_ROOT = Path('/var/lib/lhm-prototype-publication/incoming')
+STATE_ROOT = Path('/var/lib/lhm-prototype-publication/receipts')
+WORKFLOW = {'name':'Deploy to lhmstaging','id':289562388,'path':'.github/workflows/deploy.yml'}
+SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
+SLUG = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
+SHA = re.compile(r'^[0-9a-f]{40}$')
+SHA256 = re.compile(r'^[0-9a-f]{64}$')
+STATIC_EXTENSIONS = {'.html', '.css', '.js', '.json', '.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.ico', '.avif', '.woff', '.woff2', '.ttf', '.otf'}
+TEXT_EXTENSIONS = {'.html', '.css', '.js', '.json', '.svg', '.md'}
+SENSITIVE = re.compile(rb'(BEGIN [A-Z ]*PRIVATE KEY|github_pat_|ghp_|sk-[A-Za-z0-9]|AKIA[0-9A-Z]{16}|password\s*[:=]|client_secret\s*[:=])', re.I)
+MAX_FILE = 10_000_000
+MAX_HTTP = 2_000_000
+FIELDS = {'schema_version','request_id','source_basicops_task','governed_parent','client_slug','project_slug','prototype_kind','repository','branch','expected_base_commit','source_directory','source_package_sha256','file_manifest','qa_evidence_reference','idempotency_key','standing_authority_reference','commit_message'}
 
 def run(args, *, env=None):
-    return subprocess.run(args,check=True,capture_output=True,text=True,env=env).stdout.strip()
+    return subprocess.run(args, check=True, capture_output=True, text=True, env=env).stdout.strip()
 
 def git(*args, env=None):
-    return run(['git','-c',f'safe.directory={CHECKOUT}','-C',str(CHECKOUT),*args],env=env)
+    return run(['git','-c',f'safe.directory={CHECKOUT}','-C',str(CHECKOUT),*args], env=env)
 
-def canonical_manifest(manifest):
-    return json.dumps(manifest,sort_keys=True,separators=(',',':')).encode()
+def digest_file(path):
+    h=hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024*1024), b''): h.update(block)
+    return h.hexdigest()
 
-def file_digest(path):
-    digest=hashlib.sha256(); size=0
-    with path.open('rb') as handle:
-        for chunk in iter(lambda:handle.read(65536),b''): digest.update(chunk); size+=len(chunk)
-    return size,digest.hexdigest()
+def package_digest(manifest):
+    canonical=(json.dumps(manifest,sort_keys=True,separators=(',',':'))+'\n').encode()
+    return hashlib.sha256(canonical).hexdigest()
+
+def prototype_prefix(r):
+    return f"{r['client_slug']}/{r['project_slug']}/"
+
+def generated_index_paths(r):
+    return {'README.md', f"{r['client_slug']}/README.md"}
+
+def generated_index_content(r):
+    url=f"{PUBLIC_ROOT}/{r['client_slug']}/{r['project_slug']}/"
+    return f"- [{r['client_slug']} / {r['project_slug']}]({url})\n".encode()
+
+def validate_contract(r):
+    if not isinstance(r,dict) or set(r)!=FIELDS or r.get('schema_version')!=2:
+        raise ValueError('invalid prototype publication request schema')
+    for field in ('request_id','source_basicops_task','governed_parent','qa_evidence_reference','idempotency_key','standing_authority_reference'):
+        if not isinstance(r[field],str) or not SAFE_ID.fullmatch(r[field]): raise ValueError(f'invalid {field}')
+    if r['request_id'] != r['idempotency_key']: raise ValueError('request_id must equal idempotency_key')
+    if not SLUG.fullmatch(r['client_slug']) or not SLUG.fullmatch(r['project_slug']): raise ValueError('invalid canonical client/project slug')
+    if r['prototype_kind'] not in {'sitemap','homepage'}: raise ValueError('prototype_kind is not allowlisted')
+    if r['project_slug'] != r['prototype_kind']: raise ValueError('project_slug must identify the governed prototype kind')
+    if r['repository']!=REPOSITORY or r['branch']!=BRANCH: raise ValueError('repository and branch are not allowlisted')
+    if not isinstance(r['expected_base_commit'],str) or not SHA.fullmatch(r['expected_base_commit']): raise ValueError('invalid expected_base_commit')
+    if not isinstance(r['source_package_sha256'],str) or not SHA256.fullmatch(r['source_package_sha256']): raise ValueError('invalid source_package_sha256')
+    if not isinstance(r['commit_message'],str) or not re.fullmatch(r'prototype: [a-z0-9-]+/(sitemap|homepage) [A-Za-z0-9][A-Za-z0-9 ._-]{0,80}',r['commit_message']): raise ValueError('invalid bounded commit message')
+    return r
 
 def validate(r):
-    fields={'schema_version','request_id','repository','branch','expected_base_commit','source_directory','manifest','package_manifest_sha256','commit_message','workflow'}
-    if not isinstance(r,dict) or set(r)!=fields or r.get('schema_version')!=1: raise ValueError('invalid prototype publication request schema')
-    if not isinstance(r['request_id'],str) or not SAFE_ID.fullmatch(r['request_id']): raise ValueError('invalid request_id')
-    if r['repository']!=REPOSITORY or r['branch']!=BRANCH: raise ValueError('repository and branch are not allowlisted')
-    if not isinstance(r['expected_base_commit'],str) or not SHA40.fullmatch(r['expected_base_commit']): raise ValueError('invalid expected_base_commit')
-    if r['workflow']!=WORKFLOW: raise ValueError('workflow identity does not match the reviewed deployment route')
+    validate_contract(r)
     source=Path(r['source_directory']); expected=(SOURCE_ROOT/r['request_id']).resolve()
     if source.resolve()!=expected or source.parent.resolve()!=SOURCE_ROOT.resolve() or not source.is_dir() or source.is_symlink(): raise ValueError('invalid source_directory')
-    manifest=r['manifest']
-    if not isinstance(manifest,list) or not manifest or len(manifest)>100: raise ValueError('manifest must contain 1..100 entries')
-    paths=[]
-    for entry in manifest:
-        if not isinstance(entry,dict) or set(entry)!={'path','sha256','bytes'}: raise ValueError('invalid manifest entry schema')
-        value=entry['path']
-        if not isinstance(value,str) or not PUBLISH_PATH.fullmatch(value): raise ValueError(f'path is outside prototype allowlist: {value}')
-        if not isinstance(entry['sha256'],str) or not SHA256.fullmatch(entry['sha256']) or not isinstance(entry['bytes'],int) or isinstance(entry['bytes'],bool) or not 1<=entry['bytes']<=2_000_000: raise ValueError('invalid manifest evidence')
-        candidate=source/value
-        if candidate.is_symlink() or not candidate.is_file() or candidate.resolve().parent!=(source/Path(value).parent).resolve(): raise ValueError(f'invalid source file: {value}')
-        size,digest=file_digest(candidate)
-        if (size,digest)!=(entry['bytes'],entry['sha256']): raise ValueError(f'source evidence mismatch: {value}')
-        if SENSITIVE.search(candidate.read_text(encoding='utf-8',errors='ignore')): raise ValueError(f'sensitive content detected: {value}')
-        paths.append(value)
-    if paths!=sorted(set(paths)): raise ValueError('manifest paths must be sorted and unique')
-    # The package digest is produced by the root-side canonical package builder. File bytes are
-    # independently verified above; the digest is retained unchanged in the immutable result.
-    if not isinstance(r['package_manifest_sha256'],str) or not SHA256.fullmatch(r['package_manifest_sha256']): raise ValueError('invalid package manifest digest')
-    if not isinstance(r['commit_message'],str) or not re.fullmatch(r'prototype: [A-Za-z0-9][A-Za-z0-9 ._:/()-]{0,120}',r['commit_message']): raise ValueError('invalid bounded commit message')
+    manifest=r['file_manifest']
+    if not isinstance(manifest,list) or not manifest: raise ValueError('file_manifest must be non-empty')
+    paths=[item.get('path') for item in manifest if isinstance(item,dict)]
+    if len(paths)!=len(manifest) or paths!=sorted(set(paths)): raise ValueError('file_manifest must be exact, sorted and unique')
+    prefix=prototype_prefix(r); has_index=False; index_links=0
+    for item in manifest:
+        if set(item)!= {'path','sha256','bytes'} or not SHA256.fullmatch(str(item['sha256'])) or not isinstance(item['bytes'],int) or not 0 <= item['bytes'] <= MAX_FILE: raise ValueError('invalid file manifest entry')
+        value=item['path']; path=PurePosixPath(value)
+        if not isinstance(value,str) or path.is_absolute() or '..' in path.parts or any(part.startswith('.') for part in path.parts): raise ValueError(f'unsafe or dotfile path: {value}')
+        if value.startswith('.github/') or value in {'.gitmodules','.gitattributes','.gitignore'}: raise ValueError(f'repository configuration is forbidden: {value}')
+        candidate=source.joinpath(*path.parts)
+        if not candidate.is_file() or candidate.is_symlink() or candidate.stat().st_size!=item['bytes'] or digest_file(candidate)!=item['sha256']: raise ValueError(f'source file does not match manifest: {value}')
+        if SENSITIVE.search(candidate.read_bytes()): raise ValueError(f'sensitive content detected: {value}')
+        if value in generated_index_paths(r):
+            index_links += 1
+            if candidate.read_bytes()!=generated_index_content(r): raise ValueError(f'README link is not narrowly generated: {value}')
+        else:
+            if not value.startswith(prefix) or path.suffix.lower() not in STATIC_EXTENSIONS: raise ValueError(f'non-static or out-of-project path: {value}')
+            has_index |= value == prefix+'index.html'
+    if index_links>2: raise ValueError('too many generated README links')
+    if not has_index: raise ValueError('prototype requires index.html')
+    if package_digest(manifest)!=r['source_package_sha256']: raise ValueError('source package digest does not match manifest')
+    return [item['path'] for item in manifest]
 
 def ssh_env():
     if not SSH_KEY.is_file() or not KNOWN_HOSTS.is_file(): raise ValueError('prototype publisher credential is not configured')
     env=os.environ.copy(); env['GIT_SSH_COMMAND']=f'/usr/bin/ssh -i {SSH_KEY} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile={KNOWN_HOSTS}'
     return env
 
-def public_url(path):
-    return PUBLIC_ROOT+path.removesuffix('index.html')
+def receipt_path(key): return STATE_ROOT/f'{key}.json'
 
-def verify_public(entry):
-    url=public_url(entry['path']); req=urllib.request.Request(url,method='GET',headers={'User-Agent':'LHM-Prototype-Publisher/1'})
+def prior_receipt(r):
+    path=receipt_path(r['idempotency_key'])
+    if not path.exists(): return None
+    value=json.loads(path.read_text(encoding='utf-8'))
+    if value.get('request_digest') != hashlib.sha256(json.dumps(r,sort_keys=True,separators=(',',':')).encode()).hexdigest(): raise ValueError('idempotency key was already used for a different request')
+    return value['result']
+
+def store_receipt(r,result):
+    STATE_ROOT.mkdir(parents=True,exist_ok=True,mode=0o700)
+    payload={'request_digest':hashlib.sha256(json.dumps(r,sort_keys=True,separators=(',',':')).encode()).hexdigest(),'result':result}
+    temporary=receipt_path(r['idempotency_key']).with_suffix(f'.{os.getpid()}.tmp')
+    flags=os.O_WRONLY|os.O_CREAT|os.O_EXCL
+    fd=os.open(temporary,flags,0o600)
+    with os.fdopen(fd,'w') as stream: json.dump(payload,stream,sort_keys=True); stream.write('\n')
+    os.replace(temporary,receipt_path(r['idempotency_key']))
+
+def verify_deploy(commit):
+    for _ in range(30):
+        data=json.loads(run(['/usr/bin/gh','api',f'repos/{REPOSITORY}/actions/workflows/{WORKFLOW["id"]}/runs?head_sha={commit}&branch={BRANCH}&event=push&per_page=20']))
+        runs=[x for x in data.get('workflow_runs',[]) if x.get('head_sha')==commit and x.get('name')==WORKFLOW['name'] and x.get('path')==WORKFLOW['path']]
+        if len(runs)==1 and runs[0].get('status')=='completed':
+            if runs[0].get('conclusion')!='success': raise ValueError('exact-commit Deploy to lhmstaging failed')
+            return runs[0]
+        time.sleep(10)
+    raise ValueError('successful exact-commit Deploy to lhmstaging run was not observed')
+
+def verify_public_url(r,commit):
+    url=f"{PUBLIC_ROOT}/{r['client_slug']}/{r['project_slug']}/"
+    req=urllib.request.Request(url,method='GET',headers={'User-Agent':'LHM-Prototype-Publisher/2'})
     with urllib.request.urlopen(req,timeout=20) as response:
-        body=response.read(2_000_001)
-        if response.status!=200 or not body or len(body)>2_000_000: raise ValueError(f'public prototype verification failed: {url}')
+        body=response.read(MAX_HTTP+1)
+        if response.status!=200 or not body or len(body)>MAX_HTTP: raise ValueError('bounded prototype HTTP verification failed')
+    index=next(item for item in r['file_manifest'] if item['path']==prototype_prefix(r)+'index.html')
     digest=hashlib.sha256(body).hexdigest()
-    if len(body)!=entry['bytes'] or digest!=entry['sha256']: raise ValueError(f'public prototype content does not match package: {url}')
-    return {'url':url,'status':200,'bytes':len(body),'sha256':digest}
+    if len(body)!=index['bytes'] or digest!=index['sha256']: raise ValueError('public prototype content does not match approved index.html')
+    return {'url':url,'status':200,'bytes':len(body),'sha256':digest,'commit':commit}
+
+def _publish_locked(r):
+    paths=validate(r); previous=prior_receipt(r)
+    if previous: return previous
+    env=ssh_env(); git('fetch','--no-tags',REMOTE,BRANCH,env=env)
+    if git('rev-parse','FETCH_HEAD')!=r['expected_base_commit']: raise ValueError('main moved since evidence-bound approval; redispatch with a fresh base')
+    git('reset','--hard',r['expected_base_commit']); git('clean','-ffd')
+    source=Path(r['source_directory'])
+    for value in paths:
+        destination=CHECKOUT.joinpath(*PurePosixPath(value).parts); destination.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(source/value,destination)
+    changed=git('status','--porcelain=v1','-z','--untracked-files=all').split('\0')
+    observed=sorted(line[3:] for line in changed if line)
+    if observed!=paths: raise ValueError('checkout changes do not match the approved manifest')
+    git('add','--',*paths); git('-c','user.name=LHM Prototype Publisher','-c','user.email=prototype-publisher@localhealthmarketing.com.au','commit','-m',r['commit_message'])
+    commit=git('rev-parse','HEAD')
+    # A lease makes the final write fail closed if main moves after the fetch check.
+    git('push',f'--force-with-lease=refs/heads/{BRANCH}:{r["expected_base_commit"]}',REMOTE,f'{commit}:refs/heads/{BRANCH}',env=env)
+    remote=run(['git','ls-remote',REMOTE,f'refs/heads/{BRANCH}'],env=env).split()
+    if len(remote)!=2 or remote[0]!=commit: raise ValueError('exact remote main SHA verification failed')
+    action=verify_deploy(commit); public=verify_public_url(r,commit)
+    result={'schema_version':2,'status':'published_and_verified','request_id':r['request_id'],'repository':REPOSITORY,'branch':BRANCH,'base_commit':r['expected_base_commit'],'commit':commit,'source_package_sha256':r['source_package_sha256'],'workflow':{**WORKFLOW,'run_id':action['id'],'conclusion':'success'},'public_verifications':[public],'changed_files':paths,'source_basicops_task':r['source_basicops_task'],'governed_parent':r['governed_parent'],'qa_evidence_reference':r['qa_evidence_reference'],'idempotency_key':r['idempotency_key'],'standing_authority_reference':r['standing_authority_reference'],'review_handoff':{'skill':'lhm-project-hub:basicops-task-manager','state':'Under Review','complete':False,'client_contact':False}}
+    store_receipt(r,result); return result
 
 def publish(r):
-    validate(r); env=ssh_env(); git('fetch',REMOTE,BRANCH,env=env)
-    if git('rev-parse','FETCH_HEAD')!=r['expected_base_commit']: raise ValueError('main moved since authority was recorded; refusing publication')
-    git('reset','--hard',r['expected_base_commit']); git('clean','-fd'); source=Path(r['source_directory'])
-    paths=[entry['path'] for entry in r['manifest']]
-    for value in paths:
-        destination=CHECKOUT/value; destination.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(source/value,destination)
-    changed=git('status','--porcelain=v1','-z','--untracked-files=all').split('\0')
-    actual=sorted(line[3:] for line in changed if line)
-    if actual!=paths: raise ValueError('checkout changes do not match approved manifest')
-    git('add','--',*paths); git('-c','user.name=LHM Prototype Publisher','-c','user.email=prototype-publisher@localhealthmarketing.com.au','commit','-m',r['commit_message'])
-    commit=git('rev-parse','HEAD'); git('push',REMOTE,f'{commit}:refs/heads/main',env=env)
-    remote=run(['git','ls-remote',REMOTE,'refs/heads/main'],env=env).split()
-    if len(remote)!=2 or remote[0]!=commit: raise ValueError('exact main commit verification failed')
-    runs=[]
-    for _ in range(30):
-        actions=json.loads(run(['/usr/bin/gh','api',f'repos/{REPOSITORY}/actions/workflows/{WORKFLOW["id"]}/runs?head_sha={commit}&branch=main&per_page=1']))
-        runs=actions.get('workflow_runs',[])
-        if len(runs)==1 and runs[0].get('head_sha')==commit and runs[0].get('name')==WORKFLOW['name'] and runs[0].get('path')==WORKFLOW['path'] and runs[0].get('status')=='completed': break
-        time.sleep(10)
-    if len(runs)!=1 or runs[0].get('head_sha')!=commit or runs[0].get('name')!=WORKFLOW['name'] or runs[0].get('path')!=WORKFLOW['path'] or runs[0].get('status')!='completed' or runs[0].get('conclusion')!='success': raise ValueError('reviewed GitHub workflow has not successfully completed for exact commit')
-    public=[verify_public(entry) for entry in r['manifest']]
-    return {'schema_version':1,'status':'published_and_verified','request_id':r['request_id'],'repository':REPOSITORY,'branch':BRANCH,'base_commit':r['expected_base_commit'],'commit':commit,'package_manifest_sha256':r['package_manifest_sha256'],'workflow':{**WORKFLOW,'run_id':runs[0]['id'],'conclusion':'success'},'public_verifications':public,'changed_files':paths}
+    # Serialize the complete check/write/receipt transaction for this idempotency key.
+    if not isinstance(r,dict) or not isinstance(r.get('idempotency_key'),str) or not SAFE_ID.fullmatch(r['idempotency_key']):
+        raise ValueError('invalid idempotency_key')
+    STATE_ROOT.mkdir(parents=True,exist_ok=True,mode=0o700)
+    lock_path=STATE_ROOT/f"{r['idempotency_key']}.lock"
+    fd=os.open(lock_path,os.O_RDWR|os.O_CREAT,0o600)
+    with os.fdopen(fd,'r+') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX)
+        return _publish_locked(r)
 
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--request',required=True); args=parser.parse_args(); path=Path(args.request)
     if not path.is_file() or path.is_symlink(): raise SystemExit('invalid publication request')
-    print(json.dumps(publish(json.loads(path.read_text(encoding='utf-8')))))
+    print(json.dumps(publish(json.loads(path.read_text(encoding='utf-8'))),sort_keys=True))
 
 if __name__=='__main__': main()

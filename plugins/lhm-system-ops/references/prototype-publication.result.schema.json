@@ -2,26 +2,30 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "status", "request_id", "repository", "branch", "base_commit", "commit", "package_manifest_sha256", "workflow", "public_verifications", "changed_files"],
+  "required": ["schema_version", "status", "request_id", "repository", "branch", "base_commit", "commit", "source_package_sha256", "workflow", "public_verifications", "changed_files", "source_basicops_task", "governed_parent", "qa_evidence_reference", "idempotency_key", "standing_authority_reference", "review_handoff"],
   "properties": {
-    "schema_version": {"const": 1},
+    "schema_version": {"const": 2},
     "status": {"const": "published_and_verified"},
     "request_id": {"type": "string"},
     "repository": {"const": "michaellhm/lhm-prototype"},
     "branch": {"const": "main"},
     "base_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
     "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
-    "package_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "source_package_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "workflow": {
-      "type": "object",
-      "additionalProperties": false,
+      "type": "object", "additionalProperties": false,
       "required": ["name", "id", "path", "run_id", "conclusion"],
       "properties": {
-        "name": {"type": "string"}, "id": {"type": "integer"}, "path": {"type": "string"},
-        "run_id": {"type": "integer"}, "conclusion": {"const": "success"}
+        "name": {"const": "Deploy to lhmstaging"}, "id": {"const": 289562388},
+        "path": {"const": ".github/workflows/deploy.yml"}, "run_id": {"type": "integer"},
+        "conclusion": {"const": "success"}
       }
     },
-    "public_verifications": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["url", "status", "bytes", "sha256"], "properties": {"url": {"type": "string"}, "status": {"const": 200}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}}},
-    "changed_files": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+    "public_verifications": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["url", "status", "bytes", "sha256", "commit"], "properties": {"url": {"type": "string"}, "status": {"const": 200}, "bytes": {"type": "integer", "minimum": 1}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}}}},
+    "changed_files": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "source_basicops_task": {"type": "string"}, "governed_parent": {"type": "string"},
+    "qa_evidence_reference": {"type": "string"}, "idempotency_key": {"type": "string"},
+    "standing_authority_reference": {"type": "string"},
+    "review_handoff": {"type": "object", "additionalProperties": false, "required": ["skill", "state", "complete", "client_contact"], "properties": {"skill": {"const": "lhm-project-hub:basicops-task-manager"}, "state": {"const": "Under Review"}, "complete": {"const": false}, "client_contact": {"const": false}}}
   }
 }

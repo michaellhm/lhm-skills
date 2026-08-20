@@ -1,0 +1,25 @@
+{
+  "schema_version": 2,
+  "request_id": "asp-sitemap-v2-publish-20260820",
+  "source_basicops_task": "2191545",
+  "governed_parent": "ASP-SITEMAP-V2-PUBLISH-20260820",
+  "client_slug": "australian-sports-physio",
+  "project_slug": "sitemap",
+  "prototype_kind": "sitemap",
+  "repository": "michaellhm/lhm-prototype",
+  "branch": "main",
+  "expected_base_commit": "f00b1d8606e9cd71e45dda299f3b7837c82f17be",
+  "source_directory": "/var/lib/lhm-prototype-publication/incoming/asp-sitemap-v2-publish-20260820",
+  "source_package_sha256": "b52a6de06e5e30a20b24e8e5b5a3c8c1703ffef04c93df2dde4d3026305f5115",
+  "file_manifest": [
+    {
+      "path": "australian-sports-physio/sitemap/index.html",
+      "sha256": "74b87dbc0f20c1d79326e11f342e1169d5777f17eded8683729f57b0d7650a70",
+      "bytes": 115238
+    }
+  ],
+  "qa_evidence_reference": "claude-producer-20260819-94",
+  "idempotency_key": "asp-sitemap-v2-publish-20260820",
+  "standing_authority_reference": "MICHAEL-PROTOTYPE-PUBLISH-STANDING-20260820",
+  "commit_message": "prototype: australian-sports-physio/sitemap approved static package"
+}

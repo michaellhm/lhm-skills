@@ -12,7 +12,8 @@ Development authority may fetch, branch, edit, test, commit and push `cto/*`. It
 
 The branch publisher holds a repository-scoped SSH deploy key in a root-only directory. The CTO
 worker cannot read it. The publisher accepts only an existing isolated CTO workspace based directly
-on `origin/main`, a generated `cto/*` branch and reconciled persisted paths under `plugins/` or the
+on `origin/main` for iteration 1 or the immediately prior evidence-loop iteration branch for
+iterations 2 and 3, a generated `cto/*` branch and reconciled persisted paths under `plugins/` or the
 two reviewed repository metadata files. It creates the commit, pushes the exact SHA without force,
 verifies the remote ref and then writes a Michael review note. GitHub branch protection remains the
 independent control preventing direct protected-main publication.
@@ -23,18 +24,21 @@ Deployment approval binds approval ID, repository, commit, plugin name, package 
 
 ## Reusable prototype publication route
 
-`lhm-prototype-publisher` is a separate root-owned capability. Its closed request schema accepts
-only `michaellhm/lhm-prototype`, branch `main`, an exact expected base commit and content-addressed
-`<client-slug>/(sitemap|homepage)/index.html` files. There are no fields for commands, refspecs,
+`lhm-prototype-publisher` is a separate root-owned capability. Its closed schema-version 2 request
+accepts only `michaellhm/lhm-prototype`, branch `main`, an exact expected base commit, governed
+BasicOps/parent/QA/standing-authority/idempotency bindings, and an exact sorted content-addressed
+manifest under `<client-slug>/(sitemap|homepage)/`. Static HTML, CSS, JavaScript, JSON, image and
+font assets are allowlisted; an exact project `index.html` is mandatory. There are no fields for commands, refspecs,
 DNS, client contact, arbitrary URLs, unrelated repositories or the live client production site.
 Its one repository-scoped write deploy key and GitHub CLI session remain root-only under
 `/etc/lhm-prototype-publisher` (directory `0700`, key `0600`). The legacy
 `lhm-asp-sitemap-publisher` name is only a compatibility entry point to the same executable.
 Source packages are accepted only from the exact root-controlled request staging directory.
 
-The route fails closed if main moved, the checkout contains an unapproved path, the exact remote
-commit cannot be read back, the exact-commit GitHub Actions run is absent or unsuccessful, or the
-staging sitemap URL does not return a bounded non-empty HTTP 200 response. A commit or push alone is
+The route serializes each idempotency key, stores an atomic durable receipt, and pushes with a
+base-bound lease. It fails closed if main moved, the checkout contains an unapproved path, the exact remote
+commit cannot be read back, the exact named/ID/path GitHub Actions run is absent or unsuccessful, or the
+staging URL does not return the approved index byte count and SHA-256. A commit or push alone is
 never success. Installation records prior executable metadata and digest; rollback restores or
 removes only that executable and its bounded trigger/config, never credentials or published content.
 A separately recorded, base-bound human authority is required before invoking the installed route.
