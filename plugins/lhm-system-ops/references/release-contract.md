@@ -21,13 +21,15 @@ Ed25519 host key, avoiding general outbound-network expansion and interactive ho
 
 Deployment approval binds approval ID, repository, commit, plugin name, package SHA-256, target profile, issue/expiry time and unused state. The deployer consumes it atomically and records the result.
 
-## ASP sitemap publication route
+## Reusable prototype publication route
 
-`lhm-asp-sitemap-publisher` is a separate root-owned capability. Its closed request schema accepts
-only `michaellhm/lhm-prototype`, branch `main`, an exact expected base commit, files below
-`australian-sports-physio/sitemap/`, and at most one minimum README link update. There are no fields
-for commands, refspecs, DNS, client contact, unrelated repositories or prototype paths, or the live
-ASP production site. Its repository-scoped credential and GitHub CLI session remain root-only.
+`lhm-prototype-publisher` is a separate root-owned capability. Its closed request schema accepts
+only `michaellhm/lhm-prototype`, branch `main`, an exact expected base commit and content-addressed
+`<client-slug>/(sitemap|homepage)/index.html` files. There are no fields for commands, refspecs,
+DNS, client contact, arbitrary URLs, unrelated repositories or the live client production site.
+Its one repository-scoped write deploy key and GitHub CLI session remain root-only under
+`/etc/lhm-prototype-publisher` (directory `0700`, key `0600`). The legacy
+`lhm-asp-sitemap-publisher` name is only a compatibility entry point to the same executable.
 Source packages are accepted only from the exact root-controlled request staging directory.
 
 The route fails closed if main moved, the checkout contains an unapproved path, the exact remote
@@ -36,3 +38,5 @@ staging sitemap URL does not return a bounded non-empty HTTP 200 response. A com
 never success. Installation records prior executable metadata and digest; rollback restores or
 removes only that executable and its bounded trigger/config, never credentials or published content.
 A separately recorded, base-bound human authority is required before invoking the installed route.
+The authoritative closed schemas are `prototype-publication.request.schema.json`,
+`prototype-publication.result.schema.json` and `prototype-basicops-handoff.schema.json`.
