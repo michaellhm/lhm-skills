@@ -33,7 +33,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.7.0':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.7.1':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -56,6 +56,7 @@ def main():
         'assets/systemd/lhm-cto-plugin-dispatch.path',
         'assets/systemd/lhm-cto-plugin-dispatch.service',
         'assets/host/lhm-cto-result-resumer',
+        'assets/host/lhm-work-resumer',
         'assets/host/lhm-cto-branch-publisher',
         'assets/host/lhm-asp-sitemap-publisher',
         'assets/host/lhm-prototype-publisher',

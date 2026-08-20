@@ -1,0 +1,273 @@
+#!/usr/bin/env python3
+"""Consume work-control events through a least-privilege Hermes handoff."""
+import hashlib
+import fcntl
+import json
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+BASE = Path('/var/lib/lhm-work-control')
+INCOMING = BASE / 'events'
+CLAIMS = BASE / 'claims'
+PARENTS = BASE / 'parents'
+PROCESSED = BASE / 'processed'
+FAILED = BASE / 'failed'
+CONSUMED = BASE / 'consumed'
+AGENT_CONSUMED = BASE / 'agent-consumed'
+RECONCILIATIONS = BASE / 'reconciliations'
+HANDOFFS = Path('/run/lhm-work-resumer')
+LOCK = BASE / '.resumer.lock'
+HERMES_UID = 10000
+HERMES_GID = 10000
+ALLOWED_STATES = {'running', 'continued', 'completed', 'waiting_on_evidence', 'waiting_on_approval'}
+SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$')
+
+
+def now():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def canonical(value):
+    return json.dumps(value, sort_keys=True, separators=(',', ':')).encode()
+
+
+def digest(value):
+    return hashlib.sha256(canonical(value)).hexdigest()
+
+
+def load(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def atomic_json(path, value, mode=0o600):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix=f'.{path.name}.', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(value, handle, indent=2, sort_keys=True)
+            handle.write('\n')
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chmod(temporary, mode)
+        os.replace(temporary, path)
+        directory = os.open(path.parent, os.O_DIRECTORY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def validate_event(event):
+    required = {'schema_version', 'event', 'event_id', 'capability_incident_id',
+                'parent_run_id', 'saved_role', 'return_point', 'created_at'}
+    if not isinstance(event, dict) or set(event) != required:
+        raise ValueError('invalid capability_restored event schema')
+    if event.get('schema_version') != 1 or event.get('event') != 'capability_restored':
+        raise ValueError('invalid capability_restored event type')
+    if any(not isinstance(event[key], str) or not event[key] for key in required - {'schema_version'}):
+        raise ValueError('invalid capability_restored event value')
+    for key in ('event_id', 'capability_incident_id', 'parent_run_id'):
+        if not SAFE_ID.fullmatch(event[key]):
+            raise ValueError(f'invalid capability_restored {key}')
+    return event
+
+
+def validate_parent(parent, event):
+    if not isinstance(parent, dict) or parent.get('parent_run_id') != event['parent_run_id']:
+        raise ValueError('event parent does not match canonical parent')
+    if parent.get('status') != 'waiting_on_capability':
+        raise ValueError('parent is not waiting_on_capability')
+    if parent.get('capability_incident_id') != event['capability_incident_id']:
+        raise ValueError('event incident does not match canonical parent')
+    return parent
+
+
+def marker_key(event):
+    return hashlib.sha256(event['event_id'].encode()).hexdigest()
+
+
+def make_handoff(event, parent):
+    key = marker_key(event)
+    handoff = HANDOFFS / key
+    if handoff.exists():
+        shutil.rmtree(handoff)
+    handoff.mkdir(parents=True, mode=0o700)
+    atomic_json(handoff / 'event.json', event, 0o400)
+    atomic_json(handoff / 'parent.json', parent, 0o400)
+    (handoff / 'response').mkdir(mode=0o700)
+    for path in (handoff, handoff / 'event.json', handoff / 'parent.json', handoff / 'response'):
+        os.chown(path, HERMES_UID, HERMES_GID)
+    return handoff
+
+
+def invoke(handoff):
+    prompt = (
+        'Read only event.json and parent.json in the supplied handoff. Resume the exact saved role '
+        'and return point. Write response/agent-consumed.json with schema_version 1, the exact '
+        'event_id and parent_run_id, transitioned true, next_status, and non-empty evidence. '
+        'If anything is unreadable or you refuse, do not claim transitioned.'
+    )
+    return subprocess.run([
+        'timeout', '1800', 'docker', 'exec', '-u', f'{HERMES_UID}:{HERMES_GID}', 'hermes',
+        '/opt/hermes/.venv/bin/hermes', '-p', 'lhm_brain', '-z', prompt,
+        '--attachment', str(handoff).replace('/run/', '/opt/run/'),
+    ], capture_output=True, text=True)
+
+
+def validate_agent_record(record, event, parent_digest):
+    required = {'schema_version', 'event_id', 'parent_run_id', 'parent_sha256',
+                'transitioned', 'next_status', 'evidence'}
+    if not isinstance(record, dict) or set(record) != required or record.get('schema_version') != 1:
+        raise ValueError('invalid agent-consumed schema')
+    if record.get('event_id') != event['event_id'] or record.get('parent_run_id') != event['parent_run_id']:
+        raise ValueError('agent-consumed identity mismatch')
+    if record.get('parent_sha256') != parent_digest:
+        raise ValueError('agent-consumed parent digest mismatch')
+    if record.get('transitioned') is not True or record.get('next_status') not in ALLOWED_STATES:
+        raise ValueError('agent reported NOT transitioned or disallowed state')
+    if not isinstance(record.get('evidence'), list) or not record['evidence'] or any(
+            not isinstance(item, str) or not item.strip() for item in record['evidence']):
+        raise ValueError('transition requires persisted evidence')
+    return record
+
+
+def _failure(claim, message):
+    attempt = f'{claim.stem}.attempt-{os.getpid()}-{now().replace(":", "-")}'
+    target = FAILED / f'{attempt}.json'
+    if claim.exists():
+        os.replace(claim, target)
+    atomic_json(FAILED / f'{attempt}.error.json', {'failed_at': now(), 'error': message})
+    return 'failed'
+
+
+def success_marker(event, record, parent):
+    return {'schema_version': 1, 'event_id': event['event_id'],
+            'parent_run_id': event['parent_run_id'], 'agent_consumed_sha256': digest(record),
+            'parent_sha256': digest(parent), 'consumed_at': now()}
+
+
+def process(path, runner=invoke):
+    CLAIMS.mkdir(parents=True, exist_ok=True)
+    claim = CLAIMS / path.name
+    os.replace(path, claim)
+    handoff = None
+    try:
+        event = validate_event(load(claim))
+        key = marker_key(event)
+        marker = CONSUMED / f'{key}.json'
+        durable_agent = AGENT_CONSUMED / f'{key}.json'
+        parent_path = PARENTS / f"{event['parent_run_id']}.json"
+        if not parent_path.is_file() or parent_path.is_symlink():
+            raise ValueError('canonical parent is unavailable or unsafe')
+        parent = load(parent_path)
+        if marker.exists():
+            marker_value = load(marker)
+            if (marker_value.get('event_id') == event['event_id'] and durable_agent.exists()
+                    and parent.get('status') in ALLOWED_STATES
+                    and parent.get('resume_event_id') == event['event_id']):
+                os.replace(claim, PROCESSED / claim.name)
+                return 'duplicate'
+            raise ValueError('unreconciled consumed marker conflicts with blocked parent')
+        if durable_agent.exists() and parent.get('status') in ALLOWED_STATES:
+            record = validate_agent_record(load(durable_agent), event, load(durable_agent)['parent_sha256'])
+            if (parent.get('resume_event_id') != event['event_id']
+                    or parent.get('resume_evidence') != record['evidence']
+                    or parent.get('status') != record['next_status']):
+                raise ValueError('persisted parent transition conflicts with agent consumption')
+            atomic_json(marker, success_marker(event, record, parent))
+            os.replace(claim, PROCESSED / claim.name)
+            return 'recovered'
+        parent = validate_parent(parent, event)
+        before = digest(parent)
+        if durable_agent.exists():
+            record = validate_agent_record(load(durable_agent), event, before)
+        else:
+            handoff = make_handoff(event, parent)
+            result = runner(handoff)
+            response = handoff / 'response' / 'agent-consumed.json'
+            if result.returncode != 0 or not response.is_file() or response.is_symlink():
+                detail = (result.stderr or result.stdout or 'missing agent-consumed response')[-1000:]
+                raise ValueError(f'Hermes resume failed: {detail}')
+            record = validate_agent_record(load(response), event, before)
+            atomic_json(durable_agent, record)
+        current = validate_parent(load(parent_path), event)
+        if digest(current) != before:
+            raise ValueError('canonical parent changed during resume')
+        transitioned = {**current, 'status': record['next_status'], 'resume_event_id': event['event_id'],
+                        'resume_evidence': record['evidence'], 'updated_at': now()}
+        atomic_json(parent_path, transitioned)
+        atomic_json(marker, success_marker(event, record, transitioned))
+        os.replace(claim, PROCESSED / claim.name)
+        return 'consumed'
+    except Exception as exc:
+        return _failure(claim, str(exc))
+    finally:
+        if handoff and handoff.exists():
+            shutil.rmtree(handoff)
+
+
+def reconcile_false_marker(marker_path, processed_event_path):
+    """Preserve the false marker, record the audit decision, and requeue only provably unconsumed work."""
+    event = validate_event(load(processed_event_path))
+    key = marker_key(event)
+    record_path = RECONCILIATIONS / f'{key}.json'
+    preserved_marker = RECONCILIATIONS / f'{key}.false-marker.json'
+    if record_path.exists():
+        if not preserved_marker.exists() or not (INCOMING / processed_event_path.name).exists():
+            raise ValueError('incomplete prior reconciliation requires operator review')
+        return 'already_requeued'
+    if not marker_path.exists() and preserved_marker.exists() and (INCOMING / processed_event_path.name).exists():
+        preserved = load(preserved_marker)
+        if preserved.get('event_id') != event['event_id']:
+            raise ValueError('preserved marker and event do not match')
+        atomic_json(record_path, {
+            'schema_version': 1, 'event_id': event['event_id'],
+            'false_marker_sha256': digest(preserved),
+            'reason': 'legacy success marker lacked agent consumption and parent remained waiting_on_capability',
+            'action': 'requeued', 'reconciled_at': now(),
+        })
+        return 'recovered_reconciliation'
+    marker = load(marker_path)
+    if marker_path.name != f'{key}.json' or marker.get('event_id') != event['event_id']:
+        raise ValueError('marker and event do not match')
+    validate_parent(load(PARENTS / f"{event['parent_run_id']}.json"), event)
+    if (AGENT_CONSUMED / f'{key}.json').exists():
+        raise ValueError('agent consumption exists; automatic reconciliation is unsafe')
+    record = {'schema_version': 1, 'event_id': event['event_id'], 'false_marker_sha256': digest(marker),
+              'reason': 'legacy success marker lacked agent consumption and parent remained waiting_on_capability',
+              'action': 'requeued', 'reconciled_at': now()}
+    requeued = INCOMING / processed_event_path.name
+    if requeued.exists():
+        raise ValueError('event is already queued without a reconciliation record')
+    shutil.copy2(processed_event_path, requeued)
+    os.replace(marker_path, preserved_marker)
+    atomic_json(record_path, record)
+    return 'requeued'
+
+
+def main():
+    for directory in (INCOMING, CLAIMS, PARENTS, PROCESSED, FAILED, CONSUMED,
+                      AGENT_CONSUMED, RECONCILIATIONS, HANDOFFS):
+        directory.mkdir(parents=True, exist_ok=True)
+    with LOCK.open('a+') as handle:
+        try:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return
+        outcomes = {'consumed': 0, 'recovered': 0, 'duplicate': 0, 'failed': 0}
+        for path in sorted(INCOMING.glob('*.json')):
+            outcomes[process(path)] += 1
+        if any(outcomes.values()):
+            print(json.dumps(outcomes, sort_keys=True))
+
+
+if __name__ == '__main__':
+    main()
