@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-08-20",
+  "source": "verified deployed Hermes host inventory",
+  "assets": {
+    "dispatcher": {
+      "source": "assets/gateways/lhm-shared-claude-dispatcher",
+      "destination": "/usr/local/libexec/lhm-claude-dispatcher",
+      "sha256": "fc633fa3afa017a230b48ed1a62b67aa50b9e87db252b500f4c6fe88f06de531",
+      "owner": "root",
+      "group": "root",
+      "mode": "0755",
+      "size_bytes": 24410
+    },
+    "worker": {
+      "source": "assets/gateways/lhm-shared-claude-worker",
+      "destination": "/usr/local/libexec/lhm-claude-worker",
+      "sha256": "afe2d7655ec2b3699958bb82c23a59cf97c0ab850878ee3351dab9e9a75e9590",
+      "owner": "root",
+      "group": "root",
+      "mode": "0755",
+      "size_bytes": 16273
+    },
+    "dispatch_unit": {
+      "source": "assets/systemd/lhm-claude-dispatch.service",
+      "destination": "/etc/systemd/system/lhm-claude-dispatch.service",
+      "owner": "root",
+      "group": "root",
+      "mode": "0644"
+    },
+    "gateway_acl_dropin": {
+      "source": "assets/systemd/lhm-brain-gateway-acl.conf",
+      "destination": "/etc/systemd/system/lhm-brain-gateway.service.d/acl.conf",
+      "owner": "root",
+      "group": "root",
+      "mode": "0644"
+    }
+  }
+}

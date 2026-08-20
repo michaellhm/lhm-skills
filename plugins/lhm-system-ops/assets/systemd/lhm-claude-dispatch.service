@@ -1,0 +1,13 @@
+[Unit]
+Description=Validate and dispatch bounded LHM Claude requests
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/lhm-claude-dispatcher
+User=root
+Group=root
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/claude
+ProtectHome=read-only
+KillMode=process
