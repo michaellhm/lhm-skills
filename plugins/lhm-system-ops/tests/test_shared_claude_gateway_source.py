@@ -18,7 +18,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.0"
+    assert MANIFEST["release_version"] == "0.9.1"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -41,7 +41,7 @@ def test_container_client_is_governed_at_exact_bind_mount_target():
     client = MANIFEST["assets"]["container_client"]
     assert client["destination"] == "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch"
     assert client["container_destination"] == "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
-    assert client["previous_sha256"] == "bf3b68abe4e86a994fe71b33bd8cbe3f0a4e1cef95b0d8ccb63877fa3ba63ff9"
+    assert client["previous_sha256"] == "a1cf82f7c16e647b50003c66a2833f4fda4472b27847665abfa38671ff406d04"
     assert client["owner"] == client["group"] == 10000
     assert client["mode"] == "0755"
 
@@ -77,6 +77,9 @@ def test_dispatcher_contains_current_bounded_worker_contract():
     assert "registered evidence pack exceeds total limit" in text
     assert "prompt['evidence_pack'] = load_google_ads_evidence(client)" in text
     assert "required_timeout = admitted_timeout_seconds(profile)" in text
+    assert "backup = HANDBACK_REGISTRY.with_name(" in text
+    assert "registry backup failed" in text
+    assert "Path('/root') / f'client-handback-targets" not in text
 
 
 def test_google_ads_profile_admits_only_extended_bounded_timeout():

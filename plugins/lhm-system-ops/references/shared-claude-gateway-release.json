@@ -1,25 +1,25 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.9.0",
+  "release_version": "0.9.1",
   "captured_at": "2026-08-21",
   "source": "verified deployed Hermes host inventory",
   "assets": {
     "dispatcher": {
       "source": "assets/gateways/lhm-shared-claude-dispatcher",
       "destination": "/usr/local/libexec/lhm-claude-dispatcher",
-      "sha256": "f02c6fd4d638c8913461b08f75b587f63ee720099152e6bbb08a1543c0ecab4b",
+      "sha256": "923a892ae0eb282f4d2686157eb1af7542347a88961d13220576c93900c6fe00",
       "previous_sha256": "f02c6fd4d638c8913461b08f75b587f63ee720099152e6bbb08a1543c0ecab4b",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 30159
+      "size_bytes": 30384
     },
     "worker": {
       "source": "assets/gateways/lhm-shared-claude-worker",
       "destination": "/usr/local/libexec/lhm-claude-worker",
       "sha256": "eab55b8376b1a57916192dea954ad5e186776168a0b04811b5b9d559364353e7",
-      "previous_sha256": "720ba0b150bdb2d306ab6f4a19e7ae44363277d816374c211d52bb4c8ea258c0",
+      "previous_sha256": "eab55b8376b1a57916192dea954ad5e186776168a0b04811b5b9d559364353e7",
       "owner": "root",
       "group": "root",
       "mode": "0755",
@@ -48,7 +48,7 @@
       "destination": "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch",
       "container_destination": "/opt/data/profiles/lhm_brain/bin/claude-dispatch",
       "sha256": "a1cf82f7c16e647b50003c66a2833f4fda4472b27847665abfa38671ff406d04",
-      "previous_sha256": "bf3b68abe4e86a994fe71b33bd8cbe3f0a4e1cef95b0d8ccb63877fa3ba63ff9",
+      "previous_sha256": "a1cf82f7c16e647b50003c66a2833f4fda4472b27847665abfa38671ff406d04",
       "owner": 10000,
       "group": 10000,
       "mode": "0755",

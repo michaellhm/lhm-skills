@@ -4,7 +4,7 @@ The files named in `shared-claude-gateway-release.json` are the authoritative tr
 
 These assets are distinct from the additive `lhm-evidence-claude-*` gateways. No evidence-bridge installer may overwrite the shared dispatcher or worker.
 
-Release 0.9.0 supervises each worker for its full lifecycle. The root dispatcher maintains
+Release 0.9.1 supervises each worker for its full lifecycle. The root dispatcher maintains
 only execute access for `claudeworker` and `codexworker` on the two named profile ancestors; the
 Claude process still runs as `claudeworker`, and its only write grant is the validated canonical
 run directory. An ACL maintenance error terminates the worker and records an explicit durable
@@ -12,7 +12,7 @@ failed terminal artifact. `assets/install/install-shared-claude-gateway.py` veri
 tracked source hashes and exact deployed predecessor hashes before mutation, saves binaries,
 metadata, and `getfacl` output, and restores all of them on rollback.
 
-Release 0.9.0 retains the 0.8.7 host admission change and governs the authoritative bind-mounted
+Release 0.9.1 retains the 0.8.7 host admission change and governs the authoritative bind-mounted
 Hermes `claude-dispatch` client as a governed source asset. Relative to its exact 0.8.7 deployed
 line, the Google Ads and general marketing submitters now use the shared collision-safe sequence
 scanner across incoming, processed, running and failed buckets. The submitted Google Ads timeout
@@ -21,14 +21,18 @@ remains 600 seconds. The installer targets the approved host side of the read-wr
 and byte-for-byte atomic rollback. Deployment acceptance must independently prove that the host and
 container paths have the manifest post-change hash and are byte-identical.
 
-Release 0.9.0 enters Google Ads through the installed `/lhm-marketing-hub:start-googleads` command,
+Release 0.9.1 enters Google Ads through the installed `/lhm-marketing-hub:start-googleads` command,
 captures Claude stream events, persists `skill-provenance.json`, and fails closed unless the monthly
 review, bid/budget, conversion-audit and delivery-QA skills emitted real `Skill` tool calls. It uses
 a bounded 24-turn and USD 4.00 provider ceiling, strict read-only MCP configuration, exact Google Ads tool
 allowlist, single registered client/CID boundary, unprivileged worker identity, and run-directory-only
 write grant. Rollback restores the prior 300-second dispatcher byte-for-byte.
 
-Release 0.9.0 also retains the Google Ads reconciliation evidence boundary and explicit Prototype,
+Release 0.9.1 stores the handback-registry safety copy beside the governed registry because the
+dispatcher systemd sandbox intentionally makes `/root` read-only. Backup failure now produces a
+durable refused registration receipt instead of terminating the dispatcher.
+
+Release 0.9.1 also retains the Google Ads reconciliation evidence boundary and explicit Prototype,
 Astro and WordPress department routes. The dispatcher reads only
 the client-specific Markdown paths explicitly registered in `google-ads-clients.json`, enforces the
 client folder, file-count and byte ceilings, rejects links and path traversal, and passes content
