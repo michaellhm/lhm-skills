@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+"""Claim sealed Hermes prototype packages and invoke the bounded root publisher."""
+import fcntl, hashlib, json, os, re, shutil, subprocess, tempfile
+from pathlib import Path, PurePosixPath
+
+BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/prototype-publication')
+INCOMING, SEALED, CLAIMS, PROCESSED, FAILED = (BASE / name for name in ('incoming', 'sealed', 'claims', 'processed', 'failed'))
+STAGING = Path('/var/lib/lhm-prototype-publication/incoming')
+PUBLISHER = '/usr/local/libexec/lhm-prototype-publisher'
+LOCK = BASE / '.consumer.lock'
+SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
+SHA256 = re.compile(r'^[0-9a-f]{64}$')
+
+
+def load(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def digest_file(path):
+    value = hashlib.sha256()
+    with path.open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            value.update(block)
+    return value.hexdigest()
+
+
+def atomic_json(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix=f'.{path.name}.', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(value, handle, indent=2, sort_keys=True)
+            handle.write('\n')
+        os.chmod(temporary, 0o640)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def validate_transport(request, path):
+    request_id = request.get('request_id') if isinstance(request, dict) else None
+    if not isinstance(request_id, str) or not SAFE_ID.fullmatch(request_id) or path.name != request_id + '.json':
+        raise ValueError('invalid request transport identity')
+    if request.get('schema_version') != 3 or request.get('idempotency_key') != request_id:
+        raise ValueError('invalid request transport contract')
+    manifest = request.get('file_manifest')
+    if not isinstance(manifest, list) or not manifest:
+        raise ValueError('file_manifest must be non-empty')
+    paths = []
+    for item in manifest:
+        if not isinstance(item, dict) or set(item) != {'path', 'sha256', 'bytes'}:
+            raise ValueError('invalid file manifest entry')
+        value = item['path']; relative = PurePosixPath(value)
+        if (not isinstance(value, str) or relative.is_absolute() or '..' in relative.parts
+                or any(part.startswith('.') for part in relative.parts)
+                or not isinstance(item['bytes'], int) or not 0 <= item['bytes'] <= 10_000_000
+                or not isinstance(item['sha256'], str) or not SHA256.fullmatch(item['sha256'])):
+            raise ValueError('unsafe file manifest entry')
+        paths.append(value)
+    if paths != sorted(set(paths)):
+        raise ValueError('file_manifest must be exact, sorted and unique')
+    return request_id, manifest
+
+
+def stage(request_id, manifest):
+    source = SEALED / request_id
+    destination = STAGING / request_id
+    if not source.is_dir() or source.is_symlink():
+        raise ValueError('sealed request package is unavailable')
+    observed = sorted(str(item.relative_to(source)) for item in source.rglob('*') if item.is_file() or item.is_symlink())
+    expected = [item['path'] for item in manifest]
+    if observed != expected:
+        raise ValueError('sealed package files do not match manifest')
+    temporary = STAGING / f'.{request_id}.{os.getpid()}.staging'
+    if destination.exists():
+        observed_existing = sorted(str(item.relative_to(destination)) for item in destination.rglob('*') if item.is_file() or item.is_symlink())
+        if observed_existing != expected:
+            raise ValueError('existing root staging conflicts with request')
+        root = destination
+    else:
+        temporary.mkdir(parents=True, mode=0o750)
+        root = temporary
+    try:
+        for item in manifest:
+            relative = PurePosixPath(item['path']); candidate = source.joinpath(*relative.parts)
+            if candidate.is_symlink() or not candidate.is_file() or candidate.stat().st_size != item['bytes'] or digest_file(candidate) != item['sha256']:
+                raise ValueError(f'sealed file does not match manifest: {item["path"]}')
+            target = root.joinpath(*relative.parts)
+            if root == temporary:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(candidate, target)
+                os.chmod(target, 0o640)
+            elif target.is_symlink() or not target.is_file() or target.stat().st_size != item['bytes'] or digest_file(target) != item['sha256']:
+                raise ValueError(f'existing root staging does not match manifest: {item["path"]}')
+        if root == temporary:
+            os.replace(temporary, destination)
+    finally:
+        if temporary.exists():
+            shutil.rmtree(temporary)
+    return destination
+
+
+def invoke(request_path, runner=subprocess.run):
+    completed = runner([PUBLISHER, '--request', str(request_path)], check=True, capture_output=True, text=True, timeout=900)
+    return json.loads(completed.stdout)
+
+
+def validate_result(result, request):
+    exact = {'schema_version': 3, 'status': 'published_and_verified', 'request_id': request['request_id'],
+             'destination_profile_id': request['destination_profile_id'], 'repository': request['repository'],
+             'branch': request['branch'], 'base_commit': request['expected_base_commit'],
+             'source_package_sha256': request['source_package_sha256'],
+             'idempotency_key': request['idempotency_key'],
+             'standing_authority_reference': request['standing_authority_reference']}
+    if not isinstance(result, dict) or any(result.get(key) != value for key, value in exact.items()):
+        raise ValueError('publisher returned a mismatched result')
+    commit = result.get('commit')
+    public = result.get('public_verifications')
+    workflow = result.get('workflow')
+    if (not isinstance(commit, str) or not re.fullmatch(r'[0-9a-f]{40}', commit)
+            or not isinstance(public, list) or not public
+            or any(not isinstance(item, dict) or item.get('commit') != commit or item.get('status') != 200 for item in public)
+            or not isinstance(workflow, dict) or workflow.get('conclusion') != 'success'):
+        raise ValueError('publisher result lacks exact verified release evidence')
+    return result
+
+
+def process(path, runner=subprocess.run):
+    claim = CLAIMS / path.name
+    if path.parent != CLAIMS:
+        os.replace(path, claim)
+    request_id = path.stem
+    try:
+        request = load(claim)
+        request_id, manifest = validate_transport(request, claim)
+        request = {**request, 'source_directory': str(stage(request_id, manifest))}
+        staged_request = STAGING / f'{request_id}.request.json'
+        atomic_json(staged_request, request)
+        result = validate_result(invoke(staged_request, runner), request)
+        atomic_json(PROCESSED / f'{request_id}.json', result)
+        claim.unlink()
+        return 'processed'
+    except Exception as exc:
+        if claim.exists():
+            os.replace(claim, FAILED / claim.name)
+        (FAILED / f'{request_id}.error').write_text(str(exc)[-2000:] + '\n', encoding='utf-8')
+        return 'failed'
+
+
+def main():
+    for directory in (INCOMING, SEALED, CLAIMS, PROCESSED, FAILED, STAGING):
+        directory.mkdir(parents=True, exist_ok=True)
+    with LOCK.open('a+') as handle:
+        try:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return
+        outcomes = {'processed': 0, 'failed': 0}
+        for path in sorted(CLAIMS.glob('*.json')):
+            outcomes[process(path)] += 1
+        for path in sorted(INCOMING.glob('*.json')):
+            outcomes[process(path)] += 1
+        if any(outcomes.values()):
+            print(json.dumps(outcomes, sort_keys=True))
+
+
+if __name__ == '__main__':
+    main()

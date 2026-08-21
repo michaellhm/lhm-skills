@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch governed prototype publication requests
+
+[Path]
+PathExistsGlob=/home/hermes/.hermes/profiles/lhm_brain/dispatch/prototype-publication/incoming/*.json
+Unit=lhm-prototype-publication.service
+
+[Install]
+WantedBy=multi-user.target
