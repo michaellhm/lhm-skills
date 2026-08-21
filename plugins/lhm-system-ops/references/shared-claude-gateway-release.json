@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.9.1",
+  "release_version": "0.9.2",
   "captured_at": "2026-08-21",
   "source": "verified deployed Hermes host inventory",
   "assets": {
     "dispatcher": {
       "source": "assets/gateways/lhm-shared-claude-dispatcher",
       "destination": "/usr/local/libexec/lhm-claude-dispatcher",
-      "sha256": "923a892ae0eb282f4d2686157eb1af7542347a88961d13220576c93900c6fe00",
-      "previous_sha256": "f02c6fd4d638c8913461b08f75b587f63ee720099152e6bbb08a1543c0ecab4b",
+      "sha256": "7c6c2a907e5b2b3f3a5a020f2c064872e300c3f3d89a543fcbe0b17301c7652a",
+      "previous_sha256": "923a892ae0eb282f4d2686157eb1af7542347a88961d13220576c93900c6fe00",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 30384
+      "size_bytes": 30478
     },
     "worker": {
       "source": "assets/gateways/lhm-shared-claude-worker",
@@ -28,7 +28,7 @@
     "dispatch_unit": {
       "source": "assets/systemd/lhm-claude-dispatch.service",
       "destination": "/etc/systemd/system/lhm-claude-dispatch.service",
-      "sha256": "db8d69be657eae486d7229164310d3c1a66284019d967ba7032a632ab832e263",
+      "sha256": "bf84087497f169bfb0bb062bf0397a670a366f618dcded08cc91522f4fa5d394",
       "previous_sha256": "db8d69be657eae486d7229164310d3c1a66284019d967ba7032a632ab832e263",
       "owner": "root",
       "group": "root",

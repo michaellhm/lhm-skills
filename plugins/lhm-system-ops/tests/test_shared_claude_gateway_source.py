@@ -18,7 +18,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.1"
+    assert MANIFEST["release_version"] == "0.9.2"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -77,9 +77,17 @@ def test_dispatcher_contains_current_bounded_worker_contract():
     assert "registered evidence pack exceeds total limit" in text
     assert "prompt['evidence_pack'] = load_google_ads_evidence(client)" in text
     assert "required_timeout = admitted_timeout_seconds(profile)" in text
-    assert "backup = HANDBACK_REGISTRY.with_name(" in text
+    assert "backup_dir = BASE / 'registry-backups'" in text
     assert "registry backup failed" in text
-    assert "Path('/root') / f'client-handback-targets" not in text
+    assert "with HANDBACK_REGISTRY.open('w'" in text
+    assert "registry update failed and backup restored" in text
+
+
+def test_dispatch_unit_grants_only_exact_registry_write_path():
+    unit = (PLUGIN / MANIFEST["assets"]["dispatch_unit"]["source"]).read_text()
+    assert "ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/claude" in unit
+    assert "ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/config/client-handback-targets.json" in unit
+    assert "ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/config\n" not in unit
 
 
 def test_google_ads_profile_admits_only_extended_bounded_timeout():

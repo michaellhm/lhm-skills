@@ -158,9 +158,9 @@ def complete_registration(path, request):
         if folder_id in other.get('drive_folder_query', ''):
             finish('failed', 'refused', f'Drive folder already belongs to {other_slug}')
             return
-    backup = HANDBACK_REGISTRY.with_name(
-        f'.client-handback-targets.json.backup-{datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")}'
-    )
+    backup_dir = BASE / 'registry-backups'
+    backup_dir.mkdir(mode=0o700, exist_ok=True)
+    backup = backup_dir / f'client-handback-targets.json.backup-{datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")}'
     try:
         shutil.copy2(HANDBACK_REGISTRY, backup)
         os.chown(backup, 0, HERMES_GID)
@@ -169,17 +169,18 @@ def complete_registration(path, request):
         finish('failed', 'refused', f'registry backup failed: {exc}')
         return
     targets[slug] = target
-    fd, temp_name = tempfile.mkstemp(prefix='.client-handback-targets.', dir=HANDBACK_REGISTRY.parent)
     try:
-        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+        with HANDBACK_REGISTRY.open('w', encoding='utf-8') as handle:
             json.dump(payload, handle, indent=2)
             handle.write('\n')
-        os.chown(temp_name, 0, HERMES_GID)
-        os.chmod(temp_name, 0o640)
-        os.replace(temp_name, HANDBACK_REGISTRY)
-    finally:
-        if os.path.exists(temp_name):
-            os.unlink(temp_name)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chown(HANDBACK_REGISTRY, 0, HERMES_GID)
+        os.chmod(HANDBACK_REGISTRY, 0o640)
+    except OSError as exc:
+        shutil.copy2(backup, HANDBACK_REGISTRY)
+        finish('failed', 'refused', f'registry update failed and backup restored: {exc}')
+        return
     finish('completed', 'registered', target=target)
 
 
