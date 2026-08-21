@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.8.7",
+  "release_version": "0.8.8",
   "captured_at": "2026-08-21",
   "source": "verified deployed Hermes host inventory",
   "assets": {
@@ -42,6 +42,17 @@
       "owner": "root",
       "group": "root",
       "mode": "0644"
+    },
+    "container_client": {
+      "source": "assets/container/claude-dispatch",
+      "destination": "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch",
+      "container_destination": "/opt/data/profiles/lhm_brain/bin/claude-dispatch",
+      "sha256": "bf3b68abe4e86a994fe71b33bd8cbe3f0a4e1cef95b0d8ccb63877fa3ba63ff9",
+      "previous_sha256": "953f6cb3f5f0295d0033c0da18c974da524507461ebf4b71448ffce2813e7bba",
+      "owner": 10000,
+      "group": 10000,
+      "mode": "0755",
+      "size_bytes": 12033
     }
   }
 }

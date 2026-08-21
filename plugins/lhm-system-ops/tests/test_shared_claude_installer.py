@@ -19,7 +19,7 @@ def test_cap_015_preflight_pins_exact_version_sources_and_predecessors(tmp_path)
     manifest = installer.load_manifest()
     installer.verify_sources(manifest)
     assert manifest["capability_id"] == "CAP-015"
-    assert manifest["release_version"] == "0.8.7"
+    assert manifest["release_version"] == "0.8.8"
     assert all(item["sha256"] and item["previous_sha256"] for item in manifest["assets"].values())
     destinations = {}
     for name, item in manifest["assets"].items():
@@ -56,3 +56,23 @@ def test_rollback_restores_exact_prior_acl_binaries_and_metadata(tmp_path, monke
     assert destination.read_bytes() == b"prior exact bytes"
     assert destination.stat().st_mode & 0o777 == 0o751
     assert calls == [["/usr/bin/setfacl", "--restore", str(acl)], ["/usr/bin/systemctl", "daemon-reload"]]
+
+
+def test_atomic_install_applies_manifest_numeric_client_identity(tmp_path, monkeypatch):
+    installer = load_installer()
+    plugin = tmp_path / "plugin"
+    plugin.mkdir()
+    source = plugin / "client"
+    source.write_bytes(b"governed client")
+    destination = tmp_path / "claude-dispatch"
+    destination.write_bytes(b"predecessor")
+    manifest = {"assets": {"container_client": {
+        "source": "client", "destination": str(destination),
+        "owner": 10000, "group": 10000, "mode": "0755",
+    }}}
+    chowns = []
+    monkeypatch.setattr(installer.os, "chown", lambda path, uid, gid: chowns.append((uid, gid)))
+    installer.atomic_install(manifest, plugin=plugin)
+    assert destination.read_bytes() == b"governed client"
+    assert destination.stat().st_mode & 0o777 == 0o755
+    assert chowns == [(10000, 10000)]
