@@ -21,7 +21,7 @@ as the exact required predecessor.
 Rollback is the existing CAP-015 byte-for-byte path: the installer records all destination bytes,
 metadata, and ancestor ACLs before installation; `--rollback-state` restores those exact assets and
 reloads systemd. The prior dispatcher hash is
-`65257d7a6e9b28362eddd108afe207b32dbe27944bc6deb14b7d8b5a3443e7cc`.
+`f02c6fd4d638c8913461b08f75b587f63ee720099152e6bbb08a1543c0ecab4b`.
 
 ## 3. QA Tester — source regression passed
 
