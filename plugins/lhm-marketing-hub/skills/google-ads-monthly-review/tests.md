@@ -97,3 +97,54 @@ Given the Lead approves a routine reversible RSA or keyword change but no Ads wr
 the Lead produces exact UI instructions and marks the action `manual_execution`. Michael is the human
 executor, not the strategy approver. Close it only after his execution confirmation and the defined
 live readback pass.
+
+## 19. Mandatory campaign bid verdicts
+
+Given three active campaigns including PMax, run `bid-budget-optimizer` read-only across all three
+before selecting final actions. The campaign table must show each current bid strategy and exactly
+one verdict: `keep`, `change`, or `insufficient_evidence`. Do not leave “confirm PMax scaling” as an
+unresolved top-five item when the available evidence can support a verdict.
+
+## 20. Uniform conversion one-pager
+
+Given Ads-hosted and GA4 conversion actions, produce `conversion-tracking-YYYY-MM.md` with current
+and recommended primary/secondary state, account-default inclusion, per-campaign goal usage, GA4
+firing evidence and Ads import state. If an Ads-hosted action cannot be demoted or deleted, recommend
+the exact campaign-goal exclusion rather than the impossible account-level mutation.
+
+## 21. Evidence-triggered keyword resolution
+
+Given a preliminary finding of dormant structure, duplicated keywords, search-term waste or missing
+negatives, run `keyword-optimizer` before finalising the five. Return exact pause/retain/add decisions
+or a bounded evidence blocker, not “clean up structure” or “run keyword optimizer”.
+
+## 22. Four-file pack and BasicOps presentation
+
+A completed monthly review must save and verify the executive review, conversion one-pager,
+specialist findings and implementation checklist. The BasicOps discussion must repeat key metrics,
+the campaign table with bid verdicts, resolved top five and the matched-zone optional checklist, then
+link all four files. The checklist must separate approved routine work from consequential work.
+
+## 23. Review-only execution ceiling
+
+Given the intake says manual implementation and no Ads mutations, prepare and verify the full pack
+but do not start live execution. Mark an approved manual item `waiting_manual_execution`, not
+`waiting_approval`, and wait for Michael as executor before live readback.
+
+## 24. Mixed register parent state
+
+Given one dependency-ready Lead action and one consequential action waiting for Michael, use parent
+status `dispatch_ready`. Keep the consequential action individually `waiting_approval` and expose
+its exact decision without blocking the Lead queue.
+
+## 25. Active PMax diagnostic
+
+Given any active PMax campaign, run the read-only monthly-review slice of `pmax-optimizer` in addition
+to the mandatory bid-strategy verdict. Route conversion firing, goal and import anomalies to
+`google-ads-conversion-audit`, not generic analytics skills.
+
+## 26. Supplementary artefact delivery
+
+Given a specialist produces Editor CSV, negative TXT or another implementation file, store it in the
+same canonical `google_ads/YYYY-MM/` Drive folder, link it from specialist findings and the
+implementation checklist, read it back, and list its verified URL under `additional_execution_files`.

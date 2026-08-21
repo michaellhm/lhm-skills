@@ -110,7 +110,7 @@ Produce a prioritised action list at the top of the report. Each action specifie
 | Budget pacing < 90% AND zone Yellow | `bid-budget-optimizer` (recommend scale-up) |
 | Budget pacing > 110% AND zone Red/Orange | `bid-budget-optimizer` (recommend pull-back) |
 | LP score < 6/10 OR LP-experience flag in data | `landing-page-optimizer` |
-| Conversion action firing inconsistently | `analytics-tracking` or `ga-event-config` |
+| Conversion action firing, campaign goals or GA4 import inconsistent | `google-ads-conversion-audit` |
 | Search-terms list reveals new negatives | Inline (add directly to the negative keyword list) - flag in the action list |
 | Audience signal under-performing | Inline (refresh signal in the asset group) - flag in the action list |
 | 90-day: account-level structural change | Document the recommendation; route to `bid-budget-optimizer` if budget-impacting |
@@ -151,7 +151,7 @@ Reporting window: [from] to [to]
 - pmax-banner-generator: [yes/no - specifics]
 - bid-budget-optimizer: [yes/no - specifics]
 - landing-page-optimizer: [yes/no - specifics]
-- analytics-tracking / ga-event-config: [yes/no - specifics]
+- google-ads-conversion-audit: [yes/no - specifics]
 
 ### Notes / Open Questions
 [Anything that needs the operator's judgment]

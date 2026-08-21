@@ -61,7 +61,7 @@ dependencies: []
 mutation_scope: read_only | prepare_only | manual_execution | consequential_approval
 authority: lead | michael
 decision: pending | approved | modified | rejected | deferred
-execution_status: not_started | running | qa | waiting_approval | complete | blocked
+  execution_status: not_started | running | qa | waiting_approval | waiting_manual_execution | complete | blocked
 verification_method: "Exact readback, query or human confirmation"
 ```
 
@@ -103,9 +103,13 @@ The worker runs only the selected skill slice. It does not choose the next accou
 | Campaign / ad groups | Structure sheet, keywords, negatives, settings, naming and Editor-ready file where supported |
 | RSA / assets | Final URLs, headlines, descriptions, pinning rationale, policy/AHPRA check and import/paste format |
 | Bid / budget | Current and proposed values, economics, capacity/measurement dependencies, monitoring and rollback threshold |
-| Conversion tracking | Current/proposed conversion matrix, system owner, exact UI/GTM/GA4 steps and observed verification method |
+| Conversion tracking | One-page current/proposed conversion matrix, source, primary/secondary state, account-default inclusion, campaign-goal usage, GA4 firing/import evidence, exact UI/GTM/GA4 steps and observed verification method. If an Ads-hosted action cannot be deleted or demoted, change campaign goal inclusion instead of recommending an impossible mutation. |
 | Landing-page dependency | Department handoff containing requirement, reason, source campaign, event/URL details and acceptance test |
 | PMax | Asset/audience/listing-group changes, excluded waste, evidence and implementation format supported by the owning skill |
+
+Maintain a single `implementation-checklist-YYYY-MM.md` for the parent. Put approved routine work in
+the main checklist and consequential work in a separate `Michael approval required` section. Update
+it after each accepted specialist result; do not create a new checklist per worker.
 
 Use the safest sufficient negative-keyword scope. Do not blindly decompose every poor query into single-word negatives; single words require evidence that they are categorically irrelevant across the client's valuable traffic.
 
@@ -121,7 +125,9 @@ Dispatch the returned action to `google-ads-delivery-qa`. QA does not edit the a
 
 After `pass`, update canonical client context and the BasicOps parent/action before selecting another action.
 
-For manual Google Ads UI work, an implementation pack may pass QA while execution remains `waiting_approval` or `waiting_on_michael`. Mark it complete only after Michael confirms the change and the defined readback verifies it.
+For manual Google Ads UI work, an implementation pack may pass QA while an already approved action
+remains `waiting_manual_execution`. Reserve `waiting_approval` for an undecided consequential change.
+Mark either complete only after Michael confirms the change and the defined readback verifies it.
 
 ## 7. Complete the department handback
 

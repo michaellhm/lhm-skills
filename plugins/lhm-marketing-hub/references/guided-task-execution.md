@@ -48,9 +48,10 @@ The Google Ads Lead must dispatch only one approved action at a time. Before dis
    - Budget or bid strategy change → `bid-budget-optimizer`
    - Keyword waste, negatives, match types, search terms → `keyword-optimizer`
    - Creative refresh or new RSAs → `ad-copy-generator`
-   - Landing page or conversion issue → `landing-page-optimizer`
+   - Landing page issue → `landing-page-optimizer`
+   - Conversion actions, campaign goals, GA4 firing or Ads imports → `google-ads-conversion-audit`
    - PMax-specific issue → `pmax-optimizer`
-   - **"Conversion actions are firing"** → don't ask the client to check. Query GA4 directly via `analytics-mcp` for the booking event, per "Conversion quality before volume" in `references/lhm-philosophy/google-ads.md`. Present what GA4 shows as the task result; only fall back to asking the client if no GA4 property is on file or GA4 itself shows the event isn't firing.
+   - **"Conversion actions are firing"** → run the `google-ads-conversion-audit` slice and use its available Google Analytics connector for the booking event, per "Conversion quality before volume" in `references/lhm-philosophy/google-ads.md`. Present what GA4 shows as the task result; only fall back to asking the client if no GA4 property is on file or GA4 itself shows the event isn't firing.
    Run only the slice that this task needs. Do not run the whole skill end to end if a single change is all that is required.
 3. **QA, verify and ask if it is done.** A dispatched worker must return observed evidence, mutations performed (or `none`) and verification. QA must return `pass`, `correction_required`, `waiting_approval`, `needs_evidence` or `blocked`. After a pass, present only the current result:
 

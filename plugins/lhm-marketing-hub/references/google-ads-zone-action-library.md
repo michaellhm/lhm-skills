@@ -34,7 +34,7 @@ commitments and campaign-level exceptions determine the final actions.
 | Add converting queries or upgrade match types | `keyword-optimizer` | Lead |
 | Expand strong campaigns or create keyword/ad-group structure | `keyword-optimizer` then `ad-copy-generator` where creative is required | Lead unless material targeting or spend changes |
 | Check or improve ads and assets | `ad-copy-generator` | Lead for substantiated compliant copy; consequential for subjective brand claims |
-| Check primary conversion actions and tracking | `analytics-tracking` | Lead for diagnosis; consequential for conversion-definition changes |
+| Check primary conversion actions, campaign goals, GA4 firing and imports | `google-ads-conversion-audit` | Lead for diagnosis; consequential for conversion-definition changes |
 | Check 404s or landing-page performance | `landing-page-optimizer` | Lead for diagnosis/preparation; route implementation through Production |
 | Diagnose PMax performance or expansion | `pmax-optimizer` | Lead for analysis; owning downstream gates still apply |
 | Diagnose device, location, audience or demographic anomalies | `bid-budget-optimizer` | Lead for diagnosis and bounded reversible tuning; consequential for major targeting exclusions |
@@ -80,4 +80,3 @@ worst observed segments, reduce budget, then pause the worst campaigns as a last
 
 `highest_impact`: preserve working settings; make small evidence-backed improvements; monitor
 competitors and anomalies; run one bounded experiment; document the reusable success pattern.
-
