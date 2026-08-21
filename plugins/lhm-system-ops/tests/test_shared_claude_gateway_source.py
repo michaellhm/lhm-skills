@@ -18,7 +18,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.8.9"
+    assert MANIFEST["release_version"] == "0.9.0"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -41,12 +41,12 @@ def test_container_client_is_governed_at_exact_bind_mount_target():
     client = MANIFEST["assets"]["container_client"]
     assert client["destination"] == "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch"
     assert client["container_destination"] == "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
-    assert client["previous_sha256"] == "953f6cb3f5f0295d0033c0da18c974da524507461ebf4b71448ffce2813e7bba"
+    assert client["previous_sha256"] == "bf3b68abe4e86a994fe71b33bd8cbe3f0a4e1cef95b0d8ccb63877fa3ba63ff9"
     assert client["owner"] == client["group"] == 10000
     assert client["mode"] == "0755"
 
 
-def test_container_client_changes_only_google_ads_submission_timeout():
+def test_container_client_uses_collision_safe_ids_and_bounded_google_ads_timeout():
     client = PLUGIN / MANIFEST["assets"]["container_client"]["source"]
     repaired = client.read_bytes()
     submitted_timeout = (
@@ -54,14 +54,9 @@ def test_container_client_changes_only_google_ads_submission_timeout():
         b"'client': client, 'objective': objective, 'timeout_seconds': 600}"
     )
     assert repaired.count(submitted_timeout) == 1
-    predecessor = repaired.replace(
-        submitted_timeout,
-        b"'profile': 'google_ads_readonly', 'agent_id': 'lhm-marketing-hub:google-ads', 'client': client, 'objective': objective, 'timeout_seconds': 300}",
-        1,
-    )
-    assert predecessor != repaired
-    assert len(predecessor) == 12033
-    assert hashlib.sha256(predecessor).hexdigest() == MANIFEST["assets"]["container_client"]["previous_sha256"]
+    assert repaired.count(b"next_run_id('claude-gads')") == 1
+    assert repaired.count(b"next_run_id('claude-mktg')") == 1
+    assert b"for bucket in ('incoming', 'processed', 'runs', 'failed')" in repaired
     assert b"'profile': 'google_ads_readonly'" in repaired
     assert b"'timeout_seconds': 600}" in repaired
 
@@ -94,12 +89,26 @@ def test_google_ads_profile_admits_only_extended_bounded_timeout():
 
 def test_google_ads_runtime_extension_preserves_readonly_tool_and_budget_ceiling():
     worker = (PLUGIN / MANIFEST["assets"]["worker"]["source"]).read_text()
-    assert "if is_marketing else ('12', '2.00')" in worker
+    assert "max_turns, budget = ('24', '4.00')" in worker
     assert "if is_marketing else 'Skill'" in worker
     assert "google-ads-readonly.mcp.json" in worker
     assert "mcp__GoogleAds__execute_gaql" in worker
     for forbidden in ("mcp__GoogleAds__mutate", "Bash", "WebFetch", "WebSearch"):
         assert forbidden not in worker
+
+
+def test_google_ads_worker_enters_canonical_command_and_verifies_real_skill_calls():
+    worker = (PLUGIN / MANIFEST["assets"]["worker"]["source"]).read_text()
+    assert "/lhm-marketing-hub:start-googleads" in worker
+    assert "'--output-format', output_format" in worker
+    assert "output_format = 'stream-json' if is_google_ads else 'json'" in worker
+    assert "block.get('type') == 'tool_use' and block.get('name') == 'Skill'" in worker
+    assert "'lhm-marketing-hub:google-ads-monthly-review'" in worker
+    assert "'lhm-marketing-hub:bid-budget-optimizer'" in worker
+    assert "'lhm-marketing-hub:google-ads-conversion-audit'" in worker
+    assert "'lhm-marketing-hub:google-ads-delivery-qa'" in worker
+    assert "skill-provenance.json" in worker
+    assert "missing required Skill tool calls" in worker
 
 
 def test_worker_persists_terminal_artifacts_inside_supplied_run_directory():

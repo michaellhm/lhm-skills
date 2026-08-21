@@ -32,14 +32,7 @@ def validate_run_id(run_id):
 def submit(client, objective):
     if client not in registered_clients():
         raise SystemExit('unregistered client')
-    date = datetime.now(ZoneInfo('Australia/Melbourne')).strftime('%Y%m%d')
-    paths = list((BASE / 'incoming').glob(f'claude-gads-{date}-*.json'))
-    paths += list((BASE / 'processed').glob(f'claude-gads-{date}-*.json'))
-    paths += list((BASE / 'runs').glob(f'claude-gads-{date}-*'))
-    sequence = max([int(path.stem[-2:]) for path in paths if path.stem[-2:].isdigit()] or [0]) + 1
-    if sequence > 99:
-        raise SystemExit('daily run limit reached')
-    run_id = f'claude-gads-{date}-{sequence:02d}'
+    run_id = next_run_id('claude-gads')
     request = {'schema_version': 1, 'run_id': run_id, 'profile': 'google_ads_readonly', 'agent_id': 'lhm-marketing-hub:google-ads', 'client': client, 'objective': objective, 'timeout_seconds': 600}
     incoming = BASE / 'incoming'
     fd, temp_name = tempfile.mkstemp(prefix=f'.{run_id}.', dir=incoming)
@@ -58,14 +51,7 @@ def submit(client, objective):
 def submit_marketing(client, objective):
     if client not in registered_clients():
         raise SystemExit('unregistered client')
-    date = datetime.now(ZoneInfo('Australia/Melbourne')).strftime('%Y%m%d')
-    paths = list((BASE / 'incoming').glob(f'claude-mktg-{date}-*.json'))
-    paths += list((BASE / 'processed').glob(f'claude-mktg-{date}-*.json'))
-    paths += list((BASE / 'runs').glob(f'claude-mktg-{date}-*'))
-    sequence = max([int(path.stem[-2:]) for path in paths if path.stem[-2:].isdigit()] or [0]) + 1
-    if sequence > 99:
-        raise SystemExit('daily run limit reached')
-    run_id = f'claude-mktg-{date}-{sequence:02d}'
+    run_id = next_run_id('claude-mktg')
     request = {'schema_version': 1, 'run_id': run_id, 'profile': 'marketing_orchestrator_readonly', 'agent_id': 'lhm-marketing-hub:start', 'client': client, 'objective': objective, 'timeout_seconds': 600}
     incoming = BASE / 'incoming'
     fd, temp_name = tempfile.mkstemp(prefix=f'.{run_id}.', dir=incoming)
