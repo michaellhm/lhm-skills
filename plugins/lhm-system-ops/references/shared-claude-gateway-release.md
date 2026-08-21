@@ -4,7 +4,7 @@ The files named in `shared-claude-gateway-release.json` are the authoritative tr
 
 These assets are distinct from the additive `lhm-evidence-claude-*` gateways. No evidence-bridge installer may overwrite the shared dispatcher or worker.
 
-Release 0.8.5 supervises each worker for its full lifecycle. The root dispatcher maintains
+Release 0.8.6 supervises each worker for its full lifecycle. The root dispatcher maintains
 only execute access for `claudeworker` and `codexworker` on the two named profile ancestors; the
 Claude process still runs as `claudeworker`, and its only write grant is the validated canonical
 run directory. An ACL maintenance error terminates the worker and records an explicit durable
@@ -12,7 +12,7 @@ failed terminal artifact. `assets/install/install-shared-claude-gateway.py` veri
 tracked source hashes and exact deployed predecessor hashes before mutation, saves binaries,
 metadata, and `getfacl` output, and restores all of them on rollback.
 
-Release 0.8.5 retains the Google Ads reconciliation evidence boundary and adds explicit Prototype,
+Release 0.8.6 retains the Google Ads reconciliation evidence boundary and adds explicit Prototype,
 Astro and WordPress department routes. The dispatcher reads only
 the client-specific Markdown paths explicitly registered in `google-ads-clients.json`, enforces the
 client folder, file-count and byte ceilings, rejects links and path traversal, and passes content
