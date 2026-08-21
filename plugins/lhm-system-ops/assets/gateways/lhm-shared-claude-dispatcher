@@ -36,6 +36,9 @@ SPECIALIST_ROUTES = {
     'gmb': ('lhm-gmb-hub:gmb-orchestrator', 'gmb-orchestrator'),
     'finance': ('lhm-finance-hub:finance-orchestrator', 'finance-orchestrator'),
     'website': ('lhm-wordpress-hub:website-orchestrator', 'website-orchestrator'),
+    'prototype': ('lhm-wordpress-hub:prototype-lead', 'prototype-lead'),
+    'astro': ('lhm-wordpress-hub:astro-lead', 'astro-lead'),
+    'wordpress': ('lhm-wordpress-hub:wordpress-lead', 'wordpress-lead'),
     'knowledge': ('lhm-knowledge-hub:knowledge-orchestrator', 'knowledge-orchestrator'),
 }
 GSC_SITES = {
