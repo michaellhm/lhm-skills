@@ -41,6 +41,17 @@ SPECIALIST_ROUTES = {
     'wordpress': ('lhm-wordpress-hub:wordpress-lead', 'wordpress-lead'),
     'knowledge': ('lhm-knowledge-hub:knowledge-orchestrator', 'knowledge-orchestrator'),
 }
+
+
+def admitted_timeout_seconds(profile):
+    """Return the one bounded elapsed-time ceiling admitted for each profile."""
+    if profile == 'handback_target_registration':
+        return 30
+    if profile == 'google_ads_readonly':
+        return 600
+    if profile == 'html_artifact_producer':
+        return 1200
+    return 600
 GSC_SITES = {
     'lhm-main': {
         'name': 'Local Health Marketing',
@@ -371,7 +382,7 @@ def process(path):
     if request.get('agent_id') != required_agent:
         reject(path, 'disallowed or missing plugin agent')
         return
-    required_timeout = 30 if profile == 'handback_target_registration' else 300 if profile == 'google_ads_readonly' else 1200 if profile == 'html_artifact_producer' else 600
+    required_timeout = admitted_timeout_seconds(profile)
     if request.get('timeout_seconds') != required_timeout:
         reject(path, 'disallowed timeout_seconds')
         return

@@ -18,7 +18,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.8.6"
+    assert MANIFEST["release_version"] == "0.8.7"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -52,6 +52,25 @@ def test_dispatcher_contains_current_bounded_worker_contract():
     assert "expected_prefix = client['evidence_prefix']" in text
     assert "registered evidence pack exceeds total limit" in text
     assert "prompt['evidence_pack'] = load_google_ads_evidence(client)" in text
+    assert "required_timeout = admitted_timeout_seconds(profile)" in text
+
+
+def test_google_ads_profile_admits_only_extended_bounded_timeout():
+    dispatcher = load_dispatcher()
+    assert dispatcher.admitted_timeout_seconds("google_ads_readonly") == 600
+    assert 300 != dispatcher.admitted_timeout_seconds("google_ads_readonly")
+    assert dispatcher.admitted_timeout_seconds("handback_target_registration") == 30
+    assert dispatcher.admitted_timeout_seconds("html_artifact_producer") == 1200
+
+
+def test_google_ads_runtime_extension_preserves_readonly_tool_and_budget_ceiling():
+    worker = (PLUGIN / MANIFEST["assets"]["worker"]["source"]).read_text()
+    assert "if is_marketing else ('12', '2.00')" in worker
+    assert "if is_marketing else 'Skill'" in worker
+    assert "google-ads-readonly.mcp.json" in worker
+    assert "mcp__GoogleAds__execute_gaql" in worker
+    for forbidden in ("mcp__GoogleAds__mutate", "Bash", "WebFetch", "WebSearch"):
+        assert forbidden not in worker
 
 
 def test_worker_persists_terminal_artifacts_inside_supplied_run_directory():
