@@ -19,10 +19,10 @@ strict read-only MCP and registered client/CID evidence boundary.
 The governed container client now uses the common collision-safe ID allocator for Google Ads and
 general marketing runs. That allocator scans incoming, processed, running and failed buckets.
 
-The first mhealth handback registration then exposed a pre-existing systemd-sandbox mismatch: the
-dispatcher attempted its safety copy under read-only `/root`. Release 0.9.1 moves that copy beside
-the already-governed registry, preserves root-only mode, and returns a durable refusal if backup
-creation ever fails.
+The first mhealth handback registrations then exposed a pre-existing systemd-sandbox mismatch. The
+final 0.9.2 boundary grants write access to only the exact registry file, keeps timestamped backups
+inside the already-writable dispatch audit tree, flushes and syncs the update, and restores the
+captured backup on failure.
 
 Drive and BasicOps remain separate least-privilege handback profiles. This change does not add those
 credentials or mutation tools to the Google Ads reader.

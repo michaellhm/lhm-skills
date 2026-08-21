@@ -9,5 +9,6 @@ Group=root
 NoNewPrivileges=yes
 ProtectSystem=strict
 ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/claude
+ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/config/client-handback-targets.json
 ProtectHome=read-only
 KillMode=process

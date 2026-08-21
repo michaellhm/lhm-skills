@@ -19,7 +19,7 @@ def test_cap_015_preflight_pins_exact_version_sources_and_predecessors(tmp_path)
     manifest = installer.load_manifest()
     installer.verify_sources(manifest)
     assert manifest["capability_id"] == "CAP-015"
-    assert manifest["release_version"] == "0.9.1"
+    assert manifest["release_version"] == "0.9.2"
     assert all(item["sha256"] and item["previous_sha256"] for item in manifest["assets"].values())
     destinations = {}
     for name, item in manifest["assets"].items():
