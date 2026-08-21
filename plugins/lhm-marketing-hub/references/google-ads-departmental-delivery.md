@@ -19,9 +19,11 @@ Use this contract after a review identifies work, when Michael asks to work thro
 
 ## Non-negotiable sequence
 
-`Production brief → Lead reconciliation → Michael action decision → one worker action → QA → Lead record → next action → Production acceptance → BasicOps handoff → Learning Steward`
+`Production brief → Lead reconciliation → authority classification → one worker action → QA → Lead record → next action → Production acceptance → BasicOps handoff → Learning Steward`
 
-Do not dispatch two actions concurrently. Do not expose the next action while the current action is running, awaiting QA, awaiting Michael confirmation or being recorded.
+Do not dispatch two actions concurrently. Do not expose another action while the active action is
+running, awaiting QA or being recorded. A consequential action awaiting Michael does not block a
+separate dependency-ready Lead action.
 
 ## 1. Accept the production brief
 
@@ -56,13 +58,18 @@ expected_outcome: "Observable success"
 skill: keyword-optimizer
 prior_commitment_state: not_started
 dependencies: []
-mutation_scope: read_only | prepare_only | approval_required
+mutation_scope: read_only | prepare_only | manual_execution | consequential_approval
+authority: lead | michael
 decision: pending | approved | modified | rejected | deferred
 execution_status: not_started | running | qa | waiting_approval | complete | blocked
 verification_method: "Exact readback, query or human confirmation"
 ```
 
-Present no more than five proposed actions. Michael approves, modifies, rejects or defers at action level. Silence, report delivery and BasicOps creation are not approval.
+Present no more than five actions. The Lead approves routine reversible account-management actions
+at action level. Michael approves, modifies, rejects or defers consequential actions: material
+budgets or reallocations, campaign pauses, conversion-definition changes, major targeting,
+commercial strategy and subjective brand claims. Silence, report delivery and BasicOps creation are
+not consequential approval.
 
 ## 4. Dispatch one action
 
@@ -166,4 +173,3 @@ Learning Steward chooses `Applied`, `Promote to Knowledge`, `Update SOP`, `Needs
 ## State recovery
 
 Persist parent ID, active action, action register, worker run ID, QA verdict, BasicOps URL and next owner after every transition. Resume the active action; never regenerate the review or submit a duplicate worker merely because the conversation or model turn changed.
-

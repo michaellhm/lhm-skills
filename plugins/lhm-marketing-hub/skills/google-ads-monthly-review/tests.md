@@ -1,5 +1,12 @@
 # Google Ads monthly operating model tests
 
+## 0. Canonical departmental entrypoint
+
+Given `/lhm-marketing-hub:start-googleads Any Stage Physio — review the last 30 days`, invoke the
+`google-ads` Lead and run `google-ads-monthly-review` before any downstream action skill. Return a
+new zone-led action register; do not resume an earlier action register unless the request says to
+resume.
+
 ## 1. Scheduled morning review
 
 Given canonical Obsidian context and all connectors, the run must compare current/prior 30 days, verify prior commitments, save/read back Drive, create one BasicOps parent without execution subtasks, and return `waiting_michael_hermes`.
@@ -18,7 +25,9 @@ The run must label its zone source `manual_fallback`, show the calculation and c
 
 ## 5. Approval boundary
 
-Saving Drive and creating BasicOps must not approve Ads mutations. Proposed actions remain `pending`; no execution subtasks or specialist mutations occur.
+Saving Drive and creating BasicOps must not approve consequential Ads mutations. After delivery,
+the Lead may approve a routine reversible action from observed evidence, but no specialist action
+starts merely because the report or task exists.
 
 ## 6. Resume through Hermes
 
@@ -59,3 +68,32 @@ When every approved action is terminal, return a completion dossier to Head of P
 ## 14. Cross-department dependency
 
 Given Ads requires an Astro landing-page tracking change, the Google Ads Lead returns an exact technical handoff and acceptance test. Head of Production owns formal routing; the Ads worker must not silently create or prioritise another department's workload.
+
+## 15. Zone candidates map to skills, not automatic checklist work
+
+Given a mechanically Yellow account with profitable PMax under pacing but a failing Search campaign,
+retain Yellow as the account zone, label the Search campaign exception, and select up to five actions
+from the zone library only where live evidence supports them. It is valid to select Orange repair
+candidates for the failing campaign. Every selected action must name its owning skill, dependencies,
+authority class and verification method. Do not select five Yellow scaling tasks merely to fill the
+register.
+
+## 16. Lead-authorised chaining starts automatically
+
+Given the review selects a keyword-waste action owned by `keyword-optimizer` with `authority=lead`
+and no dependencies, the Google Ads Lead marks it approved and dispatches it without asking Michael
+whether to proceed. The worker runs only that action slice, Google Ads Delivery QA checks it, and the
+result returns to the Lead before any next action starts.
+
+## 17. Consequential action does not create a blanket stop
+
+Given GA-01 is an independent Lead-authorised tracking diagnosis and GA-02 is a conversion-definition
+change requiring Michael, dispatch GA-01 while GA-02 remains `waiting_approval`. Ask Michael only for
+the exact GA-02 decision. Do not ask for permission to begin GA-01 and do not dispatch GA-02.
+
+## 18. Manual execution versus decision authority
+
+Given the Lead approves a routine reversible RSA or keyword change but no Ads write connector exists,
+the Lead produces exact UI instructions and marks the action `manual_execution`. Michael is the human
+executor, not the strategy approver. Close it only after his execution confirmation and the defined
+live readback pass.

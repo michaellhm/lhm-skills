@@ -1,6 +1,6 @@
 ---
 name: pmax-optimizer
-description: Optimise an existing Performance Max campaign for an Australian local-service business. Runs either a monthly tactical optimisation pass or a 90-day strategic review. Use this when the user mentions "optimise PMax", "PMax optimisation", "Performance Max review", "PMax monthly", "PMax 90-day", "PMax quarterly", "fix Performance Max", "improve PMax performance", "PMax not converting", "PMax CPL too high", or routes from the google-ads-monthly-review agent for a PMax-heavy account. Outputs a prioritised action list with AdPulse zone mapping and routes to bid-budget-optimizer, pmax-banner-generator, or landing-page-optimizer where appropriate.
+description: Optimise an existing Performance Max campaign for an Australian local-service business. Runs either a monthly tactical optimisation pass or a 90-day strategic review. Use this when the user mentions "optimise PMax", "PMax optimisation", "Performance Max review", "PMax monthly", "PMax 90-day", "PMax quarterly", "fix Performance Max", "improve PMax performance", "PMax not converting", "PMax CPL too high", or when the Google Ads Lead routes a PMax action after a monthly review. Outputs a prioritised action list with AdPulse zone mapping and routes to bid-budget-optimizer, pmax-banner-generator, or landing-page-optimizer where appropriate.
 ---
 
 # PMax Optimizer (Local Business)
