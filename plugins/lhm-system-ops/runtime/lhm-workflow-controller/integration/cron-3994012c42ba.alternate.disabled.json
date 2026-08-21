@@ -1,0 +1,10 @@
+{
+  "enabled": false,
+  "id": "3994012c42ba-org-candidate",
+  "name": "LHM weekly SEO rollout — governed organisational candidate",
+  "schedule": {"kind": "cron", "expr": "0 18 * * 0"},
+  "no_agent": true,
+  "script": "/opt/lhm-workflow/current/integration/lhm-seo-org-cron-alternate",
+  "deliver": "none",
+  "replaces_after_canary_only": "3994012c42ba"
+}

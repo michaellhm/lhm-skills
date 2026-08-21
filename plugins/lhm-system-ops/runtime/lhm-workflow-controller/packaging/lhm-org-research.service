@@ -1,0 +1,13 @@
+[Unit]
+Description=Root trusted Claude/GSC canary research broker
+[Service]
+Type=oneshot
+User=root
+Group=root
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+InaccessiblePaths=/var/lib/lhm-workflow-canary/keys
+ReadWritePaths=/var/lib/lhm-workflow-canary /home/hermes/.hermes/profiles/lhm_brain/dispatch/claude/runs
+ExecStart=/opt/lhm-workflow/current/integration/lhm-org-research-adapter /var/lib/lhm-workflow-canary

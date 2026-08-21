@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch for root-authored Hermes workflow bridge manifests
+
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/bridge-incoming/*.json
+Unit=lhm-workflow-bridge.service
+
+[Install]
+WantedBy=multi-user.target

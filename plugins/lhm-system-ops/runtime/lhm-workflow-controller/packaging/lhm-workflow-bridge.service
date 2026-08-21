@@ -1,0 +1,33 @@
+[Unit]
+Description=Promote trusted Hermes host observations into candidate workflow receipts
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+SupplementaryGroups=lhmworkflow
+UMask=0027
+WorkingDirectory=/opt/lhm-workflow/current
+Environment=PYTHONPATH=/opt/lhm-workflow/current/src PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/lhm-workflow/current/venv/bin/python -m lhm_workflow.daemon bridge-scan
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+CapabilityBoundingSet=CAP_CHOWN CAP_FOWNER
+SystemCallArchitectures=native
+ReadOnlyPaths=/var/lib/lhm-workflow/issued-contracts /var/lib/lhm-workflow/host-events /var/lib/lhm-workflow/worker-results
+ReadWritePaths=/var/lib/lhm-workflow/bridge-incoming /var/lib/lhm-workflow/adapter-source /var/lib/lhm-workflow/processed/bridge /var/lib/lhm-workflow/quarantine/bridge

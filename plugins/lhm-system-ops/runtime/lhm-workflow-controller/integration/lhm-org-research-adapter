@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+import argparse,json,os
+from pathlib import Path
+from lhm_workflow.org_canary import Canary,atomic
+def main():
+ p=argparse.ArgumentParser(); p.add_argument("root",type=Path); a=p.parse_args()
+ if os.geteuid()!=0: raise SystemExit("root Research broker only")
+ candidates=sorted((a.root/"research-requests").glob("*.json"))
+ if not candidates: return
+ request=candidates[0]; value=json.loads(request.read_text()); canary=Canary(a.root,{})
+ artifact=canary._claude(value["parent"],value["contract"],value["config"])
+ registry=json.loads((a.root/"artifact-registry.json").read_text()); path=registry[artifact["artifact_id"]]["path"]
+ atomic(a.root/"research-results"/request.name,{"artifact":artifact,"path":path}); request.unlink()
+if __name__=="__main__": main()

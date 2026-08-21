@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch isolated @ROLE@ canary signing requests
+
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow-canary/sign-requests/@ROLE@/*.json
+Unit=lhm-org-signer-@ROLE@.service
+
+[Install]
+WantedBy=multi-user.target
