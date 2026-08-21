@@ -158,8 +158,16 @@ def complete_registration(path, request):
         if folder_id in other.get('drive_folder_query', ''):
             finish('failed', 'refused', f'Drive folder already belongs to {other_slug}')
             return
-    backup = Path('/root') / f'client-handback-targets.json.backup-{datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")}'
-    shutil.copy2(HANDBACK_REGISTRY, backup)
+    backup = HANDBACK_REGISTRY.with_name(
+        f'.client-handback-targets.json.backup-{datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")}'
+    )
+    try:
+        shutil.copy2(HANDBACK_REGISTRY, backup)
+        os.chown(backup, 0, HERMES_GID)
+        os.chmod(backup, 0o600)
+    except OSError as exc:
+        finish('failed', 'refused', f'registry backup failed: {exc}')
+        return
     targets[slug] = target
     fd, temp_name = tempfile.mkstemp(prefix='.client-handback-targets.', dir=HANDBACK_REGISTRY.parent)
     try:
