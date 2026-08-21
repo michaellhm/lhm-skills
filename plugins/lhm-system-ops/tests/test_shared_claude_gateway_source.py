@@ -18,7 +18,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.8.7"
+    assert MANIFEST["release_version"] == "0.8.8"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -35,6 +35,35 @@ def test_shared_gateway_destinations_are_exact_and_distinct_from_evidence_bridge
     assert "lhm-evidence-claude" not in assets["dispatcher"]["destination"]
     assert "lhm-evidence-claude" not in assets["worker"]["destination"]
     assert assets["dispatcher"]["mode"] == assets["worker"]["mode"] == "0755"
+
+
+def test_container_client_is_governed_at_exact_bind_mount_target():
+    client = MANIFEST["assets"]["container_client"]
+    assert client["destination"] == "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch"
+    assert client["container_destination"] == "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
+    assert client["previous_sha256"] == "953f6cb3f5f0295d0033c0da18c974da524507461ebf4b71448ffce2813e7bba"
+    assert client["owner"] == client["group"] == 10000
+    assert client["mode"] == "0755"
+
+
+def test_container_client_changes_only_google_ads_submission_timeout():
+    client = PLUGIN / MANIFEST["assets"]["container_client"]["source"]
+    repaired = client.read_bytes()
+    submitted_timeout = (
+        b"'profile': 'google_ads_readonly', 'agent_id': 'lhm-marketing-hub:google-ads', "
+        b"'client': client, 'objective': objective, 'timeout_seconds': 600}"
+    )
+    assert repaired.count(submitted_timeout) == 1
+    predecessor = repaired.replace(
+        submitted_timeout,
+        b"'profile': 'google_ads_readonly', 'agent_id': 'lhm-marketing-hub:google-ads', 'client': client, 'objective': objective, 'timeout_seconds': 300}",
+        1,
+    )
+    assert predecessor != repaired
+    assert len(predecessor) == 12033
+    assert hashlib.sha256(predecessor).hexdigest() == MANIFEST["assets"]["container_client"]["previous_sha256"]
+    assert b"'profile': 'google_ads_readonly'" in repaired
+    assert b"'timeout_seconds': 600}" in repaired
 
 
 def test_dispatcher_contains_current_bounded_worker_contract():

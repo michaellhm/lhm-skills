@@ -10,7 +10,7 @@ import tempfile
 from pathlib import Path
 
 CAPABILITY_ID = 'CAP-015'
-RELEASE_VERSION = '0.8.7'
+RELEASE_VERSION = '0.8.8'
 PLUGIN = Path(__file__).resolve().parents[2]
 MANIFEST_PATH = PLUGIN / 'references/shared-claude-gateway-release.json'
 ANCESTORS = ('/home/hermes/.hermes', '/home/hermes/.hermes/profiles/lhm_brain')
@@ -18,6 +18,14 @@ ANCESTORS = ('/home/hermes/.hermes', '/home/hermes/.hermes/profiles/lhm_brain')
 
 def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def numeric_identity(value, kind):
+    if isinstance(value, int) and value >= 0:
+        return value
+    if value == 'root':
+        return 0
+    raise SystemExit(f'unsupported manifest {kind}')
 
 
 def load_manifest(path=MANIFEST_PATH):
@@ -80,7 +88,8 @@ def atomic_install(manifest, plugin=PLUGIN):
                 handle.write(source.read_bytes())
                 handle.flush()
                 os.fsync(handle.fileno())
-            os.chown(temporary, 0, 0)
+            os.chown(temporary, numeric_identity(item['owner'], 'owner'),
+                     numeric_identity(item['group'], 'group'))
             os.chmod(temporary, int(item['mode'], 8))
             os.replace(temporary, destination)
         finally:
@@ -97,9 +106,18 @@ def rollback(state_path, runner=subprocess.run):
         if sha256(backup) != record['sha256']:
             raise SystemExit('rollback backup hash mismatch')
         destination = Path(record['destination'])
-        shutil.copyfile(backup, destination)
-        os.chown(destination, record['uid'], record['gid'])
-        os.chmod(destination, record['mode'])
+        fd, temporary = tempfile.mkstemp(prefix=f'.{destination.name}.rollback.', dir=destination.parent)
+        try:
+            with os.fdopen(fd, 'wb') as handle:
+                handle.write(backup.read_bytes())
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.chown(temporary, record['uid'], record['gid'])
+            os.chmod(temporary, record['mode'])
+            os.replace(temporary, destination)
+        finally:
+            if os.path.exists(temporary):
+                os.unlink(temporary)
     runner(['/usr/bin/setfacl', '--restore', state['acl_backup']], check=True)
     runner(['/usr/bin/systemctl', 'daemon-reload'], check=True)
 

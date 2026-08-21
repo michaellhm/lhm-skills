@@ -87,7 +87,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.8.6':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.8.8':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -120,6 +120,7 @@ def main():
         'assets/systemd/lhm-cto-result-resumer.service',
         'assets/systemd/lhm-cto-result-resumer.timer',
         'assets/container/source-dispatch',
+        'assets/container/claude-dispatch',
         'assets/host/lhm-source-production-runtime',
         'assets/host/lhm-source-adapter',
         'assets/host/lhm-evidence-fathom-backend',
