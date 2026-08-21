@@ -6,7 +6,10 @@ Keep the tone plain and direct throughout. The point of this loop is to make the
 
 ## When this runs
 
-Run this after, not instead of, the review's own analysis and approval gate. The review decides *what* matters; this protocol drives *getting it done*. For every governed Google Ads flow, also follow `references/google-ads-departmental-delivery.md`. For a Hermes monthly flow, resume the monthly structured handback rather than regenerating discovery.
+Run this after, not instead of, the review's analysis and authority classification. The review decides
+*what* matters; this protocol drives *getting it done*. For every governed Google Ads flow, also
+follow `references/google-ads-departmental-delivery.md`. For a Hermes monthly flow, resume the monthly
+structured handback rather than regenerating discovery.
 
 ## Step 1: Lay out the task list in chat
 
@@ -27,14 +30,12 @@ Here are the 7 tasks:
 ...
 ```
 
-## Step 2: Offer to work through them
+## Step 2: Classify authority and start
 
-Ask one question, plainly:
-
-> "Do you want me to work through each task one at a time?"
-
-- **If no:** leave the list as it stands and go straight to Step 4 (closeout). Do not push.
-- **If yes:** start the loop in Step 3.
+The Google Ads Lead marks routine reversible actions `approved` and begins the first
+dependency-ready action without asking a generic permission question. Mark consequential actions
+`waiting_approval` and ask Michael only for the exact decision required. If no action can progress,
+hand back the bounded approval or blocker.
 
 ## Step 3: Work through one task at a time
 
@@ -53,10 +54,9 @@ The Google Ads Lead must dispatch only one approved action at a time. Before dis
    Run only the slice that this task needs. Do not run the whole skill end to end if a single change is all that is required.
 3. **QA, verify and ask if it is done.** A dispatched worker must return observed evidence, mutations performed (or `none`) and verification. QA must return `pass`, `correction_required`, `waiting_approval`, `needs_evidence` or `blocked`. After a pass, present only the current result:
 
-   > "Is that one done?"
-
-   - The user may confirm, or may have follow-up questions. Answer the follow-ups, then ask again.
-   - Move to the next task only once the user confirms done, or explicitly chooses to skip it.
+   For API-observable work, the Lead accepts completion from QA plus the defined live readback; do
+   not ask Michael to reconfirm it. For manual Google Ads UI work, wait for Michael's execution
+   confirmation and then run the defined verification before closing the action.
 4. **Track what happened** for each task: done, skipped (with reason), or deferred. You will need this for the closeout.
 
 Stop the loop early if the user asks to. Whatever is left becomes "deferred" in the closeout.
@@ -86,6 +86,7 @@ End every session with this question, without exception:
 
 ## Notes
 
-- This loop never replaces the review's approval gate. The user still approves *which* actions matter before any of this starts.
+- This loop never replaces consequential approval gates. The Lead decides routine reversible
+  actions; Michael decides only the consequential classes defined by the departmental contract.
 - Keep each task self-contained. The whole value is that the user only ever looks at one small thing at a time.
 - Never fabricate completion. A specialist action is complete only when its returned evidence verifies the expected outcome; a manual action is complete only when the user confirms it.

@@ -36,6 +36,13 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/google-ads-monthly-operating-model.md`. P
 
 Before proposing work, reconcile canonical Obsidian context, prior Drive artefacts, BasicOps commitments and live settings using the commitment states in the departmental-delivery contract.
 
+After the review returns, read `${CLAUDE_PLUGIN_ROOT}/references/google-ads-zone-action-library.md`.
+Validate that each selected action is supported by account-specific evidence and names an owning
+skill. Classify each action as `lead` or `michael`. Mark routine reversible actions approved without
+asking Michael, select the first dependency-ready Lead action and dispatch it. Ask Michael only for
+an exact consequential decision. A waiting consequential action does not block an independent
+Lead-authorised action.
+
 ### Quarterly adversarial review
 Follow `${CLAUDE_PLUGIN_ROOT}/skills/quarterly-adversarial-review/SKILL.md`.
 
@@ -59,7 +66,12 @@ Follow `${CLAUDE_PLUGIN_ROOT}/references/google-ads-departmental-delivery.md`. P
 
 ## Step 5: Execute approved tasks sequentially
 
-For a monthly flow, recommendations are proposals until Michael approves them through Hermes. Maintain one stable action register. Dispatch one approved action at a time using the departmental action packet. Every worker result must pass `google-ads-delivery-qa`; record its evidence in Obsidian and BasicOps before selecting the next action. Never infer approval from the scheduled run, report save or BasicOps task creation.
+For a monthly flow, maintain one stable action register. Lead-authorised actions are approved by the
+Lead after evidence review; consequential actions remain proposals until Michael decides them
+through Hermes. Dispatch one approved action at a time using the departmental action packet. Every
+worker result must pass `google-ads-delivery-qa`; record its evidence in Obsidian and BasicOps before
+selecting the next action. Never infer consequential approval from the scheduled run, report save or
+BasicOps task creation.
 
 For a directly invoked specific task, use the guided task protocol, the owning skill's approval gate and delivery QA before claiming completion.
 

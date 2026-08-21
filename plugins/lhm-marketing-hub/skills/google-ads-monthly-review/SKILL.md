@@ -1,6 +1,6 @@
 ---
 name: google-ads-monthly-review
-description: "Quick Google Ads health check that analyses account performance and determines AdPulse zone (Red/Orange/Yellow/Blue/Green). Use this when the user mentions 'zone check', 'health check', 'what zone are we in', 'quick review', 'account health', or 'AdPulse zone'. For a full monthly review with automatic skill chaining, route to the google-ads-monthly-review agent instead."
+description: "Analyse Google Ads performance, determine the AdPulse zone and measurement confidence, reconcile prior commitments, and return up to five evidence-backed actions with specialist skill routes. Use for monthly reviews, zone checks, account health checks, or the review stage of a Google Ads Lead session. The Google Ads Lead owns subsequent action selection and skill chaining."
 license: MIT
 ---
 
@@ -8,9 +8,10 @@ license: MIT
 
 ## Purpose
 
-Analyse Google Ads account performance, determine the performance zone and measurement confidence, and recommend no more than five prioritised actions. This is the lightweight skill version — it analyses and recommends but does not execute actions automatically.
-
-For a full review that executes recommended actions across skills, use the **google-ads-monthly-review agent** instead.
+Analyse Google Ads account performance, determine the performance zone and measurement confidence,
+and return no more than five prioritised actions. This skill decides what matters; it does not execute
+the actions. The persistent `google-ads` Lead owns authority classification, sequencing and specialist
+skill dispatch after this review returns.
 
 ## When to Use
 
@@ -20,6 +21,7 @@ For a full review that executes recommended actions across skills, use the **goo
 - **After major changes** — Reassess zone after budget or performance shifts
 
 Read and follow `${CLAUDE_PLUGIN_ROOT}/references/google-ads-monthly-operating-model.md` before starting.
+Read `${CLAUDE_PLUGIN_ROOT}/references/google-ads-zone-action-library.md` before selecting actions.
 
 ## Prerequisites
 
@@ -83,13 +85,20 @@ See the **Zone Reference** section below for full zone decision trees and execut
 
 ### Step 5: Generate the top five proposed actions
 
-Based on the evidence, provide no more than five prioritised action items. Each recommendation must include:
+Use the matched zone as a candidate library, not a mandatory checklist. Rank its highest-impact
+candidates first, then filter them through live evidence, client economics, prior commitments and
+campaign-level exceptions. A failing campaign may justify Orange/Red repair actions inside a Yellow
+account, but the account's mechanical zone must remain unchanged.
+
+Provide no more than five prioritised action items. Each recommendation must include:
 - Action title and urgency
 - Estimated impact
 - Specific metrics to target
 - Reasoning
 - Owning specialist skill
-- Whether it is read-only or requires approval for a live mutation
+- Dependencies and verification method
+- Authority class: `lead` or `michael`
+- Mutation scope: `read_only`, `prepare_only`, `manual_execution`, or `consequential_approval`
 
 ### Step 6: Dispatch, save and verify delivery
 
@@ -110,16 +119,20 @@ If the destination is missing, dispatch is unavailable, either connector is unav
 
 ### Step 7: Hermes overview, BasicOps record and approval gate
 
-Return the compact overview and structured handback defined in the operating model after the delivery worker returns both verified links. Put the report URL, overview, top five and approval question in the BasicOps discussion; do not create execution subtasks yet. Set BasicOps `workflow_state=waiting-on-michael-via-hermes` and `approval_status=pending-michael`; use internal handback `status=waiting_michael_hermes` only after both readbacks succeed.
+Return the compact overview and structured handback defined in the operating model after the delivery
+worker returns both verified links. Put the report URL, overview, top five, authority classes and any
+exact consequential decision in the BasicOps discussion; do not create execution subtasks merely
+from report delivery. If a Michael decision is actually required, set the governed waiting-on-Michael
+state. Otherwise hand the action register to the Google Ads Lead for sequential dispatch.
 
-**APPROVAL REQUIRED** — Hermes presents recommendations and waits for Michael. Ask:
-- Which actions would you like to tackle?
-- Any actions to skip or modify?
-- Questions about any recommendations?
+The Google Ads Lead classifies each action after review delivery. Lead-authorised actions become
+`approved` automatically and enter the sequential queue. Consequential actions remain
+`waiting_approval` and Hermes asks Michael only for the exact decision required. Do not stop the
+entire action register merely because one action requires Michael.
 
 ### Step 8: Recommend Next Skills
 
-Based on approved actions, suggest which skills to run next:
+For every selected action, name the skill the Google Ads Lead should dispatch next:
 
 | Issue Identified | Recommended Skill |
 |-----------------|-------------------|
@@ -132,7 +145,9 @@ Include specific parameters to pass to the next skill.
 
 ### Step 9: Sequential specialist execution
 
-Once the report is saved and Michael has approved which actions matter through Hermes, hand off to the shared guided task execution protocol:
+Once the report is saved and the Lead has classified action authority, hand off to the shared guided
+task execution protocol. Lead-authorised actions may begin immediately; Michael-authorised actions
+wait at their exact consequential gate:
 
 `${CLAUDE_PLUGIN_ROOT}/references/guided-task-execution.md`
 
@@ -185,9 +200,9 @@ Measurement confidence: [High/Medium/Low] — [one-line reason]
 ## Tips
 
 - Run at month start (days 1-5 is ideal)
-- Don't skip the approval gate
+- Do not skip consequential approval gates
 - Follow zone priorities: Red/Orange before Yellow/Green
-- For full execution across skills, use the agent version instead
+- For execution across skills, return to the persistent `google-ads` Lead
 
 ## Related Skills
 
