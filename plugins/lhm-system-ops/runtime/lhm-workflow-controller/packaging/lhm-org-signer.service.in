@@ -1,0 +1,15 @@
+[Unit]
+Description=Isolated LHM organisational signer @ROLE@
+
+[Service]
+Type=oneshot
+User=@USER@
+Group=@USER@
+SupplementaryGroups=lhmorg
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadOnlyPaths=/opt/lhm-workflow/current /var/lib/lhm-workflow-canary/keys/@ROLE@.private.pem
+ReadWritePaths=/var/lib/lhm-workflow-canary/sign-requests/@ROLE@ /var/lib/lhm-workflow-canary/sign-results/@ROLE@
+ExecStart=/opt/lhm-workflow/current/integration/lhm-org-role-adapter @ROLE@ /var/lib/lhm-workflow-canary/keys/@ROLE@.private.pem @VERIFY@ --request-dir /var/lib/lhm-workflow-canary/sign-requests/@ROLE@ --result-dir /var/lib/lhm-workflow-canary/sign-results/@ROLE@

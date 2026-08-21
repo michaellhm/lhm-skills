@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hermes Client Onboarding"
+  short_description: "Verify client access before autonomous work"
+  default_prompt: "Use $hermes-client-onboarding to create or verify a client capability preflight."

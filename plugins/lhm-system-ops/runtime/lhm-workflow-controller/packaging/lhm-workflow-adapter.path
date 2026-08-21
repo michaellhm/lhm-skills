@@ -1,0 +1,6 @@
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/adapter-source/*.json
+Unit=lhm-workflow-adapter.service
+
+[Install]
+WantedBy=multi-user.target
