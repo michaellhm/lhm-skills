@@ -55,6 +55,7 @@ Follow `${CLAUDE_PLUGIN_ROOT}/skills/google-ads-monthly-loop/SKILL.md`.
 | Ad copy / RSAs | `${CLAUDE_PLUGIN_ROOT}/skills/ad-copy-generator/SKILL.md` |
 | Keywords / negatives / match types | `${CLAUDE_PLUGIN_ROOT}/skills/keyword-optimizer/SKILL.md` |
 | Bid strategy / budget | `${CLAUDE_PLUGIN_ROOT}/skills/bid-budget-optimizer/SKILL.md` |
+| Google Ads conversion actions / campaign goals / GA4 imports | `${CLAUDE_PLUGIN_ROOT}/skills/google-ads-conversion-audit/SKILL.md` |
 | Landing page | `${CLAUDE_PLUGIN_ROOT}/skills/landing-page-optimizer/SKILL.md` |
 | PMax banners/assets | `${CLAUDE_PLUGIN_ROOT}/skills/pmax-banner-generator/SKILL.md` |
 | PMax campaign setup | `${CLAUDE_PLUGIN_ROOT}/skills/pmax-campaign-setup/SKILL.md` |

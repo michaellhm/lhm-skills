@@ -9,9 +9,8 @@ license: MIT
 ## Purpose
 
 Analyse Google Ads account performance, determine the performance zone and measurement confidence,
-and return no more than five prioritised actions. This skill decides what matters; it does not execute
-the actions. The persistent `google-ads` Lead owns authority classification, sequencing and specialist
-skill dispatch after this review returns.
+run the mandatory diagnostic specialists, and return no more than five resolved actions. The
+persistent `google-ads` Lead owns authority classification, sequencing and subsequent implementation.
 
 ## When to Use
 
@@ -39,12 +38,12 @@ Use the canonical Obsidian context envelope supplied by Hermes. It must cover ob
 ### Step 2: Data access and comparison
 
 **Option A: Google Ads MCP (Preferred)**
-If Google Ads MCP is available, fetch campaign performance data automatically. All accounts live under **MCC 394-736-1921**. Pull the current 30 days and immediately preceding 30 days using aligned definitions.
+If Google Ads MCP is available, fetch campaign performance data automatically. All accounts live under **MCC 394-736-1921**. Unless the brief specifies another convention, use the last 30 complete calendar days ending yesterday and the immediately preceding 30 complete days. State both inclusive date ranges.
 
 **Option B: CSV Export (Fallback)**
 If MCP isn't available, ask the user to provide a campaign performance CSV with columns: Campaign, Cost, Conversions, Conv. Value, CPA, ROAS, Budget. Date range: last 30 days.
 
-**Zone data specifically: use AdPulse MCP directly, don't hand-calculate it.** Read `${CLAUDE_PLUGIN_ROOT}/references/adpulse-integration.md` and pull `pacing`/`kpiPercentage` straight from AdPulse for Step 3-4 below instead of computing budget pacing % / performance variance % from raw Google Ads numbers. That reference also covers a known gap in the zone matrix (Under-pacing + Poor performance) and how to handle it.
+**Zone data specifically: use AdPulse MCP directly, don't hand-calculate pacing when it is available.** Read `${CLAUDE_PLUGIN_ROOT}/references/adpulse-integration.md` and pull `pacing`/`kpiPercentage` from AdPulse for Steps 3-4. AdPulse `pacing` controls the pacing axis. The canonical business CPA/ROAS target controls the performance axis; treat `kpiPercentage` as supporting evidence unless canonical context explicitly defines it against that same target. That reference also covers a known gap in the zone matrix (Under-pacing + Poor performance) and how to handle it.
 
 Also reconcile every open commitment from the previous review against live settings. When Ads conversions are zero, falling, inconsistent or suspicious, query GA4 for the same date windows before diagnosing demand or tracking.
 
@@ -83,14 +82,37 @@ If the mechanical matrix produces Yellow but unfinished commitments or a negativ
 
 See the **Zone Reference** section below for full zone decision trees and execution checklists.
 
-### Step 5: Generate the top five proposed actions
+### Step 5: Run the mandatory diagnostic specialists
+
+Before selecting the top five, dispatch these read-only or prepare-only skill slices and return each
+result to the Lead:
+
+1. Run `bid-budget-optimizer` for every active campaign. Return the current bid strategy, observed
+   constraints, and one of `keep`, `change`, or `insufficient_evidence`, with the proposed strategy or
+   value when change is supported. Include PMax in this assessment. When any PMax campaign is active,
+   also run the read-only monthly-review slice of `pmax-optimizer` so conversion mix, asset/listing
+   constraints and scaling evidence are resolved consistently.
+2. Run `google-ads-conversion-audit` for the account and every active campaign. Use GA4 evidence when
+   the Ads configuration or event firing is unclear. Produce the required conversion one-pager.
+3. Trigger `keyword-optimizer` whenever the evidence identifies search-term waste, negative-keyword
+   work, dormant/duplicated search structure, match-type problems, or keyword expansion. Do not leave
+   “clean up keywords/structure” as a preliminary recommendation.
+4. Trigger other specialists only where account evidence supports them.
+
+These diagnostics do not authorise live mutations. They resolve preliminary observations into exact
+recommendations for the Lead.
+
+### Step 6: Generate the top five resolved actions
 
 Use the matched zone as a candidate library, not a mandatory checklist. Rank its highest-impact
 candidates first, then filter them through live evidence, client economics, prior commitments and
 campaign-level exceptions. A failing campaign may justify Orange/Red repair actions inside a Yellow
 account, but the account's mechanical zone must remain unchanged.
 
-Provide no more than five prioritised action items. Each recommendation must include:
+Provide no more than five prioritised action items after the relevant diagnostic skill has run. A
+final action must state the actual change, retention decision, or bounded investigation. Do not use
+“run [skill]”, “confirm whether”, “review”, or “clean up” as the action when the available specialist
+can resolve it now. Each recommendation must include:
 - Action title and urgency
 - Estimated impact
 - Specific metrics to target
@@ -100,13 +122,13 @@ Provide no more than five prioritised action items. Each recommendation must inc
 - Authority class: `lead` or `michael`
 - Mutation scope: `read_only`, `prepare_only`, `manual_execution`, or `consequential_approval`
 
-### Step 6: Dispatch, save and verify delivery
+### Step 7: Dispatch, save and verify delivery
 
 Saving the read-only monthly report and creating its review record are part of delivery, not consequential Google Ads actions. Do this **before** asking for approval.
 
 1. Read the client's canonical service file and use its exact Google Drive destination for Google Ads deliverables. Do not infer a folder from the client name when a destination is recorded.
-2. Return the completed one-page report to Hermes. Hermes submits one bounded monthly-review delivery job to the configured ChatGPT/Codex bridge; it must not require a direct Drive or BasicOps connector in the Hermes session.
-3. The delivery worker saves `google_ads/YYYY-MM/monthly-review-YYYY-MM.md`, reads it back, and captures the observed Drive file ID/URL and parent folder.
+2. Return the completed four-file review pack to Hermes. Hermes submits one bounded monthly-review delivery job to the configured ChatGPT/Codex bridge; it must not require a direct Drive or BasicOps connector in the Hermes session.
+3. The delivery worker saves and reads back the four-file review pack defined below, then captures the observed Drive file IDs/URLs and parent folder.
 4. In the same job, the worker invokes `lhm-project-hub:basicops-task-manager`, deduplicates and creates or updates the review parent, writes the discussion and reads it back.
 5. Hermes polls the recorded delivery run ID and resumes it rather than submitting duplicates. It may proceed to the approval gate only after receiving verified Drive and BasicOps URLs.
 
@@ -117,22 +139,24 @@ If the destination is missing, dispatch is unavailable, either connector is unav
 - state the exact missing destination, permission or verification problem;
 - say `analysis complete; delivery incomplete`, preserve the delivery run ID and do not silently save somewhere else.
 
-### Step 7: Hermes overview, BasicOps record and approval gate
+### Step 8: Hermes overview, BasicOps record and approval gate
 
 Return the compact overview and structured handback defined in the operating model after the delivery
-worker returns both verified links. Put the report URL, overview, top five, authority classes and any
-exact consequential decision in the BasicOps discussion; do not create execution subtasks merely
+worker returns all verified links. Put the key metrics, campaign breakdown including bid-strategy
+verdicts, performance zone, measurement confidence, resolved top five, matched-zone optional
+checklist, artefact URLs, authority classes and any exact consequential decision in the BasicOps
+discussion; do not create execution subtasks merely
 from report delivery. If a Michael decision is actually required, set the governed waiting-on-Michael
 state. Otherwise hand the action register to the Google Ads Lead for sequential dispatch.
 
-The Google Ads Lead classifies each action after review delivery. Lead-authorised actions become
+The Google Ads Lead classifies each action before building the review pack. Lead-authorised actions become
 `approved` automatically and enter the sequential queue. Consequential actions remain
 `waiting_approval` and Hermes asks Michael only for the exact decision required. Do not stop the
 entire action register merely because one action requires Michael.
 
-### Step 8: Recommend Next Skills
+### Step 9: Record specialist provenance
 
-For every selected action, name the skill the Google Ads Lead should dispatch next:
+For every selected action, name the skill that produced or owns it:
 
 | Issue Identified | Recommended Skill |
 |-----------------|-------------------|
@@ -140,10 +164,11 @@ For every selected action, name the skill the Google Ads Lead should dispatch ne
 | Keyword waste/negatives | `keyword-optimizer` |
 | Ad performance/refresh | `ad-copy-generator` |
 | Landing page issues | `landing-page-optimizer` |
+| Conversion definitions, imports, firing or campaign goals | `google-ads-conversion-audit` |
 
 Include specific parameters to pass to the next skill.
 
-### Step 9: Sequential specialist execution
+### Step 10: Sequential specialist execution
 
 Once the report is saved and the Lead has classified action authority, hand off to the shared guided
 task execution protocol. Lead-authorised actions may begin immediately; Michael-authorised actions
@@ -153,9 +178,29 @@ wait at their exact consequential gate:
 
 Read it and follow it. Hermes dispatches exactly one approved action at a time. After every worker handback, record evidence and status in Obsidian and BasicOps before dispatching another action.
 
-## Report format
+Respect the intake's execution ceiling. If it says review-only, prepare-only, manual implementation,
+or no Ads mutations, build and deliver the complete pack but do not start live execution. Mark the
+next approved manual item `waiting_manual_execution`; this is an execution handoff, not a strategy
+approval gate.
 
-Save and verify the zone assessment through Step 6:
+## Required review pack
+
+Save and verify all four files in `google_ads/YYYY-MM/` before the decision handoff:
+
+1. `monthly-review-YYYY-MM.md`: one-page executive review.
+2. `conversion-tracking-YYYY-MM.md`: one-page conversion audit from
+   `google-ads-conversion-audit`.
+3. `specialist-findings-YYYY-MM.md`: concise bid/budget, keyword, PMax and other triggered
+   specialist evidence, recommendations and QA state. Omit empty sections, not the file. Specialist
+   execution files required by an owning skill must use the same canonical Drive
+   `google_ads/YYYY-MM/` folder, be uploaded and read back, and be linked from this index and the
+   implementation checklist instead of expanding the core pack.
+4. `implementation-checklist-YYYY-MM.md`: atomic approved routine actions plus a separate
+   `Michael approval required` section for consequential actions. Every checkbox must name the
+   exact object, current state, proposed state and verification step. Never use vague items such as
+   “optimise campaign” or “review tracking”.
+
+### Executive monthly review format
 
 **File**: `google_ads/YYYY-MM/monthly-review-YYYY-MM.md`
 
@@ -182,19 +227,21 @@ Measurement confidence: [High/Medium/Low] — [one-line reason]
 | ... | ... | Applied/Partial/Not applied/Unknown |
 
 ### Campaign Breakdown
-| Campaign | Spend | Conv | CPA | vs Target | Status |
-|----------|-------|------|-----|-----------|--------|
-| ... | ... | ... | ... | ... | ... |
+| Campaign | Spend | Conv | CPA | vs Target | Bid strategy | Verdict |
+|----------|-------|------|-----|-----------|--------------|---------|
+| ... | ... | ... | ... | ... | ... | ... |
 
 ### Priority Actions
 1. [Action] — [Impact] — [Reasoning]
 2. ...
 
-### [Zone] Execution Checklist
-[Paste the matched zone's checklist from zone-analysis.md]
+### Optional [Zone] Checklist
+[Mark each matched-zone candidate Done, Selected, Not supported, or Optional]
 
-### Recommended Next Skills
-- [Skill name] for [specific focus]
+### Review Pack
+- [Conversion one-pager URL]
+- [Specialist findings URL]
+- [Implementation checklist URL]
 ```
 
 ## Tips

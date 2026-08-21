@@ -7,7 +7,7 @@ description: How to pull zone data (pacing/performance) directly from the AdPuls
 
 AdPulse MCP tools are prefixed `adpulse_graphql_*` (schema, schema_search, query, mutation). The exact server ID varies by session — search available tools for "adpulse" if the prefix isn't already visible.
 
-**AdPulse does not expose a pre-computed Red/Orange/Yellow/Blue/Green zone field.** It only exposes the two raw inputs the zone matrix is built from: `pacing` (%) and `kpiPercentage` (%) on a budget's `entries`. Always pull these directly instead of hand-calculating budget pacing / performance variance from raw Google Ads numbers — that's the point of having AdPulse connected, and it's the source of truth the client's account is actually configured against (it may track a different KPI than a flat CPA target, e.g. cost-per-conversion vs previous period).
+**AdPulse does not expose a pre-computed Red/Orange/Yellow/Blue/Green zone field.** It exposes `pacing` (%) and `kpiPercentage` (%) on a budget's `entries`. Use AdPulse `pacing` for the matrix pacing axis instead of hand-calculating it. Use the canonical client CPA/ROAS target for the performance axis. Treat `kpiPercentage` as supporting trend evidence unless canonical context confirms that AdPulse is configured against that same business target.
 
 ## Finding a client's AdPulse budget
 
@@ -47,7 +47,7 @@ Also check `alertsSummary` for the budget — if AdPulse already has active aler
 
 ## Applying the zone matrix
 
-Feed `current.pacing` and `current.kpiPercentage` (or the client's actual target CPA/ROAS from `goals.md` if that's a better fit than AdPulse's configured KPI) into the matrix in `skills/google-ads-monthly-review/SKILL.md`.
+Feed `current.pacing` and performance against the canonical client CPA/ROAS target into the matrix in `skills/google-ads-monthly-review/SKILL.md`. Show `current.kpiPercentage` separately as AdPulse trend/configuration context; never substitute a previous-period KPI for the business target.
 
 **Known gap: the matrix has no defined cell for Under-pacing (<90%) + Poor performance.** This happens when a campaign isn't spending its full budget *because* it's converting so poorly that Target Spend/auction pressure can't find enough qualifying clicks/conversions — not because the client capped it. Do not default this combination to Yellow (the only "Under" cell that exists) — that would recommend scaling budget into a broken funnel. Treat it as Red-severity instead: performance problems override pacing when the two disagree. Say explicitly in the report that this was a matrix gap, not a real Yellow call, so the client owner understands why the checklist doesn't match a clean zone.
 
