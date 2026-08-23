@@ -4,6 +4,7 @@ from importlib.machinery import SourceFileLoader
 import json
 import os
 import subprocess
+import stat
 import sys
 import types
 from pathlib import Path
@@ -20,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.3"
+    assert MANIFEST["release_version"] == "0.9.4"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -43,7 +44,7 @@ def test_container_client_is_governed_at_exact_bind_mount_target():
     client = MANIFEST["assets"]["container_client"]
     assert client["destination"] == "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch"
     assert client["container_destination"] == "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
-    assert client["previous_sha256"] == "a1cf82f7c16e647b50003c66a2833f4fda4472b27847665abfa38671ff406d04"
+    assert client["previous_sha256"] == "cf9eff5237b2525744f710b663b4d82c8b77a47bba1dbb95711024508f4dc961"
     assert client["owner"] == client["group"] == 10000
     assert client["mode"] == "0755"
 
@@ -53,14 +54,14 @@ def test_container_client_uses_collision_safe_ids_and_bounded_google_ads_timeout
     repaired = client.read_bytes()
     submitted_timeout = (
         b"'profile': 'google_ads_readonly', 'agent_id': 'lhm-marketing-hub:google-ads', "
-        b"'client': client, 'objective': objective, 'timeout_seconds': 600}"
+        b"'client': client, 'objective': objective, 'timeout_seconds': 600, "
     )
     assert repaired.count(submitted_timeout) == 1
     assert repaired.count(b"next_run_id('claude-gads')") == 1
     assert repaired.count(b"next_run_id('claude-mktg')") == 1
     assert b"for bucket in ('incoming', 'processed', 'runs', 'failed')" in repaired
     assert b"'profile': 'google_ads_readonly'" in repaired
-    assert b"'timeout_seconds': 600}" in repaired
+    assert b"'timeout_seconds': 600" in repaired
 
 
 def test_dispatcher_contains_current_bounded_worker_contract():
@@ -79,10 +80,16 @@ def test_dispatcher_contains_current_bounded_worker_contract():
     assert "registered evidence pack exceeds total limit" in text
     assert "prompt['evidence_pack'] = load_google_ads_evidence(client)" in text
     assert "required_timeout = admitted_timeout_seconds(profile)" in text
-    assert "backup_dir = BASE / 'registry-backups'" in text
+    assert "def durable_registry_backup():" in text
+    assert "def governed_registry_backup_dir():" in text
+    assert "os.O_EXCL" in text
+    assert "getattr(os, 'O_DIRECTORY', 0)" in text
+    assert "os.fsync(handle.fileno())" in text
+    assert "def durable_registry_restore(backup):" in text
+    assert "restored registry readback mismatch" in text
     assert "registry backup failed" in text
     assert "with HANDBACK_REGISTRY.open('w'" in text
-    assert "registry update failed and backup restored" in text
+    assert "registry update failed and backup restored with readback" in text
 
 
 def test_dispatch_unit_grants_only_exact_registry_write_path():
@@ -114,7 +121,7 @@ def test_google_ads_worker_enters_canonical_command_and_verifies_real_skill_call
     worker = (PLUGIN / MANIFEST["assets"]["worker"]["source"]).read_text()
     assert "/lhm-marketing-hub:start-googleads" in worker
     assert "'--output-format', output_format" in worker
-    assert "output_format = 'stream-json' if is_google_ads else 'json'" in worker
+    assert "output_format = 'stream-json' if is_observed_skill_profile else 'json'" in worker
     assert "block.get('type') == 'tool_use' and block.get('name') == 'Skill'" in worker
     assert "'lhm-marketing-hub:google-ads-monthly-review'" in worker
     assert "'lhm-marketing-hub:bid-budget-optimizer'" in worker
@@ -122,6 +129,80 @@ def test_google_ads_worker_enters_canonical_command_and_verifies_real_skill_call
     assert "'lhm-marketing-hub:google-ads-delivery-qa'" in worker
     assert "skill-provenance.json" in worker
     assert "missing required Skill tool calls" in worker
+
+
+def test_root_owned_contract_table_pins_every_live_workflow_and_route():
+    dispatcher = load_dispatcher()
+    expected = {
+        "google_ads_readonly": ("google-ads-monthly-review", (
+            "lhm-marketing-hub:google-ads-monthly-review",
+            "lhm-marketing-hub:bid-budget-optimizer",
+            "lhm-marketing-hub:google-ads-conversion-audit",
+            "lhm-marketing-hub:google-ads-delivery-qa",
+        ), ("google_ads.account_read",)),
+        "marketing_orchestrator_readonly": ("marketing-review", ("lhm-marketing-hub:start",), ("google_ads.account_read",)),
+        "seo_gsc_readonly": ("seo-gsc-review", ("lhm-marketing-hub:seo-audit",), ("google_search_console.property_read",)),
+        "google_drive_client_file_create": ("google-drive-file-publish", ("google-drive:google-drive",), ("google_drive.file_create", "google_drive.file_readback")),
+        "basicops_task_discussion_update": ("basicops-task-discussion-update", ("lhm-project-hub:basicops-task-manager",), ("basicops.task_read", "basicops.discussion_create", "basicops.discussion_readback")),
+        "handback_target_registration": ("handback-target-registration", ("lhm-connector-repair:handback-target-registration",), ()),
+        "html_artifact_producer": ("html-artifact-production", ("lhm-marketing-hub:content",), ()),
+    }
+    for profile, contract in expected.items():
+        assert dispatcher.admitted_contract(profile) == contract
+    for route, skill in dispatcher.SPECIALIST_SKILLS.items():
+        assert dispatcher.admitted_contract("specialist_readonly", route) == (
+            f"{route}-review", (skill,), ())
+    assert dispatcher.admitted_contract("specialist_readonly", "unknown") is None
+
+
+def test_dispatcher_rejects_forged_contract_before_any_worker_run(tmp_path, monkeypatch):
+    dispatcher = load_dispatcher()
+    incoming = tmp_path / "incoming"
+    failed = tmp_path / "failed"
+    incoming.mkdir()
+    failed.mkdir()
+    monkeypatch.setattr(dispatcher, "FAILED", failed)
+    monkeypatch.setattr(dispatcher.os, "chown", lambda *args: None)
+    base = {
+        "schema_version": 1,
+        "run_id": "claude-delegate-20260823-01",
+        "profile": "specialist_readonly",
+        "agent_id": "lhm-marketing-hub:seo",
+        "route": "seo",
+        "subject_type": "internal",
+        "subject_name": "Local Health Marketing",
+        "objective": "Review the bounded SEO opportunity and return evidence.",
+        "approval_state": "review_only",
+        "timeout_seconds": 600,
+        "workflow_id": "seo-review",
+        "required_skills": ["lhm-marketing-hub:seo-audit"],
+        "required_capabilities": [],
+    }
+    mutations = (
+        {"workflow_id": "content-review"},
+        {"required_skills": ["lhm-marketing-hub:content-strategy"]},
+        {"required_skills": ["lhm-marketing-hub:seo-audit", "lhm-marketing-hub:seo-audit"]},
+        {"required_capabilities": ["google_ads.account_read"]},
+    )
+    for sequence, changes in enumerate(mutations, 1):
+        request = dict(base)
+        request["run_id"] = f"claude-delegate-20260823-{sequence:02d}"
+        request.update(changes)
+        queued = incoming / f"request-{sequence}.json"
+        queued.write_text(json.dumps(request))
+        dispatcher.process(queued)
+        assert not queued.exists()
+        error = (failed / f"request-{sequence}.error").read_text()
+        assert "contract does not match" in error
+
+
+def test_specialist_skill_invocation_is_observed_not_self_attested():
+    worker = (PLUGIN / MANIFEST["assets"]["worker"]["source"]).read_text()
+    assert "is_observed_skill_profile = is_google_ads or is_specialist" in worker
+    assert "required_observed_skills" in worker
+    assert "required_observed_skills.issubset(set(skill_calls))" in worker
+    assert "'workflow_id': prompt_data.get('workflow_id')" in worker
+    assert "'skill_provenance': prompt_data.get('skill_provenance_mode'" in worker
 
 
 def test_worker_persists_terminal_artifacts_inside_supplied_run_directory():
@@ -219,8 +300,10 @@ def registration_fixture(tmp_path, monkeypatch):
     monkeypatch.setattr(dispatcher, "BASE", base)
     monkeypatch.setattr(dispatcher, "VAULT", vault)
     monkeypatch.setattr(dispatcher, "HANDBACK_REGISTRY", registry)
+    monkeypatch.setattr(dispatcher, "BACKUP_UID", os.getuid())
+    monkeypatch.setattr(dispatcher, "BACKUP_GID", os.getgid())
     monkeypatch.setattr(dispatcher.os, "chown", lambda *args: None)
-    monkeypatch.setattr(dispatcher.shutil, "copy2", lambda source, destination: Path(destination).write_bytes(Path(source).read_bytes()))
+    monkeypatch.setattr(dispatcher.os, "fchown", lambda *args: None)
     return dispatcher, incoming, runs, registry
 
 
@@ -237,6 +320,9 @@ def registration_request(run_id="claude-register-20260823-01", **changes):
         "drive_folder_id": "1abcdefghijklmno",
         "basicops_task_ids": ["2199999"],
         "timeout_seconds": 30,
+        "workflow_id": "handback-target-registration",
+        "required_skills": ["lhm-connector-repair:handback-target-registration"],
+        "required_capabilities": [],
     }
     request.update(changes)
     return request
@@ -258,6 +344,135 @@ def test_internal_handback_registration_is_exactly_bounded(tmp_path, monkeypatch
         "drive_folder_query": "exact folder with folder ID 1abcdefghijklmno",
         "basicops_task_ids": ["2199999"],
     }
+    assert final["workflow_contract"]["skill_provenance"] == "declared_only_no_worker"
+
+
+def test_registry_backup_fsyncs_base_on_first_creation_and_backup_dir_every_time(tmp_path, monkeypatch):
+    dispatcher, _, _, _ = registration_fixture(tmp_path, monkeypatch)
+    real_fsync = dispatcher.os.fsync
+    directory_syncs = []
+
+    def observe_fsync(fd):
+        info = os.fstat(fd)
+        if stat.S_ISDIR(info.st_mode):
+            directory_syncs.append(info.st_ino)
+        real_fsync(fd)
+
+    monkeypatch.setattr(dispatcher.os, "fsync", observe_fsync)
+    base_inode = dispatcher.BASE.stat().st_ino
+    first = dispatcher.durable_registry_backup()
+    backup_dir_inode = first.parent.stat().st_ino
+    first_backup_dir_syncs = directory_syncs.count(backup_dir_inode)
+    assert first_backup_dir_syncs >= 1
+    second = dispatcher.durable_registry_backup()
+    assert first != second
+    assert directory_syncs.count(base_inode) == 1
+    assert directory_syncs.count(backup_dir_inode) == first_backup_dir_syncs + 1
+
+
+def test_registry_backup_rejects_link_nondirectory_and_wrong_mode(tmp_path, monkeypatch):
+    for sequence, setup in enumerate(("symlink", "file", "mode"), 1):
+        dispatcher, _, _, _ = registration_fixture(tmp_path / str(sequence), monkeypatch)
+        backup_dir = dispatcher.BASE / "registry-backups"
+        if setup == "symlink":
+            target = dispatcher.BASE / "elsewhere"
+            target.mkdir()
+            backup_dir.symlink_to(target, target_is_directory=True)
+        elif setup == "file":
+            backup_dir.write_text("not a directory")
+        else:
+            backup_dir.mkdir(mode=0o755)
+        with pytest.raises(OSError):
+            dispatcher.durable_registry_backup()
+
+
+def test_registration_post_write_failure_restores_bytes_metadata_and_readback(tmp_path, monkeypatch):
+    dispatcher, incoming, runs, registry = registration_fixture(tmp_path, monkeypatch)
+    original = registry.read_bytes()
+    request = registration_request("claude-register-20260823-09")
+    queued = incoming / "request.json"
+    queued.write_text(json.dumps(request))
+    def fail_registry_chown(path, uid, gid):
+        if Path(path) == registry:
+            raise OSError("injected post-write chown failure")
+    monkeypatch.setattr(dispatcher.os, "chown", fail_registry_chown)
+    dispatcher.complete_registration(queued, request)
+    final = json.loads((runs / request["run_id"] / "final.json").read_text())
+    assert final["status"] == "failed"
+    assert "backup restored with readback" in final["verification"]["error"]
+    assert registry.read_bytes() == original
+    assert registry.stat().st_mode & 0o777 == 0o640
+    backups = list((dispatcher.BASE / "registry-backups").glob("client-handback-targets.json.backup-*"))
+    assert len(backups) == 1
+    assert backups[0].read_bytes() == original
+    assert backups[0].stat().st_mode & 0o777 == 0o600
+
+
+def test_canonical_client_handback_scope_is_strict_and_bounded():
+    dispatcher = load_dispatcher()
+    client = {
+        "name": "Example Health",
+        "evidence_prefix": "20 Clients/Example Health/",
+        "drive_folder_url": "https://drive.google.com/drive/folders/1abcdefghijklmno",
+        "basicops_task_ids": [123, "456"],
+    }
+    assert dispatcher.canonical_client_handback_target(client) == {
+        "type": "client",
+        "name": "Example Health",
+        "vault_prefix": "20 Clients/Example Health/",
+        "drive_folder_query": "exact folder with folder ID 1abcdefghijklmno",
+        "basicops_task_ids": ["123", "456"],
+    }
+    for changes in (
+        {"name": "x"},
+        {"evidence_prefix": "30 Projects/LHM Growth/"},
+        {"drive_folder_url": "https://example.com/folders/1abcdefghijklmno"},
+        {"basicops_task_ids": ["1", "1"]},
+        {"basicops_task_ids": [str(value) for value in range(21)]},
+    ):
+        candidate = dict(client)
+        candidate.update(changes)
+        with pytest.raises(SystemExit):
+            dispatcher.canonical_client_handback_target(candidate)
+
+
+def test_canonical_and_explicit_handback_disagreement_fails_closed(tmp_path, monkeypatch):
+    dispatcher = load_dispatcher()
+    incoming = tmp_path / "incoming"
+    failed = tmp_path / "failed"
+    incoming.mkdir()
+    failed.mkdir()
+    client_registry = tmp_path / "clients.json"
+    handback_registry = tmp_path / "handbacks.json"
+    client_registry.write_text(json.dumps({"clients": {"example": {
+        "name": "Example Health", "customer_id": "1234567890", "manager_id": "0987654321",
+        "evidence_prefix": "20 Clients/Example Health/",
+        "evidence_files": ["20 Clients/Example Health/project-management/Google Ads.md"],
+        "drive_folder_url": "https://drive.google.com/drive/folders/1abcdefghijklmno",
+        "basicops_task_ids": ["123"],
+    }}}))
+    handback_registry.write_text(json.dumps({"clients": {"example": {
+        "type": "client", "name": "Example Health",
+        "vault_prefix": "20 Clients/Example Health/",
+        "drive_folder_query": "exact folder with folder ID 1differentfolder",
+        "basicops_task_ids": ["123"],
+    }}}))
+    monkeypatch.setattr(dispatcher, "CLIENT_REGISTRY", client_registry)
+    monkeypatch.setattr(dispatcher, "HANDBACK_REGISTRY", handback_registry)
+    monkeypatch.setattr(dispatcher, "FAILED", failed)
+    monkeypatch.setattr(dispatcher.os, "chown", lambda *args: None)
+    request = {
+        "schema_version": 1, "run_id": "claude-basicops-20260823-01",
+        "profile": "basicops_task_discussion_update", "agent_id": "lhm-connector-repair",
+        "client": "example", "task_id": "123", "discussion": "A bounded verified discussion message.",
+        "timeout_seconds": 600, "workflow_id": "basicops-task-discussion-update",
+        "required_skills": ["lhm-project-hub:basicops-task-manager"],
+        "required_capabilities": ["basicops.task_read", "basicops.discussion_create", "basicops.discussion_readback"],
+    }
+    queued = incoming / "request.json"
+    queued.write_text(json.dumps(request))
+    dispatcher.process(queued)
+    assert "canonical client and handback target conflict" in (failed / "request.error").read_text()
 
 
 def test_internal_handback_registration_rejects_other_slug_or_prefix(tmp_path, monkeypatch):
