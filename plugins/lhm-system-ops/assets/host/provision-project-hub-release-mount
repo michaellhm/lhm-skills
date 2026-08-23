@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+
+[ "$(id -u)" -eq 0 ] || { echo "root required" >&2; exit 1; }
+SOURCE=/opt/lhm-plugin-releases
+ALIAS=/home/hermes/.hermes/immutable-plugin-releases
+UNIT='home-hermes-.hermes-immutable\x2dplugin\x2dreleases.mount'
+UNIT_SOURCE=$(CDPATH= cd -- "$(dirname -- "$0")/../systemd" && pwd)/$UNIT
+
+[ ! -L /opt ] && [ "$(stat -c '%u:%g' /opt)" = 0:0 ] && [ $((0$(stat -c '%a' /opt) & 0022)) -eq 0 ] || { echo "unsafe /opt ancestor" >&2; exit 1; }
+[ ! -L "$SOURCE" ] || { echo "immutable release source must not be a symlink" >&2; exit 1; }
+install -d -o root -g root -m 0755 "$SOURCE" "$SOURCE/lhm-project-hub" "$SOURCE/current"
+[ ! -L "$ALIAS" ] || { echo "immutable release alias must not be a symlink" >&2; exit 1; }
+install -d -o root -g root -m 0755 "$ALIAS"
+install -o root -g root -m 0644 "$UNIT_SOURCE" "/etc/systemd/system/$UNIT"
+systemctl daemon-reload
+systemctl enable --now "$UNIT"
+[ "$(stat -c '%u:%g' "$SOURCE")" = 0:0 ] && [ "$(stat -c '%a' "$SOURCE")" = 755 ]
+[ "$(stat -c '%u:%g' "$ALIAS")" = 0:0 ]
+findmnt -rn -T "$ALIAS" -o OPTIONS | tr ',' '\n' | grep -qx ro
+printf '%s\n' 'Host alias ready. Recreate Hermes with the reviewed read-only bind before running the deployer.'

@@ -1,0 +1,9 @@
+services:
+  hermes:
+    volumes:
+      - type: bind
+        source: /opt/lhm-plugin-releases
+        target: /opt/data/immutable-plugin-releases
+        read_only: true
+        bind:
+          propagation: rprivate
