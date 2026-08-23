@@ -4,6 +4,7 @@ import hashlib
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -23,6 +24,8 @@ VAULT = Path('/home/hermes/.hermes/profiles/lhm_brain/vault')
 PRODUCER_REGISTRY = Path('/home/hermes/.hermes/profiles/lhm_brain/config/claude-producer-artifacts.json')
 WORKER_UID = 10002
 HERMES_GID = 10000
+BACKUP_UID = 0
+BACKUP_GID = HERMES_GID
 ACL_POLL_SECONDS = 0.25
 WORKER_TRAVERSAL_ANCESTORS = (
     Path('/home/hermes/.hermes'),
@@ -41,6 +44,49 @@ SPECIALIST_ROUTES = {
     'wordpress': ('lhm-wordpress-hub:wordpress-lead', 'wordpress-lead'),
     'knowledge': ('lhm-knowledge-hub:knowledge-orchestrator', 'knowledge-orchestrator'),
 }
+SPECIALIST_SKILLS = {
+    'marketing': 'lhm-marketing-hub:start',
+    'seo': 'lhm-marketing-hub:seo-audit',
+    'content': 'lhm-marketing-hub:content-strategy',
+    'project': 'lhm-project-hub:team-work-brief',
+    'gmb': 'lhm-gmb-hub:run-local-diagnostic',
+    'finance': 'lhm-finance-hub:finance-advisor',
+    'website': 'lhm-wordpress-hub:wp-start',
+    'prototype': 'lhm-wordpress-hub:html-prototype',
+    'astro': 'lhm-wordpress-hub:astro-build',
+    'wordpress': 'lhm-wordpress-hub:wp-start',
+    'knowledge': 'lhm-knowledge-hub:lhm-vault-thinking',
+}
+PROFILE_CONTRACTS = {
+    'google_ads_readonly': ('google-ads-monthly-review', (
+        'lhm-marketing-hub:google-ads-monthly-review',
+        'lhm-marketing-hub:bid-budget-optimizer',
+        'lhm-marketing-hub:google-ads-conversion-audit',
+        'lhm-marketing-hub:google-ads-delivery-qa',
+    ), ('google_ads.account_read',)),
+    'marketing_orchestrator_readonly': (
+        'marketing-review', ('lhm-marketing-hub:start',), ('google_ads.account_read',)),
+    'seo_gsc_readonly': (
+        'seo-gsc-review', ('lhm-marketing-hub:seo-audit',),
+        ('google_search_console.property_read',)),
+    'google_drive_client_file_create': (
+        'google-drive-file-publish', ('google-drive:google-drive',),
+        ('google_drive.file_create', 'google_drive.file_readback')),
+    'basicops_task_discussion_update': (
+        'basicops-task-discussion-update', ('lhm-project-hub:basicops-task-manager',),
+        ('basicops.task_read', 'basicops.discussion_create', 'basicops.discussion_readback')),
+    'handback_target_registration': (
+        'handback-target-registration', ('lhm-connector-repair:handback-target-registration',), ()),
+    'html_artifact_producer': (
+        'html-artifact-production', ('lhm-marketing-hub:content',), ()),
+}
+
+
+def admitted_contract(profile, route=None):
+    """Return the root-owned exact workflow contract for a request."""
+    if profile == 'specialist_readonly' and route in SPECIALIST_SKILLS:
+        return (f'{route}-review', (SPECIALIST_SKILLS[route],), ())
+    return PROFILE_CONTRACTS.get(profile)
 
 
 def admitted_timeout_seconds(profile):
@@ -59,6 +105,86 @@ GSC_SITES = {
         'host': 'localhealthmarketing.com',
     },
 }
+
+
+def fsync_directory(path):
+    flags = os.O_RDONLY | getattr(os, 'O_DIRECTORY', 0) | getattr(os, 'O_NOFOLLOW', 0)
+    fd = os.open(path, flags)
+    try:
+        if not stat.S_ISDIR(os.fstat(fd).st_mode):
+            raise OSError(f'not a directory: {path}')
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+def governed_registry_backup_dir():
+    backup_dir = BASE / 'registry-backups'
+    created = False
+    try:
+        os.mkdir(backup_dir, 0o700)
+        created = True
+    except FileExistsError:
+        pass
+    flags = os.O_RDONLY | getattr(os, 'O_DIRECTORY', 0) | getattr(os, 'O_NOFOLLOW', 0)
+    try:
+        fd = os.open(backup_dir, flags)
+    except OSError as exc:
+        raise OSError('registry backup path is linked or not a directory') from exc
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISDIR(info.st_mode):
+            raise OSError('registry backup path is not a directory')
+        if created:
+            os.fchown(fd, BACKUP_UID, BACKUP_GID)
+            os.fchmod(fd, 0o700)
+            os.fsync(fd)
+            fsync_directory(BASE)
+            info = os.fstat(fd)
+        if (info.st_uid != BACKUP_UID or info.st_gid != BACKUP_GID
+                or stat.S_IMODE(info.st_mode) != 0o700):
+            raise OSError('registry backup directory has unexpected owner or mode')
+    finally:
+        os.close(fd)
+    return backup_dir
+
+
+def durable_registry_backup():
+    backup_dir = governed_registry_backup_dir()
+    stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
+    backup = backup_dir / f'client-handback-targets.json.backup-{stamp}'
+    payload = HANDBACK_REGISTRY.read_bytes()
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_NOFOLLOW', 0)
+    directory_flags = os.O_RDONLY | getattr(os, 'O_DIRECTORY', 0) | getattr(os, 'O_NOFOLLOW', 0)
+    directory_fd = os.open(backup_dir, directory_flags)
+    try:
+        directory_info = os.fstat(directory_fd)
+        if (not stat.S_ISDIR(directory_info.st_mode)
+                or directory_info.st_uid != BACKUP_UID or directory_info.st_gid != BACKUP_GID
+                or stat.S_IMODE(directory_info.st_mode) != 0o700):
+            raise OSError('registry backup directory changed during backup')
+        fd = os.open(backup.name, flags, 0o600, dir_fd=directory_fd)
+        try:
+            with os.fdopen(fd, 'wb', closefd=False) as handle:
+                handle.write(payload); handle.flush(); os.fsync(handle.fileno())
+            os.fchown(fd, BACKUP_UID, BACKUP_GID); os.fchmod(fd, 0o600); os.fsync(fd)
+        finally:
+            os.close(fd)
+        os.fsync(directory_fd)
+    finally:
+        os.close(directory_fd)
+    if backup.read_bytes() != payload:
+        raise OSError('registry backup readback mismatch')
+    return backup
+
+
+def durable_registry_restore(backup):
+    payload = backup.read_bytes()
+    with HANDBACK_REGISTRY.open('wb') as handle:
+        handle.write(payload); handle.flush(); os.fsync(handle.fileno())
+        os.fchown(handle.fileno(), 0, HERMES_GID); os.fchmod(handle.fileno(), 0o640); os.fsync(handle.fileno())
+    if HANDBACK_REGISTRY.read_bytes() != payload:
+        raise OSError('restored registry readback mismatch')
 
 
 def complete_registration(path, request):
@@ -82,6 +208,12 @@ def complete_registration(path, request):
             'agent_id': request['agent_id'],
             'completed_at': datetime.now(timezone.utc).isoformat(),
             'verification': {'verification': 'passed' if status == 'completed' else 'failed', 'action': action},
+            'workflow_contract': {
+                'workflow_id': request['workflow_id'],
+                'required_skills': request['required_skills'],
+                'required_capabilities': request['required_capabilities'],
+                'skill_provenance': 'declared_only_no_worker',
+            },
         }
         if target is not None:
             final['verification']['target'] = target
@@ -167,13 +299,8 @@ def complete_registration(path, request):
         if folder_id in other.get('drive_folder_query', ''):
             finish('failed', 'refused', f'Drive folder already belongs to {other_slug}')
             return
-    backup_dir = BASE / 'registry-backups'
-    backup_dir.mkdir(mode=0o700, exist_ok=True)
-    backup = backup_dir / f'client-handback-targets.json.backup-{datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")}'
     try:
-        shutil.copy2(HANDBACK_REGISTRY, backup)
-        os.chown(backup, 0, HERMES_GID)
-        os.chmod(backup, 0o600)
+        backup = durable_registry_backup()
     except OSError as exc:
         finish('failed', 'refused', f'registry backup failed: {exc}')
         return
@@ -187,8 +314,12 @@ def complete_registration(path, request):
         os.chown(HANDBACK_REGISTRY, 0, HERMES_GID)
         os.chmod(HANDBACK_REGISTRY, 0o640)
     except OSError as exc:
-        shutil.copy2(backup, HANDBACK_REGISTRY)
-        finish('failed', 'refused', f'registry update failed and backup restored: {exc}')
+        try:
+            durable_registry_restore(backup)
+        except OSError as restore_exc:
+            finish('failed', 'refused', f'registry update failed and rollback failed: {exc}; {restore_exc}')
+            return
+        finish('failed', 'refused', f'registry update failed and backup restored with readback: {exc}')
         return
     finish('completed', 'registered', target=target)
 
@@ -258,6 +389,48 @@ def load_handback_targets():
     if not isinstance(targets, dict) or not targets:
         raise SystemExit('invalid handback registry')
     return targets
+
+
+def optional_handback_target(slug):
+    """Read one explicit target while allowing a valid empty registry."""
+    try:
+        payload = json.loads(HANDBACK_REGISTRY.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f'handback registry unavailable: {exc}')
+    targets = payload.get('clients')
+    if not isinstance(targets, dict):
+        raise SystemExit('invalid handback registry')
+    return targets.get(slug)
+
+
+def canonical_client_handback_target(client):
+    """Derive governed delivery scope from the canonical Google Ads client registry."""
+    name = client.get('name')
+    vault_prefix = client.get('evidence_prefix')
+    folder_url = client.get('drive_folder_url')
+    task_ids = client.get('basicops_task_ids', [])
+    if (not isinstance(name, str) or not 2 <= len(name) <= 120
+            or any(ord(char) < 32 for char in name)):
+        raise SystemExit('invalid canonical client name')
+    if (not isinstance(vault_prefix, str) or not vault_prefix.startswith('20 Clients/')
+            or not vault_prefix.endswith('/') or '..' in Path(vault_prefix).parts):
+        raise SystemExit('invalid canonical client vault prefix')
+    if not isinstance(folder_url, str):
+        raise SystemExit('canonical client Drive folder unavailable')
+    match = re.fullmatch(r'https://drive\.google\.com/drive/folders/([A-Za-z0-9_-]{10,})/?', folder_url)
+    if not match:
+        raise SystemExit('invalid canonical client Drive folder URL')
+    if (not isinstance(task_ids, list) or len(task_ids) > 20
+            or not all(isinstance(value, (str, int)) and re.fullmatch(r'[0-9]{1,20}', str(value)) for value in task_ids)
+            or len({str(value) for value in task_ids}) != len(task_ids)):
+        raise SystemExit('invalid canonical client BasicOps task allowlist')
+    return {
+        'name': name,
+        'type': 'client',
+        'vault_prefix': vault_prefix,
+        'drive_folder_query': f'exact folder with folder ID {match.group(1)}',
+        'basicops_task_ids': [str(value) for value in task_ids],
+    }
 
 
 def ensure_worker_traversal():
@@ -365,19 +538,20 @@ def process(path):
         return
     profile = request.get('profile')
     handback_profiles = {'google_drive_client_file_create', 'basicops_task_discussion_update'}
-    expected_fields = ({'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_name', 'objective', 'output_name', 'input_artifacts', 'timeout_seconds'}
+    contract_fields = {'workflow_id', 'required_skills', 'required_capabilities'}
+    expected_fields = ({'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_name', 'objective', 'output_name', 'input_artifacts', 'timeout_seconds'} | contract_fields
                        if profile == 'html_artifact_producer' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'artifact_path', 'file_name', 'timeout_seconds'}
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'artifact_path', 'file_name', 'timeout_seconds'} | contract_fields
                        if profile == 'google_drive_client_file_create' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'task_id', 'discussion', 'timeout_seconds'}
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'task_id', 'discussion', 'timeout_seconds'} | contract_fields
                        if profile == 'basicops_task_discussion_update' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'target_type', 'client', 'name', 'vault_prefix', 'drive_folder_id', 'basicops_task_ids', 'timeout_seconds'}
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'target_type', 'client', 'name', 'vault_prefix', 'drive_folder_id', 'basicops_task_ids', 'timeout_seconds'} | contract_fields
                        if profile == 'handback_target_registration' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_type', 'subject_name', 'objective', 'approval_state', 'timeout_seconds'}
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_type', 'subject_name', 'objective', 'approval_state', 'timeout_seconds'} | contract_fields
                        if profile == 'specialist_readonly' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'site', 'urls', 'objective', 'timeout_seconds'}
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'site', 'urls', 'objective', 'timeout_seconds'} | contract_fields
                        if profile == 'seo_gsc_readonly' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'objective', 'timeout_seconds'})
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'objective', 'timeout_seconds'} | contract_fields)
     if set(request) != expected_fields:
         reject(path, 'unexpected request fields')
         return
@@ -399,6 +573,13 @@ def process(path):
     }[profile])
     if request.get('agent_id') != required_agent:
         reject(path, 'disallowed or missing plugin agent')
+        return
+    contract = admitted_contract(profile, request.get('route'))
+    supplied_contract = (
+        request.get('workflow_id'), tuple(request.get('required_skills', ())),
+        tuple(request.get('required_capabilities', ())))
+    if contract is None or supplied_contract != contract:
+        reject(path, 'workflow/skill/capability contract does not match the admitted profile and route')
         return
     required_timeout = admitted_timeout_seconds(profile)
     if request.get('timeout_seconds') != required_timeout:
@@ -521,11 +702,23 @@ def process(path):
             return
         client = None
     else:
-        clients = load_clients() if profile not in handback_profiles else load_handback_targets()
-        if request.get('client') not in clients:
-            reject(path, 'unregistered client')
-            return
-        client = clients[request['client']]
+        canonical_clients = load_clients()
+        slug = request.get('client')
+        if profile in handback_profiles and slug in canonical_clients:
+            client = canonical_client_handback_target(canonical_clients[slug])
+            registered = optional_handback_target(slug)
+            if registered is not None:
+                comparable = {key: value for key, value in client.items() if key != 'type'}
+                legacy_registered = {key: value for key, value in registered.items() if key != 'type'}
+                if legacy_registered != comparable:
+                    reject(path, 'canonical client and handback target conflict')
+                    return
+        else:
+            clients = load_handback_targets() if profile in handback_profiles else canonical_clients
+            if request.get('client') not in clients:
+                reject(path, 'unregistered client')
+                return
+            client = clients[request['client']]
     if profile not in handback_profiles and profile not in {'specialist_readonly', 'seo_gsc_readonly', 'html_artifact_producer'}:
         objective = request.get('objective')
         if not isinstance(objective, str) or not 10 <= len(objective) <= 4000:
@@ -550,6 +743,10 @@ def process(path):
             'output_name': output_name,
             'source_sha256': supplied['sha256'],
             'source_html': source.read_text(encoding='utf-8'),
+            'workflow_id': contract[0],
+            'required_skills': list(contract[1]),
+            'required_capabilities': list(contract[2]),
+            'skill_provenance_mode': 'declared_only',
         }
     elif profile == 'specialist_readonly':
         prompt = {
@@ -561,6 +758,10 @@ def process(path):
             'subject_name': subject_name,
             'objective': objective,
             'approval_state': 'review_only',
+            'workflow_id': contract[0],
+            'required_skills': list(contract[1]),
+            'required_capabilities': list(contract[2]),
+            'skill_provenance_mode': 'observed',
         }
     elif profile == 'seo_gsc_readonly':
         prompt = {
@@ -572,6 +773,10 @@ def process(path):
             'urls': urls,
             'objective': objective,
             'approval_state': 'review_only',
+            'workflow_id': contract[0],
+            'required_skills': list(contract[1]),
+            'required_capabilities': list(contract[2]),
+            'skill_provenance_mode': 'declared_only',
         }
     else:
         prompt = {
@@ -579,6 +784,11 @@ def process(path):
             'agent_id': request['agent_id'],
             'client': request['client'],
             'client_name': client['name'],
+            'workflow_id': contract[0],
+            'required_skills': list(contract[1]),
+            'required_capabilities': list(contract[2]),
+            'skill_provenance_mode': ('observed' if profile == 'google_ads_readonly'
+                                      else 'declared_only'),
         }
     if profile in {'specialist_readonly', 'seo_gsc_readonly', 'html_artifact_producer'}:
         pass

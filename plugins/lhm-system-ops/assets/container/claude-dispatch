@@ -12,6 +12,20 @@ from zoneinfo import ZoneInfo
 BASE = Path('/opt/data/profiles/lhm_brain/dispatch/claude')
 CLIENT_REGISTRY = Path('/opt/data/profiles/lhm_brain/config/google-ads-clients.json')
 
+ROUTE_SKILLS = {
+    'marketing': 'lhm-marketing-hub:start', 'seo': 'lhm-marketing-hub:seo-audit',
+    'content': 'lhm-marketing-hub:content-strategy', 'project': 'lhm-project-hub:team-work-brief',
+    'gmb': 'lhm-gmb-hub:run-local-diagnostic', 'finance': 'lhm-finance-hub:finance-advisor',
+    'website': 'lhm-wordpress-hub:wp-start', 'prototype': 'lhm-wordpress-hub:html-prototype',
+    'astro': 'lhm-wordpress-hub:astro-build', 'wordpress': 'lhm-wordpress-hub:wp-start',
+    'knowledge': 'lhm-knowledge-hub:lhm-vault-thinking',
+}
+
+
+def contract(workflow_id, required_skills, required_capabilities=()):
+    return {'workflow_id': workflow_id, 'required_skills': list(required_skills),
+            'required_capabilities': list(required_capabilities)}
+
 
 def registered_clients():
     try:
@@ -33,7 +47,7 @@ def submit(client, objective):
     if client not in registered_clients():
         raise SystemExit('unregistered client')
     run_id = next_run_id('claude-gads')
-    request = {'schema_version': 1, 'run_id': run_id, 'profile': 'google_ads_readonly', 'agent_id': 'lhm-marketing-hub:google-ads', 'client': client, 'objective': objective, 'timeout_seconds': 600}
+    request = {'schema_version': 1, 'run_id': run_id, 'profile': 'google_ads_readonly', 'agent_id': 'lhm-marketing-hub:google-ads', 'client': client, 'objective': objective, 'timeout_seconds': 600, **contract('google-ads-monthly-review', ['lhm-marketing-hub:google-ads-monthly-review', 'lhm-marketing-hub:bid-budget-optimizer', 'lhm-marketing-hub:google-ads-conversion-audit', 'lhm-marketing-hub:google-ads-delivery-qa'], ['google_ads.account_read'])}
     incoming = BASE / 'incoming'
     fd, temp_name = tempfile.mkstemp(prefix=f'.{run_id}.', dir=incoming)
     try:
@@ -52,7 +66,7 @@ def submit_marketing(client, objective):
     if client not in registered_clients():
         raise SystemExit('unregistered client')
     run_id = next_run_id('claude-mktg')
-    request = {'schema_version': 1, 'run_id': run_id, 'profile': 'marketing_orchestrator_readonly', 'agent_id': 'lhm-marketing-hub:start', 'client': client, 'objective': objective, 'timeout_seconds': 600}
+    request = {'schema_version': 1, 'run_id': run_id, 'profile': 'marketing_orchestrator_readonly', 'agent_id': 'lhm-marketing-hub:start', 'client': client, 'objective': objective, 'timeout_seconds': 600, **contract('marketing-review', ['lhm-marketing-hub:start'], ['google_ads.account_read'])}
     incoming = BASE / 'incoming'
     fd, temp_name = tempfile.mkstemp(prefix=f'.{run_id}.', dir=incoming)
     try:
@@ -71,7 +85,8 @@ def submit_gsc(site, urls, objective):
     run_id = next_run_id('claude-gsc')
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'seo_gsc_readonly',
                       'agent_id': 'lhm-marketing-hub:seo', 'site': site,
-                      'urls': urls, 'objective': objective, 'timeout_seconds': 600})
+                      'urls': urls, 'objective': objective, 'timeout_seconds': 600,
+                      **contract('seo-gsc-review', ['lhm-marketing-hub:seo-audit'], ['google_search_console.property_read'])})
 
 
 def next_run_id(prefix):
@@ -105,14 +120,16 @@ def submit_drive_file(client, artifact_path, file_name):
     run_id = next_run_id('claude-gdrive')
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'google_drive_client_file_create',
                       'agent_id': 'lhm-connector-repair', 'client': client, 'artifact_path': artifact_path,
-                      'file_name': file_name, 'timeout_seconds': 600})
+                      'file_name': file_name, 'timeout_seconds': 600,
+                      **contract('google-drive-file-publish', ['google-drive:google-drive'], ['google_drive.file_create', 'google_drive.file_readback'])})
 
 
 def submit_basicops_discussion(client, task_id, discussion):
     run_id = next_run_id('claude-basicops')
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'basicops_task_discussion_update',
                       'agent_id': 'lhm-connector-repair', 'client': client, 'task_id': task_id,
-                      'discussion': discussion, 'timeout_seconds': 600})
+                      'discussion': discussion, 'timeout_seconds': 600,
+                      **contract('basicops-task-discussion-update', ['lhm-project-hub:basicops-task-manager'], ['basicops.task_read', 'basicops.discussion_create', 'basicops.discussion_readback'])})
 
 
 def register_handback_target(target_type, client, name, vault_prefix, drive_folder_id, task_ids):
@@ -121,7 +138,8 @@ def register_handback_target(target_type, client, name, vault_prefix, drive_fold
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'handback_target_registration',
                       'agent_id': 'lhm-connector-repair', 'target_type': target_type, 'client': client,
                       'name': name, 'vault_prefix': vault_prefix, 'drive_folder_id': drive_folder_id,
-                      'basicops_task_ids': basicops_task_ids, 'timeout_seconds': 30})
+                      'basicops_task_ids': basicops_task_ids, 'timeout_seconds': 30,
+                      **contract('handback-target-registration', ['lhm-connector-repair:handback-target-registration'])})
 
 
 def submit_specialist(route, subject_type, subject_name, objective):
@@ -146,7 +164,8 @@ def submit_specialist(route, subject_type, subject_name, objective):
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'specialist_readonly',
                       'agent_id': agent_ids[route], 'route': route, 'subject_type': subject_type,
                       'subject_name': subject_name, 'objective': objective,
-                      'approval_state': 'review_only', 'timeout_seconds': 600})
+                      'approval_state': 'review_only', 'timeout_seconds': 600,
+                      **contract(f'{route}-review', [ROUTE_SKILLS[route]])})
 
 
 def submit_producer_artifact(artifact_id, subject_name, output_name, objective):
@@ -161,7 +180,8 @@ def submit_producer_artifact(artifact_id, subject_name, output_name, objective):
     enqueue_and_wait({'schema_version': 2, 'run_id': run_id, 'profile': 'html_artifact_producer',
                       'agent_id': 'lhm-marketing-hub:content', 'route': 'content',
                       'subject_name': subject_name, 'objective': objective, 'output_name': output_name,
-                      'input_artifacts': [supplied], 'timeout_seconds': 1200})
+                      'input_artifacts': [supplied], 'timeout_seconds': 1200,
+                      **contract('html-artifact-production', ['lhm-marketing-hub:content'])})
 
 
 def wait_for_completion(run_id, max_wait_seconds=105):
