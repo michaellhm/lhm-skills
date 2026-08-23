@@ -111,6 +111,33 @@ class ProjectHubDeployerTests(unittest.TestCase):
         self.assertIn('Options=bind,ro,nosuid,nodev,noexec',mount_unit)
         source=DEPLOYER.read_text()
         self.assertGreaterEqual(source.count('secure_release_boundary()'),2)
+        self.assertNotIn('os.path.ismount(VISIBLE_ROOT)', source)
+
+    def test_mountinfo_accepts_exact_same_filesystem_readonly_bind(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary); target=root/'alias'; target.mkdir()
+            mountinfo=root/'mountinfo'
+            mountinfo.write_text(
+                f'147 43 8:1 /opt/lhm-plugin-releases {target} '
+                'ro,nosuid,nodev,noexec,relatime shared:1 - ext4 /dev/sda1 rw\n'
+            )
+            self.assertTrue(deployer.mount_is_read_only(target,mountinfo))
+            mountinfo.write_text(
+                f'147 43 8:1 /opt/lhm-plugin-releases {target} '
+                'rw,nosuid,nodev,noexec,relatime shared:1 - ext4 /dev/sda1 rw\n'
+            )
+            self.assertFalse(deployer.mount_is_read_only(target,mountinfo))
+            readonly=(
+                f'147 43 8:1 /opt/lhm-plugin-releases {target} '
+                'ro,nosuid,nodev,noexec,relatime shared:1 - ext4 /dev/sda1 rw\n'
+            )
+            writable=(
+                f'148 43 8:1 /opt/lhm-plugin-releases {target} '
+                'rw,nosuid,nodev,noexec,relatime shared:1 - ext4 /dev/sda1 rw\n'
+            )
+            for rows in (readonly+writable,writable+readonly):
+                mountinfo.write_text(rows)
+                self.assertFalse(deployer.mount_is_read_only(target,mountinfo))
 
     def test_approval_schema_is_action_bound(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -53,8 +53,8 @@ chown root:root /etc/lhm-plugin-approvals/project-hub-approval.key
 chmod 0600 /etc/lhm-plugin-approvals/project-hub-approval.key
 ```
 
-For deployer release 1.0.0 the first command must return
-`2c2b2d80387d44ca2af85e87a793e1ad16ec678cd21006ac67b815c90391a747`; otherwise stop.
+For deployer release 1.0.3 the first command must return
+`f185ff67135508d8c606a35c09496934da81bb204cdebb0e15c37317f8b085ae`; otherwise stop.
 
 This bootstrap does not install Project Hub and must not enable a service. Record the installed
 executable hash and keep the System Ops rollback available.
