@@ -77,11 +77,12 @@ def secure_root_ancestors(path, stop, uid=0):
 
 def mount_is_read_only(path, mountinfo=MOUNTINFO):
     expected=str(path.absolute())
+    matches=[]
     for line in mountinfo.read_text().splitlines():
         left=line.split(' - ',1)[0].split()
         if len(left)>5 and left[4].replace('\\040',' ')==expected:
-            return 'ro' in left[5].split(',')
-    return False
+            matches.append(left[5].split(','))
+    return len(matches)==1 and 'ro' in matches[0]
 
 
 def secure_container_mount():
@@ -97,7 +98,10 @@ def secure_release_boundary():
     secure_root_ancestors(RELEASE_ROOT, Path('/opt'))
     secure_root_directory(RELEASES); secure_root_directory(CURRENT.parent)
     secure_root_directory(VISIBLE_ROOT)
-    if not os.path.ismount(VISIBLE_ROOT) or not mount_is_read_only(VISIBLE_ROOT):
+    # Same-filesystem bind mounts can report False from os.path.ismount() because
+    # the bind target and its parent share a device. The exact mountinfo target,
+    # read-only flag, and source inode/device checks below are authoritative.
+    if not mount_is_read_only(VISIBLE_ROOT):
         raise SystemExit('host immutable release alias is not a read-only mount')
     source=RELEASE_ROOT.stat(); visible=VISIBLE_ROOT.stat()
     if (source.st_dev,source.st_ino)!=(visible.st_dev,visible.st_ino):
