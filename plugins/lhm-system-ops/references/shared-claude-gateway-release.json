@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.9.4",
+  "release_version": "0.9.5",
   "captured_at": "2026-08-23",
   "source": "verified deployed Hermes host inventory",
   "assets": {
@@ -29,7 +29,7 @@
       "source": "assets/systemd/lhm-claude-dispatch.service",
       "destination": "/etc/systemd/system/lhm-claude-dispatch.service",
       "sha256": "bf84087497f169bfb0bb062bf0397a670a366f618dcded08cc91522f4fa5d394",
-      "previous_sha256": "bf84087497f169bfb0bb062bf0397a670a366f618dcded08cc91522f4fa5d394",
+      "previous_sha256": "db8d69be657eae486d7229164310d3c1a66284019d967ba7032a632ab832e263",
       "owner": "root",
       "group": "root",
       "mode": "0644"
