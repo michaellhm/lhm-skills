@@ -1,6 +1,6 @@
 # Shared Claude gateway release boundary
 
-The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. They were captured byte-for-byte from the verified deployed host on 2026-08-20 after their paths, owners, modes, sizes and SHA-256 hashes were independently recorded.
+The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. Release 0.9.3 was reconciled on 2026-08-23 against the verified 0.9.2 deployed predecessor after paths, owners, modes, sizes and SHA-256 hashes were independently recorded.
 
 These assets are distinct from the additive `lhm-evidence-claude-*` gateways. No evidence-bridge installer may overwrite the shared dispatcher or worker.
 
@@ -27,7 +27,7 @@ captures Claude stream events, persists `skill-provenance.json`, and fails close
 review, bid/budget, conversion-audit and delivery-QA skills emitted real `Skill` tool calls. It uses
 a bounded 24-turn and USD 4.00 provider ceiling, strict read-only MCP configuration, exact Google Ads tool
 allowlist, single registered client/CID boundary, unprivileged worker identity, and run-directory-only
-write grant. Rollback restores the prior 300-second dispatcher byte-for-byte.
+write grant. Rollback restores the exact prior 0.9.2 dispatcher byte-for-byte; its Google Ads ceiling is 600 seconds.
 
 Release 0.9.3 grants the dispatcher write access to only the exact handback-registry file. Timestamped
 safety copies remain inside the already-writable dispatch audit tree. Updates are flushed and synced;

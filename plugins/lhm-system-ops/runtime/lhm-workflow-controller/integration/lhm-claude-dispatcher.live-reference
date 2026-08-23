@@ -167,9 +167,9 @@ def complete_registration(path, request):
         if folder_id in other.get('drive_folder_query', ''):
             finish('failed', 'refused', f'Drive folder already belongs to {other_slug}')
             return
-    backup = HANDBACK_REGISTRY.with_name(
-        f'.client-handback-targets.json.backup-{datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")}'
-    )
+    backup_dir = BASE / 'registry-backups'
+    backup_dir.mkdir(mode=0o700, exist_ok=True)
+    backup = backup_dir / f'client-handback-targets.json.backup-{datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")}'
     try:
         shutil.copy2(HANDBACK_REGISTRY, backup)
         os.chown(backup, 0, HERMES_GID)
@@ -178,17 +178,18 @@ def complete_registration(path, request):
         finish('failed', 'refused', f'registry backup failed: {exc}')
         return
     targets[slug] = target
-    fd, temp_name = tempfile.mkstemp(prefix='.client-handback-targets.', dir=HANDBACK_REGISTRY.parent)
     try:
-        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+        with HANDBACK_REGISTRY.open('w', encoding='utf-8') as handle:
             json.dump(payload, handle, indent=2)
             handle.write('\n')
-        os.chown(temp_name, 0, HERMES_GID)
-        os.chmod(temp_name, 0o640)
-        os.replace(temp_name, HANDBACK_REGISTRY)
-    finally:
-        if os.path.exists(temp_name):
-            os.unlink(temp_name)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chown(HANDBACK_REGISTRY, 0, HERMES_GID)
+        os.chmod(HANDBACK_REGISTRY, 0o640)
+    except OSError as exc:
+        shutil.copy2(backup, HANDBACK_REGISTRY)
+        finish('failed', 'refused', f'registry update failed and backup restored: {exc}')
+        return
     finish('completed', 'registered', target=target)
 
 
@@ -257,30 +258,6 @@ def load_handback_targets():
     if not isinstance(targets, dict) or not targets:
         raise SystemExit('invalid handback registry')
     return targets
-
-
-def canonical_client_handback_target(client):
-    """Derive governed delivery scope from the canonical Google Ads client registry."""
-    vault_prefix = client.get('evidence_prefix')
-    folder_url = client.get('drive_folder_url')
-    task_ids = client.get('basicops_task_ids', [])
-    if (not isinstance(vault_prefix, str) or not vault_prefix.startswith('20 Clients/')
-            or not vault_prefix.endswith('/') or '..' in Path(vault_prefix).parts):
-        raise SystemExit('invalid canonical client vault prefix')
-    if not isinstance(folder_url, str):
-        raise SystemExit('canonical client Drive folder unavailable')
-    match = re.fullmatch(r'https://drive\.google\.com/drive/folders/([A-Za-z0-9_-]{10,})/?', folder_url)
-    if not match:
-        raise SystemExit('invalid canonical client Drive folder URL')
-    if (not isinstance(task_ids, list)
-            or not all(isinstance(value, (str, int)) and re.fullmatch(r'[0-9]+', str(value)) for value in task_ids)):
-        raise SystemExit('invalid canonical client BasicOps task allowlist')
-    return {
-        'name': client['name'],
-        'vault_prefix': vault_prefix,
-        'drive_folder_query': f'exact folder with folder ID {match.group(1)}',
-        'basicops_task_ids': [str(value) for value in task_ids],
-    }
 
 
 def ensure_worker_traversal():
@@ -388,22 +365,19 @@ def process(path):
         return
     profile = request.get('profile')
     handback_profiles = {'google_drive_client_file_create', 'basicops_task_discussion_update'}
-    contract_fields = {'workflow_id', 'required_skills', 'required_capabilities'}
-    governed = isinstance(request.get('controller_child_run_id'), str)
-    governed_fields = {'controller_child_run_id'} if governed else set()
-    expected_fields = ({'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_name', 'objective', 'output_name', 'input_artifacts', 'timeout_seconds'} | contract_fields
+    expected_fields = ({'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_name', 'objective', 'output_name', 'input_artifacts', 'timeout_seconds'}
                        if profile == 'html_artifact_producer' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'artifact_path', 'file_name', 'timeout_seconds'} | contract_fields
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'artifact_path', 'file_name', 'timeout_seconds'}
                        if profile == 'google_drive_client_file_create' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'task_id', 'discussion', 'timeout_seconds'} | contract_fields
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'task_id', 'discussion', 'timeout_seconds'}
                        if profile == 'basicops_task_discussion_update' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'target_type', 'client', 'name', 'vault_prefix', 'drive_folder_id', 'basicops_task_ids', 'timeout_seconds'} | contract_fields
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'target_type', 'client', 'name', 'vault_prefix', 'drive_folder_id', 'basicops_task_ids', 'timeout_seconds'}
                        if profile == 'handback_target_registration' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_type', 'subject_name', 'objective', 'approval_state', 'timeout_seconds'} | contract_fields
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_type', 'subject_name', 'objective', 'approval_state', 'timeout_seconds'}
                        if profile == 'specialist_readonly' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'site', 'urls', 'objective', 'timeout_seconds'} | contract_fields
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'site', 'urls', 'objective', 'timeout_seconds'}
                        if profile == 'seo_gsc_readonly' else
-                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'objective', 'timeout_seconds'} | contract_fields) | governed_fields
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'objective', 'timeout_seconds'})
     if set(request) != expected_fields:
         reject(path, 'unexpected request fields')
         return
@@ -425,19 +399,6 @@ def process(path):
     }[profile])
     if request.get('agent_id') != required_agent:
         reject(path, 'disallowed or missing plugin agent')
-        return
-    if (not isinstance(request.get('workflow_id'), str)
-            or not re.fullmatch(r'[a-z0-9][a-z0-9-]{2,79}', request['workflow_id'])
-            or not isinstance(request.get('required_skills'), list)
-            or not request['required_skills']
-            or not all(isinstance(item, str) and ':' in item for item in request['required_skills'])
-            or not isinstance(request.get('required_capabilities'), list)
-            or not all(isinstance(item, str) and re.fullmatch(r'[a-z0-9_.-]+', item) for item in request['required_capabilities'])):
-        reject(path, 'missing or invalid workflow/skill/capability contract')
-        return
-    if governed and (request['controller_child_run_id'] != request['run_id']
-                     or profile not in {'seo_gsc_readonly', 'specialist_readonly'}):
-        reject(path, 'invalid governed controller child')
         return
     required_timeout = admitted_timeout_seconds(profile)
     if request.get('timeout_seconds') != required_timeout:
@@ -560,15 +521,11 @@ def process(path):
             return
         client = None
     else:
-        canonical_clients = load_clients()
-        if profile in handback_profiles and request.get('client') in canonical_clients:
-            client = canonical_client_handback_target(canonical_clients[request['client']])
-        else:
-            clients = load_handback_targets() if profile in handback_profiles else canonical_clients
-            if request.get('client') not in clients:
-                reject(path, 'unregistered client')
-                return
-            client = clients[request['client']]
+        clients = load_clients() if profile not in handback_profiles else load_handback_targets()
+        if request.get('client') not in clients:
+            reject(path, 'unregistered client')
+            return
+        client = clients[request['client']]
     if profile not in handback_profiles and profile not in {'specialist_readonly', 'seo_gsc_readonly', 'html_artifact_producer'}:
         objective = request.get('objective')
         if not isinstance(objective, str) or not 10 <= len(objective) <= 4000:
@@ -582,11 +539,7 @@ def process(path):
         reject(path, 'run_id already exists')
         return
     run_dir.mkdir(mode=0o2750)
-    if governed:
-        os.chown(run_dir, 0, HERMES_GID)
-        os.chmod(run_dir, 0o750)
-    else:
-        configure_worker_run_dir(run_dir)
+    configure_worker_run_dir(run_dir)
     if profile == 'html_artifact_producer':
         prompt = {
             'profile': profile,
@@ -608,9 +561,6 @@ def process(path):
             'subject_name': subject_name,
             'objective': objective,
             'approval_state': 'review_only',
-            'workflow_id': request['workflow_id'],
-            'required_skills': request['required_skills'],
-            'required_capabilities': request['required_capabilities'],
         }
     elif profile == 'seo_gsc_readonly':
         prompt = {
@@ -621,8 +571,6 @@ def process(path):
             'site_property': site['property'],
             'urls': urls,
             'objective': objective,
-            'required_skills': request['required_skills'],
-            'required_capabilities': request['required_capabilities'],
             'approval_state': 'review_only',
         }
     else:
@@ -631,9 +579,6 @@ def process(path):
             'agent_id': request['agent_id'],
             'client': request['client'],
             'client_name': client['name'],
-            'workflow_id': request['workflow_id'],
-            'required_skills': request['required_skills'],
-            'required_capabilities': request['required_capabilities'],
         }
     if profile in {'specialist_readonly', 'seo_gsc_readonly', 'html_artifact_producer'}:
         pass
@@ -676,8 +621,8 @@ def process(path):
     for name, payload in (('request.json', request), ('prompt.json', prompt)):
         item = run_dir / name
         item.write_text(json.dumps(payload, indent=2) + '\n', encoding='utf-8')
-        os.chown(item, 0 if governed else WORKER_UID, HERMES_GID)
-        os.chmod(item, 0o600 if governed else 0o640)
+        os.chown(item, WORKER_UID, HERMES_GID)
+        os.chmod(item, 0o640)
     events = run_dir / 'events.jsonl'
     summary = {
         'google_ads_readonly': 'Validated Google Ads read-only request queued for Claude.',
@@ -689,21 +634,14 @@ def process(path):
         'html_artifact_producer': 'Validated bounded HTML producer request queued for Claude.',
     }[profile]
     events.write_text(json.dumps({'event': 'queued', 'run_id': run_id, 'summary': summary}) + '\n', encoding='utf-8')
-    os.chown(events, 0 if governed else WORKER_UID, HERMES_GID)
-    os.chmod(events, 0o600 if governed else 0o640)
+    os.chown(events, WORKER_UID, HERMES_GID)
+    os.chmod(events, 0o640)
     unit = f'lhm-claude-run-{run_id}'
-    launch = ([
+    subprocess.run([
         'systemd-run', '--quiet', '--no-block', f'--unit={unit}',
         '--property=Type=oneshot', '--property=KillMode=process',
         '/usr/local/libexec/lhm-claude-dispatcher', '--supervise', str(run_dir), str(request['timeout_seconds'])
-    ] if not governed else [
-        'systemd-run', '--quiet', '--no-block', f'--unit={unit}',
-        '--property=Type=oneshot', '--property=KillMode=process',
-        '/opt/lhm-workflow/current/venv/bin/python',
-        '/opt/lhm-workflow/current/integration/lhm_claude_trusted_supervisor.py',
-        request['controller_child_run_id'], str(run_dir / 'prompt.json'), str(run_dir),
-    ])
-    subprocess.run(launch, check=True)
+    ], check=True)
     shutil.move(str(path), PROCESSED / path.name)
 
 

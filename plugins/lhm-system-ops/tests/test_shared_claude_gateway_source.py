@@ -216,10 +216,11 @@ def registration_fixture(tmp_path, monkeypatch):
     registry.write_text(json.dumps({"schema_version": 1, "clients": {}}))
     monkeypatch.setattr(dispatcher, "RUNS", runs)
     monkeypatch.setattr(dispatcher, "PROCESSED", processed)
+    monkeypatch.setattr(dispatcher, "BASE", base)
     monkeypatch.setattr(dispatcher, "VAULT", vault)
     monkeypatch.setattr(dispatcher, "HANDBACK_REGISTRY", registry)
     monkeypatch.setattr(dispatcher.os, "chown", lambda *args: None)
-    monkeypatch.setattr(dispatcher.shutil, "copy2", lambda source, destination: (tmp_path / "registry.backup").write_bytes(Path(source).read_bytes()))
+    monkeypatch.setattr(dispatcher.shutil, "copy2", lambda source, destination: Path(destination).write_bytes(Path(source).read_bytes()))
     return dispatcher, incoming, runs, registry
 
 
@@ -248,7 +249,7 @@ def test_internal_handback_registration_is_exactly_bounded(tmp_path, monkeypatch
     queued.write_text(json.dumps(request))
     dispatcher.complete_registration(queued, request)
     final = json.loads((runs / request["run_id"] / "final.json").read_text())
-    assert final["status"] == "completed"
+    assert final["status"] == "completed", json.dumps(final, sort_keys=True)
     target = json.loads(registry.read_text())["clients"]["local-health-marketing"]
     assert target == {
         "type": "internal",
