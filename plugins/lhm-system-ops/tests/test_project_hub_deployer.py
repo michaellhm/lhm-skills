@@ -2,6 +2,7 @@ import importlib.util
 import hashlib
 import hmac
 import json
+import shutil
 import tempfile
 import unittest
 import zipfile
@@ -59,6 +60,56 @@ class ProjectHubDeployerTests(unittest.TestCase):
             plugin, skills=deployer.validate_archive(source, root/'stage')
             self.assertEqual(plugin.name, 'lhm-project-hub')
             self.assertEqual(skills, ['basicops-task-manager'])
+
+    def test_existing_identical_release_can_be_verified_for_relink(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary); source=root/'approved'; existing=root/'existing'
+            (source/'skills/basicops-task-manager').mkdir(parents=True)
+            (source/'skills/basicops-task-manager/SKILL.md').write_text('approved\n')
+            shutil.copytree(source,existing)
+            deployer.verify_existing_release(existing,source,uid=os.getuid())
+            (existing/'skills/basicops-task-manager/SKILL.md').write_text('tampered\n')
+            with self.assertRaisesRegex(SystemExit,'bytes differ'):
+                deployer.verify_existing_release(existing,source,uid=os.getuid())
+
+    def test_existing_release_rejects_extra_member_and_symlink(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary); source=root/'approved'; existing=root/'existing'
+            source.mkdir(); (source/'SKILL.md').write_text('approved\n'); shutil.copytree(source,existing)
+            (existing/'extra').write_text('extra\n')
+            with self.assertRaisesRegex(SystemExit,'member set differs'):
+                deployer.verify_existing_release(existing,source,uid=os.getuid())
+            (existing/'extra').unlink(); (existing/'linked').symlink_to(existing/'SKILL.md')
+            with self.assertRaisesRegex(SystemExit,'link or special'):
+                deployer.verify_existing_release(existing,source,uid=os.getuid())
+
+    def test_existing_release_rejects_writable_root_and_hardlink(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary); source=root/'approved'; existing=root/'existing'
+            source.mkdir(); (source/'SKILL.md').write_text('approved\n'); shutil.copytree(source,existing)
+            existing.chmod(0o777)
+            with self.assertRaisesRegex(SystemExit,'secure directory'):
+                deployer.verify_existing_release(existing,source,uid=os.getuid())
+            existing.chmod(0o755); (existing/'hardlink').hardlink_to(existing/'SKILL.md')
+            (source/'hardlink').write_text('approved\n')
+            with self.assertRaisesRegex(SystemExit,'hard-linked'):
+                deployer.verify_existing_release(existing,source,uid=os.getuid())
+
+    def test_post_seal_reverification_rejects_injected_tamper(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary); source=root/'approved'; existing=root/'existing'
+            source.mkdir(); (source/'SKILL.md').write_text('approved\n'); shutil.copytree(source,existing)
+            original=deployer.seal_release
+            def tampering_seal(path,uid=0):
+                original(path,uid=uid)
+                (path/'SKILL.md').chmod(0o644)
+                (path/'SKILL.md').write_text('tampered\n')
+            deployer.seal_release=tampering_seal
+            try:
+                with self.assertRaisesRegex(SystemExit,'bytes differ'):
+                    deployer.seal_and_reverify_release(existing,source,uid=os.getuid())
+            finally:
+                deployer.seal_release=original
 
     def test_rejects_wrong_version_or_plugin(self):
         for version, prefix, error in (

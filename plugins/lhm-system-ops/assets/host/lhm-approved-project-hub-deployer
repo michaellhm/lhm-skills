@@ -7,6 +7,7 @@ import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import tempfile
 import zipfile
@@ -201,6 +202,48 @@ def validate_archive(archive, staging):
     return plugin, skills
 
 
+def verify_existing_release(release, expected, uid=0):
+    release_state=release.lstat() if release.exists() or release.is_symlink() else None
+    if (release_state is None or not stat.S_ISDIR(release_state.st_mode) or release.is_symlink()
+            or release_state.st_uid != uid or release_state.st_mode & 0o022):
+        raise SystemExit('existing release is not a secure directory')
+    actual_members={Path('.')}; expected_members={Path('.')}
+    for root, members, required_uid in ((release,actual_members,uid),(expected,expected_members,None)):
+        for item in root.rglob('*'):
+            relative=item.relative_to(root); state=item.lstat()
+            if stat.S_ISLNK(state.st_mode) or not (stat.S_ISDIR(state.st_mode) or stat.S_ISREG(state.st_mode)):
+                raise SystemExit('release tree contains a link or special file')
+            if required_uid is not None and (state.st_uid != required_uid or state.st_mode & 0o022):
+                raise SystemExit('existing release member has unsafe ownership or mode')
+            if stat.S_ISREG(state.st_mode) and state.st_nlink != 1:
+                raise SystemExit('release tree contains a hard-linked file')
+            members.add(relative)
+    if actual_members != expected_members:
+        raise SystemExit('existing release member set differs from approved archive')
+    for relative in expected_members-{Path('.')}:
+        actual=release/relative; wanted=expected/relative
+        if actual.is_dir() != wanted.is_dir():
+            raise SystemExit('existing release member type differs from approved archive')
+        if actual.is_file() and (actual.stat().st_size != wanted.stat().st_size or digest(actual) != digest(wanted)):
+            raise SystemExit('existing release bytes differ from approved archive')
+
+
+def seal_release(release, uid=0):
+    for item in release.rglob('*'):
+        state=item.lstat()
+        if stat.S_ISLNK(state.st_mode) or not (stat.S_ISDIR(state.st_mode) or stat.S_ISREG(state.st_mode)):
+            raise SystemExit('release link or special file is prohibited')
+        if stat.S_ISREG(state.st_mode) and state.st_nlink != 1:
+            raise SystemExit('release hard-linked file is prohibited')
+        os.chmod(item, 0o555 if stat.S_ISDIR(state.st_mode) else 0o444); os.chown(item,uid,0 if uid == 0 else os.getgid())
+    os.chmod(release,0o555); os.chown(release,uid,0 if uid == 0 else os.getgid())
+
+
+def seal_and_reverify_release(release, expected, uid=0):
+    seal_release(release,uid=uid)
+    verify_existing_release(release,expected,uid=uid)
+
+
 def snapshot(path, backup):
     if path.is_symlink(): return {'kind': 'symlink', 'target': os.readlink(path)}
     if path.exists():
@@ -261,19 +304,18 @@ def install(approval_id, archive):
     if git('status', '--porcelain'):
         raise SystemExit('source checkout is dirty or at the wrong commit')
     secure_release_boundary()
-    approval = consume_approval(approval_id, 'install', archive_sha256, commit)
-    release_id = approval['archive_sha256']
+    release_id = archive_sha256
     release = RELEASES / release_id
-    if release.exists(): raise SystemExit('release already exists; refusing overwrite')
     with tempfile.TemporaryDirectory(prefix='lhm-project-hub.') as temporary:
         plugin, skills = validate_archive(archive, Path(temporary))
-        RELEASES.mkdir(parents=True, exist_ok=True)
-        staged = RELEASES / f'.{release_id}.new'
-        shutil.copytree(plugin, staged)
-        for item in staged.rglob('*'):
-            if item.is_symlink(): raise SystemExit('staged plugin symlink is prohibited')
-            os.chmod(item, 0o555 if item.is_dir() else 0o444); os.chown(item,0,0)
-        os.chmod(staged,0o555); os.chown(staged, 0, 0); os.replace(staged, release)
+        if release.exists() or release.is_symlink(): verify_existing_release(release,plugin)
+        approval = consume_approval(approval_id, 'install', archive_sha256, commit)
+        if release.exists():
+            seal_and_reverify_release(release,plugin)
+        else:
+            RELEASES.mkdir(parents=True, exist_ok=True)
+            staged = RELEASES / f'.{release_id}.new'
+            shutil.copytree(plugin, staged); seal_and_reverify_release(staged,plugin); os.replace(staged, release)
     stamp = now().strftime('%Y%m%dT%H%M%SZ')
     backup = BACKUPS / f'{PLUGIN}-{stamp}-{approval["commit"][:12]}'
     backup.mkdir(parents=True, mode=0o700, exist_ok=False)
