@@ -44,7 +44,7 @@ def main() -> None:
             result = ctl.departmental_init(_stdin_json())
         elif command == "department-status" and len(sys.argv) == 3:
             result = ctl.departmental.load(sys.argv[2])
-        elif command in {"department-issue", "department-candidate", "department-qa-accept", "department-lead-accept", "department-project", "department-revise-inputs", "department-complete-dossier"} and len(sys.argv) == 3:
+        elif command in {"department-issue", "department-candidate", "department-qa-accept", "department-lead-accept", "department-project", "department-revise-inputs", "department-complete-dossier", "department-approval-event"} and len(sys.argv) == 3:
             result = ctl.departmental_transition(sys.argv[2], command.removeprefix("department-"), _stdin_json())
         elif command == "recover" and len(sys.argv) == 2:
             result = ctl.recover()

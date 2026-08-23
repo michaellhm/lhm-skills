@@ -1,0 +1,13 @@
+[Unit]
+Description=LHM root bounded departmental snapshot broker
+[Service]
+Type=oneshot
+User=root
+ExecStart=/opt/lhm-workflow/current/venv/bin/python /usr/local/libexec/lhm-department-snapshot-broker
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/var/lib/lhm-workflow/departmental-parents /var/lib/lhm-workflow/public/controller-dispatch.public.pem
+ReadWritePaths=/var/lib/lhm-workflow/controller-outgoing /var/lib/lhm-workflow/projection-requests /var/lib/lhm-workflow/hop-requests /var/lib/lhm-workflow/snapshot-consumed /var/lib/lhm-workflow/snapshot-quarantine
+RestrictAddressFamilies=AF_UNIX

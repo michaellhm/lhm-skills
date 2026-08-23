@@ -43,6 +43,12 @@ executable fake adapters with isolated test keys. Live pilot enablement still re
 and service-testing the real Lead and projection signers plus their BasicOps and Drive readbacks;
 this source release does not claim those external adapters are live.
 
+The packaged QA and Lead producer paths are the first real signer lanes. Their request schema
+contains identifiers only; receipts are derived from controller-observed candidate/QA state. Drive,
+BasicOps, approval, projection and HOP producers remain fail-closed pending a trusted observed-data
+adapter. The existing Claude dispatcher references demonstrate available Drive and BasicOps APIs,
+but are not promoted here because they do not yet emit the closed departmental receipt schemas.
+
 Internal status vocabulary is `ready`, `worker_running`, `qa_accepted`, `lead_accepted`, and
 `department_accepted`. External worker outcomes remain `candidate`; human approval is represented
 only by a version-bound machine approval receipt, never by a free-text status.

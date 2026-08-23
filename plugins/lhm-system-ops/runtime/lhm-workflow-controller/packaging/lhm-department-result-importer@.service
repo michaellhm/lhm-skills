@@ -1,0 +1,13 @@
+[Unit]
+Description=LHM root bounded %i result importer
+[Service]
+Type=oneshot
+User=root
+ExecStart=/opt/lhm-workflow/current/venv/bin/python /usr/local/libexec/lhm-department-result-importer %i
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/var/lib/lhm-workflow/public /var/lib/lhm-workflow/snapshot-consumed
+ReadWritePaths=/var/lib/lhm-workflow/departmental-parents /var/lib/lhm-workflow/wal /var/lib/lhm-workflow/locks /var/lib/lhm-workflow/projection-results /var/lib/lhm-workflow/hop-results /var/lib/lhm-workflow/result-consumed /var/lib/lhm-workflow/result-quarantine
+RestrictAddressFamilies=AF_UNIX

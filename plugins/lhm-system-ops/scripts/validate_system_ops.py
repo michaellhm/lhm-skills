@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import ast
+import hashlib
 import json
 import re
 import sys
@@ -87,7 +88,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.9.2':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.9.3':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -107,6 +108,7 @@ def main():
         'assets/host/cto-dispatch',
         'assets/host/lhm-cto-plugin-dispatcher',
         'assets/host/lhm-approved-plugin-deployer',
+        'assets/host/lhm-approved-project-hub-deployer',
         'assets/systemd/lhm-cto-plugin-dispatch.path',
         'assets/systemd/lhm-cto-plugin-dispatch.service',
         'assets/host/lhm-cto-result-resumer',
@@ -141,10 +143,22 @@ def main():
         'references/shared-claude-gateway-release.json',
         'references/shared-claude-gateway-release.md',
         'references/google-ads-evidence-pack.md',
+        'references/project-hub-production-release.md',
+        'references/project-hub-deployer-release.json',
+        'scripts/build_project_hub_release.py',
     }
     for relative in required_assets:
         if not (PLUGIN / relative).is_file():
             errors.append(f'missing runtime asset: {relative}')
+    deployer_release = json.loads((PLUGIN / 'references/project-hub-deployer-release.json').read_text(encoding='utf-8'))
+    deployer_source = PLUGIN / deployer_release.get('source', '')
+    if (deployer_release.get('capability_id') != 'LHM-PROJECT-HUB-DEPLOYER'
+            or deployer_release.get('destination') != '/usr/local/libexec/lhm-approved-project-hub-deployer'
+            or not deployer_source.is_file()
+            or hashlib.sha256(deployer_source.read_bytes()).hexdigest() != deployer_release.get('sha256')
+            or deployer_source.stat().st_size != deployer_release.get('size_bytes')
+            or deployer_release.get('mode') != '0755'):
+        errors.append('Project Hub deployer release manifest does not bind the exact source and destination')
     schemas = list((PLUGIN / 'references/evidence-bridge').glob('*.schema.json'))
     if len(schemas) != 8:
         errors.append('evidence bridge requires exact request/result schemas for four backends')

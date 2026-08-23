@@ -1,0 +1,7 @@
+[Unit]
+Description=Watch for bounded departmental QA requests
+[Path]
+PathExists=/var/lib/lhm-workflow/qa-requests/request.json
+Unit=lhm-department-qa-producer.service
+[Install]
+WantedBy=multi-user.target

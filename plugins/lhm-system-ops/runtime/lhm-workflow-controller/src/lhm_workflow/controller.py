@@ -14,7 +14,7 @@ from .storage import Storage, StorageConfig, digest
 from .departmental_state import (DepartmentalStateStore, new_departmental_state,
     issue_next_action, record_candidate, record_qa_acceptance,
     record_lead_acceptance, record_projection, revise_action_inputs)
-from .departmental_state import validate_approval, accept_completion_dossier
+from .departmental_state import validate_approval, accept_completion_dossier, record_approval_event
 
 
 class ControllerError(ValueError):
@@ -349,11 +349,16 @@ class WorkflowController:
         if operation == "issue":
             validate_approval(current, (self.secrets / "approval.key").read_bytes())
             updated, contract = issue_next_action(current, payload.get("child_run_id"))
-        elif operation == "candidate": updated = record_candidate(current, contract, payload, (self.secrets / "adapter.key").read_bytes())
+        elif operation == "candidate":
+            verifier = self.root / "public" / "adapter.public.pem"
+            updated = record_candidate(current, contract, payload, verifier if verifier.exists() else (self.secrets / "adapter.key").read_bytes())
         elif operation == "qa-accept": updated = record_qa_acceptance(current, contract, payload, (self.secrets / "verifier.key").read_bytes())
         elif operation == "lead-accept": updated = record_lead_acceptance(current, contract, payload, (self.secrets / "department-lead.key").read_bytes())
-        elif operation == "project": updated = record_projection(current, contract, payload, (self.secrets / "projection.key").read_bytes())
+        elif operation == "project":
+            verifier = self.root / "public" / "projection.public.pem"
+            updated = record_projection(current, contract, payload, verifier if verifier.exists() else (self.secrets / "projection.key").read_bytes())
         elif operation == "revise-inputs": updated = revise_action_inputs(current, payload.get("action_id"), payload.get("accepted_inputs"))
+        elif operation == "approval-event": updated = record_approval_event(current, payload, (self.secrets / "approval.key").read_bytes())
         else: raise ControllerError("invalid departmental operation")
         persisted = self.departmental.checkpoint(updated, expected_generation=generation)
         return {"state": persisted, "contract": contract} if operation == "issue" else persisted

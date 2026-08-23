@@ -4,8 +4,10 @@ from importlib.machinery import SourceFileLoader
 import json
 import os
 import subprocess
+import sys
 import types
 from pathlib import Path
+import pytest
 
 
 PLUGIN = Path(__file__).resolve().parents[1]
@@ -18,7 +20,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.2"
+    assert MANIFEST["release_version"] == "0.9.3"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -200,6 +202,79 @@ def load_dispatcher():
     return module
 
 
+def registration_fixture(tmp_path, monkeypatch):
+    dispatcher = load_dispatcher()
+    base = tmp_path / "dispatch"
+    runs = base / "runs"
+    processed = base / "processed"
+    incoming = base / "incoming"
+    for directory in (runs, processed, incoming):
+        directory.mkdir(parents=True, exist_ok=True)
+    vault = tmp_path / "vault"
+    (vault / "30 Projects/LHM Growth").mkdir(parents=True)
+    registry = tmp_path / "client-handback-targets.json"
+    registry.write_text(json.dumps({"schema_version": 1, "clients": {}}))
+    monkeypatch.setattr(dispatcher, "RUNS", runs)
+    monkeypatch.setattr(dispatcher, "PROCESSED", processed)
+    monkeypatch.setattr(dispatcher, "VAULT", vault)
+    monkeypatch.setattr(dispatcher, "HANDBACK_REGISTRY", registry)
+    monkeypatch.setattr(dispatcher.os, "chown", lambda *args: None)
+    monkeypatch.setattr(dispatcher.shutil, "copy2", lambda source, destination: (tmp_path / "registry.backup").write_bytes(Path(source).read_bytes()))
+    return dispatcher, incoming, runs, registry
+
+
+def registration_request(run_id="claude-register-20260823-01", **changes):
+    request = {
+        "schema_version": 1,
+        "run_id": run_id,
+        "profile": "handback_target_registration",
+        "agent_id": "lhm-connector-repair",
+        "target_type": "internal",
+        "client": "local-health-marketing",
+        "name": "Local Health Marketing",
+        "vault_prefix": "30 Projects/LHM Growth/",
+        "drive_folder_id": "1abcdefghijklmno",
+        "basicops_task_ids": ["2199999"],
+        "timeout_seconds": 30,
+    }
+    request.update(changes)
+    return request
+
+
+def test_internal_handback_registration_is_exactly_bounded(tmp_path, monkeypatch):
+    dispatcher, incoming, runs, registry = registration_fixture(tmp_path, monkeypatch)
+    request = registration_request()
+    queued = incoming / "request.json"
+    queued.write_text(json.dumps(request))
+    dispatcher.complete_registration(queued, request)
+    final = json.loads((runs / request["run_id"] / "final.json").read_text())
+    assert final["status"] == "completed"
+    target = json.loads(registry.read_text())["clients"]["local-health-marketing"]
+    assert target == {
+        "type": "internal",
+        "name": "Local Health Marketing",
+        "vault_prefix": "30 Projects/LHM Growth/",
+        "drive_folder_query": "exact folder with folder ID 1abcdefghijklmno",
+        "basicops_task_ids": ["2199999"],
+    }
+
+
+def test_internal_handback_registration_rejects_other_slug_or_prefix(tmp_path, monkeypatch):
+    for sequence, changes, error in (
+        (2, {"client": "another-internal"}, "restricted to local-health-marketing"),
+        (3, {"vault_prefix": "30 Projects/LHM Growth/Other/"}, "exact governed LHM Growth prefix"),
+    ):
+        dispatcher, incoming, runs, _ = registration_fixture(tmp_path / str(sequence), monkeypatch)
+        request = registration_request(f"claude-register-20260823-0{sequence}", **changes)
+        queued = incoming / "request.json"
+        queued.write_text(json.dumps(request))
+        dispatcher.complete_registration(queued, request)
+        final = json.loads((runs / request["run_id"] / "final.json").read_text())
+        assert final["status"] == "failed"
+        assert error in final["verification"]["error"]
+
+
+@pytest.mark.skipif(sys.platform != "linux", reason="Linux POSIX ACL rehearsal requires setfacl")
 def test_mask_reset_mid_run_is_repaired_and_terminal_artifacts_persist(tmp_path, monkeypatch):
     dispatcher = load_dispatcher()
     runs = tmp_path / "runs"

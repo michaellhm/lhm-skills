@@ -1,0 +1,5 @@
+[Path]
+PathExists=/var/lib/lhm-workflow/hop-requests/request.json
+Unit=lhm-department-hop-producer.service
+[Install]
+WantedBy=multi-user.target

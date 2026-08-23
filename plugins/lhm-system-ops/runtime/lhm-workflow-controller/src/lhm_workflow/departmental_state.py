@@ -1,6 +1,6 @@
 """Governed one-action departmental state with independent QA and durable CAS."""
 from __future__ import annotations
-import copy,fcntl,hashlib,hmac,json,os,re,tempfile
+import base64,copy,fcntl,hashlib,hmac,json,os,re,subprocess,tempfile
 from contextlib import contextmanager
 from pathlib import Path
 SAFE=re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$"); HEX=re.compile(r"^[0-9a-f]{64}$")
@@ -11,7 +11,23 @@ def seal(v,key):
  u=copy.deepcopy(v);u.pop("attestation",None);u["attestation"]=hmac.new(key,canonical(u),hashlib.sha256).hexdigest();return u
 def authenticated(v,key,role):
  sig=v.get("attestation") if isinstance(v,dict) else None;u=copy.deepcopy(v) if isinstance(v,dict) else {};u.pop("attestation",None)
- return v.get("role") == role and isinstance(sig,str) and hmac.compare_digest(sig,hmac.new(key,canonical(u),hashlib.sha256).hexdigest())
+ if v.get("role")!=role:return False
+ if isinstance(key,(str,Path)):
+  if not isinstance(sig,dict) or sig.get("algorithm")!="ed25519":return False
+  try: raw=base64.b64decode(sig.get("signature",""),validate=True)
+  except Exception:return False
+  fd,data=tempfile.mkstemp();sf,signature=tempfile.mkstemp()
+  try:
+   os.write(fd,canonical(u));os.close(fd);os.write(sf,raw);os.close(sf)
+   return subprocess.run(["openssl","pkeyutl","-verify","-pubin","-inkey",str(key),"-rawin","-in",data,"-sigfile",signature],capture_output=True).returncode==0
+  finally:Path(data).unlink(missing_ok=True);Path(signature).unlink(missing_ok=True)
+ return isinstance(sig,str) and hmac.compare_digest(sig,hmac.new(key,canonical(u),hashlib.sha256).hexdigest())
+def seal_ed25519(v,key):
+ u=copy.deepcopy(v);u.pop("attestation",None);fd,path=tempfile.mkstemp()
+ try:
+  os.write(fd,canonical(u));os.close(fd);done=subprocess.run(["openssl","pkeyutl","-sign","-inkey",str(key),"-rawin","-in",path],capture_output=True,check=True)
+ finally:Path(path).unlink(missing_ok=True)
+ u["attestation"]={"algorithm":"ed25519","signature":base64.b64encode(done.stdout).decode()};return u
 def ident(v,n):
  if not isinstance(v,str) or not SAFE.fullmatch(v): raise ValueError(f"invalid {n}")
  return v
@@ -77,6 +93,17 @@ def validate_approval(s,key):
  material=digest({"objective":a["objective"],"inputs":a["accepted_inputs"],"envelope":{k:v for k,v in a["dispatch_envelope"].items() if k!="approval"}})
  if not isinstance(r,dict) or set(r)!=keys or not authenticated(r,key,"approval_authority") or (r["parent_run_id"],r["action_id"],r["action_version"],r["material_sha256"],r["decision"])!=(s["parent_run_id"],a["action_id"],a["version"],material,"approved"):raise ValueError("valid machine approval required")
  return True
+def record_approval_event(s,event,key):
+ """Consume a separately authenticated human decision; never manufactures approval."""
+ u=copy.deepcopy(validate_state(s));a=next(x for x in u["action_register"] if x["status"] not in DONE);approval=a["dispatch_envelope"]["approval"]
+ if not approval["required"]:raise ValueError("approval not required")
+ if approval["receipt"] is not None:
+  if approval["receipt"]!=event:raise ValueError("conflicting approval replay")
+  return u
+ approval["receipt"]=copy.deepcopy(event)
+ try:validate_approval(u,key)
+ except Exception:approval["receipt"]=None;raise
+ return validate_state(u)
 def revise_action_inputs(s,action_id,inputs):
  u=copy.deepcopy(validate_state(s)); a=next(x for x in u["action_register"] if x["action_id"]==action_id)
  if a["status"] not in {"ready","waiting","running","qa_accepted"}: raise ValueError("action inputs cannot be revised")

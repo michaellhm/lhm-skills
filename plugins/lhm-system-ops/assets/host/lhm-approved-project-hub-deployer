@@ -1,0 +1,275 @@
+#!/usr/bin/env python3
+"""Approval-bound immutable installer and rollback for lhm-project-hub."""
+import argparse
+import hmac
+import hashlib
+import json
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+import zipfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+REPO = Path('/srv/lhm-plugin-source')
+APPROVALS = Path('/etc/lhm-plugin-approvals')
+APPROVAL_KEY = APPROVALS / 'project-hub-approval.key'
+USED_NONCES = Path('/var/lib/lhm-plugin-approval-nonces/lhm-project-hub')
+ARCHIVES = Path('/var/lib/lhm-plugin-releases')
+PROFILE = Path('/home/hermes/.hermes/profiles/lhm_brain')
+RELEASES = Path('/opt/lhm-plugin-releases/lhm-project-hub')
+CURRENT = Path('/opt/lhm-plugin-releases/current/lhm-project-hub')
+BACKUPS = Path('/var/backups/lhm-plugin-deployments')
+REPOSITORY = 'michaellhm/lhm-skills'
+PLUGIN = 'lhm-project-hub'
+VERSION = '0.1.73'
+
+
+def now(): return datetime.now(timezone.utc)
+def digest(path): return hashlib.sha256(path.read_bytes()).hexdigest()
+def git(*args):
+    return subprocess.run(['git', '-C', str(REPO), *args], check=True,
+                          capture_output=True, text=True).stdout.strip()
+
+
+def safe_id(value):
+    return isinstance(value, str) and value and all(c.isalnum() or c in '._:-' for c in value)
+
+
+def secure_root_file(path, mode=0o600):
+    if not path.is_file() or path.is_symlink(): raise SystemExit(f'insecure or missing root file: {path}')
+    state = path.stat()
+    if state.st_uid != 0 or state.st_mode & 0o777 != mode:
+        raise SystemExit(f'invalid root file owner or mode: {path}')
+
+
+def secure_root_directory(path):
+    if not path.is_dir() or path.is_symlink(): raise SystemExit(f'insecure root directory: {path}')
+    state = path.stat()
+    if state.st_uid != 0 or state.st_mode & 0o022:
+        raise SystemExit(f'root directory is writable by a non-root principal: {path}')
+
+
+def signed_payload(value):
+    return json.dumps({key: item for key, item in value.items() if key != 'signature'},
+                      sort_keys=True, separators=(',', ':')).encode()
+
+
+def verify_signature(value):
+    secure_root_directory(APPROVALS)
+    secure_root_file(APPROVAL_KEY)
+    key = APPROVAL_KEY.read_bytes()
+    if len(key) < 32: raise SystemExit('approval authentication key is too short')
+    expected = hmac.new(key, signed_payload(value), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(expected, str(value.get('signature', ''))):
+        raise SystemExit('approval signature mismatch')
+
+
+def sign_approval(approval_id):
+    if not safe_id(approval_id): raise SystemExit('invalid approval_id')
+    path = APPROVALS / f'{approval_id}.json'; secure_root_directory(APPROVALS); secure_root_file(path)
+    value = json.loads(path.read_text())
+    if value.get('approval_id') != approval_id or value.get('signature') not in {'', None}:
+        raise SystemExit('approval is already signed or has the wrong identity')
+    secure_root_file(APPROVAL_KEY); key = APPROVAL_KEY.read_bytes()
+    if len(key) < 32: raise SystemExit('approval authentication key is too short')
+    value['signature'] = hmac.new(key, signed_payload(value), hashlib.sha256).hexdigest()
+    atomic_json(path, value)
+    print(json.dumps({'status':'signed','approval_id':approval_id,'nonce':value.get('nonce')}))
+
+
+def secure_nonce_directory(path):
+    state = path.stat()
+    if state.st_uid != 0 or state.st_mode & 0o077:
+        raise SystemExit('approval nonce ledger is not root-private')
+def claim_nonce(value):
+    USED_NONCES.mkdir(parents=True, mode=0o700, exist_ok=True)
+    secure_nonce_directory(USED_NONCES)
+    receipt = USED_NONCES / value['nonce']
+    try:
+        fd = os.open(receipt, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_NOFOLLOW', 0), 0o600)
+    except FileExistsError:
+        raise SystemExit('approval nonce already consumed')
+    with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+        json.dump({'approval_id': value['approval_id'], 'action': value['action'],
+                   'approval_sha256': hashlib.sha256(signed_payload(value)).hexdigest(),
+                   'claimed_at': now().isoformat()}, handle, sort_keys=True)
+        handle.write('\n'); handle.flush(); os.fsync(handle.fileno())
+
+
+def atomic_json(path, value):
+    fd, temporary = tempfile.mkstemp(prefix=f'.{path.name}.', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(value, handle, indent=2, sort_keys=True); handle.write('\n')
+            handle.flush(); os.fsync(handle.fileno())
+        os.chmod(temporary, 0o600); os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary): os.unlink(temporary)
+
+
+def atomic_symlink(target, link):
+    link.parent.mkdir(parents=True, exist_ok=True)
+    temporary = link.parent / f'.{link.name}.{os.getpid()}.new'
+    if temporary.exists() or temporary.is_symlink(): temporary.unlink()
+    temporary.symlink_to(target)
+    os.replace(temporary, link)
+
+
+def validate_archive(archive, staging):
+    with zipfile.ZipFile(archive) as bundle:
+        members = bundle.infolist()
+        if not members or len(members) > 500 or sum(x.file_size for x in members) > 10_000_000:
+            raise ValueError('plugin archive exceeds size or file-count ceiling')
+        prefix = f'{PLUGIN}/'
+        for item in members:
+            mode = (item.external_attr >> 16) & 0o170000
+            if mode == 0o120000:
+                raise ValueError('plugin archive symlink is prohibited')
+            path = Path(item.filename)
+            if not item.filename.startswith(prefix) or '..' in path.parts or path.is_absolute():
+                raise ValueError('unsafe plugin archive path')
+        bundle.extractall(staging)
+    plugin = staging / PLUGIN
+    manifest = json.loads((plugin / '.claude-plugin/plugin.json').read_text())
+    if manifest.get('name') != PLUGIN or manifest.get('version') != VERSION:
+        raise ValueError('plugin identity or version mismatch')
+    skills = sorted(p.parent.name for p in (plugin / 'skills').glob('*/SKILL.md'))
+    if not skills or len(skills) != len(set(skills)):
+        raise ValueError('plugin contains no unique skills')
+    return plugin, skills
+
+
+def snapshot(path, backup):
+    if path.is_symlink(): return {'kind': 'symlink', 'target': os.readlink(path)}
+    if path.exists():
+        shutil.copytree(path, backup)
+        return {'kind': 'directory', 'backup': str(backup)}
+    return {'kind': 'absent'}
+
+
+def restore(path, record):
+    if path.exists() or path.is_symlink():
+        if path.is_dir() and not path.is_symlink(): shutil.rmtree(path)
+        else: path.unlink()
+    if record['kind'] == 'symlink': atomic_symlink(record['target'], path)
+    elif record['kind'] == 'directory': shutil.copytree(record['backup'], path)
+
+
+def consume_approval(approval_id, action, archive_sha256, commit, backup=None):
+    if not safe_id(approval_id): raise SystemExit('invalid approval_id')
+    path = APPROVALS / f'{approval_id}.json'
+    secure_root_file(path)
+    value = json.loads(path.read_text())
+    required = {'schema_version','approval_id','action','repository','commit','archive_sha256',
+                'plugin','profile','issued_at','expires_at','nonce','used','signature'}
+    allowed = required | ({'backup'} if action == 'rollback' else set())
+    if value.get('schema_version') != 3 or set(value) != allowed:
+        raise SystemExit('invalid approval schema')
+    verify_signature(value)
+    if value.get('approval_id') != approval_id or value.get('action') != action or value.get('used') is not False:
+        raise SystemExit('approval scope or use mismatch')
+    if value.get('repository') != REPOSITORY or value.get('plugin') != PLUGIN or value.get('profile') != 'lhm_brain':
+        raise SystemExit('approval scope mismatch')
+    try:
+        issued = datetime.fromisoformat(value['issued_at']); expires = datetime.fromisoformat(value['expires_at'])
+    except (TypeError, ValueError): raise SystemExit('invalid approval timestamps')
+    current = now()
+    if issued.tzinfo is None or expires.tzinfo is None or issued > current or expires <= current:
+        raise SystemExit('approval is not currently valid')
+    if (expires - issued).total_seconds() > 86400: raise SystemExit('approval validity exceeds 24 hours')
+    if not re.fullmatch(r'[a-f0-9]{40}', str(value['commit'])):
+        raise SystemExit('invalid approval commit')
+    if not re.fullmatch(r'[a-f0-9]{64}', str(value['archive_sha256'])):
+        raise SystemExit('invalid approval archive digest')
+    if not isinstance(value['nonce'], str) or not re.fullmatch(r'[a-f0-9]{32,64}', value['nonce']):
+        raise SystemExit('invalid approval nonce')
+    if value['archive_sha256'] != archive_sha256 or value['commit'] != commit:
+        raise SystemExit('approval release binding mismatch')
+    if action == 'rollback' and Path(value['backup']).resolve() != backup.resolve(): raise SystemExit('rollback backup mismatch')
+    claim_nonce(value)
+    return value
+
+
+def install(approval_id, archive):
+    archive = archive.resolve()
+    if archive.parent != ARCHIVES or not archive.is_file() or archive.is_symlink():
+        raise SystemExit('unapproved archive location')
+    archive_sha256 = digest(archive)
+    commit = git('rev-parse', 'HEAD')
+    if git('status', '--porcelain'):
+        raise SystemExit('source checkout is dirty or at the wrong commit')
+    approval = consume_approval(approval_id, 'install', archive_sha256, commit)
+    release_id = approval['archive_sha256']
+    release = RELEASES / release_id
+    if release.exists(): raise SystemExit('release already exists; refusing overwrite')
+    with tempfile.TemporaryDirectory(prefix='lhm-project-hub.') as temporary:
+        plugin, skills = validate_archive(archive, Path(temporary))
+        RELEASES.mkdir(parents=True, exist_ok=True)
+        staged = RELEASES / f'.{release_id}.new'
+        shutil.copytree(plugin, staged)
+        for item in staged.rglob('*'):
+            if item.is_symlink(): raise SystemExit('staged plugin symlink is prohibited')
+            os.chmod(item, 0o755 if item.is_dir() else 0o644)
+        os.chown(staged, 0, 0); os.replace(staged, release)
+    stamp = now().strftime('%Y%m%dT%H%M%SZ')
+    backup = BACKUPS / f'{PLUGIN}-{stamp}-{approval["commit"][:12]}'
+    backup.mkdir(parents=True, mode=0o700, exist_ok=False)
+    records = {'schema_version': 1, 'plugin': PLUGIN, 'version': VERSION,
+               'installed_commit': commit, 'installed_archive_sha256': archive_sha256,
+               'current': snapshot(CURRENT, backup / 'current'), 'skills': {},
+               'plugin_source': snapshot(PROFILE / 'plugin-sources' / PLUGIN, backup / 'plugin-source')}
+    for name in skills:
+        records['skills'][name] = snapshot(PROFILE / 'skills' / name, backup / f'skill-{name}')
+    atomic_json(backup / 'rollback.json', records)
+    atomic_symlink(release, CURRENT)
+    for name in skills:
+        atomic_symlink(CURRENT / 'skills' / name, PROFILE / 'skills' / name)
+    atomic_symlink(CURRENT, PROFILE / 'plugin-sources' / PLUGIN)
+    print(json.dumps({'status':'installed','plugin':PLUGIN,'version':VERSION,
+                      'release':str(release),'backup':str(backup)}))
+
+
+def rollback(approval_id, backup):
+    if (backup.parent != BACKUPS or not backup.name.startswith(f'{PLUGIN}-')
+            or not backup.is_dir() or backup.is_symlink()):
+        raise SystemExit('rollback backup is outside the governed backup root')
+    state_file = backup / 'rollback.json'
+    if not state_file.is_file() or state_file.is_symlink(): raise SystemExit('rollback state unavailable')
+    state = json.loads(state_file.read_text())
+    if set(state) != {'schema_version','plugin','version','installed_commit','installed_archive_sha256','current','skills','plugin_source'} or not isinstance(state['skills'], dict):
+        raise SystemExit('invalid rollback state schema')
+    if state['schema_version'] != 1 or state['plugin'] != PLUGIN or state['version'] != VERSION:
+        raise SystemExit('rollback state identity mismatch')
+    consume_approval(approval_id, 'rollback', state['installed_archive_sha256'],
+                     state['installed_commit'], backup=backup)
+    for name, record in state['skills'].items():
+        if not safe_id(name) or record.get('kind') not in {'absent','symlink','directory'}:
+            raise SystemExit('invalid rollback skill record')
+    for record in [state['current'], state['plugin_source'], *state['skills'].values()]:
+        if record.get('kind') == 'directory':
+            saved = Path(record.get('backup', '')).resolve()
+            try: saved.relative_to(backup.resolve())
+            except ValueError: raise SystemExit('rollback content escapes governed backup')
+            if not saved.is_dir() or saved.is_symlink(): raise SystemExit('rollback content unavailable')
+    restore(CURRENT, state['current'])
+    for name, record in state['skills'].items(): restore(PROFILE / 'skills' / name, record)
+    restore(PROFILE / 'plugin-sources' / PLUGIN, state['plugin_source'])
+    print(json.dumps({'status':'rolled_back','plugin':PLUGIN,'backup':str(backup)}))
+
+
+def main():
+    if os.geteuid() != 0: raise SystemExit('installer must run as root')
+    parser = argparse.ArgumentParser(); sub = parser.add_subparsers(dest='action', required=True)
+    ins = sub.add_parser('install'); ins.add_argument('approval_id'); ins.add_argument('archive', type=Path)
+    rb = sub.add_parser('rollback'); rb.add_argument('approval_id'); rb.add_argument('backup', type=Path)
+    sg = sub.add_parser('sign'); sg.add_argument('approval_id')
+    args = parser.parse_args()
+    if args.action == 'install': install(args.approval_id, args.archive)
+    elif args.action == 'rollback': rollback(args.approval_id, args.backup.resolve())
+    else: sign_approval(args.approval_id)
+
+
+if __name__ == '__main__': main()

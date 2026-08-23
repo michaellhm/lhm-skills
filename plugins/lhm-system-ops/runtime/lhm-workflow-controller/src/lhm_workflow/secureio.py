@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 import stat
+import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 
 
@@ -49,3 +51,16 @@ def read_trusted(path: Path, *, root: Path, uid: int, max_bytes: int = 2_000_000
         return raw
     finally:
         os.close(fd)
+
+@contextmanager
+def trusted_key_copy(path: Path, *, uid: int):
+    """Snapshot a trusted key through a checked descriptor for crypto subprocesses."""
+    raw = read_trusted(path, root=path.parent, uid=uid, max_bytes=64_000)
+    fd, name = tempfile.mkstemp(prefix="lhm-key-")
+    try:
+        os.write(fd, raw); os.fsync(fd); os.close(fd); os.chmod(name, 0o400)
+        yield Path(name)
+    finally:
+        try: os.close(fd)
+        except OSError: pass
+        Path(name).unlink(missing_ok=True)

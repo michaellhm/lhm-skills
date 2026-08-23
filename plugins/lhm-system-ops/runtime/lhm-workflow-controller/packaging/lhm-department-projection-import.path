@@ -1,0 +1,3 @@
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/projection-results/*.json
+Unit=lhm-department-result-importer@projection.service

@@ -1,0 +1,5 @@
+[Path]
+PathExists=/var/lib/lhm-workflow/projection-requests/request.json
+Unit=lhm-department-projection-producer.service
+[Install]
+WantedBy=multi-user.target

@@ -26,7 +26,7 @@ CLAUDE_HOME = Path("/home/claudeworker")
 # Tests may still override this path explicitly through `_test_override`.
 HOOK = Path(__file__).resolve().with_name("hermes_workflow_hook.py")
 GSC_CONFIG = Path("/home/claudeworker/.config/lhm-bridge/seo-gsc-readonly.mcp.json")
-PLUGIN = Path("/opt/lhm-workflow/claude/plugins/lhm-marketing-hub-2.2.0")
+PLUGIN = Path("/opt/lhm-workflow/claude/plugins/lhm-marketing-hub-2.2.1")
 RUNS = Path("/home/hermes/.hermes/profiles/lhm_brain/dispatch/claude/runs")
 SAFE_CHILD = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$")
 GSC_TOOLS = {

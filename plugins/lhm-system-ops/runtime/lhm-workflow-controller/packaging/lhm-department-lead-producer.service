@@ -1,0 +1,15 @@
+[Unit]
+Description=LHM departmental Lead receipt producer
+[Service]
+Type=oneshot
+User=lhmdepartmentlead
+Group=lhmdepartmentlead
+ExecStart=/opt/lhm-workflow/current/venv/bin/python -m lhm_workflow.department_receipt_producer /var/lib/lhm-workflow/lead-requests/request.json /var/lib/lhm-workflow/lead-requests/evidence.json /var/lib/lhm-workflow/lead-results/result.json --request-root /var/lib/lhm-workflow/lead-requests --key /var/lib/lhm-workflow/secrets/department-lead.private.pem --claude-public /var/lib/lhm-workflow/public/verifier.public.pem
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/var/lib/lhm-workflow/departmental-parents /var/lib/lhm-workflow/secrets/department-lead.private.pem /var/lib/lhm-workflow/public/verifier.public.pem /var/lib/lhm-workflow/public/evidence-attestor.public.pem
+ReadWritePaths=/var/lib/lhm-workflow/lead-requests /var/lib/lhm-workflow/lead-results
+RestrictAddressFamilies=AF_UNIX
+SystemCallFilter=@system-service

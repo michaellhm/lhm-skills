@@ -1,0 +1,3 @@
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/controller-outgoing/*.json
+Unit=lhm-department-snapshot-broker.service

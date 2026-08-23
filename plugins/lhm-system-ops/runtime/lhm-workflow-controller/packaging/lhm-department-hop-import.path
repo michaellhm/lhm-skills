@@ -1,0 +1,3 @@
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/hop-results/*.json
+Unit=lhm-department-result-importer@hop.service

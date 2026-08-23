@@ -99,8 +99,8 @@ def complete_registration(path, request):
     vault_prefix = request.get('vault_prefix')
     folder_id = request.get('drive_folder_id')
     task_ids = request.get('basicops_task_ids')
-    if target_type not in {'client', 'opportunity'}:
-        finish('failed', 'refused', 'target_type must be client or opportunity')
+    if target_type not in {'client', 'opportunity', 'internal'}:
+        finish('failed', 'refused', 'target_type must be client, opportunity or internal')
         return
     if not isinstance(slug, str) or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', slug):
         finish('failed', 'refused', 'invalid target slug')
@@ -108,7 +108,16 @@ def complete_registration(path, request):
     if not isinstance(name, str) or not 2 <= len(name) <= 120 or any(ord(c) < 32 for c in name):
         finish('failed', 'refused', 'invalid target name')
         return
-    allowed_root = '20 Clients/' if target_type == 'client' else '01 Inbox/Sales Opportunities/'
+    if target_type == 'internal':
+        if slug != 'local-health-marketing':
+            finish('failed', 'refused', 'internal target is restricted to local-health-marketing')
+            return
+        allowed_root = '30 Projects/LHM Growth/'
+        if vault_prefix != allowed_root:
+            finish('failed', 'refused', 'local-health-marketing must use the exact governed LHM Growth prefix')
+            return
+    else:
+        allowed_root = '20 Clients/' if target_type == 'client' else '01 Inbox/Sales Opportunities/'
     if (not isinstance(vault_prefix, str) or not vault_prefix.startswith(allowed_root)
             or not vault_prefix.endswith('/') or '..' in Path(vault_prefix).parts):
         finish('failed', 'refused', f'vault prefix must be beneath {allowed_root}')
