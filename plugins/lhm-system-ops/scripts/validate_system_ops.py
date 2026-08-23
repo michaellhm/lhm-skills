@@ -88,7 +88,7 @@ def main():
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.9.4':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.9.5':
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -109,6 +109,8 @@ def main():
         'assets/host/lhm-cto-plugin-dispatcher',
         'assets/host/lhm-approved-plugin-deployer',
         'assets/host/lhm-approved-project-hub-deployer',
+        'assets/host/provision-project-hub-release-mount',
+        'assets/systemd/home-hermes-.hermes-immutable\\x2dplugin\\x2dreleases.mount',
         'assets/systemd/lhm-cto-plugin-dispatch.path',
         'assets/systemd/lhm-cto-plugin-dispatch.service',
         'assets/host/lhm-cto-result-resumer',
@@ -145,6 +147,7 @@ def main():
         'references/google-ads-evidence-pack.md',
         'references/project-hub-production-release.md',
         'references/project-hub-deployer-release.json',
+        'references/hermes-project-hub-readonly-mount.compose.yaml',
         'scripts/build_project_hub_release.py',
     }
     for relative in required_assets:

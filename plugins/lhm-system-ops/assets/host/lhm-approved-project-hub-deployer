@@ -19,8 +19,13 @@ APPROVAL_KEY = APPROVALS / 'project-hub-approval.key'
 USED_NONCES = Path('/var/lib/lhm-plugin-approval-nonces/lhm-project-hub')
 ARCHIVES = Path('/var/lib/lhm-plugin-releases')
 PROFILE = Path('/home/hermes/.hermes/profiles/lhm_brain')
-RELEASES = Path('/opt/lhm-plugin-releases/lhm-project-hub')
-CURRENT = Path('/opt/lhm-plugin-releases/current/lhm-project-hub')
+RELEASE_ROOT = Path('/opt/lhm-plugin-releases')
+RELEASES = RELEASE_ROOT / 'lhm-project-hub'
+CURRENT = RELEASE_ROOT / 'current/lhm-project-hub'
+VISIBLE_ROOT = Path('/home/hermes/.hermes/immutable-plugin-releases')
+VISIBLE_CURRENT = VISIBLE_ROOT / 'current/lhm-project-hub'
+CONTAINER_VISIBLE_ROOT = Path('/opt/data/immutable-plugin-releases')
+MOUNTINFO = Path('/proc/self/mountinfo')
 BACKUPS = Path('/var/backups/lhm-plugin-deployments')
 REPOSITORY = 'michaellhm/lhm-skills'
 PLUGIN = 'lhm-project-hub'
@@ -45,11 +50,60 @@ def secure_root_file(path, mode=0o600):
         raise SystemExit(f'invalid root file owner or mode: {path}')
 
 
-def secure_root_directory(path):
+def secure_root_directory(path, uid=0):
     if not path.is_dir() or path.is_symlink(): raise SystemExit(f'insecure root directory: {path}')
     state = path.stat()
-    if state.st_uid != 0 or state.st_mode & 0o022:
+    if state.st_uid != uid or state.st_mode & 0o022:
         raise SystemExit(f'root directory is writable by a non-root principal: {path}')
+
+
+def reject_symlink_components(path):
+    current = path.absolute()
+    while current != current.parent:
+        if current.is_symlink(): raise SystemExit(f'linked path component is prohibited: {current}')
+        current = current.parent
+
+
+def secure_root_ancestors(path, stop, uid=0):
+    path=path.absolute(); stop=stop.absolute()
+    try: path.relative_to(stop)
+    except ValueError: raise SystemExit('secure path escapes governed root')
+    current=path
+    while True:
+        secure_root_directory(current,uid=uid)
+        if current == stop: break
+        current=current.parent
+
+
+def mount_is_read_only(path, mountinfo=MOUNTINFO):
+    expected=str(path.absolute())
+    for line in mountinfo.read_text().splitlines():
+        left=line.split(' - ',1)[0].split()
+        if len(left)>5 and left[4].replace('\\040',' ')==expected:
+            return 'ro' in left[5].split(',')
+    return False
+
+
+def secure_container_mount():
+    result=subprocess.run(['docker','inspect','--format','{{json .Mounts}}','hermes'],check=True,capture_output=True,text=True)
+    mounts=json.loads(result.stdout)
+    valid=[m for m in mounts if m.get('Type')=='bind' and m.get('Source')==str(RELEASE_ROOT)
+           and m.get('Destination')==str(CONTAINER_VISIBLE_ROOT) and m.get('RW') is False]
+    if len(valid)!=1: raise SystemExit('Hermes immutable release read-only bind is absent or ambiguous')
+
+
+def secure_release_boundary():
+    reject_symlink_components(RELEASE_ROOT); reject_symlink_components(VISIBLE_ROOT)
+    secure_root_ancestors(RELEASE_ROOT, Path('/opt'))
+    secure_root_directory(RELEASES); secure_root_directory(CURRENT.parent)
+    secure_root_directory(VISIBLE_ROOT)
+    if not os.path.ismount(VISIBLE_ROOT) or not mount_is_read_only(VISIBLE_ROOT):
+        raise SystemExit('host immutable release alias is not a read-only mount')
+    source=RELEASE_ROOT.stat(); visible=VISIBLE_ROOT.stat()
+    if (source.st_dev,source.st_ino)!=(visible.st_dev,visible.st_ino):
+        raise SystemExit('host immutable release alias has the wrong source')
+    reject_symlink_components(PROFILE / 'skills'); reject_symlink_components(PROFILE / 'plugin-sources')
+    secure_container_mount()
 
 
 def signed_payload(value):
@@ -114,7 +168,8 @@ def atomic_symlink(target, link):
     link.parent.mkdir(parents=True, exist_ok=True)
     temporary = link.parent / f'.{link.name}.{os.getpid()}.new'
     if temporary.exists() or temporary.is_symlink(): temporary.unlink()
-    temporary.symlink_to(target)
+    linked_target = os.path.relpath(target, link.parent) if isinstance(target, Path) and target.is_absolute() else target
+    temporary.symlink_to(linked_target)
     os.replace(temporary, link)
 
 
@@ -194,13 +249,14 @@ def consume_approval(approval_id, action, archive_sha256, commit, backup=None):
 
 
 def install(approval_id, archive):
-    archive = archive.resolve()
+    archive = archive.absolute()
     if archive.parent != ARCHIVES or not archive.is_file() or archive.is_symlink():
         raise SystemExit('unapproved archive location')
     archive_sha256 = digest(archive)
     commit = git('rev-parse', 'HEAD')
     if git('status', '--porcelain'):
         raise SystemExit('source checkout is dirty or at the wrong commit')
+    secure_release_boundary()
     approval = consume_approval(approval_id, 'install', archive_sha256, commit)
     release_id = approval['archive_sha256']
     release = RELEASES / release_id
@@ -212,8 +268,8 @@ def install(approval_id, archive):
         shutil.copytree(plugin, staged)
         for item in staged.rglob('*'):
             if item.is_symlink(): raise SystemExit('staged plugin symlink is prohibited')
-            os.chmod(item, 0o755 if item.is_dir() else 0o644)
-        os.chown(staged, 0, 0); os.replace(staged, release)
+            os.chmod(item, 0o555 if item.is_dir() else 0o444); os.chown(item,0,0)
+        os.chmod(staged,0o555); os.chown(staged, 0, 0); os.replace(staged, release)
     stamp = now().strftime('%Y%m%dT%H%M%SZ')
     backup = BACKUPS / f'{PLUGIN}-{stamp}-{approval["commit"][:12]}'
     backup.mkdir(parents=True, mode=0o700, exist_ok=False)
@@ -226,8 +282,8 @@ def install(approval_id, archive):
     atomic_json(backup / 'rollback.json', records)
     atomic_symlink(release, CURRENT)
     for name in skills:
-        atomic_symlink(CURRENT / 'skills' / name, PROFILE / 'skills' / name)
-    atomic_symlink(CURRENT, PROFILE / 'plugin-sources' / PLUGIN)
+        atomic_symlink(VISIBLE_CURRENT / 'skills' / name, PROFILE / 'skills' / name)
+    atomic_symlink(VISIBLE_CURRENT, PROFILE / 'plugin-sources' / PLUGIN)
     print(json.dumps({'status':'installed','plugin':PLUGIN,'version':VERSION,
                       'release':str(release),'backup':str(backup)}))
 
@@ -236,6 +292,7 @@ def rollback(approval_id, backup):
     if (backup.parent != BACKUPS or not backup.name.startswith(f'{PLUGIN}-')
             or not backup.is_dir() or backup.is_symlink()):
         raise SystemExit('rollback backup is outside the governed backup root')
+    secure_release_boundary()
     state_file = backup / 'rollback.json'
     if not state_file.is_file() or state_file.is_symlink(): raise SystemExit('rollback state unavailable')
     state = json.loads(state_file.read_text())
@@ -268,7 +325,7 @@ def main():
     sg = sub.add_parser('sign'); sg.add_argument('approval_id')
     args = parser.parse_args()
     if args.action == 'install': install(args.approval_id, args.archive)
-    elif args.action == 'rollback': rollback(args.approval_id, args.backup.resolve())
+    elif args.action == 'rollback': rollback(args.approval_id, args.backup.absolute())
     else: sign_approval(args.approval_id)
 
 

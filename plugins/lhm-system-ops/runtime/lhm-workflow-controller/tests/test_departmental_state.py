@@ -161,10 +161,10 @@ def test_projection_and_hop_sources_have_no_direct_read_text():
  source=Path(__file__).parents[1]/"src/lhm_workflow"
  for name in ("projection_producer.py","hop_producer.py"):
   text=(source/name).read_text();assert ".read_text()" not in text and "trusted_key_copy" in text and "read_trusted" in text
-def test_trusted_claude_pins_marketing_hub_221_hashes():
+def test_trusted_claude_pins_complete_marketing_hub_222_archive():
  root=Path(__file__).parents[1];script=(root/"packaging/provision-trusted-claude.sh").read_text();supervisor=(root/"integration/lhm_claude_trusted_supervisor.py").read_text()
- assert "lhm-marketing-hub/2.2.1" in script and "lhm-marketing-hub-2.2.1" in supervisor and "2.2.0" not in script+supervisor
- assert "88848e6d2173a9d0a73ece8a85032b4fead9ff67f257782d05bc7c4dba3cf7c2" in script and "0818f43675fdb09abcdf5cb083c54879fb285e828bbac21f770b1165d069266c" in script
+ assert "lhm-marketing-hub-2.2.2.tar" in script and "lhm-marketing-hub-2.2.2" in supervisor
+ assert "/.claude/plugins/cache/" not in script and "trusted-marketing-hub-package.py" in script
 def test_snapshot_broker_allowlist_stale_replay_and_traversal(tmp_path,monkeypatch):
  root=tmp_path;store=DepartmentalStateStore(root/"departmental-parents");current=store.checkpoint(state(),expected_generation=None);snap={"state_record":current};value={"role":"controller_dispatch","target_role":"projection","parent_run_id":"wave-1","generation":1,"state_sha256":digest(current),"snapshot_sha256":digest(snap),"snapshot":snap,"attestation":"test"}
  monkeypatch.setattr(broker,"authenticated",lambda *a:True);out=root/"controller-outgoing";out.mkdir();source=out/"request.json";source.write_text(json.dumps(value));assert broker.process(source,root,tmp_path/"public") == "delivered"

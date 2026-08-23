@@ -5,6 +5,7 @@ import json
 import tempfile
 import unittest
 import zipfile
+import os
 from importlib.machinery import SourceFileLoader
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -72,9 +73,44 @@ class ProjectHubDeployerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary); first=root/'release-one'; second=root/'release-two'; first.mkdir(); second.mkdir()
             link=root/'current'; deployer.atomic_symlink(first,link)
+            self.assertFalse(Path(link.readlink()).is_absolute())
             record=deployer.snapshot(link,root/'unused')
             deployer.atomic_symlink(second,link); self.assertEqual(link.resolve(),second.resolve())
             deployer.restore(link,record); self.assertEqual(link.resolve(),first.resolve())
+
+    def test_release_and_profile_links_share_readonly_container_visible_tree(self):
+        self.assertEqual(deployer.RELEASES, Path('/opt/lhm-plugin-releases/lhm-project-hub'))
+        self.assertEqual(deployer.CURRENT, Path('/opt/lhm-plugin-releases/current/lhm-project-hub'))
+        self.assertEqual(deployer.VISIBLE_ROOT, Path('/home/hermes/.hermes/immutable-plugin-releases'))
+        self.assertEqual(deployer.CONTAINER_VISIBLE_ROOT, Path('/opt/data/immutable-plugin-releases'))
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary); profile=root/'.hermes/profiles/lhm_brain'; release=root/'.hermes/immutable-plugin-releases/lhm-project-hub/hash'
+            skill=release/'skills/basicops-task-manager'; skill.mkdir(parents=True)
+            link=profile/'skills/basicops-task-manager'; deployer.atomic_symlink(skill,link)
+            self.assertFalse(Path(link.readlink()).is_absolute())
+            self.assertEqual(link.resolve(),skill.resolve())
+
+    def test_secure_ancestor_helpers_reject_symlink_and_writable_parent(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary); governed=root/'governed'; child=governed/'current'; child.mkdir(parents=True)
+            governed.chmod(0o777)
+            with self.assertRaisesRegex(SystemExit,'writable'):
+                deployer.secure_root_ancestors(child,governed,uid=os.getuid())
+            governed.chmod(0o755); real=root/'real'; real.mkdir(); linked=root/'linked'; linked.symlink_to(real)
+            with self.assertRaisesRegex(SystemExit,'linked'):
+                deployer.reject_symlink_components(linked/'current')
+
+    def test_mount_contract_is_explicit_and_read_only(self):
+        compose=(ROOT/'references/hermes-project-hub-readonly-mount.compose.yaml').read_text()
+        provisioner=(ROOT/'assets/host/provision-project-hub-release-mount').read_text()
+        mount_unit=(ROOT/'assets/systemd/home-hermes-.hermes-immutable\\x2dplugin\\x2dreleases.mount').read_text()
+        self.assertIn('source: /opt/lhm-plugin-releases',compose)
+        self.assertIn('target: /opt/data/immutable-plugin-releases',compose)
+        self.assertIn('read_only: true',compose)
+        self.assertIn('systemctl enable --now',provisioner)
+        self.assertIn('Options=bind,ro,nosuid,nodev,noexec',mount_unit)
+        source=DEPLOYER.read_text()
+        self.assertGreaterEqual(source.count('secure_release_boundary()'),2)
 
     def test_approval_schema_is_action_bound(self):
         with tempfile.TemporaryDirectory() as temporary:

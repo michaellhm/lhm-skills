@@ -4,6 +4,25 @@ Project Hub is installed separately from the mutable `/home/hermes/.hermes/lhm-s
 The supported target for this release is `lhm-project-hub` 0.1.73. Never `git pull` or copy files
 into the live shared checkout as a deployment mechanism.
 
+Immutable releases live below the root-owned host tree
+`/opt/lhm-plugin-releases/lhm-project-hub/<archive-sha256>`. Hermes never writes this tree. The
+reviewed `hermes-project-hub-readonly-mount.compose.yaml` binds it read-only at
+`/opt/data/immutable-plugin-releases` in the container. On the host,
+`provision-project-hub-release-mount` binds the same source read-only at
+`/home/hermes/.hermes/immutable-plugin-releases`. These matching positions preserve relative
+profile skill and plugin-source links across host and container namespaces without trusting a
+replaceable directory inside the Hermes-owned data tree. The deployer verifies the root-owned
+source ancestors, host bind identity/read-only state and exact Docker bind before install or
+rollback.
+
+Each immutable release is sealed as root-owned `0555` directories and `0444` regular files. The
+release root and `current` parent remain root-owned `0755` solely so the approved deployer can add
+a new hash-addressed release and atomically switch the relative `current` link.
+
+Run the host mount provisioner, merge the compose fragment into the governed Hermes definition,
+recreate Hermes, and confirm Docker reports exactly one bind from `/opt/lhm-plugin-releases` to
+`/opt/data/immutable-plugin-releases` with `RW=false`. The deployer fails closed otherwise.
+
 ## Build
 
 From the reviewed, clean, exact commit:

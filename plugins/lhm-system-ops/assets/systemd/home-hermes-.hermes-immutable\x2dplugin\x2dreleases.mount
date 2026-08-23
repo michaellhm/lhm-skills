@@ -1,0 +1,12 @@
+[Unit]
+Description=Read-only host alias for immutable LHM plugin releases
+Before=docker.service
+
+[Mount]
+What=/opt/lhm-plugin-releases
+Where=/home/hermes/.hermes/immutable-plugin-releases
+Type=none
+Options=bind,ro,nosuid,nodev,noexec
+
+[Install]
+WantedBy=multi-user.target
