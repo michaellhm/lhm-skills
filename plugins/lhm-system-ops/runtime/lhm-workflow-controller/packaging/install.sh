@@ -74,8 +74,17 @@ install -d -o root -g lhmworkflow -m 0750 /var/lib/lhm-workflow/secrets
 umask 0077
 test -f /var/lib/lhm-workflow/secrets/adapter.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/adapter.key
 test -f /var/lib/lhm-workflow/secrets/verifier.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/verifier.key
+test -f /var/lib/lhm-workflow/secrets/department-lead.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/department-lead.key
+test -f /var/lib/lhm-workflow/secrets/projection.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/projection.key
+test -f /var/lib/lhm-workflow/secrets/approval.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/approval.key
+test -f /var/lib/lhm-workflow/secrets/head-production.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/head-production.key
+test -f /var/lib/lhm-workflow/secrets/production.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/production.key
 chown root:lhmadapterkey /var/lib/lhm-workflow/secrets/adapter.key; chown root:lhmverifierkey /var/lib/lhm-workflow/secrets/verifier.key
 chmod 0640 /var/lib/lhm-workflow/secrets/adapter.key /var/lib/lhm-workflow/secrets/verifier.key
+chown root:lhmworkflow /var/lib/lhm-workflow/secrets/department-lead.key /var/lib/lhm-workflow/secrets/projection.key
+chmod 0640 /var/lib/lhm-workflow/secrets/department-lead.key /var/lib/lhm-workflow/secrets/projection.key
+chown root:lhmworkflow /var/lib/lhm-workflow/secrets/approval.key /var/lib/lhm-workflow/secrets/head-production.key /var/lib/lhm-workflow/secrets/production.key
+chmod 0640 /var/lib/lhm-workflow/secrets/approval.key /var/lib/lhm-workflow/secrets/head-production.key /var/lib/lhm-workflow/secrets/production.key
 
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-workflow-*.service "$repo_dir"/packaging/lhm-workflow-*.path /etc/systemd/system/
 systemctl daemon-reload

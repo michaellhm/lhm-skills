@@ -11,6 +11,10 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from .storage import Storage, StorageConfig, digest
+from .departmental_state import (DepartmentalStateStore, new_departmental_state,
+    issue_next_action, record_candidate, record_qa_acceptance,
+    record_lead_acceptance, record_projection, revise_action_inputs)
+from .departmental_state import validate_approval, accept_completion_dossier
 
 
 class ControllerError(ValueError):
@@ -36,6 +40,7 @@ class WorkflowController:
         self.secrets = self.root / "secrets"
         self.adapter_root = self.root.parent / "adapter" if test_mode else self.root / "adapter-incoming"
         self.worker_root = self.adapter_root / "artifacts"
+        self.departmental = DepartmentalStateStore(self.root / "departmental-parents")
         self.verifier_root = self.root.parent / "verifier" if test_mode else self.root / "verifier-results"
         self.expected_adapter_uid = os.getuid() if test_mode else 10005
         self.expected_worker_uid = self.expected_adapter_uid
@@ -44,7 +49,7 @@ class WorkflowController:
                      self.failure_receipts, self.repair_queue, self.diagnostic_queue):
             path.mkdir(parents=True, exist_ok=True, mode=0o750)
         if test_mode:
-            for name in ("adapter.key", "verifier.key", "production.key"):
+            for name in ("adapter.key", "verifier.key", "production.key", "department-lead.key", "projection.key", "approval.key", "head-production.key"):
                 key_path = self.secrets / name
                 if not key_path.exists():
                     key_path.write_bytes(os.urandom(32))
@@ -321,6 +326,37 @@ class WorkflowController:
         if parent is None:
             raise ControllerError("unknown parent")
         return parent
+
+    def departmental_init(self, value: dict) -> dict:
+        state = new_departmental_state(**value)
+        return self.departmental.checkpoint(state, expected_generation=None)
+
+    def departmental_transition(self, parent_id: str, operation: str, payload: dict) -> dict:
+        """Governed CLI boundary: load current state, apply one transition, CAS checkpoint."""
+        current = self.departmental.load(self._safe_name(parent_id))
+        if operation == "complete-dossier":
+            accepted = accept_completion_dossier(current, payload, (self.secrets / "head-production.key").read_bytes())
+            path = self.audit / f"department-completion-{self._safe_name(parent_id)}.json"
+            if path.exists():
+                observed = json.loads(path.read_text())
+                if observed != accepted: raise ControllerError("conflicting completion dossier replay")
+                return observed
+            self._atomic(path, accepted, mode=0o440)
+            return json.loads(path.read_text())
+        generation = current["generation"]
+        action = next((a for a in current["action_register"] if a["status"] not in {"accepted","cancelled","obsolete"}), None)
+        contract = None if action is None else action.get("contract")
+        if operation == "issue":
+            validate_approval(current, (self.secrets / "approval.key").read_bytes())
+            updated, contract = issue_next_action(current, payload.get("child_run_id"))
+        elif operation == "candidate": updated = record_candidate(current, contract, payload, (self.secrets / "adapter.key").read_bytes())
+        elif operation == "qa-accept": updated = record_qa_acceptance(current, contract, payload, (self.secrets / "verifier.key").read_bytes())
+        elif operation == "lead-accept": updated = record_lead_acceptance(current, contract, payload, (self.secrets / "department-lead.key").read_bytes())
+        elif operation == "project": updated = record_projection(current, contract, payload, (self.secrets / "projection.key").read_bytes())
+        elif operation == "revise-inputs": updated = revise_action_inputs(current, payload.get("action_id"), payload.get("accepted_inputs"))
+        else: raise ControllerError("invalid departmental operation")
+        persisted = self.departmental.checkpoint(updated, expected_generation=generation)
+        return {"state": persisted, "contract": contract} if operation == "issue" else persisted
 
     def record_failure(self, failure: dict) -> dict:
         """Record a controller-owned failure decision; workers cannot resume themselves."""

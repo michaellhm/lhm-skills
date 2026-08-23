@@ -18,3 +18,9 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `client-sitemap-plan` — Phased website content plan for an existing client, same architecture without the sales widget.
 
 `google-ads-delivery-qa` — Verify bounded Google Ads evidence, implementation artefacts, approval boundaries and completion before the Lead advances.
+
+`start-seo` — Start or resume the reusable staged SEO department from a governed production envelope.
+
+`seo-page-brief` — Turn accepted SEO research into a bounded, implementation-ready page brief package.
+
+`seo-delivery-qa` — Independently verify SEO scope, evidence, artefact delivery, approval boundaries and completion before the Lead advances.
