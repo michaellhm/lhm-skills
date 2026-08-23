@@ -133,7 +133,7 @@ def make_handoff(event, parent):
         (handoff / 'response').mkdir(mode=0o700)
         for path in (handoff, handoff / 'event.json', handoff / 'parent.json', handoff / 'response'):
             os.chown(path, HERMES_UID, HERMES_GID)
-        return handoff
+        return handoff.resolve()
     except Exception:
         if handoff.exists():
             shutil.rmtree(handoff)
@@ -141,16 +141,6 @@ def make_handoff(event, parent):
 
 
 def invoke(handoff):
-    host_root = HANDOFFS.resolve()
-    supplied = Path(handoff)
-    if not supplied.is_absolute() or supplied != supplied.resolve():
-        raise ValueError('handoff is outside the configured handoff root')
-    try:
-        relative = supplied.relative_to(host_root)
-    except ValueError as exc:
-        raise ValueError('handoff is outside the configured handoff root') from exc
-    if len(relative.parts) != 1 or not SAFE_ID.fullmatch(relative.name):
-        raise ValueError('handoff is outside the configured handoff root')
     container_root = HERMES_HANDOFFS
     try:
         container_relative = container_root.relative_to('/opt/data')
@@ -159,6 +149,17 @@ def invoke(handoff):
     if (not container_root.is_absolute() or container_root != container_root.resolve()
             or container_root != Path('/opt/data') / container_relative):
         raise ValueError('configured container handoff root is outside /opt/data')
+    host_root = HANDOFFS.resolve()
+    supplied_path = Path(handoff)
+    if not supplied_path.is_absolute():
+        raise ValueError('handoff is outside the configured handoff root')
+    supplied = supplied_path.resolve()
+    try:
+        relative = supplied.relative_to(host_root)
+    except ValueError as exc:
+        raise ValueError('handoff is outside the configured handoff root') from exc
+    if len(relative.parts) != 1 or not SAFE_ID.fullmatch(relative.name):
+        raise ValueError('handoff is outside the configured handoff root')
     container_handoff = container_root / relative
     event_path = container_handoff / 'event.json'
     parent_path = container_handoff / 'parent.json'
@@ -174,10 +175,10 @@ def invoke(handoff):
         'If anything is unreadable or you refuse, do not claim transitioned.'
     )
     return subprocess.run([
-        'timeout', '1800', 'docker', 'exec', '-u', f'{HERMES_UID}:{HERMES_GID}', 'hermes',
+        'docker', 'exec', '-u', f'{HERMES_UID}:{HERMES_GID}', 'hermes',
         '/opt/hermes/.venv/bin/hermes', '-p', 'lhm_brain', '--in', str(container_handoff),
         '-z', prompt,
-    ], capture_output=True, text=True)
+    ], capture_output=True, text=True, timeout=1800)
 
 
 def validate_agent_record(record, event, parent_digest):

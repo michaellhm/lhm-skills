@@ -1,0 +1,13 @@
+[Unit]
+Description=LHM closed metadata evidence attestor
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/bin/false
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+RestrictAddressFamilies=AF_UNIX
+SystemCallFilter=@system-service

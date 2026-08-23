@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+import argparse
+from pathlib import Path
+from lhm_workflow.departmental_state import DepartmentalStateStore
+from lhm_workflow.department_snapshot import issue,atomic_dispatch
+p=argparse.ArgumentParser();p.add_argument("parent_run_id");p.add_argument("role",choices=("projection","hop"));a=p.parse_args();root=Path("/var/lib/lhm-workflow");state=DepartmentalStateStore(root/"departmental-parents").load(a.parent_run_id);value=issue(state,a.role,root/"secrets/controller-dispatch.private.pem");print(atomic_dispatch(value,root/"controller-outgoing"))

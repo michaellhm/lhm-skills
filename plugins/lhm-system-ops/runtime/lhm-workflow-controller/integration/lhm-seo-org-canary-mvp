@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+"""Manual, no-delivery trusted-internal SEO organisational canary."""
+import argparse,json,os
+from pathlib import Path
+from lhm_workflow.org_canary import Canary,DEFAULT_ROOT,KEY_NAMES
+from lhm_workflow.client_preflight import DEFAULT_VAULT,require_capability
+
+def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument("event",type=Path); parser.add_argument("parent"); parser.add_argument("config",type=Path)
+    parser.add_argument("--step",action="store_true"); parser.add_argument("--pause-after")
+    parser.add_argument("--root",type=Path,default=DEFAULT_ROOT)
+    parser.add_argument("--vault-root",type=Path,default=DEFAULT_VAULT)
+    args=parser.parse_args(); test=os.environ.get("LHM_WORKFLOW_TEST_MODE")=="1"
+    if os.geteuid()!=0 and not test: raise SystemExit("root canary only")
+    if args.root!=DEFAULT_ROOT and not test: raise SystemExit("root override requires test mode")
+    if args.vault_root!=DEFAULT_VAULT and not test: raise SystemExit("vault override requires test mode")
+    key_path=args.root/"controller.key"; stat=key_path.lstat()
+    expected=os.getuid() if test else 0
+    if key_path.is_symlink() or stat.st_uid!=expected or stat.st_mode&0o077: raise SystemExit("unsafe controller key")
+    key=key_path.read_bytes()
+    if len(key)<32: raise SystemExit("short controller key")
+    event=json.loads(args.event.read_text()); config=json.loads(args.config.read_text())
+    allowed={"client_id","objective","site_property","urls","completed_at","content_required","website_required","timeout_seconds"}
+    required={"client_id","objective","site_property","urls","completed_at","content_required","website_required"}
+    if not isinstance(config,dict) or not required.issubset(config) or set(config)-allowed:
+        raise SystemExit("invalid manual canary config fields")
+    if (not isinstance(config["objective"],str) or not config["objective"].strip()
+            or not isinstance(config["site_property"],str) or not config["site_property"].strip()
+            or not isinstance(config["urls"],list) or not config["urls"]
+            or not all(isinstance(url,str) and url for url in config["urls"])):
+        raise SystemExit("invalid manual canary research scope")
+    if config.get("content_required"): raise SystemExit("Content is disabled in this research-only canary")
+    if config.get("website_required"): raise SystemExit("Website work requires consequential approval and is disabled in this canary")
+    gsc=require_capability(args.vault_root,config["client_id"],"google_search_console",test_mode=test)
+    if gsc.get("route")!="seo_gsc_readonly": raise SystemExit("client_onboarding_required: unsupported GSC route")
+    if gsc.get("identifiers",{}).get("property")!=config["site_property"]:
+        raise SystemExit("client_onboarding_required: configured GSC property does not match workflow scope")
+    needed={"list_sites","batch_url_inspection","search_analytics","list_sitemaps"}
+    if not needed.issubset(set(gsc.get("allowed_operations",[]))):
+        raise SystemExit("client_onboarding_required: GSC read operations are incomplete")
+    canary=Canary(args.root,{role:key for role in KEY_NAMES},trusted_internal=True)
+    canary.research=canary._claude
+    # A progressed parent is the durable resume point. Only create intake state
+    # when this parent does not already exist; Router.initialise intentionally
+    # rejects replacing progressed state with a fresh intake envelope.
+    if not canary.router._path(args.parent).exists():
+        canary.initialise(event,args.parent)
+    state=canary.run(args.parent,config,step=args.step,pause_after=args.pause_after)
+    print(json.dumps({"parent":args.parent,"state":state["state"],"cursor":state["cursor"],"delivery":state["delivery"]},sort_keys=True))
+
+if __name__=="__main__": main()

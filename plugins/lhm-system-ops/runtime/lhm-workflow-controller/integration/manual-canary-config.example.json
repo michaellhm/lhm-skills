@@ -1,0 +1,12 @@
+{
+  "client_id": "local-health-marketing",
+  "objective": "Inspect the admitted URLs using fresh read-only Google Search Console evidence.",
+  "site_property": "REPLACE_WITH_EXACT_GSC_PROPERTY",
+  "urls": [
+    "REPLACE_WITH_EXACT_ADMITTED_URL"
+  ],
+  "completed_at": "REPLACE_WITH_CURRENT_RFC3339_TIMESTAMP",
+  "content_required": false,
+  "website_required": false,
+  "timeout_seconds": 600
+}

@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+REPO_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+export PYTHONPATH="$REPO_DIR/src${PYTHONPATH:+:$PYTHONPATH}"
+if [ "${LHM_WORKFLOW_TEST_MODE:-}" = "1" ]; then
+  PYTHON_BIN=${LHM_WORKFLOW_PYTHON:-python3}
+else
+  PYTHON_BIN=/opt/lhm-workflow/current/venv/bin/python
+fi
+exec "$PYTHON_BIN" -m lhm_workflow.cli "$@"

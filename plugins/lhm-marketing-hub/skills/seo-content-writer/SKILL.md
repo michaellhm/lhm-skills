@@ -31,14 +31,16 @@ Creates search-engine-optimized content that ranks well while providing genuine 
 
 Long-form content (over 300 words or page-level web/blog copy) goes through the 8-pass pipeline. This skill is responsible for:
 
-1. Research and brief construction
-2. Outline planning
-3. Building a `structured_brief` for the content-writer (target keyword, intent, outline, internal/external link targets, client voice notes from `client_profile.md` or product marketing context)
-4. Calling the content-writer agent with `content_type: "blog-post"` and the structured brief
-5. Saving returned content to the agreed output path
-6. Final SEO validation (primary keyword density, internal link count, meta description) where applicable
+1. Validate the accepted research and approved brief supplied for this bounded writing action
+2. Build the `structured_brief` for the content-writer without silently changing the accepted strategy (target keyword, intent, outline, internal/external link targets, and approved voice notes)
+3. Call the content-writer agent with `content_type: "blog-post"` and the structured brief
+4. Save returned content to the exact registered output destination
+5. Read the saved artefact back and return its verified identity
+6. Perform only the completion checks assigned to this writing action; independent SEO/content QA remains a later Lead-dispatched stage
 
 Do not generate the body content directly. Delegate to content-writer.
+
+When invoked by an SEO Lead, this is one bounded writing stage. Do not redo accepted keyword research or page-brief work, do not perform the later independent QA stage, and do not start website implementation. If a required accepted input or registered Drive destination is absent or contradictory, return canonical state `needs_context` to the SEO Lead with the precise gap, Context & Research owner and resume point. Supply legacy `work_state: needs_review` only when an older schema requires it.
 
 ## Instructions
 
@@ -48,7 +50,7 @@ When a user requests SEO content:
 
 Before writing anything, gather voice/style guidelines (anti-AI writing rules, tone docs, brand voice) and confirm all internal page URLs the content should link to. Applying style guidelines or adding links after writing forces a full revision pass that risks introducing errors.
 
-If writing multiple articles in a batch, write and confirm one article at a time. Writing 4+ full articles in a single session risks hitting context limits mid-batch. Vary word count and structure between posts in a batch (mix 1,200-word posts with 1,800-word posts). Identical-length posts with identical section patterns look artificial.
+If writing multiple articles in a batch, write and confirm one article at a time unless the bounded action contract explicitly defines a safe batch. Writing 4+ full articles in a single session risks hitting context limits mid-batch. Vary word count and structure between posts in a batch (mix 1,200-word posts with 1,800-word posts). Identical-length posts with identical section patterns look artificial.
 
 ```markdown
 ### Content Requirements
@@ -217,6 +219,11 @@ See [Content Structure Templates](./references/content-structure-templates.md) f
 - [ ] Internal links included (3-5)
 - [ ] FAQ section present with at least 3 questions
 - [ ] Readability appropriate for target audience
+- [ ] Saved to the exact registered Drive parent and read back successfully when a Drive destination was supplied
+
+## Production handback
+
+Preserve `parent_goal`, `department_goal` and `action_id` in the return. Include each produced artefact's observed file ID, URL, parent folder ID, name/version and readback evidence. Do not report completion when a required artefact was not saved and verified. A desktop working folder or local draft is not a substitute for the registered Google Drive destination.
 
 ## Tips for Success
 

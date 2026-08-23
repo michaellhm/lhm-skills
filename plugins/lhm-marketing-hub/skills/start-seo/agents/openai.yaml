@@ -1,0 +1,4 @@
+interface:
+  display_name: "Start SEO"
+  short_description: "Run staged SEO departmental delivery"
+  default_prompt: "Use $start-seo to start or resume this SEO production goal through one bounded specialist action at a time."

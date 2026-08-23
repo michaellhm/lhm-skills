@@ -64,9 +64,11 @@ Ask the user to provide:
 
 When a user requests keyword research:
 
+If invoked as a bounded production action, preserve the supplied `parent_goal`, `department_goal`, `action_id`, accepted inputs, scope and completion test. Perform keyword research only. Do not continue into page briefs, copywriting, QA or implementation, and do not ask again for context already confirmed in the production envelope.
+
 ### 1. Understand the Context
 
-Ask clarifying questions if not provided:
+Ask clarifying questions only for material context not already supplied:
 - What is your product/service/topic?
 - Who is your target audience?
 - What is your business goal? (traffic, leads, sales)
@@ -197,7 +199,9 @@ Group keywords into content clusters:
 
 ## Output File
 
-Save to: `seo/YYYY-MM/keyword-research-[topic].md`
+For a governed production action, save the report to the exact registered Google Drive destination supplied in `delivery_destinations`; never infer a client folder from its name or rely on the desktop-selected folder. Read the saved file metadata/content back and return its file ID, URL, observed parent folder ID and verification result. If the exact destination is unavailable, return canonical state `needs_context`, name Context & Research as owner, and preserve the exact resume point without claiming completion. Supply legacy `work_state: needs_review` only when required by an older handback schema.
+
+For an interactive legacy session without a registered production envelope, use the agreed client destination and the conventional filename `seo/YYYY-MM/keyword-research-[topic].md`, subject to the delivery artefact contract.
 
 ## Tips
 

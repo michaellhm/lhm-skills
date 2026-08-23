@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+from pathlib import Path
+from lhm_workflow.snapshot_broker import process,quarantine
+ROOT=Path("/var/lib/lhm-workflow")
+for path in sorted((ROOT/"controller-outgoing").glob("*.json")):
+ try:process(path,ROOT,ROOT/"public/controller-dispatch.public.pem")
+ except Exception as exc:quarantine(path,ROOT,str(exc))

@@ -16,7 +16,20 @@ Read the client or project state before execution. Use the exact registered dest
 | Financial workbooks and sensitive financial evidence | Configured governed finance destination |
 | Notifications | Link to the canonical artefact; never become the primary record |
 
-If the exact destination is missing, stop the artefact write, preserve the result in the worker handoff and return `needs_review` with the missing destination or permission. Do not guess.
+If the exact destination is missing, stop the artefact write and preserve the result in the worker handoff. In a governed departmental run return canonical state `needs_context`, name the context owner and preserve the exact resume point. For a legacy non-departmental caller whose schema only supports the older vocabulary, project that state as `work_state: needs_review` while retaining `state: needs_context`. Do not guess.
+
+Reusable skills define the destination fields but do not embed client-specific IDs. The calling context must resolve and pass destinations in this form (additional systems may be included):
+
+```yaml
+delivery_destinations:
+  google_drive:
+    folder_id: "exact registered parent ID"
+    folder_url: "observed registered folder URL"
+    relative_path: "optional governed subfolder"
+    source_record: "canonical record used to resolve it"
+```
+
+Folder names and a desktop-selected working folder are not proof of the canonical destination. File-producing workers must use the exact supplied parent ID and return the observed parent ID on readback.
 
 ## Worker responsibility
 
@@ -25,7 +38,8 @@ The specialist worker that produces the deliverable must:
 1. Save it to the canonical system before claiming completion or requesting approval for consequential execution.
 2. Read the saved file, record or deployment metadata back.
 3. Verify its name, parent/project, version/branch when relevant and observed URL or record ID.
-4. Return the verified reference with `work_state: completed` or `needs_review`.
+4. For Google Drive, verify the file ID, URL and observed parent folder ID by readback.
+5. Return the verified reference with canonical departmental `state` when applicable and the legacy `work_state` projection required by the caller.
 
 Saving an internal draft or report is not approval to publish, deploy, send, merge or change a live advertising/account system. Keep those approval gates separate.
 
@@ -43,6 +57,7 @@ Return:
 - `work_state`: `completed`, `needs_review` or `failed`
 - `artefact_state`: `verified`, `needs_review` or `not_required`
 - `artefact_type`, `canonical_system`, observed URL/ID/path and verification evidence
+- for Drive artefacts: `drive_file_id`, `drive_url`, `observed_parent_folder_id`, version/name and `upload_verified`
 - approval required, next owner and next action
 
 Never report `completed` when a required artefact was not saved and verified.

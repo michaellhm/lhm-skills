@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+import argparse,json,os,pwd
+from pathlib import Path
+from lhm_workflow.org_canary import Canary,DEFAULT_ROOT,load_keys
+def main():
+    p=argparse.ArgumentParser(); p.add_argument("event",type=Path); p.add_argument("parent"); p.add_argument("config",type=Path)
+    p.add_argument("--step",action="store_true"); p.add_argument("--pause-after"); p.add_argument("--root",type=Path,default=DEFAULT_ROOT); a=p.parse_args()
+    test=os.environ.get("LHM_WORKFLOW_TEST_MODE")=="1"
+    if os.geteuid()!=0 and not test: raise SystemExit("root canary only")
+    if a.root!=DEFAULT_ROOT and not test: raise SystemExit("root override requires test mode")
+    event=json.loads(a.event.read_text()); config=json.loads(a.config.read_text())
+    if not test:
+        identity=pwd.getpwnam("lhmorg"); os.setgroups([]); os.setgid(identity.pw_gid); os.setuid(identity.pw_uid)
+    canary=Canary(a.root,load_keys(a.root,test))
+    canary.initialise(event,a.parent); state=canary.run(a.parent,config,step=a.step,pause_after=a.pause_after); print(json.dumps({"parent":a.parent,"state":state["state"],"cursor":state["cursor"]},sort_keys=True))
+if __name__=="__main__": main()

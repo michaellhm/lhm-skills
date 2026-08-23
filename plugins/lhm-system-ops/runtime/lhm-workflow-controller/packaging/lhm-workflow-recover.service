@@ -1,0 +1,36 @@
+[Unit]
+Description=Reconcile incomplete LHM workflow transactions
+After=local-fs.target
+
+[Service]
+Type=oneshot
+User=lhmworkflow
+Group=lhmworkflow
+SupplementaryGroups=lhmadapterkey lhmverifierkey
+UMask=0027
+WorkingDirectory=/opt/lhm-workflow/current
+Environment=PYTHONPATH=/opt/lhm-workflow/current/src PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/lhm-workflow/current/venv/bin/lhm-workflow recover
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+CapabilityBoundingSet=
+SystemCallArchitectures=native
+ReadWritePaths=/var/lib/lhm-workflow
+
+[Install]
+WantedBy=multi-user.target

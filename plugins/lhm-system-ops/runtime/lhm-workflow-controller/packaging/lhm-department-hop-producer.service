@@ -1,0 +1,14 @@
+[Unit]
+Description=LHM isolated Head of Production dossier producer
+[Service]
+Type=oneshot
+User=lhmhop
+Group=lhmhop
+ExecStart=/opt/lhm-workflow/current/venv/bin/python -m lhm_workflow.hop_producer /var/lib/lhm-workflow/hop-requests/request.json /var/lib/lhm-workflow/hop-results/result.json
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/var/lib/lhm-workflow/department-observations /var/lib/lhm-workflow/public /var/lib/lhm-workflow/secrets/hop.private.pem
+ReadWritePaths=/var/lib/lhm-workflow/hop-requests /var/lib/lhm-workflow/hop-results
+RestrictAddressFamilies=AF_UNIX

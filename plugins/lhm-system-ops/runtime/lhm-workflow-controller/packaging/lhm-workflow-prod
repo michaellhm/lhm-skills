@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+unset LHM_WORKFLOW_ROOT LHM_WORKFLOW_TEST_MODE LHM_WORKFLOW_PYTHON LHM_FAULT_INJECT
+export PYTHONPATH=/opt/lhm-workflow/current/src
+exec /opt/lhm-workflow/current/venv/bin/python -m lhm_workflow.cli "$@"

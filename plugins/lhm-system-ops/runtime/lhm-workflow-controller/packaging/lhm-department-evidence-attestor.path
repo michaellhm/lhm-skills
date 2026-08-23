@@ -1,0 +1,5 @@
+[Unit]
+Description=Disabled pending rootful evidence attestor rehearsal
+[Path]
+PathExists=/var/lib/lhm-workflow/evidence-attestor-disabled
+Unit=lhm-department-evidence-attestor.service

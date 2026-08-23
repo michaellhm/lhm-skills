@@ -1,0 +1,14 @@
+[Unit]
+Description=LHM isolated projection producer
+[Service]
+Type=oneshot
+User=lhmprojection
+Group=lhmprojection
+ExecStart=/opt/lhm-workflow/current/venv/bin/python -m lhm_workflow.projection_producer /var/lib/lhm-workflow/projection-requests/request.json /var/lib/lhm-workflow/projection-results/result.json
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadOnlyPaths=/var/lib/lhm-workflow/department-observations /var/lib/lhm-workflow/public /var/lib/lhm-workflow/secrets/projection.private.pem
+ReadWritePaths=/var/lib/lhm-workflow/projection-requests /var/lib/lhm-workflow/projection-results
+RestrictAddressFamilies=AF_UNIX

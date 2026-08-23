@@ -1,0 +1,8 @@
+{
+  "source": "hermes-cron-alternate",
+  "source_cron_id": "3994012c42ba",
+  "job_name": "LHM weekly SEO rollout — manual no-delivery canary",
+  "prompt": "Run the governed read-only weekly SEO evidence review.",
+  "delivery": "none",
+  "triggered_at": "REPLACE_WITH_CURRENT_RFC3339_TIMESTAMP"
+}

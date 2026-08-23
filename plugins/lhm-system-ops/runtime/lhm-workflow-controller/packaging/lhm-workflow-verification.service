@@ -1,0 +1,33 @@
+[Unit]
+Description=Consume independently verified LHM workflow results
+
+[Service]
+Type=oneshot
+User=lhmworkflow
+Group=lhmworkflow
+SupplementaryGroups=lhmadapterkey lhmverifierkey
+UMask=0027
+WorkingDirectory=/opt/lhm-workflow/current
+Environment=PYTHONPATH=/opt/lhm-workflow/current/src PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/lhm-workflow/current/venv/bin/python -m lhm_workflow.daemon verification-scan
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+CapabilityBoundingSet=
+SystemCallArchitectures=native
+ReadOnlyPaths=/var/lib/lhm-workflow/secrets
+ReadWritePaths=/var/lib/lhm-workflow/verifier-results /var/lib/lhm-workflow/verifier-requests /var/lib/lhm-workflow/parents /var/lib/lhm-workflow/wal /var/lib/lhm-workflow/locks /var/lib/lhm-workflow/operations /var/lib/lhm-workflow/processed /var/lib/lhm-workflow/quarantine /var/lib/lhm-workflow/audit /var/lib/lhm-workflow/controller.lock

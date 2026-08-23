@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://localhealthmarketing.com.au/schemas/departmental-state-v1.json",
+  "title": "LHM one-action departmental state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generation", "parent_run_id", "department", "parent_goal", "department_goal", "state", "action_register"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "generation": {"type": "integer", "minimum": 0},
+    "parent_run_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$"},
+    "department": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$"},
+    "parent_goal": {"type": "string", "minLength": 1},
+    "department_goal": {"type": "string", "minLength": 1},
+    "state": {"enum": ["ready", "worker_running", "qa_accepted", "lead_accepted", "department_accepted", "failed"]},
+    "action_register": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["position", "action_id", "version", "dependencies", "objective", "required_skills", "accepted_inputs", "required_output", "dispatch_envelope", "input_digest", "stable_action_key", "status", "child_run_id", "contract", "candidate", "qa_receipt", "lead_acceptance", "projection_receipt"],
+        "properties": {
+          "position": {"type": "integer", "minimum": 0},
+          "action_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$"},
+          "version": {"type": "integer", "minimum": 1},
+          "dependencies": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "objective": {"type": "string", "minLength": 1},
+          "required_skills": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+          "accepted_inputs": {"type": "array"},
+          "required_output": {"enum": ["durable", "non_durable"]},
+          "dispatch_envelope": {
+            "type": "object", "additionalProperties": false,
+            "required": ["delivery_parent_id", "permission_ceiling", "completion_test", "basicops_task_id", "basicops_dedupe_key", "discussion_payload", "no_subtasks", "constraints", "return_role", "return_point", "approval"],
+            "properties": {
+              "delivery_parent_id": {"type": "string", "minLength": 1},
+              "permission_ceiling": {"enum": ["green", "amber"]},
+              "completion_test": {"type": "array", "minItems": 1},
+              "basicops_task_id": {"type": "string", "minLength": 1},
+              "basicops_dedupe_key": {"type": "string", "minLength": 1},
+              "discussion_payload": {"type": "object", "additionalProperties": false, "required": ["Goal", "Outcome", "Milestones", "Actions", "Artefacts", "Dependencies", "Completion", "Next handoff"], "properties": {"Goal": {}, "Outcome": {}, "Milestones": {}, "Actions": {}, "Artefacts": {}, "Dependencies": {}, "Completion": {}, "Next handoff": {}}},
+              "no_subtasks": {"const": true},
+              "constraints": {"type": "array"},
+              "return_role": {"type": "string", "minLength": 1},
+              "return_point": {"type": "string", "minLength": 1},
+              "approval": {"type": "object", "additionalProperties": false, "required": ["required", "receipt", "superseded_by_version"], "properties": {"required": {"type": "boolean"}, "receipt": {"type": ["object", "null"]}, "superseded_by_version": {"type": ["integer", "null"], "minimum": 1}}}
+            }
+          },
+          "input_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "stable_action_key": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "status": {"enum": ["waiting", "ready", "running", "qa_accepted", "lead_accepted", "accepted", "cancelled", "obsolete"]},
+          "child_run_id": {"type": ["string", "null"]},
+          "candidate": {"type": ["object", "null"]},
+          "qa_receipt": {"type": ["object", "null"]},
+          "lead_acceptance": {"type": ["object", "null"]},
+          "projection_receipt": {"type": ["object", "null"]},
+          "contract": {"type": ["object", "null"]}
+        }
+      }
+    }
+  }
+}
