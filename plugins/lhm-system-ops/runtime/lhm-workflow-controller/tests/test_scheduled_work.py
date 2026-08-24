@@ -137,3 +137,9 @@ def test_installer_and_rollback_cover_scheduled_work_units():
     for unit in ("lhm-scheduled-work.service", "lhm-scheduled-work.path"):
         assert unit in installer
         assert unit in rollback
+
+
+def test_host_ingress_binds_installed_controller_source():
+    launcher = (ROOT / "integration" / "lhm-scheduled-work-ingress").read_text()
+    assert "export PYTHONPATH=/opt/lhm-workflow/current/src" in launcher
+    assert "unset LHM_WORKFLOW_ROOT LHM_WORKFLOW_TEST_MODE" in launcher
