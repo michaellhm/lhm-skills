@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""Host-side validator and dispatcher for container-authored schedule requests."""
+import json
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+from pathlib import Path
+
+BASE = Path("/home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-work")
+INCOMING, PROCESSED, FAILED, RUNS = (BASE / name for name in ("incoming", "processed", "failed", "runs"))
+INGRESS = "/usr/local/libexec/lhm-scheduled-work-ingress"
+SAFE = re.compile(r"^[a-z0-9][a-z0-9-]{0,79}$")
+
+
+def atomic(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(value, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+        os.chmod(temporary, 0o640)
+        os.replace(temporary, path)
+    finally:
+        Path(temporary).unlink(missing_ok=True)
+
+
+def validate(request, filename):
+    if not isinstance(request, dict) or set(request) != {"schema_version", "workflow_key", "parent_run_id", "event"}:
+        raise ValueError("invalid scheduled request schema")
+    if request["schema_version"] != 1 or not SAFE.fullmatch(request.get("workflow_key", "")):
+        raise ValueError("invalid scheduled request")
+    parent = request.get("parent_run_id", "")
+    if not SAFE.fullmatch(parent) or filename != f"{parent}.json":
+        raise ValueError("invalid scheduled request identity")
+    event = request.get("event")
+    required = {"source", "source_cron_id", "job_name", "prompt", "delivery", "triggered_at"}
+    if not isinstance(event, dict) or set(event) != required or event["source"] != "hermes-cron-alternate" or event["delivery"] != "none":
+        raise ValueError("invalid scheduled event")
+    if not all(isinstance(event[key], str) and event[key] for key in required):
+        raise ValueError("invalid scheduled event value")
+    return request
+
+
+def process(path, runner=subprocess.run):
+    request = validate(json.loads(path.read_text(encoding="utf-8")), path.name)
+    run_dir = RUNS / request["parent_run_id"]
+    event_path = run_dir / "event.json"
+    run_dir.mkdir(parents=True, exist_ok=True, mode=0o750)
+    atomic(event_path, request["event"])
+    done = runner(
+        [INGRESS, request["workflow_key"], str(event_path), request["parent_run_id"]],
+        capture_output=True, text=True, timeout=120,
+    )
+    if done.returncode:
+        raise RuntimeError((done.stderr or done.stdout)[-1000:])
+    receipt = json.loads(done.stdout)
+    atomic(run_dir / "final.json", {"schema_version": 1, "scheduler": "accepted", "receipt": receipt})
+    shutil.move(path, PROCESSED / path.name)
+    return receipt
+
+
+def main():
+    for directory in (INCOMING, PROCESSED, FAILED, RUNS):
+        directory.mkdir(parents=True, exist_ok=True)
+    for path in sorted(INCOMING.glob("*.json")):
+        try:
+            process(path)
+        except Exception as exc:
+            atomic(FAILED / f"{path.stem}.json", {"schema_version": 1, "scheduler": "failed", "error": str(exc)[-1000:]})
+            shutil.move(path, PROCESSED / path.name)
+
+
+if __name__ == "__main__":
+    main()

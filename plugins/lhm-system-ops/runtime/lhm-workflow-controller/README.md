@@ -5,6 +5,25 @@ Host-enforced orchestration for the fixed `seo-content-astro-v1` production work
 This service owns durable workflow state and accepts only host-derived evidence. Workers cannot
 advance parent state or self-verify completion.
 
+## Shared scheduled-work ingress
+
+`lhm_workflow.scheduled_work` is the reusable boundary for recurring Hermes work. A cron is a
+thin container-visible trigger: it writes a closed request into the shared Hermes volume. A
+root-owned path service validates that request, supplies the trusted event and stable parent ID to
+the host ingress, while the root-owned
+`scheduled-workflows.json` registry supplies the department, permission ceiling, authoritative
+destinations, reviewer and completion test. The ingress rejects unregistered cron/job pairs,
+persists the parent atomically, reads it back, and treats an identical replay as accepted without
+creating another parent.
+
+The SEO job is the first registered consumer. Its wrapper contains only its registered identity and
+objective; Chief of
+Staff, Production, specialist and independent-verifier routing remain in the shared controller.
+Future scheduled work adds a reviewed registry definition and an existing departmental handler,
+not another retry, persistence, QA or recovery implementation. Scheduler acceptance remains
+separate from business completion: a successfully queued parent reports `accepted/running`, while
+capability and approval states remain non-success until the durable parent reaches closure.
+
 ## Client preflight release
 
 The `lhm-seo-org-canary-mvp` entry point requires a canonical Obsidian client record before

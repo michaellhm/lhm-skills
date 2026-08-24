@@ -29,7 +29,7 @@ check_user lhmprojection 10007; check_user lhmhop 10008
 check_group lhmdepartmentqa 10009; check_group lhmdepartmentlead 10010
 check_user lhmdepartmentqa 10009; check_user lhmdepartmentlead 10010
 
-units='lhm-workflow-bridge.path lhm-workflow-adapter.path lhm-workflow-stage.path lhm-workflow-verifier.path lhm-workflow-verification.path lhm-workflow-recover.service'
+units='lhm-workflow-bridge.path lhm-workflow-adapter.path lhm-workflow-stage.path lhm-workflow-verifier.path lhm-workflow-verification.path lhm-workflow-recover.service lhm-scheduled-work.path'
 department_units='lhm-department-evidence-attestor.path lhm-department-qa-producer.path lhm-department-lead-producer.path lhm-department-connector-translator.path lhm-department-snapshot-broker.path lhm-department-projection-producer.path lhm-department-hop-producer.path lhm-department-projection-import.path lhm-department-hop-import.path'
 systemctl disable --now $units 2>/dev/null || true
 systemctl disable --now $department_units 2>/dev/null || true
@@ -70,6 +70,8 @@ ln -sfn "releases/$release_id" /opt/lhm-workflow/current.new
 mv -Tf /opt/lhm-workflow/current.new /opt/lhm-workflow/current
 
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow
+install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/scheduled-intake
+install -d -o root -g root -m 0755 /etc/lhm-workflow
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/departmental-parents
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/artifacts /var/lib/lhm-workflow/seo-envelope /var/lib/lhm-workflow/seo-failures
 install -d -o root -g root -m 0750 /var/lib/lhm-workflow/department-observations
@@ -142,6 +144,14 @@ install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-department-*.service "
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-department-snapshot-dispatch "$repo_dir"/integration/lhm-department-snapshot-broker "$repo_dir"/integration/lhm-department-result-importer /usr/local/libexec/
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-seo-envelope-runtime /usr/local/libexec/lhm-seo-envelope-runtime
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-workflow-registered-adapter /usr/local/libexec/lhm-workflow-registered-adapter
+install -o root -g root -m 0755 "$repo_dir"/integration/lhm-scheduled-work-ingress /usr/local/libexec/lhm-scheduled-work-ingress
+install -o root -g root -m 0755 "$repo_dir"/integration/lhm-scheduled-work-runtime /usr/local/libexec/lhm-scheduled-work-runtime
+install -D -o root -g root -m 0755 "$repo_dir"/integration/lhm-scheduled-work-dispatch /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-scheduled-work-dispatch
+install -D -o root -g root -m 0755 "$repo_dir"/integration/lhm-seo-org-cron-alternate /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-seo-org-cron-alternate
+install -o root -g root -m 0644 "$repo_dir"/integration/scheduled-workflows.json /etc/lhm-workflow/scheduled-workflows.json
+scheduled_base=/home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-work
+install -d -o root -g 10000 -m 0730 "$scheduled_base/incoming"
+for d in processed failed runs; do install -d -o root -g root -m 0750 "$scheduled_base/$d"; done
 systemctl daemon-reload
 systemd-analyze verify /etc/systemd/system/lhm-workflow-*.service /etc/systemd/system/lhm-workflow-*.path
 if test "$enable_units" = 1; then

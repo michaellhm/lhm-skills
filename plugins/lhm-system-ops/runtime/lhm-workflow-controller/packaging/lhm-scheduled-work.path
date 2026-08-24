@@ -1,0 +1,7 @@
+[Unit]
+Description=Watch registered Hermes scheduled-work requests
+[Path]
+DirectoryNotEmpty=/home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-work/incoming
+Unit=lhm-scheduled-work.service
+[Install]
+WantedBy=multi-user.target
