@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-shared-scheduled-ingress-20260825-r2",
-  "version": "0.1.8",
+  "release_id": "lhm-workflow-controller-shared-scheduled-ingress-20260825-r3",
+  "version": "0.1.9",
   "source_baseline": "main-8c0da39-plus-reviewed-seo-envelope",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -19,7 +19,7 @@
     "disabled_by_default_path_activation_and_rollback",
     "explicit_scheduled_unit_install_and_rollback_coverage"
   ],
-  "source_tree_sha256_excluding_manifest": "369118a257e9d1c79d12155a9b1be25ad99abf6504e56ebe06120fb0f140860f",
+  "source_tree_sha256_excluding_manifest": "f284c259e2996c9fa5a2f19591dca31f4c654bae0b64feda01f8ef997dd78fd3",
   "critical_files": {
     "src/lhm_workflow/seo_envelope_runtime.py": "ef55bce61485239187f3c4885227f8efb878c4d77dde6ef0cfeee2a0877e77a6",
     "src/lhm_workflow/cli.py": "e4f71176072050f42d519d272ede8a7d5269d6c365db090e8d00c9ef2e131f18",
