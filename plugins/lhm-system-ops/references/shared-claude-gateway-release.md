@@ -1,10 +1,12 @@
 # Shared Claude gateway release boundary
 
-The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. Release 0.9.7 was prepared on 2026-08-26 from the governed 0.9.6 source. The admitted predecessor hashes are the 0.9.6 dispatcher `88191722…`, worker `cf25ea01…`, dispatch unit `bf840874…`, gateway ACL drop-in `41016cd8…`, and container client `612f711b…`.
+The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. Release 0.9.8 adds the disabled-by-default live-artifact bridge to deployed 0.9.7. The exact admitted 0.9.7 predecessors are dispatcher `0d0700f2…`, worker `cf25ea01…`, dispatch unit `bf840874…`, gateway ACL drop-in `41016cd8…`, and container client `e2e6ec2a…`.
+
+The bridge accepts only opaque identifiers through a write-only, non-listable spool. Root alone derives protected Hermes run paths and validates the exact current specialist `final.json`, `skill-provenance.json`, and unchanged `result.md` through no-follow descriptors. It produces content-addressed workflow artifacts and an adapter-incoming handback. It does not publish to Drive; Drive remains a separate exact-folder connector stage.
 
 These assets are distinct from the additive `lhm-evidence-claude-*` gateways. No evidence-bridge installer may overwrite the shared dispatcher or worker.
 
-Release 0.9.7 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.69.
+Release 0.9.8 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.69.
 It supervises each worker for its full lifecycle. The root dispatcher maintains
 only execute access for `claudeworker` and `codexworker` on the two named profile ancestors; the
 Claude process still runs as `claudeworker`, and its only write grant is the validated canonical

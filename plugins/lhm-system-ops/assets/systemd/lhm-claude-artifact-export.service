@@ -1,0 +1,15 @@
+[Unit]
+Description=Export protected CAP-015 terminal artifacts to LHM workflow
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/local/libexec/lhm-claude-artifact-exporter
+TimeoutStartSec=610
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=yes
+ReadOnlyPaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/claude/runs
+ReadWritePaths=/var/lib/lhm-workflow/claude-artifact-export /var/lib/lhm-workflow/adapter-incoming
