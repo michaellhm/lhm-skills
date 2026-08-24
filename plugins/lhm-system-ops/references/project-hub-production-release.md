@@ -1,7 +1,7 @@
 # Project Hub immutable production release
 
 Project Hub is installed separately from the mutable `/home/hermes/.hermes/lhm-skills` checkout.
-The supported target for this release is `lhm-project-hub` 0.1.73. Never `git pull` or copy files
+The supported target for this release is `lhm-project-hub` 0.1.74. Never `git pull` or copy files
 into the live shared checkout as a deployment mechanism.
 
 Immutable releases live below the root-owned host tree
@@ -29,11 +29,11 @@ From the reviewed, clean, exact commit:
 
 ```text
 python3 plugins/lhm-system-ops/scripts/build_project_hub_release.py \
-  --output /var/lib/lhm-plugin-releases/lhm-project-hub-0.1.73.zip
+  --output /var/lib/lhm-plugin-releases/lhm-project-hub-0.1.74.zip
 ```
 
 Record the emitted commit and SHA-256. The builder reads only tracked bytes from `HEAD`, assigns a
-fixed ZIP timestamp and mode, and refuses a dirty checkout or any version other than 0.1.73.
+fixed ZIP timestamp and mode, and refuses a dirty checkout or any version other than 0.1.74.
 
 ## Install approval
 
@@ -53,8 +53,8 @@ chown root:root /etc/lhm-plugin-approvals/project-hub-approval.key
 chmod 0600 /etc/lhm-plugin-approvals/project-hub-approval.key
 ```
 
-For deployer release 1.0.4 the first command must return
-`97ee7aaf363dc209d885e715a23649a3e776acf16582482f6a45506f8d9ae88c`; otherwise stop.
+For deployer release 1.0.5 the first command must return
+`ae62e3323ea9834ed9c6778964c8063db686b13f6b87e3b4ffbc88cee8a18af0`; otherwise stop.
 
 This bootstrap does not install Project Hub and must not enable a service. Record the installed
 executable hash and keep the System Ops rollback available.
@@ -65,7 +65,7 @@ Michael or the delegated approver creates one root-owned `0600` record at
 ```json
 {
   "schema_version": 3,
-  "approval_id": "project-hub-0.1.73-install",
+  "approval_id": "project-hub-0.1.74-install",
   "action": "install",
   "repository": "michaellhm/lhm-skills",
   "commit": "FULL_COMMIT_SHA",
@@ -83,7 +83,7 @@ Michael or the delegated approver creates one root-owned `0600` record at
 The root operator signs the exact closed-schema record without exposing the key:
 
 ```text
-/usr/local/libexec/lhm-approved-project-hub-deployer sign project-hub-0.1.73-install
+/usr/local/libexec/lhm-approved-project-hub-deployer sign project-hub-0.1.74-install
 ```
 
 The HMAC covers schema, action, repository, exact commit, archive digest, plugin, profile,
@@ -96,8 +96,8 @@ After separate install approval, run as root:
 
 ```text
 /usr/local/libexec/lhm-approved-project-hub-deployer install \
-  project-hub-0.1.73-install \
-  /var/lib/lhm-plugin-releases/lhm-project-hub-0.1.73.zip
+  project-hub-0.1.74-install \
+  /var/lib/lhm-plugin-releases/lhm-project-hub-0.1.74.zip
 ```
 
 The deployer verifies the allowlisted repository, clean exact commit, plugin identity/version,
