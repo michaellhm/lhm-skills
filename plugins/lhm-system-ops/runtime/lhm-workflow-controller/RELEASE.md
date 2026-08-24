@@ -1,6 +1,16 @@
-# LHM SEO client-preflight release — 2026-08-22
+# LHM SEO capability-envelope release — 2026-08-24
 
-Release version: `0.1.4`.
+Release version: `0.1.5`.
+
+## SEO-01 envelope
+
+- Corrects the canonical tracker to `30 Projects/LHM Growth/LHM Website SEO Growth Rollout/rollout-state.md` and retains CAS plus exact readback.
+- Pins the existing immutable Marketing Hub 2.2.2 archive and exact hashes for the only admitted specialist skills: `keyword-research`, then `seo-delivery-qa`.
+- Binds local-health-marketing GSC read-only access, Drive `seo/` new-Markdown create/readback, and the exact BasicOps workspace/project/section/task discussion route.
+- Requires degraded-evidence labels for unavailable Keywords Everywhere and Google Ads; neither may be inferred.
+- Separates Lead acceptance and canonical, Drive, and BasicOps readback projections before stop.
+- Allows one same-key safe retry, then one immutable parent-bound incident and immediate failure receipt, with no diagnostic redispatch or search loop.
+- Keeps snapshot and projection services disabled pending reviewed deployment approval.
 
 ## Provenance
 

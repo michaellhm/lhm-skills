@@ -24,7 +24,7 @@ def test_manual_step_restart_no_website_no_delivery_and_complete_bundle(tmp_path
     assert state["state"]=="closed" and "website" not in state["stage_order"]
     assert state["delivery"]=={"channel":"suppressed_canary","status":"suppressed"}
     bundle=json.loads((tmp_path/"evidence/canary-1.json").read_text()); assert bundle["parent_sha256"] and bundle["artifact_hashes"]
-    assert (tmp_path/"vault/30 Projects/LHM Website SEO Growth Rollout/rollout-state.md").is_file()
+    assert (tmp_path/"vault/30 Projects/LHM Growth/LHM Website SEO Growth Rollout/rollout-state.md").is_file()
 
 def test_pause_after_and_content_fails_closed_without_adapter(tmp_path,monkeypatch):
     c=make_canary(tmp_path,monkeypatch); c.initialise(cron(),"canary-2")

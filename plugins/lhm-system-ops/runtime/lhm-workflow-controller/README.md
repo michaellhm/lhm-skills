@@ -31,6 +31,14 @@ materialised only after all four complete. The `department-*` CLI commands expos
 path. The fixed SEO canary and client-preflight path remain
 unchanged until a separately governed pilot adopts this contract.
 
+The source-only SEO-01 pilot envelope in `seo_capability_envelope` pins Marketing Hub 2.2.2 and
+admits only `keyword-research` followed by `seo-delivery-qa`. It binds the registered LHM GSC
+property, Drive folder, BasicOps hierarchy/task, and corrected canonical tracker path. Keywords
+Everywhere and Google Ads are explicitly unavailable and every result must retain the degraded
+evidence label. Canonical-state, Drive, and BasicOps projections are separate, ordered exact
+readback transitions. `seo-envelope-deployment.json` keeps snapshot and projection services off
+until reviewed and separately approved for deployment.
+
 Drive observations, QA acceptance, Lead acceptance, and final projection are closed HMAC-sealed
 role receipts. Durable outputs require an exact file/parent/content/readback receipt. Non-durable
 actions must declare that contractually and return a structured `not_required` reason. Projection

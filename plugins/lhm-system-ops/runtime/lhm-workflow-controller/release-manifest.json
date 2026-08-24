@@ -1,33 +1,25 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-client-preflight-20260822-r4-proof1",
-  "version": "0.1.4",
-  "source_baseline": "rc10-audited-tree",
-  "manual_proof": {
-    "parent_run_id": "lhm-seo-onboarding-20260822-070717",
-    "evidence_sha256": "6193b923f2464599c6755a1f4f0198f781224c8b6a2d922228c38f59b03df577"
-  },
+  "release_id": "lhm-workflow-controller-seo-envelope-20260824-r1",
+  "version": "0.1.5",
+  "source_baseline": "main-efc1618",
   "changes": [
-    "client_capability_preflight",
-    "supervisor_creates_governed_run_directory",
-    "parent_namespaced_tracker_artifact",
-    "strict_parent_scoped_evidence_bundle",
-    "hashed_safe_preflight_evidence",
-    "portable_linux_owner_regression",
-    "vault_owner_and_root_evidence_split"
+    "corrected_canonical_tracker_path",
+    "seo_01_closed_capability_envelope",
+    "marketing_hub_2_2_2_skill_hash_allowlist",
+    "registered_gsc_drive_basicops_bindings",
+    "ordered_specialist_and_projection_readbacks",
+    "single_retry_single_incident_fail_fast",
+    "disabled_default_snapshot_projection_services"
   ],
-  "source_tree_sha256_excluding_manifest": "b3a77ef41484b7ed1a0354eb5142cfc317cc44c6d5345f64a76c1287097ce1fa",
+  "source_tree_sha256_excluding_manifest": "be72ba6a0b9f6707908af457446ec494f2b082f2c7e4f23f43b1020c13a31801",
   "critical_files": {
-    "src/lhm_workflow/client_preflight.py": "14c8871b73136b0e0b8f01acc4cbe0408b49d3b2185e285e1918638b4e18be8c",
-    "src/lhm_workflow/org_canary.py": "44e1722d62da019e4369c60d2c41b2660cf33a4edfa737a215597b6fdcd769eb",
-    "integration/lhm-seo-org-canary-mvp": "c061405b10374ed84a9d1da4720c862133f0432566321294cd32a365af76885f",
-    "integration/lhm_claude_trusted_supervisor.py": "4441d4fe4244045b8262c39b1ad4675f6a2e1fb55fa12ef27977776f108f5d2e",
-    "tests/test_client_preflight.py": "0afdc0dfd1ef250035651626e18e71a6d77aa054ba8b44b2ee70bf4fde7e1633",
-    "tests/test_org_canary.py": "24f6e2a737d0615e6d74a3cb035f50d5cb42b60a6a7d20f1dfe3a86e03938f17",
-    "tests/test_org_canary_mvp.py": "0d38dd1c58b6aa65ade3dee32cf5e418ece8e386a51486a22ef8b0c52546af24",
-    "tests/test_release_blockers_adversarial.py": "34ceeae5e430d0d917f2ce1a983b69ce014e3f9f9af8b117de17fc416a501dad"
+    "src/lhm_workflow/seo_capability_envelope.py": "250427785c79c28d9c6c7881a83ec908db50eda6d1196d2f90b840fb1b693683",
+    "src/lhm_workflow/tracker_connector.py": "c0e1a6bf4c22a230907ce2e1249b5f17543183ef5fac3435662c0d58ebc7d514",
+    "tests/test_seo_capability_envelope.py": "bfd24fee21d1f68c7474c8a86ca8169f65dfb5c5f6b5af56678512a0c455d576",
+    "seo-envelope-deployment.json": "c744b9a443285241e80d65c56d20a01de067a554261ce6bc92a1f96db038450d"
   },
-  "activation_state": "source_only",
+  "activation_state": "source_only_disabled",
   "cron_changed": false,
   "watchers_changed": false,
   "live_services_changed": false
