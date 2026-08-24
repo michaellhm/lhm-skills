@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from .controller import ControllerError, WorkflowController
+from .tracker_connector import TrackerConnector
 
 
 def _controller() -> WorkflowController:
@@ -44,6 +45,16 @@ def main() -> None:
             result = ctl.departmental_init(_stdin_json())
         elif command == "department-status" and len(sys.argv) == 3:
             result = ctl.departmental.load(sys.argv[2])
+        elif command == "tracker-cas-readback" and len(sys.argv) == 3:
+            vault_override = os.environ.get("LHM_TRACKER_VAULT")
+            if vault_override:
+                if os.environ.get("LHM_WORKFLOW_TEST_MODE") != "1":
+                    raise ControllerError("tracker vault override requires test mode")
+                vault = Path(vault_override).resolve()
+            else:
+                vault = Path("/home/hermes/.hermes/profiles/lhm_brain/vault")
+            receipt, _ = TrackerConnector(vault).append_structured(_stdin_json(), sys.argv[2])
+            result = {"path": str(TrackerConnector(vault).path.relative_to(vault)), "sha256": receipt["sha256"], "readback_sha256": receipt["sha256"], "cas": True}
         elif command in {"department-issue", "department-candidate", "department-qa-accept", "department-lead-accept", "department-project", "department-revise-inputs", "department-complete-dossier", "department-approval-event"} and len(sys.argv) == 3:
             result = ctl.departmental_transition(sys.argv[2], command.removeprefix("department-"), _stdin_json())
         elif command == "recover" and len(sys.argv) == 2:

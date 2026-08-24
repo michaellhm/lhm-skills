@@ -7,7 +7,7 @@ import json
 import re
 from pathlib import Path
 
-TRACKER_RELATIVE=Path("30 Projects/LHM Website SEO Growth Rollout/rollout-state.md")
+TRACKER_RELATIVE=Path("30 Projects/LHM Growth/LHM Website SEO Growth Rollout/rollout-state.md")
 
 
 def sha(raw: bytes) -> str: return hashlib.sha256(raw).hexdigest()

@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+"""Root-owned argv adapter for the two registered CLIs; no shell or connector expansion."""
+import hashlib
+import json
+import subprocess
+import sys
+
+DISPATCH = "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
+CONTROLLER = "/opt/lhm-workflow/current/venv/bin/lhm-workflow"
+
+request = json.load(sys.stdin)
+if set(request) != {"schema_version", "operation", "argv", "binding"} or request["schema_version"] != 1:
+    raise SystemExit(2)
+operation, argv = request["operation"], request["argv"]
+if operation == "claude_dispatch":
+    allowed = {"submit-seo-gsc-readonly", "submit-specialist-readonly", "submit-google-drive-client-file-create", "submit-basicops-task-discussion-update"}
+    if not isinstance(argv, list) or len(argv) < 2 or argv[0] != DISPATCH or argv[1] not in allowed:
+        raise SystemExit(3)
+    done = subprocess.run(argv, text=True, capture_output=True, timeout=610, check=False)
+elif operation == "department_lead_accept":
+    if not isinstance(argv, list) or len(argv) != 4 or argv[:2] != [CONTROLLER, "department-lead-accept"]:
+        raise SystemExit(3)
+    done = subprocess.run(argv[:3], input=argv[3], text=True, capture_output=True, timeout=30, check=False)
+elif operation == "tracker_cas_readback":
+    if not isinstance(argv, list) or len(argv) != 4 or argv[:2] != [CONTROLLER, "tracker-cas-readback"]:
+        raise SystemExit(3)
+    done = subprocess.run(argv[:3], input=argv[3], text=True, capture_output=True, timeout=30, check=False)
+else:
+    raise SystemExit(3)
+if done.returncode:
+    raise SystemExit(4)
+lines = [line for line in done.stdout.splitlines() if line.strip().startswith("{")]
+if not lines:
+    raise SystemExit(4)
+result = json.loads(lines[-1])
+receipt = {"schema_version": 1, "operation": operation, "binding": request["binding"], "result": result}
+receipt["receipt_sha256"] = hashlib.sha256(json.dumps(result, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+print(json.dumps(receipt, sort_keys=True))

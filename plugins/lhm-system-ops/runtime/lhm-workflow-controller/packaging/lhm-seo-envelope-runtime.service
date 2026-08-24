@@ -1,0 +1,23 @@
+[Unit]
+Description=LHM bounded SEO departmental envelope (disabled by default)
+ConditionPathExists=/var/lib/lhm-workflow/seo-envelope/request.json
+
+[Service]
+Type=oneshot
+User=lhmworkflow
+Group=lhmworkflow
+Environment=LHM_WORKFLOW_ADAPTER=/usr/local/libexec/lhm-workflow-registered-adapter
+ExecStart=/usr/local/libexec/lhm-seo-envelope-runtime
+StandardInput=file:/var/lib/lhm-workflow/seo-envelope/request.json
+StandardOutput=file:/var/lib/lhm-workflow/seo-envelope/result.json
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/lhm-workflow
+RestrictAddressFamilies=AF_UNIX
+LockPersonality=true
+MemoryDenyWriteExecute=true
+
+[Install]
+# Deliberately no WantedBy: callable only by an explicit approved systemctl start.

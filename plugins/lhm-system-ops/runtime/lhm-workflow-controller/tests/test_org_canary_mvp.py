@@ -32,7 +32,7 @@ def test_trusted_internal_manual_canary_exact_once_and_readback(tmp_path,monkeyp
     assert "website" not in state["stage_order"]
     assert state["delivery"]=={"channel":"suppressed_canary","status":"suppressed"}
     assert (tmp_path/"evidence/mvp-canary-1.json").is_file()
-    tracker=(tmp_path/"vault/30 Projects/LHM Website SEO Growth Rollout/rollout-state.md").read_text()
+    tracker=(tmp_path/"vault/30 Projects/LHM Growth/LHM Website SEO Growth Rollout/rollout-state.md").read_text()
     assert tracker.count("## Governed run mvp-canary-1")==1
 
 def test_mvp_executable_rejects_website(tmp_path,monkeypatch):

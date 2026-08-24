@@ -44,7 +44,7 @@ def test_container_client_is_governed_at_exact_bind_mount_target():
     client = MANIFEST["assets"]["container_client"]
     assert client["destination"] == "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch"
     assert client["container_destination"] == "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
-    assert client["previous_sha256"] == "cf9eff5237b2525744f710b663b4d82c8b77a47bba1dbb95711024508f4dc961"
+    assert client["previous_sha256"] == "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac"
     assert client["owner"] == client["group"] == 10000
     assert client["mode"] == "0755"
 
@@ -159,6 +159,10 @@ def test_seo_lead_route_is_distinct_and_preserves_existing_seo_contracts():
     dispatcher = load_dispatcher()
     assert dispatcher.SPECIALIST_ROUTES["seo-lead"] == ("lhm-marketing-hub:seo", "seo")
     assert dispatcher.SPECIALIST_SKILLS["seo-lead"] == "lhm-marketing-hub:start-seo"
+    assert dispatcher.SPECIALIST_ROUTES["keyword-research"] == ("lhm-marketing-hub:seo", "seo")
+    assert dispatcher.SPECIALIST_SKILLS["keyword-research"] == "lhm-marketing-hub:keyword-research"
+    assert dispatcher.SPECIALIST_ROUTES["seo-delivery-qa"] == ("lhm-marketing-hub:seo", "seo")
+    assert dispatcher.SPECIALIST_SKILLS["seo-delivery-qa"] == "lhm-marketing-hub:seo-delivery-qa"
     assert dispatcher.admitted_contract("specialist_readonly", "seo-lead") == (
         "seo-lead-review", ("lhm-marketing-hub:start-seo",), ())
     assert dispatcher.SPECIALIST_ROUTES["seo"] == ("lhm-marketing-hub:seo", "seo")
