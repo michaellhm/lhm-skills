@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: lhm-workflow-controller
+Version: 0.1.8
+Summary: Host-enforced LHM production workflow controller
+Requires-Python: >=3.11

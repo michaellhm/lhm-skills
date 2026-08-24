@@ -23,6 +23,10 @@ for f in /etc/systemd/system/lhm-workflow-*.service /etc/systemd/system/lhm-work
   test -e "$f" || continue
   mv "$f" "$backup/"
 done
+for f in /etc/systemd/system/lhm-scheduled-work.service /etc/systemd/system/lhm-scheduled-work.path; do
+  test -e "$f" || continue
+  mv "$f" "$backup/"
+done
 for f in /etc/systemd/system/lhm-department-*.service /etc/systemd/system/lhm-department-*.path; do
   test -e "$f" || continue
   mv "$f" "$backup/"
