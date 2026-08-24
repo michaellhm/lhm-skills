@@ -25,7 +25,7 @@ TEXT_EXTENSIONS = {'.html', '.css', '.js', '.json', '.svg', '.md'}
 SENSITIVE = re.compile(rb'(BEGIN [A-Z ]*PRIVATE KEY|github_pat_|ghp_|(?<![A-Za-z0-9])sk-[A-Za-z0-9]|AKIA[0-9A-Z]{16}|password\s*[:=]|client_secret\s*[:=])', re.I)
 MAX_FILE = 10_000_000
 MAX_HTTP = 2_000_000
-FIELDS = {'schema_version','request_id','source_basicops_task','governed_parent','destination_profile_id','operation','credential_reference','client_slug','project_slug','prototype_kind','repository','branch','expected_base_commit','source_directory','source_package_sha256','file_manifest','qa_evidence_reference','idempotency_key','standing_authority_reference','commit_message'}
+FIELDS = {'schema_version','request_id','source_basicops_task','governed_parent','destination_profile_id','operation','credential_reference','client_slug','project_slug','prototype_kind','repository','branch','expected_base_commit','source_directory','source_package_sha256','source_drive_file_id','source_drive_file_sha256','source_drive_file_bytes','file_manifest','qa_evidence_reference','idempotency_key','standing_authority_reference','commit_message'}
 
 def run(args, *, env=None):
     return subprocess.run(args, check=True, capture_output=True, text=True, env=env).stdout.strip()
@@ -69,6 +69,9 @@ def validate_contract(r):
     if r['standing_authority_reference']!=STANDING_AUTHORITY: raise ValueError('standing authority is not allowlisted')
     if not isinstance(r['expected_base_commit'],str) or not SHA.fullmatch(r['expected_base_commit']): raise ValueError('invalid expected_base_commit')
     if not isinstance(r['source_package_sha256'],str) or not SHA256.fullmatch(r['source_package_sha256']): raise ValueError('invalid source_package_sha256')
+    if not isinstance(r['source_drive_file_id'],str) or not SAFE_ID.fullmatch(r['source_drive_file_id']): raise ValueError('invalid source_drive_file_id')
+    if not isinstance(r['source_drive_file_sha256'],str) or not SHA256.fullmatch(r['source_drive_file_sha256']): raise ValueError('invalid source_drive_file_sha256')
+    if not isinstance(r['source_drive_file_bytes'],int) or not 0 < r['source_drive_file_bytes'] <= MAX_FILE: raise ValueError('invalid source_drive_file_bytes')
     if not isinstance(r['commit_message'],str) or not re.fullmatch(r'prototype: [a-z0-9-]+/(sitemap|homepage) [A-Za-z0-9][A-Za-z0-9 ._-]{0,80}',r['commit_message']): raise ValueError('invalid bounded commit message')
     return r
 
@@ -98,6 +101,9 @@ def validate(r):
     if index_links>2: raise ValueError('too many generated README links')
     if not has_index: raise ValueError('prototype requires index.html')
     if package_digest(manifest)!=r['source_package_sha256']: raise ValueError('source package digest does not match manifest')
+    index=next(item for item in manifest if item['path']==prefix+'index.html')
+    if index['sha256']!=r['source_drive_file_sha256'] or index['bytes']!=r['source_drive_file_bytes']:
+        raise ValueError('Drive readback does not match approved index.html')
     return [item['path'] for item in manifest]
 
 def ssh_env():
