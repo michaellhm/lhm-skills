@@ -4,7 +4,7 @@ The files named in `shared-claude-gateway-release.json` are the authoritative tr
 
 These assets are distinct from the additive `lhm-evidence-claude-*` gateways. No evidence-bridge installer may overwrite the shared dispatcher or worker.
 
-Release 0.9.6 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.10.
+Release 0.9.6 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.11.
 It supervises each worker for its full lifecycle. The root dispatcher maintains
 only execute access for `claudeworker` and `codexworker` on the two named profile ancestors; the
 Claude process still runs as `claudeworker`, and its only write grant is the validated canonical
