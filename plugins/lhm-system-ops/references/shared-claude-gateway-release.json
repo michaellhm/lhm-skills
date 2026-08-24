@@ -1,25 +1,25 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.9.5",
-  "captured_at": "2026-08-23",
+  "release_version": "0.9.6",
+  "captured_at": "2026-08-24",
   "source": "verified deployed Hermes host inventory",
   "assets": {
     "dispatcher": {
       "source": "assets/gateways/lhm-shared-claude-dispatcher",
       "destination": "/usr/local/libexec/lhm-claude-dispatcher",
-      "sha256": "3a9c044c6336b7a45788d7fef29be2022c554c89eebbada290a4fb08ffa705a6",
-      "previous_sha256": "e6c7c17ae1270a8bfff81e28210252b020361ebbd0324d3f9d25ac7ace37cb97",
+      "sha256": "cfc80d320335968db2596100fe811e721c0d5597fbafd0a12bfbdee04d5996c2",
+      "previous_sha256": "3a9c044c6336b7a45788d7fef29be2022c554c89eebbada290a4fb08ffa705a6",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 40784
+      "size_bytes": 40881
     },
     "worker": {
       "source": "assets/gateways/lhm-shared-claude-worker",
       "destination": "/usr/local/libexec/lhm-claude-worker",
       "sha256": "cf25ea0117ae0f701c02768d1ebc95b87408d80c13e4c68cfe37ff29bdeeebcb",
-      "previous_sha256": "ee1dff6124586f148de211f194e33de9abfb72dbf2e5355ac342a0ad36e0410b",
+      "previous_sha256": "cf25ea0117ae0f701c02768d1ebc95b87408d80c13e4c68cfe37ff29bdeeebcb",
       "owner": "root",
       "group": "root",
       "mode": "0755",
@@ -29,7 +29,7 @@
       "source": "assets/systemd/lhm-claude-dispatch.service",
       "destination": "/etc/systemd/system/lhm-claude-dispatch.service",
       "sha256": "bf84087497f169bfb0bb062bf0397a670a366f618dcded08cc91522f4fa5d394",
-      "previous_sha256": "db8d69be657eae486d7229164310d3c1a66284019d967ba7032a632ab832e263",
+      "previous_sha256": "bf84087497f169bfb0bb062bf0397a670a366f618dcded08cc91522f4fa5d394",
       "owner": "root",
       "group": "root",
       "mode": "0644"
@@ -47,12 +47,12 @@
       "source": "assets/container/claude-dispatch",
       "destination": "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch",
       "container_destination": "/opt/data/profiles/lhm_brain/bin/claude-dispatch",
-      "sha256": "cf9eff5237b2525744f710b663b4d82c8b77a47bba1dbb95711024508f4dc961",
+      "sha256": "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac",
       "previous_sha256": "cf9eff5237b2525744f710b663b4d82c8b77a47bba1dbb95711024508f4dc961",
       "owner": 10000,
       "group": 10000,
       "mode": "0755",
-      "size_bytes": 12955
+      "size_bytes": 13047
     }
   }
 }

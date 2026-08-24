@@ -34,6 +34,7 @@ WORKER_TRAVERSAL_ANCESTORS = (
 SPECIALIST_ROUTES = {
     'marketing': ('lhm-marketing-hub:start', 'start'),
     'seo': ('lhm-marketing-hub:seo', 'seo'),
+    'seo-lead': ('lhm-marketing-hub:seo', 'seo'),
     'content': ('lhm-marketing-hub:content', 'content'),
     'project': ('lhm-project-hub:pm-orchestrator', 'pm-orchestrator'),
     'gmb': ('lhm-gmb-hub:gmb-orchestrator', 'gmb-orchestrator'),
@@ -47,6 +48,7 @@ SPECIALIST_ROUTES = {
 SPECIALIST_SKILLS = {
     'marketing': 'lhm-marketing-hub:start',
     'seo': 'lhm-marketing-hub:seo-audit',
+    'seo-lead': 'lhm-marketing-hub:start-seo',
     'content': 'lhm-marketing-hub:content-strategy',
     'project': 'lhm-project-hub:team-work-brief',
     'gmb': 'lhm-gmb-hub:run-local-diagnostic',
