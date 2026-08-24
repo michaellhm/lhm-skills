@@ -8,12 +8,12 @@
     "dispatcher": {
       "source": "assets/gateways/lhm-shared-claude-dispatcher",
       "destination": "/usr/local/libexec/lhm-claude-dispatcher",
-      "sha256": "cfc80d320335968db2596100fe811e721c0d5597fbafd0a12bfbdee04d5996c2",
-      "previous_sha256": "3a9c044c6336b7a45788d7fef29be2022c554c89eebbada290a4fb08ffa705a6",
+      "sha256": "88191722f7ebd956c4b3be014de45290a98c9cb8b5513bca2902df569fd869b3",
+      "previous_sha256": "cfc80d320335968db2596100fe811e721c0d5597fbafd0a12bfbdee04d5996c2",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 40881
+      "size_bytes": 41118
     },
     "worker": {
       "source": "assets/gateways/lhm-shared-claude-worker",
@@ -47,12 +47,12 @@
       "source": "assets/container/claude-dispatch",
       "destination": "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch",
       "container_destination": "/opt/data/profiles/lhm_brain/bin/claude-dispatch",
-      "sha256": "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac",
-      "previous_sha256": "cf9eff5237b2525744f710b663b4d82c8b77a47bba1dbb95711024508f4dc961",
+      "sha256": "612f711b94d68df7edf52dc7fa942044c37bec9c54cc00b90573e3cb40002ba6",
+      "previous_sha256": "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac",
       "owner": 10000,
       "group": 10000,
       "mode": "0755",
-      "size_bytes": 13047
+      "size_bytes": 13274
     }
   }
 }
