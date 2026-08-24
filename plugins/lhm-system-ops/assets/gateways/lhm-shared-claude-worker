@@ -39,6 +39,13 @@ google_ads_evidence = '\n\n'.join(
 )
 google_ads_user_prompt = f'''/lhm-marketing-hub:start-googleads {prompt_data.get('client_name')} — {prompt_data.get('objective')}\n\nCurrent Melbourne date: {melbourne_date}\nAuthorised client: {prompt_data.get('client_name')}\nGoogle Ads customer ID: {prompt_data.get('customer_id')}\nManager ID: {prompt_data.get('manager_id')}\n\nCanonical reconciliation evidence supplied by Hermes:\n{google_ads_evidence}'''
 
+google_ads_identity_system_prompt = '''This is a host-enforced Google Ads connection test. Use only the supplied read-only Google Ads tools. Retrieve the exact authorised customer identity through the registered manager. Do not invoke skills, analyse performance, query campaigns, recommend changes, use other tools, or mutate anything. Return one concise JSON object with customer_id, descriptive_name, currency_code, time_zone, manager_id, verification and mutation. verification is passed only when the returned customer ID exactly matches the authorised ID; mutation must be none.'''
+google_ads_identity_user_prompt = f'''Authorised client: {prompt_data.get('client_name')} ({prompt_data.get('client')})
+Authorised customer ID: {prompt_data.get('customer_id')}
+Registered manager ID: {prompt_data.get('manager_id')}
+
+Run only the minimum account-identity read and return the required JSON object.'''
+
 gsc_system_prompt = '''This is a host-enforced, bounded, read-only run of the installed LHM Marketing Hub SEO agent. Use only the supplied Google Search Console read tools and packaged skills. The host has validated the site and exact URL list. Retrieve fresh live evidence; do not infer index status from analytics, sitemap inclusion, repository state, or ordinary web availability. Never submit or delete a sitemap, request indexing, use shell/files/browser, mutate an external system, or claim a change occurred. Return a concise self-contained handback with: run date; URL-by-URL inspection verdict and coverage state; last-28-day impressions, clicks and average position where available; sitemap registration state; specific evidence gaps; gate assessment; recommended next bounded action; mutation state (none); and status needs_review.''' 
 gsc_user_prompt = f'''Current Melbourne date: {melbourne_date}\nWorkflow ID: {prompt_data.get('workflow_id')}\nDeclared entry skill: {', '.join(prompt_data.get('required_skills', []))}\nRegistered site: {prompt_data.get('site_name')} ({prompt_data.get('site')})\nSearch Console property: {prompt_data.get('site_property')}\nExact authorised URLs:\n''' + '\n'.join(f'- {url}' for url in prompt_data.get('urls', [])) + f'''\n\nObjective from Hermes:\n{prompt_data.get('objective')}'''
 
@@ -64,8 +71,14 @@ is_specialist = profile == 'specialist_readonly'
 is_producer = profile == 'html_artifact_producer'
 is_gsc = profile == 'seo_gsc_readonly'
 is_google_ads = profile == 'google_ads_readonly'
+is_google_ads_identity = profile == 'google_ads_identity_readonly'
 
-if is_gsc:
+if is_google_ads_identity:
+    system_prompt, user_prompt = google_ads_identity_system_prompt, google_ads_identity_user_prompt
+    agent, max_turns, budget = None, '4', '1.00'
+    allowed_tools = ','.join(['mcp__GoogleAds__list_accessible_accounts', 'mcp__GoogleAds__execute_gaql'])
+    provisioned_tools = ''
+elif is_gsc:
     system_prompt, user_prompt = gsc_system_prompt, gsc_user_prompt
     agent, max_turns, budget = 'seo', '24', '4.00'
     allowed_tools = ','.join(['Skill', 'mcp__gscServer__list_sites', 'mcp__gscServer__batch_url_inspection', 'mcp__gscServer__search_analytics', 'mcp__gscServer__list_sitemaps', 'mcp__gscServer__get_sitemap'])
@@ -164,10 +177,28 @@ try:
             repair_result = json.loads(cleaned.strip())
         except json.JSONDecodeError:
             repair_result = None
+    identity_result = None
+    if is_google_ads_identity and isinstance(result, str):
+        cleaned = result.strip()
+        if cleaned.startswith('```json'):
+            cleaned = cleaned[7:]
+        if cleaned.endswith('```'):
+            cleaned = cleaned[:-3]
+        try:
+            identity_result = json.loads(cleaned.strip())
+        except json.JSONDecodeError:
+            identity_result = None
+    identity_verified = (
+        isinstance(identity_result, dict)
+        and re.sub(r'\D', '', str(identity_result.get('customer_id', ''))) == prompt_data.get('customer_id')
+        and re.sub(r'\D', '', str(identity_result.get('manager_id', ''))) == prompt_data.get('manager_id')
+        and identity_result.get('verification') == 'passed'
+        and identity_result.get('mutation') == 'none'
+    )
     repair_verified = isinstance(repair_result, dict) and repair_result.get('verification') == 'passed'
     producer_html = result.strip() if is_producer and isinstance(result, str) else ''
     producer_valid = not is_producer or (producer_html.lower().startswith('<!doctype html') and producer_html.lower().endswith('</html>') and len(producer_html.encode('utf-8')) <= 200000)
-    valid = completed.returncode == 0 and isinstance(result, str) and result.strip() and producer_valid and skill_verified and (not (is_drive or is_basicops) or repair_verified)
+    valid = completed.returncode == 0 and isinstance(result, str) and result.strip() and producer_valid and skill_verified and (not (is_drive or is_basicops) or repair_verified) and (not is_google_ads_identity or identity_verified)
     if valid:
         if is_observed_skill_profile:
             provenance = {
@@ -196,13 +227,15 @@ try:
             final['verification'] = receipt
         if repair_result:
             final['verification'] = repair_result
+        if identity_result:
+            final['verification'] = identity_result
         if is_observed_skill_profile:
             final['skill_provenance_file'] = 'skill-provenance.json'
         (run_dir / 'final.json').write_text(json.dumps(final, indent=2) + '\n', encoding='utf-8')
         emit('completed', 'HTML artifact produced with durable receipt.' if is_producer else 'Connector repair completed and verified.' if (is_drive or is_basicops) else 'Read-only result ready for review.')
     else:
         missing_skills = sorted(required_observed_skills - set(skill_calls)) if is_observed_skill_profile else []
-        error = (f'missing required Skill tool calls: {missing_skills}' if missing_skills else completed.stderr or raw or f'Claude exited {completed.returncode}')[:4000]
+        error = ('Google Ads identity readback did not match the registered client' if is_google_ads_identity and not identity_verified else f'missing required Skill tool calls: {missing_skills}' if missing_skills else completed.stderr or raw or f'Claude exited {completed.returncode}')[:4000]
         (run_dir / 'error.txt').write_text(error + '\n', encoding='utf-8')
         final = {'run_id': run_dir.name, 'status': 'failed', 'profile': profile, 'agent_id': prompt_data['agent_id'], 'completed_at': datetime.now(timezone.utc).isoformat(), 'error_file': 'error.txt'}
         final['workflow_contract'] = {
@@ -213,6 +246,8 @@ try:
         }
         if repair_result:
             final['verification'] = repair_result
+        if identity_result:
+            final['verification'] = identity_result
         (run_dir / 'final.json').write_text(json.dumps(final, indent=2) + '\n', encoding='utf-8')
         emit('failed', 'Connector repair did not pass read-back verification.' if (is_drive or is_basicops) else 'Claude did not return a valid result.')
 except subprocess.TimeoutExpired:

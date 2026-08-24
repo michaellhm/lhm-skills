@@ -1,29 +1,29 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.9.6",
-  "captured_at": "2026-08-24",
-  "source": "verified deployed Hermes host inventory",
+  "release_version": "0.9.7",
+  "captured_at": "2026-08-25",
+  "source": "reviewed tracked source derived from the verified 0.9.6 Hermes host inventory",
   "assets": {
     "dispatcher": {
       "source": "assets/gateways/lhm-shared-claude-dispatcher",
       "destination": "/usr/local/libexec/lhm-claude-dispatcher",
-      "sha256": "cfc80d320335968db2596100fe811e721c0d5597fbafd0a12bfbdee04d5996c2",
-      "previous_sha256": "3a9c044c6336b7a45788d7fef29be2022c554c89eebbada290a4fb08ffa705a6",
+      "sha256": "f373f0aba31188d7b4f8b5a490570f92acaa1d596b96fefcf39caa30432ad597",
+      "previous_sha256": "cfc80d320335968db2596100fe811e721c0d5597fbafd0a12bfbdee04d5996c2",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 40881
+      "size_bytes": 41335
     },
     "worker": {
       "source": "assets/gateways/lhm-shared-claude-worker",
       "destination": "/usr/local/libexec/lhm-claude-worker",
-      "sha256": "cf25ea0117ae0f701c02768d1ebc95b87408d80c13e4c68cfe37ff29bdeeebcb",
+      "sha256": "7080562c7109ec4fbae6b4708d7a8ff7dde38fb8cc5a40756d9c64fc1e416b2c",
       "previous_sha256": "cf25ea0117ae0f701c02768d1ebc95b87408d80c13e4c68cfe37ff29bdeeebcb",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 21142
+      "size_bytes": 23577
     },
     "dispatch_unit": {
       "source": "assets/systemd/lhm-claude-dispatch.service",
@@ -47,12 +47,12 @@
       "source": "assets/container/claude-dispatch",
       "destination": "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch",
       "container_destination": "/opt/data/profiles/lhm_brain/bin/claude-dispatch",
-      "sha256": "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac",
-      "previous_sha256": "cf9eff5237b2525744f710b663b4d82c8b77a47bba1dbb95711024508f4dc961",
+      "sha256": "90c265b585c3ddc9a9fe01307938cbe3f8abced967bc7799cbd2d72f208f7647",
+      "previous_sha256": "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac",
       "owner": 10000,
       "group": 10000,
       "mode": "0755",
-      "size_bytes": 13047
+      "size_bytes": 13794
     }
   }
 }

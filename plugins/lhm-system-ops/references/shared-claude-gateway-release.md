@@ -1,10 +1,10 @@
 # Shared Claude gateway release boundary
 
-The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. Release 0.9.6 was prepared on 2026-08-24 from the reviewed 0.9.5 source. The admitted predecessor hashes are the governed 0.9.5 dispatcher `3a9c044c…`, worker `cf25ea01…`, dispatch unit `bf840874…`, gateway ACL drop-in `41016cd8…`, and container client `cf9eff52…`.
+The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. Release 0.9.7 was prepared on 2026-08-25 from the reviewed 0.9.6 source. The admitted predecessor hashes are the governed 0.9.6 dispatcher `cfc80d32…`, worker `cf25ea01…`, dispatch unit `bf840874…`, gateway ACL drop-in `41016cd8…`, and container client `d78705d9…`.
 
 These assets are distinct from the additive `lhm-evidence-claude-*` gateways. No evidence-bridge installer may overwrite the shared dispatcher or worker.
 
-Release 0.9.6 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.11.
+Release 0.9.7 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.13.
 It supervises each worker for its full lifecycle. The root dispatcher maintains
 only execute access for `claudeworker` and `codexworker` on the two named profile ancestors; the
 Claude process still runs as `claudeworker`, and its only write grant is the validated canonical
@@ -13,7 +13,7 @@ failed terminal artifact. `assets/install/install-shared-claude-gateway.py` veri
 tracked source hashes and exact deployed predecessor hashes before mutation, saves binaries,
 metadata, and `getfacl` output, and restores all of them on rollback.
 
-Release 0.9.6 retains the host admission and registry-write protections and governs the authoritative bind-mounted
+Release 0.9.7 retains the host admission and registry-write protections and governs the authoritative bind-mounted
 Hermes `claude-dispatch` client as a governed source asset. Relative to the exact observed live
 predecessors pinned in the release manifest, the Google Ads and general marketing submitters use the shared collision-safe sequence
 scanner across incoming, processed, running and failed buckets. The submitted Google Ads timeout
@@ -22,18 +22,23 @@ remains 600 seconds. The installer targets the approved host side of the read-wr
 and byte-for-byte atomic rollback. Deployment acceptance must independently prove that the host and
 container paths have the manifest post-change hash and are byte-identical.
 
-Release 0.9.6 enters Google Ads through the installed `/lhm-marketing-hub:start-googleads` command,
+Release 0.9.7 keeps the full Google Ads monthly-review route through the installed `/lhm-marketing-hub:start-googleads` command,
 captures Claude stream events, persists `skill-provenance.json`, and fails closed unless the monthly
 review, bid/budget, conversion-audit and delivery-QA skills emitted real `Skill` tool calls. It uses
 a bounded 24-turn and USD 4.00 provider ceiling, strict read-only MCP configuration, exact Google Ads tool
 allowlist, single registered client/CID boundary, unprivileged worker identity, and run-directory-only
 write grant. Rollback restores the exact observed live predecessor bytes pinned in the manifest; the Google Ads ceiling remains 600 seconds.
 
-Release 0.9.6 grants the dispatcher write access to only the exact handback-registry file. Timestamped
+Release 0.9.7 additionally admits a distinct `google_ads_identity_readonly` connection-test profile.
+It permits only account listing and bounded GAQL identity reads, loads no campaign evidence pack or
+marketing skills, forbids recommendations and mutations, and is limited to four turns, USD 1.00 and
+120 seconds. A credential check therefore cannot silently expand into the monthly-review workflow.
+
+Release 0.9.7 grants the dispatcher write access to only the exact handback-registry file. Timestamped
 safety copies remain inside the already-writable dispatch audit tree. Updates are flushed and synced;
 an update error restores the captured backup and produces a durable refusal.
 
-Release 0.9.6 also retains the Google Ads reconciliation evidence boundary and explicit Prototype,
+Release 0.9.7 also retains the Google Ads reconciliation evidence boundary and explicit Prototype,
 Astro and WordPress department routes. The dispatcher reads only
 the client-specific Markdown paths explicitly registered in `google-ads-clients.json`, enforces the
 client folder, file-count and byte ceilings, rejects links and path traversal, and passes content
@@ -46,7 +51,7 @@ The handback-target registration surface additionally admits one internal destin
 internal slug or prefix fails closed. Existing client and opportunity registration behavior is
 unchanged; the Drive folder ID and BasicOps task IDs remain exact bounded inputs.
 
-Release 0.9.6 adds one distinct `seo-lead` specialist contract. It maps the existing
+Release 0.9.7 retains the distinct `seo-lead` specialist contract. It maps the existing
 `lhm-marketing-hub:seo` agent and Claude `seo` agent to the exact
 `lhm-marketing-hub:start-seo` required Skill under workflow `seo-lead-review`. The existing `seo`
 route remains pinned to `lhm-marketing-hub:seo-audit` under `seo-review`, and the
@@ -55,7 +60,7 @@ review-only, Skill-only, no-MCP, and bounded to 600 seconds. A worker succeeds o
 a real `lhm-marketing-hub:start-seo` Skill tool call and records it in `skill-provenance.json`;
 prose-only claims and `seo-audit`-only calls fail closed.
 
-Release 0.9.6 reconciles the workflow metadata already present on the live client without trusting
+Release 0.9.7 retains the workflow metadata reconciliation already present on the live client without trusting
 it as authority. A root-owned dispatcher table pins the exact workflow ID, ordered required skills,
 and required capabilities for every admitted profile and specialist route; missing, reordered,
 duplicated, additional, or substituted values fail closed. These values are propagated from the

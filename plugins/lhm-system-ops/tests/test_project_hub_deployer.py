@@ -17,7 +17,7 @@ spec = importlib.util.spec_from_loader('project_hub_deployer', SourceFileLoader(
 deployer = importlib.util.module_from_spec(spec); spec.loader.exec_module(deployer)
 
 
-def archive(path, *, version='0.1.74', prefix='lhm-project-hub'):
+def archive(path, *, version='0.1.75', prefix='lhm-project-hub'):
     with zipfile.ZipFile(path, 'w') as bundle:
         bundle.writestr(f'{prefix}/.claude-plugin/plugin.json', json.dumps({'name':'lhm-project-hub','version':version}))
         bundle.writestr(f'{prefix}/skills/basicops-task-manager/SKILL.md', '---\nname: basicops-task-manager\n---\n')
@@ -114,7 +114,7 @@ class ProjectHubDeployerTests(unittest.TestCase):
     def test_rejects_wrong_version_or_plugin(self):
         for version, prefix, error in (
             ('0.1.72','lhm-project-hub','identity or version mismatch'),
-            ('0.1.74','lhm-system-ops','unsafe plugin archive path'),
+            ('0.1.75','lhm-system-ops','unsafe plugin archive path'),
         ):
             with self.subTest(version=version,prefix=prefix), tempfile.TemporaryDirectory() as temporary:
                 root=Path(temporary); source=root/'release.zip'; archive(source,version=version,prefix=prefix)

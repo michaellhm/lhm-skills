@@ -60,6 +60,8 @@ SPECIALIST_SKILLS = {
     'knowledge': 'lhm-knowledge-hub:lhm-vault-thinking',
 }
 PROFILE_CONTRACTS = {
+    'google_ads_identity_readonly': (
+        'google-ads-account-identity', (), ('google_ads.account_read',)),
     'google_ads_readonly': ('google-ads-monthly-review', (
         'lhm-marketing-hub:google-ads-monthly-review',
         'lhm-marketing-hub:bid-budget-optimizer',
@@ -95,6 +97,8 @@ def admitted_timeout_seconds(profile):
     """Return the one bounded elapsed-time ceiling admitted for each profile."""
     if profile == 'handback_target_registration':
         return 30
+    if profile == 'google_ads_identity_readonly':
+        return 120
     if profile == 'google_ads_readonly':
         return 600
     if profile == 'html_artifact_producer':
@@ -561,11 +565,12 @@ def process(path):
     if request.get('schema_version') != expected_schema:
         reject(path, 'unsupported schema_version')
         return
-    if profile not in {'google_ads_readonly', 'seo_gsc_readonly', 'marketing_orchestrator_readonly', 'handback_target_registration', 'specialist_readonly', 'html_artifact_producer'} | handback_profiles:
+    if profile not in {'google_ads_identity_readonly', 'google_ads_readonly', 'seo_gsc_readonly', 'marketing_orchestrator_readonly', 'handback_target_registration', 'specialist_readonly', 'html_artifact_producer'} | handback_profiles:
         reject(path, 'disallowed profile')
         return
     required_agent = (SPECIALIST_ROUTES.get(request.get('route'), (None, None))[0]
                       if profile in {'specialist_readonly', 'html_artifact_producer'} else {
+        'google_ads_identity_readonly': 'lhm-marketing-hub:google-ads',
         'google_ads_readonly': 'lhm-marketing-hub:google-ads',
         'seo_gsc_readonly': 'lhm-marketing-hub:seo',
         'marketing_orchestrator_readonly': 'lhm-marketing-hub:start',
@@ -588,7 +593,8 @@ def process(path):
         reject(path, 'disallowed timeout_seconds')
         return
     run_id = request.get('run_id', '')
-    prefix = {'google_ads_readonly': 'claude-gads', 'marketing_orchestrator_readonly': 'claude-mktg',
+    prefix = {'google_ads_identity_readonly': 'claude-gads-id',
+              'google_ads_readonly': 'claude-gads', 'marketing_orchestrator_readonly': 'claude-mktg',
               'seo_gsc_readonly': 'claude-gsc',
               'google_drive_client_file_create': 'claude-gdrive',
               'basicops_task_discussion_update': 'claude-basicops',
@@ -837,6 +843,7 @@ def process(path):
         os.chmod(item, 0o640)
     events = run_dir / 'events.jsonl'
     summary = {
+        'google_ads_identity_readonly': 'Validated Google Ads identity-only request queued for Claude.',
         'google_ads_readonly': 'Validated Google Ads read-only request queued for Claude.',
         'seo_gsc_readonly': 'Validated Search Console read-only request queued for Claude.',
         'marketing_orchestrator_readonly': 'Validated general marketing request queued for the Claude start orchestrator.',

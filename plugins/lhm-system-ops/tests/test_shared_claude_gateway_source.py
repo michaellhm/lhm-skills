@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.6"
+    assert MANIFEST["release_version"] == "0.9.7"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -44,7 +44,7 @@ def test_container_client_is_governed_at_exact_bind_mount_target():
     client = MANIFEST["assets"]["container_client"]
     assert client["destination"] == "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch"
     assert client["container_destination"] == "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
-    assert client["previous_sha256"] == "cf9eff5237b2525744f710b663b4d82c8b77a47bba1dbb95711024508f4dc961"
+    assert client["previous_sha256"] == "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac"
     assert client["owner"] == client["group"] == 10000
     assert client["mode"] == "0755"
 
@@ -101,10 +101,56 @@ def test_dispatch_unit_grants_only_exact_registry_write_path():
 
 def test_google_ads_profile_admits_only_extended_bounded_timeout():
     dispatcher = load_dispatcher()
+    assert dispatcher.admitted_timeout_seconds("google_ads_identity_readonly") == 120
     assert dispatcher.admitted_timeout_seconds("google_ads_readonly") == 600
     assert 300 != dispatcher.admitted_timeout_seconds("google_ads_readonly")
     assert dispatcher.admitted_timeout_seconds("handback_target_registration") == 30
     assert dispatcher.admitted_timeout_seconds("html_artifact_producer") == 1200
+
+
+def test_google_ads_identity_contract_is_distinct_from_monthly_review():
+    dispatcher = load_dispatcher()
+    assert dispatcher.admitted_contract("google_ads_identity_readonly") == (
+        "google-ads-account-identity", (), ("google_ads.account_read",))
+    assert dispatcher.admitted_contract("google_ads_readonly")[0] == "google-ads-monthly-review"
+
+    client_path = PLUGIN / MANIFEST["assets"]["container_client"]["source"]
+    spec = importlib.util.spec_from_loader(
+        "identity_client", SourceFileLoader("identity_client", str(client_path)))
+    client = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(client)
+    captured = []
+    monkeypatch = pytest.MonkeyPatch()
+    try:
+        monkeypatch.setattr(client, "registered_clients", lambda: {"local-health-marketing": {}})
+        monkeypatch.setattr(client, "next_run_id", lambda prefix: "claude-gads-id-20260825-01")
+        monkeypatch.setattr(client, "enqueue_and_wait", captured.append)
+        client.submit_google_ads_identity("local-health-marketing")
+    finally:
+        monkeypatch.undo()
+    assert captured == [{
+        "schema_version": 1,
+        "run_id": "claude-gads-id-20260825-01",
+        "profile": "google_ads_identity_readonly",
+        "agent_id": "lhm-marketing-hub:google-ads",
+        "client": "local-health-marketing",
+        "timeout_seconds": 120,
+        "workflow_id": "google-ads-account-identity",
+        "required_skills": [],
+        "required_capabilities": ["google_ads.account_read"],
+    }]
+
+
+def test_google_ads_identity_worker_cannot_expand_into_monthly_review():
+    worker = (PLUGIN / MANIFEST["assets"]["worker"]["source"]).read_text()
+    assert "profile == 'google_ads_identity_readonly'" in worker
+    assert "Do not invoke skills, analyse performance, query campaigns" in worker
+    assert "agent, max_turns, budget = None, '4', '1.00'" in worker
+    assert "mcp__GoogleAds__list_accessible_accounts" in worker
+    assert "mcp__GoogleAds__execute_gaql" in worker
+    assert "not is_google_ads_identity or identity_verified" in worker
+    assert "identity_result.get('mutation') == 'none'" in worker
+    assert "Google Ads identity readback did not match the registered client" in worker
 
 
 def test_google_ads_runtime_extension_preserves_readonly_tool_and_budget_ceiling():
@@ -134,6 +180,7 @@ def test_google_ads_worker_enters_canonical_command_and_verifies_real_skill_call
 def test_root_owned_contract_table_pins_every_live_workflow_and_route():
     dispatcher = load_dispatcher()
     expected = {
+        "google_ads_identity_readonly": ("google-ads-account-identity", (), ("google_ads.account_read",)),
         "google_ads_readonly": ("google-ads-monthly-review", (
             "lhm-marketing-hub:google-ads-monthly-review",
             "lhm-marketing-hub:bid-budget-optimizer",
