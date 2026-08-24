@@ -85,6 +85,8 @@ Immediate owner: Kristalyn for coordination; Jaimee or the applicable specialist
 
 Generate and work only the access, asset and configuration items required by purchased services. Verify access directly where connected tools allow. A request sent is not verified access. Record missing items with an owner and follow-up date. If no tracking/configuration branch applies, complete that top-level gate only after a human confirms and Obsidian records `N/A — no tracking/configuration required for purchased scope`.
 
+Invoke `lhm-project-hub:hermes-client-onboarding` during this phase. Create or resume the canonical `_System/Hermes/clients/<client-id>/capabilities.json` preflight, mark only capabilities required by the purchased scope, and run the applicable real-boundary smoke tests. Discovered identifiers without a passing test remain `configured`; never promote them to `verified` from configuration or a sent access request alone. Do not advance to Service Kickoff while a required capability returns `client_onboarding_required` unless the service is explicitly deferred with an owner and reason in canonical Obsidian state.
+
 ### 4 — Service Kickoff
 
 Immediate owner: Kristalyn.
