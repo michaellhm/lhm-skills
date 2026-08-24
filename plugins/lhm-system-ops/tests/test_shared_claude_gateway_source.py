@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.7"
+    assert MANIFEST["release_version"] == "0.9.8"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -44,7 +44,7 @@ def test_container_client_is_governed_at_exact_bind_mount_target():
     client = MANIFEST["assets"]["container_client"]
     assert client["destination"] == "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch"
     assert client["container_destination"] == "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
-    assert client["previous_sha256"] == "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac"
+    assert client["previous_sha256"] == "90c265b585c3ddc9a9fe01307938cbe3f8abced967bc7799cbd2d72f208f7647"
     assert client["owner"] == client["group"] == 10000
     assert client["mode"] == "0755"
 
@@ -213,6 +213,17 @@ def test_seo_lead_route_is_distinct_and_preserves_existing_seo_contracts():
     assert dispatcher.admitted_contract("seo_gsc_readonly") == (
         "seo-gsc-review", ("lhm-marketing-hub:seo-audit",),
         ("google_search_console.property_read",))
+
+
+def test_multi_stage_project_route_is_distinct_from_single_task_brief():
+    dispatcher = load_dispatcher()
+    assert dispatcher.SPECIALIST_ROUTES["project-multi-stage"] == (
+        "lhm-project-hub:pm-orchestrator", "pm-orchestrator")
+    assert dispatcher.admitted_contract("specialist_readonly", "project-multi-stage") == (
+        "project-multi-stage-review",
+        ("lhm-project-hub:multi-stage-delivery-brief",), ())
+    assert dispatcher.admitted_contract("specialist_readonly", "project") == (
+        "project-review", ("lhm-project-hub:team-work-brief",), ())
 
 
 def test_container_client_submits_exact_seo_lead_contract(monkeypatch):

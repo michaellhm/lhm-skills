@@ -1,10 +1,10 @@
 # Shared Claude gateway release boundary
 
-The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. Release 0.9.7 was prepared on 2026-08-25 from the reviewed 0.9.6 source. The admitted predecessor hashes are the governed 0.9.6 dispatcher `cfc80d32…`, worker `cf25ea01…`, dispatch unit `bf840874…`, gateway ACL drop-in `41016cd8…`, and container client `d78705d9…`.
+The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. Release 0.9.8 was prepared on 2026-08-25 from the reviewed 0.9.7 source. The admitted predecessor hashes are the governed 0.9.7 dispatcher `f373f0ab…`, worker `7080562c…`, dispatch unit `bf840874…`, gateway ACL drop-in `41016cd8…`, and container client `90c265b5…`.
 
 These assets are distinct from the additive `lhm-evidence-claude-*` gateways. No evidence-bridge installer may overwrite the shared dispatcher or worker.
 
-Release 0.9.7 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.13.
+Release 0.9.8 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.14.
 It supervises each worker for its full lifecycle. The root dispatcher maintains
 only execute access for `claudeworker` and `codexworker` on the two named profile ancestors; the
 Claude process still runs as `claudeworker`, and its only write grant is the validated canonical
@@ -13,7 +13,7 @@ failed terminal artifact. `assets/install/install-shared-claude-gateway.py` veri
 tracked source hashes and exact deployed predecessor hashes before mutation, saves binaries,
 metadata, and `getfacl` output, and restores all of them on rollback.
 
-Release 0.9.7 retains the host admission and registry-write protections and governs the authoritative bind-mounted
+Release 0.9.8 retains the host admission and registry-write protections and governs the authoritative bind-mounted
 Hermes `claude-dispatch` client as a governed source asset. Relative to the exact observed live
 predecessors pinned in the release manifest, the Google Ads and general marketing submitters use the shared collision-safe sequence
 scanner across incoming, processed, running and failed buckets. The submitted Google Ads timeout
@@ -29,7 +29,7 @@ a bounded 24-turn and USD 4.00 provider ceiling, strict read-only MCP configurat
 allowlist, single registered client/CID boundary, unprivileged worker identity, and run-directory-only
 write grant. Rollback restores the exact observed live predecessor bytes pinned in the manifest; the Google Ads ceiling remains 600 seconds.
 
-Release 0.9.7 additionally admits a distinct `google_ads_identity_readonly` connection-test profile.
+Release 0.9.8 additionally retains the distinct `google_ads_identity_readonly` connection-test profile.
 It permits only account listing and bounded GAQL identity reads, loads no campaign evidence pack or
 marketing skills, forbids recommendations and mutations, and is limited to four turns, USD 1.00 and
 120 seconds. A credential check therefore cannot silently expand into the monthly-review workflow.
@@ -74,6 +74,11 @@ client prefix, exact Drive folder URL, and at most 20 unique numeric task IDs. I
 handback entry exists for the same slug, it must agree exactly with the canonical values or the
 request fails closed. This does not broaden the exact artifact-path, folder, task, read-back, or
 mutation boundaries.
+
+Release 0.9.8 adds the distinct `project-multi-stage` specialist route. It pins
+`lhm-project-hub:multi-stage-delivery-brief` under `project-multi-stage-review`, while the existing
+`project` route remains pinned to the one-task `team-work-brief`. This makes an approved dependency
+plan reachable without broadening the single-task contract.
 
 ## Change and release rules
 
