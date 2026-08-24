@@ -16,7 +16,8 @@ class PrototypePublisherTests(unittest.TestCase):
             path=root/client/kind/relative; path.parent.mkdir(parents=True,exist_ok=True); path.write_bytes(data)
             manifest.append({'path':f'{client}/{kind}/{relative}','sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)})
         manifest.sort(key=lambda x:x['path']); request_id=root.name
-        value={'schema_version':3,'request_id':request_id,'source_basicops_task':'task-123','governed_parent':'parent-123','destination_profile_id':publisher.PROFILE_ID,'operation':'publish_'+kind,'credential_reference':publisher.CREDENTIAL_REFERENCE,'client_slug':client,'project_slug':kind,'prototype_kind':kind,'repository':publisher.REPOSITORY,'branch':'main','expected_base_commit':'a'*40,'source_directory':str(root),'source_package_sha256':publisher.package_digest(manifest),'file_manifest':manifest,'qa_evidence_reference':'qa-123','idempotency_key':request_id,'standing_authority_reference':publisher.STANDING_AUTHORITY,'commit_message':f'prototype: {client}/{kind} approved static package'}
+        index=next(item for item in manifest if item['path']==f'{client}/{kind}/index.html')
+        value={'schema_version':3,'request_id':request_id,'source_basicops_task':'task-123','governed_parent':'parent-123','destination_profile_id':publisher.PROFILE_ID,'operation':'publish_'+kind,'credential_reference':publisher.CREDENTIAL_REFERENCE,'client_slug':client,'project_slug':kind,'prototype_kind':kind,'repository':publisher.REPOSITORY,'branch':'main','expected_base_commit':'a'*40,'source_directory':str(root),'source_package_sha256':publisher.package_digest(manifest),'source_drive_file_id':'drive-file-123','source_drive_file_sha256':index['sha256'],'source_drive_file_bytes':index['bytes'],'file_manifest':manifest,'qa_evidence_reference':'qa-123','idempotency_key':request_id,'standing_authority_reference':publisher.STANDING_AUTHORITY,'commit_message':f'prototype: {client}/{kind} approved static package'}
         value.update(updates); return value
 
     def test_two_clients_and_both_prototype_kinds_with_static_assets(self):
@@ -84,6 +85,12 @@ class PrototypePublisherTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary)/'source'; root.mkdir(); good=self.request(root)
             with self.assertRaisesRegex(ValueError,'package digest'): publisher.validate({**good,'source_package_sha256':'0'*64})
+
+    def test_rejects_drive_readback_that_does_not_match_approved_html(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)/'source'; root.mkdir(); good=self.request(root)
+            with self.assertRaisesRegex(ValueError,'Drive readback'):
+                publisher.validate({**good,'source_drive_file_sha256':'0'*64})
 
     def test_moved_main_fails_before_reset_or_push(self):
         with tempfile.TemporaryDirectory() as temporary:

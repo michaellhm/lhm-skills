@@ -44,6 +44,6 @@ Missing client facts, repository, branch or approval are gaps, not permission to
 
 `Hermes intake -> named Lead -> required entry skill -> specialist skills -> website-delivery-qa -> Lead handback -> Hermes state/BasicOps`
 
-For sitemap or homepage mock work, `prototype-lead` owns creation and feedback revisions. Publishing requires `approved_for_publish` plus the exact repository, branch and client path.
+For sitemap or homepage mock work, `prototype-lead` owns creation and feedback revisions. Publishing requires `approved_for_publish`, the exact repository, branch and client path, an independently QA-approved manifest, and a Google Drive readback identifying the exact HTML file, byte count and SHA-256. The Lead passes only those bound values to the root-owned publisher; it never receives a repository credential.
 
-Return `request_id`, `route`, `lead`, `entry_skill_invoked`, `skills_used`, evidence, artefacts, mutations, QA verdict, validation, gaps, URL, commit SHA, next owner and status. Completion requires artefact readback and the stated completion test. Publication additionally requires the observed commit SHA and URL; a local file alone is not published.
+Return `request_id`, `route`, `lead`, `entry_skill_invoked`, `skills_used`, Drive file ID/link/hash, evidence, artefacts, mutations, QA verdict, validation, gaps, URL, commit SHA, next owner and status. Completion requires artefact readback and the stated completion test. Publication additionally requires the observed commit SHA, successful deployment and matching public URL; a local file alone is not published.

@@ -14,6 +14,9 @@
   "expected_base_commit": "f00b1d8606e9cd71e45dda299f3b7837c82f17be",
   "source_directory": "/var/lib/lhm-prototype-publication/incoming/asp-sitemap-v2-publish-20260820",
   "source_package_sha256": "b52a6de06e5e30a20b24e8e5b5a3c8c1703ffef04c93df2dde4d3026305f5115",
+  "source_drive_file_id": "asp-sitemap-v2-drive-file",
+  "source_drive_file_sha256": "74b87dbc0f20c1d79326e11f342e1169d5777f17eded8683729f57b0d7650a70",
+  "source_drive_file_bytes": 115238,
   "file_manifest": [
     {
       "path": "australian-sports-physio/sitemap/index.html",
