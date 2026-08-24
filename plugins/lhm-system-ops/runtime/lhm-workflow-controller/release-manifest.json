@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-shared-scheduled-ingress-20260825-r3",
-  "version": "0.1.9",
+  "release_id": "lhm-workflow-controller-shared-scheduled-ingress-20260825-r4",
+  "version": "0.1.10",
   "source_baseline": "main-8c0da39-plus-reviewed-seo-envelope",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -17,9 +17,10 @@
     "container_to_host_scheduled_work_queue",
     "closed_schema_host_dispatch_and_failure_receipts",
     "disabled_by_default_path_activation_and_rollback",
-    "explicit_scheduled_unit_install_and_rollback_coverage"
+    "explicit_scheduled_unit_install_and_rollback_coverage",
+    "installed_controller_pythonpath_binding"
   ],
-  "source_tree_sha256_excluding_manifest": "f284c259e2996c9fa5a2f19591dca31f4c654bae0b64feda01f8ef997dd78fd3",
+  "source_tree_sha256_excluding_manifest": "f725c4bef2faf2f7b7cf76b6d4b57052b05210c60b354db2ef945868a99ad815",
   "critical_files": {
     "src/lhm_workflow/seo_envelope_runtime.py": "ef55bce61485239187f3c4885227f8efb878c4d77dde6ef0cfeee2a0877e77a6",
     "src/lhm_workflow/cli.py": "e4f71176072050f42d519d272ede8a7d5269d6c365db090e8d00c9ef2e131f18",
@@ -32,7 +33,7 @@
     "packaging/rollback.sh": "d8264bef7d952809e953960efc6b46cf527c98e16d9908184f829c6478d457e8",
     "packaging/lhm-seo-envelope-runtime.service": "8bcb42c1a4a955c4215f5ddef9e088503c913e9791802895aa46bf557b48f046",
     "src/lhm_workflow/scheduled_work.py": "750989d48a95531ba23bd01d5ff2915552529ab118b8aa508b4873f714368537",
-    "integration/lhm-scheduled-work-ingress": "56c0d81fbe7cc251ae950bfe98ba5ad51dfdc8e9e230f95ed7a0806f31d18020",
+    "integration/lhm-scheduled-work-ingress": "89835bee2ff612a6a1abdfc489c1dfa071643954cf892be8b57f60f67249c147",
     "integration/lhm-scheduled-work-dispatch": "3bb3ca6f101d1e823b3ae977fc4b9d70eac7115a7467d8142ea3a07db0625dc8",
     "integration/lhm-scheduled-work-runtime": "eeabd481634e137ca82a179855c1317bea6ef1dff53d9004c10339c64103a29b",
     "integration/lhm-seo-org-cron-alternate": "35b7f7a47586b33ee49ad83ecb3c42dd503926a3a4a4f2a195b96f417e7adb90",
@@ -40,7 +41,7 @@
     "integration/cron-3994012c42ba.alternate.disabled.json": "082c8d8b597c6e3d48cfc18a5ee12df179c8dbdd42138da2d6c4775da35baea8",
     "packaging/lhm-scheduled-work.path": "41f9913d296ce6dea2550a1988f30d3fce3d17b7a7fb6666e0b10a8396df996e",
     "packaging/lhm-scheduled-work.service": "1c8cd5596436e475de7016f0931b1674e6e121be20b870deab885bf1d867ca81",
-    "tests/test_scheduled_work.py": "bf45572431d5886f79ea40dc70a354c1297a1873c9f9a82f57f0717279dbbd15"
+    "tests/test_scheduled_work.py": "f4b6934945c9bc5a2d74b4533f80b9f862234610ab991c776e303c893b5c1f4d"
   },
   "activation_state": "source_only_disabled",
   "cron_changed": false,
