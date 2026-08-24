@@ -140,6 +140,7 @@ chown root:root /var/lib/lhm-workflow/secrets/evidence-attestor.private.pem; chm
 chmod 0644 /var/lib/lhm-workflow/public/evidence-attestor.public.pem
 
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-workflow-*.service "$repo_dir"/packaging/lhm-workflow-*.path /etc/systemd/system/
+install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-scheduled-work.service "$repo_dir"/packaging/lhm-scheduled-work.path /etc/systemd/system/
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-department-*.service "$repo_dir"/packaging/lhm-department-*.path /etc/systemd/system/
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-department-snapshot-dispatch "$repo_dir"/integration/lhm-department-snapshot-broker "$repo_dir"/integration/lhm-department-result-importer /usr/local/libexec/
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-seo-envelope-runtime /usr/local/libexec/lhm-seo-envelope-runtime
@@ -153,7 +154,7 @@ scheduled_base=/home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-work
 install -d -o root -g 10000 -m 0730 "$scheduled_base/incoming"
 for d in processed failed runs; do install -d -o root -g root -m 0750 "$scheduled_base/$d"; done
 systemctl daemon-reload
-systemd-analyze verify /etc/systemd/system/lhm-workflow-*.service /etc/systemd/system/lhm-workflow-*.path
+systemd-analyze verify /etc/systemd/system/lhm-workflow-*.service /etc/systemd/system/lhm-workflow-*.path /etc/systemd/system/lhm-scheduled-work.service /etc/systemd/system/lhm-scheduled-work.path
 if test "$enable_units" = 1; then
   systemctl enable --now $units
 else

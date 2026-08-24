@@ -129,3 +129,11 @@ def test_cron_candidate_uses_only_container_visible_thin_trigger():
     assert candidate["script"].startswith("/opt/data/profiles/lhm_brain/bin/")
     assert "lhm-scheduled-work-dispatch" in wrapper
     assert "lhm-scheduled-work-ingress" not in wrapper
+
+
+def test_installer_and_rollback_cover_scheduled_work_units():
+    installer = (ROOT / "packaging" / "install.sh").read_text()
+    rollback = (ROOT / "packaging" / "rollback.sh").read_text()
+    for unit in ("lhm-scheduled-work.service", "lhm-scheduled-work.path"):
+        assert unit in installer
+        assert unit in rollback
