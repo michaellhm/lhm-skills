@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "workflows": {
+    "local-health-marketing-seo": {
+      "source_cron_id": "3994012c42ba",
+      "job_name": "LHM weekly SEO rollout",
+      "handler": "seo-org-v1",
+      "department": "seo",
+      "client_id": "local-health-marketing",
+      "permission_ceiling": "non-production-preview",
+      "reviewer": "michael",
+      "delivery": "none",
+      "destinations": {
+        "basicops_task_id": "2192596",
+        "drive_folder_id": "1t3aUHy1ZSMiHophhJQsQC-cDjcZiMxUA",
+        "tracker": "30 Projects/LHM Growth/LHM Website SEO Growth Rollout/rollout-state.md"
+      },
+      "completion_test": "Accepted SEO evidence and any required content or website work pass independent QA, durable destinations read back, and Chief of Staff returns the governed handoff."
+    }
+  }
+}

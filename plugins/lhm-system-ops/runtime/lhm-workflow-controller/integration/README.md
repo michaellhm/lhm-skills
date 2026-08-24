@@ -20,3 +20,10 @@ events belong in the host connector adapter after successful readback.
 The draft is not installed or enabled by `install.sh`; it must undergo the
 same exact-byte deployment and real-user rehearsal as the controller before
 use.
+
+`lhm-scheduled-work-dispatch` is the container-visible queue writer and
+`lhm-scheduled-work-ingress` is the common trusted host entry point. Department-specific wrappers
+may select a registered identity and objective; they must not embed worker commands, polling,
+retries, QA or delivery logic. The root-owned registry remains authoritative. The disabled SEO candidate is the
+reference configuration and does not replace the live job until the full organisational canary,
+failure receipt and rollback checks pass.
