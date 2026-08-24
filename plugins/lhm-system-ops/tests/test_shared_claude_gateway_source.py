@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.5"
+    assert MANIFEST["release_version"] == "0.9.6"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -155,6 +155,46 @@ def test_root_owned_contract_table_pins_every_live_workflow_and_route():
     assert dispatcher.admitted_contract("specialist_readonly", "unknown") is None
 
 
+def test_seo_lead_route_is_distinct_and_preserves_existing_seo_contracts():
+    dispatcher = load_dispatcher()
+    assert dispatcher.SPECIALIST_ROUTES["seo-lead"] == ("lhm-marketing-hub:seo", "seo")
+    assert dispatcher.SPECIALIST_SKILLS["seo-lead"] == "lhm-marketing-hub:start-seo"
+    assert dispatcher.admitted_contract("specialist_readonly", "seo-lead") == (
+        "seo-lead-review", ("lhm-marketing-hub:start-seo",), ())
+    assert dispatcher.SPECIALIST_ROUTES["seo"] == ("lhm-marketing-hub:seo", "seo")
+    assert dispatcher.SPECIALIST_SKILLS["seo"] == "lhm-marketing-hub:seo-audit"
+    assert dispatcher.admitted_contract("seo_gsc_readonly") == (
+        "seo-gsc-review", ("lhm-marketing-hub:seo-audit",),
+        ("google_search_console.property_read",))
+
+
+def test_container_client_submits_exact_seo_lead_contract(monkeypatch):
+    client_path = PLUGIN / MANIFEST["assets"]["container_client"]["source"]
+    spec = importlib.util.spec_from_loader(
+        "shared_client", SourceFileLoader("shared_client", str(client_path)))
+    client = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(client)
+    captured = []
+    monkeypatch.setattr(client, "next_run_id", lambda prefix: "claude-delegate-20260824-01")
+    monkeypatch.setattr(client, "enqueue_and_wait", captured.append)
+    client.submit_specialist("seo-lead", "internal", "marketing", "Run the seven-page modality SEO review.")
+    assert captured == [{
+        "schema_version": 1,
+        "run_id": "claude-delegate-20260824-01",
+        "profile": "specialist_readonly",
+        "agent_id": "lhm-marketing-hub:seo",
+        "route": "seo-lead",
+        "subject_type": "internal",
+        "subject_name": "marketing",
+        "objective": "Run the seven-page modality SEO review.",
+        "approval_state": "review_only",
+        "timeout_seconds": 600,
+        "workflow_id": "seo-lead-review",
+        "required_skills": ["lhm-marketing-hub:start-seo"],
+        "required_capabilities": [],
+    }]
+
+
 def test_dispatcher_rejects_forged_contract_before_any_worker_run(tmp_path, monkeypatch):
     dispatcher = load_dispatcher()
     incoming = tmp_path / "incoming"
@@ -196,6 +236,46 @@ def test_dispatcher_rejects_forged_contract_before_any_worker_run(tmp_path, monk
         assert "contract does not match" in error
 
 
+def test_seo_lead_forgery_is_rejected_before_worker_launch(tmp_path, monkeypatch):
+    dispatcher = load_dispatcher()
+    incoming = tmp_path / "incoming"
+    failed = tmp_path / "failed"
+    incoming.mkdir()
+    failed.mkdir()
+    monkeypatch.setattr(dispatcher, "FAILED", failed)
+    monkeypatch.setattr(dispatcher.os, "chown", lambda *args: None)
+    launched = []
+    monkeypatch.setattr(dispatcher.subprocess, "run", lambda *args, **kwargs: launched.append(args))
+    base = {
+        "schema_version": 1, "run_id": "claude-delegate-20260824-01",
+        "profile": "specialist_readonly", "agent_id": "lhm-marketing-hub:seo",
+        "route": "seo-lead", "subject_type": "internal", "subject_name": "marketing",
+        "objective": "Run the bounded seven-page modality SEO review.",
+        "approval_state": "review_only", "timeout_seconds": 600,
+        "workflow_id": "seo-lead-review",
+        "required_skills": ["lhm-marketing-hub:start-seo"], "required_capabilities": [],
+    }
+    mutations = (
+        {"workflow_id": "seo-review"},
+        {"required_skills": ["lhm-marketing-hub:seo-audit"]},
+        {"required_skills": ["lhm-marketing-hub:start-seo", "lhm-marketing-hub:seo-audit"]},
+        {"required_skills": ["lhm-marketing-hub:seo-audit", "lhm-marketing-hub:start-seo"]},
+        {"required_capabilities": ["google_search_console.property_read"]},
+        {"agent_id": "lhm-marketing-hub:start"},
+        {"approval_state": "approved"},
+        {"unknown": "field"},
+    )
+    for sequence, changes in enumerate(mutations, 1):
+        request = dict(base)
+        request["run_id"] = f"claude-delegate-20260824-{sequence:02d}"
+        request.update(changes)
+        queued = incoming / f"forged-{sequence}.json"
+        queued.write_text(json.dumps(request))
+        dispatcher.process(queued)
+        assert (failed / f"forged-{sequence}.error").is_file()
+    assert launched == []
+
+
 def test_specialist_skill_invocation_is_observed_not_self_attested():
     worker = (PLUGIN / MANIFEST["assets"]["worker"]["source"]).read_text()
     assert "is_observed_skill_profile = is_google_ads or is_specialist" in worker
@@ -203,6 +283,66 @@ def test_specialist_skill_invocation_is_observed_not_self_attested():
     assert "required_observed_skills.issubset(set(skill_calls))" in worker
     assert "'workflow_id': prompt_data.get('workflow_id')" in worker
     assert "'skill_provenance': prompt_data.get('skill_provenance_mode'" in worker
+
+
+@pytest.mark.parametrize("observed_skill, expected_status", [
+    ("lhm-marketing-hub:start-seo", "needs_review"),
+    (None, "failed"),
+    ("lhm-marketing-hub:seo-audit", "failed"),
+])
+def test_seo_lead_worker_requires_real_start_seo_skill_call(
+        tmp_path, observed_skill, expected_status):
+    worker_source = (PLUGIN / MANIFEST["assets"]["worker"]["source"]).read_text()
+    fake_claude = tmp_path / "fake-claude"
+    events = []
+    if observed_skill is not None:
+        events.append({
+            "type": "assistant", "message": {"content": [{
+                "type": "tool_use", "name": "Skill", "input": {"skill": observed_skill},
+            }]},
+        })
+    events.append({
+        "type": "result",
+        "result": "Invoked lhm-marketing-hub:start-seo and completed the review.",
+    })
+    fake_claude.write_text(
+        "#!/usr/bin/env python3\nimport json\n" +
+        "events = " + repr(events) + "\n" +
+        "for event in events: print(json.dumps(event))\n")
+    fake_claude.chmod(0o755)
+    worker = tmp_path / "worker.py"
+    worker.write_text(worker_source.replace(
+        "'/home/claudeworker/.local/bin/claude'", repr(str(fake_claude))).replace(
+        "cwd=worker_home", "cwd=" + repr(str(tmp_path))))
+    run_dir = tmp_path / ("run-" + (observed_skill or "prose").split(":")[-1])
+    run_dir.mkdir()
+    (run_dir / "events.jsonl").write_text("")
+    (run_dir / "prompt.json").write_text(json.dumps({
+        "profile": "specialist_readonly",
+        "agent_id": "lhm-marketing-hub:seo",
+        "claude_agent": "seo",
+        "route": "seo-lead",
+        "subject_type": "internal",
+        "subject_name": "marketing",
+        "objective": "Run the seven-page modality SEO review.",
+        "approval_state": "review_only",
+        "workflow_id": "seo-lead-review",
+        "required_skills": ["lhm-marketing-hub:start-seo"],
+        "required_capabilities": [],
+        "skill_provenance_mode": "observed",
+    }))
+    completed = subprocess.run(
+        [sys.executable, str(worker), str(run_dir), "30"], capture_output=True, text=True)
+    assert completed.returncode == 0, completed.stderr
+    final = json.loads((run_dir / "final.json").read_text())
+    assert final["status"] == expected_status
+    provenance = run_dir / "skill-provenance.json"
+    if expected_status == "needs_review":
+        assert json.loads(provenance.read_text())["observed_skill_calls"] == [
+            "lhm-marketing-hub:start-seo"]
+    else:
+        assert not provenance.exists()
+        assert "missing required Skill tool calls" in (run_dir / "error.txt").read_text()
 
 
 def test_worker_persists_terminal_artifacts_inside_supplied_run_directory():

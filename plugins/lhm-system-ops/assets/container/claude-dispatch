@@ -14,6 +14,7 @@ CLIENT_REGISTRY = Path('/opt/data/profiles/lhm_brain/config/google-ads-clients.j
 
 ROUTE_SKILLS = {
     'marketing': 'lhm-marketing-hub:start', 'seo': 'lhm-marketing-hub:seo-audit',
+    'seo-lead': 'lhm-marketing-hub:start-seo',
     'content': 'lhm-marketing-hub:content-strategy', 'project': 'lhm-project-hub:team-work-brief',
     'gmb': 'lhm-gmb-hub:run-local-diagnostic', 'finance': 'lhm-finance-hub:finance-advisor',
     'website': 'lhm-wordpress-hub:wp-start', 'prototype': 'lhm-wordpress-hub:html-prototype',
@@ -146,6 +147,7 @@ def submit_specialist(route, subject_type, subject_name, objective):
     agent_ids = {
         'marketing': 'lhm-marketing-hub:start',
         'seo': 'lhm-marketing-hub:seo',
+        'seo-lead': 'lhm-marketing-hub:seo',
         'content': 'lhm-marketing-hub:content',
         'project': 'lhm-project-hub:pm-orchestrator',
         'gmb': 'lhm-gmb-hub:gmb-orchestrator',
