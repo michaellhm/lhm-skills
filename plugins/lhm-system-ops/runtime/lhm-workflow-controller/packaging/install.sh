@@ -138,6 +138,7 @@ chmod 0644 /var/lib/lhm-workflow/public/evidence-attestor.public.pem
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-workflow-*.service "$repo_dir"/packaging/lhm-workflow-*.path /etc/systemd/system/
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-department-*.service "$repo_dir"/packaging/lhm-department-*.path /etc/systemd/system/
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-department-snapshot-dispatch "$repo_dir"/integration/lhm-department-snapshot-broker "$repo_dir"/integration/lhm-department-result-importer /usr/local/libexec/
+install -o root -g root -m 0755 "$repo_dir"/integration/lhm-seo-envelope-runtime /usr/local/libexec/lhm-seo-envelope-runtime
 systemctl daemon-reload
 systemd-analyze verify /etc/systemd/system/lhm-workflow-*.service /etc/systemd/system/lhm-workflow-*.path
 if test "$enable_units" = 1; then

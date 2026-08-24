@@ -47,12 +47,12 @@
       "source": "assets/container/claude-dispatch",
       "destination": "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch",
       "container_destination": "/opt/data/profiles/lhm_brain/bin/claude-dispatch",
-      "sha256": "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac",
-      "previous_sha256": "cf9eff5237b2525744f710b663b4d82c8b77a47bba1dbb95711024508f4dc961",
+      "sha256": "612f711b94d68df7edf52dc7fa942044c37bec9c54cc00b90573e3cb40002ba6",
+      "previous_sha256": "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac",
       "owner": 10000,
       "group": 10000,
       "mode": "0755",
-      "size_bytes": 13047
+      "size_bytes": 13274
     }
   }
 }

@@ -29,7 +29,7 @@ for f in /etc/systemd/system/lhm-department-*.service /etc/systemd/system/lhm-de
 done
 systemctl daemon-reload
 # Broker/importer executables are preserved in the rollback backup for recovery.
-for f in /usr/local/libexec/lhm-department-snapshot-dispatch /usr/local/libexec/lhm-department-snapshot-broker /usr/local/libexec/lhm-department-result-importer; do
+for f in /usr/local/libexec/lhm-department-snapshot-dispatch /usr/local/libexec/lhm-department-snapshot-broker /usr/local/libexec/lhm-department-result-importer /usr/local/libexec/lhm-seo-envelope-runtime; do
   test -e "$f" || continue
   mv "$f" "$backup/"
 done
