@@ -15,6 +15,35 @@
         "drive_folder_id": "1t3aUHy1ZSMiHophhJQsQC-cDjcZiMxUA",
         "tracker": "30 Projects/LHM Growth/LHM Website SEO Growth Rollout/rollout-state.md"
       },
+      "profile_aliases": {
+        "lhm_chief_of_staff": "/home/hermes/.hermes/.local/bin/lhm_chief_of_staff",
+        "lhm_head_of_production": "/home/hermes/.hermes/.local/bin/lhm_production",
+        "lhm_seo_lead": "/home/hermes/.hermes/.local/bin/lhm_seo",
+        "lhm_researcher": "/home/hermes/.hermes/.local/bin/lhm_researcher",
+        "lhm_content": "/home/hermes/.hermes/.local/bin/lhm_content",
+        "lhm_website": "/home/hermes/.hermes/.local/bin/lhm_website",
+        "lhm_verifier": "/home/hermes/.hermes/.local/bin/lhm_verifier",
+        "lhm_learning_steward": "/home/hermes/.hermes/.local/bin/lhm_learning_steward"
+      },
+      "canonical_sources": [
+        "/home/hermes/.hermes/profiles/lhm_brain/vault/20 Clients/Local Health Marketing/Local Health Marketing.md",
+        "/home/hermes/.hermes/profiles/lhm_brain/vault/25 Marketing/Website/LHM Website Operating File.md",
+        "/home/hermes/.hermes/profiles/lhm_brain/vault/30 Projects/LHM Growth/LHM Website SEO Growth Rollout.md",
+        "/home/hermes/.hermes/profiles/lhm_brain/vault/30 Projects/LHM Growth/LHM Website SEO Growth Rollout/"
+      ],
+      "gsc": {
+        "property": "https://localhealthmarketing.com/",
+        "route": "seo_gsc_readonly",
+        "allowed_actions": ["list_sites", "batch_url_inspection", "search_analytics", "list_sitemaps"],
+        "evidence_path": "/var/lib/lhm-workflow-canary/evidence/lhm-seo-onboarding-20260822-070717.json",
+        "evidence_sha256": "6193b923f2464599c6755a1f4f0198f781224c8b6a2d922228c38f59b03df577"
+      },
+      "work_control": {
+        "path": "/home/hermes/.hermes/profiles/lhm_brain/bin/work-control",
+        "sha256": "7814ccfba1670b389764222b6d2bfa108b3bdd30af22f2f4a9b40f4a6d9cc35a",
+        "return_role": "head_of_production",
+        "return_point": "scheduled_parent_ready_before_chief_intake"
+      },
       "completion_test": "Accepted SEO evidence and any required content or website work pass independent QA, durable destinations read back, and Chief of Staff returns the governed handoff."
     }
   }
