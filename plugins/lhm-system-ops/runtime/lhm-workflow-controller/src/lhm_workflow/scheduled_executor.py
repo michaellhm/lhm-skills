@@ -236,7 +236,10 @@ class ScheduledExecutor:
         stage_instruction = ("For this Context stage, validate only the source manifest paths and SHA-256 evidence "
                              "already contained in request.json. Do not open the referenced source files, perform "
                              "research, or use tools beyond reading request.json. Return an empty decision object. "
-                             if contract["stage_id"] == "context" else "")
+                             if contract["stage_id"] == "context" else
+                             "For this independent Verifier stage, read each exact path in input_artifact_paths, "
+                             "compute or compare its SHA-256 to the declared value, and accept only an exact match. "
+                             "Return an empty decision object. " if contract["runtime"] == "verifier" else "")
         prompt=(f"Read the exact absolute file {container_dir}/request.json. {stage_instruction}Print only one JSON object to stdout "
                 f"with exactly these three keys: status, artifact_hashes, decision. Do not repeat identity or hashes "
                 f"from the request and do not use markdown "
@@ -325,7 +328,17 @@ class ScheduledExecutor:
             atomic_json(request_path, request)
             try:
                 if contract["runtime"] == "verifier":
-                    verifier_request={**request, "independent_verification": True, "self_approval_forbidden": True}
+                    registry=json.loads((self.root / "artifact-registry.json").read_text())
+                    private_inputs=[]
+                    for index,item in enumerate(contract["input_artifacts"]):
+                        record=registry.get(item["artifact_id"]); source=Path(record["path"]) if record else None
+                        if not source or record["sha256"]!=item["sha256"] or hashlib.sha256(source.read_bytes()).hexdigest()!=item["sha256"]:
+                            raise ValueError("verifier source artifact readback mismatch")
+                        destination=run_dir / f"input-artifact-{index:02d}.json"
+                        destination.write_bytes(source.read_bytes()); os.chown(destination,10000,10000); os.chmod(destination,0o600)
+                        private_inputs.append({**item,"path":f"/opt/data/profiles/lhm_verifier/dispatch/scheduled-executor/{parent_id}/{child}/{destination.name}"})
+                    verifier_request={**request, "independent_verification": True, "self_approval_forbidden": True,
+                                      "input_artifact_paths":private_inputs}
                     atomic_json(request_path, verifier_request)
                     self._invoke("lhm_verifier", run_dir, request_path, result_path, contract)
                     outputs = contract["input_artifacts"]
