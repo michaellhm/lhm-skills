@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r11",
-  "version": "0.1.17",
+  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r12",
+  "version": "0.1.18",
   "source_baseline": "main-8c0da39-plus-reviewed-seo-envelope",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -32,7 +32,8 @@
     "installed_executor_pythonpath_binding",
     "systemd_bounded_bot_handoff_write_path",
     "strict_hermes_oneshot_stdout_materialisation",
-    "bounded_file_only_toolset"
+    "bounded_file_only_toolset",
+    "container_bound_work_control_producer"
   ],
   "source_tree_sha256_excluding_manifest": "f7f89f6669ed200d8767071dd814c9ca041041ad57d2cd751dd06c90e54b0a88",
   "critical_files": {
@@ -47,7 +48,7 @@
     "packaging/rollback.sh": "060a8365c357cf76fa2828155c7eeb57d1ccabe01a717e26ce18a7340d373d10",
     "packaging/lhm-seo-envelope-runtime.service": "8bcb42c1a4a955c4215f5ddef9e088503c913e9791802895aa46bf557b48f046",
     "src/lhm_workflow/scheduled_work.py": "39d1d40e4cc66aaf5a04bd4df6f7744d3663d0c11218925fe81a6cc0b347af63",
-    "src/lhm_workflow/scheduled_executor.py": "201ef43dff266d149ff10d46e4c923f96f4c3f0d130319a7101088703b7c0789",
+    "src/lhm_workflow/scheduled_executor.py": "813c39a1ec33322d1217d3e9dc85c592c04691458bb867cc48b9cce828239061",
     "integration/lhm-scheduled-work-ingress": "89835bee2ff612a6a1abdfc489c1dfa071643954cf892be8b57f60f67249c147",
     "integration/lhm-scheduled-work-dispatch": "3bb3ca6f101d1e823b3ae977fc4b9d70eac7115a7467d8142ea3a07db0625dc8",
     "integration/lhm-scheduled-work-runtime": "a3948b3d972c26451e403134b5efd84331d649a7e737286dea2bcb51121ceb57",
@@ -60,7 +61,7 @@
     "packaging/lhm-scheduled-org-signer.service.in": "383d12c806ab11af4c5d14bbc4c1a84a903a988521420db333025bd89afc827d",
     "packaging/lhm-scheduled-org-signer.path.in": "8b222a87f8d7334f9595a5301852a045e656ce163800b2e73f0256eda379d603",
     "tests/test_scheduled_work.py": "c8b92095b86bead52d1713e294eb3af946d8e899856678290b1629b221c17960",
-    "tests/test_scheduled_executor.py": "177325e69e8211cd5acdabf3ca38577e380f9d859c27975c0d428c5d409a2430"
+    "tests/test_scheduled_executor.py": "51ed303f7f5f3806c6f8ffbe9573c91f46dcd7fece2040b0fab03d78dfc6aa0d"
   },
   "activation_state": "source_only_disabled",
   "cron_changed": false,

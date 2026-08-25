@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lhm-workflow-controller"
-version = "0.1.17"
+version = "0.1.18"
 description = "Host-enforced LHM production workflow controller"
 requires-python = ">=3.11"
 dependencies = []

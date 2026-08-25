@@ -119,7 +119,7 @@ def test_work_control_exact_stdin_after_hash_verification(tmp_path):
     assert invoke_work_control(parent, contract(), "connector unavailable", runner) == expected
     assert set(expected) == {"parent_run_id", "capability_incident_id", "return_point", "resume_token", "objective", "acceptance_test", "permission_ceiling"}
     assert expected["permission_ceiling"] == "green"
-    assert captured == {"argv":[str(executable), "block"], "stdin":json.dumps(expected, sort_keys=True, separators=(",", ":"))}
+    assert captured == {"argv":["/usr/bin/docker", "exec", "-i", "--user", "10000:10000", "hermes", "/opt/data/profiles/lhm_brain/bin/work-control", "block"], "stdin":json.dumps(expected, sort_keys=True, separators=(",", ":"))}
     executable.write_bytes(b"changed")
     with pytest.raises(ValueError, match="hash mismatch"): invoke_work_control(parent, contract(), "x", runner)
 
