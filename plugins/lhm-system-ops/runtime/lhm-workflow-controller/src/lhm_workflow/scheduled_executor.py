@@ -247,7 +247,10 @@ class ScheduledExecutor:
                              if contract["stage_id"] == "context" else
                              "For this independent Verifier stage, read each exact path in input_artifact_paths, "
                              "compute or compare its SHA-256 to the declared value, and accept only an exact match. "
-                             "Return an empty decision object. " if contract["runtime"] == "verifier" else "")
+                             "Return an empty decision object. " if contract["runtime"] == "verifier" else
+                             "For this Research synthesis stage, read the exact immutable_connector_evidence path, "
+                             "summarise only that read-only GSC evidence in decision, and do not request or mutate data. "
+                             if contract["stage_id"] == "research" and request_value.get("phase") == "synthesis" else "")
         prompt=(f"Read the exact absolute file {container_dir}/request.json. {stage_instruction}Print only one JSON object to stdout "
                 f"with exactly these three keys: status, artifact_hashes, decision. Do not repeat identity or hashes "
                 f"from the request and do not use markdown "
@@ -363,17 +366,18 @@ class ScheduledExecutor:
                     outputs = contract["input_artifacts"]
                 elif contract["stage_id"] in BOT_STAGES:
                     alias = stage_profile
-                    closed = self._invoke(alias, run_dir, request_path, result_path, contract)
                     if contract["stage_id"] == "research":
-                        plan = closed["value"]["decision"]
-                        if set(plan) != {"gsc_property", "urls"} or not isinstance(plan["urls"], list):
-                            raise ValueError("researcher returned an invalid bounded plan")
-                        connector_request = registered_gsc_request(contract, plan["gsc_property"], plan["urls"])
+                        _,candidate_urls=snapshot_sources(parent["scheduled_contract"]["canonical_sources"],run_dir / "research-sources",parent["scheduled_contract"]["gsc"]["property"])
+                        connector_request = registered_gsc_request(contract,parent["scheduled_contract"]["gsc"]["property"],candidate_urls[:25])
                         connector_receipt = invoke_registered_adapter(connector_request, self.runner)
                         evidence_path = run_dir / "connector-evidence.json"
                         atomic_json(evidence_path, {"request_sha256": canonical_sha(connector_request), "receipt": connector_receipt, "receipt_sha256": canonical_sha(connector_receipt)})
-                        request = {**request, "phase": "synthesis", "immutable_connector_evidence": artifact(evidence_path, "gsc-connector-evidence")}
+                        evidence=artifact(evidence_path,"gsc-connector-evidence")
+                        evidence["path"]=f"/opt/data/profiles/{PROFILE_NAMES[alias]}/dispatch/scheduled-executor/{parent_id}/{child}/connector-evidence.json"
+                        request = {**request, "phase": "synthesis", "immutable_connector_evidence": evidence}
                         atomic_json(request_path, request)
+                        closed = self._invoke(alias, run_dir, request_path, result_path, contract)
+                    else:
                         closed = self._invoke(alias, run_dir, request_path, result_path, contract)
                     if contract["stage_id"] == "operations_write":
                         proposal=closed["value"]["decision"]
