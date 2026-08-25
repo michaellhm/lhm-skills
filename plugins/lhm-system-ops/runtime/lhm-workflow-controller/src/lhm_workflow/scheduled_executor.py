@@ -150,11 +150,7 @@ def registered_gsc_request(contract: dict, site_key: str, property_name: str, ur
     return {"schema_version": 1, "operation": "claude_dispatch", "argv": argv, "binding": binding}
 
 
-def invoke_registered_adapter(request: dict, runner: Callable = subprocess.run) -> dict:
-    payload = json.dumps(request, sort_keys=True, separators=(",", ":"))
-    done = runner([ADAPTER], input=payload, capture_output=True, text=True, timeout=610)
-    if done.returncode: raise RuntimeError("registered GSC connector failed")
-    receipt = json.loads(done.stdout)
+def validate_registered_adapter_receipt(receipt: dict, request: dict) -> dict:
     if receipt.get("binding") != request["binding"] or receipt.get("operation") != "claude_dispatch": raise ValueError("GSC connector receipt binding mismatch")
     if receipt.get("receipt_sha256") != canonical_sha(receipt.get("result")): raise ValueError("GSC connector receipt hash mismatch")
     result = receipt.get("result")
@@ -163,6 +159,13 @@ def invoke_registered_adapter(request: dict, runner: Callable = subprocess.run) 
             not result["evidence"].strip() or result.get("evidence_sha256") != hashlib.sha256(result["evidence"].encode()).hexdigest()):
         raise ValueError("GSC connector did not return terminal evidence")
     return receipt
+
+
+def invoke_registered_adapter(request: dict, runner: Callable = subprocess.run) -> dict:
+    payload = json.dumps(request, sort_keys=True, separators=(",", ":"))
+    done = runner([ADAPTER], input=payload, capture_output=True, text=True, timeout=610)
+    if done.returncode: raise RuntimeError("registered GSC connector failed")
+    return validate_registered_adapter_receipt(json.loads(done.stdout), request)
 
 
 def work_control_request(parent: dict, contract: dict, reason: str) -> dict:
@@ -386,9 +389,15 @@ class ScheduledExecutor:
                     if contract["stage_id"] == "research":
                         _,candidate_urls=snapshot_sources(parent["scheduled_contract"]["canonical_sources"],run_dir / "research-sources",parent["scheduled_contract"]["gsc"]["property"])
                         connector_request = registered_gsc_request(contract,parent["scheduled_contract"]["gsc"]["site_key"],parent["scheduled_contract"]["gsc"]["property"],candidate_urls[:25])
-                        connector_receipt = invoke_registered_adapter(connector_request, self.runner)
                         evidence_path = run_dir / "connector-evidence.json"
-                        atomic_json(evidence_path, {"request_sha256": canonical_sha(connector_request), "receipt": connector_receipt, "receipt_sha256": canonical_sha(connector_receipt)})
+                        request_digest=canonical_sha(connector_request)
+                        existing=json.loads(evidence_path.read_text()) if evidence_path.exists() else None
+                        if (isinstance(existing,dict) and existing.get("request_sha256")==request_digest and
+                                existing.get("receipt_sha256")==canonical_sha(existing.get("receipt"))):
+                            connector_receipt=validate_registered_adapter_receipt(existing["receipt"],connector_request)
+                        else:
+                            connector_receipt = invoke_registered_adapter(connector_request, self.runner)
+                            atomic_json(evidence_path, {"request_sha256": request_digest, "receipt": connector_receipt, "receipt_sha256": canonical_sha(connector_receipt)})
                         evidence=artifact(evidence_path,"gsc-connector-evidence")
                         evidence["path"]=f"/opt/data/profiles/{PROFILE_NAMES[alias]}/dispatch/scheduled-executor/{parent_id}/{child}/connector-evidence.json"
                         request = {**request, "phase": "synthesis", "immutable_connector_evidence": evidence}
