@@ -154,6 +154,7 @@ install -D -o root -g root -m 0755 "$repo_dir"/integration/lhm-scheduled-work-di
 install -D -o root -g root -m 0755 "$repo_dir"/integration/lhm-seo-org-cron-alternate /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-seo-org-cron-alternate
 install -o root -g root -m 0644 "$repo_dir"/integration/scheduled-workflows.json /etc/lhm-workflow/scheduled-workflows.json
 scheduled_base=/home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-work
+install -d -o root -g 10000 -m 0710 "$scheduled_base"
 install -d -o root -g 10000 -m 0730 "$scheduled_base/incoming"
 for d in processed failed runs; do install -d -o root -g root -m 0750 "$scheduled_base/$d"; done
 systemctl daemon-reload
