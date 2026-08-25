@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r28",
-  "version": "0.1.34",
+  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r29",
+  "version": "0.1.35",
   "source_baseline": "main-8c0da39-plus-reviewed-seo-envelope",
   "changes": [
     "exact_registered_claude_dispatch_bindings",

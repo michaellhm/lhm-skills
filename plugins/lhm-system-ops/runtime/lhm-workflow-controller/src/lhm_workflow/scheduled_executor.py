@@ -253,9 +253,10 @@ class ScheduledExecutor:
         registry_path = self.root / "artifact-registry.json"
         registry = json.loads(registry_path.read_text()) if registry_path.exists() else {}
         for item in envelope["outputs"]:
-            candidate = Path(item["path"]) if item.get("path") else run_dir / "result.json"
-            if not candidate.exists() and contract["input_artifacts"]:
-                prior = registry.get(item["artifact_id"]); candidate = Path(prior["path"]) if prior else candidate
+            prior = registry.get(item["artifact_id"])
+            candidate = (Path(item["path"]) if item.get("path") else
+                         Path(prior["path"]) if prior and contract["input_artifacts"] else
+                         run_dir / "result.json")
             if not candidate.exists() or hashlib.sha256(candidate.read_bytes()).hexdigest()!=item["sha256"]:
                 raise ValueError("artifact registry readback mismatch")
             registry[item["artifact_id"]] = {"path": str(candidate), "sha256": item["sha256"]}
