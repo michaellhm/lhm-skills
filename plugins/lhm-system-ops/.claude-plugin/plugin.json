@@ -1,7 +1,7 @@
 {
   "name": "lhm-system-ops",
   "description": "Governed CTO capability research, engineering, QA, security review, GitHub delivery, and approved Hermes plugin deployment.",
-  "version": "0.9.52",
+  "version": "0.9.53",
   "author": { "name": "LHM Digital" },
   "keywords": ["cto", "hermes", "capability", "plugin", "github", "qa", "security"]
 }
