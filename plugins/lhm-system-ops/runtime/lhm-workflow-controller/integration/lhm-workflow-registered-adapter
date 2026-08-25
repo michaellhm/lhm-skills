@@ -35,7 +35,6 @@ if done.returncode:
 lines = [line for line in done.stdout.splitlines() if line.strip().startswith("{")]
 if not lines:
     raise SystemExit(4)
-result = json.loads(lines[-1])
 if operation == "claude_dispatch" and argv[1] == "submit-seo-gsc-readonly":
     completion = json.loads(lines[0])
     marker = "---RESULT---\n"
@@ -46,6 +45,8 @@ if operation == "claude_dispatch" and argv[1] == "submit-seo-gsc-readonly":
         raise SystemExit(4)
     result = {"completion": completion, "evidence": evidence,
               "evidence_sha256": hashlib.sha256(evidence.encode()).hexdigest()}
+else:
+    result = json.loads(lines[-1])
 receipt = {"schema_version": 1, "operation": operation, "binding": request["binding"], "result": result}
 receipt["receipt_sha256"] = hashlib.sha256(json.dumps(result, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 print(json.dumps(receipt, sort_keys=True))
