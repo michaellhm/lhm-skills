@@ -52,6 +52,16 @@ Skills exempt (own constraints): `ad-copy-generator`, `meta-tags-optimizer`, `so
 
 Never generate long-form content in a single pass.
 
+## Mandatory: Content Department Gate
+
+Read and follow `${CLAUDE_PLUGIN_ROOT}/references/content-departmental-delivery.md` whenever work creates or materially changes customer-facing words.
+
+- Channel skills such as SEO, Google Ads, CRO, competitive analysis, content gaps and TAYA own evidence, diagnosis and briefs. They do not own implementation-ready copy.
+- The `content` agent is the Content Lead and owns final wording, writing-skill selection and editorial acceptance.
+- Developers and publishers receive only a verified `implementation_ready_copy` artefact with one selected replacement per field. They must not implement audit suggestions, candidate wording or unselected variants.
+- Every final copy artefact records anti-AI, factual, brand, compliance and channel checks. `em_dash_count` must be `0`.
+- In a staged workflow, an accepted `content_brief` answers the Content Agent interview. Ask only for a material field that remains unresolved.
+
 ## Mandatory: Self-Learning Protocol
 
 Each agent has a `-learned.md` file in the `learnings/` directory. This file is Claude's persistent memory for that agent and all its skills, written by Claude through use.

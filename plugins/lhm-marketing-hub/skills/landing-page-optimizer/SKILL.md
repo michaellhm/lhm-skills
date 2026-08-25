@@ -8,16 +8,18 @@ license: MIT
 
 ## Purpose
 
-Audit landing pages for conversion optimisation, identify issues affecting performance, and generate AHPRA-compliant copy improvements. Get a scored audit with prioritised recommendations and A/B test suggestions.
+Audit landing pages for conversion optimisation, identify issues affecting performance, and prepare an evidence-backed content brief. This skill owns CRO diagnosis. The Content Department owns final replacement wording.
 
-## Routing Through content-writer Agent (When Generating New Copy)
+## Content Department Handoff
 
 This skill has two modes:
 
-1. **Audit existing copy** (no content-writer routing) — review the current page, score it, suggest improvements inline. The 8-pass agent is not invoked because no new long-form copy is being generated.
-2. **Generate replacement copy** — when the audit recommends a substantial rewrite, call the content-writer agent with `content_type: "page-copy"` and a structured brief built from the audit findings. The brief should include the original page's failures, the target conversion improvements, and any client voice notes.
+1. **Audit existing copy**: review the current page, score it and explain what needs to change. Example wording must be clearly labelled `illustrative, not implementation-ready`.
+2. **Prepare copy work**: create a versioned `content_brief` using `${CLAUDE_PLUGIN_ROOT}/references/content-departmental-delivery.md`, then hand it to the `content` agent. The Content Lead selects `copywriting`, runs the required writing method and independent editorial QA, saves the verified copy artefact and returns it to Head of Production.
 
-Use AskUserQuestion to confirm with the user which mode they want before proceeding.
+For an interactive request, confirm whether the user wants an audit only or wants the accepted audit converted into a Content Department brief. For a staged Hermes action, follow the supplied objective and approval state without repeating that question.
+
+Never return audit suggestions, candidate headlines or unselected A/B variants as executable developer input. Never call a generic content writer directly from this skill. The formal next owner for copy production is Content Lead.
 
 ## When to Use
 
@@ -91,7 +93,7 @@ Check all copy for healthcare compliance:
 - Testimonials (consent required)
 - Claims and promises
 
-### Step 7: Generate Recommendations
+### Step 7: Generate Recommendations or Content Brief
 
 Produce:
 - Overall score (X/10)
@@ -99,6 +101,19 @@ Produce:
 - High priority improvements
 - Medium/low priority nice-to-haves
 - A/B test suggestions
+
+If writing work is approved, also return a `content_brief` with:
+
+- observed page and exact fields affected;
+- audience, search or campaign intent and desired action;
+- performance evidence and diagnosed failures;
+- required message and voice-of-customer evidence;
+- exact CTA destination;
+- content, offers and claims that must remain unchanged;
+- compliance and channel constraints;
+- research gaps, delivery destination and completion test.
+
+An A/B idea remains `review_ready` until one variant is selected. Development may begin only from an `implementation_ready_copy` artefact whose approval state is `approved_for_implementation`.
 
 ## Expected Interaction Flow
 
@@ -132,11 +147,11 @@ and AHPRA compliance. Let me review each section...
 1. [Test hypothesis]
 ...
 
-Would you like me to provide optimised copy suggestions?
+Would you like me to prepare the Content Team brief for the approved changes?
 
 You: Yes, especially for the headline and CTA.
 
-Claude: [Provides AHPRA-compliant copy alternatives]
+Claude: [Returns a structured content brief to Content Lead. Content Lead produces and QA-checks the final copy as a separate action.]
 ```
 
 ## Audit Categories

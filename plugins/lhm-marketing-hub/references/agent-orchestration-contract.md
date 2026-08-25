@@ -51,6 +51,12 @@ Use installed agent or skill identifiers, not filesystem paths into another plug
 
 An unavailable specialist capability is not permission for a Lead to perform the specialist work itself. Return the required capability, expected output contract and resume point so the same parent can continue once the route is restored.
 
+### Customer-facing copy boundary
+
+When a child finding requires new or materially revised customer-facing copy, the originating Lead must return an accepted `content_brief` under `content-departmental-delivery.md`. Do not pass audit suggestions, candidate headlines or a strategy report directly to a developer or publisher.
+
+Content Lead returns a verified `implementation_ready_copy` artefact after writing and independent editorial QA. Head of Production may dispatch implementation only when that artefact contains one selected replacement per field and its approval state is `approved_for_implementation`. A `review_ready` variant set remains a human decision, not executable work.
+
 Outside a staged Lead action register, independent read-only children may run in parallel when supported. Within any staged departmental Lead loop, never dispatch multiple register actions in parallel, even when they appear read-only: dispatch exactly the first dependency-ready action, accept and persist it, then select again. Run dependent or mutation-capable work sequentially. Never let a child expand its own permissions.
 
 ## Approval
