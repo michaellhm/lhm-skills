@@ -239,7 +239,9 @@ class ScheduledExecutor:
                 if candidate.is_file() and not candidate.is_symlink(): os.chown(candidate, 10000, 10000)
                 elif candidate.is_dir() and not candidate.is_symlink(): os.chown(candidate, 10000, 10000)
         request_value=json.loads(request.read_text()); request_sha256=canonical_sha(request_value)
-        stale_sha=hashlib.sha256(result.read_bytes()).hexdigest() if result.exists() else None
+        # Freshness is established by removing the prior file and materialising
+        # only this invocation's bounded stdout. A deterministic retry is
+        # allowed to reproduce byte-identical business output.
         result.unlink(missing_ok=True)
         container_dir=f"/opt/data/profiles/{PROFILE_NAMES[profile]}/dispatch/scheduled-executor/{contract['parent_run_id']}/{contract['child_run_id']}"
         stage_instruction = ("For this Context stage, validate only the source manifest paths and SHA-256 evidence "
@@ -251,7 +253,12 @@ class ScheduledExecutor:
                              "Return an empty decision object. " if contract["runtime"] == "verifier" else
                              "For this Research synthesis stage, read the exact immutable_connector_evidence path, "
                              "summarise only that read-only GSC evidence in decision, and do not request or mutate data. "
-                             if contract["stage_id"] == "research" and request_value.get("phase") == "synthesis" else "")
+                             if contract["stage_id"] == "research" and request_value.get("phase") == "synthesis" else
+                             "For this SEO acceptance stage, return a decision object with exactly content_required "
+                             "(boolean), website_required (boolean), and reason (non-empty string). Base the flags only "
+                             "on explicitly required downstream work; when no such work is available, set both false "
+                             "and explain that no additional implementation was explicitly required. "
+                             if contract["stage_id"] == "seo_accept" else "")
         prompt=(f"Read the exact absolute file {container_dir}/request.json. {stage_instruction}Print only one JSON object to stdout "
                 f"with exactly these three keys: status, artifact_hashes, decision. Do not repeat identity or hashes "
                 f"from the request and do not use markdown "
@@ -262,7 +269,7 @@ class ScheduledExecutor:
         done = self.runner(hermes_argv(profile, container_dir, prompt), capture_output=True, text=True, timeout=900)
         if done.returncode: raise RuntimeError("bounded Hermes role invocation failed")
         materialise_stdout_result(result, done.stdout, contract, request_sha256)
-        return validate_closed_result(result, contract, request_sha256, prior_result_sha256=stale_sha)
+        return validate_closed_result(result, contract, request_sha256)
 
     def _wait_signed(self, contract: dict, envelope: dict, run_dir: Path) -> dict:
         registry_path = self.root / "artifact-registry.json"

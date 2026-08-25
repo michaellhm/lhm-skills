@@ -100,6 +100,20 @@ def test_host_materialises_only_strict_json_stdout(tmp_path):
         materialise_stdout_result(path, json.dumps(model_result)+json.dumps(model_result), contract(), "a"*64)
 
 
+def test_deterministic_retry_may_reproduce_identical_closed_result(tmp_path):
+    path = tmp_path / "result.json"
+    value = closed_result()
+    path.write_text(json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n")
+    path.unlink()
+    materialise_stdout_result(
+        path,
+        json.dumps({"status": "accepted", "artifact_hashes": ["b" * 64], "decision": {}}),
+        contract(),
+        "a" * 64,
+    )
+    assert validate_closed_result(path, contract(), "a" * 64)["value"] == value
+
+
 def test_registered_gsc_gateway_contract_and_failures():
     urls = ["https://localhealthmarketing.com/about", "https://localhealthmarketing.com/services/seo"]
     request = registered_gsc_request(contract(), "https://localhealthmarketing.com/", urls)
