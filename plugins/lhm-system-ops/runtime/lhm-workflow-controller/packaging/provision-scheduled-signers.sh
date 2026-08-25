@@ -14,7 +14,7 @@ for role in $roles; do
   openssl pkey -in "$private" -pubout -out "$public"
   chown "$user:$user" "$private"; chmod 0400 "$private"
   chown root:root "$public"; chmod 0644 "$public"
-  install -d -o lhmworkflow -g "$user" -m 2730 "/var/lib/lhm-workflow/org-signer-requests/$role"
+  install -d -o lhmworkflow -g "$user" -m 2770 "/var/lib/lhm-workflow/org-signer-requests/$role"
   install -d -o "$user" -g lhmworkflow -m 2730 "/var/lib/lhm-workflow/org-signer-results/$role"
   verify=''
   test "$role" != lhm_verifier || verify='--verifier --registry /var/lib/lhm-workflow/artifact-registry.json'

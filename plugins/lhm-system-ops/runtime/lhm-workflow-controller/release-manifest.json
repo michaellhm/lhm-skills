@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r20",
-  "version": "0.1.26",
+  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r21",
+  "version": "0.1.27",
   "source_baseline": "main-8c0da39-plus-reviewed-seo-envelope",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -41,7 +41,8 @@
     "explicit_closed_result_value_contract",
     "host_bound_closed_result_identity",
     "unprivileged_signer_adapter_parent_traversal",
-    "installed_signer_pythonpath_binding"
+    "installed_signer_pythonpath_binding",
+    "role_signer_queue_list_permission"
   ],
   "source_tree_sha256_excluding_manifest": "f7f89f6669ed200d8767071dd814c9ca041041ad57d2cd751dd06c90e54b0a88",
   "critical_files": {
@@ -65,7 +66,7 @@
     "integration/cron-3994012c42ba.alternate.disabled.json": "082c8d8b597c6e3d48cfc18a5ee12df179c8dbdd42138da2d6c4775da35baea8",
     "packaging/lhm-scheduled-work.path": "41f9913d296ce6dea2550a1988f30d3fce3d17b7a7fb6666e0b10a8396df996e",
     "packaging/lhm-scheduled-work.service": "342fdb0a14e1f135a70b0c25dd7c3c56c9b9ccc0016817bcc9fb7cba36c6ab2b",
-    "packaging/provision-scheduled-signers.sh": "027ccd5f16cbecee87816c54c9953e83e78c55d4642f5f4bc6fe6b971e186934",
+    "packaging/provision-scheduled-signers.sh": "ad19a8d6eddfe51dc84168f54345dc661ccf71015abeed1d1e47bc44dbb6811a",
     "packaging/lhm-scheduled-org-signer.service.in": "d2bf18af2c15b300ff3f6de0055a4f2dd61648c23736d8a8cc0382a561c656ea",
     "packaging/lhm-scheduled-org-signer.path.in": "8b222a87f8d7334f9595a5301852a045e656ce163800b2e73f0256eda379d603",
     "tests/test_scheduled_work.py": "c8b92095b86bead52d1713e294eb3af946d8e899856678290b1629b221c17960",
