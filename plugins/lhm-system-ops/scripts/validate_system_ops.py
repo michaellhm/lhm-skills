@@ -83,7 +83,7 @@ def main():
         errors.append(f'generated Python bytecode in plugin release contents: {relative}')
     expected_manifest_versions = {
         '.codex-plugin/plugin.json': '0.9.48',
-        '.claude-plugin/plugin.json': '0.9.65',
+        '.claude-plugin/plugin.json': '0.9.66',
     }
     for relative, expected_version in expected_manifest_versions.items():
         path = PLUGIN / relative
@@ -212,7 +212,7 @@ def main():
     if '--untracked-files=all' not in dispatcher or '--untracked-files=all' not in publisher:
         errors.append('dispatcher and publisher must enumerate individual untracked files')
     prototype_publisher = (PLUGIN / 'assets/host/lhm-prototype-publisher').read_text(encoding='utf-8')
-    for required in ("REPOSITORY = 'michaellhm/lhm-prototype'", "BRANCH = 'main'", "SOURCE_ROOT = Path('/var/lib/lhm-prototype-publication/incoming')", "SSH_KEY = Path('/etc/lhm-prototype-publisher/id_ed25519')", 'schema_version', 'source_basicops_task', 'governed_parent', 'source_package_sha256', 'file_manifest', 'idempotency_key', 'standing_authority_reference', 'StrictHostKeyChecking=yes', 'actions/workflows/{WORKFLOW["id"]}/runs?', 'public prototype content does not match approved index.html'):
+    for required in ("REPOSITORY = 'michaellhm/lhm-prototype'", "BRANCH = 'main'", "SOURCE_ROOT = Path('/var/lib/lhm-prototype-publication/incoming')", "SSH_KEY = Path('/etc/lhm-prototype-publisher/id_ed25519')", 'schema_version', 'source_basicops_task', 'governed_parent', 'source_package_sha256', 'file_manifest', 'idempotency_key', 'standing_authority_reference', 'StrictHostKeyChecking=yes', 'wait_for_public_deploy', 'public prototype content does not match approved index.html'):
         if required not in prototype_publisher:
             errors.append(f'prototype publisher is missing bounded control: {required}')
     prototype_runtime = (PLUGIN / 'assets/host/lhm-prototype-publication-runtime').read_text(encoding='utf-8')
