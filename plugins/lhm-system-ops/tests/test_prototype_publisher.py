@@ -149,10 +149,12 @@ class PrototypePublisherTests(unittest.TestCase):
 
     def test_exact_named_actions_and_bounded_http_are_success_gates(self):
         completed={'workflow_runs':[{'id':7,'name':'Deploy to lhmstaging','path':'.github/workflows/deploy.yml','head_sha':'a'*40,'status':'completed','conclusion':'success'}]}
-        with mock.patch.object(publisher,'github_cli',return_value='/available/gh'), mock.patch.object(publisher,'run',return_value=json.dumps(completed)):
+        response=mock.MagicMock(); response.read.return_value=json.dumps(completed).encode(); response.__enter__.return_value=response
+        with mock.patch.object(publisher.urllib.request,'urlopen',return_value=response):
             self.assertEqual(publisher.verify_deploy('a'*40)['id'],7)
         wrong={'workflow_runs':[{'id':8,'name':'Other','head_sha':'a'*40,'status':'completed','conclusion':'success'}]}
-        with mock.patch.object(publisher,'github_cli',return_value='/available/gh'), mock.patch.object(publisher,'run',return_value=json.dumps(wrong)), mock.patch.object(publisher.time,'sleep'):
+        response.read.return_value=json.dumps(wrong).encode()
+        with mock.patch.object(publisher.urllib.request,'urlopen',return_value=response), mock.patch.object(publisher.time,'sleep'):
             with self.assertRaisesRegex(ValueError,'not observed'): publisher.verify_deploy('a'*40)
 
     def test_public_readback_requires_exact_index_bytes_and_hash(self):
@@ -180,9 +182,9 @@ class PrototypePublisherTests(unittest.TestCase):
             for update,message in cases:
                 with self.subTest(update=update), self.assertRaisesRegex(ValueError,message): publisher.validate({**good,**update})
 
-    def test_preflight_requires_post_publish_cli_before_mutation(self):
-        with mock.patch.object(publisher.shutil,'which',side_effect=lambda name: None if name=='gh' else '/bin/'+name):
-            with self.assertRaisesRegex(ValueError,'GitHub CLI'): publisher.preflight_post_publish_dependencies()
+    def test_preflight_requires_repository_transport_before_mutation(self):
+        with mock.patch.object(publisher.shutil,'which',side_effect=lambda name: None if name=='git' else '/bin/'+name):
+            with self.assertRaisesRegex(ValueError,'repository transport'): publisher.preflight_post_publish_dependencies()
 
     def test_interrupted_exact_push_resumes_verification_and_one_receipt_without_commit(self):
         with tempfile.TemporaryDirectory() as temporary:
