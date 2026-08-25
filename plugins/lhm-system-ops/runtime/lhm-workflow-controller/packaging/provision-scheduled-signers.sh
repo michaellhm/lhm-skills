@@ -3,7 +3,8 @@ set -eu
 test "$(id -u)" -eq 0
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 roles='lhm_chief_of_staff lhm_head_of_production lhm_seo_lead lhm_researcher lhm_content lhm_website lhm_operations lhm_learning_steward lhm_verifier'
-install -d -o root -g root -m 0700 /var/lib/lhm-workflow/secrets/org
+install -d -o root -g root -m 0711 /var/lib/lhm-workflow/secrets/org
+install -d -o root -g lhmworkflow -m 0750 /var/lib/lhm-workflow/org-signer-requests /var/lib/lhm-workflow/org-signer-results
 for role in $roles; do
   user="lhmsign-$(printf %s "$role" | sed 's/^lhm_//;s/_/-/g')"
   id "$user" >/dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin/nologin "$user"
