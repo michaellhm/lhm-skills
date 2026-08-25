@@ -11,6 +11,8 @@ from pathlib import Path
 BASE = Path("/home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-work")
 INCOMING, PROCESSED, FAILED, RUNS = (BASE / name for name in ("incoming", "processed", "failed", "runs"))
 INGRESS = "/usr/local/libexec/lhm-scheduled-work-ingress"
+EXECUTOR = "/opt/lhm-workflow/current/venv/bin/python3"
+PARENT_OUTBOX = Path("/var/lib/lhm-workflow/scheduled-intake")
 SAFE = re.compile(r"^[a-z0-9][a-z0-9-]{0,79}$")
 
 
@@ -57,7 +59,15 @@ def process(path, runner=subprocess.run):
     if done.returncode:
         raise RuntimeError((done.stderr or done.stdout)[-1000:])
     receipt = json.loads(done.stdout)
-    atomic(run_dir / "final.json", {"schema_version": 1, "scheduler": "accepted", "receipt": receipt})
+    atomic(run_dir / "acceptance.json", {"schema_version": 1, "scheduler": "accepted", "receipt": receipt})
+    executed = runner(
+        [EXECUTOR, "-m", "lhm_workflow.scheduled_executor", str(PARENT_OUTBOX / f"{request['parent_run_id']}.json")],
+        capture_output=True, text=True, timeout=7200,
+    )
+    if executed.returncode:
+        raise RuntimeError((executed.stderr or executed.stdout)[-1000:])
+    business = json.loads(executed.stdout)
+    atomic(run_dir / "final.json", {"schema_version": 1, "scheduler": "accepted", "business": business})
     shutil.move(path, PROCESSED / path.name)
     return receipt
 

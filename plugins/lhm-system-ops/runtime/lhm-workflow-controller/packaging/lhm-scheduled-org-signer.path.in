@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch isolated scheduled signer requests for @ROLE@
+
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/org-signer-requests/@ROLE@/*.json
+Unit=lhm-scheduled-org-signer-@ROLE@.service
+
+[Install]
+WantedBy=multi-user.target

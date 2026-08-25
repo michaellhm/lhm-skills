@@ -44,6 +44,7 @@ def load_definition(path: Path, workflow_key: str, *, test_mode: bool = False) -
     required = {
         "source_cron_id", "job_name", "handler", "department", "client_id",
         "permission_ceiling", "reviewer", "delivery", "destinations", "completion_test",
+        "profile_aliases", "canonical_sources", "gsc", "work_control",
     }
     if not isinstance(definition, dict) or set(definition) != required:
         raise ValueError("unknown or invalid scheduled workflow")
@@ -56,6 +57,21 @@ def load_definition(path: Path, workflow_key: str, *, test_mode: bool = False) -
         raise ValueError("scheduled workflow requires authoritative destinations")
     if not isinstance(definition["completion_test"], str) or not definition["completion_test"].strip():
         raise ValueError("scheduled workflow requires a completion test")
+    aliases = definition["profile_aliases"]
+    required_aliases = {"lhm_chief_of_staff", "lhm_head_of_production", "lhm_seo_lead", "lhm_researcher", "lhm_content", "lhm_website", "lhm_verifier", "lhm_operations", "lhm_learning_steward"}
+    if not isinstance(aliases, dict) or set(aliases) != required_aliases or any(not str(value).startswith("/home/hermes/.hermes/.local/bin/") for value in aliases.values()):
+        raise ValueError("invalid Hermes profile alias registry")
+    sources = definition["canonical_sources"]
+    if not isinstance(sources, list) or len(sources) != 4 or any(not str(value).startswith("/home/hermes/.hermes/profiles/lhm_brain/vault/") for value in sources):
+        raise ValueError("invalid canonical source registry")
+    gsc = definition["gsc"]
+    if set(gsc) != {"property", "route", "allowed_actions", "evidence_path", "evidence_sha256"} or gsc["property"] != "https://localhealthmarketing.com/" or gsc["route"] != "seo_gsc_readonly":
+        raise ValueError("invalid registered GSC property")
+    if set(gsc["allowed_actions"]) != {"list_sites", "batch_url_inspection", "search_analytics", "list_sitemaps"}:
+        raise ValueError("invalid GSC permission ceiling")
+    work_control = definition["work_control"]
+    if set(work_control) != {"path", "sha256", "return_role", "return_point"} or work_control["return_role"] != "head_of_production":
+        raise ValueError("invalid work-control registry")
     return definition
 
 
@@ -90,9 +106,14 @@ def create_parent(definition: dict, event: dict, parent_run_id: str) -> dict:
         "reviewer": definition["reviewer"],
         "destinations": definition["destinations"],
         "completion_test": definition["completion_test"],
+        "profile_aliases": definition["profile_aliases"],
+        "canonical_sources": definition["canonical_sources"],
+        "gsc": definition["gsc"],
+        "work_control": definition["work_control"],
     }
     parent["scheduled_contract"] = contract
     parent["scheduled_contract_sha256"] = _digest(contract)
+    parent["stage_order"] = ["chief_intake", "context", "context_verify", "research", "research_verify", "production_plan", "seo_plan", "seo_plan_verify", "seo_accept"]
     return parent
 
 

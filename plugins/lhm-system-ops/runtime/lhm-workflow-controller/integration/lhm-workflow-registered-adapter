@@ -6,6 +6,9 @@ import subprocess
 import sys
 
 DISPATCH = "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
+DOCKER = "/usr/bin/docker"
+CONTAINER = "hermes"
+CONTAINER_USER = "10000:10000"
 CONTROLLER = "/opt/lhm-workflow/current/venv/bin/lhm-workflow"
 
 request = json.load(sys.stdin)
@@ -16,7 +19,7 @@ if operation == "claude_dispatch":
     allowed = {"submit-seo-gsc-readonly", "submit-specialist-readonly", "submit-google-drive-client-file-create", "submit-basicops-task-discussion-update"}
     if not isinstance(argv, list) or len(argv) < 2 or argv[0] != DISPATCH or argv[1] not in allowed:
         raise SystemExit(3)
-    done = subprocess.run(argv, text=True, capture_output=True, timeout=610, check=False)
+    done = subprocess.run([DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER, *argv], text=True, capture_output=True, timeout=610, check=False)
 elif operation == "department_lead_accept":
     if not isinstance(argv, list) or len(argv) != 4 or argv[:2] != [CONTROLLER, "department-lead-accept"]:
         raise SystemExit(3)
