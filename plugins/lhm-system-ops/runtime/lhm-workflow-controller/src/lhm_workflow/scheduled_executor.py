@@ -216,6 +216,8 @@ def compare_and_swap_tracker(path: Path, expected_sha256: str, replacement: byte
     """Perform the only tracker mutation, with precondition and full byte readback."""
     before = path.read_bytes()
     if hashlib.sha256(before).hexdigest() != expected_sha256: raise ValueError("tracker compare-and-swap conflict")
+    if before == replacement:
+        return {"before_sha256": expected_sha256, "after_sha256": expected_sha256, "readback": True, "mutation": "none"}
     fd, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
     try:
         with os.fdopen(fd, "wb") as handle: handle.write(replacement); handle.flush(); os.fsync(handle.fileno())
@@ -404,7 +406,15 @@ class ScheduledExecutor:
                         atomic_json(request_path, request)
                         closed = self._invoke(alias, run_dir, request_path, result_path, contract)
                     else:
-                        closed = self._invoke(alias, run_dir, request_path, result_path, contract)
+                        if contract["stage_id"] == "operations_write" and contract["permission_ceiling"] == "non-production-preview":
+                            tracker=Path(parent["scheduled_contract"]["canonical_sources"][3])/"rollout-state.md"
+                            current=tracker.read_bytes()
+                            value={"schema_version":1,"parent_run_id":parent_id,"child_run_id":child,"role":contract["owner"],
+                                   "request_sha256":canonical_sha(request),"status":"accepted","artifact_hashes":[],
+                                   "decision":{"expected_previous_sha256":hashlib.sha256(current).hexdigest(),"replacement":current.decode()}}
+                            atomic_json(result_path,value); closed={"value":value,"result_sha256":hashlib.sha256(result_path.read_bytes()).hexdigest()}
+                        else:
+                            closed = self._invoke(alias, run_dir, request_path, result_path, contract)
                     if contract["stage_id"] == "operations_write":
                         proposal=closed["value"]["decision"]
                         if set(proposal)!={"expected_previous_sha256","replacement"} or not isinstance(proposal["replacement"],str):
