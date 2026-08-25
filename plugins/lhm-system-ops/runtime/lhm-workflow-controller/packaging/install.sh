@@ -157,6 +157,7 @@ scheduled_base=/home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-work
 install -d -o root -g 10000 -m 0710 "$scheduled_base"
 install -d -o root -g 10000 -m 0730 "$scheduled_base/incoming"
 for profile in lhm_chief_of_staff lhm_production lhm_researcher lhm_seo lhm_content lhm_website lhm_verifier lhm_operations_connector lhm_learning_steward; do
+  install -d -o 10000 -g 10000 -m 0700 "/home/hermes/.hermes/profiles/$profile/dispatch"
   install -d -o root -g 10000 -m 0710 "/home/hermes/.hermes/profiles/$profile/dispatch/scheduled-executor"
 done
 for d in processed failed runs; do install -d -o root -g root -m 0750 "$scheduled_base/$d"; done
