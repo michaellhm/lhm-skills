@@ -1,6 +1,5 @@
 [Unit]
-Description=Stage and publish governed prototype packages
-
+Description=Validate and dispatch governed prototype publication
 [Service]
 Type=oneshot
 User=root
@@ -10,7 +9,9 @@ NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/prototype-publication /var/lib/lhm-prototype-publication
+ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/prototype-publication /var/lib/lhm-prototype-publication /srv/lhm-prototype-publisher
+ReadOnlyPaths=/etc/lhm-prototype-publisher
+InaccessiblePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/prototype-publication/sealed
 PrivateDevices=yes
 ProtectKernelTunables=yes
 ProtectKernelModules=yes

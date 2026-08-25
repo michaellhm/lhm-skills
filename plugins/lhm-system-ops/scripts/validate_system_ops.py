@@ -83,7 +83,7 @@ def main():
         errors.append(f'generated Python bytecode in plugin release contents: {relative}')
     expected_manifest_versions = {
         '.codex-plugin/plugin.json': '0.9.48',
-        '.claude-plugin/plugin.json': '0.9.63',
+        '.claude-plugin/plugin.json': '0.9.64',
     }
     for relative, expected_version in expected_manifest_versions.items():
         path = PLUGIN / relative
@@ -124,6 +124,7 @@ def main():
         'assets/host/lhm-cto-branch-publisher',
         'assets/host/lhm-asp-sitemap-publisher',
         'assets/host/lhm-prototype-publisher',
+        'assets/container/prototype-dispatch',
         'assets/host/lhm-prototype-publication-runtime',
         'assets/systemd/lhm-prototype-publication.path',
         'assets/systemd/lhm-prototype-publication.service',
@@ -218,10 +219,10 @@ def main():
     prototype_path = (PLUGIN / 'assets/systemd/lhm-prototype-publication.path').read_text(encoding='utf-8')
     prototype_service = (PLUGIN / 'assets/systemd/lhm-prototype-publication.service').read_text(encoding='utf-8')
     shared_incoming = '/home/hermes/.hermes/profiles/lhm_brain/dispatch/prototype-publication/incoming'
-    for required in (f"BASE = Path('{shared_incoming.rsplit('/incoming',1)[0]}')", "STAGING = Path('/var/lib/lhm-prototype-publication/incoming')", "PUBLISHER = '/usr/local/libexec/lhm-prototype-publisher'"):
+    for required in (f"QUEUE=Path('{shared_incoming.rsplit('/incoming',1)[0]}')", "STAGING=Path('/var/lib/lhm-prototype-publication/incoming')", "PUBLISHER='/usr/local/libexec/lhm-prototype-publisher'"):
         if required not in prototype_runtime:
             errors.append(f'prototype publication runtime is missing bounded control: {required}')
-    if f'PathExistsGlob={shared_incoming}/*.json' not in prototype_path:
+    if f'DirectoryNotEmpty={shared_incoming}' not in prototype_path:
         errors.append('prototype publication path unit does not watch the shared incoming directory')
     for required in (shared_incoming.rsplit('/incoming',1)[0], '/var/lib/lhm-prototype-publication'):
         if required not in prototype_service:

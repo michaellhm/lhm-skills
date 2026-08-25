@@ -1,169 +1,86 @@
 #!/usr/bin/env python3
-"""Claim sealed Hermes prototype packages and invoke the bounded root publisher."""
-import fcntl, hashlib, json, os, re, shutil, subprocess, tempfile
+"""Root queue consumer for the closed prototype publication route."""
+import hashlib, json, os, re, shutil, subprocess, tempfile
+from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 
-BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/prototype-publication')
-INCOMING, SEALED, CLAIMS, PROCESSED, FAILED = (BASE / name for name in ('incoming', 'sealed', 'claims', 'processed', 'failed'))
-STAGING = Path('/var/lib/lhm-prototype-publication/incoming')
-PUBLISHER = '/usr/local/libexec/lhm-prototype-publisher'
-LOCK = BASE / '.consumer.lock'
-SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
-SHA256 = re.compile(r'^[0-9a-f]{64}$')
+QUEUE=Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/prototype-publication')
+INCOMING,PROCESSED,FAILED=(QUEUE/x for x in ('incoming','processed','failed'))
+STAGING=Path('/var/lib/lhm-prototype-publication/incoming')
+PUBLISHER='/usr/local/libexec/lhm-prototype-publisher'
+SAFE=re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$'); SHA=re.compile(r'^[0-9a-f]{40}$'); SHA256=re.compile(r'^[0-9a-f]{64}$')
+SLUG=re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
+FIELDS={'schema_version','request_id','source_basicops_task','governed_parent','destination_profile_id','operation','credential_reference','client_slug','project_slug','prototype_kind','repository','branch','expected_base_commit','source_directory','source_package_sha256','source_drive_file_id','source_drive_file_sha256','source_drive_file_bytes','file_manifest','qa_evidence_reference','idempotency_key','standing_authority_reference','commit_message'}
 
-
-def load(path):
-    return json.loads(path.read_text(encoding='utf-8'))
-
-
-def digest_file(path):
-    value = hashlib.sha256()
-    with path.open('rb') as stream:
-        for block in iter(lambda: stream.read(1024 * 1024), b''):
-            value.update(block)
-    return value.hexdigest()
-
-
-def atomic_json(path, value):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd, temporary = tempfile.mkstemp(prefix=f'.{path.name}.', dir=path.parent)
+def package_digest(manifest): return hashlib.sha256((json.dumps(manifest,sort_keys=True,separators=(',',':'))+'\n').encode()).hexdigest()
+def atomic(path,value,mode=0o600):
+    path.parent.mkdir(parents=True,exist_ok=True); fd,tmp=tempfile.mkstemp(prefix='.'+path.name+'.',dir=path.parent)
     try:
-        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
-            json.dump(value, handle, indent=2, sort_keys=True)
-            handle.write('\n')
-        os.chmod(temporary, 0o640)
-        os.replace(temporary, path)
+        with os.fdopen(fd,'w',encoding='utf-8') as stream: json.dump(value,stream,indent=2,sort_keys=True); stream.write('\n')
+        os.chmod(tmp,mode); os.replace(tmp,path)
     finally:
-        if os.path.exists(temporary):
-            os.unlink(temporary)
+        if os.path.exists(tmp): os.unlink(tmp)
 
-
-def validate_transport(request, path):
-    request_id = request.get('request_id') if isinstance(request, dict) else None
-    if not isinstance(request_id, str) or not SAFE_ID.fullmatch(request_id) or path.name != request_id + '.json':
-        raise ValueError('invalid request transport identity')
-    if request.get('schema_version') != 3 or request.get('idempotency_key') != request_id:
-        raise ValueError('invalid request transport contract')
-    manifest = request.get('file_manifest')
-    if not isinstance(manifest, list) or not manifest:
-        raise ValueError('file_manifest must be non-empty')
-    paths = []
+def validate(request,bundle):
+    request_path=bundle/'request.json'
+    if bundle.is_symlink() or not request_path.is_file() or request_path.is_symlink(): raise ValueError('invalid queued request bundle')
+    if not isinstance(request,dict) or set(request)!=FIELDS or request.get('schema_version')!=3: raise ValueError('invalid prototype publication schema_v3')
+    request_id=request.get('request_id','')
+    if not SAFE.fullmatch(request_id) or bundle.name!=request_id or request.get('idempotency_key')!=request_id: raise ValueError('invalid request identity')
+    if not all(SAFE.fullmatch(request.get(field,'')) for field in ('source_basicops_task','governed_parent','qa_evidence_reference')): raise ValueError('invalid governed reference')
+    if request.get('source_directory')!='source': raise ValueError('arbitrary source_directory is forbidden')
+    if (request.get('destination_profile_id'),request.get('repository'),request.get('branch'),request.get('credential_reference'),request.get('standing_authority_reference')) != ('prototype-main-v1','michaellhm/lhm-prototype','main','LHM_PROTOTYPE_MAIN_DEPLOY_KEY','MICHAEL-PROTOTYPE-PUBLISH-STANDING-20260820'): raise ValueError('request is outside the fixed publication authority')
+    if not SLUG.fullmatch(request.get('client_slug','')) or request.get('project_slug') not in {'sitemap','homepage'} or request.get('prototype_kind')!=request['project_slug'] or request.get('operation')!='publish_'+request['project_slug']: raise ValueError('invalid prototype operation')
+    if not SHA.fullmatch(request.get('expected_base_commit','')): raise ValueError('invalid expected_base_commit')
+    if not SAFE.fullmatch(request.get('source_drive_file_id','')) or not SHA256.fullmatch(request.get('source_drive_file_sha256','')) or not isinstance(request.get('source_drive_file_bytes'),int) or not 1<=request['source_drive_file_bytes']<=10_000_000: raise ValueError('invalid Drive readback evidence')
+    manifest=request.get('file_manifest'); paths=[x.get('path') for x in manifest or [] if isinstance(x,dict)]
+    if not manifest or len(paths)!=len(manifest) or paths!=sorted(set(paths)): raise ValueError('file_manifest must be exact, sorted and unique')
+    source=bundle/'source'
+    if not source.is_dir() or source.is_symlink() or source.resolve().parent!=bundle.resolve(): raise ValueError('invalid queued source directory')
     for item in manifest:
-        if not isinstance(item, dict) or set(item) != {'path', 'sha256', 'bytes'}:
-            raise ValueError('invalid file manifest entry')
-        value = item['path']; relative = PurePosixPath(value)
-        if (not isinstance(value, str) or relative.is_absolute() or '..' in relative.parts
-                or any(part.startswith('.') for part in relative.parts)
-                or not isinstance(item['bytes'], int) or not 0 <= item['bytes'] <= 10_000_000
-                or not isinstance(item['sha256'], str) or not SHA256.fullmatch(item['sha256'])):
-            raise ValueError('unsafe file manifest entry')
-        paths.append(value)
-    if paths != sorted(set(paths)):
-        raise ValueError('file_manifest must be exact, sorted and unique')
-    return request_id, manifest
+        relative=PurePosixPath(item.get('path',''))
+        if set(item)!={'path','sha256','bytes'} or relative.is_absolute() or '..' in relative.parts or any(p.startswith('.') for p in relative.parts): raise ValueError('unsafe manifest path')
+        candidate=source.joinpath(*relative.parts)
+        try: candidate.resolve().relative_to(source.resolve())
+        except (ValueError,OSError): raise ValueError('manifest path escapes queued source')
+        if not SHA256.fullmatch(str(item['sha256'])) or not isinstance(item['bytes'],int) or not 0<=item['bytes']<=10_000_000 or not candidate.is_file() or candidate.is_symlink() or candidate.stat().st_size!=item['bytes'] or hashlib.sha256(candidate.read_bytes()).hexdigest()!=item['sha256']: raise ValueError('sealed file does not match manifest')
+    contents=list(source.rglob('*'))
+    if any(path.is_symlink() for path in contents): raise ValueError('queued package contains a symlink')
+    observed=sorted(str(p.relative_to(source)) for p in contents if p.is_file())
+    if observed!=paths: raise ValueError('staged package contains unmanifested files')
+    if package_digest(manifest)!=request.get('source_package_sha256') or not SHA256.fullmatch(request.get('source_package_sha256','')): raise ValueError('package digest mismatch')
+    index=next((item for item in manifest if item['path']==f"{request['client_slug']}/{request['project_slug']}/index.html"),None)
+    if not index or index['sha256']!=request['source_drive_file_sha256'] or index['bytes']!=request['source_drive_file_bytes']: raise ValueError('Drive readback does not match approved index.html')
+    return source
 
-
-def stage(request_id, manifest):
-    source = SEALED / request_id
-    destination = STAGING / request_id
-    if not source.is_dir() or source.is_symlink():
-        raise ValueError('sealed request package is unavailable')
-    observed = sorted(str(item.relative_to(source)) for item in source.rglob('*') if item.is_file() or item.is_symlink())
-    expected = [item['path'] for item in manifest]
-    if observed != expected:
-        raise ValueError('sealed package files do not match manifest')
-    temporary = STAGING / f'.{request_id}.{os.getpid()}.staging'
-    if destination.exists():
-        observed_existing = sorted(str(item.relative_to(destination)) for item in destination.rglob('*') if item.is_file() or item.is_symlink())
-        if observed_existing != expected:
-            raise ValueError('existing root staging conflicts with request')
-        root = destination
+def process(bundle,runner=subprocess.run):
+    if bundle.is_symlink() or not bundle.is_dir(): raise ValueError('invalid queued request bundle')
+    request=json.loads((bundle/'request.json').read_text(encoding='utf-8')); source=validate(request,bundle); request_id=request['request_id']; stage=STAGING/request_id
+    staged={**request,'source_directory':str(stage)}
+    if stage.exists():
+        staged_request=json.loads((stage/'request.json').read_text(encoding='utf-8'))
+        if staged_request!=staged: raise ValueError('request_id already staged with a different request')
     else:
-        temporary.mkdir(parents=True, mode=0o750)
-        root = temporary
-    try:
-        for item in manifest:
-            relative = PurePosixPath(item['path']); candidate = source.joinpath(*relative.parts)
-            if candidate.is_symlink() or not candidate.is_file() or candidate.stat().st_size != item['bytes'] or digest_file(candidate) != item['sha256']:
-                raise ValueError(f'sealed file does not match manifest: {item["path"]}')
-            target = root.joinpath(*relative.parts)
-            if root == temporary:
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(candidate, target)
-                os.chmod(target, 0o640)
-            elif target.is_symlink() or not target.is_file() or target.stat().st_size != item['bytes'] or digest_file(target) != item['sha256']:
-                raise ValueError(f'existing root staging does not match manifest: {item["path"]}')
-        if root == temporary:
-            os.replace(temporary, destination)
-    finally:
-        if temporary.exists():
-            shutil.rmtree(temporary)
-    return destination
-
-
-def invoke(request_path, runner=subprocess.run):
-    completed = runner([PUBLISHER, '--request', str(request_path)], check=True, capture_output=True, text=True, timeout=900)
-    return json.loads(completed.stdout)
-
-
-def validate_result(result, request):
-    exact = {'schema_version': 3, 'status': 'published_and_verified', 'request_id': request['request_id'],
-             'destination_profile_id': request['destination_profile_id'], 'repository': request['repository'],
-             'branch': request['branch'], 'base_commit': request['expected_base_commit'],
-             'source_package_sha256': request['source_package_sha256'],
-             'idempotency_key': request['idempotency_key'],
-             'standing_authority_reference': request['standing_authority_reference']}
-    if not isinstance(result, dict) or any(result.get(key) != value for key, value in exact.items()):
-        raise ValueError('publisher returned a mismatched result')
-    commit = result.get('commit')
-    public = result.get('public_verifications')
-    workflow = result.get('workflow')
-    if (not isinstance(commit, str) or not re.fullmatch(r'[0-9a-f]{40}', commit)
-            or not isinstance(public, list) or not public
-            or any(not isinstance(item, dict) or item.get('commit') != commit or item.get('status') != 200 for item in public)
-            or not isinstance(workflow, dict) or workflow.get('conclusion') != 'success'):
-        raise ValueError('publisher result lacks exact verified release evidence')
-    return result
-
-
-def process(path, runner=subprocess.run):
-    claim = CLAIMS / path.name
-    if path.parent != CLAIMS:
-        os.replace(path, claim)
-    request_id = path.stem
-    try:
-        request = load(claim)
-        request_id, manifest = validate_transport(request, claim)
-        request = {**request, 'source_directory': str(stage(request_id, manifest))}
-        staged_request = STAGING / f'{request_id}.request.json'
-        atomic_json(staged_request, request)
-        result = validate_result(invoke(staged_request, runner), request)
-        atomic_json(PROCESSED / f'{request_id}.json', result)
-        claim.unlink()
-        return 'processed'
-    except Exception as exc:
-        if claim.exists():
-            os.replace(claim, FAILED / claim.name)
-        (FAILED / f'{request_id}.error').write_text(str(exc)[-2000:] + '\n', encoding='utf-8')
-        return 'failed'
-
+        temporary=Path(tempfile.mkdtemp(prefix='.'+request_id+'.',dir=STAGING))
+        try:
+            for item in request['file_manifest']:
+                relative=PurePosixPath(item['path']); destination=temporary.joinpath(*relative.parts); destination.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(source.joinpath(*relative.parts),destination)
+            atomic(temporary/'request.json',staged); os.replace(temporary,stage)
+        finally:
+            if temporary.exists(): shutil.rmtree(temporary)
+    staged_request=stage/'request.json'
+    done=runner([PUBLISHER,'--request',str(staged_request)],capture_output=True,text=True,timeout=1800)
+    if done.returncode: raise RuntimeError((done.stderr or done.stdout)[-1000:])
+    result=json.loads(done.stdout); receipt={'schema_version':1,'status':'processed','request_id':request_id,'source_package_sha256':request['source_package_sha256'],'publisher_result':result,'processed_at':datetime.now(timezone.utc).isoformat()}
+    destination=PROCESSED/request_id; destination.mkdir(parents=True,exist_ok=True,mode=0o755); os.chmod(destination,0o755); atomic(destination/'receipt.json',receipt,0o644); shutil.rmtree(bundle); return receipt
 
 def main():
-    for directory in (INCOMING, SEALED, CLAIMS, PROCESSED, FAILED, STAGING):
-        directory.mkdir(parents=True, exist_ok=True)
-    with LOCK.open('a+') as handle:
-        try:
-            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
-            return
-        outcomes = {'processed': 0, 'failed': 0}
-        for path in sorted(CLAIMS.glob('*.json')):
-            outcomes[process(path)] += 1
-        for path in sorted(INCOMING.glob('*.json')):
-            outcomes[process(path)] += 1
-        if any(outcomes.values()):
-            print(json.dumps(outcomes, sort_keys=True))
-
-
-if __name__ == '__main__':
-    main()
+    for directory in (INCOMING,PROCESSED,FAILED,STAGING): directory.mkdir(parents=True,exist_ok=True)
+    for directory in (PROCESSED,FAILED): os.chmod(directory,0o755)
+    for bundle in sorted(x for x in INCOMING.iterdir() if not x.name.startswith('.')):
+        try: process(bundle)
+        except Exception as exc:
+            destination=FAILED/bundle.name; destination.mkdir(parents=True,exist_ok=True,mode=0o755); os.chmod(destination,0o755); atomic(destination/'error.json',{'schema_version':1,'status':'failed','request_id':bundle.name,'error':'host validation or publication failed','failed_at':datetime.now(timezone.utc).isoformat()},0o644)
+            if bundle.is_symlink() or not bundle.is_dir(): bundle.unlink()
+            else: shutil.rmtree(bundle)
+if __name__=='__main__': main()
