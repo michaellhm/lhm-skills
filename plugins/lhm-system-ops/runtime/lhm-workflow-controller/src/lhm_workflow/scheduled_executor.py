@@ -289,6 +289,8 @@ class ScheduledExecutor:
             run_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
             os.chmod(run_dir, 0o700)
             if self.root == DEFAULT_ROOT:
+                os.chown(run_dir.parent, 0, 10000)
+                os.chmod(run_dir.parent, 0o710)
                 os.chown(run_dir, 10000, 10000)
             request_path, result_path = run_dir / "request.json", run_dir / "result.json"
             request = {"schema_version": 1, "contract": contract, "parent_run_id": parent_id, "permission_ceiling": contract["permission_ceiling"]}

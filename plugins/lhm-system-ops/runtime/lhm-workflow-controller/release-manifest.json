@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r15",
-  "version": "0.1.21",
+  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r16",
+  "version": "0.1.22",
   "source_baseline": "main-8c0da39-plus-reviewed-seo-envelope",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -36,7 +36,8 @@
     "container_bound_work_control_producer",
     "per_role_profile_handoff_isolation",
     "absolute_role_request_prompt_binding",
-    "role_dispatch_parent_traversal"
+    "role_dispatch_parent_traversal",
+    "dynamic_parent_run_traversal"
   ],
   "source_tree_sha256_excluding_manifest": "f7f89f6669ed200d8767071dd814c9ca041041ad57d2cd751dd06c90e54b0a88",
   "critical_files": {
@@ -51,7 +52,7 @@
     "packaging/rollback.sh": "060a8365c357cf76fa2828155c7eeb57d1ccabe01a717e26ce18a7340d373d10",
     "packaging/lhm-seo-envelope-runtime.service": "8bcb42c1a4a955c4215f5ddef9e088503c913e9791802895aa46bf557b48f046",
     "src/lhm_workflow/scheduled_work.py": "39d1d40e4cc66aaf5a04bd4df6f7744d3663d0c11218925fe81a6cc0b347af63",
-    "src/lhm_workflow/scheduled_executor.py": "44e00596d93a0437c6daa4583f7594b1b6d324b359f99f86651727e0a69de71d",
+    "src/lhm_workflow/scheduled_executor.py": "634a9e205e556c2f0d542ea5b54c701c5d1a630880d837533fb362fbe69a48e7",
     "integration/lhm-scheduled-work-ingress": "89835bee2ff612a6a1abdfc489c1dfa071643954cf892be8b57f60f67249c147",
     "integration/lhm-scheduled-work-dispatch": "3bb3ca6f101d1e823b3ae977fc4b9d70eac7115a7467d8142ea3a07db0625dc8",
     "integration/lhm-scheduled-work-runtime": "a3948b3d972c26451e403134b5efd84331d649a7e737286dea2bcb51121ceb57",
