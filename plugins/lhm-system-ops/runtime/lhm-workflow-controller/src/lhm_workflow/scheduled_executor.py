@@ -101,8 +101,16 @@ def materialise_stdout_result(path: Path, stdout: str, contract: dict, request_s
         return
     try:
         value = json.loads(stdout.strip())
-    except json.JSONDecodeError as exc:
-        raise ValueError("Hermes stdout is not a closed JSON result") from exc
+    except json.JSONDecodeError:
+        decoder=json.JSONDecoder(); candidates=[]
+        for index,character in enumerate(stdout):
+            if character != "{": continue
+            try: candidate,_ = decoder.raw_decode(stdout[index:])
+            except json.JSONDecodeError: continue
+            if isinstance(candidate,dict) and set(candidate)=={"status","artifact_hashes","decision"}:
+                candidates.append(candidate)
+        if len(candidates) != 1: raise ValueError("Hermes stdout is not one closed JSON result")
+        value=candidates[0]
     if not isinstance(value, dict) or set(value) != {"status", "artifact_hashes", "decision"}:
         raise ValueError("Hermes stdout is not a closed JSON object")
     # Hermes roles sometimes use the terminal synonym "completed" despite the

@@ -93,8 +93,11 @@ def test_host_materialises_only_strict_json_stdout(tmp_path):
     materialise_stdout_result(path, json.dumps({**model_result, "status":"completed"}), contract(), "a"*64)
     assert json.loads(path.read_text()) == closed_result()
     path.unlink()
-    with pytest.raises(ValueError, match="closed JSON"):
-        materialise_stdout_result(path, "```json\n{}\n```", contract(), "a"*64)
+    materialise_stdout_result(path, "transport noise\n"+json.dumps(model_result)+"\nend noise", contract(), "a"*64)
+    assert json.loads(path.read_text()) == closed_result()
+    path.unlink()
+    with pytest.raises(ValueError, match="one closed JSON"):
+        materialise_stdout_result(path, json.dumps(model_result)+json.dumps(model_result), contract(), "a"*64)
 
 
 def test_registered_gsc_gateway_contract_and_failures():
