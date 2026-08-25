@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r8",
-  "version": "0.1.14",
+  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r9",
+  "version": "0.1.15",
   "source_baseline": "main-8c0da39-plus-reviewed-seo-envelope",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -28,7 +28,8 @@
     "container_readable_handoff_ownership",
     "real_operations_readback_stage",
     "portable_scheduled_signer_provision_invocation",
-    "container_queue_parent_traversal"
+    "container_queue_parent_traversal",
+    "installed_executor_pythonpath_binding"
   ],
   "source_tree_sha256_excluding_manifest": "f7f89f6669ed200d8767071dd814c9ca041041ad57d2cd751dd06c90e54b0a88",
   "critical_files": {
@@ -46,7 +47,7 @@
     "src/lhm_workflow/scheduled_executor.py": "17265b9dcfaf21e91fcf801108e72fc9c33443cda2bf23afbe67f7e550ff4719",
     "integration/lhm-scheduled-work-ingress": "89835bee2ff612a6a1abdfc489c1dfa071643954cf892be8b57f60f67249c147",
     "integration/lhm-scheduled-work-dispatch": "3bb3ca6f101d1e823b3ae977fc4b9d70eac7115a7467d8142ea3a07db0625dc8",
-    "integration/lhm-scheduled-work-runtime": "1463981a4d1d053330f7a831cdc7403defddc2e99c7847d46def623fb976830d",
+    "integration/lhm-scheduled-work-runtime": "a3948b3d972c26451e403134b5efd84331d649a7e737286dea2bcb51121ceb57",
     "integration/lhm-seo-org-cron-alternate": "35b7f7a47586b33ee49ad83ecb3c42dd503926a3a4a4f2a195b96f417e7adb90",
     "integration/scheduled-workflows.json": "b96a8263b0906a35612f2871696c0e94b24e6356228d043879ecfab217700966",
     "integration/cron-3994012c42ba.alternate.disabled.json": "082c8d8b597c6e3d48cfc18a5ee12df179c8dbdd42138da2d6c4775da35baea8",
