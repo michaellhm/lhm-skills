@@ -443,7 +443,10 @@ class ScheduledExecutor:
                 # but cannot become organisational routing instructions.
                 decision = (json.loads(result_path.read_text()).get("decision", {})
                             if result_path.exists() and contract["stage_id"] == "seo_accept" else {})
-                signed = self._wait_signed(contract, {"contract": contract, "outputs": outputs, "checks": ["artifact.readback_sha256"], "decision": decision}, run_dir)
+                checks=["artifact.readback_sha256"]
+                if contract["stage_id"]=="chief_handback" and state["delivery"]["channel"]=="suppressed_canary":
+                    checks.append("governed_delivery_suppressed_canary")
+                signed = self._wait_signed(contract, {"contract": contract, "outputs": outputs, "checks": checks, "decision": decision}, run_dir)
                 state = self.router.accept(parent_id, contract, signed)
                 self._checkpoint(parent_id, {"status": state["state"], "cursor": state["cursor"], "child_run_id": child, "idempotency_key": contract["idempotency_key"], "signed_receipt_sha256": digest(signed)})
             except Exception as exc:
