@@ -315,10 +315,14 @@ class ScheduledExecutor:
 
     def run_parent(self, parent: dict) -> dict:
         parent_id = parent["parent_run_id"]
-        try: self.router.initialise({key: parent[key] for key in ("source", "source_cron_id", "job_name", "prompt", "delivery", "triggered_at")}, parent_id)
-        except KeyError:
-            # Persisted ingress parents contain the already validated intake fields under their canonical names.
-            self.router._atomic(self.router._path(parent_id), parent)
+        # Capability resumes must reopen the durable parent. Reinitialising an
+        # existing parent would rewind its cursor and conflict with the signed
+        # child-receipt ledger.
+        if not self.router._path(parent_id).exists():
+            try: self.router.initialise({key: parent[key] for key in ("source", "source_cron_id", "job_name", "prompt", "delivery", "triggered_at")}, parent_id)
+            except KeyError:
+                # Persisted ingress parents contain the already validated intake fields under their canonical names.
+                self.router._atomic(self.router._path(parent_id), parent)
         while True:
             state = self.router.load(parent_id)
             if state["state"] == "closed": return state
