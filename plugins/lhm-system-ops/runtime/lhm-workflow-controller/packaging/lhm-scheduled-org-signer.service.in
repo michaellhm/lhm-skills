@@ -1,0 +1,21 @@
+[Unit]
+Description=Isolated scheduled-work signer @ROLE@
+
+[Service]
+Type=oneshot
+User=@USER@
+Group=@USER@
+SupplementaryGroups=lhmworkflow
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX
+ReadOnlyPaths=/opt/lhm-workflow/current /var/lib/lhm-workflow/secrets/org/@ROLE@.private.pem /var/lib/lhm-workflow/artifact-registry.json
+ReadWritePaths=/var/lib/lhm-workflow/org-signer-requests/@ROLE@ /var/lib/lhm-workflow/org-signer-results/@ROLE@
+ExecStart=/opt/lhm-workflow/current/integration/lhm-org-role-adapter @ROLE@ /var/lib/lhm-workflow/secrets/org/@ROLE@.private.pem @VERIFY@ --request-dir /var/lib/lhm-workflow/org-signer-requests/@ROLE@ --result-dir /var/lib/lhm-workflow/org-signer-results/@ROLE@
+

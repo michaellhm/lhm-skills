@@ -1,0 +1,308 @@
+"""Durable, disabled-by-default executor for registered scheduled parents.
+
+Bots receive bounded snapshots and write closed JSON results.  They never receive signing
+keys, tracker write access, deployment authority, or Search Console mutation authority.
+"""
+from __future__ import annotations
+
+import hashlib
+import argparse
+import json
+import os
+import re
+import stat
+import subprocess
+import tempfile
+import time
+from pathlib import Path
+from typing import Callable
+
+from .org_routing import ROLE_POLICY, Router, digest
+from .scheduled_work import normalise_urls
+
+DEFAULT_ROOT = Path("/var/lib/lhm-workflow")
+HOST_HANDOFF_ROOT = Path("/home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-executor")
+URL = re.compile(r"(?:https://localhealthmarketing\.com)?/[A-Za-z0-9][A-Za-z0-9_./-]*")
+BOT_STAGES = {"chief_intake", "context", "research", "production_plan", "seo_plan", "seo_accept", "content", "website", "production_closeout", "chief_handback", "operations_write", "learning"}
+DOCKER = "/usr/bin/docker"
+CONTAINER = "hermes"
+CONTAINER_USER = "10000:10000"
+ADAPTER = "/usr/local/libexec/lhm-workflow-registered-adapter"
+DISPATCH = "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
+PROFILE_ROOT = "/opt/data/profiles/lhm_brain"
+PROFILE_EXECUTABLES = {name: f"/opt/data/.local/bin/{name}" for name in (
+    "lhm_chief_of_staff", "lhm_production", "lhm_seo", "lhm_researcher", "lhm_content",
+    "lhm_website", "lhm_verifier", "lhm_operations", "lhm_learning_steward")}
+RESULT_FIELDS = {"schema_version", "parent_run_id", "child_run_id", "role", "request_sha256", "status", "artifact_hashes", "decision"}
+
+
+def atomic_json(path: Path, value: object, mode: int = 0o600) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o750)
+    fd, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(value, handle, sort_keys=True, separators=(",", ":")); handle.write("\n")
+            handle.flush(); os.fsync(handle.fileno())
+        os.chmod(temporary, mode); os.replace(temporary, path)
+    finally:
+        Path(temporary).unlink(missing_ok=True)
+
+
+def artifact(path: Path, artifact_id: str) -> dict:
+    data = path.read_bytes()
+    return {"artifact_id": artifact_id, "path": str(path), "sha256": hashlib.sha256(data).hexdigest(), "media_type": "application/json"}
+
+
+def canonical_sha(value: object) -> str:
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def validate_closed_result(path: Path, contract: dict, request_sha256: str, *, prior_result_sha256: str | None = None) -> dict:
+    """Accept only a new, exact, request-bound result from the named child role."""
+    if path.is_symlink() or not path.is_file():
+        raise ValueError("closed result is absent or not a regular file")
+    raw = path.read_bytes(); result_sha256 = hashlib.sha256(raw).hexdigest()
+    if prior_result_sha256 and result_sha256 == prior_result_sha256:
+        raise ValueError("stale result replay")
+    try: value = json.loads(raw)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc: raise ValueError("malformed closed result") from exc
+    if not isinstance(value, dict) or set(value) != RESULT_FIELDS or value["schema_version"] != 1:
+        raise ValueError("malformed closed result")
+    expected = (contract["parent_run_id"], contract["child_run_id"], contract["owner"], request_sha256)
+    if (value["parent_run_id"], value["child_run_id"], value["role"], value["request_sha256"]) != expected:
+        raise ValueError("closed result binding mismatch")
+    if value["status"] != "accepted" or not isinstance(value["decision"], dict):
+        raise ValueError("closed result not accepted")
+    hashes = value["artifact_hashes"]
+    if not isinstance(hashes, list) or any(not re.fullmatch(r"[0-9a-f]{64}", str(item)) for item in hashes):
+        raise ValueError("invalid artifact hashes")
+    return {"value": value, "result_sha256": result_sha256}
+
+
+def hermes_argv(profile: str, container_run_dir: str, prompt: str) -> list[str]:
+    """The sole allowlisted Hermes invocation: fixed container, numeric owner and profile path."""
+    if profile not in PROFILE_EXECUTABLES:
+        raise ValueError("unregistered Hermes profile")
+    if not container_run_dir.startswith(PROFILE_ROOT + "/dispatch/scheduled-executor/"):
+        raise ValueError("handoff outside shared volume")
+    return [DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER, PROFILE_EXECUTABLES[profile], "--in", container_run_dir, "-z", prompt, "--usage-file", f"{container_run_dir}/usage.json", "--skills", "none"]
+
+
+def metadata_probe_argv(profile: str) -> list[str]:
+    """Read real numeric ownership/mode metadata without granting shell expansion."""
+    executable = hermes_argv(profile, f"{PROFILE_ROOT}/dispatch/scheduled-executor/probe", "probe")[6]
+    return [DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER, "/usr/bin/stat", "--format=%u:%g:%a", executable]
+
+
+def probe_profile_metadata(profile: str, runner: Callable = subprocess.run) -> dict:
+    host_path=Path(f"/home/hermes/.hermes/.local/bin/{profile}")
+    host=host_path.stat(follow_symlinks=False)
+    if host_path.is_symlink() or (host.st_uid,host.st_gid,stat.S_IMODE(host.st_mode))!=(10000,10000,0o700):
+        raise ValueError("unsafe host Hermes profile metadata")
+    done=runner(metadata_probe_argv(profile),capture_output=True,text=True,timeout=30)
+    if done.returncode or done.stdout.strip()!="10000:10000:700": raise ValueError("unsafe container Hermes profile metadata")
+    return {"profile":profile,"host":{"uid":host.st_uid,"gid":host.st_gid,"mode":"0700"},"container":{"uid":10000,"gid":10000,"mode":"0700"}}
+
+
+def registered_gsc_request(contract: dict, property_name: str, urls: list[str]) -> dict:
+    if property_name != "https://localhealthmarketing.com/" or not urls or normalise_urls(property_name, urls) != urls:
+        raise ValueError("research plan exceeds registered GSC property")
+    binding = {"parent_run_id": contract["parent_run_id"], "child_run_id": contract["child_run_id"], "role": contract["owner"], "property": property_name, "operations": ["list_sites", "batch_url_inspection", "search_analytics", "list_sitemaps"]}
+    argv = [DISPATCH, "submit-seo-gsc-readonly", property_name, ",".join(urls), json.dumps({**binding, "objective": "Collect bounded GSC evidence for scheduled SEO research"}, sort_keys=True, separators=(",", ":"))]
+    return {"schema_version": 1, "operation": "claude_dispatch", "argv": argv, "binding": binding}
+
+
+def invoke_registered_adapter(request: dict, runner: Callable = subprocess.run) -> dict:
+    payload = json.dumps(request, sort_keys=True, separators=(",", ":"))
+    done = runner([ADAPTER], input=payload, capture_output=True, text=True, timeout=610)
+    if done.returncode: raise RuntimeError("registered GSC connector failed")
+    receipt = json.loads(done.stdout)
+    if receipt.get("binding") != request["binding"] or receipt.get("operation") != "claude_dispatch": raise ValueError("GSC connector receipt binding mismatch")
+    if receipt.get("receipt_sha256") != canonical_sha(receipt.get("result")): raise ValueError("GSC connector receipt hash mismatch")
+    return receipt
+
+
+def work_control_request(parent: dict, contract: dict, reason: str) -> dict:
+    incident = f"scheduled-{contract['stage_id']}-capability"
+    resume = digest({"parent": parent["parent_run_id"], "incident": incident, "contract": digest(contract)})
+    return {"schema_version": 1, "action": "block", "parent_run_id": parent["parent_run_id"], "capability_incident_id": incident, "saved_role": parent["scheduled_contract"]["work_control"]["return_role"], "return_point": parent["scheduled_contract"]["work_control"]["return_point"], "resume_token": resume, "objective": parent["objective"], "acceptance_tests": [parent["scheduled_contract"]["completion_test"]], "permission_ceiling": parent["scheduled_contract"]["permission_ceiling"], "reason": reason[-1000:]}
+
+
+def invoke_work_control(parent: dict, contract: dict, reason: str, runner: Callable = subprocess.run) -> dict:
+    wc = parent["scheduled_contract"]["work_control"]
+    executable = Path(wc["path"])
+    if hashlib.sha256(executable.read_bytes()).hexdigest() != wc["sha256"]: raise ValueError("work-control executable hash mismatch")
+    payload = work_control_request(parent, contract, reason)
+    done = runner([str(executable)], input=json.dumps(payload, sort_keys=True, separators=(",", ":")), capture_output=True, text=True, timeout=60)
+    if done.returncode: raise RuntimeError("work-control block failed")
+    return payload
+
+
+def snapshot_sources(paths: list[str], destination: Path, site: str) -> tuple[list[dict], list[str]]:
+    """Copy only registered source bytes and derive same-property URLs on every run."""
+    records, candidates = [], []
+    destination.mkdir(parents=True, exist_ok=True, mode=0o700)
+    selected: list[Path] = []
+    for raw in paths:
+        source = Path(raw)
+        selected.extend(sorted(p for p in source.iterdir() if p.name in {"rollout-state.md", "sitemap.json", "LHM-Proposed-Sitemap.html"})) if source.is_dir() else selected.append(source)
+    for index, source in enumerate(selected):
+        if source.is_symlink() or not source.is_file(): raise ValueError("canonical source is not a regular file")
+        data = source.read_bytes(); target = destination / f"source-{index:02d}{source.suffix}"
+        target.write_bytes(data); target.chmod(0o600)
+        if target.read_bytes() != data: raise ValueError("canonical snapshot readback mismatch")
+        records.append({"source_path": str(source), **artifact(target, f"canonical-source-{index:02d}")})
+        candidates.extend(match.group(0) for match in URL.finditer(data.decode("utf-8", errors="ignore")))
+    urls = normalise_urls(site, candidates)
+    if not urls: raise ValueError("canonical sources yielded no registered-property URLs")
+    return records, urls
+
+
+def compare_and_swap_tracker(path: Path, expected_sha256: str, replacement: bytes) -> dict:
+    """Perform the only tracker mutation, with precondition and full byte readback."""
+    before = path.read_bytes()
+    if hashlib.sha256(before).hexdigest() != expected_sha256: raise ValueError("tracker compare-and-swap conflict")
+    fd, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    try:
+        with os.fdopen(fd, "wb") as handle: handle.write(replacement); handle.flush(); os.fsync(handle.fileno())
+        os.chmod(temporary, path.stat().st_mode & 0o777); os.replace(temporary, path)
+    finally: Path(temporary).unlink(missing_ok=True)
+    if path.read_bytes() != replacement: raise ValueError("tracker full readback mismatch")
+    return {"before_sha256": expected_sha256, "after_sha256": hashlib.sha256(replacement).hexdigest(), "readback": True}
+
+
+class ScheduledExecutor:
+    def __init__(self, root: Path = DEFAULT_ROOT, *, runner: Callable = subprocess.run, test_mode: bool = False):
+        self.root, self.runner, self.test_mode = root, runner, test_mode
+        self.router = Router(root, self._public_keys())
+
+    def _public_keys(self) -> dict:
+        public = self.root / "public"
+        return {p.name.removesuffix(".public.pem"): p for p in public.glob("*.public.pem")} if public.exists() else {}
+
+    def _checkpoint(self, parent: str, value: dict) -> None:
+        atomic_json(self.root / "scheduled-runs" / parent / "checkpoint.json", value)
+
+    def _invoke(self, profile: str, run_dir: Path, request: Path, result: Path, contract: dict) -> dict:
+        if self.root == DEFAULT_ROOT:
+            metadata=probe_profile_metadata(profile,self.runner)
+            atomic_json(run_dir/"profile-metadata.json",metadata)
+        request_value=json.loads(request.read_text()); request_sha256=canonical_sha(request_value)
+        stale_sha=hashlib.sha256(result.read_bytes()).hexdigest() if result.exists() else None
+        result.unlink(missing_ok=True)
+        container_dir=f"{PROFILE_ROOT}/dispatch/scheduled-executor/{contract['parent_run_id']}/{contract['child_run_id']}"
+        prompt=f"Read request.json. Return only result.json with the exact parent, child, role and request_sha256 {request_sha256}; do not access credentials or mutate systems."
+        done = self.runner(hermes_argv(profile, container_dir, prompt), capture_output=True, text=True, timeout=900)
+        if done.returncode: raise RuntimeError("bounded Hermes role invocation failed")
+        return validate_closed_result(result, contract, request_sha256, prior_result_sha256=stale_sha)
+
+    def _wait_signed(self, contract: dict, envelope: dict, run_dir: Path) -> dict:
+        registry_path = self.root / "artifact-registry.json"
+        registry = json.loads(registry_path.read_text()) if registry_path.exists() else {}
+        for item in envelope["outputs"]:
+            candidate = Path(item["path"]) if item.get("path") else run_dir / "result.json"
+            if not candidate.exists() and contract["input_artifacts"]:
+                prior = registry.get(item["artifact_id"]); candidate = Path(prior["path"]) if prior else candidate
+            if not candidate.exists() or hashlib.sha256(candidate.read_bytes()).hexdigest()!=item["sha256"]:
+                raise ValueError("artifact registry readback mismatch")
+            registry[item["artifact_id"]] = {"path": str(candidate), "sha256": item["sha256"]}
+        atomic_json(registry_path, registry, 0o640)
+        request = self.root / "org-signer-requests" / contract["owner"] / f"{contract['child_run_id']}.json"
+        result = self.root / "org-signer-results" / contract["owner"] / request.name
+        signer_envelope={**envelope,"outputs":[{k:v for k,v in item.items() if k!="path"} for item in envelope["outputs"]]}
+        atomic_json(request, signer_envelope, 0o640)
+        deadline = time.monotonic() + (2 if self.test_mode else 120)
+        while time.monotonic() < deadline:
+            if result.exists():
+                value = json.loads(result.read_text()); atomic_json(run_dir / "signed-receipt.json", value); return value
+            time.sleep(0.01 if self.test_mode else 0.25)
+        raise TimeoutError(f"isolated signer unavailable: {contract['owner']}")
+
+    def _block(self, parent: dict, contract: dict, reason: str) -> None:
+        incident = f"scheduled-{contract['stage_id']}-capability"
+        resume = digest({"parent": parent["parent_run_id"], "incident": incident, "contract": digest(contract)})
+        wc = parent["scheduled_contract"]["work_control"]
+        invoke_work_control(parent, contract, reason, self.runner)
+        self._checkpoint(parent["parent_run_id"], {"status": "waiting_on_capability", "incident": incident, "return_point": wc["return_point"], "reason": reason, "resume_token_sha256": hashlib.sha256(resume.encode()).hexdigest()})
+
+    def run_parent(self, parent: dict) -> dict:
+        parent_id = parent["parent_run_id"]
+        try: self.router.initialise({key: parent[key] for key in ("source", "source_cron_id", "job_name", "prompt", "delivery", "triggered_at")}, parent_id)
+        except KeyError:
+            # Persisted ingress parents contain the already validated intake fields under their canonical names.
+            self.router._atomic(self.router._path(parent_id), parent)
+        while True:
+            state = self.router.load(parent_id)
+            if state["state"] == "closed": return state
+            child = f"{parent_id}-{state['cursor']:02d}"
+            contract = self.router.issue(parent_id, child)
+            run_dir = (HOST_HANDOFF_ROOT / parent_id / child) if self.root == DEFAULT_ROOT else (self.root / "scheduled-runs" / parent_id / "children" / child)
+            run_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+            os.chmod(run_dir, 0o700)
+            if self.root == DEFAULT_ROOT:
+                os.chown(run_dir, 10000, 10000)
+            request_path, result_path = run_dir / "request.json", run_dir / "result.json"
+            request = {"schema_version": 1, "contract": contract, "parent_run_id": parent_id, "permission_ceiling": contract["permission_ceiling"]}
+            if contract["stage_id"] == "context":
+                sources, urls = snapshot_sources(parent["scheduled_contract"]["canonical_sources"], run_dir / "sources", parent["scheduled_contract"]["gsc"]["property"])
+                request.update(canonical_sources=sources, gsc={**parent["scheduled_contract"]["gsc"], "candidate_urls": urls})
+            atomic_json(request_path, request)
+            try:
+                if contract["runtime"] == "verifier":
+                    verifier_request={**request, "independent_verification": True, "self_approval_forbidden": True}
+                    atomic_json(request_path, verifier_request)
+                    self._invoke("lhm_verifier", run_dir, request_path, result_path, contract)
+                    outputs = contract["input_artifacts"]
+                elif contract["stage_id"] in BOT_STAGES:
+                    alias = Path(parent["scheduled_contract"]["profile_aliases"][contract["owner"]]).name
+                    closed = self._invoke(alias, run_dir, request_path, result_path, contract)
+                    if contract["stage_id"] == "research":
+                        plan = closed["value"]["decision"]
+                        if set(plan) != {"gsc_property", "urls"} or not isinstance(plan["urls"], list):
+                            raise ValueError("researcher returned an invalid bounded plan")
+                        connector_request = registered_gsc_request(contract, plan["gsc_property"], plan["urls"])
+                        connector_receipt = invoke_registered_adapter(connector_request, self.runner)
+                        evidence_path = run_dir / "connector-evidence.json"
+                        atomic_json(evidence_path, {"request_sha256": canonical_sha(connector_request), "receipt": connector_receipt, "receipt_sha256": canonical_sha(connector_receipt)})
+                        request = {**request, "phase": "synthesis", "immutable_connector_evidence": artifact(evidence_path, "gsc-connector-evidence")}
+                        atomic_json(request_path, request)
+                        closed = self._invoke(alias, run_dir, request_path, result_path, contract)
+                    if contract["stage_id"] == "operations_write":
+                        proposal=closed["value"]["decision"]
+                        if set(proposal)!={"expected_previous_sha256","replacement"} or not isinstance(proposal["replacement"],str):
+                            raise ValueError("operations returned invalid tracker replacement")
+                        tracker=Path(parent["scheduled_contract"]["canonical_sources"][3])/"rollout-state.md"
+                        cas=compare_and_swap_tracker(tracker,proposal["expected_previous_sha256"],proposal["replacement"].encode())
+                        cas_path=run_dir/"tracker-cas-readback.json"; atomic_json(cas_path,cas)
+                        outputs=[artifact(cas_path,"operations-tracker-cas")]
+                    else:
+                        outputs = [artifact(result_path, f"{contract['stage_id']}-result")]
+                elif contract["stage_id"] == "operations_readback":
+                    outputs = contract["input_artifacts"]
+                else:
+                    atomic_json(result_path, {"status": "accepted", "stage_id": contract["stage_id"]})
+                    outputs = [artifact(result_path, f"{contract['stage_id']}-result")]
+                decision = json.loads(result_path.read_text()).get("decision", {}) if result_path.exists() else {}
+                signed = self._wait_signed(contract, {"contract": contract, "outputs": outputs, "checks": ["artifact.readback_sha256"], "decision": decision}, run_dir)
+                state = self.router.accept(parent_id, contract, signed)
+                self._checkpoint(parent_id, {"status": state["state"], "cursor": state["cursor"], "child_run_id": child, "idempotency_key": contract["idempotency_key"], "signed_receipt_sha256": digest(signed)})
+            except Exception as exc:
+                checkpoint = self.root / "scheduled-runs" / parent_id / "checkpoint.json"
+                previous = json.loads(checkpoint.read_text()) if checkpoint.exists() else {}
+                if previous.get("failed_child") != child:
+                    self._checkpoint(parent_id, {"status": "retrying", "failed_child": child, "safe_retry": 1, "reason": str(exc)})
+                    continue
+                self._block(parent, contract, str(exc)); return {"state": "incident", "parent_run_id": parent_id}
+
+
+def main(argv: list[str] | None = None) -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("parent", type=Path)
+    parser.add_argument("--root", type=Path, default=DEFAULT_ROOT)
+    args = parser.parse_args(argv)
+    parent = json.loads(args.parent.read_text())
+    state = ScheduledExecutor(args.root, test_mode=os.environ.get("LHM_WORKFLOW_TEST_MODE") == "1").run_parent(parent)
+    print(json.dumps({"parent_run_id": parent["parent_run_id"], "business_state": state["state"]}, sort_keys=True))
+
+
+if __name__ == "__main__": main()
