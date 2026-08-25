@@ -66,6 +66,8 @@ def test_all_hermes_argv_are_numeric_uid_gid_and_profile_allowlisted():
         assert argv[3:6] == ["--user", "10000:10000", "hermes"]
         assert "1000:1000" not in argv
         assert metadata_probe_argv(profile)[3:6] == ["--user", CONTAINER_USER, "hermes"]
+        assert "--skills" not in argv
+    assert hermes_argv("lhm_operations", "/opt/data/profiles/lhm_brain/dispatch/scheduled-executor/p/c", "closed")[8] == "lhm_operations_connector"
     with pytest.raises(ValueError, match="unregistered"):
         hermes_argv("lhm_shell", "/opt/data/profiles/lhm_brain/dispatch/scheduled-executor/p/c", "x")
 
@@ -105,7 +107,9 @@ def test_work_control_exact_stdin_after_hash_verification(tmp_path):
     def runner(argv, **kwargs): captured.update(argv=argv, stdin=kwargs["input"]); return SimpleNamespace(returncode=0, stdout="{}")
     expected=work_control_request(parent, contract(), "connector unavailable")
     assert invoke_work_control(parent, contract(), "connector unavailable", runner) == expected
-    assert captured == {"argv":[str(executable)], "stdin":json.dumps(expected, sort_keys=True, separators=(",", ":"))}
+    assert set(expected) == {"parent_run_id", "capability_incident_id", "return_point", "resume_token", "objective", "acceptance_test", "permission_ceiling"}
+    assert expected["permission_ceiling"] == "green"
+    assert captured == {"argv":[str(executable), "block"], "stdin":json.dumps(expected, sort_keys=True, separators=(",", ":"))}
     executable.write_bytes(b"changed")
     with pytest.raises(ValueError, match="hash mismatch"): invoke_work_control(parent, contract(), "x", runner)
 

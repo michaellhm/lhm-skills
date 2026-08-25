@@ -23,16 +23,19 @@ from .scheduled_work import normalise_urls
 DEFAULT_ROOT = Path("/var/lib/lhm-workflow")
 HOST_HANDOFF_ROOT = Path("/home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-executor")
 URL = re.compile(r"(?:https://localhealthmarketing\.com)?/[A-Za-z0-9][A-Za-z0-9_./-]*")
-BOT_STAGES = {"chief_intake", "context", "research", "production_plan", "seo_plan", "seo_accept", "content", "website", "production_closeout", "chief_handback", "operations_write", "learning"}
+BOT_STAGES = {"chief_intake", "context", "research", "production_plan", "seo_plan", "seo_accept", "content", "website", "production_closeout", "chief_handback", "operations_write", "operations_readback", "learning"}
 DOCKER = "/usr/bin/docker"
 CONTAINER = "hermes"
 CONTAINER_USER = "10000:10000"
 ADAPTER = "/usr/local/libexec/lhm-workflow-registered-adapter"
 DISPATCH = "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
 PROFILE_ROOT = "/opt/data/profiles/lhm_brain"
-PROFILE_EXECUTABLES = {name: f"/opt/data/.local/bin/{name}" for name in (
-    "lhm_chief_of_staff", "lhm_production", "lhm_seo", "lhm_researcher", "lhm_content",
-    "lhm_website", "lhm_verifier", "lhm_operations", "lhm_learning_steward")}
+PROFILE_NAMES = {
+    "lhm_chief_of_staff": "lhm_chief_of_staff", "lhm_production": "lhm_production",
+    "lhm_seo": "lhm_seo", "lhm_researcher": "lhm_researcher", "lhm_content": "lhm_content",
+    "lhm_website": "lhm_website", "lhm_verifier": "lhm_verifier",
+    "lhm_operations": "lhm_operations_connector", "lhm_learning_steward": "lhm_learning_steward",
+}
 RESULT_FIELDS = {"schema_version", "parent_run_id", "child_run_id", "role", "request_sha256", "status", "artifact_hashes", "decision"}
 
 
@@ -81,21 +84,26 @@ def validate_closed_result(path: Path, contract: dict, request_sha256: str, *, p
 
 def hermes_argv(profile: str, container_run_dir: str, prompt: str) -> list[str]:
     """The sole allowlisted Hermes invocation: fixed container, numeric owner and profile path."""
-    if profile not in PROFILE_EXECUTABLES:
+    if profile not in PROFILE_NAMES:
         raise ValueError("unregistered Hermes profile")
     if not container_run_dir.startswith(PROFILE_ROOT + "/dispatch/scheduled-executor/"):
         raise ValueError("handoff outside shared volume")
-    return [DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER, PROFILE_EXECUTABLES[profile], "--in", container_run_dir, "-z", prompt, "--usage-file", f"{container_run_dir}/usage.json", "--skills", "none"]
+    return [DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER,
+            "/opt/hermes/bin/hermes", "-p", PROFILE_NAMES[profile], "--in", container_run_dir,
+            "-z", prompt, "--usage-file", f"{container_run_dir}/usage.json"]
 
 
 def metadata_probe_argv(profile: str) -> list[str]:
     """Read real numeric ownership/mode metadata without granting shell expansion."""
-    executable = hermes_argv(profile, f"{PROFILE_ROOT}/dispatch/scheduled-executor/probe", "probe")[6]
-    return [DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER, "/usr/bin/stat", "--format=%u:%g:%a", executable]
+    if profile not in PROFILE_NAMES:
+        raise ValueError("unregistered Hermes profile")
+    directory = f"/opt/data/profiles/{PROFILE_NAMES[profile]}"
+    return [DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER, "/usr/bin/stat", "--format=%u:%g:%a", directory]
 
 
 def probe_profile_metadata(profile: str, runner: Callable = subprocess.run) -> dict:
-    host_path=Path(f"/home/hermes/.hermes/.local/bin/{profile}")
+    if profile not in PROFILE_NAMES: raise ValueError("unregistered Hermes profile")
+    host_path=Path(f"/home/hermes/.hermes/profiles/{PROFILE_NAMES[profile]}")
     host=host_path.stat(follow_symlinks=False)
     if host_path.is_symlink() or (host.st_uid,host.st_gid,stat.S_IMODE(host.st_mode))!=(10000,10000,0o700):
         raise ValueError("unsafe host Hermes profile metadata")
@@ -125,7 +133,14 @@ def invoke_registered_adapter(request: dict, runner: Callable = subprocess.run) 
 def work_control_request(parent: dict, contract: dict, reason: str) -> dict:
     incident = f"scheduled-{contract['stage_id']}-capability"
     resume = digest({"parent": parent["parent_run_id"], "incident": incident, "contract": digest(contract)})
-    return {"schema_version": 1, "action": "block", "parent_run_id": parent["parent_run_id"], "capability_incident_id": incident, "saved_role": parent["scheduled_contract"]["work_control"]["return_role"], "return_point": parent["scheduled_contract"]["work_control"]["return_point"], "resume_token": resume, "objective": parent["objective"], "acceptance_tests": [parent["scheduled_contract"]["completion_test"]], "permission_ceiling": parent["scheduled_contract"]["permission_ceiling"], "reason": reason[-1000:]}
+    ceiling = parent["scheduled_contract"]["permission_ceiling"]
+    work_control_ceiling = {"non-production-preview": "green", "green": "green", "amber": "amber", "red": "red"}.get(ceiling)
+    if work_control_ceiling is None: raise ValueError("unsupported work-control permission ceiling")
+    return {"parent_run_id": parent["parent_run_id"], "capability_incident_id": incident,
+            "return_point": parent["scheduled_contract"]["work_control"]["return_point"],
+            "resume_token": resume, "objective": parent["objective"],
+            "acceptance_test": parent["scheduled_contract"]["completion_test"],
+            "permission_ceiling": work_control_ceiling}
 
 
 def invoke_work_control(parent: dict, contract: dict, reason: str, runner: Callable = subprocess.run) -> dict:
@@ -133,7 +148,7 @@ def invoke_work_control(parent: dict, contract: dict, reason: str, runner: Calla
     executable = Path(wc["path"])
     if hashlib.sha256(executable.read_bytes()).hexdigest() != wc["sha256"]: raise ValueError("work-control executable hash mismatch")
     payload = work_control_request(parent, contract, reason)
-    done = runner([str(executable)], input=json.dumps(payload, sort_keys=True, separators=(",", ":")), capture_output=True, text=True, timeout=60)
+    done = runner([str(executable), "block"], input=json.dumps(payload, sort_keys=True, separators=(",", ":")), capture_output=True, text=True, timeout=60)
     if done.returncode: raise RuntimeError("work-control block failed")
     return payload
 
@@ -187,6 +202,11 @@ class ScheduledExecutor:
         if self.root == DEFAULT_ROOT:
             metadata=probe_profile_metadata(profile,self.runner)
             atomic_json(run_dir/"profile-metadata.json",metadata)
+        if self.root == DEFAULT_ROOT:
+            os.chown(request, 10000, 10000)
+            for candidate in run_dir.rglob("*"):
+                if candidate.is_file() and not candidate.is_symlink(): os.chown(candidate, 10000, 10000)
+                elif candidate.is_dir() and not candidate.is_symlink(): os.chown(candidate, 10000, 10000)
         request_value=json.loads(request.read_text()); request_sha256=canonical_sha(request_value)
         stale_sha=hashlib.sha256(result.read_bytes()).hexdigest() if result.exists() else None
         result.unlink(missing_ok=True)
@@ -277,8 +297,6 @@ class ScheduledExecutor:
                         outputs=[artifact(cas_path,"operations-tracker-cas")]
                     else:
                         outputs = [artifact(result_path, f"{contract['stage_id']}-result")]
-                elif contract["stage_id"] == "operations_readback":
-                    outputs = contract["input_artifacts"]
                 else:
                     atomic_json(result_path, {"status": "accepted", "stage_id": contract["stage_id"]})
                     outputs = [artifact(result_path, f"{contract['stage_id']}-result")]
