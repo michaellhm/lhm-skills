@@ -9,7 +9,7 @@ import pytest
 
 from lhm_workflow.scheduled_executor import (
     ADAPTER, CONTAINER_USER, canonical_sha, compare_and_swap_tracker, hermes_argv,
-    invoke_registered_adapter, invoke_work_control, metadata_probe_argv,
+    invoke_registered_adapter, invoke_work_control, materialise_stdout_result, metadata_probe_argv,
     registered_gsc_request, snapshot_sources, validate_closed_result, work_control_request,
 )
 
@@ -67,6 +67,7 @@ def test_all_hermes_argv_are_numeric_uid_gid_and_profile_allowlisted():
         assert "1000:1000" not in argv
         assert metadata_probe_argv(profile)[3:6] == ["--user", CONTAINER_USER, "hermes"]
         assert "--skills" not in argv
+        assert argv[11:13] == ["-t", "file"]
     assert hermes_argv("lhm_operations", "/opt/data/profiles/lhm_brain/dispatch/scheduled-executor/p/c", "closed")[8] == "lhm_operations_connector"
     with pytest.raises(ValueError, match="unregistered"):
         hermes_argv("lhm_shell", "/opt/data/profiles/lhm_brain/dispatch/scheduled-executor/p/c", "x")
@@ -81,6 +82,15 @@ def test_closed_result_binds_request_and_rejects_stale_malformed_and_self_approv
     with pytest.raises(ValueError, match="malformed"): validate_closed_result(path, contract(), "a" * 64)
     path.write_text(json.dumps(closed_result(role="lhm_verifier")))
     with pytest.raises(ValueError, match="binding"): validate_closed_result(path, contract(), "a" * 64)
+
+
+def test_host_materialises_only_strict_json_stdout(tmp_path):
+    path = tmp_path / "result.json"
+    materialise_stdout_result(path, json.dumps(closed_result()))
+    assert json.loads(path.read_text()) == closed_result()
+    path.unlink()
+    with pytest.raises(ValueError, match="closed JSON"):
+        materialise_stdout_result(path, "```json\n{}\n```")
 
 
 def test_registered_gsc_gateway_contract_and_failures():

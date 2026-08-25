@@ -90,7 +90,20 @@ def hermes_argv(profile: str, container_run_dir: str, prompt: str) -> list[str]:
         raise ValueError("handoff outside shared volume")
     return [DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER,
             "/opt/hermes/bin/hermes", "-p", PROFILE_NAMES[profile], "--in", container_run_dir,
-            "-z", prompt, "--usage-file", f"{container_run_dir}/usage.json"]
+            "-t", "file", "-z", prompt, "--usage-file", f"{container_run_dir}/usage.json"]
+
+
+def materialise_stdout_result(path: Path, stdout: str) -> None:
+    """Persist only a single strict JSON object returned by Hermes one-shot stdout."""
+    if path.exists():
+        return
+    try:
+        value = json.loads(stdout.strip())
+    except json.JSONDecodeError as exc:
+        raise ValueError("Hermes stdout is not a closed JSON result") from exc
+    if not isinstance(value, dict):
+        raise ValueError("Hermes stdout is not a closed JSON object")
+    atomic_json(path, value)
 
 
 def metadata_probe_argv(profile: str) -> list[str]:
@@ -211,9 +224,10 @@ class ScheduledExecutor:
         stale_sha=hashlib.sha256(result.read_bytes()).hexdigest() if result.exists() else None
         result.unlink(missing_ok=True)
         container_dir=f"{PROFILE_ROOT}/dispatch/scheduled-executor/{contract['parent_run_id']}/{contract['child_run_id']}"
-        prompt=f"Read request.json. Return only result.json with the exact parent, child, role and request_sha256 {request_sha256}; do not access credentials or mutate systems."
+        prompt=f"Read request.json. Print only one JSON object to stdout with the exact parent, child, role and request_sha256 {request_sha256}; do not write files, access credentials or mutate systems."
         done = self.runner(hermes_argv(profile, container_dir, prompt), capture_output=True, text=True, timeout=900)
         if done.returncode: raise RuntimeError("bounded Hermes role invocation failed")
+        materialise_stdout_result(result, done.stdout)
         return validate_closed_result(result, contract, request_sha256, prior_result_sha256=stale_sha)
 
     def _wait_signed(self, contract: dict, envelope: dict, run_dir: Path) -> dict:
