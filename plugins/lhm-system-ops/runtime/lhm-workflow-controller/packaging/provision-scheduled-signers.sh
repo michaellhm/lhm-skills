@@ -18,8 +18,12 @@ for role in $roles; do
   install -d -o lhmworkflow -g "$user" -m 2770 "/var/lib/lhm-workflow/org-signer-requests/$role"
   install -d -o "$user" -g lhmworkflow -m 2730 "/var/lib/lhm-workflow/org-signer-results/$role"
   verify=''
-  test "$role" != lhm_verifier || verify='--verifier --registry /var/lib/lhm-workflow/artifact-registry.json'
-  sed -e "s|@USER@|$user|g" -e "s|@ROLE@|$role|g" -e "s|@VERIFY@|$verify|g" "$repo_dir/packaging/lhm-scheduled-org-signer.service.in" > "/etc/systemd/system/lhm-scheduled-org-signer-$role.service"
+  extra_read=''
+  if test "$role" = lhm_verifier; then
+    verify='--verifier --registry /var/lib/lhm-workflow/artifact-registry.json'
+    extra_read='/home/hermes/.hermes/profiles/lhm_verifier/dispatch/scheduled-executor'
+  fi
+  sed -e "s|@USER@|$user|g" -e "s|@ROLE@|$role|g" -e "s|@VERIFY@|$verify|g" -e "s|@EXTRA_READ@|$extra_read|g" "$repo_dir/packaging/lhm-scheduled-org-signer.service.in" > "/etc/systemd/system/lhm-scheduled-org-signer-$role.service"
   sed -e "s|@ROLE@|$role|g" "$repo_dir/packaging/lhm-scheduled-org-signer.path.in" > "/etc/systemd/system/lhm-scheduled-org-signer-$role.path"
   chmod 0644 "/etc/systemd/system/lhm-scheduled-org-signer-$role.service" "/etc/systemd/system/lhm-scheduled-org-signer-$role.path"
   systemctl disable --now "lhm-scheduled-org-signer-$role.path" 2>/dev/null || true
@@ -28,4 +32,6 @@ if test ! -f /var/lib/lhm-workflow/artifact-registry.json; then
   install -o lhmworkflow -g lhmworkflow -m 0640 /dev/null /var/lib/lhm-workflow/artifact-registry.json
   printf '{}\n' > /var/lib/lhm-workflow/artifact-registry.json
 fi
+chown lhmworkflow:lhmworkflow /var/lib/lhm-workflow/artifact-registry.json
+chmod 0640 /var/lib/lhm-workflow/artifact-registry.json
 echo 'Scheduled signer units provisioned disabled by default.'

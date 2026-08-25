@@ -264,6 +264,7 @@ class ScheduledExecutor:
                 raise ValueError("artifact registry readback mismatch")
             registry[item["artifact_id"]] = {"path": str(candidate), "sha256": item["sha256"]}
         atomic_json(registry_path, registry, 0o640)
+        if self.root == DEFAULT_ROOT: os.chown(registry_path,10004,10004)
         request = self.root / "org-signer-requests" / contract["owner"] / f"{contract['child_run_id']}.json"
         result = self.root / "org-signer-results" / contract["owner"] / request.name
         signer_envelope={**envelope,"outputs":[{k:v for k,v in item.items() if k!="path"} for item in envelope["outputs"]]}
@@ -336,7 +337,10 @@ class ScheduledExecutor:
                             raise ValueError("verifier source artifact readback mismatch")
                         destination=run_dir / f"input-artifact-{index:02d}.json"
                         destination.write_bytes(source.read_bytes()); os.chown(destination,10000,10000); os.chmod(destination,0o600)
+                        registry[item["artifact_id"]]={"path":str(destination),"sha256":item["sha256"]}
                         private_inputs.append({**item,"path":f"/opt/data/profiles/lhm_verifier/dispatch/scheduled-executor/{parent_id}/{child}/{destination.name}"})
+                    atomic_json(self.root / "artifact-registry.json",registry,0o640)
+                    if self.root == DEFAULT_ROOT: os.chown(self.root / "artifact-registry.json",10004,10004)
                     verifier_request={**request, "independent_verification": True, "self_approval_forbidden": True,
                                       "input_artifact_paths":private_inputs}
                     atomic_json(request_path, verifier_request)
