@@ -261,6 +261,14 @@ class ScheduledExecutor:
             if result.exists():
                 value = json.loads(result.read_text()); atomic_json(run_dir / "signed-receipt.json", value); return value
             time.sleep(0.01 if self.test_mode else 0.25)
+        # The path-triggered signer can publish at the same instant as the main
+        # deadline. Give that already-admitted request one bounded final grace
+        # window so a valid receipt is not misclassified as unavailable.
+        grace_deadline = time.monotonic() + (0.05 if self.test_mode else 2)
+        while time.monotonic() < grace_deadline:
+            if result.exists():
+                value = json.loads(result.read_text()); atomic_json(run_dir / "signed-receipt.json", value); return value
+            time.sleep(0.01 if self.test_mode else 0.05)
         raise TimeoutError(f"isolated signer unavailable: {contract['owner']}")
 
     def _block(self, parent: dict, contract: dict, reason: str) -> None:
