@@ -227,7 +227,10 @@ class ScheduledExecutor:
         stale_sha=hashlib.sha256(result.read_bytes()).hexdigest() if result.exists() else None
         result.unlink(missing_ok=True)
         container_dir=f"/opt/data/profiles/{PROFILE_NAMES[profile]}/dispatch/scheduled-executor/{contract['parent_run_id']}/{contract['child_run_id']}"
-        prompt=f"Read request.json. Print only one JSON object to stdout with the exact parent, child, role and request_sha256 {request_sha256}; do not write files, access credentials or mutate systems."
+        prompt=(f"Read the exact absolute file {container_dir}/request.json. Print only one JSON object to stdout "
+                f"with exactly these keys: schema_version, parent_run_id, child_run_id, role, request_sha256, "
+                f"status, artifact_hashes, decision. Bind request_sha256 to {request_sha256}; do not use markdown "
+                "fences, write files, access credentials or mutate systems.")
         done = self.runner(hermes_argv(profile, container_dir, prompt), capture_output=True, text=True, timeout=900)
         if done.returncode: raise RuntimeError("bounded Hermes role invocation failed")
         materialise_stdout_result(result, done.stdout)
