@@ -233,7 +233,11 @@ class ScheduledExecutor:
         stale_sha=hashlib.sha256(result.read_bytes()).hexdigest() if result.exists() else None
         result.unlink(missing_ok=True)
         container_dir=f"/opt/data/profiles/{PROFILE_NAMES[profile]}/dispatch/scheduled-executor/{contract['parent_run_id']}/{contract['child_run_id']}"
-        prompt=(f"Read the exact absolute file {container_dir}/request.json. Print only one JSON object to stdout "
+        stage_instruction = ("For this Context stage, validate only the source manifest paths and SHA-256 evidence "
+                             "already contained in request.json. Do not open the referenced source files, perform "
+                             "research, or use tools beyond reading request.json. Return an empty decision object. "
+                             if contract["stage_id"] == "context" else "")
+        prompt=(f"Read the exact absolute file {container_dir}/request.json. {stage_instruction}Print only one JSON object to stdout "
                 f"with exactly these three keys: status, artifact_hashes, decision. Do not repeat identity or hashes "
                 f"from the request and do not use markdown "
                 "fences. If you read the request and complete the bounded stage, set status to the exact string "
