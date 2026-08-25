@@ -121,7 +121,7 @@ def test_registered_gsc_gateway_contract_and_failures():
     assert request["argv"][1] == "submit-seo-gsc-readonly"
     assert request["argv"][2] == "lhm-main"
     assert request["binding"]["operations"] == ["list_sites", "batch_url_inspection", "search_analytics", "list_sitemaps"]
-    assert request["argv"][2:4] == ["https://localhealthmarketing.com/", ",".join(urls)]
+    assert request["argv"][2:4] == ["lhm-main", ",".join(urls)]
     with pytest.raises(ValueError, match="property"):
         registered_gsc_request(contract(), "evil", "https://evil.example/", ["https://evil.example/a"])
     def good(argv, **kwargs):
