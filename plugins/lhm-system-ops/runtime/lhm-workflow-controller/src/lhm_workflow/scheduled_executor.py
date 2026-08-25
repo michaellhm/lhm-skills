@@ -431,6 +431,8 @@ class ScheduledExecutor:
                         cas=compare_and_swap_tracker(tracker,proposal["expected_previous_sha256"],proposal["replacement"].encode())
                         cas_path=run_dir/"tracker-cas-readback.json"; atomic_json(cas_path,cas)
                         outputs=[artifact(cas_path,"operations-tracker-cas")]
+                    elif contract["stage_id"] == "operations_readback" and parent["scheduled_contract"]["permission_ceiling"] == "non-production-preview":
+                        outputs=contract["input_artifacts"]
                     else:
                         outputs = [artifact(result_path, f"{contract['stage_id']}-result")]
                 else:
