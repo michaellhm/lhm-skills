@@ -95,7 +95,7 @@ def hermes_argv(profile: str, container_run_dir: str, prompt: str) -> list[str]:
             "-t", "file", "-z", prompt, "--usage-file", f"{container_run_dir}/usage.json"]
 
 
-def materialise_stdout_result(path: Path, stdout: str) -> None:
+def materialise_stdout_result(path: Path, stdout: str, contract: dict, request_sha256: str) -> None:
     """Persist only a single strict JSON object returned by Hermes one-shot stdout."""
     if path.exists():
         return
@@ -103,9 +103,11 @@ def materialise_stdout_result(path: Path, stdout: str) -> None:
         value = json.loads(stdout.strip())
     except json.JSONDecodeError as exc:
         raise ValueError("Hermes stdout is not a closed JSON result") from exc
-    if not isinstance(value, dict):
+    if not isinstance(value, dict) or set(value) != {"status", "artifact_hashes", "decision"}:
         raise ValueError("Hermes stdout is not a closed JSON object")
-    atomic_json(path, value)
+    atomic_json(path, {"schema_version": 1, "parent_run_id": contract["parent_run_id"],
+                       "child_run_id": contract["child_run_id"], "role": contract["owner"],
+                       "request_sha256": request_sha256, **value})
 
 
 def metadata_probe_argv(profile: str) -> list[str]:
@@ -228,15 +230,15 @@ class ScheduledExecutor:
         result.unlink(missing_ok=True)
         container_dir=f"/opt/data/profiles/{PROFILE_NAMES[profile]}/dispatch/scheduled-executor/{contract['parent_run_id']}/{contract['child_run_id']}"
         prompt=(f"Read the exact absolute file {container_dir}/request.json. Print only one JSON object to stdout "
-                f"with exactly these keys: schema_version, parent_run_id, child_run_id, role, request_sha256, "
-                f"status, artifact_hashes, decision. Bind request_sha256 to {request_sha256}; do not use markdown "
+                f"with exactly these three keys: status, artifact_hashes, decision. Do not repeat identity or hashes "
+                f"from the request and do not use markdown "
                 "fences. If you read the request and complete the bounded stage, set status to the exact string "
                 "accepted, artifact_hashes to a JSON array of SHA-256 strings (an empty array is allowed), and "
                 "decision to a JSON object (an empty object is allowed). Never return null for these fields. Do not "
                 "write files, access credentials or mutate systems.")
         done = self.runner(hermes_argv(profile, container_dir, prompt), capture_output=True, text=True, timeout=900)
         if done.returncode: raise RuntimeError("bounded Hermes role invocation failed")
-        materialise_stdout_result(result, done.stdout)
+        materialise_stdout_result(result, done.stdout, contract, request_sha256)
         return validate_closed_result(result, contract, request_sha256, prior_result_sha256=stale_sha)
 
     def _wait_signed(self, contract: dict, envelope: dict, run_dir: Path) -> dict:

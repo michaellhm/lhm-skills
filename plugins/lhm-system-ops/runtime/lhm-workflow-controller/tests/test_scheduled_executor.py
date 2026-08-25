@@ -86,11 +86,12 @@ def test_closed_result_binds_request_and_rejects_stale_malformed_and_self_approv
 
 def test_host_materialises_only_strict_json_stdout(tmp_path):
     path = tmp_path / "result.json"
-    materialise_stdout_result(path, json.dumps(closed_result()))
+    model_result = {"status":"accepted","artifact_hashes":["b"*64],"decision":{}}
+    materialise_stdout_result(path, json.dumps(model_result), contract(), "a"*64)
     assert json.loads(path.read_text()) == closed_result()
     path.unlink()
     with pytest.raises(ValueError, match="closed JSON"):
-        materialise_stdout_result(path, "```json\n{}\n```")
+        materialise_stdout_result(path, "```json\n{}\n```", contract(), "a"*64)
 
 
 def test_registered_gsc_gateway_contract_and_failures():
