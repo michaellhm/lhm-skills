@@ -337,7 +337,14 @@ class ScheduledExecutor:
                             raise ValueError("verifier source artifact readback mismatch")
                         destination=run_dir / f"input-artifact-{index:02d}.json"
                         destination.write_bytes(source.read_bytes()); os.chown(destination,10000,10000); os.chmod(destination,0o600)
-                        registry[item["artifact_id"]]={"path":str(destination),"sha256":item["sha256"]}
+                        signing_dir=self.root / "verifier-signing-inputs" / parent_id / child
+                        signing_dir.mkdir(parents=True,exist_ok=True,mode=0o750)
+                        signing_copy=signing_dir / destination.name; signing_copy.write_bytes(source.read_bytes()); os.chmod(signing_copy,0o640)
+                        if self.root == DEFAULT_ROOT:
+                            for directory in (self.root / "verifier-signing-inputs", signing_dir.parent, signing_dir):
+                                os.chown(directory,0,10004); os.chmod(directory,0o750)
+                            os.chown(signing_copy,0,10004)
+                        registry[item["artifact_id"]]={"path":str(signing_copy),"sha256":item["sha256"]}
                         private_inputs.append({**item,"path":f"/opt/data/profiles/lhm_verifier/dispatch/scheduled-executor/{parent_id}/{child}/{destination.name}"})
                     atomic_json(self.root / "artifact-registry.json",registry,0o640)
                     if self.root == DEFAULT_ROOT: os.chown(self.root / "artifact-registry.json",10004,10004)

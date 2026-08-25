@@ -5,6 +5,7 @@ repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 roles='lhm_chief_of_staff lhm_head_of_production lhm_seo_lead lhm_researcher lhm_content lhm_website lhm_operations lhm_learning_steward lhm_verifier'
 install -d -o root -g root -m 0711 /var/lib/lhm-workflow/secrets/org
 install -d -o root -g lhmworkflow -m 0750 /var/lib/lhm-workflow/org-signer-requests /var/lib/lhm-workflow/org-signer-results
+install -d -o root -g lhmworkflow -m 0750 /var/lib/lhm-workflow/verifier-signing-inputs
 for role in $roles; do
   user="lhmsign-$(printf %s "$role" | sed 's/^lhm_//;s/_/-/g')"
   id "$user" >/dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin/nologin "$user"
@@ -21,7 +22,7 @@ for role in $roles; do
   extra_read=''
   if test "$role" = lhm_verifier; then
     verify='--verifier --registry /var/lib/lhm-workflow/artifact-registry.json'
-    extra_read='/home/hermes/.hermes/profiles/lhm_verifier/dispatch/scheduled-executor'
+    extra_read='/var/lib/lhm-workflow/verifier-signing-inputs'
   fi
   sed -e "s|@USER@|$user|g" -e "s|@ROLE@|$role|g" -e "s|@VERIFY@|$verify|g" -e "s|@EXTRA_READ@|$extra_read|g" "$repo_dir/packaging/lhm-scheduled-org-signer.service.in" > "/etc/systemd/system/lhm-scheduled-org-signer-$role.service"
   sed -e "s|@ROLE@|$role|g" "$repo_dir/packaging/lhm-scheduled-org-signer.path.in" > "/etc/systemd/system/lhm-scheduled-org-signer-$role.path"
