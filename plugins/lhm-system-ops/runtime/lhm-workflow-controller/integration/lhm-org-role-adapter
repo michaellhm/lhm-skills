@@ -12,7 +12,7 @@ def main():
  value=json.loads(a.request.read_text()) if a.request else json.load(sys.stdin); contract=value["contract"]
  if contract["owner"]!=a.owner: raise SystemExit("owner mismatch")
  st=a.private_key.stat(follow_symlinks=False)
- if a.private_key.is_symlink() or st.st_uid!=(os.getuid() if os.environ.get("LHM_WORKFLOW_TEST_MODE")=="1" else 0) or st.st_mode&0o077: raise SystemExit("unsafe private key")
+ if a.private_key.is_symlink() or st.st_uid!=os.getuid() or st.st_mode&0o077: raise SystemExit("unsafe private key")
  outputs=value["outputs"]
  if a.verifier:
   if contract["runtime"]!="verifier" or outputs!=contract["input_artifacts"] or a.registry is None: raise SystemExit("invalid verifier envelope")

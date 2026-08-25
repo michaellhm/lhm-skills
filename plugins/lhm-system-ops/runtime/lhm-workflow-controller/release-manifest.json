@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r22",
-  "version": "0.1.28",
+  "release_id": "lhm-workflow-controller-scheduled-stage-executor-20260825-r23",
+  "version": "0.1.29",
   "source_baseline": "main-8c0da39-plus-reviewed-seo-envelope",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -44,7 +44,8 @@
     "installed_signer_pythonpath_binding",
     "role_signer_queue_list_permission",
     "signer_key_traverse_only_parent",
-    "signer_common_queue_parent_traversal"
+    "signer_common_queue_parent_traversal",
+    "role_signer_owned_private_key_invariant"
   ],
   "source_tree_sha256_excluding_manifest": "f7f89f6669ed200d8767071dd814c9ca041041ad57d2cd751dd06c90e54b0a88",
   "critical_files": {
@@ -54,6 +55,7 @@
     "integration/lhm-seo-envelope-runtime": "b35d0dac1730a5ce7a7db0deba270eb41fa04fb1662b04f22c43f766e840fb65",
     "integration/claude-dispatch.live-reference": "612f711b94d68df7edf52dc7fa942044c37bec9c54cc00b90573e3cb40002ba6",
     "integration/lhm-workflow-registered-adapter": "f4c8b0064f9607031f9fb19da0f9261213e9a30824b2a8b35a74a9528a6d6c09",
+    "integration/lhm-org-role-adapter": "e6144938b1db22e061e0f2924987cefa7bd7d8215aa87716b8ad0fca57a0acd9",
     "tests/test_seo_envelope_runtime.py": "97996712e6e887da30c613d80031c281a9d46bd9112cb17917fac4a6e725d387",
     "packaging/install.sh": "abe68eb574ef3a5812550a394749fb586ec5367e5c6e4129b951e44f03493a20",
     "packaging/rollback.sh": "060a8365c357cf76fa2828155c7eeb57d1ccabe01a717e26ce18a7340d373d10",
