@@ -29,6 +29,7 @@ CONTAINER = "hermes"
 CONTAINER_USER = "10000:10000"
 ADAPTER = "/usr/local/libexec/lhm-workflow-registered-adapter"
 DISPATCH = "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
+WORK_CONTROL_CONTAINER = "/opt/data/profiles/lhm_brain/bin/work-control"
 PROFILE_ROOT = "/opt/data/profiles/lhm_brain"
 PROFILE_NAMES = {
     "lhm_chief_of_staff": "lhm_chief_of_staff", "lhm_production": "lhm_production",
@@ -161,7 +162,8 @@ def invoke_work_control(parent: dict, contract: dict, reason: str, runner: Calla
     executable = Path(wc["path"])
     if hashlib.sha256(executable.read_bytes()).hexdigest() != wc["sha256"]: raise ValueError("work-control executable hash mismatch")
     payload = work_control_request(parent, contract, reason)
-    done = runner([str(executable), "block"], input=json.dumps(payload, sort_keys=True, separators=(",", ":")), capture_output=True, text=True, timeout=60)
+    argv = [DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER, WORK_CONTROL_CONTAINER, "block"]
+    done = runner(argv, input=json.dumps(payload, sort_keys=True, separators=(",", ":")), capture_output=True, text=True, timeout=60)
     if done.returncode: raise RuntimeError("work-control block failed")
     return payload
 
