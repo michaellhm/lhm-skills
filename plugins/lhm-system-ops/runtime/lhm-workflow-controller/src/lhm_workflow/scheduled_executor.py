@@ -413,6 +413,14 @@ class ScheduledExecutor:
                                    "request_sha256":canonical_sha(request),"status":"accepted","artifact_hashes":[],
                                    "decision":{"expected_previous_sha256":hashlib.sha256(current).hexdigest(),"replacement":current.decode()}}
                             atomic_json(result_path,value); closed={"value":value,"result_sha256":hashlib.sha256(result_path.read_bytes()).hexdigest()}
+                        elif contract["stage_id"] == "operations_readback" and parent["scheduled_contract"]["permission_ceiling"] == "non-production-preview":
+                            registry=json.loads((self.root/"artifact-registry.json").read_text())
+                            inputs=contract["input_artifacts"]
+                            if len(inputs)!=1 or registry.get(inputs[0]["artifact_id"],{}).get("sha256")!=inputs[0]["sha256"]:
+                                raise ValueError("operations preview readback mismatch")
+                            value={"schema_version":1,"parent_run_id":parent_id,"child_run_id":child,"role":contract["owner"],
+                                   "request_sha256":canonical_sha(request),"status":"accepted","artifact_hashes":[inputs[0]["sha256"]],"decision":{}}
+                            atomic_json(result_path,value); closed={"value":value,"result_sha256":hashlib.sha256(result_path.read_bytes()).hexdigest()}
                         else:
                             closed = self._invoke(alias, run_dir, request_path, result_path, contract)
                     if contract["stage_id"] == "operations_write":
