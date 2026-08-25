@@ -52,6 +52,8 @@ def test_packaged_asset_validates_staged_asp_request_with_desk_worker_html_witho
     request['source_directory'] = str(source)
     request['file_manifest'] = [{'path':relative,'sha256':hashlib.sha256(html).hexdigest(),'bytes':len(html)}]
     request['source_package_sha256'] = publisher.package_digest(request['file_manifest'])
+    request['source_drive_file_sha256'] = hashlib.sha256(html).hexdigest()
+    request['source_drive_file_bytes'] = len(html)
     publisher.SOURCE_ROOT = source.parent
 
     monkeypatch.setattr(publisher, 'run', lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError('external command attempted')))
