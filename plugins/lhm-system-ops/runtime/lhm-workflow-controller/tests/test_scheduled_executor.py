@@ -37,6 +37,9 @@ def test_tracker_compare_and_swap_and_full_readback(tmp_path):
     assert receipt["readback"] and tracker.read_bytes() == b"new"
     with pytest.raises(ValueError, match="conflict"):
         compare_and_swap_tracker(tracker, expected, b"duplicate")
+    unchanged = hashlib.sha256(b"new").hexdigest()
+    receipt = compare_and_swap_tracker(tracker, unchanged, b"new")
+    assert receipt == {"before_sha256": unchanged, "after_sha256": unchanged, "readback": True, "mutation": "none"}
 
 
 def test_registered_configuration_is_readonly_and_native(tmp_path):
@@ -177,6 +180,7 @@ def test_safe_retry_interruption_and_scheduler_business_separation_are_persisted
     assert 'candidate_urls[:25]' in source and 'request_value.get("phase") == "synthesis"' in source
     assert 'GSC connector did not return terminal evidence' in source
     assert 'connector_receipt=validate_registered_adapter_receipt(existing["receipt"],connector_request)' in source
+    assert 'contract["stage_id"] == "operations_write" and contract["permission_ceiling"] == "non-production-preview"' in source
     dispatch=(Path(__file__).parents[1]/"integration/claude-dispatch.live-reference").read_text()
     assert 'max_wait_seconds=540' in dispatch and 'def enqueue_and_wait(request, max_wait_seconds=240)' in dispatch
     adapter=(Path(__file__).parents[1]/"integration/lhm-workflow-registered-adapter").read_text()
