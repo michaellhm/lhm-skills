@@ -44,6 +44,7 @@ def test_registered_configuration_is_readonly_and_native(tmp_path):
     registry = json.loads((Path(__file__).parents[1] / "integration" / "scheduled-workflows.json").read_text())
     definition = registry["workflows"]["local-health-marketing-seo"]
     assert definition["gsc"]["route"] == "seo_gsc_readonly"
+    assert definition["gsc"]["site_key"] == "lhm-main"
     assert "request_indexing" not in definition["gsc"]["allowed_actions"]
     assert definition["profile_aliases"]["lhm_head_of_production"].endswith("/lhm_production")
     assert definition["profile_aliases"]["lhm_seo_lead"].endswith("/lhm_seo")
@@ -116,12 +117,13 @@ def test_deterministic_retry_may_reproduce_identical_closed_result(tmp_path):
 
 def test_registered_gsc_gateway_contract_and_failures():
     urls = ["https://localhealthmarketing.com/about", "https://localhealthmarketing.com/services/seo"]
-    request = registered_gsc_request(contract(), "https://localhealthmarketing.com/", urls)
+    request = registered_gsc_request(contract(), "lhm-main", "https://localhealthmarketing.com/", urls)
     assert request["argv"][1] == "submit-seo-gsc-readonly"
+    assert request["argv"][2] == "lhm-main"
     assert request["binding"]["operations"] == ["list_sites", "batch_url_inspection", "search_analytics", "list_sitemaps"]
     assert request["argv"][2:4] == ["https://localhealthmarketing.com/", ",".join(urls)]
     with pytest.raises(ValueError, match="property"):
-        registered_gsc_request(contract(), "https://evil.example/", ["https://evil.example/a"])
+        registered_gsc_request(contract(), "evil", "https://evil.example/", ["https://evil.example/a"])
     def good(argv, **kwargs):
         result={"evidence_sha256":"c"*64}; receipt={"schema_version":1,"operation":"claude_dispatch","binding":request["binding"],"result":result,"receipt_sha256":canonical_sha(result)}
         assert argv == [ADAPTER] and kwargs["input"] == json.dumps(request, sort_keys=True, separators=(",", ":"))

@@ -142,11 +142,11 @@ def probe_profile_metadata(profile: str, runner: Callable = subprocess.run) -> d
     return {"profile":profile,"host":{"uid":host.st_uid,"gid":host.st_gid,"mode":"0700"},"container":{"uid":10000,"gid":10000,"mode":"0700"}}
 
 
-def registered_gsc_request(contract: dict, property_name: str, urls: list[str]) -> dict:
-    if property_name != "https://localhealthmarketing.com/" or not urls or normalise_urls(property_name, urls) != urls:
+def registered_gsc_request(contract: dict, site_key: str, property_name: str, urls: list[str]) -> dict:
+    if site_key != "lhm-main" or property_name != "https://localhealthmarketing.com/" or not urls or normalise_urls(property_name, urls) != urls:
         raise ValueError("research plan exceeds registered GSC property")
-    binding = {"parent_run_id": contract["parent_run_id"], "child_run_id": contract["child_run_id"], "role": contract["owner"], "property": property_name, "operations": ["list_sites", "batch_url_inspection", "search_analytics", "list_sitemaps"]}
-    argv = [DISPATCH, "submit-seo-gsc-readonly", property_name, ",".join(urls), json.dumps({**binding, "objective": "Collect bounded GSC evidence for scheduled SEO research"}, sort_keys=True, separators=(",", ":"))]
+    binding = {"parent_run_id": contract["parent_run_id"], "child_run_id": contract["child_run_id"], "role": contract["owner"], "site_key": site_key, "property": property_name, "operations": ["list_sites", "batch_url_inspection", "search_analytics", "list_sitemaps"]}
+    argv = [DISPATCH, "submit-seo-gsc-readonly", site_key, ",".join(urls), json.dumps({**binding, "objective": "Collect bounded GSC evidence for scheduled SEO research"}, sort_keys=True, separators=(",", ":"))]
     return {"schema_version": 1, "operation": "claude_dispatch", "argv": argv, "binding": binding}
 
 
@@ -380,7 +380,7 @@ class ScheduledExecutor:
                     alias = stage_profile
                     if contract["stage_id"] == "research":
                         _,candidate_urls=snapshot_sources(parent["scheduled_contract"]["canonical_sources"],run_dir / "research-sources",parent["scheduled_contract"]["gsc"]["property"])
-                        connector_request = registered_gsc_request(contract,parent["scheduled_contract"]["gsc"]["property"],candidate_urls[:25])
+                        connector_request = registered_gsc_request(contract,parent["scheduled_contract"]["gsc"]["site_key"],parent["scheduled_contract"]["gsc"]["property"],candidate_urls[:25])
                         connector_receipt = invoke_registered_adapter(connector_request, self.runner)
                         evidence_path = run_dir / "connector-evidence.json"
                         atomic_json(evidence_path, {"request_sha256": canonical_sha(connector_request), "receipt": connector_receipt, "receipt_sha256": canonical_sha(connector_receipt)})
