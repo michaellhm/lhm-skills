@@ -145,5 +145,6 @@ def test_safe_retry_interruption_and_scheduler_business_separation_are_persisted
     assert 'prior and contract["input_artifacts"]' in source
     assert '"input_artifact_paths":private_inputs' in source
     assert 'os.chown(registry_path,10004,10004)' in source
+    assert 'self.root / "verifier-signing-inputs"' in source
     assert '"scheduler": "accepted"' in runtime and '"business": business' in runtime
     assert "shutil.move(path, PROCESSED / path.name)" in runtime
