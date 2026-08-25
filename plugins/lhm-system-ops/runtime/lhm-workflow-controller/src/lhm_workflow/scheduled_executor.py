@@ -406,7 +406,7 @@ class ScheduledExecutor:
                         atomic_json(request_path, request)
                         closed = self._invoke(alias, run_dir, request_path, result_path, contract)
                     else:
-                        if contract["stage_id"] == "operations_write" and contract["permission_ceiling"] == "non-production-preview":
+                        if contract["stage_id"] == "operations_write" and parent["scheduled_contract"]["permission_ceiling"] == "non-production-preview":
                             tracker=Path(parent["scheduled_contract"]["canonical_sources"][3])/"rollout-state.md"
                             current=tracker.read_bytes()
                             value={"schema_version":1,"parent_run_id":parent_id,"child_run_id":child,"role":contract["owner"],
