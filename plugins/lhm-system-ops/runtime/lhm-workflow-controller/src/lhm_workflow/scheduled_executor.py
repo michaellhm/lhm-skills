@@ -90,9 +90,10 @@ def hermes_argv(profile: str, container_run_dir: str, prompt: str) -> list[str]:
     expected_root = f"/opt/data/profiles/{PROFILE_NAMES[profile]}/dispatch/scheduled-executor/"
     if not container_run_dir.startswith(expected_root):
         raise ValueError("handoff outside role profile")
+    toolsets = "file,code_execution" if profile == "lhm_verifier" else "file"
     return [DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER,
             "/opt/hermes/bin/hermes", "-p", PROFILE_NAMES[profile], "--in", container_run_dir,
-            "-t", "file", "-z", prompt, "--usage-file", f"{container_run_dir}/usage.json"]
+            "-t", toolsets, "-z", prompt, "--usage-file", f"{container_run_dir}/usage.json"]
 
 
 def materialise_stdout_result(path: Path, stdout: str, contract: dict, request_sha256: str) -> None:
