@@ -125,10 +125,15 @@ def test_registered_gsc_gateway_contract_and_failures():
     with pytest.raises(ValueError, match="property"):
         registered_gsc_request(contract(), "evil", "https://evil.example/", ["https://evil.example/a"])
     def good(argv, **kwargs):
-        result={"evidence_sha256":"c"*64}; receipt={"schema_version":1,"operation":"claude_dispatch","binding":request["binding"],"result":result,"receipt_sha256":canonical_sha(result)}
+        evidence="GSC terminal evidence\n"; result={"completion":{"status":"needs_review","profile":"seo_gsc_readonly"},"evidence":evidence,"evidence_sha256":hashlib.sha256(evidence.encode()).hexdigest()}; receipt={"schema_version":1,"operation":"claude_dispatch","binding":request["binding"],"result":result,"receipt_sha256":canonical_sha(result)}
         assert argv == [ADAPTER] and kwargs["input"] == json.dumps(request, sort_keys=True, separators=(",", ":"))
         return SimpleNamespace(returncode=0, stdout=json.dumps(receipt))
-    assert invoke_registered_adapter(request, good)["result"]["evidence_sha256"] == "c" * 64
+    assert invoke_registered_adapter(request, good)["result"]["completion"]["status"] == "needs_review"
+    def running(argv, **kwargs):
+        result={"status":"running","follow_up_required":True}; receipt={"schema_version":1,"operation":"claude_dispatch","binding":request["binding"],"result":result,"receipt_sha256":canonical_sha(result)}
+        return SimpleNamespace(returncode=0, stdout=json.dumps(receipt))
+    with pytest.raises(ValueError, match="terminal evidence"):
+        invoke_registered_adapter(request, running)
     with pytest.raises(RuntimeError, match="connector failed"):
         invoke_registered_adapter(request, lambda *a, **k: SimpleNamespace(returncode=1, stdout=""))
 
@@ -166,6 +171,7 @@ def test_safe_retry_interruption_and_scheduler_business_separation_are_persisted
     assert 'os.chown(registry_path,10004,10004)' in source
     assert 'self.root / "verifier-signing-inputs"' in source
     assert 'candidate_urls[:25]' in source and 'request_value.get("phase") == "synthesis"' in source
+    assert 'GSC connector did not return terminal evidence' in source
     assert 'if not self.router._path(parent_id).exists()' in source
     assert '"scheduler": "accepted"' in runtime and '"business": business' in runtime
     assert "shutil.move(path, PROCESSED / path.name)" in runtime

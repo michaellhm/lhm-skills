@@ -36,6 +36,16 @@ lines = [line for line in done.stdout.splitlines() if line.strip().startswith("{
 if not lines:
     raise SystemExit(4)
 result = json.loads(lines[-1])
+if operation == "claude_dispatch" and argv[1] == "submit-seo-gsc-readonly":
+    completion = json.loads(lines[0])
+    marker = "---RESULT---\n"
+    if completion.get("status") != "needs_review" or completion.get("profile") != "seo_gsc_readonly" or marker not in done.stdout:
+        raise SystemExit(4)
+    evidence = done.stdout.partition(marker)[2]
+    if not evidence.strip() or len(evidence.encode()) > 200000:
+        raise SystemExit(4)
+    result = {"completion": completion, "evidence": evidence,
+              "evidence_sha256": hashlib.sha256(evidence.encode()).hexdigest()}
 receipt = {"schema_version": 1, "operation": operation, "binding": request["binding"], "result": result}
 receipt["receipt_sha256"] = hashlib.sha256(json.dumps(result, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 print(json.dumps(receipt, sort_keys=True))

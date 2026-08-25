@@ -157,6 +157,11 @@ def invoke_registered_adapter(request: dict, runner: Callable = subprocess.run) 
     receipt = json.loads(done.stdout)
     if receipt.get("binding") != request["binding"] or receipt.get("operation") != "claude_dispatch": raise ValueError("GSC connector receipt binding mismatch")
     if receipt.get("receipt_sha256") != canonical_sha(receipt.get("result")): raise ValueError("GSC connector receipt hash mismatch")
+    result = receipt.get("result")
+    if (not isinstance(result, dict) or result.get("completion", {}).get("status") != "needs_review" or
+            result.get("completion", {}).get("profile") != "seo_gsc_readonly" or not isinstance(result.get("evidence"), str) or
+            not result["evidence"].strip() or result.get("evidence_sha256") != hashlib.sha256(result["evidence"].encode()).hexdigest()):
+        raise ValueError("GSC connector did not return terminal evidence")
     return receipt
 
 
