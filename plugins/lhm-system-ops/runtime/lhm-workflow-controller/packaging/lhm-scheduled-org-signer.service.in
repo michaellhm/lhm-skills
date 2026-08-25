@@ -15,7 +15,7 @@ ProtectKernelTunables=yes
 ProtectKernelModules=yes
 ProtectControlGroups=yes
 RestrictAddressFamilies=AF_UNIX
-ReadOnlyPaths=/opt/lhm-workflow/current /var/lib/lhm-workflow/secrets/org/@ROLE@.private.pem /var/lib/lhm-workflow/artifact-registry.json
+ReadOnlyPaths=/opt/lhm-workflow/current /var/lib/lhm-workflow/secrets/org/@ROLE@.private.pem /var/lib/lhm-workflow/artifact-registry.json @EXTRA_READ@
 ReadWritePaths=/var/lib/lhm-workflow/org-signer-requests/@ROLE@ /var/lib/lhm-workflow/org-signer-results/@ROLE@
 Environment=PYTHONPATH=/opt/lhm-workflow/current/src
 ExecStart=/opt/lhm-workflow/current/integration/lhm-org-role-adapter @ROLE@ /var/lib/lhm-workflow/secrets/org/@ROLE@.private.pem @VERIFY@ --request-dir /var/lib/lhm-workflow/org-signer-requests/@ROLE@ --result-dir /var/lib/lhm-workflow/org-signer-results/@ROLE@
