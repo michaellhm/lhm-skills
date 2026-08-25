@@ -105,6 +105,10 @@ def materialise_stdout_result(path: Path, stdout: str, contract: dict, request_s
         raise ValueError("Hermes stdout is not a closed JSON result") from exc
     if not isinstance(value, dict) or set(value) != {"status", "artifact_hashes", "decision"}:
         raise ValueError("Hermes stdout is not a closed JSON object")
+    # Hermes roles sometimes use the terminal synonym "completed" despite the
+    # prompt's closed enum. Canonicalise that single known synonym on the host;
+    # every other status still fails validation.
+    if value["status"] == "completed": value["status"] = "accepted"
     atomic_json(path, {"schema_version": 1, "parent_run_id": contract["parent_run_id"],
                        "child_run_id": contract["child_run_id"], "role": contract["owner"],
                        "request_sha256": request_sha256, **value})
