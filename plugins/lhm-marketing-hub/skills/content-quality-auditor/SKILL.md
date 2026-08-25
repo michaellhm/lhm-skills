@@ -7,6 +7,52 @@ description: "Runs a full CORE-EEAT 80-item quality audit on any piece of conten
 
 Runs the full CORE-EEAT 80-item benchmark across 8 dimensions to evaluate content quality for both GEO (AI citation potential) and SEO (search ranking strength).
 
+In a staged Content Department workflow, this skill is also the independent editorial QA gate defined in `${CLAUDE_PLUGIN_ROOT}/references/content-departmental-delivery.md`. The two modes are distinct:
+
+1. **Benchmark mode**: run the full CORE-EEAT audit and improvement plan.
+2. **Implementation-copy QA mode**: verify one exact copy version against its accepted brief and return a pass/fail-style verdict without rewriting it.
+
+## Implementation-copy QA mode
+
+Require the accepted `content_brief`, exact copy version, immutable digest and content type. Check:
+
+- every requested placement has one exact replacement;
+- protected copy, offers, claims and CTA destinations remain unchanged;
+- claims map to accepted evidence and no unsupported specificity was introduced;
+- the wording matches audience intent, brand sources and channel constraints;
+- healthcare and other applicable compliance constraints pass;
+- `anti-ai-writing-guidelines.json` is satisfied, including a mechanical em dash count of zero;
+- page-level or over-300-word copy contains evidence that the eight-pass writing route was used;
+- no audit note, placeholder, unresolved alternative or internal instruction appears in executable copy.
+
+Return exactly one verdict: `pass`, `correction_required`, `needs_evidence`, `needs_approval`, `waiting_on_capability` or `failed`.
+
+```yaml
+content_editorial_qa:
+  schema_version: 1
+  parent_id: "stable production parent"
+  action_id: "stable content action"
+  brief_version: 1
+  copy_version: 1
+  content_digest: "immutable digest"
+  verdict: "pass"
+  checks:
+    brief_conformance: pass
+    exact_placements: pass
+    preserved_content: pass
+    factual_support: pass
+    brand_voice: pass
+    compliance: "pass | not_applicable"
+    channel_constraints: pass
+    anti_ai: pass
+    em_dash_count: 0
+    writing_route: "eight_pass | constrained_short_form"
+  issues: []
+  next_owner: "Content Lead"
+```
+
+Do not repair the copy inside QA. On `correction_required`, return a bounded issue list with placement or line references. Content Lead returns that list to the same writer and submits a new copy version for another QA run.
+
 ## When to Use This Skill
 
 - Before publishing content — quality gate check

@@ -11,7 +11,8 @@ Use this contract for LHM and client SEO work. Pilot it on the LHM website rollo
 
 - **Head of Production:** owns the parent goal, durable machine state, cross-department sequence, BasicOps parent and final acceptance.
 - **SEO Lead (`start-seo`):** owns SEO judgement, the department goal, dynamic action register, dependencies, specialist selection and acceptance of QA-passed work.
-- **SEO specialist:** uses one selected marketplace skill to produce one bounded outcome. The specialist owns its professional method.
+- **SEO specialist:** uses one selected marketplace skill to produce one bounded research, diagnosis or brief outcome. The specialist owns its professional method.
+- **Content Lead:** owns final customer-facing wording, writing-skill selection and editorial acceptance whenever the SEO action requires copy.
 - **SEO Delivery QA:** independently verifies the returned work. It does not repair the artefact or perform the specialist action.
 - **Astro Lead:** receives only an accepted SEO implementation package through Head of Production.
 - **BasicOps Task Manager:** is the only BasicOps mutation boundary.
@@ -129,14 +130,29 @@ Select the best installed specialist by capability, inputs, output contract and 
 | Keyword and intent evidence | `keyword-research` |
 | Content opportunity gaps | `content-gap-analysis` |
 | Page briefs | `seo-page-brief` |
-| New page content | `seo-content-writer` |
-| Existing page improvement | `content-refresher` |
+| New page content brief | `seo-page-brief` or `seo-content-writer` in brief mode, then Content Lead |
+| Existing page improvement brief | `content-refresher` in diagnosis/brief mode, then Content Lead |
 | Technical diagnosis | `seo-audit` or the applicable technical skill |
 | Independent department QA | `seo-delivery-qa` |
 
 These are candidates, not a rigid sequence. Let the specialist skill own method. The Lead supplies the goal, bounded objective, accepted evidence, permissions, required output and completion test.
 
 If no installed skill can satisfy the action, return `waiting_on_capability`. Do not let the Lead silently perform specialist work.
+
+### Content Department boundary
+
+SEO Lead owns keyword intent, SERP evidence, internal-link requirements, information architecture and the content brief. It does not own final prose.
+
+When an SEO action requires new or materially revised customer-facing copy:
+
+1. Produce and QA a versioned `content_brief` under `content-departmental-delivery.md`.
+2. Persist and read back that brief as the accepted SEO artefact.
+3. Return it to Head of Production for Content Lead dispatch.
+4. Content Lead selects the writing skill, runs the required writing pipeline and independent editorial QA, then returns verified `implementation_ready_copy`.
+5. SEO Lead verifies intent coverage, factual source use, internal links and metadata requirements without silently rewriting the accepted copy.
+6. Head of Production dispatches Astro or another publisher only after the copy artefact contains one selected replacement per field and is `approved_for_implementation`.
+
+Research suggestions, outlines, candidate paragraphs and `review_ready` alternatives do not satisfy a copy action and must not be handed directly to implementation.
 
 ## Action dispatch and handback
 
@@ -256,6 +272,8 @@ seo_completion_dossier:
   department_goal: "Accepted SEO result"
   completed_actions: []
   verified_drive_artefacts: []
+  accepted_content_briefs: []
+  implementation_ready_copy: []
   page_routes: []
   internal_link_requirements: []
   metadata_and_schema_requirements: []

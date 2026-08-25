@@ -12,6 +12,7 @@ Use this contract after a review identifies work, when Michael asks to work thro
 - **Google Ads Lead (`google-ads` agent):** owns account judgement, the stable action register, dependencies, sequencing and strategic acceptance.
 - **Worker:** Claude or another registered worker executes one bounded action through the named specialist skill. A skill is a procedure, not a persistent department role.
 - **Google Ads Delivery QA:** independently checks the returned evidence, artefact, approval boundary and completion claim.
+- **Content Lead:** receives accepted briefs whenever Ads work requires customer-facing words and returns QA-passed implementation-ready copy.
 - **Head of Production:** owns the original production brief, durable execution state, cross-department routing and final acceptance against the brief.
 - **BasicOps Task Manager:** is the only BasicOps mutation boundary. It is a shared skill, not a manager or source of technical judgement.
 - **Learning Steward:** routes verified corrections, friction and decisions to client context, Knowledge, SOPs, skills or capability incidents and defines the next regression.
@@ -19,7 +20,7 @@ Use this contract after a review identifies work, when Michael asks to work thro
 
 ## Non-negotiable sequence
 
-`Production brief → Lead reconciliation → authority classification → one worker action → QA → Lead record → next action → Production acceptance → BasicOps handoff → Learning Steward`
+`Production brief -> Lead reconciliation -> authority classification -> one worker action -> QA -> Lead record -> Content Department when words change -> Production acceptance -> BasicOps handoff -> Learning Steward`
 
 Do not dispatch two actions concurrently. Do not expose another action while the active action is
 running, awaiting QA or being recorded. A consequential action awaiting Michael does not block a
@@ -104,7 +105,7 @@ The worker runs only the selected skill slice. It does not choose the next accou
 | RSA / assets | Final URLs, headlines, descriptions, pinning rationale, policy/AHPRA check and import/paste format |
 | Bid / budget | Current and proposed values, economics, capacity/measurement dependencies, monitoring and rollback threshold |
 | Conversion tracking | One-page current/proposed conversion matrix, source, primary/secondary state, account-default inclusion, campaign-goal usage, GA4 firing/import evidence, exact UI/GTM/GA4 steps and observed verification method. If an Ads-hosted action cannot be deleted or demoted, change campaign goal inclusion instead of recommending an impossible mutation. |
-| Landing-page dependency | Department handoff containing requirement, reason, source campaign, event/URL details and acceptance test |
+| Landing-page dependency | Accepted `content_brief` containing requirement, evidence, source campaign, audience/search intent, exact page and fields, protected copy/offer, CTA destination, constraints, delivery destination and acceptance test. Return it to Head of Production for Content Lead dispatch. |
 | PMax | Asset/audience/listing-group changes, excluded waste, evidence and implementation format supported by the owning skill |
 
 Maintain a single `implementation-checklist-YYYY-MM.md` for the parent. Put approved routine work in
@@ -155,6 +156,18 @@ google_ads_completion_dossier:
 ```
 
 Head of Production returns `accepted` or one bounded `production_correction`. It owns formal routing of cross-department work; the Google Ads Lead supplies the technical brief but does not silently create another department's workload.
+
+### Copy-producing Google Ads actions
+
+When an Ads action requires landing-page copy, comparison copy or another material customer-facing change:
+
+1. Google Ads Lead completes diagnosis and returns a versioned `content_brief` under `content-departmental-delivery.md`.
+2. Head of Production dispatches Content Lead. Google Ads Lead does not write the final page copy and does not send recommendations to the developer.
+3. Content Lead returns a verified `implementation_ready_copy` artefact after writing and independent editorial QA.
+4. Google Ads Lead verifies message match, final URL, campaign intent and channel constraints without rewriting the copy.
+5. Head of Production dispatches development only when one exact replacement per field is `approved_for_implementation`.
+
+RSA, asset and other constrained ad copy may still be authored by the relevant Ads writing skill. When it belongs to a staged production project, Content Lead must accept the final version's anti-AI, voice, claims and channel checks before live implementation.
 
 ## 8. Learning Steward closeout
 
