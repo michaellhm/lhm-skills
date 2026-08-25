@@ -87,8 +87,9 @@ def hermes_argv(profile: str, container_run_dir: str, prompt: str) -> list[str]:
     """The sole allowlisted Hermes invocation: fixed container, numeric owner and profile path."""
     if profile not in PROFILE_NAMES:
         raise ValueError("unregistered Hermes profile")
-    if not container_run_dir.startswith(PROFILE_ROOT + "/dispatch/scheduled-executor/"):
-        raise ValueError("handoff outside shared volume")
+    expected_root = f"/opt/data/profiles/{PROFILE_NAMES[profile]}/dispatch/scheduled-executor/"
+    if not container_run_dir.startswith(expected_root):
+        raise ValueError("handoff outside role profile")
     return [DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER,
             "/opt/hermes/bin/hermes", "-p", PROFILE_NAMES[profile], "--in", container_run_dir,
             "-t", "file", "-z", prompt, "--usage-file", f"{container_run_dir}/usage.json"]
@@ -225,7 +226,7 @@ class ScheduledExecutor:
         request_value=json.loads(request.read_text()); request_sha256=canonical_sha(request_value)
         stale_sha=hashlib.sha256(result.read_bytes()).hexdigest() if result.exists() else None
         result.unlink(missing_ok=True)
-        container_dir=f"{PROFILE_ROOT}/dispatch/scheduled-executor/{contract['parent_run_id']}/{contract['child_run_id']}"
+        container_dir=f"/opt/data/profiles/{PROFILE_NAMES[profile]}/dispatch/scheduled-executor/{contract['parent_run_id']}/{contract['child_run_id']}"
         prompt=f"Read request.json. Print only one JSON object to stdout with the exact parent, child, role and request_sha256 {request_sha256}; do not write files, access credentials or mutate systems."
         done = self.runner(hermes_argv(profile, container_dir, prompt), capture_output=True, text=True, timeout=900)
         if done.returncode: raise RuntimeError("bounded Hermes role invocation failed")
@@ -272,7 +273,16 @@ class ScheduledExecutor:
             if state["state"] == "closed": return state
             child = f"{parent_id}-{state['cursor']:02d}"
             contract = self.router.issue(parent_id, child)
-            run_dir = (HOST_HANDOFF_ROOT / parent_id / child) if self.root == DEFAULT_ROOT else (self.root / "scheduled-runs" / parent_id / "children" / child)
+            stage_profile = None
+            if contract["runtime"] == "verifier":
+                stage_profile = "lhm_verifier"
+            elif contract["stage_id"] in BOT_STAGES:
+                stage_profile = Path(parent["scheduled_contract"]["profile_aliases"][contract["owner"]]).name
+            if self.root == DEFAULT_ROOT:
+                profile_name = PROFILE_NAMES.get(stage_profile, "lhm_brain")
+                run_dir = Path(f"/home/hermes/.hermes/profiles/{profile_name}/dispatch/scheduled-executor") / parent_id / child
+            else:
+                run_dir = self.root / "scheduled-runs" / parent_id / "children" / child
             run_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
             os.chmod(run_dir, 0o700)
             if self.root == DEFAULT_ROOT:
@@ -290,7 +300,7 @@ class ScheduledExecutor:
                     self._invoke("lhm_verifier", run_dir, request_path, result_path, contract)
                     outputs = contract["input_artifacts"]
                 elif contract["stage_id"] in BOT_STAGES:
-                    alias = Path(parent["scheduled_contract"]["profile_aliases"][contract["owner"]]).name
+                    alias = stage_profile
                     closed = self._invoke(alias, run_dir, request_path, result_path, contract)
                     if contract["stage_id"] == "research":
                         plan = closed["value"]["decision"]

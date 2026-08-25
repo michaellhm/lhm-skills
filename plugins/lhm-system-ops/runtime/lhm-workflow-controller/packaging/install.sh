@@ -156,7 +156,9 @@ install -o root -g root -m 0644 "$repo_dir"/integration/scheduled-workflows.json
 scheduled_base=/home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-work
 install -d -o root -g 10000 -m 0710 "$scheduled_base"
 install -d -o root -g 10000 -m 0730 "$scheduled_base/incoming"
-install -d -o root -g 10000 -m 0710 /home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-executor
+for profile in lhm_chief_of_staff lhm_production lhm_researcher lhm_seo lhm_content lhm_website lhm_verifier lhm_operations_connector lhm_learning_steward; do
+  install -d -o root -g 10000 -m 0710 "/home/hermes/.hermes/profiles/$profile/dispatch/scheduled-executor"
+done
 for d in processed failed runs; do install -d -o root -g root -m 0750 "$scheduled_base/$d"; done
 systemctl daemon-reload
 systemd-analyze verify /etc/systemd/system/lhm-workflow-*.service /etc/systemd/system/lhm-workflow-*.path /etc/systemd/system/lhm-scheduled-work.service /etc/systemd/system/lhm-scheduled-work.path

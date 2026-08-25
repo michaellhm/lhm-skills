@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 from lhm_workflow.scheduled_executor import (
-    ADAPTER, CONTAINER_USER, canonical_sha, compare_and_swap_tracker, hermes_argv,
+    ADAPTER, CONTAINER_USER, PROFILE_NAMES, canonical_sha, compare_and_swap_tracker, hermes_argv,
     invoke_registered_adapter, invoke_work_control, materialise_stdout_result, metadata_probe_argv,
     registered_gsc_request, snapshot_sources, validate_closed_result, work_control_request,
 )
@@ -62,13 +62,13 @@ def closed_result(request_sha="a" * 64, **changes):
 
 def test_all_hermes_argv_are_numeric_uid_gid_and_profile_allowlisted():
     for profile in ("lhm_chief_of_staff", "lhm_production", "lhm_seo", "lhm_researcher", "lhm_content", "lhm_website", "lhm_verifier", "lhm_operations", "lhm_learning_steward"):
-        argv = hermes_argv(profile, "/opt/data/profiles/lhm_brain/dispatch/scheduled-executor/p/c", "closed")
+        argv = hermes_argv(profile, f"/opt/data/profiles/{PROFILE_NAMES[profile]}/dispatch/scheduled-executor/p/c", "closed")
         assert argv[3:6] == ["--user", "10000:10000", "hermes"]
         assert "1000:1000" not in argv
         assert metadata_probe_argv(profile)[3:6] == ["--user", CONTAINER_USER, "hermes"]
         assert "--skills" not in argv
         assert argv[11:13] == ["-t", "file"]
-    assert hermes_argv("lhm_operations", "/opt/data/profiles/lhm_brain/dispatch/scheduled-executor/p/c", "closed")[8] == "lhm_operations_connector"
+    assert hermes_argv("lhm_operations", "/opt/data/profiles/lhm_operations_connector/dispatch/scheduled-executor/p/c", "closed")[8] == "lhm_operations_connector"
     with pytest.raises(ValueError, match="unregistered"):
         hermes_argv("lhm_shell", "/opt/data/profiles/lhm_brain/dispatch/scheduled-executor/p/c", "x")
 
