@@ -117,7 +117,7 @@ def materialise_stdout_result(path: Path, stdout: str, contract: dict, request_s
     # Hermes roles sometimes use terminal synonyms despite the prompt's closed
     # enum. Canonicalise only known affirmative terminal words on the host;
     # every other status still fails validation.
-    if value["status"] in {"completed", "validated"}: value["status"] = "accepted"
+    if value["status"] in {"complete", "completed", "validated", "success", "succeeded"}: value["status"] = "accepted"
     atomic_json(path, {"schema_version": 1, "parent_run_id": contract["parent_run_id"],
                        "child_run_id": contract["child_run_id"], "role": contract["owner"],
                        "request_sha256": request_sha256, **value})
