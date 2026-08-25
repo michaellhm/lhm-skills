@@ -230,7 +230,10 @@ class ScheduledExecutor:
         prompt=(f"Read the exact absolute file {container_dir}/request.json. Print only one JSON object to stdout "
                 f"with exactly these keys: schema_version, parent_run_id, child_run_id, role, request_sha256, "
                 f"status, artifact_hashes, decision. Bind request_sha256 to {request_sha256}; do not use markdown "
-                "fences, write files, access credentials or mutate systems.")
+                "fences. If you read the request and complete the bounded stage, set status to the exact string "
+                "accepted, artifact_hashes to a JSON array of SHA-256 strings (an empty array is allowed), and "
+                "decision to a JSON object (an empty object is allowed). Never return null for these fields. Do not "
+                "write files, access credentials or mutate systems.")
         done = self.runner(hermes_argv(profile, container_dir, prompt), capture_output=True, text=True, timeout=900)
         if done.returncode: raise RuntimeError("bounded Hermes role invocation failed")
         materialise_stdout_result(result, done.stdout)
