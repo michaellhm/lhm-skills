@@ -259,6 +259,9 @@ class ScheduledExecutor:
         request = self.root / "org-signer-requests" / contract["owner"] / f"{contract['child_run_id']}.json"
         result = self.root / "org-signer-results" / contract["owner"] / request.name
         signer_envelope={**envelope,"outputs":[{k:v for k,v in item.items() if k!="path"} for item in envelope["outputs"]]}
+        # A resumed idempotent child must wait for a receipt over its current
+        # contract, never consume the prior attempt's result at the same path.
+        result.unlink(missing_ok=True)
         atomic_json(request, signer_envelope, 0o640)
         deadline = time.monotonic() + (2 if self.test_mode else 120)
         while time.monotonic() < deadline:
