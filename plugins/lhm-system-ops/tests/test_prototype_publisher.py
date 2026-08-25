@@ -110,8 +110,7 @@ class PrototypePublisherTests(unittest.TestCase):
                  mock.patch.object(publisher,'preflight_post_publish_dependencies'), \
                  mock.patch.object(publisher,'git',side_effect=git_results) as git, \
                  mock.patch.object(publisher,'run',return_value=f"{'b'*40}\trefs/heads/main"), \
-                 mock.patch.object(publisher,'verify_deploy',return_value={'id':7}), \
-                 mock.patch.object(publisher,'verify_public_url',return_value={'url':'https://example.test','status':200,'bytes':1,'sha256':'0'*64,'commit':'b'*40}):
+                mock.patch.object(publisher,'wait_for_public_deploy',return_value={'url':'https://example.test','status':200,'bytes':1,'sha256':'0'*64,'commit':'b'*40}):
                 result=publisher.publish(request)
             self.assertEqual(result['commit'],'b'*40)
             push=next(call for call in git.call_args_list if call.args and call.args[0]=='push')
@@ -147,15 +146,10 @@ class PrototypePublisherTests(unittest.TestCase):
             publisher.SSH_KEY=Path(temporary)/'missing'; publisher.KNOWN_HOSTS=Path(temporary)/'hosts'
             with self.assertRaisesRegex(ValueError,'credential is not configured'): publisher.ssh_env()
 
-    def test_exact_named_actions_and_bounded_http_are_success_gates(self):
-        completed={'workflow_runs':[{'id':7,'name':'Deploy to lhmstaging','path':'.github/workflows/deploy.yml','head_sha':'a'*40,'status':'completed','conclusion':'success'}]}
-        response=mock.MagicMock(); response.read.return_value=json.dumps(completed).encode(); response.__enter__.return_value=response
-        with mock.patch.object(publisher.urllib.request,'urlopen',return_value=response):
-            self.assertEqual(publisher.verify_deploy('a'*40)['id'],7)
-        wrong={'workflow_runs':[{'id':8,'name':'Other','head_sha':'a'*40,'status':'completed','conclusion':'success'}]}
-        response.read.return_value=json.dumps(wrong).encode()
-        with mock.patch.object(publisher.urllib.request,'urlopen',return_value=response), mock.patch.object(publisher.time,'sleep'):
-            with self.assertRaisesRegex(ValueError,'not observed'): publisher.verify_deploy('a'*40)
+    def test_public_deploy_poll_retries_until_exact_content_is_observed(self):
+        with mock.patch.object(publisher,'verify_public_url',side_effect=[ValueError('not ready'),{'status':200,'commit':'a'*40}]) as verify, mock.patch.object(publisher.time,'sleep'):
+            self.assertEqual(publisher.wait_for_public_deploy({},'a'*40)['status'],200)
+            self.assertEqual(verify.call_count,2)
 
     def test_public_readback_requires_exact_index_bytes_and_hash(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -194,8 +188,7 @@ class PrototypePublisherTests(unittest.TestCase):
             publisher.pending_path(request['idempotency_key']).write_text(json.dumps({'request_digest':publisher.request_digest(request),'commit':commit,'base_commit':request['expected_base_commit']}))
             with mock.patch.object(publisher,'ssh_env',return_value={}), mock.patch.object(publisher,'preflight_post_publish_dependencies'), \
                  mock.patch.object(publisher,'git',side_effect=['',commit]) as git, \
-                 mock.patch.object(publisher,'verify_deploy',return_value={'id':7}), \
-                 mock.patch.object(publisher,'verify_public_url',return_value={'url':'https://example.test','status':200,'bytes':1,'sha256':'0'*64,'commit':commit}):
+                 mock.patch.object(publisher,'wait_for_public_deploy',return_value={'url':'https://example.test','status':200,'bytes':1,'sha256':'0'*64,'commit':commit}):
                 first=publisher.publish(request); second=publisher.publish(request)
             self.assertEqual(first,second)
             self.assertEqual(len(list(publisher.STATE_ROOT.glob('source.json'))),1)
