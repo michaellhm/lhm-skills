@@ -140,5 +140,6 @@ def test_safe_retry_interruption_and_scheduler_business_separation_are_persisted
     runtime=(Path(__file__).parents[1]/"integration/lhm-scheduled-work-runtime").read_text()
     assert '"safe_retry": 1' in source and 'previous.get("failed_child") != child' in source
     assert source.count("result.unlink(missing_ok=True)") >= 2
+    assert 'contract["stage_id"] == "seo_accept" else {}' in source
     assert '"scheduler": "accepted"' in runtime and '"business": business' in runtime
     assert "shutil.move(path, PROCESSED / path.name)" in runtime
