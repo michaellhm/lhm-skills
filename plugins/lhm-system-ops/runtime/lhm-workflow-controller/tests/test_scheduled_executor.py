@@ -181,6 +181,7 @@ def test_safe_retry_interruption_and_scheduler_business_separation_are_persisted
     assert 'GSC connector did not return terminal evidence' in source
     assert 'connector_receipt=validate_registered_adapter_receipt(existing["receipt"],connector_request)' in source
     assert 'contract["stage_id"] == "operations_write" and parent["scheduled_contract"]["permission_ceiling"] == "non-production-preview"' in source
+    assert 'contract["stage_id"] == "operations_readback" and parent["scheduled_contract"]["permission_ceiling"] == "non-production-preview"' in source
     dispatch=(Path(__file__).parents[1]/"integration/claude-dispatch.live-reference").read_text()
     assert 'max_wait_seconds=540' in dispatch and 'def enqueue_and_wait(request, max_wait_seconds=240)' in dispatch
     adapter=(Path(__file__).parents[1]/"integration/lhm-workflow-registered-adapter").read_text()
