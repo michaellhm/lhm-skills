@@ -351,7 +351,11 @@ class ScheduledExecutor:
                 else:
                     atomic_json(result_path, {"status": "accepted", "stage_id": contract["stage_id"]})
                     outputs = [artifact(result_path, f"{contract['stage_id']}-result")]
-                decision = json.loads(result_path.read_text()).get("decision", {}) if result_path.exists() else {}
+                # Only SEO acceptance is authorised to change the remaining
+                # route. Other role decisions remain evidence in result.json
+                # but cannot become organisational routing instructions.
+                decision = (json.loads(result_path.read_text()).get("decision", {})
+                            if result_path.exists() and contract["stage_id"] == "seo_accept" else {})
                 signed = self._wait_signed(contract, {"contract": contract, "outputs": outputs, "checks": ["artifact.readback_sha256"], "decision": decision}, run_dir)
                 state = self.router.accept(parent_id, contract, signed)
                 self._checkpoint(parent_id, {"status": state["state"], "cursor": state["cursor"], "child_run_id": child, "idempotency_key": contract["idempotency_key"], "signed_receipt_sha256": digest(signed)})
