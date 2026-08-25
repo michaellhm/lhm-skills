@@ -65,7 +65,7 @@ def load_definition(path: Path, workflow_key: str, *, test_mode: bool = False) -
     if not isinstance(sources, list) or len(sources) != 4 or any(not str(value).startswith("/home/hermes/.hermes/profiles/lhm_brain/vault/") for value in sources):
         raise ValueError("invalid canonical source registry")
     gsc = definition["gsc"]
-    if set(gsc) != {"property", "route", "allowed_actions", "evidence_path", "evidence_sha256"} or gsc["property"] != "https://localhealthmarketing.com/" or gsc["route"] != "seo_gsc_readonly":
+    if set(gsc) != {"site_key", "property", "route", "allowed_actions", "evidence_path", "evidence_sha256"} or gsc["site_key"] != "lhm-main" or gsc["property"] != "https://localhealthmarketing.com/" or gsc["route"] != "seo_gsc_readonly":
         raise ValueError("invalid registered GSC property")
     if set(gsc["allowed_actions"]) != {"list_sites", "batch_url_inspection", "search_analytics", "list_sitemaps"}:
         raise ValueError("invalid GSC permission ceiling")
