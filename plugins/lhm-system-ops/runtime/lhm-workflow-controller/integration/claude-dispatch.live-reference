@@ -89,7 +89,8 @@ def submit_gsc(site, urls, objective):
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'seo_gsc_readonly',
                       'agent_id': 'lhm-marketing-hub:seo', 'site': site,
                       'urls': urls, 'objective': objective, 'timeout_seconds': 600,
-                      **contract('seo-gsc-review', ['lhm-marketing-hub:seo-audit'], ['google_search_console.property_read'])})
+                      **contract('seo-gsc-review', ['lhm-marketing-hub:seo-audit'], ['google_search_console.property_read'])},
+                     max_wait_seconds=540)
 
 
 def next_run_id(prefix):
@@ -103,7 +104,7 @@ def next_run_id(prefix):
     return f'{prefix}-{date}-{sequence:02d}'
 
 
-def enqueue_and_wait(request):
+def enqueue_and_wait(request, max_wait_seconds=240):
     run_id = request['run_id']
     incoming = BASE / 'incoming'
     fd, temp_name = tempfile.mkstemp(prefix=f'.{run_id}.', dir=incoming)
@@ -116,7 +117,7 @@ def enqueue_and_wait(request):
     finally:
         if os.path.exists(temp_name):
             os.unlink(temp_name)
-    wait_for_completion(run_id, max_wait_seconds=240)
+    wait_for_completion(run_id, max_wait_seconds=max_wait_seconds)
 
 
 def submit_drive_file(client, artifact_path, file_name):

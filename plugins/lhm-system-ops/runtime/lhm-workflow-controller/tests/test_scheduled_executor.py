@@ -175,6 +175,8 @@ def test_safe_retry_interruption_and_scheduler_business_separation_are_persisted
     assert 'self.root / "verifier-signing-inputs"' in source
     assert 'candidate_urls[:25]' in source and 'request_value.get("phase") == "synthesis"' in source
     assert 'GSC connector did not return terminal evidence' in source
+    dispatch=(Path(__file__).parents[1]/"integration/claude-dispatch.live-reference").read_text()
+    assert 'max_wait_seconds=540' in dispatch and 'def enqueue_and_wait(request, max_wait_seconds=240)' in dispatch
     assert 'if not self.router._path(parent_id).exists()' in source
     assert '"scheduler": "accepted"' in runtime and '"business": business' in runtime
     assert "shutil.move(path, PROCESSED / path.name)" in runtime
