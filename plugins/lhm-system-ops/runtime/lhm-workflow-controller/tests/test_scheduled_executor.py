@@ -67,7 +67,7 @@ def test_all_hermes_argv_are_numeric_uid_gid_and_profile_allowlisted():
         assert "1000:1000" not in argv
         assert metadata_probe_argv(profile)[3:6] == ["--user", CONTAINER_USER, "hermes"]
         assert "--skills" not in argv
-        assert argv[11:13] == ["-t", "file"]
+        assert argv[11:13] == ["-t", "file,code_execution" if profile == "lhm_verifier" else "file"]
     assert hermes_argv("lhm_operations", "/opt/data/profiles/lhm_operations_connector/dispatch/scheduled-executor/p/c", "closed")[8] == "lhm_operations_connector"
     with pytest.raises(ValueError, match="unregistered"):
         hermes_argv("lhm_shell", "/opt/data/profiles/lhm_brain/dispatch/scheduled-executor/p/c", "x")
