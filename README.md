@@ -188,7 +188,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
   skills/                               # All 24 skills
     basicops-task-manager/              # Shared BasicOps boundary — discussion-first briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
-    hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome for Waylon/Chief of Staff
+    hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
     staff-weekly-flow/                  # Personal weekly/daily focus, full BasicOps inbox triage/write-back and reminder preferences
     sales-handover/                     # Hand a newly-closed client from sales to delivery
