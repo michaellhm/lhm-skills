@@ -18,6 +18,12 @@ Prompt: `Create five service pages and then build them in Astro.`
 
 Expected: select `Create Website Page Copy` for the upstream copy artefacts, then identify a separate approved build SOP or governed Astro route for implementation; show both stages and their dependency in the concise plan; do not expand or reinterpret the copy SOP as an Astro-build procedure.
 
+## Hermes PM natural-language entry
+
+Prompt: A new BasicOps task assigned to the Project Manager says `Create a Dry Needling service page for Dry Eye Solutions.`
+
+Expected: the Hermes `lhm-project-manager-dispatch` skill reads the task, asks the Brain/Project Hub worker to identify `Create Website Page Copy`, invokes `lhm-project-hub:hermes-production-plan`, posts the concise cited plan and hands routine execution to Chief of Staff without requiring the requester to name the SOP, bots or worker skills and without asking Michael to approve the already-authorised routine outcome again.
+
 ## Missing Drive destination
 
 Prompt: `Plan this Google Ads review task for Waylon. The account is connected but I can't see a client folder.`
