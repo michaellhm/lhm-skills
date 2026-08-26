@@ -1,11 +1,17 @@
 ---
 name: hermes-production-plan
-description: Prepare, approve, and verify a concise Hermes execution plan for an existing LHM BasicOps task before it is handed to the Chief of Staff. Use when someone asks Monica to "plan this for Waylon", work out the AI or Hermes production steps, check whether a task is ready for autonomous execution, or reconcile Waylon's completed work against the approved plan. This skill plans and checks specialist work; it does not execute the production work itself.
+description: Prepare, approve, monitor, and verify a concise Hermes execution plan for an existing LHM BasicOps task. Use when someone asks Monica to "plan this for Waylon", "where are we at with this task?", "where are you at?", check whether work is ready or blocked, explain a CTO capability incident, or reconcile Waylon's completed work against the approved plan. This skill plans, reports, and checks specialist work; it does not execute the production work itself.
 ---
 
 # Hermes Production Plan
 
 Turn one existing BasicOps outcome into an executable, version-bound plan for the governed Hermes workforce. Monica owns plan readiness and final reconciliation. Waylon/Chief of Staff owns orchestration after approval.
+
+Select the mode from the request:
+
+- planning or readiness → Sections 1–5;
+- progress/status question → Status mode;
+- returned work → Reconcile Waylon's return.
 
 Read `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md` before planning material work.
 
@@ -113,3 +119,48 @@ Next handoff: <accountable human review or approved next action>
 ```
 
 Leave human-owned tasks open in `Under Review` until the accountable human explicitly requests completion. Return the verified BasicOps URL.
+
+## Status mode
+
+When Michael asks Monica “where are you at?” or “where are we at with this task?”, read the BasicOps task and the authoritative workforce parent/child checkpoints. Do not infer progress from the age of a comment, a promised action, a request ID or an isolated worker message.
+
+Return a short plain-English update:
+
+```markdown
+Task status
+
+Current stage: <planning / waiting for approval / research / production / QA / waiting on capability / ready for review>
+
+Completed: <last verified result>
+
+Now: <current owner and action, or exact wait>
+
+Next: <next action, owner and expected trigger>
+
+Issue: <none, or plain-English blocker and impact>
+```
+
+Include the BasicOps task link. Add technical IDs only when they help diagnose or resume the work. Do not create a new Discussion message for an ordinary status question unless Michael asks to record it or a material blocker/status transition needs to be visible on the task.
+
+Distinguish these states:
+
+- a healthy worker, scheduled check or upstream dependency is `in progress` or `waiting`, not blocked;
+- missing evidence that Context & Research is actively resolving is `needs context`;
+- a verified missing/broken route, access, authentication, connector, scheduler, artefact transport or infrastructure incident owned by CTO is `waiting on capability`;
+- only describe the BasicOps task as `Blocked` after the capability incident is verified and continued task execution cannot proceed safely.
+
+### CTO and capability incidents
+
+When a verified capability incident is opened or materially changes, Monica gives Michael one proactive plain-English heads-up containing:
+
+- what cannot currently happen;
+- what has already been completed and remains safe;
+- what the CTO is repairing;
+- whether Michael needs to decide or provide anything;
+- what automatically resumes after verified repair.
+
+Do not dump logs, stack traces or internal retry history into BasicOps. Link the durable incident or review record when useful.
+
+During the pilot, show Michael the proposed BasicOps change and ask for confirmation before changing the task status to `Blocked`. If confirmed, route the mutation through `basicops-task-manager`; preserve the prior status, post the concise blocker/update in Discussion, then read back status, assignee, board/list and message. Never treat a Discussion comment as though it changed task status.
+
+When CTO emits a matching verified `capability_restored` event and Waylon/Head of Production resumes the same parent, notify Michael in plain English. Propose restoring the preserved prior BasicOps status through `basicops-task-manager`; during the pilot, obtain Michael's confirmation before that mutation too. Do not mark the task complete merely because the capability was repaired.
