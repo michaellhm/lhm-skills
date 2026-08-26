@@ -5,7 +5,7 @@ from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[3]
 PLUGIN = 'plugins/lhm-project-hub'
-EXPECTED_VERSION = '0.1.74'
+EXPECTED_VERSION = '0.1.79'
 
 def git(*args):
     return subprocess.run(['git','-C',str(ROOT),*args],check=True,capture_output=True,text=True).stdout
