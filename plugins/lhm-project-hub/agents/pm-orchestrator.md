@@ -46,7 +46,11 @@ Note on `current-projects.md` block shapes: blocks in the wild may not all match
 
 For status-only work, recommend exactly **one** next skill with a one-line reason tied to Step 3. Do not present a menu.
 
-When the user asked to perform work, invoke the owning skill or ordered skill chain. Examples: live Fathom evidence → `client-meeting-email` → `post-meeting-review`; weekly prioritisation → `staff-weekly-flow`; website stage update → `website-project-cockpit` → `basicops-task-manager` → `wp-project-manager`; any other BasicOps mutation → `basicops-task-manager` after its approval gate. Pass the full context envelope and reconcile every child handback.
+When the user asked to perform work from an existing BasicOps task, classify the work from the task's intended outcome and completion condition. Search `70 SOPs/AI Operations/` in the canonical Obsidian Brain and read the closest matching active or draft SOP before planning. Match primarily against each SOP's **Use this when** section; use the task's nouns only as supporting evidence. Cite the selected SOP by title and vault path in the plan. If no SOP matches, say so and continue through the existing governed skill route rather than inventing a procedure.
+
+For example, a task to create a homepage, service page, location page, landing page or batch of non-blog website pages matches `70 SOPs/AI Operations/Create Website Page Copy.md`. Route the existing BasicOps outcome through `hermes-production-plan`; that skill converts the SOP into a concise task-specific plan for Chief of Staff. A task that also asks to build the resulting files needs a separately matched build SOP or governed build route after the copy artefacts exist; do not expand the copy SOP itself.
+
+For other operational requests, invoke the owning skill or ordered skill chain. Examples: live Fathom evidence → `client-meeting-email` → `post-meeting-review`; weekly prioritisation → `staff-weekly-flow`; website stage update → `website-project-cockpit` → `basicops-task-manager` → `wp-project-manager`; any other BasicOps mutation → `basicops-task-manager` after its approval gate. Pass the full context envelope and reconcile every child handback.
 
 If the user has already named what they want to do instead (a specific skill, or "just give me the status"), take that instruction directly rather than pushing your own recommendation.
 
@@ -59,7 +63,7 @@ All Project Hub skills, and when to route to each:
 | `lhm-project-hub:basicops-task-manager` | Any workflow or user asks to create, edit, assign, discuss, move, complete or otherwise mutate a BasicOps task. This is the mandatory final write path even when another skill prepared the task context. |
 | `lhm-project-hub:staff-weekly-flow` | Michael or a team member asks what to focus on this week/today, feels overloaded, wants a mini stand-up, or wants to review and clean up their full personal BasicOps inbox. The skill prepares priorities and routes confirmed inbox mutations through `basicops-task-manager`. |
 | `lhm-project-hub:team-work-brief` | Any team member needs to turn a rough request, client email or idea into a context-checked brief; or an assignee gives feedback about what a future brief should include. It resolves requester, client, assignee, access, dependencies, completion and next handoff before routing the approved task to BasicOps. |
-| `lhm-project-hub:hermes-production-plan` | An existing BasicOps outcome needs an approval-ready Hermes execution plan, a “where are we at?” status check, a plain-English CTO/blocker update or post-run reconciliation for Waylon/Chief of Staff. |
+| `lhm-project-hub:hermes-production-plan` | An existing BasicOps outcome needs its matching Obsidian AI Operations SOP identified and converted into an executable Hermes plan, a “where are we at?” status check, a plain-English CTO/blocker update or post-run reconciliation for Waylon/Chief of Staff. |
 | `lhm-project-hub:drive-artifact-delivery` | Head of Production has an approved, QA-passed staging artefact that must be created or verified in the client's registered Google Drive folder with exact content readback. |
 | `lhm-project-hub:sales-handover` | A deal just closed and needs handing from sales to delivery — new client, or an existing client buying a new package. |
 | `lhm-project-hub:client-onboarding` | A new-client onboarding pipeline (Payment & Billing → Client Contact & Strategy → Access, Assets & Config → Service Kickoff → Onboarding Complete) is live or needs a status check. |
@@ -88,7 +92,7 @@ All Project Hub skills, and when to route to each:
 
 - Never mutate BasicOps directly. Route every BasicOps write through `lhm-project-hub:basicops-task-manager`; the originating workflow supplies context and receives the verified handback.
 - Route rough delegation and handoff-readiness work through `lhm-project-hub:team-work-brief` before BasicOps. Do not expect an assistant or non-specialist requester to diagnose technical requirements unaided.
-- Route requests to “plan this for Waylon”, “where are we at with this task?”, explain a CTO/blocker state or check Waylon's returned work through `lhm-project-hub:hermes-production-plan`. Monica prepares, monitors and reconciles the plan; Chief of Staff owns execution after version-bound approval.
+- Route requests to “plan this for Waylon”, natural-language production outcomes in an existing BasicOps task, “where are we at with this task?”, explain a CTO/blocker state or check Waylon's returned work through `lhm-project-hub:hermes-production-plan`. Monica selects the matching Obsidian SOP, prepares, monitors and reconciles the task-specific plan; Chief of Staff owns execution. The task itself authorises ordinary in-scope work unless the selected SOP, canonical task or owning workflow identifies a genuine ambiguity or consequential approval gate.
 - Client-facing emails are drafts only, never sent.
 - Follow-up items tick only on explicit human confirmation or successful MCP verification.
 - Missing or unauthenticated MCP → state plainly what's missing, never silently skip.

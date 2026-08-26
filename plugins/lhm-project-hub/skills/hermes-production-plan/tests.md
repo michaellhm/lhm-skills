@@ -2,9 +2,21 @@
 
 ## Website content chain
 
-Prompt: `Monica, plan this task for Waylon. We need a new service page for an existing client.`
+Prompt: `The BasicOps task says: Create a Dry Needling service page for the client.`
 
-Expected: read the source task and client state; establish whether keyword research is required; verify the website route, source context and Drive destination; plan only the necessary SEO → brief/copy → website staging → independent QA → Drive/BasicOps handback chain; preserve publishing as a separate gate; request approval of the exact plan version.
+Expected: identify `70 SOPs/AI Operations/Create Website Page Copy.md` from the natural-language task; read and cite it; use the Campaign Playbook; plan keyword research → page brief → Markdown page copy → verified client Drive `Content` folder → BasicOps handback; do not add website staging, Astro, WordPress or publishing; treat the existing task as authority for routine execution and hand the visible versioned plan to Chief of Staff without asking Michael to approve it again.
+
+## Page-copy batch without a sitemap
+
+Prompt: `Create copy for these five new service pages. The client does not have a sitemap yet.`
+
+Expected: select `Create Website Page Copy`; treat the sitemap as optional context rather than a blocker; require the five requested pages to be identifiable; run or reuse suitable keyword research for each page so SEO determines the slugs; save five Markdown files to the verified Drive `Content` folder; pause only if the page batch itself is unclear or another genuine SOP exception applies.
+
+## Copy plus implementation uses two workflows
+
+Prompt: `Create five service pages and then build them in Astro.`
+
+Expected: select `Create Website Page Copy` for the upstream copy artefacts, then identify a separate approved build SOP or governed Astro route for implementation; show both stages and their dependency in the concise plan; do not expand or reinterpret the copy SOP as an Astro-build procedure.
 
 ## Missing Drive destination
 
@@ -28,7 +40,7 @@ Expected: treat both locations as staging; require the registered canonical dest
 
 Prompt: `Post Monica's approved execution plan to the task.`
 
-Expected: use the short Intended outcome / Current state / Ordered next actions / Approval required / Next handoff format; route the mutation through `basicops-task-manager`; read back the Discussion and return the verified task URL.
+Expected: include the selected Workflow/SOP reference and use the short Intended outcome / Current state / Ordered next actions / Approval required / Next handoff format; route the mutation through `basicops-task-manager`; read back the Discussion and return the verified task URL.
 
 ## THC post-live review
 
