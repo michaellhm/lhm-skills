@@ -1,7 +1,7 @@
 {
   "name": "lhm-project-hub",
   "description": "LHM project management hub. Owns the agency process layer: Obsidian-first sales handover, scope-aware client onboarding, delivery kickoffs, monthly and quarterly reviews, meeting wraps, and client updates. Detailed state lives in canonical client project files; BasicOps carries visible gates, owners and next actions.",
-  "version": "0.1.74",
+  "version": "0.1.75",
   "author": { "name": "LHM Digital" },
   "keywords": ["project-management", "onboarding", "sales-handover", "client-success", "basicops", "agency", "kickoff", "monthly-review"]
 }
