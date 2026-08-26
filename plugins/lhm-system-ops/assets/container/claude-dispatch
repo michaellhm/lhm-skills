@@ -18,6 +18,7 @@ ROUTE_SKILLS = {
     'keyword-research': 'lhm-marketing-hub:keyword-research',
     'seo-delivery-qa': 'lhm-marketing-hub:seo-delivery-qa',
     'content': 'lhm-marketing-hub:content-strategy', 'project': 'lhm-project-hub:team-work-brief',
+    'project-production-plan': 'lhm-project-hub:hermes-production-plan',
     'gmb': 'lhm-gmb-hub:run-local-diagnostic', 'finance': 'lhm-finance-hub:finance-advisor',
     'website': 'lhm-wordpress-hub:wp-start', 'prototype': 'lhm-wordpress-hub:html-prototype',
     'astro': 'lhm-wordpress-hub:astro-build', 'wordpress': 'lhm-wordpress-hub:wp-start',
@@ -147,6 +148,8 @@ def register_handback_target(target_type, client, name, vault_prefix, drive_fold
 
 
 def submit_specialist(route, subject_type, subject_name, objective):
+    if route == 'project' and 'lhm-project-hub:hermes-production-plan' in objective:
+        route = 'project-production-plan'
     agent_ids = {
         'marketing': 'lhm-marketing-hub:start',
         'seo': 'lhm-marketing-hub:seo',
@@ -155,6 +158,7 @@ def submit_specialist(route, subject_type, subject_name, objective):
         'seo-delivery-qa': 'lhm-marketing-hub:seo',
         'content': 'lhm-marketing-hub:content',
         'project': 'lhm-project-hub:pm-orchestrator',
+        'project-production-plan': 'lhm-project-hub:pm-orchestrator',
         'gmb': 'lhm-gmb-hub:gmb-orchestrator',
         'finance': 'lhm-finance-hub:finance-orchestrator',
         'website': 'lhm-wordpress-hub:website-orchestrator',

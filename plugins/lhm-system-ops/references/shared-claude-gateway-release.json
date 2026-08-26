@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.9.6",
-  "captured_at": "2026-08-24",
+  "release_version": "0.9.7",
+  "captured_at": "2026-08-26",
   "source": "verified deployed Hermes host inventory",
   "assets": {
     "dispatcher": {
       "source": "assets/gateways/lhm-shared-claude-dispatcher",
       "destination": "/usr/local/libexec/lhm-claude-dispatcher",
-      "sha256": "88191722f7ebd956c4b3be014de45290a98c9cb8b5513bca2902df569fd869b3",
-      "previous_sha256": "cfc80d320335968db2596100fe811e721c0d5597fbafd0a12bfbdee04d5996c2",
+      "sha256": "0d0700f22d73ea94ce5b2844863583387ca922d2ee76969bdd39197c0175b0b8",
+      "previous_sha256": "88191722f7ebd956c4b3be014de45290a98c9cb8b5513bca2902df569fd869b3",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 41118
+      "size_bytes": 41278
     },
     "worker": {
       "source": "assets/gateways/lhm-shared-claude-worker",
@@ -47,12 +47,12 @@
       "source": "assets/container/claude-dispatch",
       "destination": "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch",
       "container_destination": "/opt/data/profiles/lhm_brain/bin/claude-dispatch",
-      "sha256": "612f711b94d68df7edf52dc7fa942044c37bec9c54cc00b90573e3cb40002ba6",
-      "previous_sha256": "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac",
+      "sha256": "e2e6ec2aba98ace85bae5edd84b0d376973664519eaa2f31c66099a2e75dc3c8",
+      "previous_sha256": "612f711b94d68df7edf52dc7fa942044c37bec9c54cc00b90573e3cb40002ba6",
       "owner": 10000,
       "group": 10000,
       "mode": "0755",
-      "size_bytes": 13274
+      "size_bytes": 13622
     }
   }
 }

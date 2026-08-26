@@ -172,6 +172,19 @@ def test_seo_lead_route_is_distinct_and_preserves_existing_seo_contracts():
         ("google_search_console.property_read",))
 
 
+def test_project_production_plan_route_is_closed_and_preserves_team_brief_route():
+    dispatcher = load_dispatcher()
+    assert dispatcher.SPECIALIST_ROUTES["project"] == (
+        "lhm-project-hub:pm-orchestrator", "pm-orchestrator")
+    assert dispatcher.SPECIALIST_SKILLS["project"] == "lhm-project-hub:team-work-brief"
+    assert dispatcher.SPECIALIST_ROUTES["project-production-plan"] == (
+        "lhm-project-hub:pm-orchestrator", "pm-orchestrator")
+    assert dispatcher.SPECIALIST_SKILLS["project-production-plan"] == (
+        "lhm-project-hub:hermes-production-plan")
+    assert dispatcher.admitted_contract("specialist_readonly", "project-production-plan") == (
+        "project-production-plan-review", ("lhm-project-hub:hermes-production-plan",), ())
+
+
 def test_container_client_submits_exact_seo_lead_contract(monkeypatch):
     client_path = PLUGIN / MANIFEST["assets"]["container_client"]["source"]
     spec = importlib.util.spec_from_loader(
@@ -197,6 +210,23 @@ def test_container_client_submits_exact_seo_lead_contract(monkeypatch):
         "required_skills": ["lhm-marketing-hub:start-seo"],
         "required_capabilities": [],
     }]
+
+
+def test_container_client_selects_production_plan_for_exact_pm_skill(monkeypatch):
+    client_path = PLUGIN / MANIFEST["assets"]["container_client"]["source"]
+    spec = importlib.util.spec_from_loader(
+        "shared_client_project_plan", SourceFileLoader("shared_client_project_plan", str(client_path)))
+    client = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(client)
+    captured = []
+    monkeypatch.setattr(client, "next_run_id", lambda prefix: "claude-delegate-20260826-01")
+    monkeypatch.setattr(client, "enqueue_and_wait", captured.append)
+    client.submit_specialist(
+        "project", "general", "page-copy",
+        "Invoke lhm-project-hub:hermes-production-plan and select the canonical SOP.")
+    assert captured[0]["route"] == "project-production-plan"
+    assert captured[0]["workflow_id"] == "project-production-plan-review"
+    assert captured[0]["required_skills"] == ["lhm-project-hub:hermes-production-plan"]
 
 
 def test_dispatcher_rejects_forged_contract_before_any_worker_run(tmp_path, monkeypatch):
