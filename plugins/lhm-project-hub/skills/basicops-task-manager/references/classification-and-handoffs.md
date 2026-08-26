@@ -18,8 +18,8 @@ Allowed values:
 - `handoff_channel`: `basicops`, `whatsapp`, `client-email`, `none`
 - `touchpoint_cadence`: `weekly`, `fortnightly`, `monthly`, `quarterly`, `one-off`, `custom`, `none`
 - `orchestration_owner`: `hermes`, a canonical person name, a confirmed role, or `none`
-- `workflow_state`: `prepared`, `waiting-on-michael-via-hermes`, `approved`, `executing`, `waiting-on-agent`, `ready-for-review`, `blocked`, `complete`, `none`
-- `approval_status`: `not-required`, `pending-michael`, `partially-approved`, `approved`, `changes-requested`, `none`
+- `workflow_state`: `prepared`, `waiting-on-human-via-hermes`, `waiting-on-michael-via-hermes` (legacy), `approved`, `executing`, `waiting-on-agent`, `ready-for-review`, `blocked`, `complete`, `none`
+- `approval_status`: `not-required`, `pending-human`, `pending-michael` (legacy), `partially-approved`, `approved`, `changes-requested`, `none`
 
 Use a canonical person name or confirmed role for `next_handoff`. Use `unknown` or `none` when the
 source does not establish a value; do not invent one. Preserve approved working URLs beneath the
@@ -31,8 +31,8 @@ when an approved workflow transition requires it; do not churn unrelated tasks. 
 
 ## Hermes-prepared review contract
 
-Use this contract when an overnight or on-demand marketing review has been prepared for Michael and
-Hermes will manage the next conversation and specialist dispatches.
+Use this contract when an overnight or on-demand marketing review has been prepared for an
+accountable human reviewer and Hermes will manage the next conversation and specialist dispatches.
 
 - Create or reuse **one review parent task**. Google Ads monthly reviews use Michael's governed
   approval queue: `Michael Tasks` (`49020`) / `Google Ads Flow` (`106309`), assigned to Michael
@@ -41,9 +41,10 @@ Hermes will manage the next conversation and specialist dispatches.
   `basicops:<client-slug>:<service>:monthly-review:<yyyy-mm>` and search the destination, client
   mother task and materially equivalent open titles before creating.
 - The initial metadata state is
-  `handoff_trigger=waiting; next_handoff=Michael via Hermes; handoff_channel=basicops; orchestration_owner=hermes; workflow_state=waiting-on-michael-via-hermes; approval_status=pending-michael`.
-- Assign the review parent to Michael unless an authorised canonical workflow names another human
-  approver. Hermes is the orchestration owner, not a fabricated BasicOps person or assignee.
+  `handoff_trigger=waiting; next_handoff=<verified-reviewer> via Hermes; handoff_channel=basicops; orchestration_owner=hermes; workflow_state=waiting-on-human-via-hermes; approval_status=pending-human`.
+- Assign the review parent to the authorised canonical human reviewer. The fixed Michael Google Ads
+  queue above is one governed workflow instance, not the engine default. Hermes is the orchestration
+  owner, not a fabricated BasicOps person or assignee.
 - Description contains only the exact metadata line and verified working URLs, normally the Google
   Workspace report and client dashboard. Put the human overview, evidence confidence, top five
   proposed actions, recommendation order and approval request in Discussion.
@@ -54,7 +55,7 @@ Hermes will manage the next conversation and specialist dispatches.
 - A message such as “let's tackle Align Health” resumes the review but does not approve all actions.
   Hermes must read the parent, summarise what is waiting, and obtain explicit action-level direction.
 
-After Michael responds through Hermes:
+After the authenticated reviewer responds through Hermes:
 
 1. Record the approved, deferred and rejected action labels in a new parent Discussion message.
 2. Set `approval_status=partially-approved` when only some actions are approved, otherwise
@@ -62,7 +63,7 @@ After Michael responds through Hermes:
 3. Create only approved execution subtasks, each with its own outcome, dependencies, completion
    condition, specialist route and next handoff in Discussion. Link verified native task URLs back to
    the parent. Do not create subtasks for deferred or rejected actions.
-4. Ask whether Michael wants the created subtasks moved to individual assignee boards. Never move
+4. Ask whether the authenticated reviewer wants the created subtasks moved to individual assignee boards. Never move
    them automatically. Agent execution does not require pretending an agent has a BasicOps board.
 5. Dispatch **one approved action at a time**. While active, set the parent to
    `workflow_state=executing`; the active subtask may use `workflow_state=waiting-on-agent` and name
@@ -70,10 +71,10 @@ After Michael responds through Hermes:
 6. After the agent returns, verify the promised artefact or account result, add a concise evidence
    message to the subtask and parent, and only then complete the subtask. If the result needs human
    review, use `ready-for-review` instead of complete.
-7. Release the next approved action only after the prior action is verified or Michael explicitly
+7. Release the next approved action only after the prior action is verified or the reviewer explicitly
    changes the order. On a blocker, use `workflow_state=blocked`, name the missing input and return
-   the handoff to `Michael via Hermes` when his decision is required.
-8. When no approved action remains, set the parent to `workflow_state=ready-for-review` if Michael
+   the handoff to `<verified-reviewer> via Hermes` when that person's decision is required.
+8. When no approved action remains, set the parent to `workflow_state=ready-for-review` if the reviewer
    must inspect outcomes, or `complete` only after the review and all approved outcomes are verified.
 
 Every transition requires an exact metadata update, a separate human Discussion message, read-back
@@ -131,6 +132,45 @@ For a completion, ready-for-review, blocked or waiting request:
    separate authorised route and approval.
 
 The flow is: `do → verify → notify → release next action → update client when required`.
+
+## BasicOps attention and decision contract
+
+A BasicOps task remains the governed record regardless of the interface that activated it. When a
+material human decision prevents safe continuation:
+
+1. Resolve the respondent from the named decision owner, verified next handoff, current assignee,
+   authenticated requester, then verified project or account owner. Do not hard-code Michael.
+2. Post one decision-ready question in Discussion with the blocker, reason, recommendation or two
+   to three bounded options, consequence and resumption point.
+3. Apply the accurate blocked, waiting or review transition through the normal mutation gate.
+4. Send the respondent a BasicOps direct message containing the concise question and native task
+   link, and verify the Discussion post and message separately.
+5. Record the authenticated answer and its local timestamp in Discussion, then release the prior
+   workflow to resume without another start approval.
+
+For an outbound DM with no incoming message context, resolve the respondent's verified BasicOps
+user ID, list direct chats and reuse the chat whose `user` matches. Create a chat for that user only
+when none exists, then call `create_message_in_chat` and verify it by chat read-back. Reserve
+`create_reply_in_message` for responding to an existing `messageId`.
+
+Do not send a duplicate direct message when the respondent is already answering the same question
+in an active authenticated interface. Do not claim a direct message was sent merely because the
+Discussion changed, the task was assigned or BasicOps shows the task as seen. If ownership is
+ambiguous, ask to confirm ownership instead of guessing.
+
+If the BasicOps connector cannot send or verify direct messages, keep the Discussion question,
+return the unsent notification as a capability gap and route it to the governed capability-incident
+workflow. Do not silently substitute Telegram or another channel.
+
+An authenticated instruction to complete a defined outcome authorises its normal reversible
+internal steps, including research, briefs, drafts, separate working files, progress notes and
+delivery into the verified client working folder. Do not turn a workflow preference with an
+established default into an approval gate. Final copy or strategy approval, client contact,
+publishing, deployment, launch, spend and meaningful scope or commercial changes retain their
+separate approval boundaries.
+
+Use the authenticated person's configured IANA timezone for human-facing dates. Michael uses
+`Australia/Melbourne`; do not use server UTC or a permanently fixed offset.
 
 ## Examples
 

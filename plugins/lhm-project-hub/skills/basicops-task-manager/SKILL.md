@@ -146,11 +146,11 @@ The calling website workflow owns the final Obsidian update. This skill returns 
 
 Read and apply the **Hermes-prepared review contract** in
 [classification-and-handoffs.md](references/classification-and-handoffs.md). The safe default is one
-monthly-review parent assigned to the human approver, with Hermes recorded only as orchestration
-owner. Keep the account overview and up to five ordered proposals in Discussion. Do not create
-execution subtasks until Michael explicitly approves action labels through Hermes. After approval,
-create only the approved subtasks and release them to specialist agents sequentially, recording and
-verifying every transition on the parent and active subtask.
+monthly-review parent assigned to the verified human approver, with Hermes recorded only as
+orchestration owner. Keep the account overview and up to five ordered proposals in Discussion. Do
+not create execution subtasks until that authenticated approver explicitly approves action labels
+through Hermes. After approval, create only the approved subtasks and release them to specialist
+agents sequentially, recording and verifying every transition on the parent and active subtask.
 
 ## Clean up and classify an existing board
 
