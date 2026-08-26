@@ -141,7 +141,8 @@ Expected:
 - Create or reuse one Google Ads monthly-review parent under the verified Align Health Co mother task
 - Stable dedupe key includes client, service and review month
 - Parent is assigned to Michael; Hermes appears only as `orchestration_owner=hermes`
-- Metadata uses `workflow_state=waiting-on-michael-via-hermes` and `approval_status=pending-michael`
+- Metadata uses `workflow_state=waiting-on-human-via-hermes` and `approval_status=pending-human`;
+  `next_handoff` names verified reviewer Michael for this governed Google Ads instance
 - Description contains only the exact metadata line plus verified report/dashboard URLs
 - Discussion contains the concise account overview, confidence caveats and ordered `A1`–`A5`
   proposals, each explicitly labelled `Proposed — not approved`
@@ -157,6 +158,26 @@ An open review parent is waiting on Michael via Hermes.
 Expected: Hermes reads the existing parent, reports its current state and asks Michael which labelled
 actions to approve, defer, reject or reorder. The phrase does not approve all five actions and does
 not create subtasks.
+
+## Team-owned blocker uses BasicOps DM
+
+Prompt: `Kristalyn assigned Hermes a website task. Research is complete, but the client must choose
+between two sitemap options and Kristalyn is the verified decision owner.`
+
+Expected: post one decision-ready question in the task Discussion with a recommendation, set the
+accurate waiting/blocked state, and send Kristalyn—not Michael—a BasicOps direct message with the
+native task link. Resolve Kristalyn's user ID, reuse or create the matching direct chat, call
+`create_message_in_chat` and verify both operations. If the connector cannot send or verify DMs,
+preserve the Discussion question and return a capability incident; do not claim `Seen by` is a DM
+or silently fall back to Telegram.
+
+## Delegated batch continues without repeat approval
+
+Prompt: `Work on this five-page content task. The pages, NAP and form treatment are now confirmed.`
+
+Expected: proceed through five separate drafts, verified client-Drive delivery and a BasicOps review
+request without asking whether to draft or whether to work page-by-page. Stop only at final human
+copy approval or another material exception. Record dates in the authenticated user's IANA timezone.
 
 ## Partial approval and sequential execution
 

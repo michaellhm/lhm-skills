@@ -21,6 +21,47 @@ recreate its employee roles locally or do the specialist work merely because dis
 5. If the user says to run or execute an existing task, ordinary internal production, durable Drive
    delivery and a BasicOps review request are authorised unless the source task narrows them.
    Deployment, publishing and outbound contact still require explicit authority.
+6. Treat delegation as authority to pursue the defined outcome through its normal reversible
+   internal steps, not merely the next visible step. Do not ask whether to continue from research
+   to brief, draft, separate working files, verified Drive delivery or BasicOps progress updates
+   when those steps are already inside the task contract. Stop only for material human judgment,
+   a missing dependency or protected access, conflicting instructions, meaningful scope or
+   commercial change, or a separately consequential approval.
+
+## Route human decisions through BasicOps
+
+A BasicOps-governed task remains governed by BasicOps even when it was activated from Telegram,
+Codex, Claude or another authenticated interface. Keep the task Discussion as the durable decision
+record and use a BasicOps direct message as the attention mechanism when a person must respond.
+
+Before asking, exhaust Context & Research and any documented reversible default. Then resolve the
+respondent from, in order: named approver or decision owner; verified next handoff; current task
+assignee; authenticated requester; verified project manager or account owner. Never hard-code
+Michael. If ownership is ambiguous, ask to confirm ownership rather than guessing a recipient.
+
+Post one decision-ready question in Discussion: what is blocked, why it matters, the recommended
+answer or two to three bounded options, and what resumes after reply. Put the task in the accurate
+blocked, waiting or review state, then send the respondent a concise BasicOps direct message with a
+native task link. Verify the Discussion post and the direct message independently.
+
+To initiate the DM, resolve the respondent's verified BasicOps user ID, list the agent's direct
+chats and reuse the chat whose `user` matches. If none exists, create a chat for that user. Post the
+question with `create_message_in_chat` because there is no incoming parent message, then list/read
+the chat messages to verify the returned message. Use `create_reply_in_message` only when replying
+to an existing incoming BasicOps message ID.
+
+If the configured BasicOps connector cannot send or verify direct messages, preserve the Discussion
+question, open a capability incident for the missing attention route and report that the DM was not
+sent. Do not silently fall back to Telegram or claim that assignment, a `Seen by` marker or a task
+notification is equivalent to a direct message.
+
+If the respondent is already answering that same question in an active authenticated interface, do
+not send a duplicate direct message. Record the answer, source and local timestamp in Discussion
+and resume automatically. Use the BasicOps direct-message loop for a later unattended blocker.
+
+Render human-facing timestamps in the authenticated person's configured IANA timezone. For Michael
+use `Australia/Melbourne`, allowing AEST/AEDT to change automatically; never derive the displayed
+date from server UTC or a fixed offset.
 
 ## Preflight Hermes
 
