@@ -52,7 +52,7 @@ For each production step record:
 
 Separate research, production, independent QA, durable delivery and consequential action. A downstream step cannot begin until its required upstream artefact exists and validates.
 
-The producing specialist owns creating and saving its deliverable. Head of Production owns ensuring required artefacts reach the registered canonical client destination and are verified there. A Hermes workspace, local drive, log or Kanban attachment is staging only. For client deliverables, use the verified client Google Drive destination unless the canonical client record names another system.
+The producing specialist owns creating the deliverable in its registered staging boundary. Head of Production must invoke `drive-artifact-delivery` for every required client file and then obtain independent final verification. A VPS path, Hermes workspace, local drive, log or Kanban/BasicOps attachment is staging only. For client deliverables, use the verified client Google Drive destination unless the canonical client record names another system. Every plan must say `delivery_required` with the expected files and destination, or `artefact_state: not_required` with a task-specific reason.
 
 Finish with independent QA against the source completion condition. Publishing, deployment, sending, paid-media mutation, spend and other consequential actions retain their separate approval gates.
 
@@ -94,13 +94,14 @@ After explicit approval, hand the unchanged plan version to `lhm-chief-of-staff`
 - permission ceiling and separate consequential gates;
 - acceptance test and accountable reviewer;
 - authoritative artefact destination;
+- required delivery manifest and `drive-artifact-delivery` step, or the approved `not_required` reason;
 - return point to Monica on `ready_for_review`, `needs_context`, `waiting_on_capability` or terminal failure.
 
 If the plan materially changes after approval, increment the version and obtain fresh approval. Do not hand specialist work directly from Monica or imitate Waylon's orchestration.
 
 ## 6. Reconcile Waylon's return
 
-Compare the returned receipts with every approved step and the source completion condition. Verify required artefact links at the canonical destination and require independent QA evidence; a worker self-report or local path is insufficient.
+Compare the returned receipts with every approved step and the source completion condition. Verify every required `drive-artifact-delivery` receipt and independent final QA evidence; a worker self-report, VPS/local path or BasicOps attachment is insufficient.
 
 If something is missing, return one bounded discrepancy to Waylon with the same parent and return point. Do not silently repair specialist work or call partial work complete.
 

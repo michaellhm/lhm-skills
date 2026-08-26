@@ -26,3 +26,5 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `seo-delivery-qa` — Independently verify SEO scope, evidence, artefact delivery, approval boundaries and completion before the Lead advances.
 
 `hermes-production-plan` — Prepare, monitor and verify a BasicOps execution plan for Waylon, including plain-English task status and CTO blocker reporting.
+
+`drive-artifact-delivery` — Deliver approved production files to the registered client Google Drive folder with exact metadata and content readback.

@@ -36,7 +36,7 @@ successful shell return or armed monitor is not acceptance.
 
 1. Dispatch the parent to `lhm-chief-of-staff` with the full contract and return point.
 2. Require the governed route:
-   `Chief of Staff → Context & Research → Head of Production → specialist worker → independent QA`.
+   `Chief of Staff → Context & Research → Head of Production → specialist worker → producer QA → Drive artefact delivery → independent final QA`.
    Skip a role only when its work is genuinely unnecessary and record why.
 3. Preserve the parent ID through every child. Record child run IDs, dependencies, artefact paths,
    idempotency keys and status evidence.
@@ -78,10 +78,11 @@ providers or spend limits.
 
 1. Require independent QA against the source acceptance test. A worker's self-report is evidence,
    not verification.
-2. Treat Hermes workspaces, container paths, logs and Kanban attachments as staging only.
+2. Treat Hermes workspaces, VPS/container paths, local files, logs and Kanban/BasicOps attachments as staging only.
 3. Resolve the existing authoritative client destination, normally the client's Google Drive
-   project folder. Upload the approved package and verify each expected file by destination listing
-   or metadata/readback. Preserve source files and existing organisation.
+   project folder. Invoke `drive-artifact-delivery` for every required manifest item. Require its
+   exact file, parent, byte-count and content-hash readback receipts. Preserve source files and
+   existing organisation. Never implement one-off upload logic inside this control-client skill.
 4. Record durable folder/file URLs, QA result, remaining exceptions and hashes or revision evidence
    when useful.
 5. Route the BasicOps write through `basicops-task-manager`. Put actionable handoff context and
@@ -107,7 +108,6 @@ Return one concise receipt containing:
 - exact next handoff;
 - CTO incident, repair and automatic-resume evidence when recovery occurred.
 
-Call the outcome complete only when the source acceptance condition, durable delivery and review
+Call the outcome complete only when the source acceptance condition, every required Drive delivery receipt and review
 request are all verified. Describe work awaiting human inspection as `ready for review`, not
 completed.
-

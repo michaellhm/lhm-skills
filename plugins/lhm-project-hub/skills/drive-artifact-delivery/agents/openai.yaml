@@ -1,0 +1,4 @@
+interface:
+  display_name: "Drive Artefact Delivery"
+  short_description: "Deliver and verify production files in client Drive"
+  default_prompt: "Deliver this approved production artefact to the client’s registered Google Drive folder and return exact create/readback evidence."
