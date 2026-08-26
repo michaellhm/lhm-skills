@@ -60,6 +60,7 @@ All Project Hub skills, and when to route to each:
 | `lhm-project-hub:staff-weekly-flow` | Michael or a team member asks what to focus on this week/today, feels overloaded, wants a mini stand-up, or wants to review and clean up their full personal BasicOps inbox. The skill prepares priorities and routes confirmed inbox mutations through `basicops-task-manager`. |
 | `lhm-project-hub:team-work-brief` | Any team member needs to turn a rough request, client email or idea into a context-checked brief; or an assignee gives feedback about what a future brief should include. It resolves requester, client, assignee, access, dependencies, completion and next handoff before routing the approved task to BasicOps. |
 | `lhm-project-hub:hermes-production-plan` | An existing BasicOps outcome needs an approval-ready Hermes execution plan, a “where are we at?” status check, a plain-English CTO/blocker update or post-run reconciliation for Waylon/Chief of Staff. |
+| `lhm-project-hub:drive-artifact-delivery` | Head of Production has an approved, QA-passed staging artefact that must be created or verified in the client's registered Google Drive folder with exact content readback. |
 | `lhm-project-hub:sales-handover` | A deal just closed and needs handing from sales to delivery — new client, or an existing client buying a new package. |
 | `lhm-project-hub:client-onboarding` | A new-client onboarding pipeline (Payment & Billing → Client Contact & Strategy → Access, Assets & Config → Service Kickoff → Onboarding Complete) is live or needs a status check. |
 | `lhm-project-hub:website-kickoff` | A new WordPress or Astro website build needs to start — intake, PM state file, BasicOps scaffold. |
@@ -83,6 +84,7 @@ All Project Hub skills, and when to route to each:
 ## Rules
 
 - Read `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md` before recording or routing material work. Require verified specialist artefact references and preserve `needs_review` when a required artefact is missing.
+- For every required client file, route durable delivery through `lhm-project-hub:drive-artifact-delivery`. A VPS/local path or BasicOps attachment never satisfies delivery.
 
 - Never mutate BasicOps directly. Route every BasicOps write through `lhm-project-hub:basicops-task-manager`; the originating workflow supplies context and receives the verified handback.
 - Route rough delegation and handoff-readiness work through `lhm-project-hub:team-work-brief` before BasicOps. Do not expect an assistant or non-specialist requester to diagnose technical requirements unaided.

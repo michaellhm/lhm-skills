@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-156 skills across nine Claude Code plugins (59 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 23 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+157 skills across nine Claude Code plugins (59 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 24 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -185,10 +185,11 @@ plugins/lhm-client-updates-hub/       # (deprecated — skills migrated to lhm-p
 plugins/lhm-project-hub/              # Agency process hub — sales handover through monthly/quarterly reviews
   .claude-plugin/plugin.json            # Plugin manifest
   agents/pm-orchestrator.md             # Main entry point — status, cadence checks and governed multi-skill coordination
-  skills/                               # All 23 skills
+  skills/                               # All 24 skills
     basicops-task-manager/              # Shared BasicOps boundary — discussion-first briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
     hermes-production-plan/             # Prepare, approve and verify a BasicOps execution plan for Waylon/Chief of Staff
+    drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
     staff-weekly-flow/                  # Personal weekly/daily focus, full BasicOps inbox triage/write-back and reminder preferences
     sales-handover/                     # Hand a newly-closed client from sales to delivery
     client-onboarding/                  # Scope-aware Obsidian-first onboarding — 5 top-level BasicOps gates
@@ -280,7 +281,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 **Personal Work Flow** (1 skill): Personal weekly planning and daily selection for Michael and the team, with overwhelmed mode, project/client priority ranking, optional mini stand-ups and a full BasicOps inbox review. The inbox flow presents client-risk rescue, stale/likely closure, delegate, keep and needs-decision groups, then applies only confirmed mutations through the shared BasicOps task manager with read-back verification.
 
-**Team Handoffs** (3 skills): A universal team-work briefing flow reads requester, client, assignee and project context; checks access, dependencies, authority, completion and review; asks one material question at a time; and learns carefully from assignee feedback. The Hermes production-plan flow lets Monica preflight an existing BasicOps outcome, prepare a concise version-bound execution chain for Waylon, answer “where are we at?” from authoritative checkpoints, explain CTO blockers in plain English, verify durable artefact delivery and reconcile the returned work. The shared BasicOps task manager then applies LHM naming, discussion-first actionable next steps, existing-client website routing, parent-discussion subtask links, personal-board confirmation, approval, deduplication and read-back verification to every task mutation.
+**Team Handoffs** (4 skills): A universal team-work briefing flow reads requester, client, assignee and project context; checks access, dependencies, authority, completion and review; asks one material question at a time; and learns carefully from assignee feedback. The Hermes production-plan flow lets Monica preflight an existing BasicOps outcome, prepare a concise version-bound execution chain for Waylon, answer “where are we at?” from authoritative checkpoints, explain CTO blockers in plain English, verify durable artefact delivery and reconcile the returned work. The shared Drive artefact delivery capability moves approved files from bounded staging into the registered client folder and proves exact metadata and content through readback. The shared BasicOps task manager then applies LHM naming, discussion-first actionable next steps, existing-client website routing, parent-discussion subtask links, personal-board confirmation, approval, deduplication and read-back verification to every task mutation.
 
 **Client Lifecycle** (3 skills): Sales-to-delivery handover; Tier 1 client onboarding; and an existing-client website handover that transfers a newly scoped website project from Michael to Kristalyn without restarting general onboarding.
 
