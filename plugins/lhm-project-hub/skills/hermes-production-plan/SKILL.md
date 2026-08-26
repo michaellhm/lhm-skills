@@ -1,11 +1,11 @@
 ---
 name: hermes-production-plan
-description: Prepare, approve, monitor, and verify a concise Hermes execution plan for an existing LHM BasicOps task. Use when someone asks Monica to "plan this for Waylon", "where are we at with this task?", "where are you at?", check whether work is ready or blocked, explain a CTO capability incident, or reconcile Waylon's completed work against the approved plan. This skill plans, reports, and checks specialist work; it does not execute the production work itself.
+description: Identify the matching Obsidian AI Operations SOP and prepare, monitor, and verify a concise Hermes execution plan for an existing LHM BasicOps task. Use when someone gives Monica a natural-language production task such as creating website page copy, asks her to "plan this for Waylon", asks "where are we at with this task?" or "where are you at?", needs a CTO capability incident explained, or wants Waylon's completed work reconciled. This skill plans, reports, and checks specialist work; it does not execute the production work itself.
 ---
 
 # Hermes Production Plan
 
-Turn one existing BasicOps outcome into an executable, version-bound plan for the governed Hermes workforce. Monica owns plan readiness and final reconciliation. Waylon/Chief of Staff owns orchestration after approval.
+Turn one existing BasicOps outcome into an executable, version-bound plan for the governed Hermes workforce. Monica owns SOP selection, plan readiness and final reconciliation. Waylon/Chief of Staff owns orchestration after the task's applicable authority and approval gates are satisfied.
 
 Select the mode from the request:
 
@@ -20,6 +20,10 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md` before pla
 Read the complete BasicOps task, including Discussion, links, parent and subtasks. Resolve the authenticated requester, client, project/workstream, intended outcome, current state, completion condition, permission ceiling and accountable reviewer.
 
 Read the minimum applicable canonical client/project context. Do not replace the source outcome with a larger strategy or treat an illustrative sequence from the requester as a mandatory workflow.
+
+Classify the work from the task's intended outcome and completion condition. Search `70 SOPs/AI Operations/` in the canonical Obsidian Brain and read the closest matching SOP. Match primarily against **Use this when**, then confirm the SOP's outcome fits the task. Record the selected SOP title and vault path. If no SOP matches, record `SOP: none found` and plan through the existing governed skills without improvising a new agency procedure.
+
+Example: a request to create a homepage, service page, location page, landing page or batch of non-blog website pages matches `70 SOPs/AI Operations/Create Website Page Copy.md`. Use its SEO → page brief → page copy → Google Drive `Content` folder → BasicOps handoff sequence. Do not add Astro, WordPress, staging or publishing unless the BasicOps task separately requests implementation and a build SOP or governed build route covers it.
 
 Do not reopen a question already answered by the task's outcome, completion condition, next handoff or canonical project decision. If those sources establish that the work is a meeting-ready diagnostic, for example, do not ask whether the meeting is for sign-off, performance review or improvement planning; preserve the stated outcome and identify only the unresolved decision that changes execution.
 
@@ -37,7 +41,7 @@ Match the capability requirement to the planned operation. Public read-only page
 
 ## 3. Build the execution contract
 
-Create the smallest dependency-ordered chain that can achieve the outcome. Choose roles and skills from the work actually required; do not force every task through SEO, Content and Website.
+Create the smallest dependency-ordered chain that can achieve the outcome. Start from the selected SOP, then adapt it only to the task's actual scope and verified context. Choose roles and skills from the work actually required; do not force every task through SEO, Content and Website.
 
 For each production step record:
 
@@ -56,7 +60,7 @@ The producing specialist owns creating the deliverable in its registered staging
 
 Finish with independent QA against the source completion condition. Publishing, deployment, sending, paid-media mutation, spend and other consequential actions retain their separate approval gates.
 
-## 4. Post the concise plan for approval
+## 4. Post the concise plan
 
 Write no BasicOps mutation directly. Route the exact Discussion payload through `basicops-task-manager` and read it back.
 
@@ -64,6 +68,8 @@ Keep Monica's comment short and scannable:
 
 ```markdown
 Production plan — v<version>
+
+Workflow: <selected SOP title and Obsidian path, or none found>
 
 Intended outcome: <one sentence>
 
@@ -73,21 +79,25 @@ Ordered next actions:
 1. <Role> — <action> → <verified output or handoff>
 2. <Role> — <action> → <verified output or handoff>
 
-Approval required: <exact approver and scope, or none>
+Approval required: <exact approver and scope, or none — task authorises routine execution>
 
 Next handoff: <person/role and trigger>
 ```
 
 Include working links only when they help execution. Keep detailed research and machine state in their canonical systems rather than dumping them into BasicOps.
 
-When readiness is blocked, post the gap and first resolution action instead of a fictional execution plan. When ready, request Michael's approval of the exact plan version. Silence is not approval, and approval of the plan does not authorise consequential production actions.
+When readiness is blocked, post the gap and first resolution action instead of a fictional execution plan.
 
-## 5. Hand the approved version to Waylon
+When the existing BasicOps task clearly requests the outcome, treat it as authority for ordinary in-scope production and hand the posted plan to Chief of Staff without adding a second Michael approval gate. The visible plan remains overrideable: apply an authorised correction that arrives before the affected step begins, increment the version when the execution contract materially changes, and preserve completed verified work where safe.
 
-After explicit approval, hand the unchanged plan version to `lhm-chief-of-staff` with:
+Pause only for a genuine ambiguity that changes the outcome or for a separately governed consequential action such as publishing, deployment, sending, spend, live-account mutation, scope expansion or an approval explicitly required by the selected SOP or canonical task. Silence never authorises those consequential actions.
+
+## 5. Hand the executable version to Waylon
+
+After the plan is posted and its applicable authority is satisfied, hand the unchanged plan version to `lhm-chief-of-staff` with:
 
 - BasicOps source ID and URL;
-- plan version and approval evidence;
+- plan version, selected SOP reference and authority/approval evidence;
 - intended outcome and current state;
 - verified evidence/capability pack;
 - ordered role, skill, artefact and dependency chain;
@@ -97,7 +107,7 @@ After explicit approval, hand the unchanged plan version to `lhm-chief-of-staff`
 - required delivery manifest and `drive-artifact-delivery` step, or the approved `not_required` reason;
 - return point to Monica on `ready_for_review`, `needs_context`, `waiting_on_capability` or terminal failure.
 
-If the plan materially changes after approval, increment the version and obtain fresh approval. Do not hand specialist work directly from Monica or imitate Waylon's orchestration.
+If the plan materially changes, increment the version. Obtain fresh approval only when the change crosses a consequential gate, expands scope or alters an approval-bound decision. Do not hand specialist work directly from Monica or imitate Waylon's orchestration.
 
 ## 6. Reconcile Waylon's return
 
