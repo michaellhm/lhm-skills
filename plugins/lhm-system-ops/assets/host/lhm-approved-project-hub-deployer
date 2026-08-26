@@ -14,7 +14,7 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-REPO = Path('/srv/lhm-plugin-release-source/project-hub-0.1.79')
+REPO = Path('/srv/lhm-plugin-release-source/project-hub-0.1.80')
 APPROVALS = Path('/etc/lhm-plugin-approvals')
 APPROVAL_KEY = APPROVALS / 'project-hub-approval.key'
 USED_NONCES = Path('/var/lib/lhm-plugin-approval-nonces/lhm-project-hub')
@@ -30,7 +30,7 @@ MOUNTINFO = Path('/proc/self/mountinfo')
 BACKUPS = Path('/var/backups/lhm-plugin-deployments')
 REPOSITORY = 'michaellhm/lhm-skills'
 PLUGIN = 'lhm-project-hub'
-VERSION = '0.1.79'
+VERSION = '0.1.80'
 
 
 def now(): return datetime.now(timezone.utc)
