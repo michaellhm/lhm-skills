@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hermes Production Plan"
+  short_description: "Plan and verify a BasicOps task for Waylon"
+  default_prompt: "Plan this BasicOps task for Waylon, check all required client systems and destinations, and post a concise approval-ready execution plan."

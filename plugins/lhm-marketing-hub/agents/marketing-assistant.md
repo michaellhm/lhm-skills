@@ -24,3 +24,5 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `seo-page-brief` — Turn accepted SEO research into a bounded, implementation-ready page brief package.
 
 `seo-delivery-qa` — Independently verify SEO scope, evidence, artefact delivery, approval boundaries and completion before the Lead advances.
+
+`hermes-production-plan` — Prepare, approve and verify a concise BasicOps execution plan for Waylon/Chief of Staff.
