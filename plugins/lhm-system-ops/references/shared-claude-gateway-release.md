@@ -1,10 +1,10 @@
 # Shared Claude gateway release boundary
 
-The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. Release 0.9.6 was prepared on 2026-08-24 from the reviewed 0.9.5 source. The admitted predecessor hashes are the governed 0.9.5 dispatcher `3a9c044c…`, worker `cf25ea01…`, dispatch unit `bf840874…`, gateway ACL drop-in `41016cd8…`, and container client `cf9eff52…`.
+The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. Release 0.9.7 was prepared on 2026-08-26 from the governed 0.9.6 source. The admitted predecessor hashes are the 0.9.6 dispatcher `88191722…`, worker `cf25ea01…`, dispatch unit `bf840874…`, gateway ACL drop-in `41016cd8…`, and container client `612f711b…`.
 
 These assets are distinct from the additive `lhm-evidence-claude-*` gateways. No evidence-bridge installer may overwrite the shared dispatcher or worker.
 
-Release 0.9.6 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.11.
+Release 0.9.7 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.69.
 It supervises each worker for its full lifecycle. The root dispatcher maintains
 only execute access for `claudeworker` and `codexworker` on the two named profile ancestors; the
 Claude process still runs as `claudeworker`, and its only write grant is the validated canonical
@@ -54,6 +54,13 @@ route remains pinned to `lhm-marketing-hub:seo-audit` under `seo-review`, and th
 review-only, Skill-only, no-MCP, and bounded to 600 seconds. A worker succeeds only after observing
 a real `lhm-marketing-hub:start-seo` Skill tool call and records it in `skill-provenance.json`;
 prose-only claims and `seo-audit`-only calls fail closed.
+
+Release 0.9.7 adds the closed `project-production-plan` specialist contract. The existing
+`project` route remains pinned to `lhm-project-hub:team-work-brief`. When the governed Hermes PM
+objective explicitly names `lhm-project-hub:hermes-production-plan`, the container client selects
+the new route, which admits only `lhm-project-hub:pm-orchestrator`, Claude's `pm-orchestrator`, and
+the exact production-plan Skill under `project-production-plan-review`. It remains review-only,
+Skill-only, no-MCP and bounded to 600 seconds.
 
 Release 0.9.6 reconciles the workflow metadata already present on the live client without trusting
 it as authority. A root-owned dispatcher table pins the exact workflow ID, ordered required skills,
