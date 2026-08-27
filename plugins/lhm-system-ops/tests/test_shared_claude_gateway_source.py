@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.12"
+    assert MANIFEST["release_version"] == "0.9.13"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -682,6 +682,13 @@ def test_governed_lhm_internal_target_is_the_only_canonical_slug_override():
     assert "slug == 'local-health-marketing'" in dispatcher
     assert "registered.get('type') == 'internal'" in dispatcher
     assert "canonical client and handback target conflict" in dispatcher
+
+
+def test_explicit_handback_may_only_add_task_ids_to_identical_client_scope():
+    dispatcher = (PLUGIN / MANIFEST["assets"]["dispatcher"]["source"]).read_text()
+    assert "canonical_ids.issubset(registered_ids)" in dispatcher
+    assert "legacy_registered != comparable" in dispatcher
+    assert "client = registered" in dispatcher
 
 
 def test_internal_handback_registration_rejects_other_slug_or_prefix(tmp_path, monkeypatch):

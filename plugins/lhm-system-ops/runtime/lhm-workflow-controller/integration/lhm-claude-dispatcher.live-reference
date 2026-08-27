@@ -742,9 +742,12 @@ def process(path):
             elif registered is not None:
                 comparable = {key: value for key, value in client.items() if key != 'type'}
                 legacy_registered = {key: value for key, value in registered.items() if key != 'type'}
-                if legacy_registered != comparable:
+                canonical_ids = {str(value) for value in comparable.pop('basicops_task_ids', [])}
+                registered_ids = {str(value) for value in legacy_registered.pop('basicops_task_ids', [])}
+                if legacy_registered != comparable or not canonical_ids.issubset(registered_ids):
                     reject(path, 'canonical client and handback target conflict')
                     return
+                client = registered
         else:
             clients = load_handback_targets() if profile in handback_profiles else canonical_clients
             if request.get('client') not in clients:

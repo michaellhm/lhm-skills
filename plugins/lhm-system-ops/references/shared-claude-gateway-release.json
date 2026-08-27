@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.9.12",
+  "release_version": "0.9.13",
   "captured_at": "2026-08-27",
   "source": "source candidate derived from exact live predecessor hashes",
   "assets": {
     "dispatcher": {
       "source": "assets/gateways/lhm-shared-claude-dispatcher",
       "destination": "/usr/local/libexec/lhm-claude-dispatcher",
-      "sha256": "f8dfebab4a32e171a451e5eb6c3d9259e9b1a25e132a819b8da06ce53b837e88",
-      "previous_sha256": "6da36c84a2c87735e653500ba4b620959884f534979a59200fc3d8b51fffbe4b",
+      "sha256": "85b4377627ca5071cbd7d2139a1b27fdfceeb3fc36a397868231884f71318570",
+      "previous_sha256": "f8dfebab4a32e171a451e5eb6c3d9259e9b1a25e132a819b8da06ce53b837e88",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 44369
+      "size_bytes": 44655
     },
     "worker": {
       "source": "assets/gateways/lhm-shared-claude-worker",
