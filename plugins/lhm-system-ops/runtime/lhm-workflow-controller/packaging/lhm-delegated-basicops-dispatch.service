@@ -3,6 +3,7 @@ Description=Dispatch claimed delegated BasicOps projections through registered a
 
 [Service]
 Type=oneshot
+Environment=PYTHONPATH=/opt/lhm-workflow/current/src
 User=root
 ExecStart=/usr/local/libexec/lhm-delegated-basicops-bridge dispatch
 NoNewPrivileges=true

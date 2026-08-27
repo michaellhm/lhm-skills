@@ -198,7 +198,7 @@ try:
             and isinstance(repair_result.get('checks'),list) and bool(repair_result.get('checks'))
             and all(set(item)=={'message_id','author_user_id','task_id','task_revision','observed_at','body'}
                     and str(item.get('task_id'))==str(prompt_data.get('task_id'))
-                    and isinstance(item.get('body'),str) and item['body'].startswith('LHM decision:')
+                    and isinstance(item.get('body'),str) and item['body'].startswith(('LHM decision:','LHM workflow event:'))
                     for item in repair_result.get('messages',[])))
     producer_html = result.strip() if is_producer and isinstance(result, str) else ''
     producer_valid = not is_producer or (producer_html.lower().startswith('<!doctype html') and producer_html.lower().endswith('</html>') and len(producer_html.encode('utf-8')) <= 200000)

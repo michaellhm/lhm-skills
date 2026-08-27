@@ -1,0 +1,24 @@
+import ast
+from pathlib import Path
+
+
+PLUGIN = Path(__file__).resolve().parents[1]
+
+
+def test_shared_worker_accepts_only_closed_decision_and_workflow_marker_prefixes():
+    for relative in (
+        'assets/gateways/lhm-shared-claude-worker',
+        'runtime/lhm-workflow-controller/integration/lhm-claude-worker.live-reference',
+    ):
+        source = (PLUGIN / relative).read_text(encoding='utf-8')
+        ast.parse(source)
+        assert "startswith(('LHM decision:','LHM workflow event:'))" in source
+        assert "startswith('LHM decision:')" not in source
+
+
+def test_every_delegated_python_service_binds_current_controller_source():
+    packaging = PLUGIN / 'runtime/lhm-workflow-controller/packaging'
+    services = sorted(packaging.glob('lhm-delegated-*.service'))
+    assert len(services) == 7
+    for service in services:
+        assert 'Environment=PYTHONPATH=/opt/lhm-workflow/current/src' in service.read_text(encoding='utf-8')

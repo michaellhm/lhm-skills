@@ -3,6 +3,7 @@ Description=Observe closed BasicOps AI workflow markers read-only
 
 [Service]
 Type=oneshot
+Environment=PYTHONPATH=/opt/lhm-workflow/current/src
 User=root
 ExecStart=/usr/local/libexec/lhm-delegated-basicops-bridge observe-workflow
 NoNewPrivileges=true

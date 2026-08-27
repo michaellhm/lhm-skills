@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r5",
-  "version": "0.1.46",
+  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r6",
+  "version": "0.1.47",
   "source_baseline": "project-hub-0.1.80-release-6f9646f",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -61,7 +61,7 @@
     "idempotent_unknown_outcome_reconciliation_without_manual_repair",
     "one_use_hmac_release_authorization_bound_to_commit_archive_source_action_and_enablement"
   ],
-  "source_tree_sha256_excluding_manifest": "0d19b596bb2c458b575793044d1084d8bd655221f63ec4dc67707a52c68ac1e0",
+  "source_tree_sha256_excluding_manifest": "37cd8fd721af9f0af19399f8318bb7871bf2da7fa2e22c93a12569d2b15f4033",
   "critical_files": {
     "src/lhm_workflow/seo_envelope_runtime.py": "ef55bce61485239187f3c4885227f8efb878c4d77dde6ef0cfeee2a0877e77a6",
     "src/lhm_workflow/cli.py": "581e024c8346578e2496f492f441c887ccb8d9ea9afe4c500a3c1740f3ddf4c4",
@@ -103,7 +103,7 @@
     "src/lhm_workflow/barney_scheduler.py": "97d95ac48a5fe513fe431a9dc5774a9c102ef980d681d1e599f6f00fd18c4109",
     "src/lhm_workflow/barney_consumer.py": "2fe3ac9dcdb3c09a47e58f9415737f036ef8b1e5448223850a067f9bc3c75e1d",
     "integration/lhm-claude-dispatcher.live-reference": "aca624727c947904ad3e48a32045a7d5c0218da5e527c8a8e10c1766f0465316",
-    "integration/lhm-claude-worker.live-reference": "2404645d07daa55198f2d987493784fbdc8347e96e81634317868577dfd55b55",
+    "integration/lhm-claude-worker.live-reference": "80687b03967a807ab7580f7a1e7c87428b8da47085e23d2955e1e657a28d8aa2",
     "integration/lhm-delegated-basicops-bridge": "4c6e6ca13f66a617330ee00a17aff2b4ad4bb0c657b7f0628f74e9b00389337e",
     "integration/lhm-barney-action-executor": "bd406c371d3c6a10f0966f32217b5b9f76673d4350390c03595f0c323f701285",
     "integration/lhm-barney-downstream-consumer": "379f6c72f71ea64d92cce9c04c06d0ca0fb77a3ff9fdb01a40cfc52dbc8f2eab",

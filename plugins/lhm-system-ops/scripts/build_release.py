@@ -24,6 +24,10 @@ def generated_bytecode_paths(root):
     )
 
 
+def releasable(path):
+    return path.is_file() and not any(part in {'.git', '.pytest_cache', '__pycache__'} for part in path.parts) and path.suffix != '.pyc'
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', required=True)
@@ -37,7 +41,7 @@ def main():
     if bytecode:
         raise SystemExit(f'release rejects generated Python bytecode: {bytecode[0]}')
     commit = git('rev-parse', 'HEAD')
-    files = sorted(path for path in PLUGIN.rglob('*') if path.is_file())
+    files = sorted(path for path in PLUGIN.rglob('*') if releasable(path))
     with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for path in files:
             relative = Path(PLUGIN.name) / path.relative_to(PLUGIN)

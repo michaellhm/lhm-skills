@@ -3,6 +3,7 @@ Description=Import closed authenticated BasicOps human decision observations
 
 [Service]
 Type=oneshot
+Environment=PYTHONPATH=/opt/lhm-workflow/current/src
 User=root
 ExecStart=/usr/local/libexec/lhm-delegated-basicops-bridge import-human
 NoNewPrivileges=true

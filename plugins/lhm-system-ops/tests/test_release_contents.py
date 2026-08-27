@@ -35,3 +35,13 @@ def test_plugin_fixture_rejects_generated_python_bytecode(tmp_path):
 def test_plugin_tree_has_no_generated_python_bytecode():
     validator = load_script('validate_system_ops')
     assert validator.generated_bytecode_paths(PLUGIN) == []
+
+
+def test_release_builder_excludes_generated_cache_paths(tmp_path):
+    builder = load_script('build_release')
+    normal = tmp_path / 'asset.txt'; normal.write_text('ok')
+    cache = tmp_path / '.pytest_cache' / 'nodeids'; cache.parent.mkdir(); cache.write_text('volatile')
+    bytecode = tmp_path / '__pycache__' / 'asset.pyc'; bytecode.parent.mkdir(); bytecode.write_bytes(b'volatile')
+    assert builder.releasable(normal)
+    assert not builder.releasable(cache)
+    assert not builder.releasable(bytecode)

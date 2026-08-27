@@ -3,6 +3,7 @@ Description=Prepare fail-closed delegated BasicOps projection requests
 
 [Service]
 Type=oneshot
+Environment=PYTHONPATH=/opt/lhm-workflow/current/src
 User=lhmworkflow
 Group=lhmworkflow
 ExecStart=/usr/local/libexec/lhm-delegated-basicops-bridge request

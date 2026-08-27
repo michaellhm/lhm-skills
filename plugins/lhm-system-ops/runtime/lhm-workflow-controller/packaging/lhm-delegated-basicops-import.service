@@ -3,6 +3,7 @@ Description=Sign and import verified delegated BasicOps projection observations
 
 [Service]
 Type=oneshot
+Environment=PYTHONPATH=/opt/lhm-workflow/current/src
 User=root
 ExecStart=/usr/local/libexec/lhm-delegated-basicops-bridge import-projections
 NoNewPrivileges=true
