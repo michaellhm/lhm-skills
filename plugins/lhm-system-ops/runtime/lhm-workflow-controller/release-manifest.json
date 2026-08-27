@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r12",
-  "version": "0.1.53",
+  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r13",
+  "version": "0.1.54",
   "source_baseline": "project-hub-0.1.80-release-6f9646f",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -64,9 +64,10 @@
     "same_id_projection_requests_are_coalesced_before_dispatch",
     "transient_projection_import_failures_preserve_retryable_observations",
     "terminal_queue_evidence_is_immutable",
-    "basicops_worker_wait_is_aligned_across_client_adapter_and_bridge"
+    "basicops_worker_wait_is_aligned_across_client_adapter_and_bridge",
+    "governed_lhm_internal_handback_target_resolves_without_client_shadowing"
   ],
-  "source_tree_sha256_excluding_manifest": "5b0080068a87d27e196cd1b161fae819abe92478c56f88acea1480b2238829f0",
+  "source_tree_sha256_excluding_manifest": "85fe78439c00a2b5aee89ea22068c6d390c26ba2056276b046dbfdf8e05ae2e4",
   "critical_files": {
     "src/lhm_workflow/seo_envelope_runtime.py": "ef55bce61485239187f3c4885227f8efb878c4d77dde6ef0cfeee2a0877e77a6",
     "src/lhm_workflow/cli.py": "581e024c8346578e2496f492f441c887ccb8d9ea9afe4c500a3c1740f3ddf4c4",
@@ -107,7 +108,7 @@
     "src/lhm_workflow/delegated_basicops_runtime.py": "436b69ba1f8753e97e9e2fbcebe3b052a9907825152c80c710750c5468cf3643",
     "src/lhm_workflow/barney_scheduler.py": "97d95ac48a5fe513fe431a9dc5774a9c102ef980d681d1e599f6f00fd18c4109",
     "src/lhm_workflow/barney_consumer.py": "2fe3ac9dcdb3c09a47e58f9415737f036ef8b1e5448223850a067f9bc3c75e1d",
-    "integration/lhm-claude-dispatcher.live-reference": "6da36c84a2c87735e653500ba4b620959884f534979a59200fc3d8b51fffbe4b",
+    "integration/lhm-claude-dispatcher.live-reference": "f8dfebab4a32e171a451e5eb6c3d9259e9b1a25e132a819b8da06ce53b837e88",
     "integration/lhm-claude-worker.live-reference": "80687b03967a807ab7580f7a1e7c87428b8da47085e23d2955e1e657a28d8aa2",
     "integration/lhm-delegated-basicops-bridge": "831561544100fcae2f26b275417a1b9aad8903eeb2b74c97dbddcf3b19bdc426",
     "integration/lhm-barney-action-executor": "bd406c371d3c6a10f0966f32217b5b9f76673d4350390c03595f0c323f701285",

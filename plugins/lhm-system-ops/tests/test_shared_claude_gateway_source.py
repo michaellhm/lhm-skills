@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.11"
+    assert MANIFEST["release_version"] == "0.9.12"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -44,7 +44,7 @@ def test_container_client_is_governed_at_exact_bind_mount_target():
     client = MANIFEST["assets"]["container_client"]
     assert client["destination"] == "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch"
     assert client["container_destination"] == "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
-    assert client["previous_sha256"] == "e11acaa73629e5841811237a16339832b834d5c51741afb256205dc6d182df66"
+    assert client["previous_sha256"] == "2e16027180a354f1901f43767f8540cf3c54f21d23ca9b6dbb8ab8de928123b1"
     assert client["owner"] == client["group"] == 10000
     assert client["mode"] == "0755"
 
@@ -675,6 +675,13 @@ def test_canonical_and_explicit_handback_disagreement_fails_closed(tmp_path, mon
     queued.write_text(json.dumps(request))
     dispatcher.process(queued)
     assert "canonical client and handback target conflict" in (failed / "request.error").read_text()
+
+
+def test_governed_lhm_internal_target_is_the_only_canonical_slug_override():
+    dispatcher = (PLUGIN / MANIFEST["assets"]["dispatcher"]["source"]).read_text()
+    assert "slug == 'local-health-marketing'" in dispatcher
+    assert "registered.get('type') == 'internal'" in dispatcher
+    assert "canonical client and handback target conflict" in dispatcher
 
 
 def test_internal_handback_registration_rejects_other_slug_or_prefix(tmp_path, monkeypatch):

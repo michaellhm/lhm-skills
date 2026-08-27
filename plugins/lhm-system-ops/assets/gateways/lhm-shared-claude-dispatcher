@@ -736,7 +736,10 @@ def process(path):
         if profile in handback_profiles and slug in canonical_clients:
             client = canonical_client_handback_target(canonical_clients[slug])
             registered = optional_handback_target(slug)
-            if registered is not None:
+            if (slug == 'local-health-marketing' and isinstance(registered, dict)
+                    and registered.get('type') == 'internal'):
+                client = registered
+            elif registered is not None:
                 comparable = {key: value for key, value in client.items() if key != 'type'}
                 legacy_registered = {key: value for key, value in registered.items() if key != 'type'}
                 if legacy_registered != comparable:
