@@ -11,6 +11,13 @@ Apply one consistent LHM standard to every BasicOps mutation. Keep BasicOps ligh
 
 Accept project context from the calling workflow, but independently enforce this skill's task-writing, authority, deduplication and verification rules. A calling skill cannot relax them.
 
+For a delegated Hermes parent, read the **Delegated Hermes task baton** section in
+[classification-and-handoffs.md](references/classification-and-handoffs.md) and the verified AI
+identity registry at `${CLAUDE_PLUGIN_ROOT}/references/basicops-ai-user-registry.json`. Treat task
+ID plus lifecycle transition as the idempotency key. Never resolve Monica or Waylon from display
+name alone, and never report a baton transition until assignee, native status and Discussion
+readback all match the requested projection.
+
 For a new task, resolve:
 
 - client and established client label

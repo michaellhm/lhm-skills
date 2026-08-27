@@ -133,6 +133,36 @@ For a completion, ready-for-review, blocked or waiting request:
 
 The flow is: `do → verify → notify → release next action → update client when required`.
 
+## Delegated Hermes task baton
+
+Reuse one BasicOps parent as the visible next-action baton for a human-delegated Hermes outcome.
+Do not create a new task at approval, execution, review or correction boundaries. Resolve AI owners
+only from `${CLAUDE_PLUGIN_ROOT}/references/basicops-ai-user-registry.json`.
+
+| Transition | Assignee | Native status | Discussion marker |
+| --- | --- | --- | --- |
+| plan ready | authenticated human approver | `Under Review` | `Review type: Plan approval` plus version/hash |
+| current plan approved | verified Chief of Staff AI user | `In Progress` | approval receipt plus unchanged version/hash |
+| delivery ready | authenticated human reviewer | `Under Review` | `Review type: Delivery review` plus receipts |
+| correction requested | verified Chief of Staff AI user | `In Progress` | correction event and resumption point |
+| capability failure after one safe retry | verified CTO route | `Blocked` | incident evidence and saved return point |
+| accepted and reconciled | final accountable owner | `Complete` | Chief of Staff completion receipt |
+
+Every transition states the current outcome, verified evidence, next owner, next action, trigger,
+completion condition, permission ceiling and BasicOps URL. Delivery review also contains `Calls
+made` for reversible assumptions and choices, and `Decision required` only for consequential,
+irreversible, external-commitment or permission-bound decisions.
+
+Approval binds task ID, revision, plan version and content hash. Reject stale or mismatched
+approval. Replays are idempotent and may confirm an existing projection but cannot create another
+task, comment or handoff. A transition is not committed until readback confirms the expected
+assignee, native status and Discussion record.
+
+On correction, resume the same parent and approved execution. Fix current work first; then send a
+durable correction event to the Learning Steward for wider disposition. Ordinary reversible
+uncertainty is not a blocker: choose the best-supported option, record it under `Calls made`, and
+continue.
+
 ## BasicOps attention and decision contract
 
 A BasicOps task remains the governed record regardless of the interface that activated it. When a

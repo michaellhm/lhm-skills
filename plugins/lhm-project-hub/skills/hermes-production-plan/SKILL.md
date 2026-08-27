@@ -14,6 +14,7 @@ Select the mode from the request:
 - returned work → Reconcile Waylon's return.
 
 Read `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md` before planning material work.
+Read `${CLAUDE_PLUGIN_ROOT}/references/basicops-ai-user-registry.json` before changing the task owner. Use only the verified IDs in that registry; a display-name match is not identity proof.
 
 ## 1. Read the source outcome
 
@@ -88,13 +89,22 @@ Include working links only when they help execution. Keep detailed research and 
 
 When readiness is blocked, post the gap and first resolution action instead of a fictional execution plan.
 
-When the existing BasicOps task clearly requests the outcome, treat it as authority for ordinary in-scope production and hand the posted plan to Chief of Staff without adding a second Michael approval gate. The visible plan remains overrideable: apply an authorised correction that arrives before the affected step begins, increment the version when the execution contract materially changes, and preserve completed verified work where safe.
-
-Pause only for a genuine ambiguity that changes the outcome or for a separately governed consequential action such as publishing, deployment, sending, spend, live-account mutation, scope expansion or an approval explicitly required by the selected SOP or canonical task. Silence never authorises those consequential actions.
+When the plan is ready, use the same BasicOps task as the durable baton. Through
+`basicops-task-manager`, assign it to the authenticated human approver, set native status `Under
+Review`, and add `Review type: Plan approval`. Bind the approval request to the exact task revision,
+plan version and content hash. Read back the owner, status and Discussion before treating the
+handoff as successful. Silence, a stale approval or approval of another version is not approval.
+Plan approval does not authorise separately consequential actions such as publishing, deployment,
+sending, spend, live-account mutation or scope expansion.
 
 ## 5. Hand the executable version to Waylon
 
-After the plan is posted and its applicable authority is satisfied, hand the unchanged plan version to `lhm-chief-of-staff` with:
+After explicit approval of the current version, hand the unchanged plan version to
+`lhm-chief-of-staff`. Through `basicops-task-manager`, assign the same task to verified Waylon user
+`82491`, set native status `In Progress`, add `Review type: none`, and read back the owner, status and
+Discussion. A replayed approval is idempotent and must not create another task, comment or handoff.
+
+The Chief of Staff handoff contains:
 
 - BasicOps source ID and URL;
 - plan version, selected SOP reference and authority/approval evidence;
@@ -107,13 +117,20 @@ After the plan is posted and its applicable authority is satisfied, hand the unc
 - required delivery manifest and `drive-artifact-delivery` step, or the approved `not_required` reason;
 - return point to Monica on `ready_for_review`, `needs_context`, `waiting_on_capability` or terminal failure.
 
-If the plan materially changes, increment the version. Obtain fresh approval only when the change crosses a consequential gate, expands scope or alters an approval-bound decision. Do not hand specialist work directly from Monica or imitate Waylon's orchestration.
+If the plan materially changes, increment the version, assign the same task back to verified Monica
+AI user `82484`, and obtain fresh human approval. Preserve completed verified work where safe. Do
+not create a replacement task, hand specialist work directly from Monica or imitate Waylon's
+orchestration.
 
 ## 6. Reconcile Waylon's return
 
 Compare the returned receipts with every approved step and the source completion condition. Verify every required `drive-artifact-delivery` receipt and independent final QA evidence; a worker self-report, VPS/local path or BasicOps attachment is insufficient.
 
-If something is missing, return one bounded discrepancy to Waylon with the same parent and return point. Do not silently repair specialist work or call partial work complete.
+If something is missing, return one bounded discrepancy to Waylon on the same BasicOps task and
+resume the existing execution. Record the correction request as a durable event. Fix current work
+first, then hand the event to the Learning Steward to decide whether a client fact, SOP, skill,
+system rule or no wider change is required. Do not silently repair specialist work, create a
+replacement task or call partial work complete.
 
 When the acceptance condition passes, route one compact Discussion update through `basicops-task-manager`:
 
@@ -126,10 +143,24 @@ Production check — v<version>
 
 Exceptions: <none, or one concise item>
 
+Calls made:
+- <reversible assumption or ordinary execution choice, plus what was chosen>
+
+Decision required:
+- <only a consequential, irreversible, external-commitment or permission-bound decision; otherwise none>
+
 Next handoff: <accountable human review or approved next action>
 ```
 
-Leave human-owned tasks open in `Under Review` until the accountable human explicitly requests completion. Return the verified BasicOps URL.
+Through `basicops-task-manager`, assign the same task to the authenticated human reviewer, set
+native status `Under Review`, add `Review type: Delivery review`, and read back the owner, status and
+Discussion. Routine uncertainty belongs under `Calls made`; choose the best-supported reversible
+option and continue rather than turning it into a question.
+
+If the reviewer requests correction, record the request against the approved plan version, assign
+the same task to verified Waylon in `In Progress`, and resume execution. If the reviewer accepts
+delivery, Waylon remains accountable for posting the final completion receipt and projecting native
+status `Complete`. Return the verified BasicOps URL.
 
 ## Status mode
 

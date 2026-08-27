@@ -75,7 +75,11 @@ successful shell return or armed monitor is not acceptance.
 
 ## Dispatch and supervise
 
-1. Dispatch the parent to `lhm-chief-of-staff` with the full contract and return point.
+1. For a human-delegated BasicOps task, invoke `hermes-production-plan` first. The Project Manager
+   posts the version-bound plan on the existing task and assigns it to the authenticated human in
+   `Under Review` with `Review type: Plan approval`. Dispatch to `lhm-chief-of-staff` only after the
+   current version is explicitly approved and the same task is assigned to verified Waylon in `In
+   Progress`. For an already-approved system event, verify its bound approval receipt first.
 2. Require the governed route:
    `Chief of Staff → Context & Research → Head of Production → specialist worker → producer QA → Drive artefact delivery → independent final QA`.
    Skip a role only when its work is genuinely unnecessary and record why.
@@ -134,6 +138,11 @@ providers or spend limits.
 7. Never mark a human-owned BasicOps task `Complete` unless the authenticated accountable human
    explicitly requests that exact mutation after reviewing the outcome.
 8. Read back the task status, reviewer, board/list, assignee, metadata, Discussion and URLs.
+
+When the reviewer requests correction, record a durable correction event, return the same task to
+verified Waylon in `In Progress`, and resume from the saved return point. Do not create a replacement
+parent or require another start approval unless the plan materially changes. After current delivery
+is corrected, route the event to the Learning Steward for governed wider improvement.
 
 ## Hand back
 
