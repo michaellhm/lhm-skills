@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r7",
-  "version": "0.1.48",
+  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r8",
+  "version": "0.1.49",
   "source_baseline": "project-hub-0.1.80-release-6f9646f",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -61,7 +61,7 @@
     "idempotent_unknown_outcome_reconciliation_without_manual_repair",
     "one_use_hmac_release_authorization_bound_to_commit_archive_source_action_and_enablement"
   ],
-  "source_tree_sha256_excluding_manifest": "a8f966597ccaee7bae15ddf79a9c98a8d151c5377b3610bddffdaa0fb2e996db",
+  "source_tree_sha256_excluding_manifest": "76ecf738acce2b1a8aaea0223000a8a90a4eaec8f469caf3146826f928ad0f99",
   "critical_files": {
     "src/lhm_workflow/seo_envelope_runtime.py": "ef55bce61485239187f3c4885227f8efb878c4d77dde6ef0cfeee2a0877e77a6",
     "src/lhm_workflow/cli.py": "581e024c8346578e2496f492f441c887ccb8d9ea9afe4c500a3c1740f3ddf4c4",

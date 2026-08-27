@@ -4,10 +4,11 @@ Description=Prepare fail-closed delegated BasicOps projection requests
 [Service]
 Type=oneshot
 Environment=PYTHONPATH=/opt/lhm-workflow/current/src
-User=lhmworkflow
-Group=lhmworkflow
+User=root
+Group=root
 ExecStart=/usr/local/libexec/lhm-delegated-basicops-bridge request
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ReadWritePaths=/var/lib/lhm-workflow/delegated-basicops-requests
+ReadOnlyPaths=/var/lib/lhm-workflow/delegated-parents /home/hermes/.hermes/profiles/lhm_brain/config/client-handback-targets.json

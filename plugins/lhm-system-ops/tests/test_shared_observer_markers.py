@@ -22,3 +22,10 @@ def test_every_delegated_python_service_binds_current_controller_source():
     assert len(services) == 7
     for service in services:
         assert 'Environment=PYTHONPATH=/opt/lhm-workflow/current/src' in service.read_text(encoding='utf-8')
+
+
+def test_projection_request_reads_root_registry_without_broad_workflow_user_access():
+    service = (PLUGIN / 'runtime/lhm-workflow-controller/packaging/lhm-delegated-basicops-request.service').read_text(encoding='utf-8')
+    assert 'User=root' in service and 'Group=root' in service
+    assert 'ReadWritePaths=/var/lib/lhm-workflow/delegated-basicops-requests' in service
+    assert 'ReadOnlyPaths=/var/lib/lhm-workflow/delegated-parents /home/hermes/.hermes/profiles/lhm_brain/config/client-handback-targets.json' in service
