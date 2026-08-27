@@ -94,7 +94,7 @@ install -d -o root -g root -m 0755 /etc/lhm-workflow
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/departmental-parents
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/delegated-parents
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/delegated-basicops-requests
-install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-basicops-inflight /var/lib/lhm-workflow/delegated-basicops-dispatched
+install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-basicops-inflight /var/lib/lhm-workflow/delegated-basicops-dispatched /var/lib/lhm-workflow/delegated-basicops-coalesced
 install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-human-observer-ledger
 install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-basicops-observations /var/lib/lhm-workflow/delegated-human-observations
 install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-basicops-observations-processed /var/lib/lhm-workflow/delegated-human-observations-processed

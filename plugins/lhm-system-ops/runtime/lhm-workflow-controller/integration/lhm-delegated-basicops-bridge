@@ -39,6 +39,11 @@ def request():
         if state["projection_pending"] is None:
             continue
         value = projection_request(state, registry)
+        dispatch_name = f"{value['dispatch_id']}.json"
+        if any((ROOT / queue / dispatch_name).exists() for queue in (
+                "delegated-basicops-requests", "delegated-basicops-inflight",
+                "delegated-basicops-dispatched", "delegated-basicops-observations")):
+            continue
         durable_put(ROOT / "delegated-basicops-requests", value["dispatch_id"], value)
 
 
@@ -72,8 +77,16 @@ def dispatch():
     # Reconcile unknown post-call outcomes first. The worker verifies/creates the
     # exact Discussion once and writes the same assignee/status values, so replay is
     # safe and removes the need for a manual inflight repair.
-    candidates = [(path, True) for path in sorted(inflight.glob("*.json"))]
-    candidates += [(path, False) for path in sorted(incoming.glob("*.json"))]
+    claimed_by_name = {path.name: path for path in sorted(inflight.glob("*.json"))}
+    for path in sorted(incoming.glob("*.json")):
+        existing = claimed_by_name.get(path.name)
+        if existing is not None:
+            if existing.read_bytes() != path.read_bytes():
+                raise RuntimeError("duplicate delegated dispatch ID has different content")
+            consume(path, ROOT / "delegated-basicops-coalesced")
+            continue
+        claimed_by_name[path.name] = path
+    candidates = [(path, path.parent == inflight) for path in claimed_by_name.values()]
     for path, already_claimed in candidates:
         claimed = inflight / path.name
         if not already_claimed:

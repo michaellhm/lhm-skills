@@ -37,3 +37,12 @@ def test_delegated_dispatch_rejects_incomplete_connector_results():
     assert 'result.get("status") != "completed"' in adapter
     assert 'not isinstance(result.get("verification"), dict)' in adapter
     assert 'registered BasicOps worker did not complete with verification' in bridge
+
+
+def test_delegated_dispatch_coalesces_same_id_and_refuses_different_content():
+    bridge = (PLUGIN / 'runtime/lhm-workflow-controller/integration/lhm-delegated-basicops-bridge').read_text(encoding='utf-8')
+    installer = (PLUGIN / 'runtime/lhm-workflow-controller/packaging/install.sh').read_text(encoding='utf-8')
+    assert 'duplicate delegated dispatch ID has different content' in bridge
+    assert 'delegated-basicops-coalesced' in bridge
+    assert 'delegated-basicops-coalesced' in installer
+    assert '"delegated-basicops-dispatched", "delegated-basicops-observations"' in bridge
