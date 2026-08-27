@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.13"
+    assert MANIFEST["release_version"] == "0.9.14"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -140,6 +140,14 @@ def test_connector_client_waits_past_the_worker_timeout_without_returning_runnin
         start = client.index(f"def {profile_call}")
         end = client.find("\ndef ", start + 5)
         assert "max_wait_seconds=610" in client[start:end]
+
+
+def test_baton_verifies_canonical_text_across_basicops_html_transport():
+    worker = (PLUGIN / MANIFEST["assets"]["worker"]["source"]).read_text()
+    assert "exactly one server-added outer <p>...</p> wrapper as transport" in worker
+    assert "Never hash the stored HTML" in worker
+    assert "checks must be a non-empty JSON array" in worker
+    assert 'verification must be exactly "passed" or "failed"' in worker
 
 
 def test_root_owned_contract_table_pins_every_live_workflow_and_route():
