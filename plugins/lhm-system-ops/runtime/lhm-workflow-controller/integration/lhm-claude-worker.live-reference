@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import hashlib
+import html
 import os
 import subprocess
 import sys
@@ -184,6 +185,13 @@ try:
             repair_result = None
     if is_observer and isinstance(repair_result, dict) and isinstance(repair_result.get('checks'), dict):
         repair_result['checks'] = [str(name) for name, passed in repair_result['checks'].items() if passed]
+    if is_observer and isinstance(repair_result, dict) and isinstance(repair_result.get('messages'), list):
+        for message in repair_result['messages']:
+            if isinstance(message, dict) and isinstance(message.get('body'), str):
+                decoded = html.unescape(message['body'])
+                if decoded.startswith('<p>') and decoded.endswith('</p>') and '<p>' not in decoded[3:-4] and '</p>' not in decoded[3:-4]:
+                    decoded = decoded[3:-4]
+                message['body'] = decoded
     repair_verified = isinstance(repair_result, dict) and repair_result.get('verification') == 'passed'
     if is_baton and repair_verified:
         required_baton = {'verification','event_id','task_id','assignee_user_id','native_status','review_type','discussion_message_id','discussion_body_sha256','task_revision_before','task_revision_after','task_url','readback_observed_at','checks','error'}
