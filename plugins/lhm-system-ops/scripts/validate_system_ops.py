@@ -83,7 +83,7 @@ def main():
         errors.append(f'generated Python bytecode in plugin release contents: {relative}')
     expected_manifest_versions = {
         '.codex-plugin/plugin.json': '0.9.49',
-        '.claude-plugin/plugin.json': '0.9.88',
+        '.claude-plugin/plugin.json': '0.9.89',
     }
     for relative, expected_version in expected_manifest_versions.items():
         path = PLUGIN / relative
