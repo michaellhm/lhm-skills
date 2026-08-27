@@ -270,3 +270,12 @@ def test_store_globally_rejects_duplicate_task_or_dedupe_key(tmp_path):
     duplicate["parent_run_id"] = "delegated-2"
     with pytest.raises(ValueError, match="already bound"):
         store.checkpoint(duplicate, expected_generation=None)
+
+
+def test_plan_handoff_must_name_verified_human_approver():
+    state, _ = project(initial(), "p0")
+    plan = {"steps": ["Draft"]}
+    wrong = event("project_manager", "wrong-plan-owner", 82484, plan=plan,
+        handoff=handoff("awaiting_plan_approval", "Waylon", "plan_approval"))
+    with pytest.raises(ValueError, match="verified human approver"):
+        post_plan(state, wrong, PM)

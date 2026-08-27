@@ -334,6 +334,8 @@ def post_plan(state: dict, event: dict, key: bytes) -> dict:
     material = event.get("plan")
     if not isinstance(material, dict) or not material:
         raise ValueError("invalid plan material")
+    if event.get("handoff", {}).get("next_action_owner") != updated["actors"]["human"]["canonical_name"]:
+        raise ValueError("plan handoff must name the verified human approver")
     previous = updated["plan"]
     if previous["version"]:
         previous_record = {"version": previous["version"], "material_sha256": previous["material_sha256"], "approval_receipt": previous["approval_receipt"]}
