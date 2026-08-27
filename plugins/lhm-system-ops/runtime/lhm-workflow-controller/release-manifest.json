@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r1",
-  "version": "0.1.42",
+  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r2",
+  "version": "0.1.43",
   "source_baseline": "project-hub-0.1.80-release-6f9646f",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -58,9 +58,10 @@
     "automatic_project_manager_chief_steward_and_cto_event_ingress",
     "five_minute_decision_observation_and_fifteen_minute_barney_monitor",
     "bounded_barney_retry_cto_notification_and_downstream_readback",
-    "idempotent_unknown_outcome_reconciliation_without_manual_repair"
+    "idempotent_unknown_outcome_reconciliation_without_manual_repair",
+    "one_use_hmac_release_authorization_bound_to_commit_archive_source_action_and_enablement"
   ],
-  "source_tree_sha256_excluding_manifest": "c9d90c482df17a0c750fa2a00f393b2cfad78a2348e37a9e313dcec33e1836d4",
+  "source_tree_sha256_excluding_manifest": "f26f8023962897b7fbb4a2f6cf05402c2ae2b440d71092759625f7ca19736206",
   "critical_files": {
     "src/lhm_workflow/seo_envelope_runtime.py": "ef55bce61485239187f3c4885227f8efb878c4d77dde6ef0cfeee2a0877e77a6",
     "src/lhm_workflow/cli.py": "581e024c8346578e2496f492f441c887ccb8d9ea9afe4c500a3c1740f3ddf4c4",
@@ -74,8 +75,10 @@
     "integration/lhm-workflow-registered-adapter": "91f3afb15b127e0a5c36dd59629d9023f33923b90f20a27e1d6d8ff395b6ec36",
     "integration/lhm-org-role-adapter": "e6144938b1db22e061e0f2924987cefa7bd7d8215aa87716b8ad0fca57a0acd9",
     "tests/test_seo_envelope_runtime.py": "97996712e6e887da30c613d80031c281a9d46bd9112cb17917fac4a6e725d387",
-    "packaging/install.sh": "e2995473ae47b002e30801b8d00fb0d2df7f32b91354e249cb48b8207c444e59",
-    "packaging/rollback.sh": "4d2f079f55bdfe77da0dbefd5f67d2dddbfc434b24b05d5dd0d9eea992a4b4e1",
+    "packaging/install.sh": "e75c86cf0c0c330a8113bbb0909797574a08e80e9bf51fdd482dc7b1bb43c75e",
+    "packaging/rollback.sh": "0cab7be6b6bf2bbe7104b6bc16aa3e8fb7484c81e700151e8de173059fdf352d",
+    "packaging/lhm-controller-release-authorizer": "45e9fe1195bbc1573abca5c8f9c45d1f93becb1fea9be3c6297abf3101111f1a",
+    "tests/test_release_authorizer.py": "f05c1443aa3ce67eecb7eb03c33d5705ca3a1cc4f77f99e63f8eb00be1599ca0",
     "packaging/source-tree-digest.py": "b6edde8e09052f615d1ae9159fa944872c5c4d4d94985a0a90bbc95178bda1a4",
     "packaging/lhm-seo-envelope-runtime.service": "8bcb42c1a4a955c4215f5ddef9e088503c913e9791802895aa46bf557b48f046",
     "src/lhm_workflow/scheduled_work.py": "b62f88e2d97680467adeb4622783456ee50b5e529201eddece9d8ecc7161d9c4",
@@ -101,7 +104,7 @@
     "src/lhm_workflow/barney_consumer.py": "2fe3ac9dcdb3c09a47e58f9415737f036ef8b1e5448223850a067f9bc3c75e1d",
     "integration/lhm-claude-dispatcher.live-reference": "aca624727c947904ad3e48a32045a7d5c0218da5e527c8a8e10c1766f0465316",
     "integration/lhm-claude-worker.live-reference": "2404645d07daa55198f2d987493784fbdc8347e96e81634317868577dfd55b55",
-    "integration/lhm-delegated-basicops-bridge": "02adcaeaaf6b6af58cfea1204058a4c79394ddf0888ef638326fc646c74f6d82",
+    "integration/lhm-delegated-basicops-bridge": "4c6e6ca13f66a617330ee00a17aff2b4ad4bb0c657b7f0628f74e9b00389337e",
     "integration/lhm-barney-action-executor": "bd406c371d3c6a10f0966f32217b5b9f76673d4350390c03595f0c323f701285",
     "integration/lhm-barney-downstream-consumer": "379f6c72f71ea64d92cce9c04c06d0ca0fb77a3ff9fdb01a40cfc52dbc8f2eab",
     "integration/lhm-barney-monitor": "13969cdc0eff3469c219238a03e17f88034454462df87b24db7a153b6936f218",

@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+"""Root-owned, one-use authorization gate for controller install and rollback."""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import hmac
+import json
+import os
+import stat
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+SCHEMA_KEYS={"schema_version","action","nonce","issued_at","expires_at","git_commit","controller_archive_sha256","source_tree_release_id","enablement","rollback_target","hmac_sha256"}
+
+def canonical(value):return json.dumps(value,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()
+
+def regular_bytes(path,maximum):
+    descriptor=os.open(path,os.O_RDONLY|os.O_NOFOLLOW)
+    try:
+        state=os.fstat(descriptor)
+        if not stat.S_ISREG(state.st_mode) or state.st_size>maximum:raise ValueError("unsafe or oversized file")
+        data=b""
+        while len(data)<=maximum:
+            chunk=os.read(descriptor,min(1024*1024,maximum+1-len(data)))
+            if not chunk:break
+            data+=chunk
+        if len(data)>maximum:raise ValueError("oversized file")
+        return data
+    finally:os.close(descriptor)
+
+def regular_sha256(path,maximum):
+    descriptor=os.open(path,os.O_RDONLY|os.O_NOFOLLOW)
+    try:
+        state=os.fstat(descriptor)
+        if not stat.S_ISREG(state.st_mode) or state.st_size>maximum:raise ValueError("unsafe or oversized archive")
+        digest=hashlib.sha256()
+        while True:
+            chunk=os.read(descriptor,1024*1024)
+            if not chunk:break
+            digest.update(chunk)
+        return digest.hexdigest()
+    finally:os.close(descriptor)
+
+def root_secret(path):
+    state=os.lstat(path)
+    if not stat.S_ISREG(state.st_mode) or state.st_uid!=0 or state.st_mode&0o077:raise PermissionError("approval key must be a root-owned private regular file")
+    return regular_bytes(path,4096)
+
+def validate(approval,key,*,action,archive_sha256,source_tree_release_id,git_commit,now):
+    if set(approval)!=SCHEMA_KEYS or approval["schema_version"]!=1:raise ValueError("closed approval schema required")
+    unsigned={k:v for k,v in approval.items() if k!="hmac_sha256"}
+    expected=hmac.new(key,canonical(unsigned),hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(str(approval["hmac_sha256"]),expected):raise ValueError("approval HMAC mismatch")
+    if approval["action"]!=action or action not in {"install","rollback"}:raise ValueError("approval action mismatch")
+    if not isinstance(approval["issued_at"],int) or not isinstance(approval["expires_at"],int) or not approval["issued_at"]<=now<=approval["expires_at"] or approval["expires_at"]-approval["issued_at"]>3600:raise ValueError("approval is expired, future-dated, or too broad")
+    if not isinstance(approval["nonce"],str) or len(approval["nonce"])<32 or any(c not in "0123456789abcdef" for c in approval["nonce"]):raise ValueError("invalid approval nonce")
+    for field,actual,length in (("git_commit",git_commit,40),("controller_archive_sha256",archive_sha256,64),("source_tree_release_id",source_tree_release_id,64)):
+        value=approval[field]
+        if value!=actual or len(value)!=length or any(c not in "0123456789abcdef" for c in value):raise ValueError(f"approval {field} mismatch")
+    flags=approval["enablement"]
+    if set(flags)!={"workflow","barney","delegated"} or any(type(value) is not bool for value in flags.values()):raise ValueError("closed enablement flags required")
+    target=approval["rollback_target"]
+    if action=="install" and target is not None:raise ValueError("install cannot carry rollback target")
+    if action=="rollback" and (not isinstance(target,str) or len(target)!=64 or any(c not in "0123456789abcdef" for c in target)):raise ValueError("rollback target required")
+    return approval
+
+def claim_once(ledger,claim_dir,approval):
+    ledger.mkdir(parents=True,exist_ok=True,mode=0o700)
+    state=ledger.lstat()
+    if not stat.S_ISDIR(state.st_mode) or state.st_uid!=os.geteuid() or state.st_mode&0o077:raise PermissionError("unsafe approval ledger")
+    target=ledger/f"{approval['nonce']}.json"
+    descriptor=os.open(target,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o400)
+    try:
+        os.write(descriptor,canonical({"approval_sha256":hashlib.sha256(canonical(approval)).hexdigest(),"claimed_at":int(time.time()),"action":approval["action"]}))
+        os.fsync(descriptor)
+    finally:os.close(descriptor)
+    directory=os.open(ledger,os.O_RDONLY|os.O_DIRECTORY)
+    try:os.fsync(directory)
+    finally:os.close(directory)
+    claim_dir.mkdir(parents=True,exist_ok=True,mode=0o700)
+    claim_state=claim_dir.lstat()
+    if not stat.S_ISDIR(claim_state.st_mode) or claim_state.st_uid!=os.geteuid() or claim_state.st_mode&0o077:raise PermissionError("unsafe runtime claim directory")
+    claim=claim_dir/f"{approval['nonce']}.json"
+    claim_descriptor=os.open(claim,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o400)
+    try:
+        os.write(claim_descriptor,canonical({"action":approval["action"],"nonce":approval["nonce"],"approval_sha256":hashlib.sha256(canonical(approval)).hexdigest()}))
+        os.fsync(claim_descriptor)
+    finally:os.close(claim_descriptor)
+    return claim
+
+def execute(action,approval_path,archive_path,repo,key_path,ledger,claim_dir=Path("/run/lhm-workflow-release-claims"),*,now=None,run=subprocess.run,getuid=os.getuid):
+    if getuid()!=0:raise PermissionError("release authorizer must run as root")
+    approval=json.loads(regular_bytes(approval_path,64*1024));key=root_secret(key_path)
+    archive_sha=regular_sha256(archive_path,2*1024*1024*1024)
+    source_id=subprocess.run([sys.executable,str(repo/"packaging/source-tree-digest.py"),str(repo)],capture_output=True,text=True,check=True).stdout.strip()
+    commit=subprocess.run(["git","-C",str(repo),"rev-parse","HEAD"],capture_output=True,text=True,check=True).stdout.strip()
+    validate(approval,key,action=action,archive_sha256=archive_sha,source_tree_release_id=source_id,git_commit=commit,now=int(time.time() if now is None else now))
+    claim=claim_once(ledger,claim_dir,approval) # Permanent nonce ledger plus ephemeral claim consumed by the child.
+    environment={**os.environ,"LHM_RELEASE_APPROVAL_CLAIM":str(claim),"LHM_WORKFLOW_RELEASE_ID":source_id,"LHM_WORKFLOW_ENABLE":"1" if approval["enablement"]["workflow"] else "0","LHM_BARNEY_ENABLE":"1" if approval["enablement"]["barney"] else "0","LHM_DELEGATED_ENABLE":"1" if approval["enablement"]["delegated"] else "0"}
+    command=[str(repo/"packaging/install.sh")] if action=="install" else [str(repo/"packaging/rollback.sh"),approval["rollback_target"]]
+    return run(command,env=environment,check=True)
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument("action",choices=("install","rollback"));parser.add_argument("approval",type=Path);parser.add_argument("archive",type=Path);parser.add_argument("--repo",type=Path,default=Path(__file__).resolve().parents[1]);args=parser.parse_args()
+    execute(args.action,args.approval,args.archive,args.repo.resolve(),Path("/etc/lhm-workflow/release-approval.key"),Path("/var/lib/lhm-workflow/release-approvals-used"))
+if __name__=="__main__":main()

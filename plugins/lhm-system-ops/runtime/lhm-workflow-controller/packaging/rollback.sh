@@ -1,6 +1,12 @@
 #!/bin/sh
 set -eu
 test "$(id -u)" -eq 0
+approval_claim=${LHM_RELEASE_APPROVAL_CLAIM:-}
+test -n "$approval_claim" && test -f "$approval_claim" && test ! -L "$approval_claim" || { echo "signed one-use rollback approval required" >&2; exit 2; }
+test "$(stat -c %u "$approval_claim")" = 0 && test "$(stat -c %a "$approval_claim")" = 400 || { echo "unsafe release approval claim" >&2; exit 2; }
+python3 -c 'import json,sys; assert json.load(open(sys.argv[1],encoding="utf-8"))["action"]=="rollback"' "$approval_claim" || { echo "rollback approval action mismatch" >&2; exit 2; }
+rm -f -- "$approval_claim"
+test ! -e "$approval_claim" || { echo "failed to consume rollback approval claim" >&2; exit 2; }
 target_release=${1:-}
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 backup="/var/backups/lhm-workflow-rollback-$stamp"

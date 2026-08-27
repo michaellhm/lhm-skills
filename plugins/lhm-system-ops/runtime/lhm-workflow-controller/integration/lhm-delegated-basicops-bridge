@@ -24,6 +24,12 @@ def consume(path, destination):
     os.replace(path, destination / path.name)
 
 
+def reject_observation(path, destination, error):
+    """Quarantine one bad observation without starving later valid markers."""
+    durable_put(destination, path.stem, {"source": path.name, "error": str(error)[:500]})
+    consume(path, destination / "payloads")
+
+
 def request():
     registry = json.loads(REGISTRY.read_text())
     for path in sorted((ROOT / "delegated-parents").glob("*.json")):
@@ -47,11 +53,14 @@ def import_projections():
     private = Path("/var/lib/lhm-workflow/secrets/delegated-connector.private.pem")
     incoming = ROOT / "delegated-basicops-observations"
     for path in sorted(incoming.glob("*.json")):
-        envelope = json.loads(path.read_text()); parent = envelope["parent_run_id"]
-        state = STORE.load(parent)
-        receipt = signed_projection_import(state, envelope["worker_result"], private)
-        submit(parent, "project", receipt)
-        consume(path, ROOT / "delegated-basicops-observations-processed")
+        try:
+            envelope = json.loads(path.read_text()); parent = envelope["parent_run_id"]
+            state = STORE.load(parent)
+            receipt = signed_projection_import(state, envelope["worker_result"], private)
+            submit(parent, "project", receipt)
+            consume(path, ROOT / "delegated-basicops-observations-processed")
+        except (ValueError, KeyError, json.JSONDecodeError, RuntimeError) as exc:
+            reject_observation(path, ROOT / "delegated-basicops-observations-failed", exc)
 
 
 def dispatch():
@@ -126,6 +135,9 @@ def observe_human():
             if not str(message.get("body", "")).startswith("LHM decision:"):
                 continue
             identity = "human-message-" + __import__("hashlib").sha256(canonical(message)).hexdigest()[:32]
+            if ((ROOT / "delegated-human-observations-processed" / f"{identity}.json").exists()
+                    or (ROOT / "delegated-human-observations-failed" / "payloads" / f"{identity}.json").exists()):
+                continue
             durable_put(ROOT / "delegated-human-observations", identity,
                         {"parent_run_id": state["parent_run_id"], "observed_message": message})
 
@@ -134,12 +146,15 @@ def import_human():
     private = Path("/var/lib/lhm-workflow/secrets/delegated-connector.private.pem")
     incoming = ROOT / "delegated-human-observations"
     for path in sorted(incoming.glob("*.json")):
-        envelope = json.loads(path.read_text()); parent = envelope["parent_run_id"]
-        state = STORE.load(parent)
-        event = closed_decision_observation(state, envelope["observed_message"], private)
-        operation = "plan-decision" if event["role"] == "human_approver" else "delivery-decision"
-        submit(parent, operation, event)
-        consume(path, ROOT / "delegated-human-observations-processed")
+        try:
+            envelope = json.loads(path.read_text()); parent = envelope["parent_run_id"]
+            state = STORE.load(parent)
+            event = closed_decision_observation(state, envelope["observed_message"], private)
+            operation = "plan-decision" if event["role"] == "human_approver" else "delivery-decision"
+            submit(parent, operation, event)
+            consume(path, ROOT / "delegated-human-observations-processed")
+        except (ValueError, KeyError, json.JSONDecodeError, RuntimeError) as exc:
+            reject_observation(path, ROOT / "delegated-human-observations-failed", exc)
 
 
 def observe_workflow():
@@ -172,6 +187,9 @@ def observe_workflow():
             if not str(message.get("body","")).startswith("LHM workflow event:"):
                 continue
             identity="workflow-message-"+__import__("hashlib").sha256(canonical(message)).hexdigest()[:32]
+            if ((ROOT/"delegated-workflow-observations-processed"/f"{identity}.json").exists()
+                    or (ROOT/"delegated-workflow-observations-failed"/"payloads"/f"{identity}.json").exists()):
+                continue
             durable_put(ROOT/"delegated-workflow-observations", identity,
                         {"parent_run_id":state["parent_run_id"], "observed_message":message})
 
@@ -180,10 +198,13 @@ def import_workflow():
     private=Path("/var/lib/lhm-workflow/secrets/delegated-connector.private.pem")
     incoming=ROOT/"delegated-workflow-observations"
     for path in sorted(incoming.glob("*.json")):
-        envelope=json.loads(path.read_text()); parent=envelope["parent_run_id"]
-        operation,event=closed_workflow_observation(STORE.load(parent), envelope["observed_message"], private)
-        submit(parent, operation, event)
-        consume(path, ROOT/"delegated-workflow-observations-processed")
+        try:
+            envelope=json.loads(path.read_text()); parent=envelope["parent_run_id"]
+            operation,event=closed_workflow_observation(STORE.load(parent), envelope["observed_message"], private)
+            submit(parent, operation, event)
+            consume(path, ROOT/"delegated-workflow-observations-processed")
+        except (ValueError, KeyError, json.JSONDecodeError, RuntimeError) as exc:
+            reject_observation(path, ROOT/"delegated-workflow-observations-failed", exc)
 
 
 if len(sys.argv) != 2 or sys.argv[1] not in {"request", "dispatch", "observe-human", "observe-workflow", "import-projections", "import-human", "import-workflow"}:

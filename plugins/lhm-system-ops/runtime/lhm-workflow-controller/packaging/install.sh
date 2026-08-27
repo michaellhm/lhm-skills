@@ -1,6 +1,12 @@
 #!/bin/sh
 set -eu
 test "$(id -u)" -eq 0
+approval_claim=${LHM_RELEASE_APPROVAL_CLAIM:-}
+test -n "$approval_claim" && test -f "$approval_claim" && test ! -L "$approval_claim" || { echo "signed one-use install approval required" >&2; exit 2; }
+test "$(stat -c %u "$approval_claim")" = 0 && test "$(stat -c %a "$approval_claim")" = 400 || { echo "unsafe release approval claim" >&2; exit 2; }
+python3 -c 'import json,sys; assert json.load(open(sys.argv[1],encoding="utf-8"))["action"]=="install"' "$approval_claim" || { echo "install approval action mismatch" >&2; exit 2; }
+rm -f -- "$approval_claim"
+test ! -e "$approval_claim" || { echo "failed to consume install approval claim" >&2; exit 2; }
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 python_bin=${LHM_WORKFLOW_PYTHON_BIN:-/usr/bin/python3}
 release_id=${LHM_WORKFLOW_RELEASE_ID:-}
@@ -94,6 +100,7 @@ install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-basicops-obse
 install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-basicops-observations-processed /var/lib/lhm-workflow/delegated-human-observations-processed
 install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-workflow-observer-ledger
 install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-workflow-observations /var/lib/lhm-workflow/delegated-workflow-observations-processed
+install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-basicops-observations-failed /var/lib/lhm-workflow/delegated-human-observations-failed /var/lib/lhm-workflow/delegated-workflow-observations-failed
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/barney-actions /var/lib/lhm-workflow/barney-actions/pending /var/lib/lhm-workflow/barney-actions/receipts /var/lib/lhm-workflow/barney-actions/runs
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/barney-dispatch /var/lib/lhm-workflow/barney-dispatch/chief-of-staff /var/lib/lhm-workflow/barney-dispatch/cto /var/lib/lhm-workflow/barney-dispatch/basicops-notifications /var/lib/lhm-workflow/barney-dispatch/inflight /var/lib/lhm-workflow/barney-dispatch/consumed /var/lib/lhm-workflow/barney-downstream-receipts
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/artifacts /var/lib/lhm-workflow/seo-envelope /var/lib/lhm-workflow/seo-failures
@@ -184,6 +191,7 @@ install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-barney-downstream-cons
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-barney-monitor /usr/local/libexec/lhm-barney-monitor
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-barney-action-executor /usr/local/libexec/lhm-barney-action-executor
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-barney-downstream-consumer /usr/local/libexec/lhm-barney-downstream-consumer
+install -o root -g root -m 0755 "$repo_dir"/packaging/lhm-controller-release-authorizer /usr/local/sbin/lhm-controller-release-authorizer
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-department-snapshot-dispatch "$repo_dir"/integration/lhm-department-snapshot-broker "$repo_dir"/integration/lhm-department-result-importer /usr/local/libexec/
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-seo-envelope-runtime /usr/local/libexec/lhm-seo-envelope-runtime
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-workflow-registered-adapter /usr/local/libexec/lhm-workflow-registered-adapter
