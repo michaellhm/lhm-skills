@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.9.10",
+  "release_version": "0.9.11",
   "captured_at": "2026-08-27",
   "source": "source candidate derived from exact live predecessor hashes",
   "assets": {
@@ -9,7 +9,7 @@
       "source": "assets/gateways/lhm-shared-claude-dispatcher",
       "destination": "/usr/local/libexec/lhm-claude-dispatcher",
       "sha256": "6da36c84a2c87735e653500ba4b620959884f534979a59200fc3d8b51fffbe4b",
-      "previous_sha256": "aca624727c947904ad3e48a32045a7d5c0218da5e527c8a8e10c1766f0465316",
+      "previous_sha256": "6da36c84a2c87735e653500ba4b620959884f534979a59200fc3d8b51fffbe4b",
       "owner": "root",
       "group": "root",
       "mode": "0755",
@@ -47,12 +47,12 @@
       "source": "assets/container/claude-dispatch",
       "destination": "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch",
       "container_destination": "/opt/data/profiles/lhm_brain/bin/claude-dispatch",
-      "sha256": "e11acaa73629e5841811237a16339832b834d5c51741afb256205dc6d182df66",
+      "sha256": "2e16027180a354f1901f43767f8540cf3c54f21d23ca9b6dbb8ab8de928123b1",
       "previous_sha256": "e11acaa73629e5841811237a16339832b834d5c51741afb256205dc6d182df66",
       "owner": 10000,
       "group": 10000,
       "mode": "0755",
-      "size_bytes": 15254
+      "size_bytes": 15426
     }
   }
 }

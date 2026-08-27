@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.10"
+    assert MANIFEST["release_version"] == "0.9.11"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -129,6 +129,17 @@ def test_google_ads_worker_enters_canonical_command_and_verifies_real_skill_call
     assert "'lhm-marketing-hub:google-ads-delivery-qa'" in worker
     assert "skill-provenance.json" in worker
     assert "missing required Skill tool calls" in worker
+
+
+def test_connector_client_waits_past_the_worker_timeout_without_returning_running():
+    client = (PLUGIN / MANIFEST["assets"]["container_client"]["source"]).read_text()
+    for profile_call in (
+        "submit_drive_file", "submit_basicops_discussion",
+        "submit_basicops_baton", "observe_basicops_human",
+    ):
+        start = client.index(f"def {profile_call}")
+        end = client.find("\ndef ", start + 5)
+        assert "max_wait_seconds=610" in client[start:end]
 
 
 def test_root_owned_contract_table_pins_every_live_workflow_and_route():

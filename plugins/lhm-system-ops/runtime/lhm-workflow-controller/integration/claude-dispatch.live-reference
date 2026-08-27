@@ -126,7 +126,8 @@ def submit_drive_file(client, artifact_path, file_name):
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'google_drive_client_file_create',
                       'agent_id': 'lhm-connector-repair', 'client': client, 'artifact_path': artifact_path,
                       'file_name': file_name, 'timeout_seconds': 600,
-                      **contract('google-drive-file-publish', ['google-drive:google-drive'], ['google_drive.file_create', 'google_drive.file_readback'])})
+                      **contract('google-drive-file-publish', ['google-drive:google-drive'], ['google_drive.file_create', 'google_drive.file_readback'])},
+                     max_wait_seconds=610)
 
 
 def submit_basicops_discussion(client, task_id, discussion):
@@ -134,7 +135,8 @@ def submit_basicops_discussion(client, task_id, discussion):
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'basicops_task_discussion_update',
                       'agent_id': 'lhm-connector-repair', 'client': client, 'task_id': task_id,
                       'discussion': discussion, 'timeout_seconds': 600,
-                      **contract('basicops-task-discussion-update', ['lhm-project-hub:basicops-task-manager'], ['basicops.task_read', 'basicops.discussion_create', 'basicops.discussion_readback'])})
+                      **contract('basicops-task-discussion-update', ['lhm-project-hub:basicops-task-manager'], ['basicops.task_read', 'basicops.discussion_create', 'basicops.discussion_readback'])},
+                     max_wait_seconds=610)
 
 
 def submit_basicops_baton(client, task_id, assignee_user_id, native_status, review_type, discussion):
@@ -143,7 +145,8 @@ def submit_basicops_baton(client, task_id, assignee_user_id, native_status, revi
                       'agent_id': 'lhm-connector-repair', 'client': client, 'task_id': task_id,
                       'assignee_user_id': assignee_user_id, 'native_status': native_status,
                       'review_type': review_type, 'discussion': discussion, 'timeout_seconds': 600,
-                      **contract('basicops-task-baton-transition', ['lhm-project-hub:basicops-task-manager'], ['basicops.task_read', 'basicops.task_update', 'basicops.discussion_create', 'basicops.discussion_readback'])})
+                      **contract('basicops-task-baton-transition', ['lhm-project-hub:basicops-task-manager'], ['basicops.task_read', 'basicops.task_update', 'basicops.discussion_create', 'basicops.discussion_readback'])},
+                     max_wait_seconds=610)
 
 
 def observe_basicops_human(client, task_id):
@@ -151,7 +154,8 @@ def observe_basicops_human(client, task_id):
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'basicops_human_decision_observe',
                       'agent_id': 'lhm-connector-repair', 'client': client, 'task_id': task_id,
                       'discussion': 'Read-only closed decision marker observation.', 'timeout_seconds': 600,
-                      **contract('basicops-human-decision-observe', [], ['basicops.task_read', 'basicops.discussion_readback'])})
+                      **contract('basicops-human-decision-observe', [], ['basicops.task_read', 'basicops.discussion_readback'])},
+                     max_wait_seconds=610)
 
 
 def register_handback_target(target_type, client, name, vault_prefix, drive_folder_id, task_ids):

@@ -125,7 +125,7 @@ def dispatch():
                                 "parent_run_id": value["parent_run_id"],
                                 "state_generation": value["state_generation"]}}
         done = subprocess.run([adapter], input=json.dumps(envelope), text=True,
-                              capture_output=True, timeout=620, check=False)
+                              capture_output=True, timeout=650, check=False)
         if done.returncode:
             raise RuntimeError(done.stderr or done.stdout or "registered BasicOps dispatch failed")
         receipt = json.loads(done.stdout)
@@ -161,7 +161,7 @@ def observe_human():
         envelope = {"schema_version": 1, "operation": "claude_dispatch",
             "argv": [claude, "observe-basicops-human-decision", target["client_slug"], target["handback_task_id"]],
             "binding": {"observation_id": observe_id, "parent_run_id": state["parent_run_id"]}}
-        done = subprocess.run([adapter], input=json.dumps(envelope), text=True, capture_output=True, timeout=620, check=False)
+        done = subprocess.run([adapter], input=json.dumps(envelope), text=True, capture_output=True, timeout=650, check=False)
         if done.returncode:
             raise RuntimeError(done.stderr or done.stdout or "human observation failed")
         receipt = json.loads(done.stdout)
@@ -213,7 +213,7 @@ def observe_workflow():
         envelope = {"schema_version":1, "operation":"claude_dispatch",
             "argv":[claude, "observe-basicops-human-decision", target["client_slug"], target["handback_task_id"]],
             "binding":{"observation_id":observe_id, "parent_run_id":state["parent_run_id"]}}
-        done = subprocess.run([adapter], input=json.dumps(envelope), text=True, capture_output=True, timeout=620, check=False)
+        done = subprocess.run([adapter], input=json.dumps(envelope), text=True, capture_output=True, timeout=650, check=False)
         if done.returncode:
             raise RuntimeError(done.stderr or done.stdout or "workflow observation failed")
         receipt=json.loads(done.stdout)
