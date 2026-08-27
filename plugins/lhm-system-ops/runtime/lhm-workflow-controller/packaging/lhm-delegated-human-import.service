@@ -1,0 +1,11 @@
+[Unit]
+Description=Import closed authenticated BasicOps human decision observations
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/libexec/lhm-delegated-basicops-bridge import-human
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/lhm-workflow

@@ -5,9 +5,17 @@ repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 python_bin=${LHM_WORKFLOW_PYTHON_BIN:-/usr/bin/python3}
 release_id=${LHM_WORKFLOW_RELEASE_ID:-}
 enable_units=${LHM_WORKFLOW_ENABLE:-0}
+enable_barney=${LHM_BARNEY_ENABLE:-0}
+enable_delegated=${LHM_DELEGATED_ENABLE:-0}
 case "$release_id" in (*[!0-9a-f]*|'') echo "LHM_WORKFLOW_RELEASE_ID must be a full lowercase SHA-256" >&2; exit 2;; esac
 test "${#release_id}" -eq 64 || { echo "release id must be 64 hex characters" >&2; exit 2; }
 test "$enable_units" = 0 || test "$enable_units" = 1
+test "$enable_barney" = 0 || test "$enable_barney" = 1
+test "$enable_delegated" = 0 || test "$enable_delegated" = 1
+computed_release_id=$("$python_bin" "$repo_dir/packaging/source-tree-digest.py" "$repo_dir")
+test "$computed_release_id" = "$release_id" || { echo "release id does not bind the exact controller source tree" >&2; exit 2; }
+manifest_release_id=$("$python_bin" -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8"))["source_tree_sha256_excluding_manifest"])' "$repo_dir/release-manifest.json")
+test "$manifest_release_id" = "$release_id" || { echo "release manifest digest mismatch" >&2; exit 2; }
 "$python_bin" -c 'import sys; assert sys.version_info >= (3,11), sys.version'
 
 check_group() {
@@ -34,6 +42,9 @@ department_units='lhm-department-evidence-attestor.path lhm-department-qa-produc
 systemctl disable --now $units 2>/dev/null || true
 systemctl disable --now $department_units 2>/dev/null || true
 systemctl disable --now lhm-seo-envelope-runtime.service 2>/dev/null || true
+systemctl disable --now lhm-barney-monitor.timer 2>/dev/null || true
+systemctl disable --now lhm-barney-action-executor.path 2>/dev/null || true
+systemctl disable --now lhm-barney-downstream-consumer.path 2>/dev/null || true
 for d in bridge-incoming adapter-source adapter-incoming verifier-requests verifier-results department-signer-requests department-signer-results department-connector-requests department-connector-results qa-requests qa-results lead-requests lead-results projection-requests projection-results hop-requests hop-results; do
   test ! -d "/var/lib/lhm-workflow/$d" || test -z "$(find "/var/lib/lhm-workflow/$d" -type f -name '*.json' -print -quit)" || { echo "refusing install with queued input in $d" >&2; exit 1; }
 done
@@ -57,11 +68,13 @@ id lhmdepartmentlead >/dev/null 2>&1 || useradd --system --uid 10010 --gid lhmde
 
 release_dir=/opt/lhm-workflow/releases/$release_id
 test ! -e "$release_dir" || { echo "release already exists; refusing overwrite" >&2; exit 1; }
-install -d -o root -g root -m 0755 /opt/lhm-workflow /opt/lhm-workflow/releases "$release_dir" "$release_dir/src"
+install -d -o root -g root -m 0755 /opt/lhm-workflow /opt/lhm-workflow/releases "$release_dir" "$release_dir/src" "$release_dir/schemas"
 "$python_bin" -m venv "$release_dir/venv"
 cp -R "$repo_dir/src/lhm_workflow" "$release_dir/src/"
+cp -R "$repo_dir/schemas/." "$release_dir/schemas/"
 find "$release_dir/src/lhm_workflow" -type d -exec chmod 0755 {} \;
 find "$release_dir/src/lhm_workflow" -type f -exec chmod 0644 {} \;
+find "$release_dir/schemas" -type f -exec chmod 0644 {} \;
 install -o root -g root -m 0755 "$repo_dir/packaging/lhm-workflow-prod" "$release_dir/venv/bin/lhm-workflow"
 install -o root -g root -m 0755 "$repo_dir/packaging/service-rehearsal.py" "$release_dir/service-rehearsal.py"
 printf '%s\n' "$release_id" > "$release_dir/RELEASE_ID"; chmod 0444 "$release_dir/RELEASE_ID"
@@ -73,6 +86,16 @@ install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/scheduled-intake
 install -d -o root -g root -m 0755 /etc/lhm-workflow
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/departmental-parents
+install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/delegated-parents
+install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/delegated-basicops-requests
+install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-basicops-inflight /var/lib/lhm-workflow/delegated-basicops-dispatched
+install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-human-observer-ledger
+install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-basicops-observations /var/lib/lhm-workflow/delegated-human-observations
+install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-basicops-observations-processed /var/lib/lhm-workflow/delegated-human-observations-processed
+install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-workflow-observer-ledger
+install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-workflow-observations /var/lib/lhm-workflow/delegated-workflow-observations-processed
+install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/barney-actions /var/lib/lhm-workflow/barney-actions/pending /var/lib/lhm-workflow/barney-actions/receipts /var/lib/lhm-workflow/barney-actions/runs
+install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/barney-dispatch /var/lib/lhm-workflow/barney-dispatch/chief-of-staff /var/lib/lhm-workflow/barney-dispatch/cto /var/lib/lhm-workflow/barney-dispatch/basicops-notifications /var/lib/lhm-workflow/barney-dispatch/inflight /var/lib/lhm-workflow/barney-dispatch/consumed /var/lib/lhm-workflow/barney-downstream-receipts
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/artifacts /var/lib/lhm-workflow/seo-envelope /var/lib/lhm-workflow/seo-failures
 install -d -o root -g root -m 0750 /var/lib/lhm-workflow/department-observations
 for d in parents wal locks receipts operations processed quarantine audit verifier-requests; do install -d -o lhmworkflow -g lhmworkflow -m 0750 "/var/lib/lhm-workflow/$d"; done
@@ -105,6 +128,11 @@ test -f /var/lib/lhm-workflow/secrets/verifier.key || head -c 32 /dev/urandom > 
 test -f /var/lib/lhm-workflow/secrets/approval.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/approval.key
 test -f /var/lib/lhm-workflow/secrets/head-production.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/head-production.key
 test -f /var/lib/lhm-workflow/secrets/production.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/production.key
+for delegated_key in project-manager chief-of-staff learning-steward cto barney-executor; do
+  test -f "/var/lib/lhm-workflow/secrets/$delegated_key.key" || head -c 32 /dev/urandom > "/var/lib/lhm-workflow/secrets/$delegated_key.key"
+  chown root:lhmworkflow "/var/lib/lhm-workflow/secrets/$delegated_key.key"
+  chmod 0640 "/var/lib/lhm-workflow/secrets/$delegated_key.key"
+done
 chown root:lhmadapterkey /var/lib/lhm-workflow/secrets/adapter.key; chown root:lhmverifierkey /var/lib/lhm-workflow/secrets/verifier.key
 chmod 0640 /var/lib/lhm-workflow/secrets/adapter.key /var/lib/lhm-workflow/secrets/verifier.key
 chown root:lhmworkflow /var/lib/lhm-workflow/secrets/approval.key /var/lib/lhm-workflow/secrets/head-production.key /var/lib/lhm-workflow/secrets/production.key
@@ -117,6 +145,7 @@ test -f /var/lib/lhm-workflow/secrets/verifier.private.pem || openssl genpkey -a
 test -f /var/lib/lhm-workflow/secrets/department-qa.private.pem || openssl genpkey -algorithm ED25519 -out /var/lib/lhm-workflow/secrets/department-qa.private.pem
 test -f /var/lib/lhm-workflow/secrets/department-lead.private.pem || openssl genpkey -algorithm ED25519 -out /var/lib/lhm-workflow/secrets/department-lead.private.pem
 test -f /var/lib/lhm-workflow/secrets/evidence-attestor.private.pem || openssl genpkey -algorithm ED25519 -out /var/lib/lhm-workflow/secrets/evidence-attestor.private.pem
+test -f /var/lib/lhm-workflow/secrets/delegated-connector.private.pem || openssl genpkey -algorithm ED25519 -out /var/lib/lhm-workflow/secrets/delegated-connector.private.pem
 openssl pkey -in /var/lib/lhm-workflow/secrets/projection.private.pem -pubout -out /var/lib/lhm-workflow/public/projection.public.pem
 openssl pkey -in /var/lib/lhm-workflow/secrets/hop.private.pem -pubout -out /var/lib/lhm-workflow/public/hop.public.pem
 openssl pkey -in /var/lib/lhm-workflow/secrets/controller-dispatch.private.pem -pubout -out /var/lib/lhm-workflow/public/controller-dispatch.public.pem
@@ -125,6 +154,7 @@ openssl pkey -in /var/lib/lhm-workflow/secrets/verifier.private.pem -pubout -out
 openssl pkey -in /var/lib/lhm-workflow/secrets/department-qa.private.pem -pubout -out /var/lib/lhm-workflow/public/department-qa.public.pem
 openssl pkey -in /var/lib/lhm-workflow/secrets/department-lead.private.pem -pubout -out /var/lib/lhm-workflow/public/department-lead.public.pem
 openssl pkey -in /var/lib/lhm-workflow/secrets/evidence-attestor.private.pem -pubout -out /var/lib/lhm-workflow/public/evidence-attestor.public.pem
+openssl pkey -in /var/lib/lhm-workflow/secrets/delegated-connector.private.pem -pubout -out /var/lib/lhm-workflow/public/delegated-connector.public.pem
 chown root:lhmprojection /var/lib/lhm-workflow/secrets/projection.private.pem; chmod 0640 /var/lib/lhm-workflow/secrets/projection.private.pem
 chown root:lhmhop /var/lib/lhm-workflow/secrets/hop.private.pem; chmod 0640 /var/lib/lhm-workflow/secrets/hop.private.pem
 chmod 0644 /var/lib/lhm-workflow/public/projection.public.pem /var/lib/lhm-workflow/public/hop.public.pem
@@ -137,6 +167,8 @@ chown root:lhmdepartmentqa /var/lib/lhm-workflow/secrets/department-qa.private.p
 chown root:lhmdepartmentlead /var/lib/lhm-workflow/secrets/department-lead.private.pem; chmod 0640 /var/lib/lhm-workflow/secrets/department-lead.private.pem
 chmod 0644 /var/lib/lhm-workflow/public/department-qa.public.pem /var/lib/lhm-workflow/public/department-lead.public.pem
 chown root:root /var/lib/lhm-workflow/secrets/evidence-attestor.private.pem; chmod 0600 /var/lib/lhm-workflow/secrets/evidence-attestor.private.pem
+chown root:root /var/lib/lhm-workflow/secrets/delegated-connector.private.pem; chmod 0600 /var/lib/lhm-workflow/secrets/delegated-connector.private.pem
+chmod 0644 /var/lib/lhm-workflow/public/delegated-connector.public.pem
 chmod 0644 /var/lib/lhm-workflow/public/evidence-attestor.public.pem
 
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-workflow-*.service "$repo_dir"/packaging/lhm-workflow-*.path /etc/systemd/system/
@@ -146,9 +178,16 @@ install -D -o root -g root -m 0755 "$repo_dir"/integration/lhm-org-role-adapter 
 sh "$repo_dir"/packaging/provision-scheduled-signers.sh
 scheduled_signer_paths=$(printf '%s ' /etc/systemd/system/lhm-scheduled-org-signer-*.path)
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-department-*.service "$repo_dir"/packaging/lhm-department-*.path /etc/systemd/system/
+install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-barney-monitor.service "$repo_dir"/packaging/lhm-barney-monitor.timer /etc/systemd/system/
+install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-barney-action-executor.service "$repo_dir"/packaging/lhm-barney-action-executor.path /etc/systemd/system/
+install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-barney-downstream-consumer.service "$repo_dir"/packaging/lhm-barney-downstream-consumer.path /etc/systemd/system/
+install -o root -g root -m 0755 "$repo_dir"/integration/lhm-barney-monitor /usr/local/libexec/lhm-barney-monitor
+install -o root -g root -m 0755 "$repo_dir"/integration/lhm-barney-action-executor /usr/local/libexec/lhm-barney-action-executor
+install -o root -g root -m 0755 "$repo_dir"/integration/lhm-barney-downstream-consumer /usr/local/libexec/lhm-barney-downstream-consumer
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-department-snapshot-dispatch "$repo_dir"/integration/lhm-department-snapshot-broker "$repo_dir"/integration/lhm-department-result-importer /usr/local/libexec/
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-seo-envelope-runtime /usr/local/libexec/lhm-seo-envelope-runtime
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-workflow-registered-adapter /usr/local/libexec/lhm-workflow-registered-adapter
+install -o root -g root -m 0755 "$repo_dir"/integration/lhm-delegated-basicops-bridge /usr/local/libexec/lhm-delegated-basicops-bridge
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-scheduled-work-ingress /usr/local/libexec/lhm-scheduled-work-ingress
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-scheduled-work-runtime /usr/local/libexec/lhm-scheduled-work-runtime
 install -D -o root -g root -m 0755 "$repo_dir"/integration/lhm-scheduled-work-dispatch /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-scheduled-work-dispatch
@@ -161,9 +200,34 @@ for profile in lhm_chief_of_staff lhm_production lhm_researcher lhm_seo lhm_cont
   install -d -o 10000 -g 10000 -m 0700 "/home/hermes/.hermes/profiles/$profile/dispatch"
   install -d -o root -g 10000 -m 0710 "/home/hermes/.hermes/profiles/$profile/dispatch/scheduled-executor"
 done
+install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-delegated-*.service "$repo_dir"/packaging/lhm-delegated-*.path "$repo_dir"/packaging/lhm-delegated-*.timer /etc/systemd/system/
 for d in processed failed runs; do install -d -o root -g root -m 0750 "$scheduled_base/$d"; done
 systemctl daemon-reload
 systemd-analyze verify /etc/systemd/system/lhm-workflow-*.service /etc/systemd/system/lhm-workflow-*.path /etc/systemd/system/lhm-scheduled-work.service /etc/systemd/system/lhm-scheduled-work.path
+systemd-analyze verify /etc/systemd/system/lhm-barney-monitor.service /etc/systemd/system/lhm-barney-monitor.timer
+systemd-analyze verify /etc/systemd/system/lhm-barney-action-executor.service /etc/systemd/system/lhm-barney-action-executor.path
+systemd-analyze verify /etc/systemd/system/lhm-barney-downstream-consumer.service /etc/systemd/system/lhm-barney-downstream-consumer.path
+systemd-analyze verify /etc/systemd/system/lhm-delegated-*.service /etc/systemd/system/lhm-delegated-*.path
+systemd-analyze verify /etc/systemd/system/lhm-delegated-*.timer
+for unit in lhm-delegated-basicops-request.path lhm-delegated-basicops-dispatch.path lhm-delegated-basicops-import.path lhm-delegated-human-observe.path lhm-delegated-human-import.path; do
+  systemctl disable --now "$unit" 2>/dev/null || true
+  test "$(systemctl is-enabled "$unit" 2>/dev/null || true)" = disabled
+done
+systemctl disable --now lhm-delegated-workflow-import.path 2>/dev/null || true
+test "$(systemctl is-enabled lhm-delegated-workflow-import.path 2>/dev/null || true)" = disabled
+systemctl disable --now lhm-delegated-human-observe.timer 2>/dev/null || true
+systemctl disable --now lhm-delegated-workflow-observe.timer 2>/dev/null || true
+test "$(systemctl is-enabled lhm-delegated-human-observe.timer 2>/dev/null || true)" = disabled
+test "$(systemctl is-enabled lhm-delegated-workflow-observe.timer 2>/dev/null || true)" = disabled
+if test "$enable_delegated" = 1; then
+  systemctl enable --now lhm-delegated-basicops-request.path
+  systemctl enable --now lhm-delegated-basicops-dispatch.path
+  systemctl enable --now lhm-delegated-basicops-import.path
+  systemctl enable --now lhm-delegated-human-import.path
+  systemctl enable --now lhm-delegated-workflow-import.path
+  systemctl enable --now lhm-delegated-human-observe.timer
+  systemctl enable --now lhm-delegated-workflow-observe.timer
+fi
 if test "$enable_units" = 1; then
   for path in $scheduled_signer_paths; do systemctl enable --now "$(basename "$path")"; done
   systemctl enable --now $units
@@ -184,3 +248,12 @@ for unit in $department_units; do
 done
 test "$(systemctl is-enabled lhm-seo-envelope-runtime.service 2>/dev/null || true)" = disabled
 seo_state=$(systemctl is-active lhm-seo-envelope-runtime.service 2>/dev/null || true); test "$seo_state" = inactive || test "$seo_state" = failed
+test "$(systemctl is-enabled lhm-barney-monitor.timer 2>/dev/null || true)" = disabled
+barney_state=$(systemctl is-active lhm-barney-monitor.timer 2>/dev/null || true); test "$barney_state" = inactive || test "$barney_state" = failed
+test "$(systemctl is-enabled lhm-barney-action-executor.path 2>/dev/null || true)" = disabled
+test "$(systemctl is-enabled lhm-barney-downstream-consumer.path 2>/dev/null || true)" = disabled
+if test "$enable_barney" = 1; then
+  systemctl enable --now lhm-barney-downstream-consumer.path
+  systemctl enable --now lhm-barney-action-executor.path
+  systemctl enable --now lhm-barney-monitor.timer
+fi

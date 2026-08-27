@@ -1,0 +1,14 @@
+[Unit]
+Description=Consume bounded Barney role dispatches
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+Environment=PYTHONPATH=/opt/lhm-workflow/current/src
+ExecStart=/usr/local/libexec/lhm-barney-downstream-consumer
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/lhm-workflow

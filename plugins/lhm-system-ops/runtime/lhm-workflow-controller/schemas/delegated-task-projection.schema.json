@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://localhealthmarketing.com.au/schemas/delegated-task-projection.schema.json",
+  "title": "Verified BasicOps baton projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "assignee_user_id", "native_status", "review_type", "discussion_sha256", "state_generation"],
+  "properties": {
+    "task_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$"},
+    "assignee_user_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$"},
+    "native_status": {"enum": ["In Progress", "Under Review", "Blocked", "On Hold", "Complete"]},
+    "review_type": {"enum": ["none", "plan_approval", "delivery_review"]},
+    "discussion_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "state_generation": {"type": "integer", "minimum": 1}
+  }
+}

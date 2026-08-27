@@ -1,0 +1,14 @@
+[Unit]
+Description=Dispatch bounded Barney actions
+
+[Service]
+Type=oneshot
+User=lhmworkflow
+Group=lhmworkflow
+Environment=PYTHONPATH=/opt/lhm-workflow/current/src
+ExecStart=/usr/local/libexec/lhm-barney-action-executor
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/lhm-workflow

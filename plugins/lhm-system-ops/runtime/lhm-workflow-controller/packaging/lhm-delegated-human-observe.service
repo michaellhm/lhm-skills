@@ -1,0 +1,11 @@
+[Unit]
+Description=Observe closed BasicOps human decision markers read-only
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/local/libexec/lhm-delegated-basicops-bridge observe-human
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/lhm-workflow /home/hermes/.hermes/profiles/lhm_brain/dispatch/claude

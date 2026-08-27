@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch for bounded Barney actions
+
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/barney-actions/pending/*.json
+Unit=lhm-barney-action-executor.service
+
+[Install]
+WantedBy=multi-user.target

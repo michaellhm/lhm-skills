@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+import os
+from pathlib import Path
+from lhm_workflow.barney_consumer import BarneyConsumer
+from lhm_workflow.delegated_task import DelegatedTaskStore
+root=Path(os.environ.get("LHM_WORKFLOW_ROOT","/var/lib/lhm-workflow"))
+BarneyConsumer(root).consume(DelegatedTaskStore(root/"delegated-parents"))

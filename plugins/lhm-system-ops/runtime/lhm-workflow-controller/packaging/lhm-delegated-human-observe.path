@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch delegated human review gates
+
+[Path]
+PathChanged=/var/lib/lhm-workflow/delegated-parents
+Unit=lhm-delegated-human-observe.service
+
+[Install]
+WantedBy=multi-user.target

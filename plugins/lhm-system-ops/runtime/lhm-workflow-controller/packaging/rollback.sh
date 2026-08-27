@@ -9,6 +9,10 @@ if test -L /opt/lhm-workflow/current; then
   readlink /opt/lhm-workflow/current > "$backup/current-target"
 fi
 systemctl disable --now lhm-workflow-bridge.path lhm-workflow-adapter.path lhm-workflow-stage.path lhm-workflow-verifier.path lhm-workflow-verification.path lhm-scheduled-work.path 2>/dev/null || true
+systemctl disable --now lhm-barney-monitor.timer 2>/dev/null || true
+systemctl disable --now lhm-barney-action-executor.path 2>/dev/null || true
+systemctl disable --now lhm-barney-downstream-consumer.path 2>/dev/null || true
+systemctl disable --now lhm-delegated-basicops-request.path lhm-delegated-basicops-dispatch.path lhm-delegated-basicops-import.path lhm-delegated-human-observe.path lhm-delegated-human-observe.timer lhm-delegated-human-import.path lhm-delegated-workflow-observe.timer lhm-delegated-workflow-import.path 2>/dev/null || true
 for unit in /etc/systemd/system/lhm-scheduled-org-signer-*.path; do
   test ! -e "$unit" || systemctl disable --now "$(basename "$unit")" 2>/dev/null || true
 done
@@ -20,6 +24,8 @@ if test -n "$target_release"; then
   ln -sfn "releases/$target_release" /opt/lhm-workflow/current.rollback
   mv -Tf /opt/lhm-workflow/current.rollback /opt/lhm-workflow/current
   printf '%s\n' "$target_release" > "$backup/restored-release"
+  systemctl daemon-reload
+  systemctl enable --now lhm-workflow-bridge.path lhm-workflow-adapter.path lhm-workflow-stage.path lhm-workflow-verifier.path lhm-workflow-verification.path lhm-scheduled-work.path
   exit 0
 fi
 for f in /etc/systemd/system/lhm-workflow-*.service /etc/systemd/system/lhm-workflow-*.path; do
@@ -37,9 +43,17 @@ for f in /etc/systemd/system/lhm-department-*.service /etc/systemd/system/lhm-de
   test -e "$f" || continue
   mv "$f" "$backup/"
 done
+for f in /etc/systemd/system/lhm-barney-monitor.service /etc/systemd/system/lhm-barney-monitor.timer /etc/systemd/system/lhm-barney-action-executor.service /etc/systemd/system/lhm-barney-action-executor.path /etc/systemd/system/lhm-barney-downstream-consumer.service /etc/systemd/system/lhm-barney-downstream-consumer.path; do
+  test -e "$f" || continue
+  mv "$f" "$backup/"
+done
+for f in /etc/systemd/system/lhm-delegated-*.service /etc/systemd/system/lhm-delegated-*.path /etc/systemd/system/lhm-delegated-*.timer; do
+  test -e "$f" || continue
+  mv "$f" "$backup/"
+done
 systemctl daemon-reload
 # Broker/importer executables are preserved in the rollback backup for recovery.
-for f in /usr/local/libexec/lhm-department-snapshot-dispatch /usr/local/libexec/lhm-department-snapshot-broker /usr/local/libexec/lhm-department-result-importer /usr/local/libexec/lhm-seo-envelope-runtime /usr/local/libexec/lhm-workflow-registered-adapter /usr/local/libexec/lhm-scheduled-work-ingress /usr/local/libexec/lhm-scheduled-work-runtime /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-scheduled-work-dispatch /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-seo-org-cron-alternate; do
+for f in /usr/local/libexec/lhm-department-snapshot-dispatch /usr/local/libexec/lhm-department-snapshot-broker /usr/local/libexec/lhm-department-result-importer /usr/local/libexec/lhm-seo-envelope-runtime /usr/local/libexec/lhm-workflow-registered-adapter /usr/local/libexec/lhm-delegated-basicops-bridge /usr/local/libexec/lhm-scheduled-work-ingress /usr/local/libexec/lhm-scheduled-work-runtime /usr/local/libexec/lhm-barney-monitor /usr/local/libexec/lhm-barney-action-executor /usr/local/libexec/lhm-barney-downstream-consumer /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-scheduled-work-dispatch /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-seo-org-cron-alternate; do
   test -e "$f" || continue
   mv "$f" "$backup/"
 done

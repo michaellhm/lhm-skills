@@ -137,6 +137,23 @@ def submit_basicops_discussion(client, task_id, discussion):
                       **contract('basicops-task-discussion-update', ['lhm-project-hub:basicops-task-manager'], ['basicops.task_read', 'basicops.discussion_create', 'basicops.discussion_readback'])})
 
 
+def submit_basicops_baton(client, task_id, assignee_user_id, native_status, review_type, discussion):
+    run_id = next_run_id('claude-basicops')
+    enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'basicops_task_baton_transition',
+                      'agent_id': 'lhm-connector-repair', 'client': client, 'task_id': task_id,
+                      'assignee_user_id': assignee_user_id, 'native_status': native_status,
+                      'review_type': review_type, 'discussion': discussion, 'timeout_seconds': 600,
+                      **contract('basicops-task-baton-transition', ['lhm-project-hub:basicops-task-manager'], ['basicops.task_read', 'basicops.task_update', 'basicops.discussion_create', 'basicops.discussion_readback'])})
+
+
+def observe_basicops_human(client, task_id):
+    run_id = next_run_id('claude-basicops')
+    enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'basicops_human_decision_observe',
+                      'agent_id': 'lhm-connector-repair', 'client': client, 'task_id': task_id,
+                      'discussion': 'Read-only closed decision marker observation.', 'timeout_seconds': 600,
+                      **contract('basicops-human-decision-observe', [], ['basicops.task_read', 'basicops.discussion_readback'])})
+
+
 def register_handback_target(target_type, client, name, vault_prefix, drive_folder_id, task_ids):
     run_id = next_run_id('claude-register')
     basicops_task_ids = [] if task_ids == '-' else task_ids.split(',')
@@ -246,6 +263,10 @@ def main():
         submit_drive_file(sys.argv[2], sys.argv[3], sys.argv[4])
     elif len(sys.argv) == 5 and sys.argv[1] == 'submit-basicops-task-discussion-update':
         submit_basicops_discussion(sys.argv[2], sys.argv[3], sys.argv[4])
+    elif len(sys.argv) == 8 and sys.argv[1] == 'submit-basicops-task-baton-transition':
+        submit_basicops_baton(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
+    elif len(sys.argv) == 4 and sys.argv[1] == 'observe-basicops-human-decision':
+        observe_basicops_human(sys.argv[2], sys.argv[3])
     elif len(sys.argv) == 8 and sys.argv[1] == 'register-handback-target':
         register_handback_target(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
     elif len(sys.argv) == 6 and sys.argv[1] == 'submit-specialist-readonly':

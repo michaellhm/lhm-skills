@@ -1,0 +1,192 @@
+#!/usr/bin/env python3
+"""Queue-only delegated BasicOps bridge. It never calls BasicOps directly."""
+import json
+import os
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+from lhm_workflow.delegated_basicops_runtime import (
+    closed_decision_observation, closed_workflow_observation, durable_put, projection_request, signed_projection_import,
+    validate_basicops_target,
+)
+from lhm_workflow.delegated_task import DelegatedTaskStore, canonical
+
+ROOT = Path(os.environ.get("LHM_WORKFLOW_ROOT", "/var/lib/lhm-workflow"))
+STORE = DelegatedTaskStore(ROOT / "delegated-parents")
+REGISTRY = Path(os.environ.get("LHM_HANDBACK_REGISTRY", "/home/hermes/.hermes/profiles/lhm_brain/config/client-handback-targets.json"))
+CONTROLLER = os.environ.get("LHM_WORKFLOW_CLI", "/opt/lhm-workflow/current/venv/bin/lhm-workflow")
+
+
+def consume(path, destination):
+    destination.mkdir(parents=True, exist_ok=True)
+    os.replace(path, destination / path.name)
+
+
+def request():
+    registry = json.loads(REGISTRY.read_text())
+    for path in sorted((ROOT / "delegated-parents").glob("*.json")):
+        if path.name.startswith("."):
+            continue
+        state = STORE.load(path.stem)
+        if state["projection_pending"] is None:
+            continue
+        value = projection_request(state, registry)
+        durable_put(ROOT / "delegated-basicops-requests", value["dispatch_id"], value)
+
+
+def submit(parent, operation, event):
+    done = subprocess.run([CONTROLLER, f"delegated-{operation}", parent], input=json.dumps(event),
+                          text=True, capture_output=True, timeout=30, check=False)
+    if done.returncode:
+        raise RuntimeError(done.stderr or done.stdout or "controller import failed")
+
+
+def import_projections():
+    private = Path("/var/lib/lhm-workflow/secrets/delegated-connector.private.pem")
+    incoming = ROOT / "delegated-basicops-observations"
+    for path in sorted(incoming.glob("*.json")):
+        envelope = json.loads(path.read_text()); parent = envelope["parent_run_id"]
+        state = STORE.load(parent)
+        receipt = signed_projection_import(state, envelope["worker_result"], private)
+        submit(parent, "project", receipt)
+        consume(path, ROOT / "delegated-basicops-observations-processed")
+
+
+def dispatch():
+    """Claim then reconcile requests through an idempotent BasicOps operation."""
+    incoming = ROOT / "delegated-basicops-requests"
+    inflight = ROOT / "delegated-basicops-inflight"; inflight.mkdir(parents=True, exist_ok=True)
+    adapter = "/usr/local/libexec/lhm-workflow-registered-adapter"
+    claude = "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
+    # Reconcile unknown post-call outcomes first. The worker verifies/creates the
+    # exact Discussion once and writes the same assignee/status values, so replay is
+    # safe and removes the need for a manual inflight repair.
+    candidates = [(path, True) for path in sorted(inflight.glob("*.json"))]
+    candidates += [(path, False) for path in sorted(incoming.glob("*.json"))]
+    for path, already_claimed in candidates:
+        claimed = inflight / path.name
+        if not already_claimed:
+            try:
+                os.replace(path, claimed)
+            except FileNotFoundError:
+                continue
+        value = json.loads(claimed.read_text())
+        argv = [claude, "submit-basicops-task-baton-transition", value["client_slug"],
+                value["task_id"], value["assignee_user_id"], value["native_status"],
+                value["review_type"], value["discussion"]]
+        envelope = {"schema_version": 1, "operation": "claude_dispatch", "argv": argv,
+                    "binding": {"dispatch_id": value["dispatch_id"],
+                                "parent_run_id": value["parent_run_id"],
+                                "state_generation": value["state_generation"]}}
+        done = subprocess.run([adapter], input=json.dumps(envelope), text=True,
+                              capture_output=True, timeout=620, check=False)
+        if done.returncode:
+            raise RuntimeError(done.stderr or done.stdout or "registered BasicOps dispatch failed")
+        receipt = json.loads(done.stdout)
+        if receipt.get("binding") != envelope["binding"]:
+            raise RuntimeError("registered adapter binding mismatch")
+        result = receipt.get("result", {})
+        worker_result = result.get("verification")
+        durable_put(ROOT / "delegated-basicops-observations", value["dispatch_id"],
+                    {"parent_run_id": value["parent_run_id"], "worker_result": worker_result})
+        consume(claimed, ROOT / "delegated-basicops-dispatched")
+
+
+def observe_human():
+    registry = json.loads(REGISTRY.read_text()); adapter = "/usr/local/libexec/lhm-workflow-registered-adapter"
+    claude = "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
+    ledger = ROOT / "delegated-human-observer-ledger"
+    for path in sorted((ROOT / "delegated-parents").glob("*.json")):
+        if path.name.startswith("."):
+            continue
+        state = STORE.load(path.stem)
+        if state["projection_pending"] is not None or state["state"] not in {"awaiting_plan_approval", "awaiting_delivery_review"}:
+            continue
+        target = validate_basicops_target(state, registry)
+        now = datetime.now(timezone.utc)
+        bucket = now.strftime("%Y%m%d%H") + f"{(now.minute // 5) * 5:02d}"
+        observe_id = f"human-observe-{state['parent_run_id']}-{state['generation']}-{bucket}"
+        marker = ledger / f"{observe_id}.json"
+        if marker.exists():
+            continue
+        durable_put(ledger, observe_id, {"status": "claimed", "parent_run_id": state["parent_run_id"]})
+        envelope = {"schema_version": 1, "operation": "claude_dispatch",
+            "argv": [claude, "observe-basicops-human-decision", target["client_slug"], target["handback_task_id"]],
+            "binding": {"observation_id": observe_id, "parent_run_id": state["parent_run_id"]}}
+        done = subprocess.run([adapter], input=json.dumps(envelope), text=True, capture_output=True, timeout=620, check=False)
+        if done.returncode:
+            raise RuntimeError(done.stderr or done.stdout or "human observation failed")
+        receipt = json.loads(done.stdout)
+        if receipt.get("binding") != envelope["binding"]:
+            raise RuntimeError("human observer binding mismatch")
+        verification = receipt.get("result", {}).get("verification", {})
+        for message in verification.get("messages", []):
+            if not str(message.get("body", "")).startswith("LHM decision:"):
+                continue
+            identity = "human-message-" + __import__("hashlib").sha256(canonical(message)).hexdigest()[:32]
+            durable_put(ROOT / "delegated-human-observations", identity,
+                        {"parent_run_id": state["parent_run_id"], "observed_message": message})
+
+
+def import_human():
+    private = Path("/var/lib/lhm-workflow/secrets/delegated-connector.private.pem")
+    incoming = ROOT / "delegated-human-observations"
+    for path in sorted(incoming.glob("*.json")):
+        envelope = json.loads(path.read_text()); parent = envelope["parent_run_id"]
+        state = STORE.load(parent)
+        event = closed_decision_observation(state, envelope["observed_message"], private)
+        operation = "plan-decision" if event["role"] == "human_approver" else "delivery-decision"
+        submit(parent, operation, event)
+        consume(path, ROOT / "delegated-human-observations-processed")
+
+
+def observe_workflow():
+    registry = json.loads(REGISTRY.read_text()); adapter = "/usr/local/libexec/lhm-workflow-registered-adapter"
+    claude = "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
+    ledger = ROOT / "delegated-workflow-observer-ledger"
+    for path in sorted((ROOT / "delegated-parents").glob("*.json")):
+        if path.name.startswith("."):
+            continue
+        state = STORE.load(path.stem)
+        if state["projection_pending"] is not None or state["state"] == "completed":
+            continue
+        target = validate_basicops_target(state, registry)
+        now = datetime.now(timezone.utc); bucket = now.strftime("%Y%m%d%H") + f"{(now.minute // 5) * 5:02d}"
+        observe_id = f"workflow-observe-{state['parent_run_id']}-{state['generation']}-{bucket}"
+        if (ledger / f"{observe_id}.json").exists():
+            continue
+        durable_put(ledger, observe_id, {"status":"claimed", "parent_run_id":state["parent_run_id"]})
+        envelope = {"schema_version":1, "operation":"claude_dispatch",
+            "argv":[claude, "observe-basicops-human-decision", target["client_slug"], target["handback_task_id"]],
+            "binding":{"observation_id":observe_id, "parent_run_id":state["parent_run_id"]}}
+        done = subprocess.run([adapter], input=json.dumps(envelope), text=True, capture_output=True, timeout=620, check=False)
+        if done.returncode:
+            raise RuntimeError(done.stderr or done.stdout or "workflow observation failed")
+        receipt=json.loads(done.stdout)
+        if receipt.get("binding") != envelope["binding"]:
+            raise RuntimeError("workflow observer binding mismatch")
+        verification=receipt.get("result",{}).get("verification",{})
+        for message in verification.get("messages",[]):
+            if not str(message.get("body","")).startswith("LHM workflow event:"):
+                continue
+            identity="workflow-message-"+__import__("hashlib").sha256(canonical(message)).hexdigest()[:32]
+            durable_put(ROOT/"delegated-workflow-observations", identity,
+                        {"parent_run_id":state["parent_run_id"], "observed_message":message})
+
+
+def import_workflow():
+    private=Path("/var/lib/lhm-workflow/secrets/delegated-connector.private.pem")
+    incoming=ROOT/"delegated-workflow-observations"
+    for path in sorted(incoming.glob("*.json")):
+        envelope=json.loads(path.read_text()); parent=envelope["parent_run_id"]
+        operation,event=closed_workflow_observation(STORE.load(parent), envelope["observed_message"], private)
+        submit(parent, operation, event)
+        consume(path, ROOT/"delegated-workflow-observations-processed")
+
+
+if len(sys.argv) != 2 or sys.argv[1] not in {"request", "dispatch", "observe-human", "observe-workflow", "import-projections", "import-human", "import-workflow"}:
+    raise SystemExit("usage: lhm-delegated-basicops-bridge request|dispatch|observe-human|observe-workflow|import-projections|import-human|import-workflow")
+{"request":request,"dispatch":dispatch,"observe-human":observe_human,"observe-workflow":observe_workflow,
+ "import-projections":import_projections,"import-human":import_human,"import-workflow":import_workflow}[sys.argv[1]]()

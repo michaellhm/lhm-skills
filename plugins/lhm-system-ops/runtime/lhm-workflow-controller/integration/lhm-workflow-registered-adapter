@@ -16,7 +16,7 @@ if set(request) != {"schema_version", "operation", "argv", "binding"} or request
     raise SystemExit(2)
 operation, argv = request["operation"], request["argv"]
 if operation == "claude_dispatch":
-    allowed = {"submit-seo-gsc-readonly", "submit-specialist-readonly", "submit-google-drive-client-file-create", "submit-basicops-task-discussion-update"}
+    allowed = {"submit-seo-gsc-readonly", "submit-specialist-readonly", "submit-google-drive-client-file-create", "submit-basicops-task-discussion-update", "submit-basicops-task-baton-transition", "observe-basicops-human-decision"}
     if not isinstance(argv, list) or len(argv) < 2 or argv[0] != DISPATCH or argv[1] not in allowed:
         raise SystemExit(3)
     done = subprocess.run([DOCKER, "exec", "-i", "--user", CONTAINER_USER, CONTAINER, *argv], text=True, capture_output=True, timeout=610, check=False)

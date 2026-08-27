@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+"""Dispatch one Barney action to an allowlisted durable role queue and receipt it."""
+from datetime import datetime, timezone
+import hashlib, hmac, json, os
+from pathlib import Path
+
+from lhm_workflow.barney_scheduler import BarneyScheduler, _atomic
+from lhm_workflow.delegated_task import canonical
+
+ROOT=Path(os.environ.get("LHM_WORKFLOW_ROOT","/var/lib/lhm-workflow"))
+KEY=ROOT/"secrets/barney-executor.key"
+ROUTES={
+    "retry_silently":"chief-of-staff",
+    "route_cto":"cto",
+    "notify_internal_owner":"basicops-notifications",
+    "escalate_internal_project_manager":"basicops-notifications",
+}
+
+for source in sorted((ROOT/"barney-actions/pending").glob("*.json")):
+    request=json.loads(source.read_text());action=request.get("action",{});route=ROUTES.get(action.get("action"))
+    if route is None: raise SystemExit("unregistered Barney action")
+    receipt_path=ROOT/"barney-actions/receipts"/f"{request['action_id']}.json"
+    if receipt_path.exists():
+        receipt=json.loads(receipt_path.read_text())
+        if (receipt.get("action_id"),receipt.get("parent_run_id"),receipt.get("state_generation"))!=(request["action_id"],request["parent_run_id"],request["state_generation"]):raise SystemExit("conflicting Barney receipt recovery")
+        source.unlink();continue
+    target=ROOT/"barney-dispatch"/route/f"{request['action_id']}.json";dispatch={"schema_version":1,"route":route,"request":request}
+    if target.exists():
+        if json.loads(target.read_text())!=dispatch:raise SystemExit("conflicting Barney dispatch replay")
+    else:_atomic(target,dispatch)
+    evidence=f"queued:{route}:{target.name}:{hashlib.sha256(canonical(dispatch)).hexdigest()}"
+    unsigned={"schema_version":1,"role":"barney_action_executor","action_id":request["action_id"],"parent_run_id":request["parent_run_id"],"state_generation":request["state_generation"],"disposition":"executed","evidence":[evidence],"executed_at":datetime.now(timezone.utc).isoformat()}
+    receipt={**unsigned,"attestation":hmac.new(KEY.read_bytes(),canonical(unsigned),hashlib.sha256).hexdigest()}
+    BarneyScheduler(None,ROOT).record_receipt(receipt,KEY.read_bytes())

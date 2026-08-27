@@ -139,7 +139,7 @@
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
       "description": "LHM project management hub — sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
-      "version": "0.1.81",
+      "version": "0.1.82",
       "category": "utilities",
       "tags": [
         "project-management",
@@ -156,7 +156,7 @@
       "name": "lhm-system-ops",
       "source": "./plugins/lhm-system-ops",
       "description": "Governed CTO operations and exact-ID evidence-to-production bridge.",
-      "version": "0.9.71",
+      "version": "0.9.72",
       "category": "utilities",
       "tags": ["cto", "source-retrieval", "production", "reliability"]
     }

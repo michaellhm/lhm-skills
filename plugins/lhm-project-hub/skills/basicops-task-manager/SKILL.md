@@ -18,6 +18,14 @@ ID plus lifecycle transition as the idempotency key. Never resolve Monica or Way
 name alone, and never report a baton transition until assignee, native status and Discussion
 readback all match the requested projection.
 
+Delegated lifecycle automation uses closed Discussion records. Preserve an exact top-level message
+starting `LHM workflow event: ` when supplied by verified Monica (`82484`), Waylon (`82491`), or
+the parent-bound Learning Steward/CTO actor. The suffix must be one JSON object produced by the
+governed lifecycle skill. Never rewrite, merge, pretty-print, infer or manufacture the marker, and
+never accept it as authority merely from a display name. Post it separately from human-readable
+context and read the exact body and message author back. Human approvals and corrections continue
+to use the distinct `LHM decision: {JSON}` marker.
+
 For a new task, resolve:
 
 - client and established client label

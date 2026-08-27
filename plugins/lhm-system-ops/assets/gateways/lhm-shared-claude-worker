@@ -57,9 +57,17 @@ drive_user_prompt = f'''Current Melbourne date: {melbourne_date}\nRegistered cli
 basicops_system_prompt = '''This is a host-enforced BasicOps task-discussion repair. First use ToolSearch only to load the specifically allowlisted BasicOps task lookup, message listing, message creation, read-back and native-link tools. Use no other discovered tool. The host already validated the client and exact existing task ID. Do not create, update, complete, move, assign, date, or otherwise mutate any task. Retrieve the task and existing discussion first. If the exact discussion exists, do not duplicate it. Otherwise create one top-level task discussion message. Read it back and obtain native task/message links. Return JSON only with keys: verification (passed|failed), action (created|already_existed|refused), task_id, task_title, task_link, message_id, message_link, checks, error. verification may be passed only after the exact message is read back on the exact task.'''
 basicops_user_prompt = f'''Current Melbourne date: {melbourne_date}\nRegistered client: {prompt_data.get('client_name')} ({prompt_data.get('client')})\nExact BasicOps task ID: {prompt_data.get('task_id')}\n\n---BEGIN DISCUSSION---\n{prompt_data.get('discussion')}\n---END DISCUSSION---\n\nCreate or verify this exact discussion on this exact existing task and perform the read-back checks.'''
 
+baton_system_prompt = '''This is a host-enforced delegated BasicOps baton transition. Use only the allowlisted exact-task lookup, task update, task Discussion create/list/readback and native-link tools. First read the task and capture its current updated/revision value. If the exact Discussion payload does not already exist, create it once. Update only assignee and native status on the existing task; never create, move, date, archive or alter title, description, project or section. Read the task and exact message back. Return JSON only with keys: verification, event_id, task_id, assignee_user_id, native_status, review_type, discussion_message_id, discussion_body_sha256, task_revision_before, task_revision_after, task_url, readback_observed_at, checks, error. verification may pass only when all requested fields and the exact Discussion body match after readback.'''
+baton_user_prompt = f'''Current Melbourne date: {melbourne_date}\nRequired event ID: {prompt_data.get('event_id')}\nExact BasicOps task ID: {prompt_data.get('task_id')}\nRequired assignee user ID: {prompt_data.get('assignee_user_id')}\nRequired native status: {prompt_data.get('native_status')}\nReview type: {prompt_data.get('review_type')}\nRequired Discussion SHA-256: {prompt_data.get('discussion_sha256')}\n\n---BEGIN CANONICAL DISCUSSION PAYLOAD---\n{prompt_data.get('discussion')}\n---END CANONICAL DISCUSSION PAYLOAD---\n\nApply or verify this exact idempotent baton transition and perform the final readback.'''
+
+observer_system_prompt = '''Strictly read-only BasicOps marker observation. Use only exact-task lookup and Discussion list/read tools. Never mutate or reply. Return JSON only with keys verification, task_id, task_revision, observed_at, messages, checks, error. Include only messages whose complete body starts exactly `LHM decision:` or `LHM workflow event:`. Each message has exactly message_id, author_user_id, task_id, task_revision, observed_at, body copied verbatim. Never interpret, infer, repair or rewrite a marker.'''
+observer_user_prompt = f'''Current Melbourne date: {melbourne_date}\nExact BasicOps task ID: {prompt_data.get('task_id')}\nReturn only exact closed LHM decision and workflow-event marker observations.'''
+
 is_marketing = prompt_data.get('agent_id') == 'lhm-marketing-hub:start'
 is_drive = profile == 'google_drive_client_file_create'
 is_basicops = profile == 'basicops_task_discussion_update'
+is_baton = profile == 'basicops_task_baton_transition'
+is_observer = profile == 'basicops_human_decision_observe'
 is_specialist = profile == 'specialist_readonly'
 is_producer = profile == 'html_artifact_producer'
 is_gsc = profile == 'seo_gsc_readonly'
@@ -75,6 +83,16 @@ elif is_drive:
     agent, max_turns, budget = None, '12', '4.00'
     allowed_tools = ','.join(['mcp__claude_ai_Google_Drive__search_files', 'mcp__claude_ai_Google_Drive__create_file', 'mcp__claude_ai_Google_Drive__get_file_metadata', 'mcp__claude_ai_Google_Drive__read_file_content', 'mcp__claude_ai_Google_Drive__download_file_content'])
     provisioned_tools = ''
+elif is_baton:
+    system_prompt, user_prompt = baton_system_prompt, baton_user_prompt
+    agent, max_turns, budget = None, '16', '5.00'
+    allowed_tools = ','.join(['ToolSearch', 'mcp__basicops__get_task', 'mcp__basicops__update_task', 'mcp__basicops__list_messages_in_task', 'mcp__basicops__create_message_in_task', 'mcp__basicops__get_message', 'mcp__basicops__link_to_task', 'mcp__basicops__link_to_message'])
+    provisioned_tools = 'ToolSearch'
+elif is_observer:
+    system_prompt, user_prompt = observer_system_prompt, observer_user_prompt
+    agent, max_turns, budget = None, '10', '3.00'
+    allowed_tools = ','.join(['ToolSearch', 'mcp__basicops__get_task', 'mcp__basicops__list_messages_in_task', 'mcp__basicops__get_message'])
+    provisioned_tools = 'ToolSearch'
 elif is_basicops:
     system_prompt, user_prompt = basicops_system_prompt, basicops_user_prompt
     agent, max_turns, budget = None, '12', '4.00'
@@ -109,12 +127,12 @@ if is_producer or is_specialist:
     command.extend(['--strict-mcp-config', '--mcp-config', '/home/claudeworker/.config/lhm-bridge/no-mcp.json'])
 elif is_gsc:
     command.extend(['--strict-mcp-config', '--mcp-config', '/home/claudeworker/.config/lhm-bridge/seo-gsc-readonly.mcp.json'])
-elif not (is_drive or is_basicops):
+elif not (is_drive or is_basicops or is_baton or is_observer):
     command.extend(['--strict-mcp-config', '--mcp-config', '/home/claudeworker/.config/lhm-bridge/google-ads-readonly.mcp.json'])
 
 env = os.environ.copy()
 env['PATH'] = '/home/claudeworker/.local/bin:/usr/local/bin:/usr/bin:/bin'
-worker_home = '/home/claudeworker-repair' if (is_drive or is_basicops) else '/home/claudeworker'
+worker_home = '/home/claudeworker-repair' if (is_drive or is_basicops or is_baton or is_observer) else '/home/claudeworker'
 env['HOME'] = worker_home
 emit('started', 'Bounded HTML artifact production started.' if is_producer else 'Search Console read-only run started.' if is_gsc else 'Scoped Google Drive repair started.' if is_drive else 'Scoped BasicOps discussion repair started.' if is_basicops else 'Delegate-first specialist run started.' if is_specialist else 'Claude read-only run started.')
 try:
@@ -154,7 +172,7 @@ try:
                                 else set())
     skill_verified = not is_observed_skill_profile or required_observed_skills.issubset(set(skill_calls))
     repair_result = None
-    if (is_drive or is_basicops) and isinstance(result, str):
+    if (is_drive or is_basicops or is_baton or is_observer) and isinstance(result, str):
         cleaned = result.strip()
         if cleaned.startswith('```json'):
             cleaned = cleaned[7:]
@@ -165,9 +183,26 @@ try:
         except json.JSONDecodeError:
             repair_result = None
     repair_verified = isinstance(repair_result, dict) and repair_result.get('verification') == 'passed'
+    if is_baton and repair_verified:
+        required_baton = {'verification','event_id','task_id','assignee_user_id','native_status','review_type','discussion_message_id','discussion_body_sha256','task_revision_before','task_revision_after','task_url','readback_observed_at','checks','error'}
+        repair_verified = (set(repair_result)==required_baton and str(repair_result.get('event_id'))==str(prompt_data.get('event_id'))
+            and str(repair_result.get('task_id'))==str(prompt_data.get('task_id')) and str(repair_result.get('assignee_user_id'))==str(prompt_data.get('assignee_user_id'))
+            and repair_result.get('native_status')==prompt_data.get('native_status') and repair_result.get('review_type')==prompt_data.get('review_type')
+            and repair_result.get('discussion_body_sha256')==prompt_data.get('discussion_sha256') and isinstance(repair_result.get('checks'),list) and bool(repair_result.get('checks'))
+            and all(repair_result.get(key) for key in ('discussion_message_id','task_revision_before','task_revision_after','task_url','readback_observed_at')))
+    if is_observer and repair_verified:
+        required_observer = {'verification','task_id','task_revision','observed_at','messages','checks','error'}
+        repair_verified = (set(repair_result)==required_observer
+            and str(repair_result.get('task_id'))==str(prompt_data.get('task_id'))
+            and isinstance(repair_result.get('messages'),list)
+            and isinstance(repair_result.get('checks'),list) and bool(repair_result.get('checks'))
+            and all(set(item)=={'message_id','author_user_id','task_id','task_revision','observed_at','body'}
+                    and str(item.get('task_id'))==str(prompt_data.get('task_id'))
+                    and isinstance(item.get('body'),str) and item['body'].startswith('LHM decision:')
+                    for item in repair_result.get('messages',[])))
     producer_html = result.strip() if is_producer and isinstance(result, str) else ''
     producer_valid = not is_producer or (producer_html.lower().startswith('<!doctype html') and producer_html.lower().endswith('</html>') and len(producer_html.encode('utf-8')) <= 200000)
-    valid = completed.returncode == 0 and isinstance(result, str) and result.strip() and producer_valid and skill_verified and (not (is_drive or is_basicops) or repair_verified)
+    valid = completed.returncode == 0 and isinstance(result, str) and result.strip() and producer_valid and skill_verified and (not (is_drive or is_basicops or is_baton or is_observer) or repair_verified)
     if valid:
         if is_observed_skill_profile:
             provenance = {
@@ -185,7 +220,7 @@ try:
             output_bytes = output_path.read_bytes()
             receipt = {'artifact_file': output_path.name, 'artifact_path': str(output_path), 'size_bytes': len(output_bytes), 'sha256': hashlib.sha256(output_bytes).hexdigest(), 'source_sha256': prompt_data['source_sha256']}
         (run_dir / 'result.md').write_text(result.strip() + '\n', encoding='utf-8')
-        final = {'run_id': run_dir.name, 'status': 'completed' if (is_drive or is_basicops or is_producer) else 'needs_review', 'profile': profile, 'agent_id': prompt_data['agent_id'], 'completed_at': datetime.now(timezone.utc).isoformat(), 'result_file': 'result.md'}
+        final = {'run_id': run_dir.name, 'status': 'completed' if (is_drive or is_basicops or is_baton or is_observer or is_producer) else 'needs_review', 'profile': profile, 'agent_id': prompt_data['agent_id'], 'completed_at': datetime.now(timezone.utc).isoformat(), 'result_file': 'result.md'}
         final['workflow_contract'] = {
             'workflow_id': prompt_data.get('workflow_id'),
             'required_skills': prompt_data.get('required_skills', []),
@@ -199,7 +234,7 @@ try:
         if is_observed_skill_profile:
             final['skill_provenance_file'] = 'skill-provenance.json'
         (run_dir / 'final.json').write_text(json.dumps(final, indent=2) + '\n', encoding='utf-8')
-        emit('completed', 'HTML artifact produced with durable receipt.' if is_producer else 'Connector repair completed and verified.' if (is_drive or is_basicops) else 'Read-only result ready for review.')
+        emit('completed', 'HTML artifact produced with durable receipt.' if is_producer else 'Connector repair completed and verified.' if (is_drive or is_basicops or is_baton) else 'Read-only result ready for review.')
     else:
         missing_skills = sorted(required_observed_skills - set(skill_calls)) if is_observed_skill_profile else []
         error = (f'missing required Skill tool calls: {missing_skills}' if missing_skills else completed.stderr or raw or f'Claude exited {completed.returncode}')[:4000]
@@ -214,7 +249,7 @@ try:
         if repair_result:
             final['verification'] = repair_result
         (run_dir / 'final.json').write_text(json.dumps(final, indent=2) + '\n', encoding='utf-8')
-        emit('failed', 'Connector repair did not pass read-back verification.' if (is_drive or is_basicops) else 'Claude did not return a valid result.')
+        emit('failed', 'Connector repair did not pass read-back verification.' if (is_drive or is_basicops or is_baton) else 'Claude did not return a valid result.')
 except subprocess.TimeoutExpired:
     (run_dir / 'final.json').write_text(json.dumps({'run_id': run_dir.name, 'status': 'failed', 'profile': profile, 'agent_id': prompt_data['agent_id'], 'completed_at': datetime.now(timezone.utc).isoformat(), 'error': 'timeout', 'workflow_contract': {'workflow_id': prompt_data.get('workflow_id'), 'required_skills': prompt_data.get('required_skills', []), 'required_capabilities': prompt_data.get('required_capabilities', []), 'skill_provenance': prompt_data.get('skill_provenance_mode', 'declared_only')}}, indent=2) + '\n', encoding='utf-8')
     emit('failed', 'Run timed out.')

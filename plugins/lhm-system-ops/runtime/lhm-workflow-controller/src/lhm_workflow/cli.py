@@ -45,6 +45,14 @@ def main() -> None:
             result = ctl.departmental_init(_stdin_json())
         elif command == "department-status" and len(sys.argv) == 3:
             result = ctl.departmental.load(sys.argv[2])
+        elif command == "delegated-init" and len(sys.argv) == 2:
+            result = ctl.delegated_init(_stdin_json())
+        elif command == "delegated-status" and len(sys.argv) == 3:
+            result = ctl.delegated.load(sys.argv[2])
+        elif command == "delegated-monitor-all" and len(sys.argv) == 2:
+            result = ctl.barney.run(**_stdin_json())
+        elif command == "delegated-monitor-receipt" and len(sys.argv) == 2:
+            result = ctl.barney.record_receipt(_stdin_json(), (ctl.secrets / "barney-executor.key").read_bytes())
         elif command == "tracker-cas-readback" and len(sys.argv) == 3:
             vault_override = os.environ.get("LHM_TRACKER_VAULT")
             if vault_override:
@@ -57,6 +65,8 @@ def main() -> None:
             result = {"path": str(TrackerConnector(vault).path.relative_to(vault)), "sha256": receipt["sha256"], "readback_sha256": receipt["sha256"], "cas": True}
         elif command in {"department-issue", "department-candidate", "department-qa-accept", "department-lead-accept", "department-project", "department-revise-inputs", "department-complete-dossier", "department-approval-event"} and len(sys.argv) == 3:
             result = ctl.departmental_transition(sys.argv[2], command.removeprefix("department-"), _stdin_json())
+        elif command in {"delegated-post-plan", "delegated-plan-decision", "delegated-chief-start", "delegated-review-ready", "delegated-delivery-decision", "delegated-chief-complete", "delegated-heartbeat", "delegated-project", "delegated-steward-disposition", "delegated-correction-fixed", "delegated-capability-restored", "delegated-monitor"} and len(sys.argv) == 3:
+            result = ctl.delegated_transition(sys.argv[2], command.removeprefix("delegated-"), _stdin_json())
         elif command == "recover" and len(sys.argv) == 2:
             result = ctl.recover()
         else:

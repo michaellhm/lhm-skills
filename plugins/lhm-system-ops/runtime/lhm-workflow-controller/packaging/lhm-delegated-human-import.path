@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch closed BasicOps human decision observations
+
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/delegated-human-observations/*.json
+Unit=lhm-delegated-human-import.service
+
+[Install]
+WantedBy=multi-user.target

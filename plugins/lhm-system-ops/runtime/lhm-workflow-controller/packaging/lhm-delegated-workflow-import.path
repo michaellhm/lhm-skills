@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch closed BasicOps AI workflow observations
+
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/delegated-workflow-observations/*.json
+Unit=lhm-delegated-workflow-import.service
+
+[Install]
+WantedBy=multi-user.target

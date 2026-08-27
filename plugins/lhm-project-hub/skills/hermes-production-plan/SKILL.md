@@ -85,6 +85,12 @@ Approval required: <exact approver and scope, or none — task authorises routin
 Next handoff: <person/role and trigger>
 ```
 
+Immediately after the human-readable plan, Monica must post a separate exact closed marker whose
+entire body is `LHM workflow event: {JSON}`. The JSON operation is `post-plan` and contains only
+`event_id`, `operation`, `plan` and `handoff`. Do not wrap it in Markdown or add prose. The
+read-only observer copies it verbatim and the governed connector accepts it only from verified
+Monica user `82484`; the marker is the durable controller ingress, not a status comment.
+
 Include working links only when they help execution. Keep detailed research and machine state in their canonical systems rather than dumping them into BasicOps.
 
 When readiness is blocked, post the gap and first resolution action instead of a fictional execution plan.
@@ -116,6 +122,14 @@ The Chief of Staff handoff contains:
 - authoritative artefact destination;
 - required delivery manifest and `drive-artifact-delivery` step, or the approved `not_required` reason;
 - return point to Monica on `ready_for_review`, `needs_context`, `waiting_on_capability` or terminal failure.
+
+At every Chief of Staff lifecycle boundary, Waylon must add a separate exact `LHM workflow event:
+{JSON}` Discussion marker using only the registered operation schema: `chief-start`, `heartbeat`,
+`review-ready`, `correction-fixed` or `chief-complete`. The connector accepts these markers only
+from verified Waylon user `82491`. Learning Steward uses `steward-disposition`; CTO uses
+`capability-restored`; each is accepted only from the verified actor recorded on the same parent.
+Never put credentials, arbitrary commands, extra fields or prose inside a marker. Reuse the same
+event ID on retry so the observer/controller can suppress replay.
 
 If the plan materially changes, increment the version, assign the same task back to verified Monica
 AI user `82484`, and obtain fresh human approval. Preserve completed verified work where safe. Do

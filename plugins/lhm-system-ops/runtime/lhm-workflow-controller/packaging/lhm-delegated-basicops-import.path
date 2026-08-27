@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch verified delegated BasicOps projection observations
+
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/delegated-basicops-observations/*.json
+Unit=lhm-delegated-basicops-import.service
+
+[Install]
+WantedBy=multi-user.target

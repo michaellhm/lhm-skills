@@ -1,0 +1,10 @@
+[Unit]
+Description=Poll delegated human review gates every five minutes
+
+[Timer]
+OnCalendar=*:0/5
+Persistent=true
+Unit=lhm-delegated-human-observe.service
+
+[Install]
+WantedBy=timers.target

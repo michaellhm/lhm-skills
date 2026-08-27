@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch delegated task state for pending BasicOps projections
+
+[Path]
+PathChanged=/var/lib/lhm-workflow/delegated-parents
+Unit=lhm-delegated-basicops-request.service
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Watch bounded Barney role queues
+
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/barney-dispatch/chief-of-staff/*.json
+PathExistsGlob=/var/lib/lhm-workflow/barney-dispatch/cto/*.json
+PathExistsGlob=/var/lib/lhm-workflow/barney-dispatch/basicops-notifications/*.json
+Unit=lhm-barney-downstream-consumer.service
+
+[Install]
+WantedBy=multi-user.target

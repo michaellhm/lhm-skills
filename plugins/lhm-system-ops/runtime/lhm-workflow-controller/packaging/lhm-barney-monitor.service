@@ -1,0 +1,14 @@
+[Unit]
+Description=LHM Barney delegated-work monitor
+After=local-fs.target
+
+[Service]
+Type=oneshot
+User=lhmworkflow
+Group=lhmworkflow
+ExecStart=/usr/local/libexec/lhm-barney-monitor
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/lhm-workflow
