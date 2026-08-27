@@ -46,3 +46,6 @@ def test_delegated_dispatch_coalesces_same_id_and_refuses_different_content():
     assert 'delegated-basicops-coalesced' in bridge
     assert 'delegated-basicops-coalesced' in installer
     assert '"delegated-basicops-dispatched", "delegated-basicops-observations"' in bridge
+    assert 'same delegated queue ID has different terminal content' in bridge
+    assert 'delegated-basicops-observations-failed" / "payloads"' in bridge
+    assert 'except RuntimeError:\n            raise' in bridge

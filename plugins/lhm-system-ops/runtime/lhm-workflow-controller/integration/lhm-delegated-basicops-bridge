@@ -21,7 +21,13 @@ CONTROLLER = os.environ.get("LHM_WORKFLOW_CLI", "/opt/lhm-workflow/current/venv/
 
 def consume(path, destination):
     destination.mkdir(parents=True, exist_ok=True)
-    os.replace(path, destination / path.name)
+    target = destination / path.name
+    if target.exists():
+        if target.read_bytes() != path.read_bytes():
+            raise RuntimeError("same delegated queue ID has different terminal content")
+        path.unlink()
+        return
+    os.replace(path, target)
 
 
 def reject_observation(path, destination, error):
@@ -40,9 +46,11 @@ def request():
             continue
         value = projection_request(state, registry)
         dispatch_name = f"{value['dispatch_id']}.json"
-        if any((ROOT / queue / dispatch_name).exists() for queue in (
+        if (any((ROOT / queue / dispatch_name).exists() for queue in (
                 "delegated-basicops-requests", "delegated-basicops-inflight",
-                "delegated-basicops-dispatched", "delegated-basicops-observations")):
+                "delegated-basicops-dispatched", "delegated-basicops-observations",
+                "delegated-basicops-observations-processed"))
+                or (ROOT / "delegated-basicops-observations-failed" / "payloads" / dispatch_name).exists()):
             continue
         durable_put(ROOT / "delegated-basicops-requests", value["dispatch_id"], value)
 
@@ -64,7 +72,9 @@ def import_projections():
             receipt = signed_projection_import(state, envelope["worker_result"], private)
             submit(parent, "project", receipt)
             consume(path, ROOT / "delegated-basicops-observations-processed")
-        except (ValueError, KeyError, json.JSONDecodeError, RuntimeError) as exc:
+        except RuntimeError:
+            raise
+        except (ValueError, KeyError, json.JSONDecodeError) as exc:
             reject_observation(path, ROOT / "delegated-basicops-observations-failed", exc)
 
 
@@ -94,6 +104,18 @@ def dispatch():
                 os.replace(path, claimed)
             except FileNotFoundError:
                 continue
+        terminal_paths = (
+            ROOT / "delegated-basicops-dispatched" / claimed.name,
+            ROOT / "delegated-basicops-observations" / claimed.name,
+            ROOT / "delegated-basicops-observations-processed" / claimed.name,
+            ROOT / "delegated-basicops-observations-failed" / "payloads" / claimed.name,
+        )
+        terminal = next((item for item in terminal_paths if item.exists()), None)
+        if terminal is not None:
+            if terminal.read_bytes() != claimed.read_bytes() and terminal.parent.name == "delegated-basicops-dispatched":
+                raise RuntimeError("duplicate delegated dispatch ID has different terminal content")
+            consume(claimed, ROOT / "delegated-basicops-coalesced")
+            continue
         value = json.loads(claimed.read_text())
         argv = [claude, "submit-basicops-task-baton-transition", value["client_slug"],
                 value["task_id"], value["assignee_user_id"], value["native_status"],

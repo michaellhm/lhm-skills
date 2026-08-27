@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r10",
-  "version": "0.1.51",
+  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r11",
+  "version": "0.1.52",
   "source_baseline": "project-hub-0.1.80-release-6f9646f",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -61,9 +61,11 @@
     "idempotent_unknown_outcome_reconciliation_without_manual_repair",
     "one_use_hmac_release_authorization_bound_to_commit_archive_source_action_and_enablement",
     "incomplete_basicops_worker_results_remain_retryable",
-    "same_id_projection_requests_are_coalesced_before_dispatch"
+    "same_id_projection_requests_are_coalesced_before_dispatch",
+    "transient_projection_import_failures_preserve_retryable_observations",
+    "terminal_queue_evidence_is_immutable"
   ],
-  "source_tree_sha256_excluding_manifest": "a6f47b0614dc9c1f38bbb41ef0cbdc29985072f78fba9ba4ad3838e7d0ff4e5c",
+  "source_tree_sha256_excluding_manifest": "10383455ee96da4e39cfbaccfb7b4690c8f576d7d5b0fcdffa424f26c4a1fc75",
   "critical_files": {
     "src/lhm_workflow/seo_envelope_runtime.py": "ef55bce61485239187f3c4885227f8efb878c4d77dde6ef0cfeee2a0877e77a6",
     "src/lhm_workflow/cli.py": "581e024c8346578e2496f492f441c887ccb8d9ea9afe4c500a3c1740f3ddf4c4",
@@ -106,7 +108,7 @@
     "src/lhm_workflow/barney_consumer.py": "2fe3ac9dcdb3c09a47e58f9415737f036ef8b1e5448223850a067f9bc3c75e1d",
     "integration/lhm-claude-dispatcher.live-reference": "6da36c84a2c87735e653500ba4b620959884f534979a59200fc3d8b51fffbe4b",
     "integration/lhm-claude-worker.live-reference": "80687b03967a807ab7580f7a1e7c87428b8da47085e23d2955e1e657a28d8aa2",
-    "integration/lhm-delegated-basicops-bridge": "a697504dcea8c564173f02941e4af3cccb268eb23fe05f1091108adf47aa4534",
+    "integration/lhm-delegated-basicops-bridge": "aab3f3d35be06ce57f2353e7c0ca07cec95aa0542fea7735097b0a53567291e4",
     "integration/lhm-barney-action-executor": "bd406c371d3c6a10f0966f32217b5b9f76673d4350390c03595f0c323f701285",
     "integration/lhm-barney-downstream-consumer": "379f6c72f71ea64d92cce9c04c06d0ca0fb77a3ff9fdb01a40cfc52dbc8f2eab",
     "integration/lhm-barney-monitor": "13969cdc0eff3469c219238a03e17f88034454462df87b24db7a153b6936f218",
