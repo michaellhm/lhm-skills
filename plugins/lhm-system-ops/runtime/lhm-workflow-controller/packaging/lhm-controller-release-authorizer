@@ -100,7 +100,7 @@ def execute(action,approval_path,archive_path,repo,key_path,ledger,claim_dir=Pat
     validate(approval,key,action=action,archive_sha256=archive_sha,source_tree_release_id=source_id,git_commit=commit,now=int(time.time() if now is None else now))
     claim=claim_once(ledger,claim_dir,approval) # Permanent nonce ledger plus ephemeral claim consumed by the child.
     environment={**os.environ,"LHM_RELEASE_APPROVAL_CLAIM":str(claim),"LHM_WORKFLOW_RELEASE_ID":source_id,"LHM_WORKFLOW_ENABLE":"1" if approval["enablement"]["workflow"] else "0","LHM_BARNEY_ENABLE":"1" if approval["enablement"]["barney"] else "0","LHM_DELEGATED_ENABLE":"1" if approval["enablement"]["delegated"] else "0"}
-    command=[str(repo/"packaging/install.sh")] if action=="install" else [str(repo/"packaging/rollback.sh"),approval["rollback_target"]]
+    command=["/bin/sh",str(repo/"packaging/install.sh")] if action=="install" else ["/bin/sh",str(repo/"packaging/rollback.sh"),approval["rollback_target"]]
     return run(command,env=environment,check=True)
 
 def main():
