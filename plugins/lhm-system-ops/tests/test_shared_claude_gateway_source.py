@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.14"
+    assert MANIFEST["release_version"] == "0.9.15"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -148,6 +148,12 @@ def test_baton_verifies_canonical_text_across_basicops_html_transport():
     assert "Never hash the stored HTML" in worker
     assert "checks must be a non-empty JSON array" in worker
     assert 'verification must be exactly "passed" or "failed"' in worker
+
+
+def test_observer_requires_closed_verification_enum_and_full_timestamp():
+    worker = (PLUGIN / MANIFEST["assets"]["worker"]["source"]).read_text()
+    assert 'verification must be exactly "passed" or "failed", never "pass"' in worker
+    assert "observed_at must be a full ISO-8601 timestamp" in worker
 
 
 def test_root_owned_contract_table_pins_every_live_workflow_and_route():

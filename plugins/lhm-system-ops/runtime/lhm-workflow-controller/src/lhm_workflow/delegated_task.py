@@ -595,13 +595,18 @@ class DelegatedTaskStore:
                     ):
                         raise ValueError("delegated task or dedupe key already bound to another parent")
             value["generation"] = 1 if observed is None else observed + 1
+            existing_stat = path.stat() if path.exists() else None
             fd, temporary = tempfile.mkstemp(dir=self.root, prefix=f".{path.name}.")
             try:
                 with os.fdopen(fd, "wb") as handle:
                     handle.write(canonical(value) + b"\n")
                     handle.flush()
                     os.fsync(handle.fileno())
-                os.chmod(temporary, 0o600)
+                    if existing_stat is not None:
+                        temporary_stat = os.fstat(handle.fileno())
+                        if (temporary_stat.st_uid, temporary_stat.st_gid) != (existing_stat.st_uid, existing_stat.st_gid):
+                            os.fchown(handle.fileno(), existing_stat.st_uid, existing_stat.st_gid)
+                os.chmod(temporary, (existing_stat.st_mode & 0o777) if existing_stat is not None else 0o600)
                 os.replace(temporary, path)
                 directory = os.open(self.root, os.O_RDONLY)
                 os.fsync(directory)

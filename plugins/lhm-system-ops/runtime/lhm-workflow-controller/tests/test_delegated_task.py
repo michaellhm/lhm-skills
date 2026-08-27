@@ -254,8 +254,10 @@ def test_new_progress_heartbeat_restores_one_safe_retry_budget():
 def test_store_cas_rejects_stale_checkpoint_and_survives_reload(tmp_path):
     store = DelegatedTaskStore(tmp_path)
     one = store.checkpoint(initial(), expected_generation=None)
+    store.path("delegated-1").chmod(0o640)
     projected, _ = project(one, "p0")
     two = store.checkpoint(projected, expected_generation=1)
+    assert store.path("delegated-1").stat().st_mode & 0o777 == 0o640
     with pytest.raises(ValueError, match="stale"):
         store.checkpoint(one, expected_generation=1)
     assert store.load("delegated-1") == two
