@@ -4,7 +4,7 @@
   "release_version": "1.0.9",
   "source": "assets/host/lhm-approved-project-hub-deployer",
   "destination": "/usr/local/libexec/lhm-approved-project-hub-deployer",
-  "sha256": "aa00db8a86338c26ccf60639a40155b7b6965d5afc2eca1c4fa7c631a7348678",
+  "sha256": "b16095cb398dc0b7dec54d0a99b0b1adff4f0860a057ec4c4c220f71865fff65",
   "size_bytes": 19318,
   "owner": "root",
   "group": "root",
