@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .delegated_connector import human_decision_event, projection_receipt
@@ -90,6 +91,10 @@ def signed_projection_import(state: dict, worker_result: dict, private_key: Path
     } or worker_result["verification"] != "passed" or not worker_result["checks"]:
         raise ValueError("invalid delegated BasicOps worker observation")
     observation = {key: value for key, value in worker_result.items() if key not in {"checks", "error"}}
+    # The adapter, not the language-model worker, is the trusted observer. Stamp
+    # the receipt at the signing boundary so a model-formatted date cannot weaken
+    # or invalidate otherwise verified readback evidence.
+    observation["readback_observed_at"] = datetime.now(timezone.utc).isoformat()
     return projection_receipt(state, observation, private_key)
 
 

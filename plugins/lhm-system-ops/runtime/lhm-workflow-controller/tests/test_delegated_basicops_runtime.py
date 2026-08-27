@@ -53,6 +53,12 @@ def test_projection_worker_observation_is_signed_only_after_exact_validation(tmp
         "readback_observed_at": "2026-08-27T10:00:00+10:00", "checks": ["readback"], "error": None}
     receipt = signed_projection_import(state, result, private)
     assert authenticated(receipt, public, "basicops_connector")
+    assert receipt["mutation"]["readback_observed_at"] != result["readback_observed_at"]
+    assert receipt["mutation"]["readback_observed_at"].endswith("+00:00")
+    receipt_from_date_only_worker = signed_projection_import(
+        state, {**result, "readback_observed_at": "2026-08-27"}, private)
+    assert authenticated(receipt_from_date_only_worker, public, "basicops_connector")
+    assert receipt_from_date_only_worker["mutation"]["readback_observed_at"].endswith("+00:00")
     with pytest.raises(ValueError):
         signed_projection_import(state, {**result, "task_id": "999"}, private)
 
