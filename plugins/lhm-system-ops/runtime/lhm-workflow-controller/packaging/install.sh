@@ -180,6 +180,7 @@ chmod 0644 /var/lib/lhm-workflow/public/evidence-attestor.public.pem
 
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-workflow-*.service "$repo_dir"/packaging/lhm-workflow-*.path /etc/systemd/system/
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-scheduled-work.service "$repo_dir"/packaging/lhm-scheduled-work.path /etc/systemd/system/
+install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-seo-envelope-runtime.service /etc/systemd/system/
 install -d -o root -g root -m 0755 "$release_dir/integration"
 install -D -o root -g root -m 0755 "$repo_dir"/integration/lhm-org-role-adapter "$release_dir"/integration/lhm-org-role-adapter
 sh "$repo_dir"/packaging/provision-scheduled-signers.sh
