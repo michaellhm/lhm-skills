@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.9.18",
+  "release_version": "0.9.19",
   "captured_at": "2026-08-27",
   "source": "source candidate derived from exact live predecessor hashes",
   "assets": {
@@ -18,12 +18,12 @@
     "worker": {
       "source": "assets/gateways/lhm-shared-claude-worker",
       "destination": "/usr/local/libexec/lhm-claude-worker",
-      "sha256": "df12d268ed665b40103c4812f22d865b2e108a03f60ed30dbebec87ebdf876bb",
-      "previous_sha256": "53e46d78c9d77241a5bbdd4ed74d4839bdba52fb1082c1b1f78359e324ac4ec5",
+      "sha256": "10c681dccdfdcb78df154c35816c11e45a7a51e8b381dadeb5e3bbb83c665401",
+      "previous_sha256": "df12d268ed665b40103c4812f22d865b2e108a03f60ed30dbebec87ebdf876bb",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 28013
+      "size_bytes": 28274
     },
     "dispatch_unit": {
       "source": "assets/systemd/lhm-claude-dispatch.service",
