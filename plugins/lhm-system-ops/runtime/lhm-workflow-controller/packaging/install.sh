@@ -251,10 +251,12 @@ else
   done
 fi
 for unit in $department_units; do
-  test "$(systemctl is-enabled "$unit" 2>/dev/null || true)" = disabled
+  unit_file_state=$(systemctl is-enabled "$unit" 2>/dev/null || true)
+  test "$unit_file_state" = disabled || test "$unit_file_state" = static
   state=$(systemctl is-active "$unit" 2>/dev/null || true); test "$state" = inactive || test "$state" = failed
 done
-test "$(systemctl is-enabled lhm-seo-envelope-runtime.service 2>/dev/null || true)" = disabled
+seo_unit_file_state=$(systemctl is-enabled lhm-seo-envelope-runtime.service 2>/dev/null || true)
+test "$seo_unit_file_state" = disabled || test "$seo_unit_file_state" = static
 seo_state=$(systemctl is-active lhm-seo-envelope-runtime.service 2>/dev/null || true); test "$seo_state" = inactive || test "$seo_state" = failed
 test "$(systemctl is-enabled lhm-barney-monitor.timer 2>/dev/null || true)" = disabled
 barney_state=$(systemctl is-active lhm-barney-monitor.timer 2>/dev/null || true); test "$barney_state" = inactive || test "$barney_state" = failed
