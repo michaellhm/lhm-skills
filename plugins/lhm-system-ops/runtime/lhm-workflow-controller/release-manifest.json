@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r22",
-  "version": "0.1.63",
+  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r23",
+  "version": "0.1.64",
   "source_baseline": "project-hub-0.1.80-release-6f9646f",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -75,9 +75,11 @@
     "observer_diagnostic_check_maps_are_normalised_at_the_host_boundary",
     "observer_normalises_one_basicops_outer_paragraph_transport_wrapper",
     "plan_handoff_names_the_verified_human_approver",
-    "basicops_under_review_uses_native_request_review"
+    "basicops_under_review_uses_native_request_review",
+    "barney_basicops_watchlist_for_tasks_outside_controller_state",
+    "barney_monitor_network_credential_and_durable_watch_install"
   ],
-  "source_tree_sha256_excluding_manifest": "b64363d6f09e0eb699085041a721820044a0ec4fa8eb1b955c058623a03d3334",
+  "source_tree_sha256_excluding_manifest": "9bd5a4459b3d4ee12f3e3e7754db4379053ed65cfb0d684d9b98f9b19bff0deb",
   "critical_files": {
     "src/lhm_workflow/seo_envelope_runtime.py": "ef55bce61485239187f3c4885227f8efb878c4d77dde6ef0cfeee2a0877e77a6",
     "src/lhm_workflow/cli.py": "581e024c8346578e2496f492f441c887ccb8d9ea9afe4c500a3c1740f3ddf4c4",
@@ -91,8 +93,10 @@
     "integration/lhm-workflow-registered-adapter": "6a453e7c95f7a501bacaa15835153dec3f5c502bab9a1797280b6d70857b5056",
     "integration/lhm-org-role-adapter": "e6144938b1db22e061e0f2924987cefa7bd7d8215aa87716b8ad0fca57a0acd9",
     "tests/test_seo_envelope_runtime.py": "97996712e6e887da30c613d80031c281a9d46bd9112cb17917fac4a6e725d387",
-    "packaging/install.sh": "39a0f57d6f607bca54aa332c1d1ac87834f99f0cfcea1102018caf4f3e3f7ac3",
-    "packaging/rollback.sh": "0cab7be6b6bf2bbe7104b6bc16aa3e8fb7484c81e700151e8de173059fdf352d",
+    "integration/lhm-barney-basicops-watch": "22f4447ebbb9f022793bed7e11d95fd1afe423cb15a4900af7c0f4a4b687e1d1",
+    "packaging/lhm-barney-monitor.service": "0c3405da90e184fad1ce0a6f22212792e787b2e92e7e54924ee1cdb7897fd673",
+    "packaging/install.sh": "2aea10b546003d316f3e10da6db464fab69591ef94adaf360402fca9990cc6a1",
+    "packaging/rollback.sh": "c5d528899cc0f17e306384a7eaf63c386197de7e5be107fec11b19c3f00621e4",
     "packaging/lhm-controller-release-authorizer": "9f3a7acab44b7ad6977f2776bb5d3818bd827fbbfb587f092224f64009be5628",
     "tests/test_release_authorizer.py": "f05c1443aa3ce67eecb7eb03c33d5705ca3a1cc4f77f99e63f8eb00be1599ca0",
     "packaging/source-tree-digest.py": "b6edde8e09052f615d1ae9159fa944872c5c4d4d94985a0a90bbc95178bda1a4",

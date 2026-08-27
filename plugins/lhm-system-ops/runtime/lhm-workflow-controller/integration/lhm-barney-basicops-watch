@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+"""Bounded BasicOps watchlist monitor for tasks outside controller state."""
+from __future__ import annotations
+
+import json
+import os
+import tempfile
+import urllib.request
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+ROOT = Path(os.environ.get("LHM_BARNEY_BASICOPS_WATCH_ROOT", "/var/lib/lhm-workflow/barney-basicops-watch"))
+WATCHES = ROOT / "watches"
+STATE = ROOT / "state"
+ENDPOINT = os.environ.get("LHM_BASICOPS_MCP_ENDPOINT", "https://app.basicops.com/mcp?agent=barney-ai")
+TERMINAL = {"Under Review", "Reviewed", "Blocked", "Cancelled", "On Hold", "Complete"}
+
+
+def _iso_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _atomic(path: Path, value: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    try:
+        with os.fdopen(fd, "w") as handle:
+            json.dump(value, handle, sort_keys=True)
+            handle.write("\n")
+        os.chmod(temporary, 0o600)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def _rpc(token: str, method: str, params: dict | None = None) -> dict:
+    body = {"jsonrpc": "2.0", "id": 1, "method": method}
+    if params is not None:
+        body["params"] = params
+    request = urllib.request.Request(
+        ENDPOINT,
+        data=json.dumps(body, separators=(",", ":")).encode(),
+        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=40) as response:
+        result = json.load(response)
+    if result.get("error"):
+        raise RuntimeError(result["error"].get("message") or "BasicOps RPC error")
+    return result.get("result") or {}
+
+
+def _tool(token: str, name: str, arguments: dict) -> dict:
+    result = _rpc(token, "tools/call", {"name": name, "arguments": arguments})
+    for item in result.get("content", []):
+        if item.get("type") == "text":
+            return json.loads(item.get("text") or "{}")
+    raise RuntimeError(f"BasicOps {name} returned no JSON text")
+
+
+def _mention(user_id: int, name: str) -> str:
+    return f'<span class="user-link record-link" _tableid="3922" _id="{user_id}">{name}</span>'
+
+
+def _message(watch: dict, task: dict, reminder_count: int) -> str:
+    assignee = task.get("assignee") or {}
+    assignee_id = int(assignee.get("id") or watch["assignee_user_id"])
+    assignee_name = assignee.get("firstName") or watch["assignee_name"]
+    opener = "Quick check-in" if reminder_count == 0 else "This task still needs a truthful update"
+    joke = "This delay is not legendary. 🥃" if reminder_count == 0 else "The suspense was fun; the missing handoff is less fun. 🥃"
+    return (
+        f"<p><b>{opener}, {_mention(assignee_id, assignee_name)}.</b> "
+        f"This approved task is still <b>{task.get('status')}</b> and has not recorded the expected next event.</p>"
+        f"<p><b>Expected next event:</b> {watch['expected_next_event']}</p>"
+        "<p>Please either complete that step and post the evidence here, or state the exact blocker, owner and next check time.</p>"
+        f"<p>{joke}</p>"
+    )
+
+
+def main() -> None:
+    credential_dir = Path(os.environ["CREDENTIALS_DIRECTORY"])
+    token = (credential_dir / "basicops-api-key").read_text().strip()
+    now = datetime.now(timezone.utc)
+    summary = []
+    for watch_path in sorted(WATCHES.glob("*.json")):
+        watch = json.loads(watch_path.read_text())
+        task_id = int(watch["task_id"])
+        state_path = STATE / f"{task_id}.json"
+        state = json.loads(state_path.read_text()) if state_path.exists() else {
+            "task_id": task_id,
+            "last_seen_updated": int(watch["baseline_updated"]),
+            "next_check_at": watch["next_check_at"],
+            "reminder_count": 0,
+            "last_message_id": None,
+            "status": "watching",
+        }
+        task = _tool(token, "get_task", {"taskId": task_id})
+        if task.get("status") in TERMINAL:
+            state.update(status="paused", pause_reason=f"task status is {task.get('status')}", observed_at=_iso_now())
+            _atomic(state_path, state)
+            summary.append({"task_id": task_id, "result": "paused", "status": task.get("status")})
+            continue
+        observed_updated = int(task.get("updated") or 0)
+        if observed_updated > int(state["last_seen_updated"]):
+            state.update(last_seen_updated=observed_updated, next_check_at=(now + timedelta(minutes=15)).isoformat(), status="watching", observed_at=_iso_now())
+            _atomic(state_path, state)
+            summary.append({"task_id": task_id, "result": "activity-observed", "next_check_at": state["next_check_at"]})
+            continue
+        next_check = datetime.fromisoformat(state["next_check_at"].replace("Z", "+00:00"))
+        if now < next_check:
+            summary.append({"task_id": task_id, "result": "not-due", "next_check_at": state["next_check_at"]})
+            continue
+        created = _tool(token, "create_message_in_task", {"taskId": task_id, "message": _message(watch, task, int(state["reminder_count"]))})
+        state.update(
+            last_message_id=str(created.get("id")),
+            reminder_count=int(state["reminder_count"]) + 1,
+            next_check_at=(now + timedelta(minutes=60)).isoformat(),
+            status="reminded",
+            observed_at=_iso_now(),
+        )
+        _atomic(state_path, state)
+        summary.append({"task_id": task_id, "result": "reminded", "message_id": state["last_message_id"], "next_check_at": state["next_check_at"]})
+    print(json.dumps({"checked_at": _iso_now(), "watches": summary}, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()

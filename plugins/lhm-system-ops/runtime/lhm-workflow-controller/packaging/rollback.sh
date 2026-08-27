@@ -59,7 +59,7 @@ for f in /etc/systemd/system/lhm-delegated-*.service /etc/systemd/system/lhm-del
 done
 systemctl daemon-reload
 # Broker/importer executables are preserved in the rollback backup for recovery.
-for f in /usr/local/libexec/lhm-department-snapshot-dispatch /usr/local/libexec/lhm-department-snapshot-broker /usr/local/libexec/lhm-department-result-importer /usr/local/libexec/lhm-seo-envelope-runtime /usr/local/libexec/lhm-workflow-registered-adapter /usr/local/libexec/lhm-delegated-basicops-bridge /usr/local/libexec/lhm-scheduled-work-ingress /usr/local/libexec/lhm-scheduled-work-runtime /usr/local/libexec/lhm-barney-monitor /usr/local/libexec/lhm-barney-action-executor /usr/local/libexec/lhm-barney-downstream-consumer /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-scheduled-work-dispatch /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-seo-org-cron-alternate; do
+for f in /usr/local/libexec/lhm-department-snapshot-dispatch /usr/local/libexec/lhm-department-snapshot-broker /usr/local/libexec/lhm-department-result-importer /usr/local/libexec/lhm-seo-envelope-runtime /usr/local/libexec/lhm-workflow-registered-adapter /usr/local/libexec/lhm-delegated-basicops-bridge /usr/local/libexec/lhm-scheduled-work-ingress /usr/local/libexec/lhm-scheduled-work-runtime /usr/local/libexec/lhm-barney-monitor /usr/local/libexec/lhm-barney-basicops-watch /usr/local/libexec/lhm-barney-action-executor /usr/local/libexec/lhm-barney-downstream-consumer /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-scheduled-work-dispatch /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-seo-org-cron-alternate; do
   test -e "$f" || continue
   mv "$f" "$backup/"
 done

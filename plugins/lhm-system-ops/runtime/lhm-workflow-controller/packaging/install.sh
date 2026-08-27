@@ -103,6 +103,7 @@ install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-workflow-obse
 install -d -o root -g root -m 0700 /var/lib/lhm-workflow/delegated-basicops-observations-failed /var/lib/lhm-workflow/delegated-human-observations-failed /var/lib/lhm-workflow/delegated-workflow-observations-failed
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/barney-actions /var/lib/lhm-workflow/barney-actions/pending /var/lib/lhm-workflow/barney-actions/receipts /var/lib/lhm-workflow/barney-actions/runs
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/barney-dispatch /var/lib/lhm-workflow/barney-dispatch/chief-of-staff /var/lib/lhm-workflow/barney-dispatch/cto /var/lib/lhm-workflow/barney-dispatch/basicops-notifications /var/lib/lhm-workflow/barney-dispatch/inflight /var/lib/lhm-workflow/barney-dispatch/consumed /var/lib/lhm-workflow/barney-downstream-receipts
+install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/barney-basicops-watch /var/lib/lhm-workflow/barney-basicops-watch/watches /var/lib/lhm-workflow/barney-basicops-watch/state
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/artifacts /var/lib/lhm-workflow/seo-envelope /var/lib/lhm-workflow/seo-failures
 install -d -o root -g root -m 0750 /var/lib/lhm-workflow/department-observations
 for d in parents wal locks receipts operations processed quarantine audit verifier-requests; do install -d -o lhmworkflow -g lhmworkflow -m 0750 "/var/lib/lhm-workflow/$d"; done
@@ -190,6 +191,7 @@ install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-barney-monitor.service
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-barney-action-executor.service "$repo_dir"/packaging/lhm-barney-action-executor.path /etc/systemd/system/
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-barney-downstream-consumer.service "$repo_dir"/packaging/lhm-barney-downstream-consumer.path /etc/systemd/system/
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-barney-monitor /usr/local/libexec/lhm-barney-monitor
+install -o root -g root -m 0755 "$repo_dir"/integration/lhm-barney-basicops-watch /usr/local/libexec/lhm-barney-basicops-watch
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-barney-action-executor /usr/local/libexec/lhm-barney-action-executor
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-barney-downstream-consumer /usr/local/libexec/lhm-barney-downstream-consumer
 install -o root -g root -m 0755 "$repo_dir"/packaging/lhm-controller-release-authorizer /usr/local/sbin/lhm-controller-release-authorizer

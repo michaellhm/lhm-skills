@@ -1,12 +1,15 @@
 [Unit]
 Description=LHM Barney delegated-work monitor
-After=local-fs.target
+Wants=network-online.target
+After=local-fs.target network-online.target
 
 [Service]
 Type=oneshot
 User=lhmworkflow
 Group=lhmworkflow
+LoadCredential=basicops-api-key:/etc/lhm-workflow/secrets/basicops-barney-ai.key
 ExecStart=/usr/local/libexec/lhm-barney-monitor
+ExecStart=/usr/local/libexec/lhm-barney-basicops-watch
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
