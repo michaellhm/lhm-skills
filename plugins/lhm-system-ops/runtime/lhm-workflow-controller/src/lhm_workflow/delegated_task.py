@@ -36,8 +36,8 @@ NATIVE_STATUS = {
     "completed": "Complete",
 }
 VERIFIED_BASICOPS_AI = {
-    "project_manager": {"user_id": "82484", "canonical_name": "Monica AI", "workspace_id": "481630853364967730"},
-    "chief_of_staff": {"user_id": "82491", "canonical_name": "Waylon", "workspace_id": "481630853364967730"},
+    "project_manager": {"user_id": "82484", "canonical_name": "Lily", "workspace_id": "481630853364967730"},
+    "chief_of_staff": {"user_id": "82491", "canonical_name": "Ted", "workspace_id": "481630853364967730"},
 }
 
 

@@ -66,7 +66,7 @@ def test_human_adapter_binds_real_message_author_revision_and_current_plan(tmp_p
         "task_id": "2199999", "task_revision": "15", "observed_at": "2026-08-27T10:05:00+10:00",
         "body_sha256": digest({"body": "Approve plan v1"}), "decision": "approved",
         "plan_version": 1, "plan_sha256": digest(plan), "correction": None,
-        "handoff": handoff("approved", "Waylon"), "verification": "passed",
+        "handoff": handoff("approved", "Ted"), "verification": "passed",
     }
     signed = human_decision_event(state, observation, private)
     assert authenticated(signed, public, "human_approver")
@@ -93,7 +93,7 @@ def test_workflow_marker_rejects_wrong_ai_author_and_non_allowlisted_fields(tmp_
     bad_author = {**observed, "message_id":"msg-pm-2", "author_user_id":"82491"}
     try:
         closed_workflow_observation(state, bad_author, private)
-        assert False, "Waylon must not submit Monica's plan marker"
+        assert False, "Ted must not submit Lily's plan marker"
     except ValueError:
         pass
     expanded = dict(marker, command="run arbitrary code")
@@ -116,7 +116,7 @@ def test_steward_and_cto_markers_are_bound_to_parent_actor_ids(tmp_path):
         ("capability-restored", "400", {
             "event_id":"cto-marker", "result":"capability_restored",
             "verification_evidence":["incident:CII-1:passed"],
-            "handoff":handoff("executing", "Waylon")}),
+            "handoff":handoff("executing", "Ted")}),
     ]
     for operation, author, payload in cases:
         body="LHM workflow event: "+json.dumps(
@@ -217,7 +217,7 @@ def test_observed_human_lifecycle_survives_restart_and_replay(tmp_path):
 
     current = restart()
     approval = observe_human(
-        current, "observed-plan-approval", "approved", handoff("approved", "Waylon")
+        current, "observed-plan-approval", "approved", handoff("approved", "Ted")
     )
     state = checkpoint(plan_decision(current, approval, adapter_public), current)
     replayed = plan_decision(restart(), approval, adapter_public)
@@ -227,7 +227,7 @@ def test_observed_human_lifecycle_survives_restart_and_replay(tmp_path):
 
     current = restart()
     started = observe_ai(current, "chief-start", 82491, {
-        "event_id":"chief-start", "handoff":handoff("executing", "Waylon")})
+        "event_id":"chief-start", "handoff":handoff("executing", "Ted")})
     state = checkpoint(chief_start(current, started, adapter_public), current)
     state, _ = observe_projection(restart(), "projection-executing")
 
@@ -245,7 +245,7 @@ def test_observed_human_lifecycle_survives_restart_and_replay(tmp_path):
     current = restart()
     correction_observation = observe_human(
         current, "observed-correction", "correction_requested",
-        handoff("correction_requested", "Waylon"), correction=correction,
+        handoff("correction_requested", "Ted"), correction=correction,
     )
     state = checkpoint(delivery_decision(current, correction_observation, adapter_public), current)
     assert len(state["correction_events"]) == 1
@@ -255,7 +255,7 @@ def test_observed_human_lifecycle_survives_restart_and_replay(tmp_path):
 
     current = restart()
     resumed = observe_ai(current, "chief-start", 82491, {
-        "event_id":"resume-correction", "handoff":handoff("executing", "Waylon")})
+        "event_id":"resume-correction", "handoff":handoff("executing", "Ted")})
     state = checkpoint(chief_start(current, resumed, adapter_public), current)
     state, _ = observe_projection(restart(), "projection-correction-executing")
 
@@ -280,7 +280,7 @@ def test_observed_human_lifecycle_survives_restart_and_replay(tmp_path):
     current = restart()
     acceptance = observe_human(
         current, "observed-delivery-acceptance", "accepted",
-        handoff("completion_pending", "Waylon"),
+        handoff("completion_pending", "Ted"),
     )
     state = checkpoint(delivery_decision(current, acceptance, adapter_public), current)
     assert delivery_decision(restart(), acceptance, adapter_public) == restart()
@@ -290,7 +290,7 @@ def test_observed_human_lifecycle_survives_restart_and_replay(tmp_path):
     completed = observe_ai(current, "chief-complete", 82491, {
         "event_id":"chief-complete", "decision":"completed",
         "completion_checks":["Approved page exists in staging"],
-        "handoff":handoff("completed", "Waylon")})
+        "handoff":handoff("completed", "Ted")})
     state = checkpoint(chief_complete(current, completed, adapter_public), current)
     state, final_projection = observe_projection(restart(), "projection-complete")
 

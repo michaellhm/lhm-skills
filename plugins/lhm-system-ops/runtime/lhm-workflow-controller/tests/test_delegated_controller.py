@@ -9,8 +9,8 @@ def actor(user_id, name):
 
 
 ACTORS = {
-    "human": actor(100, "Aiya"), "project_manager": actor(82484, "Monica AI"),
-    "chief_of_staff": actor(82491, "Waylon"), "cto": actor(900, "CTO"),
+    "human": actor(100, "Aiya"), "project_manager": actor(82484, "Lily"),
+    "chief_of_staff": actor(82491, "Ted"), "cto": actor(900, "CTO"),
     "learning_steward": actor(901, "Learning Steward"),
 }
 
@@ -46,7 +46,7 @@ def test_controller_persists_version_bound_plan_and_exact_basicops_baton(tmp_pat
         "basicops_target": {"client_slug": "local-health-marketing", "handback_task_id": "2199999"},
         "basicops_dedupe_key": "delegated:aiya:page-1", "objective": "Create page",
         "completion_condition": "Staging page passes QA", "permission_ceiling": "green",
-        "actors": ACTORS, "initial_handoff": handoff("planning", "Monica AI"),
+        "actors": ACTORS, "initial_handoff": handoff("planning", "Lily"),
     })
     state = project(controller, state, "project-0")
     plan = {"steps": [{"role": "Content", "skill": "copywriting"}]}
@@ -62,7 +62,7 @@ def test_controller_persists_version_bound_plan_and_exact_basicops_baton(tmp_pat
     approval = sign(controller, "human-approval.key", {
         "role": "human_approver", "event_id": "approve-1", "actor_user_id": "100",
         "parent_run_id": "delegated-cli-1", "task_id": "2199999", "decision": "approved",
-        "plan_version": 1, "plan_sha256": digest(plan), "handoff": handoff("approved", "Waylon"),
+        "plan_version": 1, "plan_sha256": digest(plan), "handoff": handoff("approved", "Ted"),
         "basicops_observation": {"message_id": "human-approve-1", "author_user_id": "100", "task_id": "2199999", "task_revision": "7", "observed_at": "2026-08-27T00:00:00+10:00", "body_sha256": digest({"decision": "approved"})},
     })
     state = controller.delegated_transition("delegated-cli-1", "plan-decision", approval)

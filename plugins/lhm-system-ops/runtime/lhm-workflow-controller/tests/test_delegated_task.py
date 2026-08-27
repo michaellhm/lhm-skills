@@ -23,8 +23,8 @@ def actor(user_id, name):
 
 ACTORS = {
     "human": actor(100, "Aiya"),
-    "project_manager": {"user_id": "82484", "canonical_name": "Monica AI", "workspace_id": "481630853364967730", "verified_at": "2026-08-27T00:00:00+10:00"},
-    "chief_of_staff": {"user_id": "82491", "canonical_name": "Waylon", "workspace_id": "481630853364967730", "verified_at": "2026-08-27T00:00:00+10:00"},
+    "project_manager": {"user_id": "82484", "canonical_name": "Lily", "workspace_id": "481630853364967730", "verified_at": "2026-08-27T00:00:00+10:00"},
+    "chief_of_staff": {"user_id": "82491", "canonical_name": "Ted", "workspace_id": "481630853364967730", "verified_at": "2026-08-27T00:00:00+10:00"},
     "cto": actor(400, "CTO"),
     "learning_steward": actor(500, "Learning Steward"),
 }
@@ -54,7 +54,7 @@ def initial():
         basicops_target={"client_slug": "local-health-marketing", "handback_task_id": "2199999"},
         basicops_dedupe_key="delegated:aiya:page-1", objective="Create a service page",
         completion_condition="Approved page exists in staging", permission_ceiling="green",
-        actors=ACTORS, initial_handoff=handoff("planning", "Monica AI"),
+        actors=ACTORS, initial_handoff=handoff("planning", "Lily"),
     )
 
 
@@ -85,10 +85,10 @@ def approved_execution():
     posted = event("project_manager", "plan-1", 82484, plan=plan, handoff=handoff("awaiting_plan_approval", "Aiya", "plan_approval"))
     state = post_plan(state, posted, PM)
     state, _ = project(state, "p1")
-    approved = event("human_approver", "approve-1", 100, decision="approved", plan_version=1, plan_sha256=digest(plan), handoff=handoff("approved", "Waylon"))
+    approved = event("human_approver", "approve-1", 100, decision="approved", plan_version=1, plan_sha256=digest(plan), handoff=handoff("approved", "Ted"))
     state = plan_decision(state, approved, HUMAN)
     state, _ = project(state, "p2")
-    started = event("chief_of_staff", "start-1", 82491, handoff=handoff("executing", "Waylon"))
+    started = event("chief_of_staff", "start-1", 82491, handoff=handoff("executing", "Ted"))
     state = chief_start(state, started, CHIEF)
     state, _ = project(state, "p3")
     return state, plan
@@ -102,10 +102,10 @@ def test_complete_baton_preserves_one_task_and_requires_human_plan_approval():
     state = review_ready(state, ready, CHIEF)
     assert state["projection_pending"]["native_status"] == "Under Review"
     state, _ = project(state, "p4")
-    accepted = event("human_reviewer", "accept-1", 100, decision="accepted", handoff=handoff("completion_pending", "Waylon", completed=["Delivery accepted"], evidence=["review-message-1"]))
+    accepted = event("human_reviewer", "accept-1", 100, decision="accepted", handoff=handoff("completion_pending", "Ted", completed=["Delivery accepted"], evidence=["review-message-1"]))
     state = delivery_decision(state, accepted, HUMAN)
     state, _ = project(state, "p5")
-    completed = event("chief_of_staff", "complete-1", 82491, decision="completed", completion_checks=["Approved page exists in staging"], handoff=handoff("completed", "Waylon", completed=["Outcome verified"], evidence=["staging-url", "qa-pass", "human-acceptance"]))
+    completed = event("chief_of_staff", "complete-1", 82491, decision="completed", completion_checks=["Approved page exists in staging"], handoff=handoff("completed", "Ted", completed=["Outcome verified"], evidence=["staging-url", "qa-pass", "human-acceptance"]))
     state = chief_complete(state, completed, CHIEF)
     assert state["state"] == "completed" and state["projection_pending"]["native_status"] == "Complete"
     assert state["plan"]["version"] == 1 and state["plan"]["material_sha256"] == digest(plan)
@@ -116,13 +116,13 @@ def test_stale_plan_approval_rejected_and_changes_resume_same_task():
     first = {"steps": ["Draft"]}
     state = post_plan(state, event("project_manager", "plan-1", 82484, plan=first, handoff=handoff("awaiting_plan_approval", "Aiya", "plan_approval")), PM)
     state, _ = project(state, "p1")
-    changes = event("human_approver", "changes-1", 100, decision="changes_requested", plan_version=1, plan_sha256=digest(first), handoff=handoff("planning", "Monica AI"))
+    changes = event("human_approver", "changes-1", 100, decision="changes_requested", plan_version=1, plan_sha256=digest(first), handoff=handoff("planning", "Lily"))
     state = plan_decision(state, changes, HUMAN)
     state, _ = project(state, "p2")
     second = {"steps": ["Draft", "Mobile QA"]}
     state = post_plan(state, event("project_manager", "plan-2", 82484, plan=second, handoff=handoff("awaiting_plan_approval", "Aiya", "plan_approval")), PM)
     state, _ = project(state, "p3")
-    stale = event("human_approver", "stale", 100, decision="approved", plan_version=1, plan_sha256=digest(first), handoff=handoff("approved", "Waylon"))
+    stale = event("human_approver", "stale", 100, decision="approved", plan_version=1, plan_sha256=digest(first), handoff=handoff("approved", "Ted"))
     with pytest.raises(ValueError, match="stale"):
         plan_decision(state, stale, HUMAN)
     assert state["basicops_task_id"] == "2199999" and state["plan"]["version"] == 2
@@ -149,7 +149,7 @@ def test_ai_identity_cannot_be_supplied_by_display_name_or_unverified_id():
             basicops_target={"client_slug": "local-health-marketing", "handback_task_id": "2199999"},
             basicops_dedupe_key="delegated:spoofed", objective="Create a page",
             completion_condition="Page exists", permission_ceiling="green", actors=actors,
-            initial_handoff={**handoff("planning", "Monica AI"), "completion_condition": "Page exists"},
+            initial_handoff={**handoff("planning", "Lily"), "completion_condition": "Page exists"},
         )
 
 
@@ -158,11 +158,11 @@ def test_correction_resumes_same_parent_and_steward_routes_without_promoting_one
     state = review_ready(state, event("chief_of_staff", "ready", 82491, completion_evidence=["preview"], handoff=handoff("awaiting_delivery_review", "Aiya", "delivery_review", calls=[{"choice": "Used 123 Smith St", "location": "CTA", "release_state": "staging"}])), CHIEF)
     state, _ = project(state, "p4")
     correction = {"old_value": "123 Smith St", "new_value": "125 Smith St", "source": "Aiya review", "authority_scope": "website domain owner", "affected_locations": ["page:cta", "client-profile:address"]}
-    request = event("human_reviewer", "correct-1", 100, decision="correction_requested", correction=correction, handoff=handoff("correction_requested", "Waylon"))
+    request = event("human_reviewer", "correct-1", 100, decision="correction_requested", correction=correction, handoff=handoff("correction_requested", "Ted"))
     state = delivery_decision(state, request, HUMAN)
     assert state["parent_run_id"] == "delegated-1" and state["basicops_task_id"] == "2199999"
     state, _ = project(state, "p5")
-    state = chief_start(state, event("chief_of_staff", "restart-fix", 82491, handoff=handoff("executing", "Waylon")), CHIEF)
+    state = chief_start(state, event("chief_of_staff", "restart-fix", 82491, handoff=handoff("executing", "Ted")), CHIEF)
     state, _ = project(state, "p6")
     fixed = event("chief_of_staff", "fixed-1", 82491, correction_event_id="correct-1", fix_evidence=["basicops-message:green-readback"])
     state = correction_fixed(state, fixed, CHIEF)
@@ -185,7 +185,7 @@ def test_capability_restored_resumes_same_parent_after_verified_cto_evidence():
     state, _ = evaluate(state, now=(base + timedelta(minutes=1)).isoformat())
     state, _ = evaluate(state, now=(base + timedelta(minutes=17)).isoformat())
     state, _ = project(state, "cap-projection")
-    restored = seal({"role": "cto", "event_id": "restore-1", "actor_user_id": "400", "parent_run_id": "delegated-1", "task_id": "2199999", "result": "capability_restored", "verification_evidence": ["incident:CII-1:passed"], "handoff": handoff("executing", "Waylon")}, b"cto")
+    restored = seal({"role": "cto", "event_id": "restore-1", "actor_user_id": "400", "parent_run_id": "delegated-1", "task_id": "2199999", "result": "capability_restored", "verification_evidence": ["incident:CII-1:passed"], "handoff": handoff("executing", "Ted")}, b"cto")
     state = capability_restored(state, restored, b"cto")
     assert state["state"] == "executing" and state["basicops_task_id"] == "2199999"
 
@@ -276,6 +276,6 @@ def test_plan_handoff_must_name_verified_human_approver():
     state, _ = project(initial(), "p0")
     plan = {"steps": ["Draft"]}
     wrong = event("project_manager", "wrong-plan-owner", 82484, plan=plan,
-        handoff=handoff("awaiting_plan_approval", "Waylon", "plan_approval"))
+        handoff=handoff("awaiting_plan_approval", "Ted", "plan_approval"))
     with pytest.raises(ValueError, match="verified human approver"):
         post_plan(state, wrong, PM)

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r23",
-  "version": "0.1.64",
+  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r24",
+  "version": "0.1.65",
   "source_baseline": "project-hub-0.1.80-release-6f9646f",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -77,14 +77,15 @@
     "plan_handoff_names_the_verified_human_approver",
     "basicops_under_review_uses_native_request_review",
     "barney_basicops_watchlist_for_tasks_outside_controller_state",
-    "barney_monitor_network_credential_and_durable_watch_install"
+    "barney_monitor_network_credential_and_durable_watch_install",
+    "renamed_project_manager_and_chief_of_staff_canonical_labels"
   ],
-  "source_tree_sha256_excluding_manifest": "9bd5a4459b3d4ee12f3e3e7754db4379053ed65cfb0d684d9b98f9b19bff0deb",
+  "source_tree_sha256_excluding_manifest": "bf9136c8b39778e459d80d462c965e646fc6e2312d407625edf319c7b61e46cf",
   "critical_files": {
     "src/lhm_workflow/seo_envelope_runtime.py": "ef55bce61485239187f3c4885227f8efb878c4d77dde6ef0cfeee2a0877e77a6",
     "src/lhm_workflow/cli.py": "581e024c8346578e2496f492f441c887ccb8d9ea9afe4c500a3c1740f3ddf4c4",
     "src/lhm_workflow/controller.py": "56330a67f49e2fc72249cd4bf201a2ea16f82d395ad5a393c4ebc9f6f50e2156",
-    "src/lhm_workflow/delegated_task.py": "f65292ab68df7d0b90bb99f1d6be8ccd4f9efc1cefba3c8971a3056a115386a2",
+    "src/lhm_workflow/delegated_task.py": "69e2ccbb919f407bf91c30ef9f3ccea993dc0ebc6aebb91a1e59ce86af9449e0",
     "src/lhm_workflow/delegated_connector.py": "22889cb4dede9b0d6655aa7d4f8e11ec3393a45cd7cd67baa14eb10eb321b5a5",
     "src/lhm_workflow/barney_monitor.py": "2a5c65521cdac5bacde81b26c3aeb577a7148209fd610ad4a187dbae3ab971de",
     "src/lhm_workflow/tracker_connector.py": "c0e1a6bf4c22a230907ce2e1249b5f17543183ef5fac3435662c0d58ebc7d514",
@@ -116,9 +117,9 @@
     "packaging/lhm-scheduled-org-signer.path.in": "8b222a87f8d7334f9595a5301852a045e656ce163800b2e73f0256eda379d603",
     "tests/test_scheduled_work.py": "c8b92095b86bead52d1713e294eb3af946d8e899856678290b1629b221c17960",
     "tests/test_scheduled_executor.py": "d9b079d88377d961a6a3daa00c1457bfd0af62b575dc35a40bb07361f9c6388c",
-    "tests/test_delegated_task.py": "c8bf10f7b32b68dca63cdd908f2338e4dcacd18e6b7d4527ebb5f317751a4d72",
-    "tests/test_delegated_controller.py": "ef2e03ac47658c6b6c2003f972b5c0b11e01b57322ca24c2efc66d87ef136183",
-    "tests/test_delegated_connector.py": "d2a52495e36ed99fb7789b66cf89e092eb95e3920aee64a7e5bcce72f6f37994",
+    "tests/test_delegated_task.py": "541db1d5b776bcb97f11a1cbf51098c189028b3e290afe331fb74c3abf42fef0",
+    "tests/test_delegated_controller.py": "37289f2f110422cc54373715ba1847cec7b6c9bd0063f37b329e2011df232e02",
+    "tests/test_delegated_connector.py": "1397b3db56c3a57863b105889f4b4d699c7b2ea31dba0b1d37444f3b3d889e0d",
     "src/lhm_workflow/delegated_basicops_runtime.py": "be8e3dae2dc2120586824e65156586fe0bf1f075d53eb1ad21ad7c929ba8cb93",
     "src/lhm_workflow/barney_scheduler.py": "97d95ac48a5fe513fe431a9dc5774a9c102ef980d681d1e599f6f00fd18c4109",
     "src/lhm_workflow/barney_consumer.py": "2fe3ac9dcdb3c09a47e58f9415737f036ef8b1e5448223850a067f9bc3c75e1d",
@@ -128,7 +129,7 @@
     "integration/lhm-barney-action-executor": "bd406c371d3c6a10f0966f32217b5b9f76673d4350390c03595f0c323f701285",
     "integration/lhm-barney-downstream-consumer": "379f6c72f71ea64d92cce9c04c06d0ca0fb77a3ff9fdb01a40cfc52dbc8f2eab",
     "integration/lhm-barney-monitor": "13969cdc0eff3469c219238a03e17f88034454462df87b24db7a153b6936f218",
-    "tests/test_delegated_basicops_runtime.py": "dcc23c4b91d8a2e3785d2c556d170bee0bb1a0b899cb022744d2f9217e1bc467",
+    "tests/test_delegated_basicops_runtime.py": "21c84d5c32fbe1b2936af86c9503b3256baef39ce3252327eed5fb040ab2ef01",
     "tests/test_barney_scheduler.py": "ad13bb449890ceafdffc695c096c913cd800d19c4ba4a0f6ed80294f3f26612c",
     "tests/test_barney_consumer.py": "d3b6b88372ca5b1ff3c330955c44188050c91914f8925997a1864a9f0a03c063"
   },

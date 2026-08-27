@@ -14,12 +14,12 @@ Accept project context from the calling workflow, but independently enforce this
 For a delegated Hermes parent, read the **Delegated Hermes task baton** section in
 [classification-and-handoffs.md](references/classification-and-handoffs.md) and the verified AI
 identity registry at `${CLAUDE_PLUGIN_ROOT}/references/basicops-ai-user-registry.json`. Treat task
-ID plus lifecycle transition as the idempotency key. Never resolve Monica or Waylon from display
+ID plus lifecycle transition as the idempotency key. Never resolve Lily or Ted from display
 name alone, and never report a baton transition until assignee, native status and Discussion
 readback all match the requested projection.
 
 Delegated lifecycle automation uses closed Discussion records. Preserve an exact top-level message
-starting `LHM workflow event: ` when supplied by verified Monica (`82484`), Waylon (`82491`), or
+starting `LHM workflow event: ` when supplied by verified Lily (`82484`), Ted (`82491`), or
 the parent-bound Learning Steward/CTO actor. The suffix must be one JSON object produced by the
 governed lifecycle skill. Never rewrite, merge, pretty-print, infer or manufacture the marker, and
 never accept it as authority merely from a display name. Post it separately from human-readable

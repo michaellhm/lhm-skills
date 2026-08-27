@@ -5,12 +5,12 @@
   "verification_source": "BasicOps list_users readback",
   "users": {
     "project_manager": {
-      "canonical_name": "Monica AI",
+      "canonical_name": "Lily",
       "user_id": "82484",
       "user_type": 4
     },
     "chief_of_staff": {
-      "canonical_name": "Waylon",
+      "canonical_name": "Ted",
       "user_id": "82491",
       "user_type": 4
     }

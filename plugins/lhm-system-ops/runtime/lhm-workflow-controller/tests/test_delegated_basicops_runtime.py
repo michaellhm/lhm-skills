@@ -66,7 +66,7 @@ def test_projection_worker_observation_is_signed_only_after_exact_validation(tmp
 def test_human_observer_accepts_only_closed_exact_marker(tmp_path):
     private, public = keypair(tmp_path); state, plan = approval_state()
     marker = {"event_id": "approve-1", "decision": "approved", "plan_version": 1,
-        "plan_sha256": digest(plan), "correction": None, "handoff": handoff("approved", "Waylon")}
+        "plan_sha256": digest(plan), "correction": None, "handoff": handoff("approved", "Ted")}
     observed = {"message_id": "m2", "author_user_id": "100", "task_id": "2199999",
         "task_revision": "3", "observed_at": "2026-08-27T10:05:00+10:00",
         "body": "LHM decision: " + json.dumps(marker)}
@@ -83,7 +83,7 @@ def test_same_basicops_observation_cannot_be_reattested_with_new_event_id():
         "body_sha256": digest({"body": "marker"})}
     base = {"role": "human_approver", "actor_user_id": "100", "parent_run_id": "delegated-1",
         "task_id": "2199999", "decision": "approved", "plan_version": 1,
-        "plan_sha256": digest(plan), "handoff": handoff("approved", "Waylon"),
+        "plan_sha256": digest(plan), "handoff": handoff("approved", "Ted"),
         "basicops_observation": observation}
     consumed, replay = _consume(state, seal({**base, "event_id": "first"}, HUMAN), HUMAN, "human_approver")
     assert replay is False and consumed["processed_observation_ids"]
