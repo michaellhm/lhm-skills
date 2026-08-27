@@ -303,9 +303,17 @@ def complete_registration(path, request):
         finish('completed', 'already_existed', target=target)
         return
     if existing is not None:
-        finish('failed', 'refused', 'slug is already registered with different details')
-        return
+        existing_normalized = dict(existing)
+        existing_normalized.setdefault('type', target_type)
+        existing_ids = existing_normalized.pop('basicops_task_ids', None)
+        target_identity = {key: value for key, value in target.items() if key != 'basicops_task_ids'}
+        if (existing_normalized != target_identity or not isinstance(existing_ids, list)
+                or not set(existing_ids).issubset(set(task_ids))):
+            finish('failed', 'refused', 'slug is already registered with different details')
+            return
     for other_slug, other in targets.items():
+        if other_slug == slug:
+            continue
         if other.get('vault_prefix') == vault_prefix:
             finish('failed', 'refused', f'vault prefix already belongs to {other_slug}')
             return
@@ -334,7 +342,7 @@ def complete_registration(path, request):
             return
         finish('failed', 'refused', f'registry update failed and backup restored with readback: {exc}')
         return
-    finish('completed', 'registered', target=target)
+    finish('completed', 'task_ids_extended' if existing is not None else 'registered', target=target)
 
 
 def load_clients():

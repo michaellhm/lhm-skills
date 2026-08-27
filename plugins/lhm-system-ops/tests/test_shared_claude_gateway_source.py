@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.9"
+    assert MANIFEST["release_version"] == "0.9.10"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -44,7 +44,7 @@ def test_container_client_is_governed_at_exact_bind_mount_target():
     client = MANIFEST["assets"]["container_client"]
     assert client["destination"] == "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch"
     assert client["container_destination"] == "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
-    assert client["previous_sha256"] == "e2e6ec2aba98ace85bae5edd84b0d376973664519eaa2f31c66099a2e75dc3c8"
+    assert client["previous_sha256"] == "e11acaa73629e5841811237a16339832b834d5c51741afb256205dc6d182df66"
     assert client["owner"] == client["group"] == 10000
     assert client["mode"] == "0755"
 
@@ -521,6 +521,21 @@ def test_internal_handback_registration_is_exactly_bounded(tmp_path, monkeypatch
         "basicops_task_ids": ["2199999"],
     }
     assert final["workflow_contract"]["skill_provenance"] == "declared_only_no_worker"
+
+
+def test_existing_handback_target_allows_only_additive_task_ids(tmp_path, monkeypatch):
+    dispatcher, incoming, runs, registry = registration_fixture(tmp_path, monkeypatch)
+    first = registration_request(run_id="claude-register-first", basicops_task_ids=["2199999"])
+    queued = incoming / "first.json"; queued.write_text(json.dumps(first)); dispatcher.complete_registration(queued, first)
+    second = registration_request(run_id="claude-register-second", basicops_task_ids=["2199999", "2193760"])
+    queued = incoming / "second.json"; queued.write_text(json.dumps(second)); dispatcher.complete_registration(queued, second)
+    final = json.loads((runs / second["run_id"] / "final.json").read_text())
+    assert final["status"] == "completed"
+    assert final["verification"]["action"] == "task_ids_extended"
+    assert json.loads(registry.read_text())["clients"]["local-health-marketing"]["basicops_task_ids"] == ["2199999", "2193760"]
+    removal = registration_request(run_id="claude-register-removal", basicops_task_ids=["2193760"])
+    queued = incoming / "removal.json"; queued.write_text(json.dumps(removal)); dispatcher.complete_registration(queued, removal)
+    assert json.loads((runs / removal["run_id"] / "final.json").read_text())["status"] == "failed"
 
 
 def test_registry_backup_fsyncs_base_on_first_creation_and_backup_dir_every_time(tmp_path, monkeypatch):
