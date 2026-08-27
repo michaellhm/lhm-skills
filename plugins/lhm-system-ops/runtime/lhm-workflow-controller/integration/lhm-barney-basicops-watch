@@ -14,6 +14,8 @@ WATCHES = ROOT / "watches"
 STATE = ROOT / "state"
 ENDPOINT = os.environ.get("LHM_BASICOPS_MCP_ENDPOINT", "https://app.basicops.com/mcp?agent=barney-ai")
 TERMINAL = {"Under Review", "Reviewed", "Blocked", "Cancelled", "On Hold", "Complete"}
+BARNEY_USER_ID = 82519
+DEFAULT_STALE_MINUTES = 180
 
 
 def _iso_now() -> str:
@@ -63,19 +65,25 @@ def _mention(user_id: int, name: str) -> str:
     return f'<span class="user-link record-link" _tableid="3922" _id="{user_id}">{name}</span>'
 
 
-def _message(watch: dict, task: dict, reminder_count: int) -> str:
+def _message(watch: dict, task: dict) -> str:
     assignee = task.get("assignee") or {}
     assignee_id = int(assignee.get("id") or watch["assignee_user_id"])
     assignee_name = assignee.get("firstName") or watch["assignee_name"]
-    opener = "Quick check-in" if reminder_count == 0 else "This task still needs a truthful update"
-    joke = "This delay is not legendary. 🥃" if reminder_count == 0 else "The suspense was fun; the missing handoff is less fun. 🥃"
     return (
-        f"<p><b>{opener}, {_mention(assignee_id, assignee_name)}.</b> "
-        f"This approved task is still <b>{task.get('status')}</b> and has not recorded the expected next event.</p>"
+        f"<p><b>Barney supervisory check, {_mention(assignee_id, assignee_name)}.</b> "
+        f"This task is still <b>{task.get('status')}</b> and has had no non-Barney activity for three hours.</p>"
         f"<p><b>Expected next event:</b> {watch['expected_next_event']}</p>"
-        "<p>Please either complete that step and post the evidence here, or state the exact blocker, owner and next check time.</p>"
-        f"<p>{joke}</p>"
+        "<p>Please post the evidence-backed progress state, or the exact blocker, owner and next check time. "
+        "I will not repeat this report unless somebody else updates the task and it later becomes stale again.</p>"
+        "<p>A true story is always legendary. A recurring reminder is just a calendar notification in a suit. 🥃</p>"
     )
+
+
+def _latest_external_message(token: str, task_id: int, barney_user_id: int) -> dict | None:
+    result = _tool(token, "list_messages_in_task", {"taskId": task_id})
+    messages = result.get("data") or []
+    external = [item for item in messages if int(item.get("user") or 0) != barney_user_id]
+    return max(external, key=lambda item: int(item.get("created") or 0), default=None)
 
 
 def main() -> None:
@@ -89,10 +97,10 @@ def main() -> None:
         state_path = STATE / f"{task_id}.json"
         state = json.loads(state_path.read_text()) if state_path.exists() else {
             "task_id": task_id,
-            "last_seen_updated": int(watch["baseline_updated"]),
             "next_check_at": watch["next_check_at"],
-            "reminder_count": 0,
             "last_message_id": None,
+            "last_external_message_id": None,
+            "reported_for_message_id": None,
             "status": "watching",
         }
         task = _tool(token, "get_task", {"taskId": task_id})
@@ -101,22 +109,35 @@ def main() -> None:
             _atomic(state_path, state)
             summary.append({"task_id": task_id, "result": "paused", "status": task.get("status")})
             continue
-        observed_updated = int(task.get("updated") or 0)
-        if observed_updated > int(state["last_seen_updated"]):
-            state.update(last_seen_updated=observed_updated, next_check_at=(now + timedelta(minutes=15)).isoformat(), status="watching", observed_at=_iso_now())
+        stale_minutes = int(watch.get("stale_after_minutes") or DEFAULT_STALE_MINUTES)
+        external = _latest_external_message(token, task_id, int(watch.get("barney_user_id") or BARNEY_USER_ID))
+        external_id = str(external.get("id")) if external else "task-created"
+        external_created = int(external.get("created") or task.get("created") or 0) if external else int(task.get("created") or 0)
+        stale_at = datetime.fromtimestamp(external_created / 1000, timezone.utc) + timedelta(minutes=stale_minutes)
+        if state.get("last_external_message_id") != external_id:
+            state.update(
+                last_external_message_id=external_id,
+                next_check_at=stale_at.isoformat(),
+                reported_for_message_id=None,
+                status="watching",
+                observed_at=_iso_now(),
+            )
             _atomic(state_path, state)
-            summary.append({"task_id": task_id, "result": "activity-observed", "next_check_at": state["next_check_at"]})
+            summary.append({"task_id": task_id, "result": "external-activity-observed", "next_check_at": state["next_check_at"]})
+            continue
+        if state.get("reported_for_message_id") == external_id:
+            summary.append({"task_id": task_id, "result": "stale-already-reported", "external_message_id": external_id})
             continue
         next_check = datetime.fromisoformat(state["next_check_at"].replace("Z", "+00:00"))
         if now < next_check:
             summary.append({"task_id": task_id, "result": "not-due", "next_check_at": state["next_check_at"]})
             continue
-        created = _tool(token, "create_message_in_task", {"taskId": task_id, "message": _message(watch, task, int(state["reminder_count"]))})
+        created = _tool(token, "create_message_in_task", {"taskId": task_id, "message": _message(watch, task)})
         state.update(
             last_message_id=str(created.get("id")),
-            reminder_count=int(state["reminder_count"]) + 1,
-            next_check_at=(now + timedelta(minutes=60)).isoformat(),
-            status="reminded",
+            reported_for_message_id=external_id,
+            next_check_at=(now + timedelta(minutes=stale_minutes)).isoformat(),
+            status="reported",
             observed_at=_iso_now(),
         )
         _atomic(state_path, state)

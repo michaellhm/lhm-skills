@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r24",
-  "version": "0.1.65",
+  "release_id": "lhm-workflow-controller-delegated-basicops-20260827-r25",
+  "version": "0.1.66",
   "source_baseline": "project-hub-0.1.80-release-6f9646f",
   "changes": [
     "exact_registered_claude_dispatch_bindings",
@@ -78,9 +78,11 @@
     "basicops_under_review_uses_native_request_review",
     "barney_basicops_watchlist_for_tasks_outside_controller_state",
     "barney_monitor_network_credential_and_durable_watch_install",
-    "renamed_project_manager_and_chief_of_staff_canonical_labels"
+    "renamed_project_manager_and_chief_of_staff_canonical_labels",
+    "barney_three_hour_external_activity_stale_detection",
+    "barney_one_report_per_stalled_episode"
   ],
-  "source_tree_sha256_excluding_manifest": "bf9136c8b39778e459d80d462c965e646fc6e2312d407625edf319c7b61e46cf",
+  "source_tree_sha256_excluding_manifest": "90e2a358fa8d89014fd8bd440cd5bd6d28dd7d0216e49d8031b3d2f6a1fe27ad",
   "critical_files": {
     "src/lhm_workflow/seo_envelope_runtime.py": "ef55bce61485239187f3c4885227f8efb878c4d77dde6ef0cfeee2a0877e77a6",
     "src/lhm_workflow/cli.py": "581e024c8346578e2496f492f441c887ccb8d9ea9afe4c500a3c1740f3ddf4c4",
@@ -94,7 +96,7 @@
     "integration/lhm-workflow-registered-adapter": "6a453e7c95f7a501bacaa15835153dec3f5c502bab9a1797280b6d70857b5056",
     "integration/lhm-org-role-adapter": "e6144938b1db22e061e0f2924987cefa7bd7d8215aa87716b8ad0fca57a0acd9",
     "tests/test_seo_envelope_runtime.py": "97996712e6e887da30c613d80031c281a9d46bd9112cb17917fac4a6e725d387",
-    "integration/lhm-barney-basicops-watch": "22f4447ebbb9f022793bed7e11d95fd1afe423cb15a4900af7c0f4a4b687e1d1",
+    "integration/lhm-barney-basicops-watch": "107ae06274301828257c46d650cfb5f7d96929313f9d140096d2d420c6d40e4d",
     "packaging/lhm-barney-monitor.service": "0c3405da90e184fad1ce0a6f22212792e787b2e92e7e54924ee1cdb7897fd673",
     "packaging/install.sh": "2aea10b546003d316f3e10da6db464fab69591ef94adaf360402fca9990cc6a1",
     "packaging/rollback.sh": "c5d528899cc0f17e306384a7eaf63c386197de7e5be107fec11b19c3f00621e4",
