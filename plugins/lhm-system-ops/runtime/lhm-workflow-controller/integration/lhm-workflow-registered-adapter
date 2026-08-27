@@ -47,6 +47,14 @@ if operation == "claude_dispatch" and argv[1] == "submit-seo-gsc-readonly":
               "evidence_sha256": hashlib.sha256(evidence.encode()).hexdigest()}
 else:
     result = json.loads(lines[-1])
+if operation == "claude_dispatch" and argv[1] in {
+        "submit-google-drive-client-file-create",
+        "submit-basicops-task-discussion-update",
+        "submit-basicops-task-baton-transition",
+        "observe-basicops-human-decision",
+    }:
+    if result.get("status") != "completed" or not isinstance(result.get("verification"), dict):
+        raise SystemExit(4)
 receipt = {"schema_version": 1, "operation": operation, "binding": request["binding"], "result": result}
 receipt["receipt_sha256"] = hashlib.sha256(json.dumps(result, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 print(json.dumps(receipt, sort_keys=True))

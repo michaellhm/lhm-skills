@@ -29,3 +29,11 @@ def test_projection_request_reads_root_registry_without_broad_workflow_user_acce
     assert 'User=root' in service and 'Group=root' in service
     assert 'ReadWritePaths=/var/lib/lhm-workflow/delegated-basicops-requests' in service
     assert 'ReadOnlyPaths=/var/lib/lhm-workflow/delegated-parents /home/hermes/.hermes/profiles/lhm_brain/config/client-handback-targets.json' in service
+
+
+def test_delegated_dispatch_rejects_incomplete_connector_results():
+    adapter = (PLUGIN / 'runtime/lhm-workflow-controller/integration/lhm-workflow-registered-adapter').read_text(encoding='utf-8')
+    bridge = (PLUGIN / 'runtime/lhm-workflow-controller/integration/lhm-delegated-basicops-bridge').read_text(encoding='utf-8')
+    assert 'result.get("status") != "completed"' in adapter
+    assert 'not isinstance(result.get("verification"), dict)' in adapter
+    assert 'registered BasicOps worker did not complete with verification' in bridge
