@@ -108,6 +108,10 @@ Monthly Budget Target: $X | Current Daily Total: $X/day | Projected: $X/month
 
 Save to: `google_ads/YYYY-MM/bid-budget-review-YYYY-MM.md`
 
+When invoked as the mandatory diagnostic inside `google-ads-monthly-review`, return the same
+campaign verdict table and summary to the monthly Lead for embedding under `Bid & Budget Findings`
+in the consolidated review. Do not save a separate bid/budget report in that mode.
+
 ## Safety Guardrails
 
 Apply these silently — don't explain them in the output unless a recommendation hits one:

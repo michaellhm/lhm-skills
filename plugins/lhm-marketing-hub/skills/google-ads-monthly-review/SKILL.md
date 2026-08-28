@@ -89,15 +89,19 @@ result to the Lead:
 
 1. Run `bid-budget-optimizer` for every active campaign. Return the current bid strategy, observed
    constraints, and one of `keep`, `change`, or `insufficient_evidence`, with the proposed strategy or
-   value when change is supported. Include PMax in this assessment. When any PMax campaign is active,
-   also run the read-only monthly-review slice of `pmax-optimizer` so conversion mix, asset/listing
-   constraints and scaling evidence are resolved consistently.
-2. Run `google-ads-conversion-audit` for the account and every active campaign. Use GA4 evidence when
-   the Ads configuration or event firing is unclear. Produce the required conversion one-pager.
-3. Trigger `keyword-optimizer` whenever the evidence identifies search-term waste, negative-keyword
-   work, dormant/duplicated search structure, match-type problems, or keyword expansion. Do not leave
-   “clean up keywords/structure” as a preliminary recommendation.
-4. Trigger other specialists only where account evidence supports them.
+   value when change is supported. Include PMax in this assessment.
+2. When any PMax campaign is active, run the read-only monthly tactical slice of `pmax-optimizer`.
+   Resolve conversion mix, asset/listing constraints, search themes, audience signals and scaling
+   evidence. Do not defer this diagnostic until after the monthly handoff.
+3. When any Search campaign is active, run the read-only/prepare-only slice of `keyword-optimizer`,
+   even when the first-pass evidence does not yet show obvious waste. Return retain/pause/add
+   decisions, negative-keyword candidates and match-type findings or an explicit
+   `insufficient_evidence` result. Produce the Editor CSV and negative TXT whenever supported by the
+   evidence; these files are preparation artefacts and do not authorise an Ads mutation.
+4. Run `google-ads-conversion-audit` for the account and every active campaign. Use GA4 evidence when
+   the Ads configuration or event firing is unclear. Return its one-page content to the monthly Lead
+   for inclusion in the consolidated review; do not create a separate conversion file in this mode.
+5. Trigger other specialists only where account evidence supports them.
 
 These diagnostics do not authorise live mutations. They resolve preliminary observations into exact
 recommendations for the Lead.
@@ -127,8 +131,8 @@ can resolve it now. Each recommendation must include:
 Saving the read-only monthly report and creating its review record are part of delivery, not consequential Google Ads actions. Do this **before** asking for approval.
 
 1. Read the client's canonical service file and use its exact Google Drive destination for Google Ads deliverables. Do not infer a folder from the client name when a destination is recorded.
-2. Return the completed four-file review pack to Hermes. Hermes submits one bounded monthly-review delivery job to the configured ChatGPT/Codex bridge; it must not require a direct Drive or BasicOps connector in the Hermes session.
-3. The delivery worker saves and reads back the four-file review pack defined below, then captures the observed Drive file IDs/URLs and parent folder.
+2. Return the completed consolidated review and any evidence-supported implementation files to Hermes. Hermes submits one bounded monthly-review delivery job to the configured ChatGPT/Codex bridge; it must not require a direct Drive or BasicOps connector in the Hermes session.
+3. The delivery worker validates the required manifest, saves and reads back every manifest item, then captures the observed Drive file IDs/URLs, byte counts and parent folder. Missing specialist completion, a missing required file or failed readback is a delivery failure, not an optional omission.
 4. In the same job, the worker invokes `lhm-project-hub:basicops-task-manager`, deduplicates and creates or updates the review parent, writes the discussion and reads it back.
 5. Hermes polls the recorded delivery run ID and resumes it rather than submitting duplicates. It may proceed to the approval gate only after receiving verified Drive and BasicOps URLs.
 
@@ -185,26 +189,38 @@ approval gate.
 
 ## Required review pack
 
-Save and verify all four files in `google_ads/YYYY-MM/` before the decision handoff:
+Save and verify one decision document in `google_ads/YYYY-MM/` before the BasicOps handoff:
 
-1. `monthly-review-YYYY-MM.md`: one-page executive review.
-2. `conversion-tracking-YYYY-MM.md`: one-page conversion audit from
-   `google-ads-conversion-audit`.
-3. `specialist-findings-YYYY-MM.md`: concise bid/budget, keyword, PMax and other triggered
-   specialist evidence, recommendations and QA state. Omit empty sections, not the file. Specialist
-   execution files required by an owning skill must use the same canonical Drive
-   `google_ads/YYYY-MM/` folder, be uploaded and read back, and be linked from this index and the
-   implementation checklist instead of expanding the core pack.
-4. `implementation-checklist-YYYY-MM.md`: atomic approved routine actions plus a separate
-   `Michael approval required` section for consequential actions. Every checkbox must name the
-   exact object, current state, proposed state and verification step. Never use vague items such as
-   “optimise campaign” or “review tracking”.
+`google-ads-monthly-review-YYYY-MM.md`
 
-### Executive monthly review format
+It combines the executive review, conversion audit, bid/budget findings, keyword findings, PMax
+findings, other triggered specialist findings and the atomic implementation checklist. Keep the
+executive section to one page; supporting sections may continue below it. Include a distinct
+`Michael approval required` section for consequential actions. Every checklist item must name the
+exact object, current state, proposed state and verification step.
 
-**File**: `google_ads/YYYY-MM/monthly-review-YYYY-MM.md`
+Create separate files only when they are directly useful for implementation. When Search is active
+and the evidence supports changes, these normally include:
 
-**This report is a one-pager. One page maximum.** Keep prose to a minimum, lead with the data, no preamble or wrap-up. The whole thing should fit on a single printed page.
+- `keyword-changes-<client-slug>-YYYY-MM.csv` for Google Ads Editor;
+- `negative-keywords-<client-slug>-YYYY-MM.txt` for reviewed, paste-ready negatives.
+
+Other specialist implementation artefacts are conditional. Store every generated file in the same
+canonical folder, link it from the combined review, and read it back. Internal worker evidence and
+QA receipts remain in the structured handback rather than becoming extra human-facing reports.
+
+The delivery manifest must contain the combined review plus every implementation file promised by
+a specialist result. A run may reach the decision handoff only when every manifest item has a
+verified Drive URL and the required specialist child runs are terminal and QA-passed. Otherwise say
+`analysis complete; delivery incomplete`, identify the first incomplete stage and preserve its run
+ID for resumption.
+
+### Consolidated monthly review format
+
+**File**: `google_ads/YYYY-MM/google-ads-monthly-review-YYYY-MM.md`
+
+Keep the opening executive review to one printed page. Lead with data and avoid a preamble or
+wrap-up. The specialist findings and implementation sections follow beneath it in the same file.
 
 Include the **Execution Checklist for the matched zone only** (see Zone Reference section below). Do not paste all five zone checklists — only the one that applies.
 
@@ -238,10 +254,27 @@ Measurement confidence: [High/Medium/Low] — [one-line reason]
 ### Optional [Zone] Checklist
 [Mark each matched-zone candidate Done, Selected, Not supported, or Optional]
 
-### Review Pack
-- [Conversion one-pager URL]
-- [Specialist findings URL]
-- [Implementation checklist URL]
+## Conversion Tracking Findings
+[Current versus recommended goal state, firing/import evidence, confidence and exact action.]
+
+## Bid & Budget Findings
+[Campaign verdicts and supporting evidence.]
+
+## Keyword Findings
+[Retain/pause/add, negatives, match-type and blocked-term findings, or not applicable.]
+
+## PMax Findings
+[Monthly tactical checklist findings, or not applicable when no PMax campaign is active.]
+
+## Implementation Checklist
+[Approved routine work with exact object/current/proposed/verification fields.]
+
+## Michael Approval Required
+[Consequential actions only, or "None".]
+
+## Implementation Files
+- [Editor CSV URL when produced]
+- [Negative keyword TXT URL when produced]
 ```
 
 ## Tips

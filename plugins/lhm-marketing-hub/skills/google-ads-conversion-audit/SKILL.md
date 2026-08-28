@@ -42,6 +42,10 @@ or campaign goals without the authority defined by the Google Ads Lead.
 
 Save as `google_ads/YYYY-MM/conversion-tracking-YYYY-MM.md`.
 
+When invoked by `google-ads-monthly-review`, return the same one-page content to the monthly Lead for
+embedding under `Conversion Tracking Findings` in the consolidated monthly review. In that mode, do
+not save a separate conversion file. Standalone conversion audits retain the filename above.
+
 ```markdown
 # Conversion Tracking: [Client] | [YYYY-MM]
 

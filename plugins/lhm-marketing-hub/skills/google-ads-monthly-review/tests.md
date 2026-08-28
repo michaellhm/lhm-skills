@@ -105,25 +105,27 @@ before selecting final actions. The campaign table must show each current bid st
 one verdict: `keep`, `change`, or `insufficient_evidence`. Do not leave “confirm PMax scaling” as an
 unresolved top-five item when the available evidence can support a verdict.
 
-## 20. Uniform conversion one-pager
+## 20. Conversion findings in the combined review
 
-Given Ads-hosted and GA4 conversion actions, produce `conversion-tracking-YYYY-MM.md` with current
+Given Ads-hosted and GA4 conversion actions, include a conversion section in `google-ads-monthly-review-YYYY-MM.md` with current
 and recommended primary/secondary state, account-default inclusion, per-campaign goal usage, GA4
 firing evidence and Ads import state. If an Ads-hosted action cannot be demoted or deleted, recommend
 the exact campaign-goal exclusion rather than the impossible account-level mutation.
 
-## 21. Evidence-triggered keyword resolution
+## 21. Active Search keyword diagnostic
 
-Given a preliminary finding of dormant structure, duplicated keywords, search-term waste or missing
-negatives, run `keyword-optimizer` before finalising the five. Return exact pause/retain/add decisions
-or a bounded evidence blocker, not “clean up structure” or “run keyword optimizer”.
+Given any active Search campaign, run `keyword-optimizer` before finalising the five, even when the
+first pass does not reveal obvious waste. Return exact pause/retain/add decisions, an explicit keep
+finding or a bounded evidence blocker. Produce the Editor CSV and negative TXT only when evidence
+supports changes; do not invent work to force those files.
 
-## 22. Four-file pack and BasicOps presentation
+## 22. Consolidated pack and BasicOps presentation
 
-A completed monthly review must save and verify the executive review, conversion one-pager,
-specialist findings and implementation checklist. The BasicOps discussion must repeat key metrics,
-the campaign table with bid verdicts, resolved top five and the matched-zone optional checklist, then
-link all four files. The checklist must separate approved routine work from consequential work.
+A completed monthly review must save and verify one `google-ads-monthly-review-YYYY-MM.md` containing
+the executive review, conversion, bid/budget, keyword and PMax findings, other triggered evidence,
+the implementation checklist and a separate consequential-approval section. The BasicOps discussion
+must repeat key metrics, the campaign table with bid verdicts, resolved top five and the matched-zone
+optional checklist, then link the combined review and applicable implementation files.
 
 ## 23. Review-only execution ceiling
 
@@ -146,5 +148,18 @@ to the mandatory bid-strategy verdict. Route conversion firing, goal and import 
 ## 26. Supplementary artefact delivery
 
 Given a specialist produces Editor CSV, negative TXT or another implementation file, store it in the
-same canonical `google_ads/YYYY-MM/` Drive folder, link it from specialist findings and the
-implementation checklist, read it back, and list its verified URL under `additional_execution_files`.
+same canonical `google_ads/YYYY-MM/` Drive folder, link it from the combined review, read it back,
+and list its verified URL under `implementation_files`.
+
+## 27. Manifest blocks premature BasicOps handoff
+
+Given the bid/budget and conversion children pass but an active-Search keyword child has no terminal
+QA receipt, do not create or update the BasicOps decision handoff. Return `analysis complete;
+delivery incomplete`, the keyword child run ID and its first incomplete stage. A later resumption
+must reuse that child and cycle identity rather than submit a duplicate.
+
+## 28. Analysis is not execution
+
+Given bid, keyword and PMax diagnostics recommend consequential changes, still deliver the combined
+review and preparation files during the cron run. Do not mutate Google Ads; put only the protected
+changes in `Michael approval required`.
