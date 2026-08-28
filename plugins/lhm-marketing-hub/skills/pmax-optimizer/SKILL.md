@@ -123,6 +123,11 @@ Save to:
 clients/<slug>/google_ads/YYYY-MM/pmax-optimisation-<monthly|90day>-YYYY-MM.md
 ```
 
+When invoked as the read-only monthly tactical diagnostic inside `google-ads-monthly-review`,
+return the headline numbers, checklist findings and routing summary to the monthly Lead for
+embedding under `PMax Findings` in the consolidated review. Do not save a separate PMax report in
+that mode. Standalone monthly and 90-day runs retain the filename above.
+
 Structure:
 
 ```markdown

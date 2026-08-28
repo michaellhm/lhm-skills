@@ -106,6 +106,12 @@ Three deliverables:
 2. **Google Ads Editor CSV** — keyword status (pause/enable) and match-type changes, ready to import into Google Ads Editor
 3. **Negative keywords TXT** — categorised, phrase-match, quoted, n-gram decomposed
 
+When invoked as the mandatory active-Search diagnostic inside `google-ads-monthly-review`, return
+the one-page findings to the monthly Lead for embedding under `Keyword Findings`; do not save a
+separate Markdown summary. Generate the Editor CSV only when keyword status or match-type changes
+are supported, and generate the negative TXT only when reviewed negative additions are supported.
+An evidence-backed keep/no-change result is valid and produces neither implementation file.
+
 ## Expected Interaction Flow
 
 ```
