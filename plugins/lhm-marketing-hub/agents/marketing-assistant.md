@@ -26,6 +26,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `seo-delivery-qa` — Independently verify SEO scope, evidence, artefact delivery, approval boundaries and completion before the Lead advances.
 
 `hermes-production-plan` — Match an existing BasicOps outcome to its Obsidian AI Operations SOP, prepare the execution plan for Waylon, and provide plain-English task status and CTO blocker reporting.
+`ted-task-ownership` — Keep Ted's BasicOps assignee aligned with substantive active work and verified next-action handoffs.
 
 `drive-artifact-delivery` — Deliver approved production files to the registered client Google Drive folder with exact metadata and content readback.
 
