@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-169 skills across ten Claude Code plugins (59 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 24 project hub, 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+170 skills across ten Claude Code plugins (59 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 25 project hub, 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -185,10 +185,11 @@ plugins/lhm-client-updates-hub/       # (deprecated — skills migrated to lhm-p
 plugins/lhm-project-hub/              # Agency process hub — sales handover through monthly/quarterly reviews
   .claude-plugin/plugin.json            # Plugin manifest
   agents/pm-orchestrator.md             # Main entry point — status, SOP discovery and governed multi-skill coordination
-  skills/                               # All 24 skills
+  skills/                               # All 25 skills
     basicops-task-manager/              # Shared BasicOps boundary — discussion-first briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
+    ted-task-ownership/                 # Keep Ted's BasicOps assignee aligned with active work and verified handoffs
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
     staff-weekly-flow/                  # Personal weekly/daily focus, full BasicOps inbox triage/write-back and reminder preferences
     sales-handover/                     # Hand a newly-closed client from sales to delivery
