@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-157 skills across nine Claude Code plugins (59 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 24 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+169 skills across ten Claude Code plugins (59 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 24 project hub, 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -223,6 +223,14 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
   skills/                               # All 2 skills
     sync-observations/                  # Push local Task Observer logs to observations/<person>/
     weekly-skill-review/                # Cross-team review — applies learnings on a branch, opens a PR
+plugins/lhm-system-ops/               # Governed CTO engineering and release operations
+  .claude-plugin/plugin.json            # Claude plugin manifest
+  .codex-plugin/plugin.json             # Codex plugin manifest
+  skills/                               # All 12 skills
+    lhm-cto/                            # Capability incident owner and team router
+    lhm-skill-maintainer/               # Canonical skill edits, tests, PR, approved deployment and hotfix reconciliation
+    lhm-plugin-release-manager/         # Immutable GitHub and Hermes release handoff
+    ... and 9 specialised engineering, QA, security and source-handoff skills
 ```
 
 ## Skills Catalog
@@ -240,6 +248,8 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 **SaaS & Growth Marketing** (25 skills): A/B testing, analytics tracking, competitor pages, content strategy, copy editing, copywriting, email sequences, form CRO, free tool strategy, launch strategy, marketing ideas, marketing psychology, onboarding CRO, page CRO, paid ads, paywall CRO, popup CRO, pricing strategy, product marketing, programmatic SEO, referral programs, schema markup, SEO audit, signup flow CRO, social content.
 
 **Pricing** (1 skill): Standalone pricing strategy and monetization.
+
+**System Operations** (12 skills): Governed CTO incident ownership, capability research, platform engineering, QA, security review, canonical skill maintenance, immutable plugin release management, release publishing and bounded source handoffs.
 
 ### GMB Hub (Local SEO)
 
