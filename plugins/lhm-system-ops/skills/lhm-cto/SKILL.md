@@ -21,6 +21,11 @@ For material work, create distinct recorded passes:
 4. `lhm-security-reviewer` verifies permissions, credentials, supply chain, audit and rollback.
 5. `lhm-plugin-release-manager` prepares the immutable GitHub and Hermes delivery handoff.
 
+For an incident whose repair changes an LHM skill, route the engineering handoff through
+`lhm-skill-maintainer`. It owns canonical-source reconciliation, repository hygiene, behavioural
+validation, the bounded branch/PR handoff, approved deployment verification and reconciliation of
+any emergency live hotfix. It does not replace QA, security review or the release manager.
+
 The same runtime may execute the roles sequentially during the pilot, but evidence and dispositions must remain separate. Never describe one runtime as independent review.
 
 ## Capability selection
