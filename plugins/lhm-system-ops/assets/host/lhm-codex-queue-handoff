@@ -1,0 +1,45 @@
+#!/usr/bin/python3
+"""Root-owned, queue-local ACL handoff for Codex request files."""
+import os
+import stat
+import subprocess
+from pathlib import Path
+
+INCOMING = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution/incoming')
+SETFACL = '/usr/bin/setfacl'
+
+
+def set_acl(acl, descriptor):
+    subprocess.run(
+        [SETFACL, '-n', '-m', acl, f'/proc/self/fd/{descriptor}'],
+        check=True, pass_fds=(descriptor,),
+    )
+
+
+def main():
+    directory = os.open(INCOMING, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        # New tempfiles inherit this entry. The submitter's chmod 0640 retains
+        # a read mask, so named read remains effective across rename.
+        set_acl('d:m::r--,d:u:codexworker:r--', directory)
+        # The triggering file predates the default ACL. Open direct JSON files
+        # without following links and grant the already-open inode only.
+        with os.scandir(directory) as entries:
+            for entry in entries:
+                if not entry.name.endswith('.json'):
+                    continue
+                try:
+                    descriptor = os.open(entry.name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory)
+                except OSError:
+                    continue
+                try:
+                    if stat.S_ISREG(os.fstat(descriptor).st_mode):
+                        set_acl('m::r--,u:codexworker:r--', descriptor)
+                finally:
+                    os.close(descriptor)
+    finally:
+        os.close(directory)
+
+
+if __name__ == '__main__':
+    main()
