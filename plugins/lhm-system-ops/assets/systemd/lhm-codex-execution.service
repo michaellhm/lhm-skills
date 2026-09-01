@@ -2,6 +2,9 @@
 Description=Run subscription-authenticated Codex worker for lhm_brain
 [Service]
 Type=oneshot
+ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes
+ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain
+ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution
 ExecStart=/usr/local/libexec/lhm-codex-execution-worker
 User=codexworker
 Group=codexworker
