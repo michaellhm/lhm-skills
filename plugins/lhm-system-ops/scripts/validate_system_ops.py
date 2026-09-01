@@ -82,8 +82,8 @@ def main():
     for relative in generated_bytecode_paths(PLUGIN):
         errors.append(f'generated Python bytecode in plugin release contents: {relative}')
     expected_manifest_versions = {
-        '.codex-plugin/plugin.json': '0.9.50',
-        '.claude-plugin/plugin.json': '0.9.71',
+        '.codex-plugin/plugin.json': '0.9.51',
+        '.claude-plugin/plugin.json': '0.9.72',
     }
     for relative, expected_version in expected_manifest_versions.items():
         path = PLUGIN / relative
@@ -157,6 +157,11 @@ def main():
         'references/project-hub-deployer-release.json',
         'references/hermes-project-hub-readonly-mount.compose.yaml',
         'scripts/build_project_hub_release.py',
+        'assets/container/lhm-codex-dispatch',
+        'assets/host/lhm-codex-execution-worker',
+        'assets/systemd/lhm-codex-execution.path',
+        'assets/systemd/lhm-codex-execution.service',
+        'references/codex-execution-release.md',
     }
     for relative in required_assets:
         if not (PLUGIN / relative).is_file():
@@ -191,6 +196,22 @@ def main():
         errors.append('dispatcher is missing the private CTO run-control directory')
     if "subprocess.run(['/usr/sbin/runuser'" not in dispatcher:
         errors.append('dispatcher must use the absolute restricted-worker launcher path')
+    codex_worker = (PLUGIN / 'assets/host/lhm-codex-execution-worker').read_text(encoding='utf-8')
+    codex_service = (PLUGIN / 'assets/systemd/lhm-codex-execution.service').read_text(encoding='utf-8')
+    codex_path = (PLUGIN / 'assets/systemd/lhm-codex-execution.path').read_text(encoding='utf-8')
+    for required in ("'/usr/bin/env','-i'", "CODEX,'login','status'", "'--ignore-user-config'", "'--sandbox','read-only'", "'selected_provider':'openai-codex'", "'authentication_class':auth"):
+        if required not in codex_worker:
+            errors.append(f'Codex execution worker is missing fail-closed control: {required}')
+    for prohibited_provider in ('OPENROUTER_API_KEY', 'ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'hermes-2'):
+        if prohibited_provider in codex_worker:
+            errors.append(f'Codex execution worker names prohibited metered inference material: {prohibited_provider}')
+    if 'DirectoryNotEmpty=/home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution/incoming' not in codex_path:
+        errors.append('replacement Codex watcher does not implement the generic queue contract')
+    for boundary in ('ProtectSystem=strict','ProtectHome=read-only','/var/run/docker.sock','/run/docker.sock','/root'):
+        if boundary not in codex_service:
+            errors.append(f'Codex execution service is missing isolation boundary: {boundary}')
+    if 'User=codexworker' not in codex_service or '/home/codexworker/.codex' in next(line for line in codex_service.splitlines() if line.startswith('ReadWritePaths=')):
+        errors.append('Codex execution must run as codexworker without writable credential storage')
     callback = (PLUGIN / 'assets/host/lhm-cto-result-resumer').read_text(encoding='utf-8')
     if 'max_iterations' not in callback or 'questions_for_chief' not in callback:
         errors.append('CTO result resumer is missing the bounded evidence-loop contract')

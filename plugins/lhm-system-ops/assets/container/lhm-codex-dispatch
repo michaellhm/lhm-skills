@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+"""Unprivileged lhm_brain client for the root-owned Codex execution queue."""
+import json, os, re, sys, tempfile
+from pathlib import Path
+
+BASE = Path('/opt/data/profiles/lhm_brain/dispatch/codex-execution')
+SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
+FIELDS = {'schema_version','request_id','parent_run_id','task_class','objective','permission_profile','timeout_seconds','created_at'}
+
+def main():
+    if len(sys.argv) != 2 or sys.argv[1] not in {'submit','status'}:
+        raise SystemExit('usage: lhm-codex-dispatch submit|status')
+    value = json.load(sys.stdin)
+    if sys.argv[1] == 'status':
+        request_id = value.get('request_id') if isinstance(value, dict) else None
+        if not isinstance(request_id, str) or not SAFE_ID.fullmatch(request_id):
+            raise SystemExit('invalid request_id')
+        for directory in ('receipts','incidents'):
+            path = BASE / directory / f'{request_id}.json'
+            if path.is_file():
+                print(path.read_text(encoding='utf-8'), end='')
+                return
+        raise SystemExit('request not complete')
+    if not isinstance(value, dict) or set(value) != FIELDS or value.get('schema_version') != 1:
+        raise SystemExit('invalid request schema')
+    for key in ('request_id','parent_run_id'):
+        if not isinstance(value[key], str) or not SAFE_ID.fullmatch(value[key]): raise SystemExit(f'invalid {key}')
+    if value['task_class'] not in {'generic_non_mutating','marketing','knowledge_work'}: raise SystemExit('invalid task_class')
+    if value['permission_profile'] != 'default-review-only': raise SystemExit('unregistered permission profile')
+    if not isinstance(value['objective'], str) or not 1 <= len(value['objective']) <= 16000: raise SystemExit('invalid objective')
+    if not isinstance(value['timeout_seconds'], int) or not 30 <= value['timeout_seconds'] <= 900: raise SystemExit('invalid timeout')
+    incoming = BASE / 'incoming'; incoming.mkdir(parents=True, exist_ok=True)
+    target = incoming / f"{value['request_id']}.json"
+    if target.exists() or any((BASE/d/f"{value['request_id']}.json").exists() for d in ('processing','receipts','incidents')):
+        raise SystemExit('duplicate request_id')
+    fd, temporary = tempfile.mkstemp(prefix='.request.', dir=incoming)
+    with os.fdopen(fd,'w',encoding='utf-8') as handle: json.dump(value,handle,sort_keys=True); handle.write('\n')
+    os.chmod(temporary,0o640); os.replace(temporary,target)
+    print(json.dumps({'accepted':True,'request_id':value['request_id'],'selected_worker':'codex','authentication_class':'subscription-backed'}))
+
+if __name__ == '__main__': main()

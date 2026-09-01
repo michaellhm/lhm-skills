@@ -1,0 +1,14 @@
+[Unit]
+Description=Run subscription-authenticated Codex worker for lhm_brain
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/lhm-codex-execution-worker
+User=codexworker
+Group=codexworker
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+ReadWritePaths=/home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution
+InaccessiblePaths=/home/hermes/.hermes/profiles/lhm_brain/vault /var/run/docker.sock /run/docker.sock /root
