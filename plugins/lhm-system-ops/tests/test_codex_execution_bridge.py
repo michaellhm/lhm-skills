@@ -76,3 +76,18 @@ def test_service_has_no_docker_vault_root_or_host_shell_exposure():
     assert 'ExecStart=/usr/local/libexec/lhm-codex-execution-worker' in unit
     assert 'User=codexworker' in unit
     assert '/home/codexworker/.codex' not in next(line for line in unit.splitlines() if line.startswith('ReadWritePaths='))
+
+def test_root_owned_launch_repairs_only_codexworker_traversal_before_worker():
+    unit=(ROOT/'assets/systemd/lhm-codex-execution.service').read_text()
+    lines=unit.splitlines()
+    acl_lines=[line for line in lines if line.startswith('ExecStartPre=')]
+    assert acl_lines == [
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes',
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain',
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution',
+    ]
+    assert max(lines.index(line) for line in acl_lines) < lines.index('ExecStart=/usr/local/libexec/lhm-codex-execution-worker')
+    assert all(line.startswith('ExecStartPre=+/usr/bin/setfacl -n -m ') for line in acl_lines)
+    assert all('m::--x,u:codexworker:--x' in line for line in acl_lines)
+    assert all('-R' not in line and 'vault' not in line and 'rwx' not in line for line in acl_lines)
+    assert not any(entry in '\n'.join(acl_lines) for entry in ('u:claudeworker:','u:hermes:','u:root:'))

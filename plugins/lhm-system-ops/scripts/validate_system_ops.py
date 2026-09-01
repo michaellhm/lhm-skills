@@ -82,8 +82,8 @@ def main():
     for relative in generated_bytecode_paths(PLUGIN):
         errors.append(f'generated Python bytecode in plugin release contents: {relative}')
     expected_manifest_versions = {
-        '.codex-plugin/plugin.json': '0.9.51',
-        '.claude-plugin/plugin.json': '0.9.72',
+        '.codex-plugin/plugin.json': '0.9.52',
+        '.claude-plugin/plugin.json': '0.9.73',
     }
     for relative, expected_version in expected_manifest_versions.items():
         path = PLUGIN / relative
@@ -212,6 +212,14 @@ def main():
             errors.append(f'Codex execution service is missing isolation boundary: {boundary}')
     if 'User=codexworker' not in codex_service or '/home/codexworker/.codex' in next(line for line in codex_service.splitlines() if line.startswith('ReadWritePaths=')):
         errors.append('Codex execution must run as codexworker without writable credential storage')
+    codex_acl_preflight = [line for line in codex_service.splitlines() if line.startswith('ExecStartPre=')]
+    expected_codex_acl_preflight = [
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes',
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain',
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution',
+    ]
+    if codex_acl_preflight != expected_codex_acl_preflight:
+        errors.append('Codex execution launch must restore only the exact codexworker traversal ACLs as root')
     callback = (PLUGIN / 'assets/host/lhm-cto-result-resumer').read_text(encoding='utf-8')
     if 'max_iterations' not in callback or 'questions_for_chief' not in callback:
         errors.append('CTO result resumer is missing the bounded evidence-loop contract')
