@@ -82,8 +82,8 @@ def main():
     for relative in generated_bytecode_paths(PLUGIN):
         errors.append(f'generated Python bytecode in plugin release contents: {relative}')
     expected_manifest_versions = {
-        '.codex-plugin/plugin.json': '0.9.53',
-        '.claude-plugin/plugin.json': '0.9.74',
+        '.codex-plugin/plugin.json': '0.9.54',
+        '.claude-plugin/plugin.json': '0.9.75',
     }
     for relative, expected_version in expected_manifest_versions.items():
         path = PLUGIN / relative
@@ -201,7 +201,7 @@ def main():
     codex_handoff = (PLUGIN / 'assets/host/lhm-codex-queue-handoff').read_text(encoding='utf-8')
     codex_service = (PLUGIN / 'assets/systemd/lhm-codex-execution.service').read_text(encoding='utf-8')
     codex_path = (PLUGIN / 'assets/systemd/lhm-codex-execution.path').read_text(encoding='utf-8')
-    for required in ("'/usr/bin/env','-i'", "CODEX,'login','status'", "'--ignore-user-config'", "'--sandbox','read-only'", "'selected_provider':'openai-codex'", "'authentication_class':auth"):
+    for required in ("'/usr/bin/env','-i'", "CODEX,'login','status'", "'--ignore-user-config'", "'--sandbox','read-only'", "'selected_provider':'openai-codex'", "'authentication_class':auth", "os.symlink(source,target/'auth.json')", "'stderr_redacted':redact(exc.stderr)", "'stdout_redacted':redact(exc.stdout)"):
         if required not in codex_worker:
             errors.append(f'Codex execution worker is missing fail-closed control: {required}')
     for prohibited_provider in ('OPENROUTER_API_KEY', 'ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'hermes-2'):
