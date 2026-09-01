@@ -1,4 +1,5 @@
 import importlib.util, io, json, os, pwd, shutil, subprocess, sys, tempfile
+import pytest
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from unittest import mock
@@ -39,12 +40,49 @@ def test_generic_request_launches_subscription_codex_and_persists_receipt():
             if 'status' in args: return subprocess.CompletedProcess(args,0,'Logged in using ChatGPT\n','')
             out=Path(args[args.index('--output-last-message')+1]); out.write_text(json.dumps({'status':'completed','summary':'Synthetic result','worker':'codex'}))
             return subprocess.CompletedProcess(args,0,'{"type":"turn.completed"}\n','')
-        with mock.patch.object(worker,'run_codex',side_effect=fake) as run: worker.process(path)
+        auth=Path(temporary)/'auth.json'; auth.write_text('{}')
+        with mock.patch.object(worker,'CODEX_HOME',Path(temporary)), mock.patch.object(worker,'run_codex',side_effect=fake) as run: worker.process(path)
         receipt=json.loads((worker.BASE/'receipts/synthetic-1.json').read_text())
         assert receipt['selected_worker']=='codex' and receipt['selected_provider']=='openai-codex'
         assert receipt['authentication_class']=='subscription-backed' and receipt['permission_ceiling']=='review-only'
         command=run.call_args_list[1].args[0]
         assert '--ignore-user-config' in command and command[command.index('--sandbox')+1]=='read-only'
+        assert run.call_args_list[1].kwargs['env']['CODEX_HOME'].endswith('/worker-runs/synthetic-1/runtime-home')
+
+def test_codex_0147_runtime_home_is_writable_but_subscription_auth_stays_read_only():
+    with tempfile.TemporaryDirectory() as temporary:
+        root=Path(temporary); credential_home=root/'credential-home'; credential_home.mkdir()
+        auth=credential_home/'auth.json'; auth.write_text('{"tokens":"synthetic"}'); auth.chmod(0o400)
+        run_dir=root/'run'; run_dir.mkdir()
+        with mock.patch.object(worker,'CODEX_HOME',credential_home): runtime=worker.runtime_home(run_dir)
+        assert runtime.is_dir() and os.access(runtime,os.W_OK)
+        link=runtime/'auth.json'; assert link.is_symlink() and link.resolve()==auth
+        assert not os.access(auth,os.W_OK) or auth.stat().st_mode & 0o222 == 0
+
+def test_codex_0147_exec_reproduces_read_only_home_runtime_exit():
+    codex=shutil.which('codex')
+    if not codex: pytest.skip('codex-cli unavailable')
+    version=subprocess.run([codex,'--version'],text=True,capture_output=True,check=True).stdout
+    if 'codex-cli 0.147.0' not in version: pytest.skip(f'0.147.0 required, found {version.strip()}')
+    if os.geteuid()==0: pytest.skip('read-only owner permissions cannot be reproduced as root')
+    with tempfile.TemporaryDirectory() as temporary:
+        root=Path(temporary); home=root/'.codex'; home.mkdir(); schema=root/'schema.json'
+        schema.write_text('{"type":"object"}\n'); home.chmod(0o500)
+        command=[codex,'exec','--ephemeral','--ignore-user-config','--sandbox','read-only','--skip-git-repo-check','--output-schema',str(schema),'--output-last-message',str(root/'result.json'),'--json','synthetic offline prompt']
+        done=subprocess.run(command,env={'HOME':str(root),'CODEX_HOME':str(home),'PATH':os.environ.get('PATH','')},text=True,capture_output=True,timeout=10)
+        assert done.returncode==1
+        assert 'failed to initialize in-process app-server client: Permission denied' in done.stderr
+
+def test_failed_codex_subprocess_persists_bounded_redacted_evidence():
+    with tempfile.TemporaryDirectory() as temporary:
+        worker.BASE=Path(temporary); [ (worker.BASE/n).mkdir() for n in ('incoming','processing','receipts','incidents','failed','worker-runs') ]
+        path=worker.BASE/'processing/synthetic-1.json'; path.write_text(json.dumps(request()))
+        secret='sk-'+'A'*40
+        worker.incident(path,worker.CodexExit(1,'event '+secret,'Authorization: Bearer '+secret+'\npermission denied'))
+        evidence=json.loads((worker.BASE/'incidents/synthetic-1.json').read_text())
+        assert evidence['subprocess_exit_status']==1 and secret not in json.dumps(evidence)
+        assert evidence['stderr_redacted'].endswith('permission denied') and '[REDACTED]' in evidence['stdout_redacted']
+        assert len(evidence['stderr_redacted'])<=4000 and len(evidence['stdout_redacted'])<=4000
 
 def test_marketing_and_knowledge_work_keep_codex_default():
     with tempfile.TemporaryDirectory() as temporary:

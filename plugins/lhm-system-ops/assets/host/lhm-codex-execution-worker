@@ -5,9 +5,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 BASE=Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution')
-CODEX='/home/codexworker/.local/bin/codex'; SAFE_ID=re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
+CODEX='/home/codexworker/.local/bin/codex'; CODEX_HOME=Path('/home/codexworker/.codex')
+SAFE_ID=re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
 FIELDS={'schema_version','request_id','parent_run_id','task_class','objective','permission_profile','timeout_seconds','created_at'}
-ENV={'HOME':'/home/codexworker','CODEX_HOME':'/home/codexworker/.codex','PATH':'/home/codexworker/.local/bin:/usr/bin:/bin'}
+ENV={'HOME':'/home/codexworker','CODEX_HOME':str(CODEX_HOME),'PATH':'/home/codexworker/.local/bin:/usr/bin:/bin'}
+REDACTIONS=(
+    re.compile(r'(?i)(authorization\s*[:=]\s*bearer\s+)[^\s"\']+'),
+    re.compile(r'(?i)((?:access|refresh|id)_token["\']?\s*[:=]\s*["\']?)[^\s,"\']+'),
+    re.compile(r'\b(?:sk|sess|eyJ)[-_A-Za-z0-9.]{16,}\b'),
+)
+
+class CodexExit(RuntimeError):
+    def __init__(self, returncode, stdout, stderr):
+        super().__init__(f'Codex subprocess exited {returncode}')
+        self.returncode=returncode; self.stdout=stdout; self.stderr=stderr
 
 def now(): return datetime.now(timezone.utc).isoformat()
 def atomic(path,value):
@@ -23,8 +34,19 @@ def validate(v,path):
     if v['permission_profile']!='default-review-only': raise ValueError('unregistered permission profile')
     if not isinstance(v['objective'],str) or not 1<=len(v['objective'])<=16000: raise ValueError('invalid objective')
     if not isinstance(v['timeout_seconds'],int) or not 30<=v['timeout_seconds']<=900: raise ValueError('invalid timeout')
-def run_codex(args,**kw):
-    return subprocess.run(['/usr/bin/env','-i',*[f'{k}={v}' for k,v in ENV.items()],*args],capture_output=True,text=True,check=True,**kw)
+def run_codex(args,env=None,check=True,**kw):
+    environment=ENV if env is None else env
+    return subprocess.run(['/usr/bin/env','-i',*[f'{k}={v}' for k,v in environment.items()],*args],capture_output=True,text=True,check=check,**kw)
+def redact(value,limit=4000):
+    text=value or ''
+    for pattern in REDACTIONS: text=pattern.sub(lambda match:(match.group(1) if match.lastindex else '')+'[REDACTED]',text)
+    return text[-limit:]
+def runtime_home(run_dir):
+    source=CODEX_HOME/'auth.json'
+    if not source.is_file() or source.is_symlink(): raise RuntimeError('Codex subscription auth file unavailable')
+    target=run_dir/'runtime-home'; target.mkdir(mode=0o700)
+    os.symlink(source,target/'auth.json')
+    return target
 def auth_status():
     result=run_codex([CODEX,'login','status'],timeout=20)
     text=(result.stdout+' '+result.stderr).lower()
@@ -37,12 +59,14 @@ def process(path):
     processing=BASE/'processing'/path.name; shutil.move(path,processing)
     run_dir=BASE/'worker-runs'/value['request_id']; run_dir.mkdir(mode=0o700)
     output=run_dir/'result.json'; events=run_dir/'events.jsonl'; output_schema=run_dir/'schema.json'; schema(output_schema)
-    auth=auth_status()
+    auth=auth_status(); ephemeral_home=runtime_home(run_dir)
     prompt=('You are the governed Codex execution worker. Complete the bounded non-mutating knowledge task below. '
       'Do not write files, mutate external systems, delegate to Claude/OpenRouter, request credentials, or exceed 12 tool/reasoning turns. '
       'If completion needs write authority or unavailable evidence, fail closed. Return only the requested structured result.\n\nTask: '+value['objective'])
     command=[CODEX,'exec','--ephemeral','--ignore-user-config','--sandbox','read-only','--skip-git-repo-check','--output-schema',str(output_schema),'--output-last-message',str(output),'--json',prompt]
-    completed=run_codex(['/usr/bin/timeout','--signal=TERM',str(value['timeout_seconds']),*command],timeout=value['timeout_seconds']+10)
+    execution_env={**ENV,'CODEX_HOME':str(ephemeral_home)}
+    completed=run_codex(['/usr/bin/timeout','--signal=TERM',str(value['timeout_seconds']),*command],env=execution_env,check=False,timeout=value['timeout_seconds']+10)
+    if completed.returncode: raise CodexExit(completed.returncode,completed.stdout,completed.stderr)
     events.write_text(completed.stdout,encoding='utf-8'); result=json.loads(output.read_text(encoding='utf-8'))
     receipt={'schema_version':1,'request_id':value['request_id'],'parent_run_id':value['parent_run_id'],'child_run_id':value['request_id']+':codex','task_class':value['task_class'],'selected_worker':'codex','selected_provider':'openai-codex','authentication_class':auth,'permission_ceiling':'review-only','started_at':started,'finished_at':now(),'final_status':result['status'],'result_receipt':result['summary'],'events_sha256':hashlib.sha256(events.read_bytes()).hexdigest()}
     atomic(BASE/'receipts'/path.name,receipt); processing.unlink()
@@ -50,7 +74,9 @@ def incident(path,exc):
     request_id=path.stem; parent=None
     try: parent=json.loads(path.read_text(encoding='utf-8')).get('parent_run_id')
     except Exception: pass
-    atomic(BASE/'incidents'/f'{request_id}.json',{'schema_version':1,'request_id':request_id,'parent_run_id':parent,'selected_worker':'codex','selected_provider':'openai-codex','authentication_class':'subscription-backed','permission_ceiling':'review-only','final_status':'capability_incident','finished_at':now(),'result_receipt':str(exc)[-1000:]})
+    evidence={}
+    if isinstance(exc,CodexExit): evidence={'subprocess_exit_status':exc.returncode,'stderr_redacted':redact(exc.stderr),'stdout_redacted':redact(exc.stdout)}
+    atomic(BASE/'incidents'/f'{request_id}.json',{'schema_version':1,'request_id':request_id,'parent_run_id':parent,'selected_worker':'codex','selected_provider':'openai-codex','authentication_class':'subscription-backed','permission_ceiling':'review-only','final_status':'capability_incident','finished_at':now(),'result_receipt':str(exc)[-1000:],**evidence})
     if path.exists(): shutil.move(path,BASE/'failed'/path.name)
 def main():
     for name in ('incoming','processing','receipts','incidents','failed','worker-runs'): (BASE/name).mkdir(parents=True,exist_ok=True)
