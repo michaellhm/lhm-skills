@@ -82,8 +82,8 @@ def main():
     for relative in generated_bytecode_paths(PLUGIN):
         errors.append(f'generated Python bytecode in plugin release contents: {relative}')
     expected_manifest_versions = {
-        '.codex-plugin/plugin.json': '0.9.52',
-        '.claude-plugin/plugin.json': '0.9.73',
+        '.codex-plugin/plugin.json': '0.9.53',
+        '.claude-plugin/plugin.json': '0.9.74',
     }
     for relative, expected_version in expected_manifest_versions.items():
         path = PLUGIN / relative
@@ -159,6 +159,7 @@ def main():
         'scripts/build_project_hub_release.py',
         'assets/container/lhm-codex-dispatch',
         'assets/host/lhm-codex-execution-worker',
+        'assets/host/lhm-codex-queue-handoff',
         'assets/systemd/lhm-codex-execution.path',
         'assets/systemd/lhm-codex-execution.service',
         'references/codex-execution-release.md',
@@ -197,6 +198,7 @@ def main():
     if "subprocess.run(['/usr/sbin/runuser'" not in dispatcher:
         errors.append('dispatcher must use the absolute restricted-worker launcher path')
     codex_worker = (PLUGIN / 'assets/host/lhm-codex-execution-worker').read_text(encoding='utf-8')
+    codex_handoff = (PLUGIN / 'assets/host/lhm-codex-queue-handoff').read_text(encoding='utf-8')
     codex_service = (PLUGIN / 'assets/systemd/lhm-codex-execution.service').read_text(encoding='utf-8')
     codex_path = (PLUGIN / 'assets/systemd/lhm-codex-execution.path').read_text(encoding='utf-8')
     for required in ("'/usr/bin/env','-i'", "CODEX,'login','status'", "'--ignore-user-config'", "'--sandbox','read-only'", "'selected_provider':'openai-codex'", "'authentication_class':auth"):
@@ -217,9 +219,16 @@ def main():
         'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes',
         'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain',
         'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution',
+        'ExecStartPre=+/usr/local/libexec/lhm-codex-queue-handoff',
     ]
     if codex_acl_preflight != expected_codex_acl_preflight:
-        errors.append('Codex execution launch must restore only the exact codexworker traversal ACLs as root')
+        errors.append('Codex execution launch must restore the exact bounded codexworker ACLs as root')
+    for required in ("d:m::r--,d:u:codexworker:r--", "m::r--,u:codexworker:r--", "entry.name.endswith('.json')", 'os.O_NOFOLLOW', 'pass_fds=(descriptor,)'):
+        if required not in codex_handoff:
+            errors.append(f'Codex queue handoff is missing bounded control: {required}')
+    for prohibited in ('-R', 'rwx', 'vault', 'claudeworker', 'hermes-2'):
+        if prohibited in codex_handoff:
+            errors.append(f'Codex queue handoff contains prohibited scope: {prohibited}')
     callback = (PLUGIN / 'assets/host/lhm-cto-result-resumer').read_text(encoding='utf-8')
     if 'max_iterations' not in callback or 'questions_for_chief' not in callback:
         errors.append('CTO result resumer is missing the bounded evidence-loop contract')

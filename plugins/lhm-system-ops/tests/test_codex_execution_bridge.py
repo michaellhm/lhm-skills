@@ -1,4 +1,4 @@
-import importlib.util, io, json, subprocess, sys, tempfile
+import importlib.util, io, json, os, pwd, shutil, subprocess, sys, tempfile
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from unittest import mock
@@ -85,9 +85,37 @@ def test_root_owned_launch_repairs_only_codexworker_traversal_before_worker():
         'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes',
         'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain',
         'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution',
+        'ExecStartPre=+/usr/local/libexec/lhm-codex-queue-handoff',
     ]
     assert max(lines.index(line) for line in acl_lines) < lines.index('ExecStart=/usr/local/libexec/lhm-codex-execution-worker')
-    assert all(line.startswith('ExecStartPre=+/usr/bin/setfacl -n -m ') for line in acl_lines)
-    assert all('m::--x,u:codexworker:--x' in line for line in acl_lines)
+    assert all(line.startswith(('ExecStartPre=+/usr/bin/setfacl -n -m ', 'ExecStartPre=+/usr/local/libexec/lhm-codex-queue-handoff')) for line in acl_lines)
+    assert all('m::--x,u:codexworker:--x' in line for line in acl_lines[:-1])
     assert all('-R' not in line and 'vault' not in line and 'rwx' not in line for line in acl_lines)
     assert not any(entry in '\n'.join(acl_lines) for entry in ('u:claudeworker:','u:hermes:','u:root:'))
+
+def test_queue_handoff_is_read_only_direct_json_and_survives_submit_chmod():
+    source=(ROOT/'assets/host/lhm-codex-queue-handoff').read_text()
+    assert "d:m::r--,d:u:codexworker:r--" in source
+    assert "m::r--,u:codexworker:r--" in source
+    assert "entry.name.endswith('.json')" in source and 'os.O_NOFOLLOW' in source
+    assert 'pass_fds=(descriptor,)' in source and "f'/proc/self/fd/{descriptor}'" in source
+    assert all(value not in source for value in ('-R','rwx','vault','claudeworker','hermes-2'))
+    if not shutil.which('setfacl') or not shutil.which('getfacl'):
+        return
+    with tempfile.TemporaryDirectory() as temporary:
+        incoming=Path(temporary)/'incoming'; incoming.mkdir()
+        username=pwd.getpwuid(os.getuid()).pw_name
+        subprocess.run(['setfacl','-n','-m',f'd:m::r--,d:u:{username}:r--',str(incoming)],check=True)
+        fd,temp_name=tempfile.mkstemp(prefix='.incident.',dir=incoming)
+        os.write(fd,b'{}\n'); os.close(fd); os.chmod(temp_name,0o640)
+        target=incoming/'codex-smoke-generic-20260901-02.json'; os.replace(temp_name,target)
+        acl=subprocess.run(['getfacl','-cp',str(target)],check=True,text=True,capture_output=True).stdout
+        assert f'user:{username}:r--' in acl and 'mask::r--' in acl and 'other::---' in acl
+        subprocess.run(['setfacl','-b',str(target)],check=True)
+        descriptor=os.open(target,os.O_RDONLY | os.O_NOFOLLOW)
+        try:
+            subprocess.run(['setfacl','-n','-m',f'm::r--,u:{username}:r--',f'/proc/self/fd/{descriptor}'],check=True,pass_fds=(descriptor,))
+        finally:
+            os.close(descriptor)
+        repaired=subprocess.run(['getfacl','-cp',str(target)],check=True,text=True,capture_output=True).stdout
+        assert f'user:{username}:r--' in repaired and 'other::---' in repaired
