@@ -12,7 +12,7 @@ import pwd
 from pathlib import Path
 
 CAPABILITY_ID = 'CAP-015'
-RELEASE_VERSION = '0.9.20'
+RELEASE_VERSION = '0.9.21'
 PLUGIN = Path(__file__).resolve().parents[2]
 MANIFEST_PATH = PLUGIN / 'references/shared-claude-gateway-release.json'
 ANCESTORS = ('/home/hermes/.hermes', '/home/hermes/.hermes/profiles/lhm_brain')

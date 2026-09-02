@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.20"
+    assert MANIFEST["release_version"] == "0.9.21"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -519,6 +519,30 @@ def test_internal_handback_registration_is_exactly_bounded(tmp_path, monkeypatch
         "basicops_task_ids": ["2199999"],
     }
     assert final["workflow_contract"]["skill_provenance"] == "declared_only_no_worker"
+
+
+def test_seo_internal_handback_uses_a_distinct_service_slug(tmp_path, monkeypatch):
+    dispatcher, incoming, runs, registry = registration_fixture(tmp_path, monkeypatch)
+    request = registration_request(
+        run_id="claude-register-20260902-01",
+        client="local-health-marketing-seo",
+        name="Local Health Marketing SEO",
+        drive_folder_id="1t3aUHy1ZSMiHophhJQsQC-cDjcZiMxUA",
+        basicops_task_ids=["2192596"],
+    )
+    queued = incoming / "seo.json"
+    queued.write_text(json.dumps(request))
+    dispatcher.complete_registration(queued, request)
+    final = json.loads((runs / request["run_id"] / "final.json").read_text())
+    assert final["status"] == "completed"
+    targets = json.loads(registry.read_text())["clients"]
+    assert "local-health-marketing" not in targets
+    assert targets["local-health-marketing-seo"]["drive_folder_query"].endswith("1t3aUHy1ZSMiHophhJQsQC-cDjcZiMxUA")
+
+
+def test_specialist_exact_artifact_transport_has_bounded_30000_character_ceiling():
+    source = (PLUGIN / "assets/gateways/lhm-shared-claude-dispatcher").read_text()
+    assert "objective_ceiling = 30000 if profile == 'specialist_readonly' else 4000" in source
 
 
 def test_registry_backup_fsyncs_base_on_first_creation_and_backup_dir_every_time(tmp_path, monkeypatch):
