@@ -83,6 +83,11 @@ PROFILE_CONTRACTS = {
     'basicops_task_discussion_update': (
         'basicops-task-discussion-update', ('lhm-project-hub:basicops-task-manager',),
         ('basicops.task_read', 'basicops.discussion_create', 'basicops.discussion_readback')),
+    'basicops_task_baton_transition': (
+        'basicops-task-baton-transition', ('lhm-project-hub:basicops-task-manager',),
+        ('basicops.task_read', 'basicops.task_update', 'basicops.discussion_create', 'basicops.discussion_readback')),
+    'basicops_human_decision_observe': (
+        'basicops-human-decision-observe', (), ('basicops.task_read', 'basicops.discussion_readback')),
     'handback_target_registration': (
         'handback-target-registration', ('lhm-connector-repair:handback-target-registration',), ()),
     'html_artifact_producer': (
@@ -298,9 +303,17 @@ def complete_registration(path, request):
         finish('completed', 'already_existed', target=target)
         return
     if existing is not None:
-        finish('failed', 'refused', 'slug is already registered with different details')
-        return
+        existing_normalized = dict(existing)
+        existing_normalized.setdefault('type', target_type)
+        existing_ids = existing_normalized.pop('basicops_task_ids', None)
+        target_identity = {key: value for key, value in target.items() if key != 'basicops_task_ids'}
+        if (existing_normalized != target_identity or not isinstance(existing_ids, list)
+                or not set(existing_ids).issubset(set(task_ids))):
+            finish('failed', 'refused', 'slug is already registered with different details')
+            return
     for other_slug, other in targets.items():
+        if other_slug == slug:
+            continue
         if other.get('vault_prefix') == vault_prefix:
             finish('failed', 'refused', f'vault prefix already belongs to {other_slug}')
             return
@@ -329,7 +342,7 @@ def complete_registration(path, request):
             return
         finish('failed', 'refused', f'registry update failed and backup restored with readback: {exc}')
         return
-    finish('completed', 'registered', target=target)
+    finish('completed', 'task_ids_extended' if existing is not None else 'registered', target=target)
 
 
 def load_clients():
@@ -545,7 +558,7 @@ def process(path):
         reject(path, f'invalid JSON: {exc}')
         return
     profile = request.get('profile')
-    handback_profiles = {'google_drive_client_file_create', 'basicops_task_discussion_update'}
+    handback_profiles = {'google_drive_client_file_create', 'basicops_task_discussion_update', 'basicops_task_baton_transition', 'basicops_human_decision_observe'}
     contract_fields = {'workflow_id', 'required_skills', 'required_capabilities'}
     expected_fields = ({'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_name', 'objective', 'output_name', 'input_artifacts', 'timeout_seconds'} | contract_fields
                        if profile == 'html_artifact_producer' else
@@ -553,6 +566,10 @@ def process(path):
                        if profile == 'google_drive_client_file_create' else
                        {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'task_id', 'discussion', 'timeout_seconds'} | contract_fields
                        if profile == 'basicops_task_discussion_update' else
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'task_id', 'assignee_user_id', 'native_status', 'review_type', 'discussion', 'timeout_seconds'} | contract_fields
+                       if profile == 'basicops_task_baton_transition' else
+                       {'schema_version', 'run_id', 'profile', 'agent_id', 'client', 'task_id', 'discussion', 'timeout_seconds'} | contract_fields
+                       if profile == 'basicops_human_decision_observe' else
                        {'schema_version', 'run_id', 'profile', 'agent_id', 'target_type', 'client', 'name', 'vault_prefix', 'drive_folder_id', 'basicops_task_ids', 'timeout_seconds'} | contract_fields
                        if profile == 'handback_target_registration' else
                        {'schema_version', 'run_id', 'profile', 'agent_id', 'route', 'subject_type', 'subject_name', 'objective', 'approval_state', 'timeout_seconds'} | contract_fields
@@ -577,6 +594,8 @@ def process(path):
         'marketing_orchestrator_readonly': 'lhm-marketing-hub:start',
         'google_drive_client_file_create': 'lhm-connector-repair',
         'basicops_task_discussion_update': 'lhm-connector-repair',
+        'basicops_task_baton_transition': 'lhm-connector-repair',
+        'basicops_human_decision_observe': 'lhm-connector-repair',
         'handback_target_registration': 'lhm-connector-repair',
     }[profile])
     if request.get('agent_id') != required_agent:
@@ -598,6 +617,8 @@ def process(path):
               'seo_gsc_readonly': 'claude-gsc',
               'google_drive_client_file_create': 'claude-gdrive',
               'basicops_task_discussion_update': 'claude-basicops',
+              'basicops_task_baton_transition': 'claude-basicops',
+              'basicops_human_decision_observe': 'claude-basicops',
               'handback_target_registration': 'claude-register',
               'specialist_readonly': 'claude-delegate',
               'html_artifact_producer': 'claude-producer'}[profile]
@@ -715,12 +736,18 @@ def process(path):
         if profile in handback_profiles and slug in canonical_clients:
             client = canonical_client_handback_target(canonical_clients[slug])
             registered = optional_handback_target(slug)
-            if registered is not None:
+            if (slug == 'local-health-marketing' and isinstance(registered, dict)
+                    and registered.get('type') == 'internal'):
+                client = registered
+            elif registered is not None:
                 comparable = {key: value for key, value in client.items() if key != 'type'}
                 legacy_registered = {key: value for key, value in registered.items() if key != 'type'}
-                if legacy_registered != comparable:
+                canonical_ids = {str(value) for value in comparable.pop('basicops_task_ids', [])}
+                registered_ids = {str(value) for value in legacy_registered.pop('basicops_task_ids', [])}
+                if legacy_registered != comparable or not canonical_ids.issubset(registered_ids):
                     reject(path, 'canonical client and handback target conflict')
                     return
+                client = registered
         else:
             clients = load_handback_targets() if profile in handback_profiles else canonical_clients
             if request.get('client') not in clients:
@@ -836,6 +863,16 @@ def process(path):
             reject(path, 'invalid discussion length')
             return
         prompt.update(task_id=task_id, discussion=discussion)
+        if profile == 'basicops_task_baton_transition':
+            assignee = str(request.get('assignee_user_id', ''))
+            if assignee not in {'36398', '36401', '36402', '36403', '63471', '82484', '82491'}:
+                reject(path, 'assignee is outside verified internal registry'); return
+            if request.get('native_status') not in {'In Progress', 'Under Review', 'Blocked', 'On Hold', 'Complete'}:
+                reject(path, 'invalid delegated native status'); return
+            if request.get('review_type') not in {'none', 'plan_approval', 'delivery_review'}:
+                reject(path, 'invalid delegated review type'); return
+            prompt.update(event_id=run_id, assignee_user_id=assignee, native_status=request['native_status'],
+                          review_type=request['review_type'], discussion_sha256=hashlib.sha256(discussion.encode('utf-8')).hexdigest())
     for name, payload in (('request.json', request), ('prompt.json', prompt)):
         item = run_dir / name
         item.write_text(json.dumps(payload, indent=2) + '\n', encoding='utf-8')
@@ -848,6 +885,8 @@ def process(path):
         'marketing_orchestrator_readonly': 'Validated general marketing request queued for the Claude start orchestrator.',
         'google_drive_client_file_create': 'Validated scoped Google Drive file repair queued for Claude.',
         'basicops_task_discussion_update': 'Validated scoped BasicOps discussion repair queued for Claude.',
+        'basicops_task_baton_transition': 'Validated delegated BasicOps baton transition queued for independent readback.',
+        'basicops_human_decision_observe': 'Validated read-only BasicOps human decision observation queued.',
         'specialist_readonly': 'Validated delegate-first specialist request queued for Claude.',
         'html_artifact_producer': 'Validated bounded HTML producer request queued for Claude.',
     }[profile]
