@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.9.20",
+  "release_version": "0.9.21",
   "captured_at": "2026-09-02",
   "source": "verified deployed Hermes host inventory",
   "assets": {
     "dispatcher": {
       "source": "assets/gateways/lhm-shared-claude-dispatcher",
       "destination": "/usr/local/libexec/lhm-claude-dispatcher",
-      "sha256": "85b4377627ca5071cbd7d2139a1b27fdfceeb3fc36a397868231884f71318570",
+      "sha256": "0bacf70ed922a8a00cb1ca985e6ca3ade7bcdde1c1fa1e70fe388ec5fe14a09a",
       "previous_sha256": "85b4377627ca5071cbd7d2139a1b27fdfceeb3fc36a397868231884f71318570",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 44655
+      "size_bytes": 44798
     },
     "worker": {
       "source": "assets/gateways/lhm-shared-claude-worker",
