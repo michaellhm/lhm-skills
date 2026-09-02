@@ -7,10 +7,12 @@ import os
 import shutil
 import subprocess
 import tempfile
+import grp
+import pwd
 from pathlib import Path
 
 CAPABILITY_ID = 'CAP-015'
-RELEASE_VERSION = '0.9.7'
+RELEASE_VERSION = '0.9.8'
 PLUGIN = Path(__file__).resolve().parents[2]
 MANIFEST_PATH = PLUGIN / 'references/shared-claude-gateway-release.json'
 ANCESTORS = ('/home/hermes/.hermes', '/home/hermes/.hermes/profiles/lhm_brain')
@@ -25,6 +27,10 @@ def numeric_identity(value, kind):
         return value
     if value == 'root':
         return 0
+    try:
+        return pwd.getpwnam(value).pw_uid if kind == 'owner' else grp.getgrnam(value).gr_gid
+    except KeyError as exc:
+        raise SystemExit(f'unknown manifest {kind}') from exc
     raise SystemExit(f'unsupported manifest {kind}')
 
 
@@ -48,6 +54,8 @@ def verify_sources(manifest, plugin=PLUGIN):
 def preflight_destinations(manifest):
     for name, item in manifest['assets'].items():
         destination = Path(item['destination'])
+        if item.get('new_in_release') and not destination.exists():
+            continue
         if not destination.is_file() or destination.is_symlink():
             raise SystemExit(f'{name}: destination missing or linked')
         expected = item.get('previous_sha256')
@@ -60,6 +68,9 @@ def write_state(manifest, backup_root, runner=subprocess.run):
     records = {}
     for name, item in manifest['assets'].items():
         source = Path(item['destination'])
+        if item.get('new_in_release') and not source.exists():
+            records[name] = {'destination': str(source), 'created': True}
+            continue
         stat = source.stat()
         backup = backup_root / name
         shutil.copyfile(source, backup)
@@ -82,6 +93,7 @@ def atomic_install(manifest, plugin=PLUGIN):
     for item in manifest['assets'].values():
         source = plugin / item['source']
         destination = Path(item['destination'])
+        destination.parent.mkdir(parents=True, exist_ok=True)
         fd, temporary = tempfile.mkstemp(prefix=f'.{destination.name}.', dir=destination.parent)
         try:
             with os.fdopen(fd, 'wb') as handle:
@@ -102,6 +114,11 @@ def rollback(state_path, runner=subprocess.run):
     if state.get('capability_id') != CAPABILITY_ID:
         raise SystemExit('rollback state is not CAP-015')
     for record in state['assets'].values():
+        if record.get('created'):
+            destination = Path(record['destination'])
+            if destination.exists() and not destination.is_symlink():
+                destination.unlink()
+            continue
         backup = Path(record['backup'])
         if sha256(backup) != record['sha256']:
             raise SystemExit('rollback backup hash mismatch')
@@ -137,11 +154,26 @@ def main():
     manifest = load_manifest()
     verify_sources(manifest)
     preflight_destinations(manifest)
+    # The caller can create only unpredictable files here, never read or list them.
+    os.makedirs('/var/lib/lhm-workflow/claude-artifact-export', mode=0o700, exist_ok=True)
+    workflow_gid = grp.getgrnam('lhmworkflow').gr_gid
+    adapter_gid = grp.getgrnam('lhmworkflowadapter').gr_gid
+    for name, mode, gid in (('incoming', 0o730, workflow_gid), ('processing', 0o700, 0),
+                            ('accepted', 0o700, 0), ('failed', 0o700, 0),
+                            ('incidents', 0o700, 0), ('locks', 0o700, 0),
+                            ('operations', 0o700, 0), ('artifacts', 0o2750, adapter_gid)):
+        path = Path('/var/lib/lhm-workflow/claude-artifact-export') / name
+        path.mkdir(mode=mode, exist_ok=True); os.chown(path, 0, gid); os.chmod(path, mode)
+    key = Path('/var/lib/lhm-workflow/claude-artifact-export/locks/exporter.key')
+    if not key.exists():
+        key.write_bytes(os.urandom(32)); os.chown(key, 0, 0); os.chmod(key, 0o600)
     state_file = write_state(manifest, Path(args.backup_directory))
     try:
         atomic_install(manifest)
         subprocess.run(['/usr/bin/systemd-analyze', 'verify',
-                        manifest['assets']['dispatch_unit']['destination']], check=True)
+                        manifest['assets']['dispatch_unit']['destination'],
+                        manifest['assets']['artifact_export_unit']['destination'],
+                        manifest['assets']['artifact_export_path']['destination']], check=True)
         subprocess.run(['/usr/bin/systemctl', 'daemon-reload'], check=True)
     except Exception:
         rollback(state_file)

@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.6"
+    assert MANIFEST["release_version"] == "0.9.8"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -44,7 +44,7 @@ def test_container_client_is_governed_at_exact_bind_mount_target():
     client = MANIFEST["assets"]["container_client"]
     assert client["destination"] == "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch"
     assert client["container_destination"] == "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
-    assert client["previous_sha256"] == "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac"
+    assert client["previous_sha256"] == "e2e6ec2aba98ace85bae5edd84b0d376973664519eaa2f31c66099a2e75dc3c8"
     assert client["owner"] == client["group"] == 10000
     assert client["mode"] == "0755"
 
