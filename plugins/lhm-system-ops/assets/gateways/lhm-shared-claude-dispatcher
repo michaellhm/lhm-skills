@@ -698,7 +698,7 @@ def process(path):
         if request.get('approval_state') != 'review_only':
             reject(path, 'specialist route must be review_only')
             return
-        if not isinstance(objective, str) or not 10 <= len(objective) <= 6000:
+        if not isinstance(objective, str) or not 10 <= len(objective) <= 30000:
             reject(path, 'invalid objective length')
             return
         if any(ord(char) < 32 and char not in '\n\t' for char in objective):
@@ -756,8 +756,7 @@ def process(path):
             client = clients[request['client']]
     if profile not in handback_profiles and profile not in {'specialist_readonly', 'seo_gsc_readonly', 'html_artifact_producer'}:
         objective = request.get('objective')
-        objective_ceiling = 30000 if profile == 'specialist_readonly' else 4000
-        if not isinstance(objective, str) or not 10 <= len(objective) <= objective_ceiling:
+        if not isinstance(objective, str) or not 10 <= len(objective) <= 4000:
             reject(path, 'invalid objective length')
             return
         if any(ord(char) < 32 and char not in '\n\t' for char in objective):

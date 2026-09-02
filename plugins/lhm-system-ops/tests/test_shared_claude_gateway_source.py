@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.22"
+    assert MANIFEST["release_version"] == "0.9.23"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -542,7 +542,8 @@ def test_seo_internal_handback_uses_a_distinct_service_slug(tmp_path, monkeypatc
 
 def test_specialist_exact_artifact_transport_has_bounded_30000_character_ceiling():
     source = (PLUGIN / "assets/gateways/lhm-shared-claude-dispatcher").read_text()
-    assert "objective_ceiling = 30000 if profile == 'specialist_readonly' else 4000" in source
+    specialist = source.split("if request.get('approval_state') != 'review_only':", 1)[1]
+    assert "not 10 <= len(objective) <= 30000" in specialist.split("elif profile == 'seo_gsc_readonly':", 1)[0]
 
 
 def test_registry_backup_fsyncs_base_on_first_creation_and_backup_dir_every_time(tmp_path, monkeypatch):
