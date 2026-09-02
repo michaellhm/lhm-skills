@@ -161,6 +161,10 @@ def test_seo_lead_route_is_distinct_and_preserves_existing_seo_contracts():
     assert dispatcher.SPECIALIST_SKILLS["seo-lead"] == "lhm-marketing-hub:start-seo"
     assert dispatcher.SPECIALIST_ROUTES["keyword-research"] == ("lhm-marketing-hub:seo", "seo")
     assert dispatcher.SPECIALIST_SKILLS["keyword-research"] == "lhm-marketing-hub:keyword-research"
+    assert dispatcher.SPECIALIST_ROUTES["seo-page-brief"] == ("lhm-marketing-hub:seo", "seo")
+    assert dispatcher.SPECIALIST_SKILLS["seo-page-brief"] == "lhm-marketing-hub:seo-page-brief"
+    assert dispatcher.admitted_contract("specialist_readonly", "seo-page-brief") == (
+        "seo-page-brief-review", ("lhm-marketing-hub:seo-page-brief",), ())
     assert dispatcher.SPECIALIST_ROUTES["seo-delivery-qa"] == ("lhm-marketing-hub:seo", "seo")
     assert dispatcher.SPECIALIST_SKILLS["seo-delivery-qa"] == "lhm-marketing-hub:seo-delivery-qa"
     assert dispatcher.admitted_contract("specialist_readonly", "seo-lead") == (
