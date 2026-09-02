@@ -1,12 +1,12 @@
 # Shared Claude gateway release boundary
 
-The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. Release 0.9.21 retains the reconciled 0.9.20 gateway and adds a distinct LHM SEO handback target plus bounded exact-artifact transport for specialist QA. The exact admitted predecessors are dispatcher `85b43776…`, worker `10c681dc…`, dispatch unit `bf840874…`, gateway ACL drop-in `41016cd8…`, and container client `2e160271…`.
+The files named in `shared-claude-gateway-release.json` are the authoritative tracked source for the root-owned shared Claude dispatch path. Release 0.9.22 retains the reconciled 0.9.20 gateway, adds a distinct LHM SEO handback target plus bounded exact-artifact transport for specialist QA, and recognises the already-installed bridge files as governed predecessors. The exact admitted predecessors are dispatcher `85b43776…`, worker `10c681dc…`, dispatch unit `bf840874…`, gateway ACL drop-in `41016cd8…`, and container client `2e160271…`.
 
 The bridge accepts only opaque identifiers through a write-only, non-listable spool. Root alone derives protected Hermes run paths and validates the exact current specialist `final.json`, `skill-provenance.json`, and unchanged `result.md` through no-follow descriptors. It produces content-addressed workflow artifacts and an adapter-incoming handback. It does not publish to Drive; Drive remains a separate exact-folder connector stage.
 
 These assets are distinct from the additive `lhm-evidence-claude-*` gateways. No evidence-bridge installer may overwrite the shared dispatcher or worker.
 
-Release 0.9.21 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.69.
+Release 0.9.22 is the shared-Claude gateway subrelease packaged inside LHM System Ops 0.9.69.
 It supervises each worker for its full lifecycle. The root dispatcher maintains
 only execute access for `claudeworker` and `codexworker` on the two named profile ancestors; the
 Claude process still runs as `claudeworker`, and its only write grant is the validated canonical

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "capability_id": "CAP-015",
-  "release_version": "0.9.21",
+  "release_version": "0.9.22",
   "captured_at": "2026-09-02",
   "source": "verified deployed Hermes host inventory",
   "assets": {
@@ -61,7 +61,7 @@
       "owner": "root",
       "group": "lhmworkflow",
       "mode": "0750",
-      "new_in_release": true
+      "previous_sha256": "c8c0e5250aeb5f955abf710bca2acf4ec3e1f39fac07babb75a7caeea15d3318"
     },
     "artifact_exporter": {
       "source": "assets/gateways/lhm-claude-artifact-exporter",
@@ -70,7 +70,7 @@
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "new_in_release": true
+      "previous_sha256": "8ecad7b3fcdcf77c6815ca11d4a69bfc23217574a267f8951fb01ef8ff9603a9"
     },
     "artifact_export_unit": {
       "source": "assets/systemd/lhm-claude-artifact-export.service",
@@ -79,7 +79,7 @@
       "owner": "root",
       "group": "root",
       "mode": "0644",
-      "new_in_release": true
+      "previous_sha256": "266c1ad90e1c32097a86ed5a27c825c628b804de8ca1fdc4f8457a6a7c05d9c2"
     },
     "artifact_export_path": {
       "source": "assets/systemd/lhm-claude-artifact-export.path",
@@ -88,7 +88,7 @@
       "owner": "root",
       "group": "root",
       "mode": "0644",
-      "new_in_release": true
+      "previous_sha256": "d79387b9f1187eccc96ab6931a6172561b6448f0417fcd594aa0fa305dd5d821"
     }
   }
 }
