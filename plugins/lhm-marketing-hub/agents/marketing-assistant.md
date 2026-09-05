@@ -31,3 +31,5 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `drive-artifact-delivery` — Deliver approved production files to the registered client Google Drive folder with exact metadata and content readback.
 
 `lhm-system-ops:lhm-skill-maintainer` — Govern an authorised LHM skill change through canonical source edits, validation, feature-branch PR delivery, approved deployment and live verification.
+
+`lhm-wordpress-hub:wp-rest-operator` — Inspect and implement registered WordPress or LeadScale content changes through the REST API with snapshots, publish separation and readback verification.

@@ -39,6 +39,8 @@ LP phases:
 
 Use AskUserQuestion to confirm next action.
 
+If the campaign targets an existing WordPress or LeadScale site and the registered delivery method is `wordpress-rest`, use `wp-rest-operator` for the implementation step instead of assuming the local multisite/SSH deployment path. Keep the same copy, prototype, approval and QA gates.
+
 ### Phase Routing
 
 **Phase 1: Copy & Content**

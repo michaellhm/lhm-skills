@@ -78,7 +78,11 @@ successful shell return or armed monitor is not acceptance.
 1. Dispatch the parent to `lhm-chief-of-staff` with the full contract and return point.
 2. Require the governed route:
    `Chief of Staff → Context & Research → Head of Production → specialist worker → producer QA → Drive artefact delivery → independent final QA`.
-   Skip a role only when its work is genuinely unnecessary and record why.
+   Skip a role only when its work is genuinely unnecessary and record why. Existing WordPress or
+   LeadScale work using the REST API belongs to `lhm_website`; that profile dispatches the
+   `wordpress-rest` route through Claude Code CLI and requires
+   `lhm-wordpress-hub:wp-rest-operator`. Keep Google Ads build work with the Google Ads specialist
+   even when the same parent task also contains a landing-page deliverable.
 3. Preserve the parent ID through every child. Record child run IDs, dependencies, artefact paths,
    idempotency keys and status evidence.
 4. Check health after launch before starting a long monitor. A zero-byte log with no live process,
