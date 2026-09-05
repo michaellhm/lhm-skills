@@ -47,6 +47,7 @@ SPECIALIST_ROUTES = {
     'prototype': ('lhm-wordpress-hub:prototype-lead', 'prototype-lead'),
     'astro': ('lhm-wordpress-hub:astro-lead', 'astro-lead'),
     'wordpress': ('lhm-wordpress-hub:wordpress-lead', 'wordpress-lead'),
+    'wordpress-rest': ('lhm-wordpress-hub:wordpress-lead', 'wordpress-lead'),
     'knowledge': ('lhm-knowledge-hub:knowledge-orchestrator', 'knowledge-orchestrator'),
 }
 SPECIALIST_SKILLS = {
@@ -65,6 +66,7 @@ SPECIALIST_SKILLS = {
     'prototype': 'lhm-wordpress-hub:html-prototype',
     'astro': 'lhm-wordpress-hub:astro-build',
     'wordpress': 'lhm-wordpress-hub:wp-start',
+    'wordpress-rest': 'lhm-wordpress-hub:wp-rest-operator',
     'knowledge': 'lhm-knowledge-hub:lhm-vault-thinking',
 }
 PROFILE_CONTRACTS = {

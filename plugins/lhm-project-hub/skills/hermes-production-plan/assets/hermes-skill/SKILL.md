@@ -17,6 +17,12 @@ The objective must name the exact Project Hub workflow required, such as client 
 
 Resolve the run with `claude-dispatch status RUN_ID`, then `claude-dispatch result RUN_ID`. The worker route is review-only: output is a proposed operational package, not an authorised BasicOps, Drive, email or client mutation.
 
+For an existing WordPress or LeadScale landing-page implementation whose registered platform is WordPress REST, assign the production child to `@lhm_website` and have that profile invoke:
+
+`/opt/data/profiles/lhm_brain/bin/claude-dispatch submit-specialist-readonly wordpress-rest client CLIENT_SLUG OBJECTIVE`
+
+This routes Claude Code CLI to `lhm-wordpress-hub:wordpress-lead` with `lhm-wordpress-hub:wp-rest-operator` as the required skill. Do not route it to the Astro worker, Google Ads worker or generic project profile. The returned package remains review-only until a separately registered WordPress REST destination profile and exact mutation authority are present.
+
 ## Natural-language SOP discovery and planning
 
 When an existing BasicOps task asks for production work:

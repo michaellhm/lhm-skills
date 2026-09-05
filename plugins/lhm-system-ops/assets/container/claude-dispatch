@@ -23,6 +23,7 @@ ROUTE_SKILLS = {
     'gmb': 'lhm-gmb-hub:run-local-diagnostic', 'finance': 'lhm-finance-hub:finance-advisor',
     'website': 'lhm-wordpress-hub:wp-start', 'prototype': 'lhm-wordpress-hub:html-prototype',
     'astro': 'lhm-wordpress-hub:astro-build', 'wordpress': 'lhm-wordpress-hub:wp-start',
+    'wordpress-rest': 'lhm-wordpress-hub:wp-rest-operator',
     'knowledge': 'lhm-knowledge-hub:lhm-vault-thinking',
 }
 
@@ -188,6 +189,7 @@ def submit_specialist(route, subject_type, subject_name, objective):
         'prototype': 'lhm-wordpress-hub:prototype-lead',
         'astro': 'lhm-wordpress-hub:astro-lead',
         'wordpress': 'lhm-wordpress-hub:wordpress-lead',
+        'wordpress-rest': 'lhm-wordpress-hub:wordpress-lead',
         'knowledge': 'lhm-knowledge-hub:knowledge-orchestrator',
     }
     if route not in agent_ids:
