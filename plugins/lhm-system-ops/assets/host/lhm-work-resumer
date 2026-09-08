@@ -22,6 +22,7 @@ PROCESSED = BASE / 'processed'
 FAILED = BASE / 'failed'
 CONSUMED = BASE / 'consumed'
 AGENT_CONSUMED = BASE / 'agent-consumed'
+CONTINUATIONS = BASE / 'continuations'
 RECONCILIATIONS = BASE / 'reconciliations'
 HANDOFFS = BASE / 'handoffs'
 LOCK = BASE / '.resumer.lock'
@@ -33,6 +34,10 @@ SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$')
 AGENT_RESPONSE_FIELDS = (
     'schema_version', 'event_id', 'parent_run_id', 'parent_sha256',
     'transitioned', 'next_status', 'evidence',
+)
+CONTINUATION_FIELDS = (
+    'continuation_id', 'next_wake_at', 'completed_child_receipts',
+    'active_child_run', 'remaining_children',
 )
 
 
@@ -74,6 +79,33 @@ def atomic_json(path, value, mode=0o600):
 
 
 def validate_event(event):
+    if isinstance(event, dict) and event.get('schema_version') == 2:
+        required = {'schema_version', 'event', 'event_id', 'prior_event_id',
+                    'continuation_id', 'capability_incident_id', 'parent_run_id',
+                    'return_role', 'return_point', 'resume_token', 'evidence_refs',
+                    'timestamp', 'next_wake_at', 'idempotency_key'}
+        if set(event) != required or event.get('event') != 'work_continuation':
+            raise ValueError('invalid work_continuation event schema')
+        for key in required - {'schema_version', 'evidence_refs'}:
+            if not isinstance(event[key], str) or not event[key]:
+                raise ValueError('invalid work_continuation event value')
+        for key in ('event_id', 'prior_event_id', 'continuation_id',
+                    'capability_incident_id', 'parent_run_id'):
+            if not SAFE_ID.fullmatch(event[key]):
+                raise ValueError(f'invalid work_continuation {key}')
+        if event['event_id'] != event['continuation_id']:
+            raise ValueError('work_continuation identity mismatch')
+        expected = hashlib.sha256(
+            f"{event['parent_run_id']}\0{event['resume_token']}\0{event['continuation_id']}".encode()
+        ).hexdigest()
+        if event['idempotency_key'] != expected:
+            raise ValueError('invalid work_continuation idempotency_key')
+        _utc(event['timestamp'], 'work_continuation timestamp')
+        _utc(event['next_wake_at'], 'work_continuation next_wake_at')
+        if (not isinstance(event['evidence_refs'], list) or not event['evidence_refs']
+                or any(not isinstance(item, str) or not item for item in event['evidence_refs'])):
+            raise ValueError('invalid work_continuation evidence_refs')
+        return event
     required = {'schema_version', 'event', 'event_id', 'capability_incident_id',
                 'parent_run_id', 'return_role', 'return_point', 'resume_token',
                 'evidence_refs', 'timestamp', 'idempotency_key'}
@@ -103,17 +135,32 @@ def validate_event(event):
     return event
 
 
+def _utc(value, label):
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise ValueError(f'invalid {label}') from exc
+    if parsed.tzinfo is None or parsed.utcoffset().total_seconds() != 0:
+        raise ValueError(f'{label} is not timezone-aware UTC')
+    return parsed
+
+
 def validate_parent(parent, event):
     if not isinstance(parent, dict) or parent.get('parent_run_id') != event['parent_run_id']:
         raise ValueError('event parent does not match canonical parent')
-    if parent.get('status') != 'waiting_on_capability':
-        raise ValueError('parent is not waiting_on_capability')
+    expected_status = ('waiting_on_capability' if event['event'] == 'capability_restored'
+                       else 'continued')
+    if parent.get('status') != expected_status:
+        raise ValueError(f'parent is not {expected_status}')
     if parent.get('capability_incident_id') != event['capability_incident_id']:
         raise ValueError('event incident does not match canonical parent')
     if parent.get('return_point') != event['return_point']:
         raise ValueError('event return point does not match canonical parent')
     if parent.get('resume_token') != event['resume_token']:
         raise ValueError('event resume token does not match canonical parent')
+    if (event['event'] == 'work_continuation'
+            and parent.get('continuation_id') != event['continuation_id']):
+        raise ValueError('continuation does not match canonical parent')
     return parent
 
 
@@ -168,10 +215,18 @@ def invoke(handoff):
     response_fields = ', '.join(AGENT_RESPONSE_FIELDS)
     prompt = (
         f'Read only {event_path} and {parent_path}. Resume the exact saved role and return point. '
-        f'Write {response_path} as one JSON object with exactly these seven fields: '
-        f'{response_fields}. Set schema_version to 1, event_id and parent_run_id to the exact '
+        f'Before dispatch, reconcile any active_child_run in parent.json; await or read it back and '
+        'never duplicate it. Never repeat a client listed in completed_child_receipts. Process at '
+        'most the first remaining portfolio child, preserving all permission ceilings. '
+        f'Write {response_path} as one JSON object with the seven base fields {response_fields} '
+        f'plus exactly these five continuation fields: {", ".join(CONTINUATION_FIELDS)}. '
+        f'Set schema_version to 2, event_id and parent_run_id to the exact '
         f'input values, parent_sha256 to exactly {parent_digest}, transitioned to true, next_status '
-        'to the resulting state, and evidence to a non-empty array of non-empty strings. '
+        'to the resulting state, and evidence to a non-empty array of non-empty strings. For every '
+        'nonterminal state, set a new safe continuation_id, a timezone-aware UTC next_wake_at, the '
+        'complete cumulative completed_child_receipts, active_child_run (null or an object with '
+        'client_id, run_id, and status active or reconcile), and non-empty remaining_children. For '
+        'completed set continuation_id and next_wake_at null and remaining_children empty. '
         'If anything is unreadable or you refuse, do not claim transitioned.'
     )
     return subprocess.run([
@@ -182,8 +237,8 @@ def invoke(handoff):
 
 
 def validate_agent_record(record, event, parent_digest):
-    required = set(AGENT_RESPONSE_FIELDS)
-    if not isinstance(record, dict) or set(record) != required or record.get('schema_version') != 1:
+    required = set(AGENT_RESPONSE_FIELDS) | set(CONTINUATION_FIELDS)
+    if not isinstance(record, dict) or set(record) != required or record.get('schema_version') != 2:
         raise ValueError('invalid agent-consumed schema')
     if record.get('event_id') != event['event_id'] or record.get('parent_run_id') != event['parent_run_id']:
         raise ValueError('agent-consumed identity mismatch')
@@ -194,7 +249,56 @@ def validate_agent_record(record, event, parent_digest):
     if not isinstance(record.get('evidence'), list) or not record['evidence'] or any(
             not isinstance(item, str) or not item.strip() for item in record['evidence']):
         raise ValueError('transition requires persisted evidence')
+    receipts = record.get('completed_child_receipts')
+    if not isinstance(receipts, list) or any(
+            not isinstance(item, dict) or set(item) != {'client_id', 'receipt_refs'}
+            or not SAFE_ID.fullmatch(item.get('client_id', ''))
+            or not isinstance(item.get('receipt_refs'), list) or not item['receipt_refs']
+            or any(not isinstance(ref, str) or not ref for ref in item['receipt_refs'])
+            for item in receipts):
+        raise ValueError('invalid completed child receipts')
+    if len({item['client_id'] for item in receipts}) != len(receipts):
+        raise ValueError('duplicate completed child receipt')
+    active = record.get('active_child_run')
+    if active is not None and (not isinstance(active, dict)
+            or set(active) != {'client_id', 'run_id', 'status'}
+            or not SAFE_ID.fullmatch(active.get('client_id', ''))
+            or not SAFE_ID.fullmatch(active.get('run_id', ''))
+            or active.get('status') not in {'active', 'reconcile'}):
+        raise ValueError('invalid active child run')
+    remaining = record.get('remaining_children')
+    if (not isinstance(remaining, list) or any(
+            not isinstance(item, str) or not SAFE_ID.fullmatch(item) for item in remaining)
+            or len(set(remaining)) != len(remaining)):
+        raise ValueError('invalid remaining children')
+    if set(remaining) & {item['client_id'] for item in receipts}:
+        raise ValueError('completed child remains queued')
+    if record['next_status'] == 'completed':
+        if record['continuation_id'] is not None or record['next_wake_at'] is not None or remaining or active:
+            raise ValueError('completed parent cannot retain continuation work')
+    else:
+        if (not isinstance(record['continuation_id'], str)
+                or not SAFE_ID.fullmatch(record['continuation_id']) or not remaining):
+            raise ValueError('nonterminal parent requires durable continuation')
+        _utc(record['next_wake_at'], 'continuation next_wake_at')
     return record
+
+
+def continuation_event(event, record):
+    continuation_id = record['continuation_id']
+    return {
+        'schema_version': 2, 'event': 'work_continuation',
+        'event_id': continuation_id, 'prior_event_id': event['event_id'],
+        'continuation_id': continuation_id,
+        'capability_incident_id': event['capability_incident_id'],
+        'parent_run_id': event['parent_run_id'], 'return_role': event['return_role'],
+        'return_point': event['return_point'], 'resume_token': event['resume_token'],
+        'evidence_refs': record['evidence'], 'timestamp': now(),
+        'next_wake_at': record['next_wake_at'],
+        'idempotency_key': hashlib.sha256(
+            f"{event['parent_run_id']}\0{event['resume_token']}\0{continuation_id}".encode()
+        ).hexdigest(),
+    }
 
 
 def _failure(claim, message, handoff=None):
@@ -273,7 +377,17 @@ def process(path, runner=invoke):
             raise ValueError('canonical parent changed during resume')
         transitioned = {**current, 'status': record['next_status'], 'resume_event_id': event['event_id'],
                         'resume_evidence': record['evidence'], 'updated_at': now()}
+        for field in CONTINUATION_FIELDS:
+            transitioned[field] = record[field]
         atomic_json(parent_path, transitioned)
+        if record['next_status'] != 'completed':
+            wake = continuation_event(event, record)
+            atomic_json(CONTINUATIONS / f"{record['continuation_id']}.json", {
+                'schema_version': 1, 'parent_run_id': event['parent_run_id'],
+                'source_event_id': event['event_id'], 'checkpoint': record,
+                'checkpoint_sha256': digest(record), 'persisted_at': now(),
+            })
+            atomic_json(INCOMING / f"{record['continuation_id']}.json", wake)
         atomic_json(marker, success_marker(event, record, transitioned))
         os.replace(claim, PROCESSED / claim.name)
         return 'consumed'
@@ -330,7 +444,7 @@ def reconcile_false_marker(marker_path, processed_event_path):
 
 def main():
     for directory in (INCOMING, CLAIMS, PARENTS, PROCESSED, FAILED, CONSUMED,
-                      AGENT_CONSUMED, RECONCILIATIONS, HANDOFFS):
+                      AGENT_CONSUMED, CONTINUATIONS, RECONCILIATIONS, HANDOFFS):
         directory.mkdir(parents=True, exist_ok=True)
     with LOCK.open('a+') as handle:
         try:
@@ -338,7 +452,9 @@ def main():
         except BlockingIOError:
             return
         outcomes = {'consumed': 0, 'recovered': 0, 'duplicate': 0, 'failed': 0}
-        for path in sorted(INCOMING.glob('*.json')):
+        # Snapshot the queue: a continuation emitted by this pass is handled by
+        # the next path-unit activation, giving every child its own 1800s budget.
+        for path in sorted(list(INCOMING.glob('*.json'))):
             outcomes[process(path)] += 1
         if any(outcomes.values()):
             print(json.dumps(outcomes, sort_keys=True))
