@@ -71,7 +71,7 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         base = Path(self.temp.name)
         for name in ('INCOMING', 'CLAIMS', 'PARENTS', 'PROCESSED', 'FAILED', 'CONSUMED',
-                     'AGENT_CONSUMED', 'RECONCILIATIONS', 'HANDOFFS'):
+                     'AGENT_CONSUMED', 'CONTINUATIONS', 'RECONCILIATIONS', 'HANDOFFS'):
             path = base / name.lower()
             setattr(resumer, name, path)
             path.mkdir()
@@ -88,11 +88,16 @@ class WorkResumerIntegrationTests(unittest.TestCase):
         self.temp.cleanup()
 
     def record(self, status='continued', transitioned=True):
+        terminal = status == 'completed'
         return {
-            'schema_version': 1, 'event_id': self.event['event_id'],
+            'schema_version': 2, 'event_id': self.event['event_id'],
             'parent_run_id': self.event['parent_run_id'],
             'parent_sha256': resumer.digest(self.parent), 'transitioned': transitioned,
             'next_status': status, 'evidence': ['saved role resumed at desktop control'],
+            'continuation_id': None if terminal else 'portfolio-next-001',
+            'next_wake_at': None if terminal else '2026-09-08T01:10:00+00:00',
+            'completed_child_receipts': [], 'active_child_run': None,
+            'remaining_children': [] if terminal else ['essential-health-physio'],
         }
 
     def runner(self, record=None, returncode=0, stdout=''):
@@ -239,8 +244,92 @@ print(json.dumps({"cwd": str(pathlib.Path.cwd()), "requested_identity": argv[2],
             'schema_version', 'event_id', 'parent_run_id', 'parent_sha256',
             'transitioned', 'next_status', 'evidence',
         })
-        self.assertIn(f'exactly these seven fields: {fields}', captured['prompt'])
+        self.assertIn(f'seven base fields {fields}', captured['prompt'])
         self.assertIn(f'parent_sha256 to exactly {resumer.digest(self.parent)}', captured['prompt'])
+
+    def test_prompt_contract_keeps_active_child_queued_and_exits_after_one_dispatch(self):
+        handoff = resumer.HANDOFFS / self.event['idempotency_key']
+        with mock.patch.object(resumer.os, 'chown'):
+            handoff = resumer.make_handoff(self.event, self.parent)
+        captured = {}
+        def run(argv, **kwargs):
+            captured['prompt'] = argv[-1]
+            return SimpleNamespace(returncode=0, stdout='', stderr='')
+        with mock.patch.object(resumer.subprocess, 'run', run):
+            resumer.invoke(handoff)
+        prompt = captured['prompt']
+        self.assertIn('remains in remaining_children while active and until ALL receipt-backed delivery and BasicOps review requirements are complete', prompt)
+        self.assertIn('only then append its unchanged complete receipt bundle', prompt)
+        self.assertIn('After one dispatch, persist the checkpoint and exit immediately', prompt)
+        self.assertIn('do not poll, sleep, or wait for the child', prompt)
+        self.assertIn('"run_id":"claude-gads-20260908-03"', prompt)
+        self.assertIn('remaining_children ["essential-health-physio","heel-centre"]', prompt)
+
+        invalid = self.record()
+        invalid['active_child_run'] = {
+            'client_id': 'raise-the-bar', 'run_id': 'claude-gads-20260908-05',
+            'status': 'reconcile',
+        }
+        with self.assertRaisesRegex(ValueError, 'active child must remain queued'):
+            resumer.validate_agent_record(invalid, self.event, resumer.digest(self.parent))
+
+        valid = self.record()
+        valid['remaining_children'] = ['raise-the-bar', 'heel-centre']
+        valid['active_child_run'] = invalid['active_child_run']
+        self.assertIs(resumer.validate_agent_record(
+            valid, self.event, resumer.digest(self.parent)), valid)
+
+    def test_nonterminal_checkpoint_queues_only_next_wake_and_preserves_receipts(self):
+        record = self.record()
+        record['completed_child_receipts'] = [{
+            'client_id': 'alpha-sports-med',
+            'receipt_refs': ['basicops:2198570', 'drive:claude-gdrive-20260908-01',
+                             'drive:claude-gdrive-20260908-02',
+                             'drive:claude-gdrive-20260908-03'],
+        }]
+        record['active_child_run'] = {
+            'client_id': 'essential-health-physio',
+            'run_id': 'claude-gads-20260908-03', 'status': 'reconcile',
+        }
+        with mock.patch.object(resumer.os, 'chown'):
+            self.assertEqual(resumer.process(self.event_path, self.runner(record)), 'consumed')
+        checkpoint = json.loads((resumer.CONTINUATIONS / 'portfolio-next-001.json').read_text())
+        self.assertEqual(checkpoint['checkpoint']['completed_child_receipts'],
+                         record['completed_child_receipts'])
+        wake = json.loads((resumer.INCOMING / 'portfolio-next-001.json').read_text())
+        self.assertEqual(wake['event'], 'work_continuation')
+        self.assertEqual(wake['prior_event_id'], self.event['event_id'])
+        parent = json.loads(self.parent_path.read_text())
+        self.assertEqual(parent['continuation_id'], 'portfolio-next-001')
+        self.assertEqual(parent['active_child_run']['run_id'], 'claude-gads-20260908-03')
+
+    def test_continuation_event_reconciles_without_repeating_completed_child(self):
+        first = self.record()
+        first['completed_child_receipts'] = [{
+            'client_id': 'alpha-sports-med', 'receipt_refs': ['basicops:2198570'],
+        }]
+        with mock.patch.object(resumer.os, 'chown'):
+            self.assertEqual(resumer.process(self.event_path, self.runner(first)), 'consumed')
+        wake_path = resumer.INCOMING / 'portfolio-next-001.json'
+        wake = json.loads(wake_path.read_text())
+        current = json.loads(self.parent_path.read_text())
+        second = {
+            **first, 'event_id': wake['event_id'], 'parent_sha256': resumer.digest(current),
+            'next_status': 'completed', 'continuation_id': None, 'next_wake_at': None,
+            'remaining_children': [], 'active_child_run': None,
+            'completed_child_receipts': first['completed_child_receipts'] + [{
+                'client_id': 'essential-health-physio', 'receipt_refs': ['drive:ehp'],
+            }],
+        }
+        calls = []
+        def runner(handoff):
+            calls.append(json.loads((handoff / 'parent.json').read_text()))
+            return self.runner(second)(handoff)
+        with mock.patch.object(resumer.os, 'chown'):
+            self.assertEqual(resumer.process(wake_path, runner), 'consumed')
+        self.assertEqual(calls[0]['completed_child_receipts'], first['completed_child_receipts'])
+        self.assertEqual(json.loads(self.parent_path.read_text())['status'], 'completed')
+        self.assertEqual(list(resumer.INCOMING.iterdir()), [])
 
     def test_wrong_parent_digest_is_rejected_and_privately_preserved_before_cleanup(self):
         wrong = self.record()
