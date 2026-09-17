@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-185 skills across eleven Claude Code plugins (60 marketing, 41 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 27 project hub, 5 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+186 skills across eleven Claude Code plugins (60 marketing, 41 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 28 project hub, 5 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -186,7 +186,7 @@ plugins/lhm-client-updates-hub/       # (deprecated — skills migrated to lhm-p
 plugins/lhm-project-hub/              # Agency process hub — sales handover through monthly/quarterly reviews
   .claude-plugin/plugin.json            # Plugin manifest
   agents/pm-orchestrator.md             # Main entry point — status, SOP discovery and governed multi-skill coordination
-  skills/                               # All 25 skills
+  skills/                               # All 28 skills
     basicops-task-manager/              # Shared BasicOps boundary — discussion-first briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
@@ -204,6 +204,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     monthly-review/                     # Monthly per-client review engine (3 modes: wrap, prep, account review)
     quarterly-review/                   # Quarterly strategy review — 3-month data pull + next-quarter plan
     client-meeting-email/               # Review-only meeting email preparation; authorised post-meeting-review owns the BasicOps card
+    meeting-to-action/                 # Interactive task reconciliation, outcome delegation and Michael execution queue
     post-meeting-review/                # Top-level meeting wraps with email and linked tasks in Description; review first, Lily distribution on request with per-task personal-board Inbox read-back
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
@@ -298,7 +299,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 **Delivery Kickoffs** (6 skills): Website build kickoff (WordPress or Astro), PPC landing page campaign kickoff, SEO engagement kickoff, GMB/local SEO cycle kickoff, blog/article content pipeline kickoff, and Google Ads campaign build kickoff (gated on conversion tracking being live). Each follows the same shared pattern: intake, a project-management state file, a BasicOps scaffold with backwards-scheduled milestones, a client kickoff email, and handoff to the delivery specialist hub.
 
-**Client Success** (6 skills): Monthly per-client review engine with three modes (KP wrap-up, meeting prep, full account review). Quarterly strategy review — pulls three months of GA4/Ads/GSC data plus the quarter's monthly reports and drafts the next 3/6-month plan. Client-ready meeting follow-up email and meeting capture — turns the Fathom summary and transcript into a polished Gmail-ready wrap with decisions verified against the transcript, action items grouped by owner, and next steps; also saves the structured meeting record and stands up the client's BasicOps card with a matching summary note. Post-meeting follow-up triage — reads that saved meeting record to update client state files, sweep the client folder for stale artefacts, and turn action items into BasicOps subtasks, walking through each one to propose an owner and offer to run research or prepare a live-system handoff plan before drafting a team summary email (migrated from Client Updates Hub). Propagates a client data change across every file that references it (migrated from Client Updates Hub). Plain-language client-facing update emails after completing work (migrated from Client Updates Hub).
+**Client Success** (7 skills): `meeting-to-action` guides Michael through evidence-led task reconciliation, end-to-end delegation and his retained actions. Monthly per-client review engine with three modes (KP wrap-up, meeting prep, full account review). Quarterly strategy review — pulls three months of GA4/Ads/GSC data plus the quarter's monthly reports and drafts the next 3/6-month plan. Client-ready meeting follow-up email and meeting capture — turns the Fathom summary and transcript into a polished Gmail-ready wrap with decisions verified against the transcript, action items grouped by owner, and next steps; also saves the structured meeting record and stands up the client's BasicOps card with a matching summary note. Post-meeting follow-up triage — reads that saved meeting record to update client state files, sweep the client folder for stale artefacts, and turn action items into BasicOps subtasks, walking through each one to propose an owner and offer to run research or prepare a live-system handoff plan before drafting a team summary email (migrated from Client Updates Hub). Propagates a client data change across every file that references it (migrated from Client Updates Hub). Plain-language client-facing update emails after completing work (migrated from Client Updates Hub).
 
 **Project Managers** (4 skills): Website project cockpit for concise, evidence-based status and handoff readiness; website build PM doc; landing page campaign PM doc; and GMB optimisation cycle PM doc. The three state-file managers are migrated from their originating hubs; shims remain in place there so existing routing keeps working.
 
