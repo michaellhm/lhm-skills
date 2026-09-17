@@ -5,6 +5,20 @@ description: Identify the matching LHM Obsidian SOP from a natural-language Basi
 
 # LHM Project Manager Dispatch
 
+## Meeting-wrap intent gate
+
+Before production planning or execution, distinguish meeting review and task
+distribution from a request to perform the work. Read the installed sibling skill
+`basicops-task-manager/references/meeting-wrap.md` (in a plugin checkout:
+`${CLAUDE_PLUGIN_ROOT}/skills/basicops-task-manager/references/meeting-wrap.md`).
+For “disperse/distribute these meeting tasks”, apply only that routing procedure
+and STOP. Assign named humans to their verified Inboxes, preserve the meeting
+Description and links, and do not invoke Ted/Chief, production plans, research,
+execution queues or production lifecycle events. A review approval or distribution
+receipt never grants production authority. This gate takes precedence over the
+ordinary production flow below; TED requires a separate explicit work request.
+
+
 ## Project Hub worker
 
 Use:
@@ -16,12 +30,6 @@ Allowed subject types are `client`, `opportunity`, `internal`, and `general`.
 The objective must name the exact Project Hub workflow required, such as client onboarding, sales handover, website kickoff, monthly review, client update, team work brief, project-manager review or `lhm-project-hub:hermes-production-plan`. Include the parent/project ID, canonical Obsidian records, known BasicOps/Drive links, current phase, permission ceiling and acceptance test.
 
 Resolve the run with `claude-dispatch status RUN_ID`, then `claude-dispatch result RUN_ID`. The worker route is review-only: output is a proposed operational package, not an authorised BasicOps, Drive, email or client mutation.
-
-For an existing WordPress or LeadScale landing-page implementation whose registered platform is WordPress REST, assign the production child to `@lhm_website` and have that profile invoke:
-
-`/opt/data/profiles/lhm_brain/bin/claude-dispatch submit-specialist-readonly wordpress-rest client CLIENT_SLUG OBJECTIVE`
-
-This routes Claude Code CLI to `lhm-wordpress-hub:wordpress-lead` with `lhm-wordpress-hub:wp-rest-operator` as the required skill. Do not route it to the Astro worker, Google Ads worker or generic project profile. The returned package remains review-only until a separately registered WordPress REST destination profile and exact mutation authority are present.
 
 ## Natural-language SOP discovery and planning
 

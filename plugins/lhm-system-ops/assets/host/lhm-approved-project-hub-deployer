@@ -14,7 +14,7 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-REPO = Path('/srv/lhm-plugin-release-source/project-hub-0.1.80')
+REPO = Path('/srv/lhm-plugin-release-source/project-hub-0.1.84')
 APPROVALS = Path('/etc/lhm-plugin-approvals')
 APPROVAL_KEY = APPROVALS / 'project-hub-approval.key'
 USED_NONCES = Path('/var/lib/lhm-plugin-approval-nonces/lhm-project-hub')
@@ -30,7 +30,17 @@ MOUNTINFO = Path('/proc/self/mountinfo')
 BACKUPS = Path('/var/backups/lhm-plugin-deployments')
 REPOSITORY = 'michaellhm/lhm-skills'
 PLUGIN = 'lhm-project-hub'
-VERSION = '0.1.80'
+VERSION = '0.1.84'
+# Meeting capture and Lily routers must follow the same immutable release as Brain.
+PROFILE_ASSETS = {
+    'lhm_brain': {'josephine-post-meeting': 'skills/client-meeting-email/assets/hermes-skill'},
+    'lhm_project_manager': {'lhm-project-manager-dispatch': 'skills/hermes-production-plan/assets/hermes-skill'},
+}
+
+def profile_asset_links():
+    return [(PROFILE.parent / profile / 'skills' / name, Path(relative))
+            for profile, assets in PROFILE_ASSETS.items() for name, relative in assets.items()]
+
 
 
 def now(): return datetime.now(timezone.utc)
@@ -108,6 +118,9 @@ def secure_release_boundary():
     if (source.st_dev,source.st_ino)!=(visible.st_dev,visible.st_ino):
         raise SystemExit('host immutable release alias has the wrong source')
     reject_symlink_components(PROFILE / 'skills'); reject_symlink_components(PROFILE / 'plugin-sources')
+    for link, _ in profile_asset_links():
+        reject_symlink_components(link.parent)
+        if not link.parent.is_dir(): raise SystemExit('profile skill directory unavailable')
     secure_container_mount()
 
 
@@ -308,6 +321,9 @@ def install(approval_id, archive):
     release = RELEASES / release_id
     with tempfile.TemporaryDirectory(prefix='lhm-project-hub.') as temporary:
         plugin, skills = validate_archive(archive, Path(temporary))
+        for _, relative in profile_asset_links():
+            if not (plugin / relative / 'SKILL.md').is_file():
+                raise SystemExit('required profile skill asset absent')
         if release.exists() or release.is_symlink(): verify_existing_release(release,plugin)
         approval = consume_approval(approval_id, 'install', archive_sha256, commit)
         if release.exists():
@@ -321,15 +337,22 @@ def install(approval_id, archive):
     backup.mkdir(parents=True, mode=0o700, exist_ok=False)
     records = {'schema_version': 1, 'plugin': PLUGIN, 'version': VERSION,
                'installed_commit': commit, 'installed_archive_sha256': archive_sha256,
-               'current': snapshot(CURRENT, backup / 'current'), 'skills': {},
+               'current': snapshot(CURRENT, backup / 'current'), 'skills': {}, 'profile_assets': {},
                'plugin_source': snapshot(PROFILE / 'plugin-sources' / PLUGIN, backup / 'plugin-source')}
     for name in skills:
         records['skills'][name] = snapshot(PROFILE / 'skills' / name, backup / f'skill-{name}')
+    for link, _ in profile_asset_links():
+        key = str(link.relative_to(PROFILE.parent))
+        records['profile_assets'][key] = snapshot(link, backup / ('asset-' + key.replace('/', '-')))
     atomic_json(backup / 'rollback.json', records)
     atomic_symlink(release, CURRENT)
     for name in skills:
         atomic_symlink(VISIBLE_CURRENT / 'skills' / name, PROFILE / 'skills' / name)
     atomic_symlink(VISIBLE_CURRENT, PROFILE / 'plugin-sources' / PLUGIN)
+    for link, relative in profile_asset_links():
+        # snapshot retained any previous directory; replace it only after the release verifies.
+        if link.is_dir() and not link.is_symlink(): shutil.rmtree(link)
+        atomic_symlink(VISIBLE_CURRENT / relative, link)
     print(json.dumps({'status':'installed','plugin':PLUGIN,'version':VERSION,
                       'release':str(release),'backup':str(backup)}))
 
@@ -342,7 +365,7 @@ def rollback(approval_id, backup):
     state_file = backup / 'rollback.json'
     if not state_file.is_file() or state_file.is_symlink(): raise SystemExit('rollback state unavailable')
     state = json.loads(state_file.read_text())
-    if set(state) != {'schema_version','plugin','version','installed_commit','installed_archive_sha256','current','skills','plugin_source'} or not isinstance(state['skills'], dict):
+    if set(state) != {'schema_version','plugin','version','installed_commit','installed_archive_sha256','current','skills','plugin_source','profile_assets'} or not isinstance(state['skills'], dict):
         raise SystemExit('invalid rollback state schema')
     if state['schema_version'] != 1 or state['plugin'] != PLUGIN or state['version'] != VERSION:
         raise SystemExit('rollback state identity mismatch')
@@ -351,7 +374,10 @@ def rollback(approval_id, backup):
     for name, record in state['skills'].items():
         if not safe_id(name) or record.get('kind') not in {'absent','symlink','directory'}:
             raise SystemExit('invalid rollback skill record')
-    for record in [state['current'], state['plugin_source'], *state['skills'].values()]:
+    expected_assets = {str(link.relative_to(PROFILE.parent)) for link, _ in profile_asset_links()}
+    if set(state['profile_assets']) != expected_assets:
+        raise SystemExit('rollback profile assets differ from governed destinations')
+    for record in [state['current'], state['plugin_source'], *state['skills'].values(), *state['profile_assets'].values()]:
         if record.get('kind') == 'directory':
             saved = Path(record.get('backup', '')).resolve()
             try: saved.relative_to(backup.resolve())
@@ -360,6 +386,7 @@ def rollback(approval_id, backup):
     restore(CURRENT, state['current'])
     for name, record in state['skills'].items(): restore(PROFILE / 'skills' / name, record)
     restore(PROFILE / 'plugin-sources' / PLUGIN, state['plugin_source'])
+    for key, record in state['profile_assets'].items(): restore(PROFILE.parent / key, record)
     print(json.dumps({'status':'rolled_back','plugin':PLUGIN,'backup':str(backup)}))
 
 

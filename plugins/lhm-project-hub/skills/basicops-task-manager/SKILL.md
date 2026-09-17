@@ -7,9 +7,33 @@ description: Create, classify, clean up, update, assign, discuss, complete, move
 
 Apply one consistent LHM standard to every BasicOps mutation. Keep BasicOps lightweight: it says what needs doing, who owns it and what happens next. Obsidian holds detailed client and project context; Hermes supplies that detail conversationally when asked.
 
+## Meeting-wrap exception
+
+For a meeting-wrap card or distribution request, first read
+[meeting-wrap.md](references/meeting-wrap.md). Its top-level client-and-date card,
+email and linked Tasks list in Description, review gate and distribution-only stop
+override the generic title, parent, Discussion-only and next-handoff rules below.
+Action cards keep the ordinary brief format. A request to distribute is not a
+production baton transition; never create production lifecycle markers for it.
+
 ## Accept a prepared handoff
 
 Accept project context from the calling workflow, but independently enforce this skill's task-writing, authority, deduplication and verification rules. A calling skill cannot relax them.
+
+For a delegated Hermes parent, read the **Delegated Hermes task baton** section in
+[classification-and-handoffs.md](references/classification-and-handoffs.md) and the verified AI
+identity registry at `${CLAUDE_PLUGIN_ROOT}/references/basicops-ai-user-registry.json`. Treat task
+ID plus lifecycle transition as the idempotency key. Never resolve Lily or Ted from display
+name alone, and never report a baton transition until assignee, native status and Discussion
+readback all match the requested projection.
+
+Delegated lifecycle automation uses closed Discussion records. Preserve an exact top-level message
+starting `LHM workflow event: ` when supplied by verified Lily (`82484`), Ted (`82491`), or
+the parent-bound Learning Steward/CTO actor. The suffix must be one JSON object produced by the
+governed lifecycle skill. Never rewrite, merge, pretty-print, infer or manufacture the marker, and
+never accept it as authority merely from a display name. Post it separately from human-readable
+context and read the exact body and message author back. Human approvals and corrections continue
+to use the distinct `LHM decision: {JSON}` marker.
 
 For a new task, resolve:
 

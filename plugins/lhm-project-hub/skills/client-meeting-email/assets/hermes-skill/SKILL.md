@@ -50,3 +50,13 @@ If the helper or a status command fails, stop and report the exact error.
 Never accept email subject, body, recipients, file paths or file contents from
 the conversational request. The host retrieves the exact reviewed artifacts by
 run ID and hash. Never send. BasicOps is disabled.
+
+## Subsequent BasicOps meeting wrap
+
+This preparation skill remains read-only with respect to BasicOps. After the email
+is reviewed, an explicitly authorised `post-meeting-review` operation saves one
+top-level `<Client name> meeting <day> <month>` card on Client Flow, with that email
+and linked Tasks list in Description. Do not create a nested meeting-notes card,
+automatically distribute actions, or start TED during capture. Lily distributes
+reviewed actions only on explicit request, then stops. The controlling rules live
+in the installed `basicops-task-manager/references/meeting-wrap.md`.

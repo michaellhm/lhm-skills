@@ -1,19 +1,34 @@
 ---
 name: hermes-production-plan
-description: Identify the matching Obsidian AI Operations SOP and prepare, monitor, and verify a concise Hermes execution plan for an existing LHM BasicOps task. Use when someone gives Monica a natural-language production task such as creating website page copy, asks her to "plan this for Waylon", asks "where are we at with this task?" or "where are you at?", needs a CTO capability incident explained, or wants Waylon's completed work reconciled. This skill plans, reports, and checks specialist work; it does not execute the production work itself.
+description: Identify the matching Obsidian AI Operations SOP and prepare, monitor, and verify a concise Hermes execution plan for an existing LHM BasicOps task. Use when someone gives Lily a natural-language production task such as creating website page copy, asks her to "plan this for Ted", asks "where are we at with this task?" or "where are you at?", needs a CTO capability incident explained, or wants Ted's completed work reconciled. This skill plans, reports, and checks specialist work; it does not execute the production work itself.
 ---
 
 # Hermes Production Plan
 
-Turn one existing BasicOps outcome into an executable, version-bound plan for the governed Hermes workforce. Monica owns SOP selection, plan readiness and final reconciliation. Waylon/Chief of Staff owns orchestration after the task's applicable authority and approval gates are satisfied.
+## Meeting-wrap intent gate
+
+Before production planning or execution, distinguish meeting review and task
+distribution from a request to perform the work. Read the installed sibling skill
+`basicops-task-manager/references/meeting-wrap.md` (in a plugin checkout:
+`${CLAUDE_PLUGIN_ROOT}/skills/basicops-task-manager/references/meeting-wrap.md`).
+For “disperse/distribute these meeting tasks”, apply only that routing procedure
+and STOP. Assign named humans to their verified Inboxes, preserve the meeting
+Description and links, and do not invoke Ted/Chief, production plans, research,
+execution queues or production lifecycle events. A review approval or distribution
+receipt never grants production authority. This gate takes precedence over the
+ordinary production flow below; TED requires a separate explicit work request.
+
+
+Turn one existing BasicOps outcome into an executable, version-bound plan for the governed Hermes workforce. Lily owns SOP selection, plan readiness and final reconciliation. Ted/Chief of Staff owns orchestration after the task's applicable authority and approval gates are satisfied.
 
 Select the mode from the request:
 
 - planning or readiness → Sections 1–5;
 - progress/status question → Status mode;
-- returned work → Reconcile Waylon's return.
+- returned work → Reconcile Ted's return.
 
 Read `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md` before planning material work.
+Read `${CLAUDE_PLUGIN_ROOT}/references/basicops-ai-user-registry.json` before changing the task owner. Use only the verified IDs in that registry; a display-name match is not identity proof.
 
 ## 1. Read the source outcome
 
@@ -64,7 +79,7 @@ Finish with independent QA against the source completion condition. Publishing, 
 
 Write no BasicOps mutation directly. Route the exact Discussion payload through `basicops-task-manager` and read it back.
 
-Keep Monica's comment short and scannable:
+Keep Lily's comment short and scannable:
 
 ```markdown
 Production plan — v<version>
@@ -84,17 +99,32 @@ Approval required: <exact approver and scope, or none — task authorises routin
 Next handoff: <person/role and trigger>
 ```
 
+Immediately after the human-readable plan, Lily must post a separate exact closed marker whose
+entire body is `LHM workflow event: {JSON}`. The JSON operation is `post-plan` and contains only
+`event_id`, `operation`, `plan` and `handoff`. Do not wrap it in Markdown or add prose. The
+read-only observer copies it verbatim and the governed connector accepts it only from verified
+Lily user `82484`; the marker is the durable controller ingress, not a status comment.
+
 Include working links only when they help execution. Keep detailed research and machine state in their canonical systems rather than dumping them into BasicOps.
 
 When readiness is blocked, post the gap and first resolution action instead of a fictional execution plan.
 
-When the existing BasicOps task clearly requests the outcome, treat it as authority for ordinary in-scope production and hand the posted plan to Chief of Staff without adding a second Michael approval gate. The visible plan remains overrideable: apply an authorised correction that arrives before the affected step begins, increment the version when the execution contract materially changes, and preserve completed verified work where safe.
+When the plan is ready, use the same BasicOps task as the durable baton. Through
+`basicops-task-manager`, assign it to the authenticated human approver, set native status `Under
+Review`, and add `Review type: Plan approval`. Bind the approval request to the exact task revision,
+plan version and content hash. Read back the owner, status and Discussion before treating the
+handoff as successful. Silence, a stale approval or approval of another version is not approval.
+Plan approval does not authorise separately consequential actions such as publishing, deployment,
+sending, spend, live-account mutation or scope expansion.
 
-Pause only for a genuine ambiguity that changes the outcome or for a separately governed consequential action such as publishing, deployment, sending, spend, live-account mutation, scope expansion or an approval explicitly required by the selected SOP or canonical task. Silence never authorises those consequential actions.
+## 5. Hand the executable version to Ted
 
-## 5. Hand the executable version to Waylon
+After explicit approval of the current version, hand the unchanged plan version to
+`lhm-chief-of-staff`. Through `basicops-task-manager`, assign the same task to verified Ted user
+`82491`, set native status `In Progress`, add `Review type: none`, and read back the owner, status and
+Discussion. A replayed approval is idempotent and must not create another task, comment or handoff.
 
-After the plan is posted and its applicable authority is satisfied, hand the unchanged plan version to `lhm-chief-of-staff` with:
+The Chief of Staff handoff contains:
 
 - BasicOps source ID and URL;
 - plan version, selected SOP reference and authority/approval evidence;
@@ -105,15 +135,30 @@ After the plan is posted and its applicable authority is satisfied, hand the unc
 - acceptance test and accountable reviewer;
 - authoritative artefact destination;
 - required delivery manifest and `drive-artifact-delivery` step, or the approved `not_required` reason;
-- return point to Monica on `ready_for_review`, `needs_context`, `waiting_on_capability` or terminal failure.
+- return point to Lily on `ready_for_review`, `needs_context`, `waiting_on_capability` or terminal failure.
 
-If the plan materially changes, increment the version. Obtain fresh approval only when the change crosses a consequential gate, expands scope or alters an approval-bound decision. Do not hand specialist work directly from Monica or imitate Waylon's orchestration.
+At every Chief of Staff lifecycle boundary, Ted must add a separate exact `LHM workflow event:
+{JSON}` Discussion marker using only the registered operation schema: `chief-start`, `heartbeat`,
+`review-ready`, `correction-fixed` or `chief-complete`. The connector accepts these markers only
+from verified Ted user `82491`. Learning Steward uses `steward-disposition`; CTO uses
+`capability-restored`; each is accepted only from the verified actor recorded on the same parent.
+Never put credentials, arbitrary commands, extra fields or prose inside a marker. Reuse the same
+event ID on retry so the observer/controller can suppress replay.
 
-## 6. Reconcile Waylon's return
+If the plan materially changes, increment the version, assign the same task back to verified Lily
+AI user `82484`, and obtain fresh human approval. Preserve completed verified work where safe. Do
+not create a replacement task, hand specialist work directly from Lily or imitate Ted's
+orchestration.
+
+## 6. Reconcile Ted's return
 
 Compare the returned receipts with every approved step and the source completion condition. Verify every required `drive-artifact-delivery` receipt and independent final QA evidence; a worker self-report, VPS/local path or BasicOps attachment is insufficient.
 
-If something is missing, return one bounded discrepancy to Waylon with the same parent and return point. Do not silently repair specialist work or call partial work complete.
+If something is missing, return one bounded discrepancy to Ted on the same BasicOps task and
+resume the existing execution. Record the correction request as a durable event. Fix current work
+first, then hand the event to the Learning Steward to decide whether a client fact, SOP, skill,
+system rule or no wider change is required. Do not silently repair specialist work, create a
+replacement task or call partial work complete.
 
 When the acceptance condition passes, route one compact Discussion update through `basicops-task-manager`:
 
@@ -126,14 +171,28 @@ Production check — v<version>
 
 Exceptions: <none, or one concise item>
 
+Calls made:
+- <reversible assumption or ordinary execution choice, plus what was chosen>
+
+Decision required:
+- <only a consequential, irreversible, external-commitment or permission-bound decision; otherwise none>
+
 Next handoff: <accountable human review or approved next action>
 ```
 
-Leave human-owned tasks open in `Under Review` until the accountable human explicitly requests completion. Return the verified BasicOps URL.
+Through `basicops-task-manager`, assign the same task to the authenticated human reviewer, set
+native status `Under Review`, add `Review type: Delivery review`, and read back the owner, status and
+Discussion. Routine uncertainty belongs under `Calls made`; choose the best-supported reversible
+option and continue rather than turning it into a question.
+
+If the reviewer requests correction, record the request against the approved plan version, assign
+the same task to verified Ted in `In Progress`, and resume execution. If the reviewer accepts
+delivery, Ted remains accountable for posting the final completion receipt and projecting native
+status `Complete`. Return the verified BasicOps URL.
 
 ## Status mode
 
-When Michael asks Monica “where are you at?” or “where are we at with this task?”, read the BasicOps task and the authoritative workforce parent/child checkpoints. Do not infer progress from the age of a comment, a promised action, a request ID or an isolated worker message.
+When Michael asks Lily “where are you at?” or “where are we at with this task?”, read the BasicOps task and the authoritative workforce parent/child checkpoints. Do not infer progress from the age of a comment, a promised action, a request ID or an isolated worker message.
 
 Return a short plain-English update:
 
@@ -162,7 +221,7 @@ Distinguish these states:
 
 ### CTO and capability incidents
 
-When a verified capability incident is opened or materially changes, Monica gives Michael one proactive plain-English heads-up containing:
+When a verified capability incident is opened or materially changes, Lily gives Michael one proactive plain-English heads-up containing:
 
 - what cannot currently happen;
 - what has already been completed and remains safe;
@@ -174,4 +233,4 @@ Do not dump logs, stack traces or internal retry history into BasicOps. Link the
 
 During the pilot, show Michael the proposed BasicOps change and ask for confirmation before changing the task status to `Blocked`. If confirmed, route the mutation through `basicops-task-manager`; preserve the prior status, post the concise blocker/update in Discussion, then read back status, assignee, board/list and message. Never treat a Discussion comment as though it changed task status.
 
-When CTO emits a matching verified `capability_restored` event and Waylon/Head of Production resumes the same parent, notify Michael in plain English. Propose restoring the preserved prior BasicOps status through `basicops-task-manager`; during the pilot, obtain Michael's confirmation before that mutation too. Do not mark the task complete merely because the capability was repaired.
+When CTO emits a matching verified `capability_restored` event and Ted/Head of Production resumes the same parent, notify Michael in plain English. Propose restoring the preserved prior BasicOps status through `basicops-task-manager`; during the pilot, obtain Michael's confirmation before that mutation too. Do not mark the task complete merely because the capability was repaired.

@@ -44,6 +44,13 @@ Note on `current-projects.md` block shapes: blocks in the wild may not all match
 
 ## Step 4: Route or coordinate
 
+For meeting-wrap review or distribution, load `post-meeting-review` and
+`basicops-task-manager/references/meeting-wrap.md` first. Save the email and task
+links in the top-level meeting card Description. Review does not route actions;
+explicit distribution routes only the approved tasks to human Inboxes and stops.
+Do not let the generic production routes below turn distribution into TED work.
+
+
 For status-only work, recommend exactly **one** next skill with a one-line reason tied to Step 3. Do not present a menu.
 
 When the user asked to perform work from an existing BasicOps task, classify the work from the task's intended outcome and completion condition. Search `70 SOPs/AI Operations/` in the canonical Obsidian Brain and read the closest matching active or draft SOP before planning. Match primarily against each SOP's **Use this when** section; use the task's nouns only as supporting evidence. Cite the selected SOP by title and vault path in the plan. If no SOP matches, say so and continue through the existing governed skill route rather than inventing a procedure.
@@ -63,7 +70,7 @@ All Project Hub skills, and when to route to each:
 | `lhm-project-hub:basicops-task-manager` | Any workflow or user asks to create, edit, assign, discuss, move, complete or otherwise mutate a BasicOps task. This is the mandatory final write path even when another skill prepared the task context. |
 | `lhm-project-hub:staff-weekly-flow` | Michael or a team member asks what to focus on this week/today, feels overloaded, wants a mini stand-up, or wants to review and clean up their full personal BasicOps inbox. The skill prepares priorities and routes confirmed inbox mutations through `basicops-task-manager`. |
 | `lhm-project-hub:team-work-brief` | Any team member needs to turn a rough request, client email or idea into a context-checked brief; or an assignee gives feedback about what a future brief should include. It resolves requester, client, assignee, access, dependencies, completion and next handoff before routing the approved task to BasicOps. |
-| `lhm-project-hub:hermes-production-plan` | An existing BasicOps outcome needs its matching Obsidian AI Operations SOP identified and converted into an executable Hermes plan, a “where are we at?” status check, a plain-English CTO/blocker update or post-run reconciliation for Waylon/Chief of Staff. |
+| `lhm-project-hub:hermes-production-plan` | An existing BasicOps outcome needs its matching Obsidian AI Operations SOP identified and converted into an executable Hermes plan, a “where are we at?” status check, a plain-English CTO/blocker update or post-run reconciliation for Ted/Chief of Staff. |
 | `lhm-project-hub:drive-artifact-delivery` | Head of Production has an approved, QA-passed staging artefact that must be created or verified in the client's registered Google Drive folder with exact content readback. |
 | `lhm-project-hub:sales-handover` | A deal just closed and needs handing from sales to delivery — new client, or an existing client buying a new package. |
 | `lhm-project-hub:client-onboarding` | A new-client onboarding pipeline (Payment & Billing → Client Contact & Strategy → Access, Assets & Config → Service Kickoff → Onboarding Complete) is live or needs a status check. |
@@ -76,10 +83,10 @@ All Project Hub skills, and when to route to each:
 | `lhm-project-hub:google-ads-kickoff` | A new Google Ads campaign build needs to start (gates on conversion tracking). |
 | `lhm-project-hub:monthly-review` | Monthly wrap, internal account review, or meeting-prep brief is due — three modes, ask which if unclear. |
 | `lhm-project-hub:quarterly-review` | Quarterly strategy review and next 3/6-month campaign plan is due. |
-| `lhm-project-hub:post-meeting-review` | `client-meeting-email` has already captured a meeting and the follow-up needs triaging — state files, propagation sweep, action items turned into assigned BasicOps subtasks, team update email. |
+| `lhm-project-hub:post-meeting-review` | Review the saved meeting wrap on a top-level Client Flow card; email and linked task list in Description; Lily distributes only on explicit request, without TED. |
 | `lhm-project-hub:client-update` | A client's name, service offering, contact details, or branding changed and every reference across the client folder needs updating. |
 | `lhm-project-hub:client-update-email` | A plain-language update email needs drafting after completing a piece of work, outside of monthly-review's own wrap flow. |
-| `lhm-project-hub:client-meeting-email` | A client meeting just happened and needs capturing — Fathom summary/transcript into a polished Gmail-ready client wrap, plus saved meeting notes and the BasicOps card. Run this first; `post-meeting-review` triages what it saves. |
+| `lhm-project-hub:client-meeting-email` | Prepare a review-only email and meeting record from Fathom. Approved capture is separate; post-meeting-review owns subsequent authorised BasicOps changes. |
 | `lhm-project-hub:wp-project-manager` | The canonical website PM doc needs reading, creating, updating, or reconciling after a verified BasicOps stage handoff. |
 | `lhm-project-hub:website-project-cockpit` | A WordPress/Astro/Decap project needs status, gate analysis, or a stage handoff across the Obsidian PM record, shared `*Web Projects` cockpit and one personal execution task. |
 | `lhm-project-hub:lp-project-manager` | The `project-management/landing-pages.md` PM doc needs reading, creating, or updating for an LP campaign. |
@@ -92,7 +99,7 @@ All Project Hub skills, and when to route to each:
 
 - Never mutate BasicOps directly. Route every BasicOps write through `lhm-project-hub:basicops-task-manager`; the originating workflow supplies context and receives the verified handback.
 - Route rough delegation and handoff-readiness work through `lhm-project-hub:team-work-brief` before BasicOps. Do not expect an assistant or non-specialist requester to diagnose technical requirements unaided.
-- Route requests to “plan this for Waylon”, natural-language production outcomes in an existing BasicOps task, “where are we at with this task?”, explain a CTO/blocker state or check Waylon's returned work through `lhm-project-hub:hermes-production-plan`. Monica selects the matching Obsidian SOP, prepares, monitors and reconciles the task-specific plan; Chief of Staff owns execution. The task itself authorises ordinary in-scope work unless the selected SOP, canonical task or owning workflow identifies a genuine ambiguity or consequential approval gate.
+- Route requests to “plan this for Ted”, natural-language production outcomes in an existing BasicOps task, “where are we at with this task?”, explain a CTO/blocker state or check Ted's returned work through `lhm-project-hub:hermes-production-plan`. Lily selects the matching Obsidian SOP, prepares, monitors and reconciles the task-specific plan; Chief of Staff owns execution. The task itself authorises ordinary in-scope work unless the selected SOP, canonical task or owning workflow identifies a genuine ambiguity or consequential approval gate.
 - Client-facing emails are drafts only, never sent.
 - Follow-up items tick only on explicit human confirmation or successful MCP verification.
 - Missing or unauthenticated MCP → state plainly what's missing, never silently skip.

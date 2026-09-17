@@ -1,4 +1,4 @@
 interface:
   display_name: "Hermes Production Plan"
-  short_description: "Match a task to its SOP and plan it for Waylon"
-  default_prompt: "Identify the matching Obsidian AI Operations SOP, turn this BasicOps task into a concise executable plan for Waylon, and verify its required systems and destinations."
+  short_description: "Match a task to its SOP and plan it for Ted"
+  default_prompt: "Identify the matching Obsidian AI Operations SOP, turn this BasicOps task into a concise executable plan for Ted, and verify its required systems and destinations."
