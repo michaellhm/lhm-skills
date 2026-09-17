@@ -440,3 +440,13 @@ files, Gmail drafts or BasicOps records were created or changed.
   changes and delegation pack. Separate, approval-bound operations apply vault
   changes or create a Gmail draft. BasicOps remains disabled.
 - Folder contract: read references/folder-convention.md (lhm-project-hub).
+
+## Subsequent BasicOps meeting wrap
+
+This preparation skill remains read-only with respect to BasicOps. After the email
+is reviewed, an explicitly authorised `post-meeting-review` operation saves one
+top-level `<Client name> meeting <day> <month>` card on Client Flow, with that email
+and linked Tasks list in Description. Do not create a nested meeting-notes card,
+automatically distribute actions, or start TED during capture. Lily distributes
+reviewed actions only on explicit request, then stops. The controlling rules live
+in the installed `basicops-task-manager/references/meeting-wrap.md`.

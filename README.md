@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-186 skills across eleven Claude Code plugins (60 marketing, 41 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 28 project hub, 5 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+185 skills across eleven Claude Code plugins (60 marketing, 41 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 27 project hub, 5 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -190,7 +190,6 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     basicops-task-manager/              # Shared BasicOps boundary — discussion-first briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
-    ted-task-ownership/                 # Keep Ted's BasicOps assignee aligned with active work and verified handoffs
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
     staff-weekly-flow/                  # Personal weekly/daily focus, full BasicOps inbox triage/write-back and reminder preferences
     sales-handover/                     # Hand a newly-closed client from sales to delivery
@@ -204,8 +203,8 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     google-ads-kickoff/                 # New Google Ads campaign build kickoff — gates on conversion tracking
     monthly-review/                     # Monthly per-client review engine (3 modes: wrap, prep, account review)
     quarterly-review/                   # Quarterly strategy review — 3-month data pull + next-quarter plan
-    client-meeting-email/               # Client-ready meeting follow-up email + meeting capture — saves notes, stands up the BasicOps card
-    post-meeting-review/                # Post-meeting follow-up triage — state files, BasicOps subtasks, team email (migrated from client updates hub; shim remains)
+    client-meeting-email/               # Review-only meeting email preparation; authorised post-meeting-review owns the BasicOps card
+    post-meeting-review/                # Top-level meeting wraps with email and linked tasks in Description; review first, Lily distribution on request
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
     wp-project-manager/                 # Website PM state plus verified BasicOps handoff reconciliation

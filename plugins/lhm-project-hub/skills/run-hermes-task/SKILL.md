@@ -5,6 +5,20 @@ description: Run substantive LHM client or internal work through the governed He
 
 # Run Hermes Task
 
+## Meeting-wrap intent gate
+
+Before production planning or execution, distinguish meeting review and task
+distribution from a request to perform the work. Read the installed sibling skill
+`basicops-task-manager/references/meeting-wrap.md` (in a plugin checkout:
+`${CLAUDE_PLUGIN_ROOT}/skills/basicops-task-manager/references/meeting-wrap.md`).
+For “disperse/distribute these meeting tasks”, apply only that routing procedure
+and STOP. Assign named humans to their verified Inboxes, preserve the meeting
+Description and links, and do not invoke Ted/Chief, production plans, research,
+execution queues or production lifecycle events. A review approval or distribution
+receipt never grants production authority. This gate takes precedence over the
+ordinary production flow below; TED requires a separate explicit work request.
+
+
 Act as the desktop control client for Hermes. Enter the existing governed workforce; do not
 recreate its employee roles locally or do the specialist work merely because dispatch is awkward.
 
@@ -75,14 +89,14 @@ successful shell return or armed monitor is not acceptance.
 
 ## Dispatch and supervise
 
-1. Dispatch the parent to `lhm-chief-of-staff` with the full contract and return point.
+1. For a human-delegated BasicOps task, invoke `hermes-production-plan` first. The Project Manager
+   posts the version-bound plan on the existing task and assigns it to the authenticated human in
+   `Under Review` with `Review type: Plan approval`. Dispatch to `lhm-chief-of-staff` only after the
+   current version is explicitly approved and the same task is assigned to verified Ted in `In
+   Progress`. For an already-approved system event, verify its bound approval receipt first.
 2. Require the governed route:
    `Chief of Staff → Context & Research → Head of Production → specialist worker → producer QA → Drive artefact delivery → independent final QA`.
-   Skip a role only when its work is genuinely unnecessary and record why. Existing WordPress or
-   LeadScale work using the REST API belongs to `lhm_website`; that profile dispatches the
-   `wordpress-rest` route through Claude Code CLI and requires
-   `lhm-wordpress-hub:wp-rest-operator`. Keep Google Ads build work with the Google Ads specialist
-   even when the same parent task also contains a landing-page deliverable.
+   Skip a role only when its work is genuinely unnecessary and record why.
 3. Preserve the parent ID through every child. Record child run IDs, dependencies, artefact paths,
    idempotency keys and status evidence.
 4. Check health after launch before starting a long monitor. A zero-byte log with no live process,
@@ -138,6 +152,11 @@ providers or spend limits.
 7. Never mark a human-owned BasicOps task `Complete` unless the authenticated accountable human
    explicitly requests that exact mutation after reviewing the outcome.
 8. Read back the task status, reviewer, board/list, assignee, metadata, Discussion and URLs.
+
+When the reviewer requests correction, record a durable correction event, return the same task to
+verified Ted in `In Progress`, and resume from the saved return point. Do not create a replacement
+parent or require another start approval unless the plan materially changes. After current delivery
+is corrected, route the event to the Learning Steward for governed wider improvement.
 
 ## Hand back
 
