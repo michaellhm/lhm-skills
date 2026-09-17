@@ -83,6 +83,7 @@ All Project Hub skills, and when to route to each:
 | `lhm-project-hub:google-ads-kickoff` | A new Google Ads campaign build needs to start (gates on conversion tracking). |
 | `lhm-project-hub:monthly-review` | Monthly wrap, internal account review, or meeting-prep brief is due — three modes, ask which if unclear. |
 | `lhm-project-hub:quarterly-review` | Quarterly strategy review and next 3/6-month campaign plan is due. |
+| `lhm-project-hub:meeting-to-action` | Michael wants to reconcile meeting tasks, delegate complete outcomes and work through his retained actions interactively. |
 | `lhm-project-hub:post-meeting-review` | Review the saved meeting wrap on a top-level Client Flow card; email and linked task list in Description; Lily distributes only on explicit request, without TED. |
 | `lhm-project-hub:client-update` | A client's name, service offering, contact details, or branding changed and every reference across the client folder needs updating. |
 | `lhm-project-hub:client-update-email` | A plain-language update email needs drafting after completing a piece of work, outside of monthly-review's own wrap flow. |

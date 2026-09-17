@@ -33,4 +33,5 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `lhm-wordpress-hub:wp-rest-operator` — Inspect and implement registered WordPress or LeadScale content changes through the REST API with snapshots, publish separation and readback verification.
 
+`meeting-to-action` — Interactive meeting task reconciliation, outcome delegation and guided execution of Michael’s retained actions.
 `post-meeting-review` — Review a top-level meeting card containing the email and task links; Lily distributes to named human Inboxes only on explicit request, then stops.
