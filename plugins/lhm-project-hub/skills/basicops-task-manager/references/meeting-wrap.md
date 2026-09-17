@@ -41,7 +41,7 @@ caller writing a meeting card. Other task types keep their existing conventions.
 
 ## Explicit distribution only
 
-“Lily, disperse these tasks”, “distribute the approved meeting tasks” and equivalent
+“Lily, disperse/disburse these tasks”, “distribute the approved meeting tasks” and equivalent
 explicit instructions authorise routing the specified reviewed actions. They do not
 authorise production. Resolve the actual task IDs and reviewed scope from the source
 meeting; if the instruction identifies only a subset, route only that subset.
@@ -75,3 +75,19 @@ For a test meeting, verify: one top-level card; full reviewed email in Descripti
 Tasks list with resolved links and owners; review-only leaves boards unchanged;
 distribution moves only selected actions into human Inboxes; a repeated request
 reuses the same IDs; no Ted assignment, production event or run is created.
+
+## Distribution execution and legacy cards
+
+Distribution must run as a finite loop over every approved action, not stop after
+listing the tasks. Build a manifest of task ID, human, personal project and Inbox;
+write `assignee`, `projectId` and `section` together with `update_task`; read each
+record back and require all three fields to match. Count moved, already routed and
+unresolved separately. Never say done while any intended destination is unverified.
+When a legacy meeting lacks a Description register, inspect its subtasks and the
+reviewed links/corrections in Discussion. Reuse them; do not manufacture tasks from
+summary coverage gaps. Explicitly approved missing actions still require deduplication.
+Post the verified links and destination board/Inbox in the meeting's Discussion as
+well as preserving the Description register. A follow-up asking for those links is
+not proof the move happened: verify actual destinations before describing them as
+already dispersed. The BasicOps webhook entry skill contains this loop directly;
+it must not depend on an un-preloaded production router to enforce distribution.

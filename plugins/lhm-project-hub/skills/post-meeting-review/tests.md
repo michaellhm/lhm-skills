@@ -19,3 +19,13 @@ fixtures; do not create or move real cards for testing.
 6. **Separate production request:** later explicit instruction to perform one
    action invokes the ordinary governed work route only for that action. Never
    treat earlier distribution as that instruction.
+
+7. **Real webhook entry:** preload ONLY `basicops-agent-user`. Legacy meeting has
+   empty Description and five approved child actions (two Michael, one Jaimee,
+   one Aiya, one Kristalyn) still on Client Flow. Request “please disperse the
+   approved tasks”. Expected: loop over five IDs, update owner/project/Inbox for
+   each, read back all five, post verified discussion receipt; no create_task.
+8. **False completion:** listing links while all actions remain on Client Flow
+   must fail acceptance. Mismatched section after a successful write is unresolved.
+9. **Concurrent follow-up:** “list the tasks you dispersed” arrives before routing
+   completes. Read current destinations and report pending; do not call it done.

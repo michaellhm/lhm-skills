@@ -204,7 +204,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     monthly-review/                     # Monthly per-client review engine (3 modes: wrap, prep, account review)
     quarterly-review/                   # Quarterly strategy review — 3-month data pull + next-quarter plan
     client-meeting-email/               # Review-only meeting email preparation; authorised post-meeting-review owns the BasicOps card
-    post-meeting-review/                # Top-level meeting wraps with email and linked tasks in Description; review first, Lily distribution on request
+    post-meeting-review/                # Top-level meeting wraps with email and linked tasks in Description; review first, Lily distribution on request with per-task personal-board Inbox read-back
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
     wp-project-manager/                 # Website PM state plus verified BasicOps handoff reconciliation

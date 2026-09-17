@@ -19,6 +19,11 @@ receipt never grants production authority. This gate takes precedence over the
 ordinary production flow below; TED requires a separate explicit work request.
 
 
+For BasicOps webhooks, `basicops-agent-user` owns the self-contained move-and-verify
+loop. “Disperse/disburse” means update each approved task's human assignee, personal
+project and Inbox, read all three back, and post verified links in the meeting
+Discussion. Listing tasks on Client Flow is a failed distribution, not completion.
+
 ## Project Hub worker
 
 Use:

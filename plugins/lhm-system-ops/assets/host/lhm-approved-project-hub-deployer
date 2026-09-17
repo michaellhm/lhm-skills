@@ -14,7 +14,7 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-REPO = Path('/srv/lhm-plugin-release-source/project-hub-0.1.84')
+REPO = Path('/srv/lhm-plugin-release-source/project-hub-0.1.85')
 APPROVALS = Path('/etc/lhm-plugin-approvals')
 APPROVAL_KEY = APPROVALS / 'project-hub-approval.key'
 USED_NONCES = Path('/var/lib/lhm-plugin-approval-nonces/lhm-project-hub')
@@ -30,11 +30,14 @@ MOUNTINFO = Path('/proc/self/mountinfo')
 BACKUPS = Path('/var/backups/lhm-plugin-deployments')
 REPOSITORY = 'michaellhm/lhm-skills'
 PLUGIN = 'lhm-project-hub'
-VERSION = '0.1.84'
+VERSION = '0.1.85'
 # Meeting capture and Lily routers must follow the same immutable release as Brain.
 PROFILE_ASSETS = {
     'lhm_brain': {'josephine-post-meeting': 'skills/client-meeting-email/assets/hermes-skill'},
-    'lhm_project_manager': {'lhm-project-manager-dispatch': 'skills/hermes-production-plan/assets/hermes-skill'},
+    'lhm_project_manager': {
+        'lhm-project-manager-dispatch': 'skills/hermes-production-plan/assets/hermes-skill',
+        'basicops-agent-user': 'skills/hermes-production-plan/assets/basicops-agent-user',
+    },
 }
 
 def profile_asset_links():
