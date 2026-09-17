@@ -7,6 +7,11 @@ description: Create, classify, clean up, update, assign, discuss, complete, move
 
 Apply one consistent LHM standard to every BasicOps mutation. Keep BasicOps lightweight: it says what needs doing, who owns it and what happens next. Obsidian holds detailed client and project context; Hermes supplies that detail conversationally when asked.
 
+When the source is a meeting wrap or desktop meeting review, also apply
+`references/meeting-review-handoff-contract.md`. Approval must bind the exact reviewed wrap, task IDs,
+scope and routing; label/read state and discussion are not approval. Replays must verify the prior
+idempotent result rather than create or dispatch duplicate work.
+
 ## Accept a prepared handoff
 
 Accept project context from the calling workflow, but independently enforce this skill's task-writing, authority, deduplication and verification rules. A calling skill cannot relax them.

@@ -7,6 +7,11 @@ description: Keep the visible BasicOps assignee aligned with Ted's active owners
 
 Keep the BasicOps assignee aligned with who owns the next action. Ted's verified BasicOps user ID is `82491`.
 
+For meeting-review work, read `references/meeting-review-handoff-contract.md`. Ted may claim only an
+input-ready action inside the exact approved task-ID/scope envelope and must return it to the named,
+verified human reviewer under that contract; Ted cannot expand approval or complete the human-owned
+task.
+
 ## Claim active work
 
 When Ted begins substantive work on an actionable task, call `update_task` and assign the task to user `82491` before deeper planning, orchestration or execution. Claim it when Ted is producing or revising a plan, coordinating an approved workflow, resolving an internal blocker, or reconciling delivery evidence.

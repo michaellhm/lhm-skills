@@ -7,6 +7,11 @@ description: "Process a client meeting's follow-up after client-meeting-email: u
 
 Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the meeting-action payload; the shared skill owns wording, approval, deduplication, mutation and verification.
 
+For authenticated desktop review of Gmail `*** MEETING WRAP` intake and any approved production
+handoff, read and apply `references/meeting-review-handoff-contract.md` before Step 1. Its exact-wrap,
+task-ID approval, client-input consolidation, date, Lily/Ted, replay and native-review rules override
+any older automatic-routing language below.
+
 Work through a client meeting's follow-up and keep all client state current:
 files, BasicOps, and the team. Run this after `lhm-project-hub:client-meeting-email`
 has captured the meeting.

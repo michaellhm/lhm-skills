@@ -8,6 +8,11 @@ description: Run substantive LHM client or internal work through the governed He
 Act as the desktop control client for Hermes. Enter the existing governed workforce; do not
 recreate its employee roles locally or do the specialist work merely because dispatch is awkward.
 
+For work originating in a reviewed meeting wrap, apply
+`references/meeting-review-handoff-contract.md` before establishing the contract. Dispatch only
+input-ready task IDs inside the exact authenticated approval envelope; preserve the contract's Lily
+handoff, review-target, replay, identity and native-review controls.
+
 ## Establish the contract
 
 1. Authenticate the requester and read the complete source task, its Discussion, canonical client

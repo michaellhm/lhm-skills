@@ -5,6 +5,11 @@ description: Identify the matching LHM Obsidian SOP from a natural-language Basi
 
 # LHM Project Manager Dispatch
 
+For a task originating in an approved desktop meeting review, first require the Project Hub worker
+to apply `references/meeting-review-handoff-contract.md`. Include the exact reviewed task IDs, scope,
+routing, reviewer and idempotency key in the objective. Dispatch only input-ready approved items;
+the Gmail label or read state is never authority.
+
 ## Project Hub worker
 
 Use:
