@@ -35,3 +35,5 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `meeting-to-action` — Interactive meeting task reconciliation, outcome delegation and guided execution of Michael’s retained actions, with a final BasicOps/Obsidian/Drive close-out prompt.
 `post-meeting-review` — Josephine captures one meeting card with the full email and proposed actions in Discussion; Michael reviews and delegates through meeting-to-action.
+
+`weekly-web-project-brief` — Lily’s Monday HTML website portfolio email, due dates, traffic lights and consolidated project feedback.
