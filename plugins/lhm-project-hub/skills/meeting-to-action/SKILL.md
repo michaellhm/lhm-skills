@@ -76,6 +76,18 @@ Verify changed tasks before reporting them complete. Distinguish assigned, accep
 
 Return the linked ownership summary, Michael's remaining actions, client inputs, unresolved scheduling/approval gaps and next suggested action. Prepare a short follow-up email when requested; read the actual previous email first and report only verified progress. Drafting does not authorise sending.
 
+### Client follow-up email
+
+At the end of a working session, offer a ready-to-send client recap. When requested, default to Michael’s approved style: a brief opening referring to the previous meeting wrap, concise dot points with bold workstream labels, and a simple sign-off. Cover all material client work progressed during the session, not only the last task discussed. Keep technical detail in the audit/task record unless it helps the client understand an outcome or decision.
+
+Read the previous sent wrap and relevant later emails when available. Build on them rather than repeating the meeting minutes. Include work Michael reports completing elsewhere and clearly stated updates from the current conversation; do not imply these were independently tested by this agent. Mention a prior email as sent only when supported by Michael’s statement or mail evidence.
+
+For each bullet distinguish completed changes, briefs/delegation, planned work, recommendations and tests still underway. A handover is not a launched campaign or completed website. For a paused workflow or staged integration, explain the current state, what is being tested, the observation period if supplied, and the condition for reconnecting or rolling out. Keep any other client in a test anonymous. Do not turn a conditional rollout into a promised date or claim a test has passed before evidence exists.
+
+Add a short measurement caveat when tracking repairs affect comparisons: recovered events are not automatically improved performance. Use only confirmed review dates and commitments. Do not copy client-specific platforms, dates, results or technical problems into future clients’ recaps.
+
+Deliver the email as a draft for Michael to send unless sending is explicitly authorised. If the audit or session decisions are also to be recorded, update the existing task and canonical notes separately; an email draft does not prove either record was updated or the client was contacted.
+
 Under authorised canonical note updates, preserve decisions, source links, task IDs, scope inspected, unresolved questions and the current queue in the existing meeting/project record. Use the vault workflow and existing paths; do not create competing project records. If note writes are not authorised, include a compact resume summary in the response.
 
 For a pilot, record how many decisions required Michael, which outcomes were delegated, remaining Michael work and any repeated question or routing failure. Measure only observed counts or timings. Use those findings to improve this skill after the run, not hypothetical automation.
