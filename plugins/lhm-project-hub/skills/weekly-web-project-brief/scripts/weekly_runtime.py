@@ -81,7 +81,7 @@ def safe_files(root):
 
 def run(cfg,week,mode):
     state=Path(cfg['state']);state.mkdir(parents=True,exist_ok=True)
-    key=week if mode=='scheduled' else week+'-'+mode
+    key=week if mode=='scheduled' else week+'-'+mode+'-'+cfg['commit'][:8]
     status=state/'runtime'/key/'status.json';status.parent.mkdir(parents=True,exist_ok=True)
     with (status.parent/'.lock').open('a') as lock:
         try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -114,6 +114,8 @@ def run(cfg,week,mode):
             for item in research['evidence_files']:
                 p=Path(item['path'])
                 if p.is_absolute() or '..' in p.parts:raise ValueError('Evidence must be inside run')
+            baseline_path=Path(json.loads((out/'comparison.json').read_text())['baseline']['path'])
+            if baseline_path.is_absolute() or '..' in baseline_path.parts:raise ValueError('Comparison baseline must be inside run')
             before={str(p.relative_to(out)):digest(p) for p in safe_files(out)}
             review=parse(invoke(cfg,work/'review',common+f'''Independently review {out}. Do not alter research or payload files. Read the complete rendered brief, latest primary evidence, Inbox selections and baseline comparison. Verify all source completeness, correct owners and dates, client-grouped concise task lists, no resurrected work/one-off project rows, and no credentials/patient details. Check each of the three Inbox sweeps is terminal and every selected action appears. Missing evidence or factual regressions require rejection. Return ONLY JSON {{"accepted":true|false,"issues":[],"checked":[...]}}. Never send email or edit tasks.''',sock))
             if not review.get('accepted') or review.get('issues'):raise RuntimeError('Independent review rejected: '+json.dumps(review))
