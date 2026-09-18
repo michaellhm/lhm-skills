@@ -15,7 +15,7 @@ Each owner bullet should be concrete, for example:
 - Michael — Your Story Physio: review the sitemap and copy during 21–25 September while Aiya prepares the first designs.
 - Aiya — Alpha: report which service pages are finished, what is blocking the remainder and the next preview date.
 
-Use the actual current records to decide the final list. Do not permanently embed those example dates/actions as recurring truth. Include a verified native task URL with each action (use the renderer’s {text, url} action object for readable linked text); avoid a generic “do the reviews above”. Link a meeting/project record if the action lacks an execution card and explicitly mark the missing card.
+Use the actual current records to decide the final list. Do not permanently embed those example dates/actions as recurring truth. Include a verified native task URL with each action (use the renderer’s {client, text, url} action object for readable linked text); avoid a generic “do the reviews above”. Link a meeting/project record if the action lacks an execution card; explicitly record that gap in inbox-review.json rather than repeating the administrative caveat in the email.
 
 ## Health / inactivity
 
@@ -24,3 +24,5 @@ Meaningful BasicOps activity is an actual delivery update, specific discussion/r
 A future agreed start or meeting can be green until work is expected; ordinary planned reviews and missing final dates need not turn green projects orange. Keep due-date uncertainty visible. If newer email evidence proves progress while BasicOps is stale, say so and assign the board update rather than alleging inactivity.
 
 Save inbox-review.json with each board/section ID, retrieval time, pagination/terminal status, selected action records and excluded candidates/reasons. Add it to the research evidence manifest. Add the project activity fields and dated human colour overrides to research-receipt.json. The controller checks that the final owner lists include all selected work and that each project row is a real project, not an isolated fix.
+
+Presentation: group all selected actions for the same client together within each owner’s section, including distinct website/landing-page scopes. Show one client name followed by short linked actions. Keep the detailed evidence, task status and missing-card flag in inbox-review.json; avoid overwhelming the email with repeated background and administrative caveats.

@@ -11,7 +11,7 @@ brief.json schema (all content plain text, no embedded HTML):
 - priorities: list of strings.
 - new_projects: list of strings, identifying kickoff/handover dates; empty produces “No new website projects this week.”
 - projects: list of {name, url, light: red|orange|green, state, target, next}. Use verified https source links. Include owner in next. Order among equal lights is supplied by the researcher.
-- owners: list of {name, actions: list of strings or {text, url} objects}; allowed names Michael, Kristalyn, Aiya, Jaimee, Josephine. Use {text, url} objects for task-linked actions so the HTML shows readable linked text rather than long raw URLs. Omit Josephine when no current dependency requires her.
+- owners: list of {name, actions: list of strings or {client, text, url} objects}; allowed names Michael, Kristalyn, Aiya, Jaimee, Josephine. Use {client, text, url} objects for task-linked actions so the HTML shows readable linked text rather than long raw URLs. Omit Josephine when no current dependency requires her.
 - older_cards: list of strings, optional; identify actual remaining uncertainty, not allegations of inactivity.
 - limitations: string, optional, only limitations affecting interpretation.
 
@@ -25,3 +25,5 @@ Regression cases from the 19 September review (examples only; refresh live evide
 - Align live-site handover after cancellation must not be reported as unfinished construction.
 - Your Story and Any Stage Pilates qualify as new handovers in the initial reporting window, not forever.
 - Planned review or a future agreed kickoff can be green. Chased feedback or seven days without a substantive BasicOps update while work is expected is orange; an evidenced stopped build is red. Dates and progress confidence remain explicit separately.
+
+Owner task lists: one compact bullet per client under each owner. Supply the same client label on all that client’s actions; the renderer groups them even when non-adjacent. Shorten each action to a verb and output (for example, “Follow up Nick and Steve”; “Obtain Mindbody access”), retaining important dates and dependencies. Do not repeat the client inside action text, copy project background, or show repeated “Task to add/confirm” caveats in the email. Preserve full task mapping and missing-card flags in inbox-review.json. Do not drop work just to shorten the display.

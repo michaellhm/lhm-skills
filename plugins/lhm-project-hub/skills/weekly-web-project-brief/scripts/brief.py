@@ -91,10 +91,31 @@ def render(d):
     text = ['Hi team,', d['intro']]
     parts = [f'<p>Hi team,</p><p>{html.escape(d["intro"])}</p>']
 
-    def section(title, items):
+    def section(title, items, grouped=False):
         if not items:
             return
         text.append(title)
+        if grouped and all(isinstance(item, dict) and item.get('client') for item in items):
+            groups = {}
+            for item in items:
+                groups.setdefault(item['client'], []).append(item)
+            entries = []
+            for client, actions in groups.items():
+                links = []
+                lines = []
+                for action in actions:
+                    label, link = action['text'], action['url']
+                    parsed = urllib.parse.urlsplit(link)
+                    if parsed.scheme != 'https' or not parsed.netloc or parsed.username or parsed.password:
+                        raise ValueError('Action links must be verified HTTPS URLs')
+                    if not isinstance(label, str) or not label.strip():
+                        raise ValueError('Action text is required')
+                    links.append('<a href="' + html.escape(link, quote=True) + '">' + html.escape(label) + '</a>')
+                    lines.append(label + ' (' + link + ')')
+                text.append('• ' + client + ': ' + '; '.join(lines))
+                entries.append('<li style="margin:12px 0"><strong>' + html.escape(client) + ':</strong> ' + '; '.join(links) + '</li>')
+            parts.append('<h2 style="font-size:19px;margin:26px 0 12px">' + html.escape(title) + '</h2><ul>' + ''.join(entries) + '</ul>')
+            return
         entries = []
         for item in items:
             if isinstance(item, dict):
@@ -125,7 +146,7 @@ def render(d):
         parts.append(f'<tr style="background:{bg}"><td {cell}><strong style="color:{colour}">{label}</strong><br><a href="{html.escape(p["url"], quote=True)}">{html.escape(p["name"])}</a></td>' + ''.join(f'<td {cell}>{html.escape(p[k])}</td>' for k in ('state', 'target', 'next')) + '</tr>')
     parts.append('</tbody></table></div>')
     for o in d['owners']:
-        section(o['name'], o['actions'])
+        section(o['name'], o['actions'], grouped=True)
     section('Older cards to clear up', d.get('older_cards', []))
     section('Updates or corrections?', [FEEDBACK.format(week=week)])
     tail = 'Evidence checked: ' + d['cutoff'] + '. ' + d.get('limitations', '')

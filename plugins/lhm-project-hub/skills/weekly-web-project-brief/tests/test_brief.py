@@ -44,6 +44,21 @@ class BriefTests(unittest.TestCase):
         self.assertIn('href="https://app.basicops.com/task/123">Your Story: review sitemap &amp; copy</a>',result['html'])
         self.assertIn('https://app.basicops.com/task/123',result['text'])
 
+    def test_client_groups_preserve_nonadjacent_actions_and_links(self):
+        d = self.fixture()
+        d['owners'] = [{'name': 'Michael', 'actions': [
+            {'client': 'mhealth & LP', 'text': 'Follow up Nick', 'url': 'https://example.org/1'},
+            {'client': 'Your Story', 'text': 'Review copy', 'url': 'https://example.org/2'},
+            {'client': 'mhealth & LP', 'text': 'Obtain access', 'url': 'https://example.org/3'}]}]
+        result = b.render(d)
+        self.assertEqual(result['html'].count('<strong>mhealth &amp; LP:</strong>'), 1)
+        self.assertLess(result['html'].index('Obtain access'), result['html'].index('<strong>Your Story:</strong>'))
+        for i in (1, 2, 3):
+            self.assertIn('https://example.org/' + str(i), result['html'])
+            self.assertIn('https://example.org/' + str(i), result['text'])
+        d['owners'][0]['actions'][0]['url'] = 'javascript:alert(1)'
+        with self.assertRaisesRegex(ValueError, 'Action links'): b.render(d)
+
     def test_reject_unsafe_owner_action_link(self):
         d = self.fixture(); d['owners'] = [{'name':'Michael','actions':[{'text':'Review','url':'javascript:alert(1)'}]}]
         with self.assertRaisesRegex(ValueError,'Action links'):b.render(d)

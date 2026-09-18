@@ -2,7 +2,7 @@
 name: weekly-web-project-brief
 description: "Prepare Lily's Monday website portfolio email or apply Michael's consolidated project corrections. Use for 'weekly web projects', 'website weekly brief', 'Monday website email', 'update the web brief' or 'website brief feedback'. Reconciles Obsidian, BasicOps discussions, email and meeting evidence; produces an HTML table with due dates and red-first traffic lights."
 metadata:
-  version: 1.2.0
+  version: 1.2.1
 ---
 
 # Weekly web project brief
@@ -59,7 +59,7 @@ Use Australia/Melbourne dates. Report week begins Monday; new projects covers th
 
 Use scripts/brief.py render with brief.json following references/editorial.md. The deterministic renderer preserves the table and escapes all source text. Do not send Markdown as HTML. Retain a readable plain-text alternative.
 
-Content order: short opening; main things to move this week; new projects this week; red-first snapshot; specific weekly owner task lists; older cards to clarify only when useful; feedback footer; short evidence limitation. No AI Support section. Include substantial portfolio projects in the snapshot. Owner sections must still name every relevant action selected for this week; never replace the actual list with “prioritise the decisions above” or “coordinate the projects”. Include the client, concrete output/action and actual date or dependency. Use references/weekly-actions.md. Jaimee: “No immediate website action identified for this week” when supported; do not invent work to fill her section. Include real immediate work if evidence later changes.
+Content order: short opening; main things to move this week; new projects this week; red-first snapshot; specific weekly owner task lists; older cards to clarify only when useful; feedback footer; short evidence limitation. No AI Support section. Include substantial portfolio projects in the snapshot. Group each owner’s actions under one client label, combining website and landing-page work for that client. Use short linked action phrases separated by semicolons, not repeated client names or full task briefs. Keep dates and essential dependencies; leave background and missing-card administration in the linked evidence. Owner sections must still name every relevant action selected for this week; never replace the actual list with “prioritise the decisions above” or “coordinate the projects”. Include the client, concrete output/action and actual date or dependency. Use references/weekly-actions.md. Jaimee: “No immediate website action identified for this week” when supported; do not invent work to fill her section. Include real immediate work if evidence later changes.
 
 Use direct names and verbs: “Kristalyn: send David the prototype and ask for feedback on the design, wording and clinic details”; “Aiya: finish the next service pages and share the link”; “Michael: finalise Johnson's feedback.” Avoid “coordinate agreed refinements”, “reconcile the delivery gate”, “confirm batch progress” or vague “handoff” without naming the output and recipient.
 
