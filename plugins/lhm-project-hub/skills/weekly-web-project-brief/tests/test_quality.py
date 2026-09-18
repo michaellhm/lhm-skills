@@ -16,6 +16,8 @@ class QualityTest(unittest.TestCase):
         self.write('access-receipt.json', {'worker':'codex-cli','skill_path':str(self.p/'SKILL.md'),'skill_sha256':q.digest(self.p/'SKILL.md'),'sources':{k:{'status':'passed','evidence':'live read'} for k in ['gmail','obsidian','basicops']} | {'meetings':{'status':'not_required','reason':'No relevant meeting'}}})
         self.write('research-receipt.json', {'coverage':{**{k:{'status':'complete'} for k in ['gmail','obsidian','basicops']},'meetings':{'status':'not_required','reason':'No relevant meeting'}},'material_gaps':[],'evidence_files':[{'path':'source.txt','sha256':q.digest(self.p/'source.txt')}]})
         self.write('comparison.json', {'baseline':{'path':'baseline.md','sha256':q.digest(self.p/'baseline.md')},'projects':[{'project':'Example','disposition':'unchanged'}],'unresolved_regressions':[]})
+        self.write('inbox-review.json', {'boards':[{'owner':n,'board_id':1,'section_id':2,'status':'complete','terminal':True,'selected_actions':[]} for n in ['Michael','Kristalyn','Aiya']]})
+        research=json.loads((self.p/'research-receipt.json').read_text());research['evidence_files'].append({'path':'inbox-review.json','sha256':q.digest(self.p/'inbox-review.json')});self.write('research-receipt.json',research)
         self.review()
     def write(self,n,d): (self.p/n).write_text(json.dumps(d))
     def change(self,n,fn):
@@ -41,6 +43,17 @@ class QualityTest(unittest.TestCase):
     def test_required_meeting_not_read(self):
         self.change('research-receipt.json',lambda d:d['coverage']['meetings'].update(status='complete'))
         with self.assertRaisesRegex(ValueError,'Live meeting read'):q.validate(self.p)
+    def test_missing_inbox_owner(self):
+        inbox=json.loads((self.p/'inbox-review.json').read_text());inbox['boards'].pop();self.write('inbox-review.json',inbox)
+        self.change('research-receipt.json',lambda d:d['evidence_files'][-1].update(sha256=q.digest(self.p/'inbox-review.json')))
+        with self.assertRaisesRegex(ValueError,'Three owner inbox'):q.validate(self.p)
+    def test_inbox_capped(self):
+        inbox=json.loads((self.p/'inbox-review.json').read_text());inbox['boards'][0]['terminal']=False;self.write('inbox-review.json',inbox)
+        self.change('research-receipt.json',lambda d:d['evidence_files'][-1].update(sha256=q.digest(self.p/'inbox-review.json')))
+        with self.assertRaisesRegex(ValueError,'Incomplete owner inbox'):q.validate(self.p)
+    def test_inbox_unbound(self):
+        self.change('research-receipt.json',lambda d:d['evidence_files'].pop())
+        with self.assertRaisesRegex(ValueError,'Inbox review must'):q.validate(self.p)
     def test_missing_meeting_reason(self):
         self.change('research-receipt.json',lambda d:d['coverage']['meetings'].pop('reason'))
         with self.assertRaisesRegex(ValueError,'Meeting coverage'):q.validate(self.p)

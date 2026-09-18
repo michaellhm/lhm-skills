@@ -6,7 +6,7 @@ Use the agreed brief as a comparison baseline, not a frozen truth or independent
 
 Read relevant Gmail message bodies for every active project (start with 30 days; extend for missing approval/scope history). Carry their IDs, date, URL and relevant content into the evidence pack. Search results alone and previous Lily emails are not primary evidence. Read relevant recent Fathom transcript passages, particularly meetings since the last substantive project note. A canonical project note defines identity and durable scope but can be superseded by later explicit client/team decisions about that same scope.
 
-Keep discovery separate from reporting: a historical open card is a cleanup candidate, not proof of current blocking work. Do not resurrect completed work, make an unknown status red, or add actions to a person solely because an old checklist mentions them. Preserve separate website versus LP scopes without duplicating the same work. Keep the approved concise main portfolio; additions require evidence of active work, not a quota or fixed client list.
+Keep discovery separate from reporting: a historical open card is a cleanup candidate, not proof of current blocking work. Do not resurrect completed work, make an unknown status red, or add actions to a person solely because an old checklist mentions them. Preserve separate website versus LP scopes without duplicating the same work. Keep the approved concise main portfolio; additions require evidence of an active substantial project, not a one-off task, quota or fixed client list. Current one-off website work belongs only in the relevant owner list. Read weekly-actions.md for the mandatory personal Inbox sweep and inactivity checks.
 
 Approval anchors: resolve the original CLIENT approval and scope from its primary evidence. If two dates might refer to different prototypes/page batches, record the conflict and use "Approval date to confirm"; do not silently move the deadline. Retain an agreed revised-date-needed state rather than promoting an old unverified field into a new missed commitment.
 
@@ -24,7 +24,7 @@ The 19 September failure provides acceptance cases, not permanent project facts:
 
 ## Run files and delivery gate
 
-Required files are brief.json, email.json, preview.html, research-receipt.json, comparison.json, access-receipt.json and quality-review.json. Keep primary evidence in the run folder (or stable paths), never in Git.
+Required files are brief.json, email.json, preview.html, research-receipt.json, comparison.json, access-receipt.json, inbox-review.json and quality-review.json. Keep primary evidence in the run folder (or stable paths), never in Git.
 
 access-receipt.json: `worker` must be `codex-cli`; `skill_path` and `skill_sha256` identify the actual SKILL.md read; `sources` has gmail, obsidian and basicops entries, each `{status: "passed", evidence: "successful read ID/path and time"}`. Include meetings as passed or not_required with a reason. Record real worker reads, not controller-only probes.
 
@@ -39,3 +39,5 @@ Run `python3 scripts/quality.py <run-directory>`. It verifies coverage, access, 
 Check actual body content after every Gmail read. Nested multipart messages can produce metadata with an empty body in the shared helper; use the read-only adapter in runtime.md before declaring the email missing. Record the body extraction route. Do not replace an unread primary message with an older summary.
 
 When a temporary per-minute Gmail limit interrupts research, pace and retry within runtime.md's bounded policy before stopping. A failed attempt remains in the audit trail; mark coverage complete only after the affected reads actually succeed. Do not abandon an otherwise healthy source after one recoverable minute-limit response.
+
+The delivery gate also requires completed, terminal Michael/Kristalyn/Aiya inbox-review.json coverage, retained in the evidence hash manifest. Independent review checks each selected weekly action is explicit in its owner section.

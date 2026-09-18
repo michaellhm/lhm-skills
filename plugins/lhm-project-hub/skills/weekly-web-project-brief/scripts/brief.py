@@ -94,12 +94,27 @@ def render(d):
     def section(title, items):
         if not items:
             return
-        text.extend([title] + ['• ' + x for x in items])
-        parts.append('<h2 style="font-size:19px;margin:26px 0 12px">' + html.escape(title) + '</h2><ul>' + ''.join('<li style="margin:8px 0">' + html.escape(x) + '</li>' for x in items) + '</ul>')
+        text.append(title)
+        entries = []
+        for item in items:
+            if isinstance(item, dict):
+                label, link = item['text'], item['url']
+                parsed = urllib.parse.urlsplit(link)
+                if parsed.scheme != 'https' or not parsed.netloc or parsed.username or parsed.password:
+                    raise ValueError('Action links must be verified HTTPS URLs')
+                if not isinstance(label, str) or not label.strip():
+                    raise ValueError('Action text is required')
+                text.append('• ' + label + '\n' + link)
+                content = '<a href="' + html.escape(link, quote=True) + '">' + html.escape(label) + '</a>'
+            else:
+                text.append('• ' + item)
+                content = html.escape(item)
+            entries.append('<li style="margin:8px 0">' + content + '</li>')
+        parts.append('<h2 style="font-size:19px;margin:26px 0 12px">' + html.escape(title) + '</h2><ul>' + ''.join(entries) + '</ul>')
 
     section('The main things to get moving', d['priorities'])
     section('New projects this week', d['new_projects'] or ['No new website projects this week.'])
-    legend = 'Red: blocked or overdue. Orange: needs attention. Green: progressing with no known blocker.'
+    legend = 'Red: blocked or stalled. Orange: needs attention or a progress update. Green: progressing or following the agreed plan.'
     dates = 'Dates are working targets unless stated otherwise. Estimates use eight weeks from confirmed client prototype approval; existing agreed targets take precedence.'
     text += ['Project snapshot', legend, dates]
     parts.append('<h2 style="font-size:19px;margin:26px 0 12px">Project snapshot</h2><p>' + legend + '</p><p style="font-size:13px;color:#526070">' + dates + '</p><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr>' + ''.join('<th scope="col" style="text-align:left;padding:12px;background:#16354a;color:white">' + x + '</th>' for x in ['Project', "Where we’re at", 'Target finish', 'What needs to happen next']) + '</tr></thead><tbody>')

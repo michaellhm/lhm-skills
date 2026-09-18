@@ -38,6 +38,16 @@ class BriefTests(unittest.TestCase):
         self.assertIn('BasicOps chat with Lily', result['text'])
         self.assertNotIn('AI Support', result['html'])
 
+    def test_readable_linked_owner_action(self):
+        d = self.fixture(); d['owners'] = [{'name':'Michael','actions':[{'text':'Your Story: review sitemap & copy','url':'https://app.basicops.com/task/123'}]}]
+        result = b.render(d)
+        self.assertIn('href="https://app.basicops.com/task/123">Your Story: review sitemap &amp; copy</a>',result['html'])
+        self.assertIn('https://app.basicops.com/task/123',result['text'])
+
+    def test_reject_unsafe_owner_action_link(self):
+        d = self.fixture(); d['owners'] = [{'name':'Michael','actions':[{'text':'Review','url':'javascript:alert(1)'}]}]
+        with self.assertRaisesRegex(ValueError,'Action links'):b.render(d)
+
     def test_bad_link_and_owner(self):
         d = self.fixture(); d['projects'][0]['url'] = 'javascript:alert(1)'
         with self.assertRaises(ValueError): b.render(d)

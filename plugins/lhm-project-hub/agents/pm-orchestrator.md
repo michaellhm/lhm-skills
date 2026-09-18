@@ -89,7 +89,7 @@ All Project Hub skills, and when to route to each:
 | `lhm-project-hub:client-update-email` | A plain-language update email needs drafting after completing a piece of work, outside of monthly-review's own wrap flow. |
 | `lhm-project-hub:client-meeting-email` | Prepare a review-only email and meeting record from Fathom. Approved capture is separate; post-meeting-review owns subsequent authorised BasicOps changes. |
 | `lhm-project-hub:wp-project-manager` | The canonical website PM doc needs reading, creating, updating, or reconciling after a verified BasicOps stage handoff. |
-| `lhm-project-hub:weekly-web-project-brief` | Weekly website portfolio email or consolidated corrections to an existing brief; uses red-first traffic lights, Codex CLI research, freshness checks, source-backed dates and HTML delivery. |
+| `lhm-project-hub:weekly-web-project-brief` | Weekly website portfolio email or consolidated corrections to an existing brief; uses project-only traffic lights, inactivity checks, full owner Inbox sweeps, specific weekly actions, fresh Codex CLI research and HTML delivery. |
 | `lhm-project-hub:website-project-cockpit` | A WordPress/Astro/Decap project needs status, gate analysis, or a stage handoff across the Obsidian PM record, shared `*Web Projects` cockpit and one personal execution task. |
 | `lhm-project-hub:lp-project-manager` | The `project-management/landing-pages.md` PM doc needs reading, creating, or updating for an LP campaign. |
 | `lhm-project-hub:gmb-project-manager` | The `project-management/gmb.md` PM doc needs reading, creating, or updating for a GMB cycle. |

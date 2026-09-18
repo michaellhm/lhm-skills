@@ -41,6 +41,14 @@ def validate(directory):
     require(bool(files), 'No retained primary evidence')
     for f in files:
         bound_file(f)
+    inbox_path = root / 'inbox-review.json'
+    require(any((root / f['path']).resolve() == inbox_path for f in files), 'Inbox review must be retained and hash-bound')
+    inbox = read('inbox-review.json')
+    boards = inbox.get('boards', [])
+    require(len(boards) == 3 and {b.get('owner') for b in boards} == {'Michael', 'Kristalyn', 'Aiya'}, 'Three owner inbox sweeps required')
+    for board in boards:
+        require(board.get('status') == 'complete' and board.get('terminal') is True and board.get('board_id') and board.get('section_id'), 'Incomplete owner inbox sweep: ' + str(board.get('owner')))
+        require(isinstance(board.get('selected_actions'), list), 'Selected weekly actions missing')
     bound_file(comparison['baseline'])
     require(bool(comparison.get('projects')), 'No baseline comparison')
     require(comparison.get('unresolved_regressions') == [], 'Unresolved factual regression')
