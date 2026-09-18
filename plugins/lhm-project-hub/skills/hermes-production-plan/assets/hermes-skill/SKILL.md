@@ -13,7 +13,7 @@ distribution from a request to perform the work. Read the installed sibling skil
 `${CLAUDE_PLUGIN_ROOT}/skills/basicops-task-manager/references/meeting-wrap.md`).
 For “disperse/distribute these meeting tasks”, apply only that routing procedure
 and STOP. Assign named humans to their verified Inboxes, preserve the meeting
-Description and links, and do not invoke Ted/Chief, production plans, research,
+original wrap and linked Discussion register (or legacy Description), and do not invoke Ted/Chief, production plans, research,
 execution queues or production lifecycle events. A review approval or distribution
 receipt never grants production authority. This gate takes precedence over the
 ordinary production flow below; TED requires a separate explicit work request.

@@ -7,6 +7,20 @@ description: Guide Michael through a client meeting action review, reconcile exi
 
 Help Michael finish a meeting review with clear ownership and less work returning to him merely because delegation is difficult. This is an interactive session coordinator. Existing Project Hub skills continue to own their specialist workflows.
 
+## Entry from Josephine's meeting wrap
+
+Josephine prepares the reviewed email and one Client Flow meeting card assigned to
+Michael. Its Discussion contains the full wrap and “Proposed actions — awaiting
+Michael's review”; legacy cards may store these in Description. Read both. Capture
+creates no action cards and does not assign execution work to the team.
+
+This skill is Michael's next stage: reconcile existing work, ask material questions,
+then create/update only authorised outcomes and delegate with complete briefs.
+Record retained, delegated, deferred and dropped actions in the card Discussion.
+When every action has a verified destination or explicit disposition, complete the
+meeting review card with downstream links; delivery tasks stay open. Kristalyn
+coordinates the assigned work. Honour delegation already authorised in this session.
+
 ## Start with evidence
 
 Accept a client name, meeting link or BasicOps task. Resolve the client, meeting date, existing wrap, canonical Obsidian context and relevant task links yourself. Prefer saved meeting notes and the actual sent email; use Fathom when missing or when a statement needs verification. Distinguish client contacts from LHM staff with the same first name.

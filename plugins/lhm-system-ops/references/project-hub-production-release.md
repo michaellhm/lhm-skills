@@ -1,7 +1,7 @@
 # Project Hub immutable production release
 
 Project Hub is installed separately from the mutable `/home/hermes/.hermes/lhm-skills` checkout.
-The supported target for this release is `lhm-project-hub` 0.1.85. Never `git pull` or copy files
+The supported target for this release is `lhm-project-hub` 0.1.88. Never `git pull` or copy files
 into the live shared checkout as a deployment mechanism.
 
 Immutable releases live below the root-owned host tree
@@ -29,14 +29,14 @@ From the reviewed, clean, exact commit:
 
 ```text
 python3 plugins/lhm-system-ops/scripts/build_project_hub_release.py \
-  --output /var/lib/lhm-plugin-releases/lhm-project-hub-0.1.85.zip
+  --output /var/lib/lhm-plugin-releases/lhm-project-hub-0.1.88.zip
 ```
 
 Record the emitted commit and SHA-256. The builder reads only tracked bytes from `HEAD`, assigns a
-fixed ZIP timestamp and mode, and refuses a dirty checkout or any version other than 0.1.85.
+fixed ZIP timestamp and mode, and refuses a dirty checkout or any version other than 0.1.88.
 
 The deployer verifies the exact clean release checkout at
-`/srv/lhm-plugin-release-source/project-hub-0.1.85`. Create this as a dedicated root-owned Git
+`/srv/lhm-plugin-release-source/project-hub-0.1.88`. Create this as a dedicated root-owned Git
 worktree at the approved merged commit. Never repurpose or clean `/srv/lhm-plugin-source`; it may
 contain unrelated in-progress capability work.
 
@@ -58,8 +58,8 @@ chown root:root /etc/lhm-plugin-approvals/project-hub-approval.key
 chmod 0600 /etc/lhm-plugin-approvals/project-hub-approval.key
 ```
 
-For deployer release 1.0.11 the first command must return
-`1604fce82662e61e880c76cbdab97bd679fbf0d425f29b6d236a78be6ed99922`; otherwise stop.
+For deployer release 1.0.12 the first command must return
+`1365d0e8e7493bb355559245e7dba0aabdefd276d082a4942681e0b290f839e5`; otherwise stop.
 
 This bootstrap does not install Project Hub and must not enable a service. Record the installed
 executable hash and keep the System Ops rollback available.
@@ -70,7 +70,7 @@ Michael or the delegated approver creates one root-owned `0600` record at
 ```json
 {
   "schema_version": 3,
-  "approval_id": "project-hub-0.1.85-install",
+  "approval_id": "project-hub-0.1.88-install",
   "action": "install",
   "repository": "michaellhm/lhm-skills",
   "commit": "FULL_COMMIT_SHA",
@@ -88,7 +88,7 @@ Michael or the delegated approver creates one root-owned `0600` record at
 The root operator signs the exact closed-schema record without exposing the key:
 
 ```text
-/usr/local/libexec/lhm-approved-project-hub-deployer sign project-hub-0.1.85-install
+/usr/local/libexec/lhm-approved-project-hub-deployer sign project-hub-0.1.88-install
 ```
 
 The HMAC covers schema, action, repository, exact commit, archive digest, plugin, profile,
@@ -101,8 +101,8 @@ After separate install approval, run as root:
 
 ```text
 /usr/local/libexec/lhm-approved-project-hub-deployer install \
-  project-hub-0.1.85-install \
-  /var/lib/lhm-plugin-releases/lhm-project-hub-0.1.85.zip
+  project-hub-0.1.88-install \
+  /var/lib/lhm-plugin-releases/lhm-project-hub-0.1.88.zip
 ```
 
 The deployer verifies the allowlisted repository, clean exact commit, plugin identity/version,
@@ -129,7 +129,7 @@ managed skill and the plugin-source registration. It does not delete immutable r
 
 ## Meeting router deployment
 
-Release 0.1.85 also snapshots and links Brain's `josephine-post-meeting` and Lily's
+Release 0.1.88 also snapshots and links Brain's `josephine-post-meeting` and Lily's
 `lhm-project-manager-dispatch` to their assets in this same immutable release.
 Lily and Chief already share `basicops-task-manager` and `run-hermes-task` through
 the current release link. Verify each profile's resolved file hashes, including
@@ -137,4 +137,4 @@ the current release link. Verify each profile's resolved file hashes, including
 for a fresh skill load; existing in-flight tasks are not retroactively changed.
 The rollback receipt includes exact prior profile asset directories or links.
 
-The 0.1.85 release also manages Lily's `basicops-agent-user` webhook entry skill. Its direct distribution loop is loaded on real BasicOps events, including legacy cards; verify this entry path, not only a manually preloaded production router.
+The 0.1.88 release also manages Lily's `basicops-agent-user` webhook entry skill. Its direct distribution loop is loaded on real BasicOps events, including legacy cards; verify this entry path, not only a manually preloaded production router.

@@ -1,6 +1,6 @@
 ---
 name: post-meeting-review
-description: "Review a saved meeting wrap, create one top-level Client Flow meeting card with the reviewed email and linked tasks in Description, and correct proposed actions before Lily distributes them on explicit request. Use for meeting wrap, post-meeting review, meeting follow-up, or client call debrief. Distribution is separate from review and never starts TED."
+description: "Review a saved meeting wrap, create one top-level Client Flow meeting card assigned to Michael with the reviewed email and proposed actions in Discussion, and correct proposed actions before Lily distributes them on explicit request. Use for meeting wrap, post-meeting review, meeting follow-up, or client call debrief. Distribution is separate from review and never starts TED."
 ---
 
 # Post-Meeting Review
@@ -123,7 +123,8 @@ Description and client-parent rules. Route all authorised BasicOps writes throug
 `basicops-task-manager`.
 
 Find or create the client-and-date meeting task at top level on `*Client Flow`.
-Use the exact reviewed team email in Description followed by the live Tasks list;
+Assign the single card to Michael. Put the exact reviewed email in Discussion followed
+by “Proposed actions — awaiting Michael’s review”; create no action cards during capture;
 do not assume `client-meeting-email` already wrote anything in BasicOps. That skill
 is preparation-only. Resolve the approved email from the authenticated email source
 or its matching saved artifact. If unavailable, report the gap without claiming the
@@ -135,16 +136,17 @@ Consolidate related client inputs. Resolve explicit meeting owners first, then
 current canonical staff responsibilities, asking only for genuine ambiguity.
 Owner resolution proposes responsibility; it does not authorise board moves.
 
-## Step 5: Review, then wait for explicit distribution
+## Step 5: Michael reviews and delegates
 
 Reviewing, saving or approving the wrap does not route actions. Stop after updating
-the reviewed register unless the user has explicitly asked Lily to distribute it.
+the reviewed register unless Michael has explicitly authorised task creation or delegation. Use
+`meeting-to-action` for his interactive scope, ownership and existing-work review.
 If distribution is already authorised in the same request, honour that authority
 without asking again and apply only the reviewed scope.
 
 For distribution follow the numbered procedure in `meeting-wrap.md`: reuse action
 IDs, assign the named humans, move to their verified Inbox sections, read back the
-result, refresh the Description links and stop. Do not invoke Auto-run, research,
+result, refresh the Discussion register and stop. Do not invoke Auto-run, research,
 production planning, Ted, Chief of Staff or specialist execution from this skill.
 
 ## Step 6: Keep email and review state accurate
