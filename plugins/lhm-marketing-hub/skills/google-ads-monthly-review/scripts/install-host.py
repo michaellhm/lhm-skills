@@ -33,12 +33,14 @@ job=next(j for j in jobs['jobs'] if j['id']=='b0ec0fbc005c')
 (backup/'ads-job.json').write_text(json.dumps(job,indent=2)+'\n')
 assert job['enabled'] and job['schedule']['expr']=='0 17,18 * * 0'
 # No installed-plugin registry changes: only this skill is sourced from the release.
-prior=live_skill.with_name('google-ads-monthly-review.before-'+commit[:12])
+prior=backup/'prior-active-skill'
 live_skill.rename(prior);live_skill.symlink_to(source,target_is_directory=True)
 profile_release=brain/'skill-releases/ads-weekly-digest'/commit
 shutil.copytree(source/'scripts',profile_release)
 shutil.copy2(source/'references/monday-digest.md',profile_release/'monday-digest.md')
 for path in [profile_release,*profile_release.rglob('*')]:os.chown(path,10000,10000)
+workspace=brain/'workspace/google-ads-weekly-digest'
+workspace.mkdir(parents=True,exist_ok=True);os.chown(workspace,10000,10000)
 link=brain/'scripts/ads-weekly-digest'
 assert not link.exists()
 link.symlink_to('../skill-releases/ads-weekly-digest/'+commit,target_is_directory=True)
@@ -52,6 +54,6 @@ subprocess.run(['docker','exec','--user','hermes','-e','HERMES_HOME=/opt/data/pr
 after=json.loads((ads/'cron/jobs.json').read_text());current=next(j for j in after['jobs'] if j['id']==job['id'])
 assert current['enabled'] and current['schedule']==job['schedule'] and current['prompt']==prompt
 assert current['deliver']==job['deliver']
-receipt={'commit':commit,'source_plugin_version':'2.2.20','deployment':'scoped review skill and digest scripts; other installed plugin files and registry unchanged','prior_skill':str(prior),'dispatcher_backup':str(backup/'monthly-delivery-dispatcher'),'job_id':job['id'],'enabled':current['enabled'],'schedule':current['schedule'],'skill_sha256':hashlib.sha256((live_skill/'SKILL.md').read_bytes()).hexdigest(),'source_skill_sha256':hashlib.sha256((source/'SKILL.md').read_bytes()).hexdigest(),'script_sha256':hashlib.sha256((link/'ads-weekly-digest.py').read_bytes()).hexdigest()}
+receipt={'commit':commit,'source_plugin_version':'2.2.21','deployment':'scoped review skill and digest scripts; other installed plugin files and registry unchanged','prior_skill':str(prior),'dispatcher_backup':str(backup/'monthly-delivery-dispatcher'),'job_id':job['id'],'enabled':current['enabled'],'schedule':current['schedule'],'skill_sha256':hashlib.sha256((live_skill/'SKILL.md').read_bytes()).hexdigest(),'source_skill_sha256':hashlib.sha256((source/'SKILL.md').read_bytes()).hexdigest(),'script_sha256':hashlib.sha256((link/'ads-weekly-digest.py').read_bytes()).hexdigest()}
 assert receipt['skill_sha256']==receipt['source_skill_sha256']
 (release/'installation-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt))

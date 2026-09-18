@@ -72,6 +72,8 @@ def assemble(manifest, registry, runs=RUNS):
             prompt = (run / 'prompt.txt').read_text()
             report = prompt.split('REPORT CONTENT\n---\n', 1)[1]
             digest = block(report, 'ads_digest')
+            if not isinstance(receipt.get('verified_basicops_url'), str) or not receipt['verified_basicops_url']:
+                raise ValueError('Verified BasicOps card URL missing')
             card = {**digest, 'name': name, 'task_url': receipt['verified_basicops_url']}
             render({'subject':'Validation','heading':'Validation','intro':'','footer':'','clients':[card]})
             cards.append(card)

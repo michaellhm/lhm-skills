@@ -44,6 +44,9 @@ class DigestTests(unittest.TestCase):
     def test_readback_required(self):
         self.receipt['readback_verified']=False;self.write()
         self.assertIn('Verified delivery receipt missing',self.render()['text'])
+    def test_missing_card_not_success(self):
+        self.receipt['verified_basicops_url']='';self.write()
+        self.assertIn('Verified BasicOps card URL missing',self.render()['text'])
     def test_stale_run_rejected(self):
         self.manifest['week']='2026-09-28'
         self.assertIn('Stale delivery',self.render()['text'])
