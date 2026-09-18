@@ -308,3 +308,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 "I need to work on [client name]"   # The agent picks up from there
 "Write ad copy for my physio client" # Routes directly to the right skill
 ```
+
+### Knowledge Hub weekly planning
+
+- `lhm-weekly-flow` (lhm-knowledge-hub) — Reviews private founder planning alongside authorised shared client, people, meeting and marketing context; saves weekly reflections privately and routes agreed operational updates to their canonical team notes. Resolves active vault roots before writing, including during Google Drive migration.

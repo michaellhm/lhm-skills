@@ -24,3 +24,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `seo-page-brief` — Turn accepted SEO research into a bounded, implementation-ready page brief package.
 
 `seo-delivery-qa` — Independently verify SEO scope, evidence, artefact delivery, approval boundaries and completion before the Lead advances.
+
+### Knowledge Hub weekly planning
+
+- `lhm-weekly-flow` (lhm-knowledge-hub) — Reviews private founder planning alongside authorised shared client, people, meeting and marketing context; saves weekly reflections privately and routes agreed operational updates to their canonical team notes. Resolves active vault roots before writing, including during Google Drive migration.
