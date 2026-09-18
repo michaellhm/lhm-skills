@@ -37,3 +37,5 @@ The controller independently checks coverage, current facts and comparison again
 Run `python3 scripts/quality.py <run-directory>`. It verifies coverage, access, evidence/baseline hashes, no material gaps/regressions and review binding. This mechanical gate supports semantic review; it cannot itself prove that a writer interpreted evidence correctly. The normal send command calls it before any network submission. Keep failed attempts and original receipts; do not bypass the gate or erase dedup state.
 
 Check actual body content after every Gmail read. Nested multipart messages can produce metadata with an empty body in the shared helper; use the read-only adapter in runtime.md before declaring the email missing. Record the body extraction route. Do not replace an unread primary message with an older summary.
+
+When a temporary per-minute Gmail limit interrupts research, pace and retry within runtime.md's bounded policy before stopping. A failed attempt remains in the audit trail; mark coverage complete only after the affected reads actually succeed. Do not abandon an otherwise healthy source after one recoverable minute-limit response.
