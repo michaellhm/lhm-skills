@@ -53,10 +53,20 @@ run ID and hash. Never send. BasicOps is disabled.
 
 ## Subsequent BasicOps meeting wrap
 
-This preparation skill remains read-only with respect to BasicOps. After the email
-is reviewed, an explicitly authorised `post-meeting-review` operation saves one
-top-level `<Client name> meeting <day> <month>` card on Client Flow, with that email
-and linked Tasks list in Description. Do not create a nested meeting-notes card,
-automatically distribute actions, or start TED during capture. Lily distributes
-reviewed actions only on explicit request, then stops. The controlling rules live
-in the installed `basicops-task-manager/references/meeting-wrap.md`.
+Email preparation remains read-only with respect to BasicOps. Josephine's explicit
+request to save the reviewed wrap authorises a separate `post-meeting-review`
+operation through `basicops-task-manager`: create or reuse one top-level
+`<Client name> meeting <day> <month>` card on Client Flow, assigned to Michael.
+Put the full reviewed email, recording/source link and **Proposed actions — awaiting
+Michael's review** in Discussion. Description holds metadata and working URLs only.
+Do not create separate action cards, nested meeting notes, delegate or start work.
+Preserve the distinction between reviewed/drafted and verified-sent email.
+
+Next handoff: Michael runs `meeting-to-action` against the card to reconcile
+existing work, resolve decisions and approve tasks and delegation. Kristalyn then
+coordinates assigned delivery. Email approval alone does not release actions.
+A request to do both stages must explicitly authorise the task/delegation stage.
+Use the authenticated BasicOps connector if available; do not change permissions
+or route BasicOps through the read-only meeting-dispatch worker. If unavailable,
+return the ready-to-save card and precise connector gap without claiming creation.
+The controlling rules are `basicops-task-manager/references/meeting-wrap.md`.

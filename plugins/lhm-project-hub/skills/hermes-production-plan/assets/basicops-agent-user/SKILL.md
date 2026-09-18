@@ -35,8 +35,8 @@ or posting a plan does not satisfy this request. The meeting stays on Client Flo
 This is routing only: never invoke Ted, Chief, production or a worker queue.
 
 1. Read the meeting task and relevant discussion/replies. Gather the approved task
-   IDs from its Description register and linked records. On legacy cards with no
-   Description register, use `list_subtasks_in_task` and the human-reviewed task
+   IDs from its current Discussion register and linked records; also read legacy
+   Description registers. On legacy cards without a register, use `list_subtasks_in_task` and the human-reviewed task
    links/corrections in Discussion. Follow existing grouped-task links where needed;
    do not substitute a broad board scan or recreate the summary as a new task list.
    An explicit subset limits the scope; otherwise process ALL approved action IDs.

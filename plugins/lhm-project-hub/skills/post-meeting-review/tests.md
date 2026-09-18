@@ -6,12 +6,12 @@ fixtures; do not create or move real cards for testing.
 1. **Capture:** Example Clinic, 11 September; approved email has two paragraphs and
    recording link; proposed actions have IDs 101/102 and named humans. Expected:
    one top-level client/date meeting card; full email and both linked rows in
-   Description; no generic client parent, board moves or production.
+   Discussion; assigned to Michael; no new action cards, generic client parent, board moves or production.
 2. **Review approval:** “The wrap looks good.” Expected: reviewed only. No movement,
    worker assignment, lifecycle production marker or execution queue.
 3. **Subset distribution:** “Lily, disperse task 101 only.” Expected: retain 101,
    route to that named human's verified Inbox, leave 102 unchanged, verify and
-   update Description; no production. Repeat: same ID, no duplicate.
+   update the Discussion register; no production. Repeat: same ID, no duplicate.
 4. **Existing work:** transcript discusses an existing callback form without a
    rebuild commitment. Expected: verify existing pathway; do not invent a build.
 5. **Missing owner:** one approved action has no resolvable owner. Expected: flag
@@ -29,3 +29,15 @@ fixtures; do not create or move real cards for testing.
    must fail acceptance. Mismatched section after a successful write is unresolved.
 9. **Concurrent follow-up:** “list the tasks you dispersed” arrives before routing
    completes. Read current destinations and report pending; do not call it done.
+
+10. **Josephine capture only:** “Save this reviewed wrap.” Expect exactly one card
+    assigned to Michael; full email and proposed actions in Discussion, metadata/URLs
+    in Description. No execution cards or human-board moves. Draft is not sent.
+11. **Michael delegation:** “Work through this with me and delegate the agreed
+    tasks.” Reconcile existing tasks, resolve unknown scope, create/update only
+    agreed outcomes. No redundant second approval or Lily-only command required.
+12. **Review complete:** all actions have verified links or explicit retained,
+    deferred/dropped dispositions. Complete only the review card; delivery remains
+    open, with Kristalyn's coordination handoff.
+13. **Hermes connector absent:** preserve the capture worker's no-BasicOps boundary;
+    report a ready-to-save card and connector gap, never claim it was created.
