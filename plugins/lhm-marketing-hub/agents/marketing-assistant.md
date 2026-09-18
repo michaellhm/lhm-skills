@@ -33,5 +33,5 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `lhm-wordpress-hub:wp-rest-operator` — Inspect and implement registered WordPress or LeadScale content changes through the REST API with snapshots, publish separation and readback verification.
 
-`meeting-to-action` — Interactive meeting task reconciliation, outcome delegation and guided execution of Michael’s retained actions.
+`meeting-to-action` — Interactive meeting task reconciliation, outcome delegation and guided execution of Michael’s retained actions, with a final BasicOps/Obsidian/Drive close-out prompt.
 `post-meeting-review` — Josephine captures one meeting card with the full email and proposed actions in Discussion; Michael reviews and delegates through meeting-to-action.

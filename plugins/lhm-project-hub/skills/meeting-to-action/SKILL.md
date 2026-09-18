@@ -90,6 +90,16 @@ Verify changed tasks before reporting them complete. Distinguish assigned, accep
 
 Return the linked ownership summary, Michael's remaining actions, client inputs, unresolved scheduling/approval gaps and next suggested action. Prepare a short follow-up email when requested; read the actual previous email first and report only verified progress. Drafting does not authorise sending.
 
+### Session record close-out
+
+Before ending a material working session, check whether BasicOps, canonical Obsidian notes and the relevant Claude Workspace shared-drive records reflect the final decisions. Prompt Michael once: “Shall I wrap this up in BasicOps, Obsidian and the Claude shared drive, including the changes, email status and next review?” If he already authorised these updates in the session or a standing instruction, perform them and report the result without asking again. If he declines, preserve a concise resume point and state which records remain outstanding.
+
+Use the available vault workflow for Obsidian, `basicops-task-manager` for BasicOps and the existing Drive delivery workflow for material artefacts. Resolve the client's actual destinations; read existing records before editing. Update existing records in place, preserve original evidence and dated history, and correct superseded current-state summaries. Do not create competing project trackers or copy full discussions into every system.
+
+Record verified changes and before/after settings where useful, decisions and scope changes, owners and task links, outstanding work, and the next executable action. Separate proposals from implementation and assignment from delivery. Record client email as drafted, sent per Michael's confirmation, or verified by mail evidence; never infer sending from wording approval. For a scheduled review record its date, timezone, observation window, automation ID and verified creation state. A discussed date is not a created schedule, and a review does not authorise automatic further changes.
+
+Obsidian holds durable client/project state; BasicOps holds concise actions and handoffs; Drive holds the existing deliverables and change records. Verify each write, preserve working links and use one short receipt linking the updated records. A local Drive-folder save proves local persistence only: distinguish it from verified cloud delivery. If a destination is unavailable, complete the other authorised updates, name the precise outstanding item and retain its return point. Do not claim the session fully recorded while a required destination is unverified.
+
 ### Client follow-up email
 
 At the end of a working session, offer a ready-to-send client recap. When requested, default to Michael’s approved style: a brief opening referring to the previous meeting wrap, concise dot points with bold workstream labels, and a simple sign-off. Cover all material client work progressed during the session, not only the last task discussed. Keep technical detail in the audit/task record unless it helps the client understand an outcome or decision.
