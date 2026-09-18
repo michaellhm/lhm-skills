@@ -91,7 +91,7 @@ All available skills in this plugin:
 | `link-gap-finder` | "Find pages missing links" | 3 |
 | `local-authority-finder` | "Find local authority links" | 3 |
 | `pr-brief-generator` | "Generate PR brief" | 3 |
-| `monthly-cycle-report` | "Generate month [N] report" | 1, 2, 3 |
+| `monthly-cycle-report` | "Monthly SEO report", "Jaimee brief", "Generate month [N] report" | 0, 1, 2, 3; multi-location |
 
 ## Important Rules
 

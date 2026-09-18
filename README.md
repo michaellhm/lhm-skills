@@ -127,7 +127,7 @@ plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
     content-expansion-agent.md          # Month 2 — FAQ or overlay pages
     link-building-agent.md              # Month 3 — link acquisition
     content-writer.md                   # 8-pass writing utility
-  skills/                               # All 18 skills
+  skills/                               # All 19 skills
     gmb-project-manager/                # Project tracking and status
     run-local-diagnostic/               # Grid scans + competitor audit
     gbp-optimiser/                      # GBP profile optimisation
@@ -136,7 +136,7 @@ plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
     entity-mapper/                      # Competitor entity extraction
     site-architecture-mapper/           # GBP-mirrored silo
     blog-schedule-builder/              # 3-month blog content schedule
-    monthly-loop-setup/                 # Scheduled automation for the monthly GMB cycle
+    monthly-loop-setup/                 # Monthly GMB automation and CLI-only Monday SEO runtime, verified delivery and Lily HTML digest
     service-priority-selector/          # Pick 3 services per cycle
     consistency-signal-audit/           # 8 homepage signals
     service-page-writer/                # Goal-completion content
@@ -146,7 +146,7 @@ plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
     link-gap-finder/                    # Pages missing links
     local-authority-finder/             # Chambers, sponsorships
     pr-brief-generator/                 # Press release drafts
-    monthly-cycle-report/               # Monthly/cycle reports
+    monthly-cycle-report/               # Client SEO reports, local phase status and AI coaching
   references/                           # 10 reference files
     anti-ai-writing-guidelines.json
     ahpra-compliance-framework.md
@@ -264,7 +264,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 **Month 3 — Link Building** (3 skills): Link gap analysis, local authority opportunities (chambers, sponsorships, .edu links), PR brief generation.
 
-**Cross-Phase** (2 skills): Adaptive monthly/cycle reporting with ranking trends, scheduled automation setup for the recurring monthly GMB cycle (Telegram + email notifications, BasicOps task creation, site-change staging).
+**Cross-Phase** (2 skills): Goal-led monthly SEO investigation, per-location phase close-out, consolidated work plans and AI coaching, scheduled automation setup for the recurring monthly GMB cycle (Telegram + email notifications, BasicOps task creation, site-change staging).
 
 ### WordPress Hub
 

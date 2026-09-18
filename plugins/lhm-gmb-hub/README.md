@@ -4,7 +4,7 @@ A Claude Code plugin that executes a repeating 3-month Google Business Profile o
 
 ## What This Is
 
-17 skills and 6 agents organised into a structured workflow: Month 0 (onboarding and GBP foundation), Month 1 (service page optimisation), Month 2 (content expansion), Month 3 (strategic link building). The cycle then repeats with new priority services.
+19 skills and 6 agents organised into a structured workflow: Month 0 (onboarding and GBP foundation), Month 1 (service page optimisation), Month 2 (content expansion), Month 3 (strategic link building). The cycle then repeats with new priority services.
 
 The plugin maintains a per-client `project-management/gmb.md` file (via `lhm-project-hub:gmb-project-manager`) that tracks all tasks, focus keywords with ranking history, and cycle progress. When resuming work, the orchestrator reads this file to understand where the client is and what needs doing next.
 
@@ -32,7 +32,7 @@ plugins/lhm-gmb-hub/
 │   ├── content-expansion-agent.md          # Month 2
 │   ├── link-building-agent.md              # Month 3
 │   └── content-writer.md                   # 8-pass writing utility
-├── skills/                                 # All 17 skills
+├── skills/                                 # All 19 skills
 │   ├── gmb-project-manager/                # Shim → lhm-project-hub:gmb-project-manager
 │   ├── run-local-diagnostic/               # Grid scans + competitor audit
 │   ├── gbp-optimiser/                      # GBP profile optimisation
@@ -49,7 +49,7 @@ plugins/lhm-gmb-hub/
 │   ├── link-gap-finder/                    # Pages missing links
 │   ├── local-authority-finder/             # Chambers, sponsorships
 │   ├── pr-brief-generator/                 # Press release drafts
-│   └── monthly-cycle-report/               # Monthly/cycle reports
+│   └── monthly-cycle-report/               # Client SEO reports, local phase status and AI coaching
 └── references/
     ├── anti-ai-writing-guidelines.json
     ├── ahpra-compliance-framework.md
@@ -105,7 +105,7 @@ plugins/lhm-gmb-hub/
 
 | Skill | Description |
 |-------|-------------|
-| `monthly-cycle-report` | Adapted monthly/cycle report with ranking trends |
+| `monthly-cycle-report` | Evidence-led client report, location stages, actionable checklist and AI coach |
 
 ## MCP Dependencies
 
@@ -118,7 +118,7 @@ plugins/lhm-gmb-hub/
 | DataForSEO | Optional (new) | 3 skills |
 | Screaming Frog | Optional (new) | 1 skill |
 
-10 of 17 skills are fully functional with already-installed MCPs. See `references/mcp-setup-guide.md` for installation instructions.
+10 of 19 skills are fully functional with already-installed MCPs. See `references/mcp-setup-guide.md` for installation instructions.
 
 ## Key Principles
 
@@ -129,3 +129,9 @@ plugins/lhm-gmb-hub/
 5. Diagnose before you build. The grid scan tells you what to build.
 6. AHPRA compliance is non-negotiable for healthcare clients.
 7. Editorial links, not nav links. Paragraph links pass authority.
+
+Monday portfolio briefs use `monthly-loop-setup` with the canonical Client Flow SEO rotation, CLI-only research/delivery, existing meeting/task reconciliation and one digest. Capability gaps keep the schedule paused; one-client tests use the explicitly approved recipient and board.
+
+SEO digest presentation: Lily via Mailgun, coloured-circle traffic lights and one BasicOps card button per client. Supporting reports/coach stay in the card. Default Monday12:15 Melbourne, after project flow; activation remains capability-gated.
+
+The dedicated weekly runtime uses a no-agent Hermes queue trigger, Claude read-only analytics, Codex reporting/delivery, separate readback QA and receipt-backed Mailgun. Its state/credentials stay outside source.
