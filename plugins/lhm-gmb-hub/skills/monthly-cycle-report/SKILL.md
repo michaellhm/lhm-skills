@@ -15,6 +15,14 @@ Resolve the client, registered Drive root, reporting window, location/profile id
 
 Assume ordinary room to grow; do not ask for a capacity inventory before analysing. Honour explicit client limits and actual supported services. Use history to propose a consistent baseline and realistic target when none is agreed, clearly labelling the target provisional with dates and reasoning. Goals follow the quarterly planning rhythm, with dated amendments for confirmed new services, staffing or business priorities. Do not silently create client commitments.
 
+## Reconcile meetings and existing work
+
+Before finalising the queue, read the client card and latest meeting-wrap discussions on `*Client Flow`, then relevant tasks and discussions on the verified SEO owner's personal board. Follow native links from the wrap even when task titles use an ambiguous client abbreviation. Read later decisions and completion evidence, not just status or due dates. Paginate searches and record coverage gaps.
+
+Match each proposed action to an existing task, completed change or unresolved commitment. Link and reuse current tasks; do not repeat completed work or create a second assignment. A closed booking-link request can still require outcome verification, but must not become a new request for the same link. An old automation failure does not prove humans did no work. Record stale automation failures separately from delivery progress.
+
+In the overview include a short **Already on the board** block with the most relevant existing task links. In evidence record source meeting, task/owner, latest discussion, disposition (reuse, verify outcome, superseded, complete with evidence, or genuinely new), and the next step. Escalate only unanswered questions after checking these sources. Report-only mode reads boards; task/email mutations require the scheduled or explicit delivery authority in `monthly-loop-setup`.
+
 ## Determine programme state per location
 
 Build an inventory: location/profile, goal, recorded cycle and dates, Month 0/1/2/3, source/date, completed work, open tasks and unresolved evidence. Month 0 is onboarding; Month 1 service pages; Month 2 supporting content; Month 3 links, PR and cycle review.

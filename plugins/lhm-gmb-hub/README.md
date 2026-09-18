@@ -129,3 +129,5 @@ plugins/lhm-gmb-hub/
 5. Diagnose before you build. The grid scan tells you what to build.
 6. AHPRA compliance is non-negotiable for healthcare clients.
 7. Editorial links, not nav links. Paragraph links pass authority.
+
+Monday portfolio briefs use `monthly-loop-setup` with the canonical Client Flow SEO rotation, CLI-only research/delivery, existing meeting/task reconciliation and one digest. Capability gaps keep the schedule paused; one-client tests use the explicitly approved recipient and board.

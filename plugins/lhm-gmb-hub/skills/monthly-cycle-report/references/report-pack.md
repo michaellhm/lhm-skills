@@ -48,3 +48,7 @@ Populate this with the verified report URLs, goal, scope and actual stage table;
 > At handoff, prepare the canonical project/Obsidian update and link verified Drive deliverables. Finish with the next action and the metric/date for checking results.
 
 Include the client's current ordered task IDs or refer to the verified overview as the single authoritative queue, so edits cannot leave competing embedded lists. The coach should help the team act and learn, not overwhelm them with the entire evidence report again.
+
+## Board reconciliation
+
+Include a short Already on the board block in the overview. Link existing meeting and SEO tasks; do not repeat their full briefs. Evidence must distinguish reported completion from independently verified outcomes and retain unresolved dependencies. The coach starts by reconciling these linked tasks before opening new work.
