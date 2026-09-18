@@ -33,6 +33,17 @@ class RuntimeTests(unittest.TestCase):
                 with self.assertRaises(TimeoutError):w.send_digest(cfg,p,{'subject':'s','text':'x','html':'x'},'test')
                 r=w.send_digest(cfg,p,{'subject':'s','text':'x','html':'x'},'test')
                 self.assertEqual(r['state'],'delivery_uncertain');self.assertEqual(call.call_count,1)
+    def test_vault_receipt_is_idempotent_and_preserves_goals(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)/'20 Clients/A';(root/'project-management').mkdir(parents=True)
+            (root/'Goals.md').write_text('Original goal: more suitable appointments.\n')
+            (root/'project-management/gmb.md').write_text('Month 0 remains open.\n')
+            cfg={'vault':d,'commit':'test'};client={'evidence_prefix':'20 Clients/A/'}
+            result={'task_url':'https://app.basicops.com/a','report_urls':['https://drive.google.com/a','https://drive.google.com/b','https://drive.google.com/c']}
+            for _ in range(2):w.record_delivery(cfg,client,'a',result,'2026-09-21','production')
+            self.assertEqual((root/'Goals.md').read_text().count('## SEO review prepared'),1)
+            self.assertTrue((root/'project-management/gmb.md').read_text().startswith('Month 0 remains open.'))
+
     def test_production_guard(self):
         with self.assertRaises(ValueError):w.run({},'production','2026-08-03')
 
