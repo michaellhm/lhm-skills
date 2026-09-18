@@ -143,6 +143,10 @@ If the destination is missing, dispatch is unavailable, either connector is unav
 - state the exact missing destination, permission or verification problem;
 - say `analysis complete; delivery incomplete`, preserve the delivery run ID and do not silently save somewhere else.
 
+### Weekly highlights and Monday email
+
+For the scheduled weekly flow, follow `references/monday-digest.md`. Include a short Highlights section and Start here action in the report and return the matching `ads_digest` JSON block. The registered deterministic email script sends one Lily HTML/text digest only after terminal child results and verified delivery receipts. Report-only requests never send email.
+
 ### Step 8: Hermes overview, BasicOps record and approval gate
 
 Return the compact overview and structured handback defined in the operating model after the delivery
@@ -231,6 +235,11 @@ Date: [Today's Date]
 ## Performance Zone: [Emoji] [Zone] — [Priority]
 
 Measurement confidence: [High/Medium/Low] — [one-line reason]
+
+### Highlights
+- [Evidence-backed result or change, with the comparison period]
+- [Main issue or opportunity, preserving measurement uncertainty]
+Start here: [First concrete action or exact approval needed]
 
 ### Key Metrics
 - Monthly Budget: $X,XXX | Actual Spend: $X,XXX (XX% of month elapsed)
