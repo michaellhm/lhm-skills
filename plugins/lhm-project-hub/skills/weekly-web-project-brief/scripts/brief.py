@@ -162,8 +162,8 @@ def send(week, email, kind='brief'):
              'started_at': now().isoformat(), 'content_sha256': hashlib.sha256(json.dumps(email, sort_keys=True).encode()).hexdigest()}
         save(p, r)
         try:
-            result = mailgun('/messages', {'from': FROM, 'to': TO, 'cc': ','.join(CC), 'h:Reply-To': TO,
-                              'subject': ('TEST | ' if kind == 'test' else '') + email['subject'],
+            result = mailgun('/messages', {'from': FROM, 'to': TO, **({'cc': ','.join(CC)} if CC else {}), 'h:Reply-To': TO,
+                              'subject': ('TEST | ' if kind == 'test' and not email['subject'].startswith('TEST | ') else '') + email['subject'],
                               'text': email['text'], 'html': email['html'], 'o:tag': 'lhm-weekly-web-brief',
                               'v:brief_week': week})
             r.update(state='queued', message_id=result['id'])
@@ -205,7 +205,14 @@ def main():
     parser.add_argument('--kind', choices=['brief', 'test'], default='brief')
     parser.add_argument('--file')
     parser.add_argument('--out')
+    parser.add_argument('--to-self', action='store_true', help='Michael-only explicitly authorised test')
     args = parser.parse_args()
+    if args.to_self:
+        if args.kind != 'test':
+            parser.error('--to-self requires --kind test')
+        global CC, RECIPIENTS
+        CC = []
+        RECIPIENTS = [TO]
     if args.action == 'gate':
         result = gate()
     elif args.action == 'render':
@@ -216,6 +223,8 @@ def main():
         (out / 'email.txt').write_text(result['text'])
         result = {'state': 'rendered', 'directory': str(out)}
     elif args.action == 'send':
+        from quality import validate
+        validate(Path(args.file).parent)
         result = send(args.week, json.loads(Path(args.file).read_text()), args.kind)
     else:
         result = verify(args.week, args.kind)

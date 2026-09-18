@@ -1,5 +1,8 @@
 import importlib.util
 import tempfile
+import json
+import sys
+import types
 import unittest
 from datetime import datetime
 from pathlib import Path
@@ -61,6 +64,30 @@ class BriefTests(unittest.TestCase):
             self.assertEqual(payload['text'], email['text'])
             self.assertEqual(payload['to'], b.TO)
             self.assertFalse(b.gate()['wakeAgent'])
+
+    def test_cli_self_only_and_single_test_prefix(self):
+        email = b.render(self.fixture())
+        email['subject'] = 'TEST | ' + email['subject']
+        payload = Path(self.temp.name) / 'email.json'
+        payload.write_text(json.dumps(email))
+        quality = types.SimpleNamespace(validate=lambda path: None)
+        with patch.dict(sys.modules, {'quality': quality}), patch.object(sys, 'argv', ['brief.py', 'send', '--week', '2026-09-21', '--kind', 'test', '--to-self', '--file', str(payload)]), patch.object(b, 'CC', b.CC[:]), patch.object(b, 'RECIPIENTS', b.RECIPIENTS[:]), patch.object(b, 'mailgun', return_value={'id': '<test>'}) as net:
+            b.main()
+            sent = net.call_args.args[1]
+            self.assertEqual(sent['to'], 'michael@localhealthmarketing.com.au')
+            self.assertNotIn('cc', sent)
+            self.assertNotIn('bcc', sent)
+            self.assertEqual(sent['subject'].count('TEST | '), 1)
+            receipt = json.loads(b.receipt('2026-09-21', 'test').read_text())
+            self.assertEqual(receipt['recipients'], [b.TO])
+
+    def test_cli_quality_failure_prevents_submission(self):
+        quality = types.SimpleNamespace(validate=lambda path: (_ for _ in ()).throw(ValueError('Incomplete research')))
+        with patch.dict(sys.modules, {'quality': quality}), patch.object(sys, 'argv', ['brief.py', 'send', '--week', '2026-09-21', '--file', str(Path(self.temp.name) / 'email.json')]), patch.object(b, 'mailgun') as net:
+            with self.assertRaisesRegex(ValueError, 'Incomplete research'):
+                b.main()
+            net.assert_not_called()
+            self.assertFalse(b.receipt('2026-09-21').exists())
 
     def test_all_recipients_required(self):
         b.save(b.receipt('2026-09-21'), {'state': 'queued', 'message_id': '<test>', 'recipients': b.RECIPIENTS})
