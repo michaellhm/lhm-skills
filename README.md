@@ -136,7 +136,7 @@ plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
     entity-mapper/                      # Competitor entity extraction
     site-architecture-mapper/           # GBP-mirrored silo
     blog-schedule-builder/              # 3-month blog content schedule
-    monthly-loop-setup/                 # Monthly GMB automation and CLI-only Monday SEO portfolio briefs and Lily HTML digest
+    monthly-loop-setup/                 # Monthly GMB automation and CLI-only Monday SEO runtime, verified delivery and Lily HTML digest
     service-priority-selector/          # Pick 3 services per cycle
     consistency-signal-audit/           # 8 homepage signals
     service-page-writer/                # Goal-completion content

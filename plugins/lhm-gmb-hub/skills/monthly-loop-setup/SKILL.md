@@ -7,7 +7,7 @@ description: "Set up (or update) a recurring automated monthly GMB optimisation 
 
 ## Portfolio Monday SEO brief
 
-For "Monday SEO flow", "Jaimee weekly client brief", "SEO highlights email" or "Hermes SEO report automation", use [references/weekly-seo-flow.md](references/weekly-seo-flow.md). This is a portfolio reporting and human-work handoff, not the legacy per-client implementation loop below. Use one schedule and the canonical Obsidian Client Flow rotation. Deliver a card-first HTML digest from Lily via Mailgun, with coloured-circle status labels. Do not silently add a second per-client schedule.
+For "Monday SEO flow", "Jaimee weekly client brief", "SEO highlights email" or "Hermes SEO report automation", use [references/weekly-seo-flow.md](references/weekly-seo-flow.md). This is a portfolio reporting and human-work handoff, not the legacy per-client implementation loop below. Use one schedule and the canonical Obsidian Client Flow rotation. The dedicated runtime lives in `scripts/weekly_runtime.py`, with a no-agent Hermes trigger in `scripts/cron_gate.py`. Deliver a card-first HTML digest from Lily via Mailgun, with coloured-circle status labels. Do not silently add a second per-client schedule.
 
 ## Legacy per-client implementation loop
 

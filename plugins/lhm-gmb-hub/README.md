@@ -133,3 +133,5 @@ plugins/lhm-gmb-hub/
 Monday portfolio briefs use `monthly-loop-setup` with the canonical Client Flow SEO rotation, CLI-only research/delivery, existing meeting/task reconciliation and one digest. Capability gaps keep the schedule paused; one-client tests use the explicitly approved recipient and board.
 
 SEO digest presentation: Lily via Mailgun, coloured-circle traffic lights and one BasicOps card button per client. Supporting reports/coach stay in the card. Default Monday12:15 Melbourne, after project flow; activation remains capability-gated.
+
+The dedicated weekly runtime uses a no-agent Hermes queue trigger, Claude read-only analytics, Codex reporting/delivery, separate readback QA and receipt-backed Mailgun. Its state/credentials stay outside source.
