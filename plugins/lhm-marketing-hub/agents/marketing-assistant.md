@@ -36,6 +36,8 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `meeting-to-action` — Interactive meeting task reconciliation, outcome delegation and guided execution of Michael’s retained actions, with a final BasicOps/Obsidian/Drive close-out prompt.
 `post-meeting-review` — Josephine captures one meeting card with the full email and proposed actions in Discussion; Michael reviews and delegates through meeting-to-action.
 
-`weekly-web-project-brief` — Lily’s Monday HTML website portfolio email, due dates, traffic lights and consolidated project feedback.
+`weekly-web-project-brief` — Lily’s Monday HTML website portfolio: project health, inactivity checks, concise client-grouped owner Inbox actions, source freshness and consolidated feedback. One-off fixes stay out of the snapshot.
+
+`google-ads-monthly-review` — Evidence-led account review, report highlights and Lily’s Monday review-card digest.
 
 `lhm-gmb-hub:monthly-cycle-report` — Goal-led monthly SEO investigation, consolidated multi-location work plan, phase close-out, meeting/task reconciliation and AI coaching pack. Portfolio Monday scheduling uses GMB `monthly-loop-setup` with a dedicated CLI-only analytics, delivery and independent-QA runtime plus a card-first Lily/Mailgun HTML digest.

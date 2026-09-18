@@ -91,15 +91,51 @@ def render(d):
     text = ['Hi team,', d['intro']]
     parts = [f'<p>Hi team,</p><p>{html.escape(d["intro"])}</p>']
 
-    def section(title, items):
+    def section(title, items, grouped=False):
         if not items:
             return
-        text.extend([title] + ['• ' + x for x in items])
-        parts.append('<h2 style="font-size:19px;margin:26px 0 12px">' + html.escape(title) + '</h2><ul>' + ''.join('<li style="margin:8px 0">' + html.escape(x) + '</li>' for x in items) + '</ul>')
+        text.append(title)
+        if grouped and all(isinstance(item, dict) and item.get('client') for item in items):
+            groups = {}
+            for item in items:
+                groups.setdefault(item['client'], []).append(item)
+            entries = []
+            for client, actions in groups.items():
+                links = []
+                lines = []
+                for action in actions:
+                    label, link = action['text'], action['url']
+                    parsed = urllib.parse.urlsplit(link)
+                    if parsed.scheme != 'https' or not parsed.netloc or parsed.username or parsed.password:
+                        raise ValueError('Action links must be verified HTTPS URLs')
+                    if not isinstance(label, str) or not label.strip():
+                        raise ValueError('Action text is required')
+                    links.append('<a href="' + html.escape(link, quote=True) + '">' + html.escape(label) + '</a>')
+                    lines.append(label + ' (' + link + ')')
+                text.append('• ' + client + ': ' + '; '.join(lines))
+                entries.append('<li style="margin:12px 0"><strong>' + html.escape(client) + ':</strong> ' + '; '.join(links) + '</li>')
+            parts.append('<h2 style="font-size:19px;margin:26px 0 12px">' + html.escape(title) + '</h2><ul>' + ''.join(entries) + '</ul>')
+            return
+        entries = []
+        for item in items:
+            if isinstance(item, dict):
+                label, link = item['text'], item['url']
+                parsed = urllib.parse.urlsplit(link)
+                if parsed.scheme != 'https' or not parsed.netloc or parsed.username or parsed.password:
+                    raise ValueError('Action links must be verified HTTPS URLs')
+                if not isinstance(label, str) or not label.strip():
+                    raise ValueError('Action text is required')
+                text.append('• ' + label + '\n' + link)
+                content = '<a href="' + html.escape(link, quote=True) + '">' + html.escape(label) + '</a>'
+            else:
+                text.append('• ' + item)
+                content = html.escape(item)
+            entries.append('<li style="margin:8px 0">' + content + '</li>')
+        parts.append('<h2 style="font-size:19px;margin:26px 0 12px">' + html.escape(title) + '</h2><ul>' + ''.join(entries) + '</ul>')
 
     section('The main things to get moving', d['priorities'])
     section('New projects this week', d['new_projects'] or ['No new website projects this week.'])
-    legend = 'Red: blocked or overdue. Orange: needs attention. Green: progressing with no known blocker.'
+    legend = 'Red: blocked or stalled. Orange: needs attention or a progress update. Green: progressing or following the agreed plan.'
     dates = 'Dates are working targets unless stated otherwise. Estimates use eight weeks from confirmed client prototype approval; existing agreed targets take precedence.'
     text += ['Project snapshot', legend, dates]
     parts.append('<h2 style="font-size:19px;margin:26px 0 12px">Project snapshot</h2><p>' + legend + '</p><p style="font-size:13px;color:#526070">' + dates + '</p><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr>' + ''.join('<th scope="col" style="text-align:left;padding:12px;background:#16354a;color:white">' + x + '</th>' for x in ['Project', "Where we’re at", 'Target finish', 'What needs to happen next']) + '</tr></thead><tbody>')
@@ -110,7 +146,7 @@ def render(d):
         parts.append(f'<tr style="background:{bg}"><td {cell}><strong style="color:{colour}">{label}</strong><br><a href="{html.escape(p["url"], quote=True)}">{html.escape(p["name"])}</a></td>' + ''.join(f'<td {cell}>{html.escape(p[k])}</td>' for k in ('state', 'target', 'next')) + '</tr>')
     parts.append('</tbody></table></div>')
     for o in d['owners']:
-        section(o['name'], o['actions'])
+        section(o['name'], o['actions'], grouped=True)
     section('Older cards to clear up', d.get('older_cards', []))
     section('Updates or corrections?', [FEEDBACK.format(week=week)])
     tail = 'Evidence checked: ' + d['cutoff'] + '. ' + d.get('limitations', '')
@@ -162,8 +198,8 @@ def send(week, email, kind='brief'):
              'started_at': now().isoformat(), 'content_sha256': hashlib.sha256(json.dumps(email, sort_keys=True).encode()).hexdigest()}
         save(p, r)
         try:
-            result = mailgun('/messages', {'from': FROM, 'to': TO, 'cc': ','.join(CC), 'h:Reply-To': TO,
-                              'subject': ('TEST | ' if kind == 'test' else '') + email['subject'],
+            result = mailgun('/messages', {'from': FROM, 'to': TO, **({'cc': ','.join(CC)} if CC else {}), 'h:Reply-To': TO,
+                              'subject': ('TEST | ' if kind == 'test' and not email['subject'].startswith('TEST | ') else '') + email['subject'],
                               'text': email['text'], 'html': email['html'], 'o:tag': 'lhm-weekly-web-brief',
                               'v:brief_week': week})
             r.update(state='queued', message_id=result['id'])
@@ -205,7 +241,14 @@ def main():
     parser.add_argument('--kind', choices=['brief', 'test'], default='brief')
     parser.add_argument('--file')
     parser.add_argument('--out')
+    parser.add_argument('--to-self', action='store_true', help='Michael-only explicitly authorised test')
     args = parser.parse_args()
+    if args.to_self:
+        if args.kind != 'test':
+            parser.error('--to-self requires --kind test')
+        global CC, RECIPIENTS
+        CC = []
+        RECIPIENTS = [TO]
     if args.action == 'gate':
         result = gate()
     elif args.action == 'render':
@@ -216,6 +259,8 @@ def main():
         (out / 'email.txt').write_text(result['text'])
         result = {'state': 'rendered', 'directory': str(out)}
     elif args.action == 'send':
+        from quality import validate
+        validate(Path(args.file).parent)
         result = send(args.week, json.loads(Path(args.file).read_text()), args.kind)
     else:
         result = verify(args.week, args.kind)

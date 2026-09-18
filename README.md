@@ -34,7 +34,7 @@ plugins/lhm-marketing-hub/             # The plugin
     bid-budget-optimizer/              # Budget and bid strategy
     keyword-optimizer/                 # Keyword and wasted spend analysis
     landing-page-optimizer/            # Landing page audits
-    google-ads-monthly-review/          # Account health check and zone analysis
+    google-ads-monthly-review/          # Account health, zone analysis and Monday highlights digest
     google-ads-delivery-qa/             # Independent action-level evidence, artefact and completion gate
     quarterly-adversarial-review/       # 90-day red-team review: reconstructs prior work, tests assumptions, assigns AdPulse zone
     competitive-analysis/               # Competitor evaluation and market positioning
@@ -209,7 +209,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
     wp-project-manager/                 # Website PM state plus verified BasicOps handoff reconciliation
-    weekly-web-project-brief/           # Lily Monday HTML portfolio email, traffic lights, dates and consolidated feedback
+    weekly-web-project-brief/           # Lily Monday HTML portfolio: project health, inactivity checks and concise client-grouped owner inbox actions
     website-project-cockpit/            # Website status and three-layer Obsidian/Web Projects/personal-task stage handoffs
     lp-project-manager/                 # Landing page campaign PM doc (migrated from WordPress hub; shim remains)
     gmb-project-manager/                # GMB optimisation cycle PM doc (migrated from GMB hub; shim remains)
@@ -302,7 +302,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 **Client Success** (7 skills): `meeting-to-action` guides Michael through evidence-led task reconciliation, end-to-end delegation, his retained actions and verified BasicOps/Obsidian/Drive session close-out. Monthly per-client review engine with three modes (KP wrap-up, meeting prep, full account review). Quarterly strategy review — pulls three months of GA4/Ads/GSC data plus the quarter's monthly reports and drafts the next 3/6-month plan. Client-ready meeting follow-up email and meeting capture — turns the Fathom summary and transcript into a polished Gmail-ready wrap with decisions verified against the transcript, action items grouped by owner, and next steps; also saves the structured meeting record and stands up the client's BasicOps card with a matching summary note. Post-meeting follow-up triage — reads that saved meeting record to update client state files, sweep the client folder for stale artefacts, and capture one review card assigned to Michael, who uses meeting-to-action to reconcile existing work and approve complete task briefs and delegation (migrated from Client Updates Hub). Propagates a client data change across every file that references it (migrated from Client Updates Hub). Plain-language client-facing update emails after completing work (migrated from Client Updates Hub).
 
-**Project Managers** (5 skills): Weekly website portfolio email with source reconciliation, red-first traffic lights, approval-based targets and a BasicOps feedback loop; Website project cockpit for concise, evidence-based status and handoff readiness; website build PM doc; landing page campaign PM doc; and GMB optimisation cycle PM doc. The three state-file managers are migrated from their originating hubs; shims remain in place there so existing routing keeps working.
+**Project Managers** (5 skills): Weekly website portfolio email with project-only traffic lights, inactivity checks, concise client-grouped owner Inbox actions, source reconciliation, approval-based targets and a BasicOps feedback loop; Website project cockpit for concise, evidence-based status and handoff readiness; website build PM doc; landing page campaign PM doc; and GMB optimisation cycle PM doc. The three state-file managers are migrated from their originating hubs; shims remain in place there so existing routing keeps working.
 
 ### Skill Ops
 
