@@ -37,3 +37,5 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `post-meeting-review` — Josephine captures one meeting card with the full email and proposed actions in Discussion; Michael reviews and delegates through meeting-to-action.
 
 `weekly-web-project-brief` — Lily’s Monday HTML website portfolio email, due dates, traffic lights and consolidated project feedback.
+
+`lhm-gmb-hub:monthly-cycle-report` — Goal-led monthly SEO investigation, consolidated multi-location work plan, phase close-out and AI coaching pack.
