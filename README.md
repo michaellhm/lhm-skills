@@ -34,7 +34,7 @@ plugins/lhm-marketing-hub/             # The plugin
     bid-budget-optimizer/              # Budget and bid strategy
     keyword-optimizer/                 # Keyword and wasted spend analysis
     landing-page-optimizer/            # Landing page audits
-    google-ads-monthly-review/          # Account health check and zone analysis
+    google-ads-monthly-review/          # Account health, zone analysis and Monday highlights digest
     google-ads-delivery-qa/             # Independent action-level evidence, artefact and completion gate
     quarterly-adversarial-review/       # 90-day red-team review: reconstructs prior work, tests assumptions, assigns AdPulse zone
     competitive-analysis/               # Competitor evaluation and market positioning
