@@ -9,10 +9,21 @@ def load(name,path):
     spec=importlib.util.spec_from_loader(name,SourceFileLoader(name,str(path))); mod=importlib.util.module_from_spec(spec); spec.loader.exec_module(mod); return mod
 worker=load('codex_execution_worker',ROOT/'assets/host/lhm-codex-execution-worker')
 client=load('codex_execution_client',ROOT/'assets/container/lhm-codex-dispatch')
+brief_renderer=load('weekly_web_brief_renderer',ROOT.parent/'lhm-project-hub/skills/weekly-web-project-brief/scripts/brief.py')
 
 def request(**overrides):
     value={'schema_version':1,'request_id':'synthetic-1','parent_run_id':'telegram-parent-1','task_class':'generic_non_mutating','objective':'Summarise this bounded synthetic request.','permission_profile':'default-review-only','timeout_seconds':60,'created_at':'2026-09-01T00:00:00Z'}
     value.update(overrides); return value
+
+def weekly_request(**overrides):
+    value=request(request_id='weekly-2026-09-21',parent_run_id='weekly-web-brief-20260921',task_class='weekly_web_project_brief',permission_profile='weekly-web-brief-json-v1')
+    value.update(workflow='weekly-web-project-brief',week='2026-09-21',evidence={'cutoff':'2026-09-21T12:00:00+10:00','sources':{'basicops':{'boards':[68635,68921]},'obsidian':{},'gmail':{}},'research_receipt':{'complete':True}})
+    value.update(overrides); return value
+
+def weekly_brief():
+    return {'week':'2026-09-21','cutoff':'2026-09-21T12:00:00+10:00','intro':'Here is the source-backed weekly view.','priorities':['Michael: review the prototype.'],'new_projects':[],
+      'projects':[{'light':'orange','name':'Synthetic Website','url':'https://basicops.example/projects/68635','state':'Prototype is ready for review.','target':'Awaiting prototype approval','next':'Michael: review the prototype and record feedback.'}],
+      'owners':[{'name':'Michael','actions':['Review the Synthetic Website prototype.']},{'name':'Jaimee','actions':['No immediate website action identified for this week.']}],'limitations':'Fixture evidence only.'}
 
 def test_protected_client_accepts_exact_generic_contract(capsys):
     with tempfile.TemporaryDirectory() as temporary:
@@ -48,6 +59,31 @@ def test_generic_request_launches_subscription_codex_and_persists_receipt():
         command=run.call_args_list[1].args[0]
         assert '--ignore-user-config' in command and command[command.index('--sandbox')+1]=='read-only'
         assert run.call_args_list[1].kwargs['env']['CODEX_HOME'].endswith('/worker-runs/synthetic-1/runtime-home')
+
+def test_weekly_route_accepts_scoped_evidence_and_render_only_fixture():
+    with tempfile.TemporaryDirectory() as temporary:
+        client.BASE=Path(temporary)/'queue'
+        with mock.patch.object(sys,'argv',['lhm-codex-dispatch','submit']), mock.patch.object(sys,'stdin',io.StringIO(json.dumps(weekly_request()))): client.main()
+        worker.BASE=client.BASE
+        for name in ('processing','receipts','incidents','failed','worker-runs'): (worker.BASE/name).mkdir(exist_ok=True)
+        def fake(args,**kwargs):
+            if 'status' in args: return subprocess.CompletedProcess(args,0,'Logged in using ChatGPT\n','')
+            Path(args[args.index('--output-last-message')+1]).write_text(json.dumps({'status':'completed','summary':'Fixture brief produced','worker':'codex','brief':weekly_brief()}))
+            return subprocess.CompletedProcess(args,0,'{"type":"turn.completed"}\n','')
+        auth=Path(temporary)/'auth.json'; auth.write_text('{}')
+        with mock.patch.object(worker,'CODEX_HOME',Path(temporary)), mock.patch.object(worker,'run_codex',side_effect=fake): worker.process(worker.BASE/'incoming/weekly-2026-09-21.json')
+        receipt=json.loads((worker.BASE/'receipts/weekly-2026-09-21.json').read_text())
+        assert receipt['workflow']=='weekly-web-project-brief' and receipt['permission_ceiling']=='brief-json-only'
+        assert receipt['selected_worker']=='codex' and receipt['brief']['week']=='2026-09-21'
+        rendered=brief_renderer.render(receipt['brief'])
+        assert '<table' in rendered['html'] and 'Updates or corrections?' in rendered['html']
+
+def test_weekly_route_rejects_unscoped_or_mismatched_contracts():
+    with tempfile.TemporaryDirectory() as temporary:
+        path=Path(temporary)/'weekly-2026-09-21.json'
+        for value in (weekly_request(permission_profile='default-review-only'),weekly_request(workflow='another-workflow'),weekly_request(evidence='raw')):
+            path.write_text(json.dumps(value))
+            with pytest.raises(ValueError): worker.validate(value,path)
 
 def test_codex_0147_runtime_home_is_writable_but_subscription_auth_stays_read_only():
     with tempfile.TemporaryDirectory() as temporary:

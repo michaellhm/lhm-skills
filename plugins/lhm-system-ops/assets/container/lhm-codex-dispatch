@@ -6,6 +6,15 @@ from pathlib import Path
 BASE = Path('/opt/data/profiles/lhm_brain/dispatch/codex-execution')
 SAFE_ID = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$')
 FIELDS = {'schema_version','request_id','parent_run_id','task_class','objective','permission_profile','timeout_seconds','created_at'}
+WEEKLY_FIELDS = FIELDS | {'workflow','week','evidence'}
+
+def valid_evidence(value):
+    if not isinstance(value, dict) or set(value) != {'cutoff','sources','research_receipt'}: return False
+    sources=value.get('sources')
+    if not isinstance(value['cutoff'],str) or not isinstance(value['research_receipt'],dict) or not isinstance(sources,dict): return False
+    if not {'basicops','obsidian','gmail'} <= set(sources) <= {'basicops','obsidian','gmail','fathom'}: return False
+    basicops=sources['basicops']
+    return isinstance(basicops,dict) and basicops.get('boards')==[68635,68921] and len(json.dumps(value,sort_keys=True))<=240000
 
 def main():
     if len(sys.argv) != 2 or sys.argv[1] not in {'submit','status'}:
@@ -21,12 +30,18 @@ def main():
                 print(path.read_text(encoding='utf-8'), end='')
                 return
         raise SystemExit('request not complete')
-    if not isinstance(value, dict) or set(value) != FIELDS or value.get('schema_version') != 1:
+    if not isinstance(value, dict) or set(value) not in (FIELDS, WEEKLY_FIELDS) or value.get('schema_version') != 1:
         raise SystemExit('invalid request schema')
     for key in ('request_id','parent_run_id'):
         if not isinstance(value[key], str) or not SAFE_ID.fullmatch(value[key]): raise SystemExit(f'invalid {key}')
-    if value['task_class'] not in {'generic_non_mutating','marketing','knowledge_work'}: raise SystemExit('invalid task_class')
-    if value['permission_profile'] != 'default-review-only': raise SystemExit('unregistered permission profile')
+    weekly = set(value) == WEEKLY_FIELDS
+    if value['task_class'] not in {'generic_non_mutating','marketing','knowledge_work','weekly_web_project_brief'}: raise SystemExit('invalid task_class')
+    expected_profile = 'weekly-web-brief-json-v1' if weekly else 'default-review-only'
+    if value['permission_profile'] != expected_profile: raise SystemExit('unregistered permission profile')
+    if weekly:
+        if value['task_class'] != 'weekly_web_project_brief' or value['workflow'] != 'weekly-web-project-brief': raise SystemExit('invalid weekly workflow binding')
+        if not isinstance(value['week'], str) or not re.fullmatch(r'20\d\d-\d\d-\d\d', value['week']): raise SystemExit('invalid week')
+        if not valid_evidence(value['evidence']): raise SystemExit('invalid evidence bundle')
     if not isinstance(value['objective'], str) or not 1 <= len(value['objective']) <= 16000: raise SystemExit('invalid objective')
     if not isinstance(value['timeout_seconds'], int) or not 30 <= value['timeout_seconds'] <= 900: raise SystemExit('invalid timeout')
     incoming = BASE / 'incoming'; incoming.mkdir(parents=True, exist_ok=True)
