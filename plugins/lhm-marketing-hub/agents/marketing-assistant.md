@@ -38,4 +38,4 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `weekly-web-project-brief` — Lily’s Monday HTML website portfolio email, due dates, traffic lights and consolidated project feedback.
 
-`lhm-gmb-hub:monthly-cycle-report` — Goal-led monthly SEO investigation, consolidated multi-location work plan, phase close-out, meeting/task reconciliation and AI coaching pack. Portfolio Monday scheduling uses GMB `monthly-loop-setup` with CLI-only workers.
+`lhm-gmb-hub:monthly-cycle-report` — Goal-led monthly SEO investigation, consolidated multi-location work plan, phase close-out, meeting/task reconciliation and AI coaching pack. Portfolio Monday scheduling uses GMB `monthly-loop-setup` with CLI-only workers and a card-first Lily/Mailgun HTML digest.

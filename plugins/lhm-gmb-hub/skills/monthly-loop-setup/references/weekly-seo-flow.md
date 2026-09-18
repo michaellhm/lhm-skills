@@ -4,7 +4,7 @@
 
 Hermes is a router only. All source research, diagnosis, report writing and delivery work runs through registered Claude CLI or Codex CLI workers. Hermes may read the canonical Client Flow selection table, submit/poll workers, preserve returned artefacts and receipts, and summarise verified results. Never fall back to native Hermes research, direct MCP analysis or report writing.
 
-Use one portfolio schedule, Australia/Melbourne Monday morning (default 08:00, DST-aware). Read `20 Clients/Client Flow.md` every run: use **SEO week**, not Ads week; omit ads-only and unconfirmed-scope clients. Use the same verified four-week anchor as the live Ads scheduler; do not infer ordinal calendar weeks. Preserve explicit reschedules and due exceptions. Do not hard-code a permanent client list or assume four clients are always due. One client with multiple profiles produces one shared queue.
+Use one portfolio schedule, Australia/Melbourne Monday (default 12:15 pm, DST-aware, after the noon project-flow email). Read `20 Clients/Client Flow.md` every run: use **SEO week**, not Ads week; omit ads-only and unconfirmed-scope clients. Use the same verified four-week anchor as the live Ads scheduler; do not infer ordinal calendar weeks. Preserve explicit reschedules and due exceptions. Do not hard-code a permanent client list or assume four clients are always due. One client with multiple profiles produces one shared queue.
 
 Before registration, inspect existing relevant schedules. Never repurpose the internal LHM website SEO rollout or an unrelated flow. Existing overlapping client automations must be identified, not silently deleted. Record candidate schedule, active/paused state, source commit, worker capability proof, rollback and next run in Obsidian.
 
@@ -35,3 +35,11 @@ An explicit test request may waive the time/rotation guard for one named client.
 - Repeated test/run reuses its receipts and never creates duplicate tasks/email.
 - Michael-only test cannot use production recipients.
 - Report-only invocation cannot mutate boards or send email.
+
+## Digest presentation and sender
+
+Send through the verified Mailgun Lily sender, not Michael's Gmail. Current verified sender is Lily <lily@mg.brieflyflow.io>; use an SEO-specific display label if needed. Retain the approved Reply-To; do not imply Lily automatically processes email replies. Credentials stay in the existing runtime secret route, never prompts/source. A send receipt is queued until matching provider events confirm delivery.
+
+Use a simple HTML newsletter with a narrow mobile-friendly column, one client section, short highlights and one **Open review card** button per client. Display 🔴 Red, 🟠 Orange, 🟢 Green; use ⚪ Unverified for missing evidence. Render Amber as Orange in the email, retaining the underlying evidence/status meaning. Keep a text label and reason beside the emoji so colour alone is not required.
+
+The email links only to each BasicOps review card. Keep the overview/evidence/AI coaching prompt inside that card; do not delete those artefacts or require readers to choose among three email links. Include phase summary and a concrete first action. Details and technical definitions belong in the card/report. Use `scripts/render_digest.py` to render from verified structured client highlights; it does not send mail. For a manual pilot, send the revised HTML version only to the explicitly approved test recipient, with no production CC.

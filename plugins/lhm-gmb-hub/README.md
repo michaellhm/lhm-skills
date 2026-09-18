@@ -131,3 +131,5 @@ plugins/lhm-gmb-hub/
 7. Editorial links, not nav links. Paragraph links pass authority.
 
 Monday portfolio briefs use `monthly-loop-setup` with the canonical Client Flow SEO rotation, CLI-only research/delivery, existing meeting/task reconciliation and one digest. Capability gaps keep the schedule paused; one-client tests use the explicitly approved recipient and board.
+
+SEO digest presentation: Lily via Mailgun, coloured-circle traffic lights and one BasicOps card button per client. Supporting reports/coach stay in the card. Default Monday12:15 Melbourne, after project flow; activation remains capability-gated.
