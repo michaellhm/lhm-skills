@@ -1,5 +1,8 @@
 import importlib.util
 import tempfile
+import json
+import sys
+import types
 import unittest
 from datetime import datetime
 from pathlib import Path
@@ -35,6 +38,31 @@ class BriefTests(unittest.TestCase):
         self.assertIn('BasicOps chat with Lily', result['text'])
         self.assertNotIn('AI Support', result['html'])
 
+    def test_readable_linked_owner_action(self):
+        d = self.fixture(); d['owners'] = [{'name':'Michael','actions':[{'text':'Your Story: review sitemap & copy','url':'https://app.basicops.com/task/123'}]}]
+        result = b.render(d)
+        self.assertIn('href="https://app.basicops.com/task/123">Your Story: review sitemap &amp; copy</a>',result['html'])
+        self.assertIn('https://app.basicops.com/task/123',result['text'])
+
+    def test_client_groups_preserve_nonadjacent_actions_and_links(self):
+        d = self.fixture()
+        d['owners'] = [{'name': 'Michael', 'actions': [
+            {'client': 'mhealth & LP', 'text': 'Follow up Nick', 'url': 'https://example.org/1'},
+            {'client': 'Your Story', 'text': 'Review copy', 'url': 'https://example.org/2'},
+            {'client': 'mhealth & LP', 'text': 'Obtain access', 'url': 'https://example.org/3'}]}]
+        result = b.render(d)
+        self.assertEqual(result['html'].count('<strong>mhealth &amp; LP:</strong>'), 1)
+        self.assertLess(result['html'].index('Obtain access'), result['html'].index('<strong>Your Story:</strong>'))
+        for i in (1, 2, 3):
+            self.assertIn('https://example.org/' + str(i), result['html'])
+            self.assertIn('https://example.org/' + str(i), result['text'])
+        d['owners'][0]['actions'][0]['url'] = 'javascript:alert(1)'
+        with self.assertRaisesRegex(ValueError, 'Action links'): b.render(d)
+
+    def test_reject_unsafe_owner_action_link(self):
+        d = self.fixture(); d['owners'] = [{'name':'Michael','actions':[{'text':'Review','url':'javascript:alert(1)'}]}]
+        with self.assertRaisesRegex(ValueError,'Action links'):b.render(d)
+
     def test_bad_link_and_owner(self):
         d = self.fixture(); d['projects'][0]['url'] = 'javascript:alert(1)'
         with self.assertRaises(ValueError): b.render(d)
@@ -61,6 +89,30 @@ class BriefTests(unittest.TestCase):
             self.assertEqual(payload['text'], email['text'])
             self.assertEqual(payload['to'], b.TO)
             self.assertFalse(b.gate()['wakeAgent'])
+
+    def test_cli_self_only_and_single_test_prefix(self):
+        email = b.render(self.fixture())
+        email['subject'] = 'TEST | ' + email['subject']
+        payload = Path(self.temp.name) / 'email.json'
+        payload.write_text(json.dumps(email))
+        quality = types.SimpleNamespace(validate=lambda path: None)
+        with patch.dict(sys.modules, {'quality': quality}), patch.object(sys, 'argv', ['brief.py', 'send', '--week', '2026-09-21', '--kind', 'test', '--to-self', '--file', str(payload)]), patch.object(b, 'CC', b.CC[:]), patch.object(b, 'RECIPIENTS', b.RECIPIENTS[:]), patch.object(b, 'mailgun', return_value={'id': '<test>'}) as net:
+            b.main()
+            sent = net.call_args.args[1]
+            self.assertEqual(sent['to'], 'michael@localhealthmarketing.com.au')
+            self.assertNotIn('cc', sent)
+            self.assertNotIn('bcc', sent)
+            self.assertEqual(sent['subject'].count('TEST | '), 1)
+            receipt = json.loads(b.receipt('2026-09-21', 'test').read_text())
+            self.assertEqual(receipt['recipients'], [b.TO])
+
+    def test_cli_quality_failure_prevents_submission(self):
+        quality = types.SimpleNamespace(validate=lambda path: (_ for _ in ()).throw(ValueError('Incomplete research')))
+        with patch.dict(sys.modules, {'quality': quality}), patch.object(sys, 'argv', ['brief.py', 'send', '--week', '2026-09-21', '--file', str(Path(self.temp.name) / 'email.json')]), patch.object(b, 'mailgun') as net:
+            with self.assertRaisesRegex(ValueError, 'Incomplete research'):
+                b.main()
+            net.assert_not_called()
+            self.assertFalse(b.receipt('2026-09-21').exists())
 
     def test_all_recipients_required(self):
         b.save(b.receipt('2026-09-21'), {'state': 'queued', 'message_id': '<test>', 'recipients': b.RECIPIENTS})
