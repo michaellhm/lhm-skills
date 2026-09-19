@@ -25,6 +25,10 @@ class RuntimeTests(unittest.TestCase):
    self.assertEqual(len(json.loads(paths[0].read_text())['records']),2)
    receipt=json.loads((out/'research-receipt.json').read_text());self.assertEqual(receipt['evidence_files'][0]['sha256'],r.digest(paths[0]))
    r.retain_raw_reads(work,out);self.assertEqual(len(json.loads((out/'research-receipt.json').read_text())['evidence_files']),1)
+   before=paths[0].read_bytes();records.append({'type':'item.completed','item':{'type':'mcp_tool_call','tool':'get_task','result':'New evidence'}})
+   (work/'events.jsonl').write_text('\n'.join(json.dumps(x) for x in records));r.retain_raw_reads(work,out)
+   self.assertEqual(paths[0].read_bytes(),before)
+   self.assertEqual(len(json.loads((out/'research-receipt.json').read_text())['evidence_files']),2)
  def test_vault_and_output_confinement(self):
   with tempfile.TemporaryDirectory() as d:
    root=Path(d);(root/'20 Clients').mkdir();(root/'20 Clients/test.md').write_text('source')

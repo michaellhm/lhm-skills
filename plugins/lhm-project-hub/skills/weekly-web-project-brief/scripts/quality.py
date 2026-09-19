@@ -37,6 +37,13 @@ def validate(directory, require_review=True):
     else:
         require(meeting_access.get('status') == 'not_required' and meeting_access.get('reason'), 'Meeting access exemption missing')
     require(research.get('material_gaps') == [], 'Material research gaps')
+    names={p['name'] for p in read('brief.json')['projects']}
+    coverage=research.get('project_source_coverage',[])
+    require(len(coverage)==len(names) and {p.get('project') for p in coverage}==names, 'Per-project source coverage required')
+    for project in coverage:
+        for source in ('gmail','obsidian','basicops'):
+            item=project.get(source,{})
+            require(item.get('status')=='complete' and isinstance(item.get('evidence'),list) and bool(item['evidence']), 'Incomplete project source: '+project['project']+' / '+source)
     files = research.get('evidence_files', [])
     require(bool(files), 'No retained primary evidence')
     for f in files:
