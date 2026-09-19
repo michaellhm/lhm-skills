@@ -5,6 +5,12 @@ description: "Set up (or update) a recurring automated monthly GMB optimisation 
 
 # Monthly Loop Setup
 
+## Portfolio Monday SEO brief
+
+For "Monday SEO flow", "Jaimee weekly client brief", "SEO highlights email" or "Hermes SEO report automation", use [references/weekly-seo-flow.md](references/weekly-seo-flow.md). This is a portfolio reporting and human-work handoff, not the legacy per-client implementation loop below. Use one schedule and the canonical Obsidian Client Flow rotation. The dedicated runtime lives in `scripts/weekly_runtime.py`, with a no-agent Hermes trigger in `scripts/cron_gate.py`. Deliver a card-first HTML digest from Lily via Mailgun, with coloured-circle status labels. Do not silently add a second per-client schedule.
+
+## Legacy per-client implementation loop
+
 Creates a `create_scheduled_task` cron job that runs the GMB monthly cycle end-to-end for one client: works the outstanding checklist items in `project-management/gmb.md`, stages any site edits on a branch (never merges), updates the PM doc, creates a BasicOps task with per-action sub-tasks, and sends a Telegram + email summary. This skill only sets up the automation — it does not itself run the monthly work.
 
 This was first built and proven out manually for Align Health Co (see `${CLAUDE_PLUGIN_ROOT}/skills/monthly-loop-setup/references/loop-prompt-template.md` — that template is the distilled, working version). Use this skill to repeat the setup for any other client without re-deriving it from scratch.

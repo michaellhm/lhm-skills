@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "2.2.20"
+    "version": "2.2.24"
   },
   "plugins": [
     {
@@ -54,7 +54,7 @@
       "name": "lhm-gmb-hub",
       "source": "./plugins/lhm-gmb-hub",
       "description": "Google Business Profile optimisation system - repeating 3-month cycle of GBP foundation, service page optimisation, content expansion, and strategic link building with per-client project management tracking.",
-      "version": "1.4.4",
+      "version": "1.4.9",
       "category": "local-seo",
       "tags": [
         "gmb",
@@ -82,7 +82,7 @@
       "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
       "description": "General marketing orchestration plus direct Google Ads, SEO, Content, and WordPress specialists with governed delegation and shared client context.",
-      "version": "2.2.20",
+      "version": "2.2.24",
       "category": "utilities",
       "tags": [
         "marketing",

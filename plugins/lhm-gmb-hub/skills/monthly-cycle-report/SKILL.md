@@ -1,222 +1,68 @@
 ---
 name: monthly-cycle-report
-description: "Generate a monthly or end-of-cycle report showing ranking progress, work completed, and next steps. Use this when the user mentions 'generate month 1 report', 'generate month 2 report', 'generate month 3 report', 'monthly report', 'cycle report', 'end of month report', 'end of cycle report', 'progress report', or wants a formatted summary of what was accomplished and how rankings have moved. Adapts format based on which month of the cycle (1, 2, or 3). Month 3 produces a full cycle summary with next-cycle recommendations."
+description: "Investigate monthly SEO and Google Business Profile results, then produce a concise client work plan, evidence report and AI coaching prompt. Use for 'monthly SEO report', 'SEO traffic lights', 'Jaimee SEO brief', 'multi-location GMB report', 'finish Month 0', or 'Month 1/2/3 cycle report'. Preserves each location's programme stage and consolidates shared work. Reporting does not execute the recommended changes or create a recurring schedule."
 ---
 
-# Monthly Cycle Report
+# Monthly SEO and GMB Review
 
-Pulls performance data from GSC, GA4, and Local Falcon, compares against the baseline diagnostic, and generates a formatted report adapted to the current month of the cycle. Month 1 focuses on service page results. Month 2 focuses on content expansion. Month 3 produces a full cycle summary with recommendations for the next 3 priority services.
+Produce a researched, goal-led work pack that a team member can read quickly and use with an AI coach. One client gets one report, one ordered checklist and one coaching prompt, even with multiple Google Business Profiles. Keep each location's evidence and programme stage distinct.
 
-## Before Starting
+## Start with context
 
-1. Read `${CLAUDE_PLUGIN_ROOT}/skills/monthly-cycle-report/LEARNED.md`
-2. Identify the client and locate their `client_profile.md`
-3. Read `[client_folder]/project-management/gmb.md` — determine which month of the cycle this is
-4. Read `[client_folder]/gmb/onboarding/diagnostic_report.md` — baseline data for comparison
-5. Read `[client_folder]/gmb/monthly-optimization/YYYY-MM/service_priorities.md` — current cycle's priority services
+Read `LEARNED.md` and the plugin's Obsidian context, delivery and writing contracts. Read the canonical client profile, Goals, Current Projects, `project-management/gmb.md` or its existing registered equivalent, recent meeting wraps and previous report/change history. Follow relevant source links to Fathom and Drive, including each location's tracker, diagnostic and priorities. Do not create parallel blank context or rename legacy files merely to run a report.
 
-## Workflow
+Resolve the client, registered Drive root, reporting window, location/profile identifiers and analytics properties from records. Default to the last complete calendar month versus the previous complete month, naming unequal day counts where applicable. A specifically requested 28-day window or phase report takes precedence. Keep retrospective results separate from later meeting decisions and today's live-page observations.
 
-### 1. Determine Report Type
+Assume ordinary room to grow; do not ask for a capacity inventory before analysing. Honour explicit client limits and actual supported services. Use history to propose a consistent baseline and realistic target when none is agreed, clearly labelling the target provisional with dates and reasoning. Goals follow the quarterly planning rhythm, with dated amendments for confirmed new services, staffing or business priorities. Do not silently create client commitments.
 
-Read `project-management/gmb.md` to identify:
-- Current cycle number
-- Current month within the cycle (1, 2, or 3)
-- Which tasks have been completed this month
+## Reconcile meetings and existing work
 
-If unclear, ask the user: "Which month report should I generate? Month 1 (service pages), Month 2 (content expansion), or Month 3 (end of cycle)?"
+Before finalising the queue, read the client card and latest meeting-wrap discussions on `*Client Flow`, then relevant tasks and discussions on the verified SEO owner's personal board. Follow native links from the wrap even when task titles use an ambiguous client abbreviation. Read later decisions and completion evidence, not just status or due dates. Paginate searches and record coverage gaps.
 
-### 2. Gather Ranking Data
+Match each proposed action to an existing task, completed change or unresolved commitment. Link and reuse current tasks; do not repeat completed work or create a second assignment. A closed booking-link request can still require outcome verification, but must not become a new request for the same link. An old automation failure does not prove humans did no work. Record stale automation failures separately from delivery progress.
 
-Ask the user via `AskUserQuestion`:
+In the overview include a short **Already on the board** block with the most relevant existing task links. In evidence record source meeting, task/owner, latest discussion, disposition (reuse, verify outcome, superseded, complete with evidence, or genuinely new), and the next step. Escalate only unanswered questions after checking these sources. Report-only mode reads boards; task/email mutations require the scheduled or explicit delivery authority in `monthly-loop-setup`.
 
-"Would you like to supply the latest rankings manually, or should I pull them from GSC and Local Falcon?"
+## Determine programme state per location
 
-**If auto-pull:**
-- Use GSC MCP `get_advanced_search_analytics` for the priority keywords: pull impressions, clicks, CTR, and average position for the past 28 days
-- Use GSC MCP `compare_search_periods` to compare this month vs. the previous month
-- Attempt Local Falcon MCP for Top 3% grid metric (if available)
-- Use GA4 MCP `run_report` for page-level sessions and conversions on optimised pages
+Build an inventory: location/profile, goal, recorded cycle and dates, Month 0/1/2/3, source/date, completed work, open tasks and unresolved evidence. Month 0 is onboarding; Month 1 service pages; Month 2 supporting content; Month 3 links, PR and cycle review.
 
-**If manual:**
-- Ask the user for each focus keyword's current position and Top 3% metric
-- Ask for GSC impressions and clicks if available
-- Ask for GA4 page traffic if available
+Elapsed months do not advance a phase. A generated draft is not published work. Contradictory records mean `stage disputed`; missing evidence means `stage unverified`, not Month 0 or complete. Inspect linked deliverables before escalating a contradiction. Each location can be in a different phase. Shared outputs satisfy a local requirement only when they cover that location's completion criteria.
 
-### 3. Compare Against Baseline
+When Month 0 remains open, make its close-out tasks the immediate work plan. Reuse completed audits. Separate confirmed outstanding items from checks of uncertain completion. Give each item the exact remaining action, proposed owner, evidence needed and completion condition. Pending directory responses or verification stay open. An authorised deferral must retain the open work, reason, owner and impact; do not tick it complete. Record the next phase date only after its entry conditions are established. Do not ask the user which month it is until available records are exhausted.
 
-Pull baseline data from the diagnostic report:
-- Original Top 3% metric per keyword
-- Original average positions
-- Original impressions/clicks (if baseline included GSC data)
+## Investigate before handing off
 
-Calculate changes:
-- Position movement per keyword (positive or negative)
-- Top 3% trend across months (M0, M1, M2, M3)
-- Impressions and clicks trend
-- New pages indexed since baseline
+Read [references/diagnosis-and-status.md](references/diagnosis-and-status.md) for measurement definitions, investigation steps, traffic lights and phase-specific coverage.
 
-### 4. Compile Work Summary
+Use available MCPs to check GA4, Search Console, Google Ads, GBP/ranking evidence, Fathom, Obsidian and existing delivery records. Discover actual tools and schemas, not assumed tool names. Seek corroborating evidence for changes that materially affect bookings or the client goal. Inspect affected public pages when needed. Do not ask the team to fetch figures the tools can retrieve.
 
-From `project-management/gmb.md`, list all completed tasks for the current month with their completion dates and output file paths.
+Compare outcomes first, then traffic, conversion yield, pages, queries and devices. Check tracking changes, attribution, seasonality/demand and previous implementation before concluding that ranking caused a booking decline. Distinguish measured fact, likely explanation and unresolved cause. Explicitly label missing sources, stale evidence and confidence; do not fabricate a complete review when access is partial. Continue useful independent analysis. Ask only specific remaining questions, naming the appropriate owner and dependent work.
 
-### 5. Generate Report — Adapt by Month
+Check every registered location. Choose a main area for deeper work from goals and evidence, and address urgent issues elsewhere. Unknown locations remain visible. Keep the continuing GMB programme alongside performance recovery and opportunities; green clients still need useful work. Review converting Ads queries, organic commercial queries and existing successful content for page, article and PR opportunities. Do not invent a new page when improving an existing page fits the intent.
 
-#### Month 1 Report: Service Page Optimisation
+## Build the work pack
 
-```markdown
-# Month 1 Report — [Client Name]
-## [Month Year]
+Read [references/report-pack.md](references/report-pack.md) for the overview layout, evidence contract and copyable coaching prompt. Prepare the researched inputs for the configured content-writer route required by the plugin, preserving source definitions and facts. If that route is unavailable, disclose the limitation; a user-authorised local draft may still be prepared, with its QA limitation recorded. Do not silently claim that the writing pipeline ran.
 
-### Summary
-[2-3 sentence overview of what was accomplished and the headline metric movement]
+Use plain English, short highlights and an approximately one-page overview (aim 350–500 words; verify pagination if delivering PDF). Put technical definitions and source tables in the evidence file. No raw dumps in the overview. Every action needs a goal, location scope, specific change, proposed owner, dependency, done condition and follow-up measure in the evidence brief. The overview can compress these. Owners are proposed unless a real assignment is verified.
 
-### Ranking Progress
+Prioritise urgent correctness/booking problems, outstanding phase work and then growth opportunities. Do not hide overdue work behind interesting new content. Consolidate website planning, tracking, articles and PR once at client level, with location-specific subchecks. Preserve separate profile changes, citations, local pages, keyword sets and Maps grids. Never multiply identical tasks by the number of clinics.
 
-| Keyword | Baseline (M0) | Current (M1) | Change |
-|---------|--------------|--------------|--------|
-| [kw1] | Pos X / Top3% Y% | Pos X / Top3% Y% | +/- Z |
+## Save, verify and record
 
-### GSC Performance (28-day comparison)
-| Metric | Previous Period | Current Period | Change |
-|--------|----------------|----------------|--------|
-| Impressions | X | Y | +/- Z% |
-| Clicks | X | Y | +/- Z% |
-| Avg Position | X | Y | +/- Z |
+Under the **registered client Drive root**, resolve or create `gmb/monthly-optimization/YYYY-MM/` for the reporting period:
 
-### Work Completed
-- [Service page 1]: [URL] — published [date]
-- [Service page 2]: [URL] — published [date]
-- [Service page 3]: [URL] — published [date]
-- Technical audit: X/Y checks passing
-- Consistency signal audit: X/8 signals passing
+- `client_report.md`: concise overview and single prioritised checklist.
+- `evidence_report.md`: supporting analysis, local phase details and full action briefs.
+- `ai_coach_prompt.md`: copyable prompt with verified report links and client context.
 
-### What Changed
-[Brief explanation of the optimisations made and why]
+A requested document/PDF format may supplement these. Use one client-level destination for multi-location reports; link existing location folders instead of moving their trackers. Preserve existing file IDs when revising. For a requested single-location phase report, retain `month_N_report.md` compatibility and clearly label its scope; N must match the verified phase. Do not name a consolidated client report after one location's phase.
 
-### Next Month Preview
-Month 2 will focus on content expansion:
-- Diagnostic re-run to measure service page impact
-- Direction decision: FAQ content, neighbourhood overlays, or both
-- Target: 6-12 supporting content pages
-```
+Read back content, parent folder and observed URLs. An unverified save is `needs_review`, not delivered. Update canonical Obsidian goals/decisions and the existing GMB state through the owning Project Hub workflow with report links, period, coverage, remaining gaps and next owner. Mark only the report task complete, not recommended work or phase exit criteria. Return the verified overview link and a short account of findings and limitations.
 
-#### Month 2 Report: Content Expansion
+Reporting authorises research and the requested report delivery, not website/profile/Ads changes, paid scans, new subscriptions, messages, BasicOps assignments or automation. Prepare actionable handoffs without executing them unless separately authorised. This skill can be used by a scheduled workflow but does not create that schedule.
 
-```markdown
-# Month 2 Report — [Client Name]
-## [Month Year]
+## Pilot validation
 
-### Summary
-[2-3 sentence overview]
-
-### Ranking Progress (3-month trend)
-
-| Keyword | M0 | M1 | M2 | Trend |
-|---------|----|----|----|----|
-| [kw1] | X | Y | Z | [arrow] |
-
-### Diagnostic Comparison
-| Metric | Baseline (M0) | Re-run (M2) | Change |
-|--------|--------------|-------------|--------|
-| Top 3% (primary) | X% | Y% | +/- Z% |
-| Direction | — | [Topical/Proximity/Mixed] | — |
-
-### Content Created
-- [List each page with title, URL, and target keyword]
-
-### Content Direction
-[Explain the diagnostic-driven decision: why FAQ, why overlays, or why mixed]
-
-### Link Building Queue for Month 3
-[List pages that need external links, prioritised]
-
-### Next Month Preview
-Month 3 will focus on link building:
-- Link gap audit to prioritise pages
-- Chamber of Commerce outreach
-- Local sponsorship opportunities
-- PR brief (if applicable)
-```
-
-#### Month 3 Report: Full Cycle Summary
-
-```markdown
-# Cycle [N] Report — [Client Name]
-## [Start Month] to [End Month Year]
-
-### Cycle Summary
-[3-4 sentence overview of the entire cycle: what was accomplished, headline results]
-
-### Ranking Progress (Full Cycle)
-
-| Keyword | M0 | M1 | M2 | M3 | Total Change |
-|---------|----|----|----|----|-------------|
-| [kw1] | X | Y | Z | W | +/- N positions |
-
-### Key Metrics
-| Metric | Start of Cycle | End of Cycle | Change |
-|--------|---------------|-------------|--------|
-| Top 3% (primary) | X% | Y% | +/- Z% |
-| GSC Impressions (28d) | X | Y | +/- Z% |
-| GSC Clicks (28d) | X | Y | +/- Z% |
-| Pages Created | 0 | [count] | — |
-| External Links Acquired | [count] | — | — |
-
-### Pages Created This Cycle
-**Service Pages:**
-- [List each with URL]
-
-**Supporting Content:**
-- [List each with URL]
-
-**Location Pages:**
-- [List each with URL, if any]
-
-### Links Acquired
-| Page | Link Source | Link Type | Date |
-|------|-----------|-----------|------|
-| [data from link_tracking.csv] |
-
-### Recommendations for Next Cycle
-Based on this cycle's results, the recommended next 3 priority services are:
-
-1. **[Service A]** — [reasoning based on data]
-2. **[Service B]** — [reasoning based on data]
-3. **[Service C]** — [reasoning based on data]
-
-**Carry-over items:**
-- [Any incomplete tasks from this cycle]
-
-**Direction for next cycle:**
-- [Topical authority vs proximity vs mixed, based on current diagnostic]
-```
-
-### 6. Present to User
-
-Present the formatted report for review. Ask if any sections need adjustment or additional data before finalising.
-
-### 7. Save and Update Project Doc
-
-Save the report to `[client_folder]/gmb/monthly-optimization/YYYY-MM/month_N_report.md`.
-
-Update `project-management/gmb.md`:
-- Mark the month report task as complete with today's date
-- Update the ranking history table with current month's data
-- For Month 3: complete the Cycle Summary section and add next-cycle recommendations
-
-## MCP Dependencies
-
-| MCP | Purpose | Fallback |
-|-----|---------|----------|
-| Local Falcon | Top 3% grid metric | Ask user to supply manually |
-| GSC | Impressions, clicks, average position, period comparison | Ask user to supply GSC data manually |
-| GA4 | Page-level traffic and conversions | Ask user to supply GA4 data manually |
-| Keywords Everywhere | Keyword volume context for recommendations | Proceed without; use existing data from service_priorities.md |
-
-If any MCP is unavailable, display setup instructions from `${CLAUDE_PLUGIN_ROOT}/references/mcp-setup-guide.md` and ask the user to provide the data manually. The report can be generated with any combination of auto-pulled and manual data.
-
-## Output
-
-- `[client_folder]/gmb/monthly-optimization/YYYY-MM/month_N_report.md` — Formatted monthly or cycle report
-- Updates: `[client_folder]/project-management/gmb.md` — Rankings updated, report task marked complete, Cycle Summary populated (Month 3 only)
+Before claiming this workflow production-tested, run it for a second client and review the overview, evidence and coach together. Use [references/acceptance-cases.md](references/acceptance-cases.md) for synthetic decision checks during maintenance. A source walkthrough is not a live client test.
