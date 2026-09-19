@@ -6,7 +6,7 @@ p=argparse.ArgumentParser();p.add_argument('--commit',required=True);a=p.parse_a
 if os.geteuid()!=0 or not re.fullmatch('[0-9a-f]{40}',a.commit):raise SystemExit('Root and immutable commit required')
 skill=Path(__file__).resolve().parents[1]
 if skill!=Path('/srv/lhm-weekly-web-releases')/a.commit/'skill':raise SystemExit('Immutable release location required')
-brain=Path('/home/hermes/.hermes/profiles/lhm_brain');state=brain/'workspace/weekly-web-project-brief';hermes=pwd.getpwnam('hermes');worker=pwd.getpwnam('codexworker')
+brain=Path('/home/hermes/.hermes/profiles/lhm_brain');state=brain/'workspace/weekly-web-project-brief';hermes=pwd.getpwnam('hermesagent');worker=pwd.getpwnam('codexworker')
 queue=state/'incoming';queue.mkdir(exist_ok=True);os.chown(queue,hermes.pw_uid,hermes.pw_gid)
 runtime=Path('/run/lhm-weekly-web-brief');runtime.mkdir(exist_ok=True)
 config={'commit':a.commit,'skill':str(skill),'state':str(state),'knowledge_source':'google-drive','baseline':'/srv/lhm-weekly-web-baseline','timeout':3600}
