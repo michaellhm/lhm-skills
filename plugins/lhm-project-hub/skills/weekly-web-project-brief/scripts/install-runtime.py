@@ -9,7 +9,7 @@ if skill!=Path('/srv/lhm-weekly-web-releases')/a.commit/'skill':raise SystemExit
 brain=Path('/home/hermes/.hermes/profiles/lhm_brain');state=brain/'workspace/weekly-web-project-brief';hermes=pwd.getpwnam('hermes');worker=pwd.getpwnam('codexworker')
 queue=state/'incoming';queue.mkdir(exist_ok=True);os.chown(queue,hermes.pw_uid,hermes.pw_gid)
 runtime=Path('/run/lhm-weekly-web-brief');runtime.mkdir(exist_ok=True)
-config={'commit':a.commit,'skill':str(skill),'state':str(state),'vault':str(brain/'vault'),'baseline':'/srv/lhm-weekly-web-baseline','timeout':3600}
+config={'commit':a.commit,'skill':str(skill),'state':str(state),'knowledge_source':'google-drive','baseline':'/srv/lhm-weekly-web-baseline','timeout':3600}
 service='''[Unit]
 Description=Weekly website brief: Codex research and independent review
 [Service]
