@@ -87,7 +87,10 @@ class BriefTests(unittest.TestCase):
             payload = net.call_args.args[1]
             self.assertEqual(payload['html'], email['html'])
             self.assertEqual(payload['text'], email['text'])
-            self.assertEqual(payload['to'], b.TO)
+            self.assertEqual(payload['to'], 'support@localhealthmarketing.com.au')
+            self.assertNotIn('cc', payload)
+            self.assertNotIn('bcc', payload)
+            self.assertEqual(payload['h:Reply-To'], 'michael@localhealthmarketing.com.au')
             self.assertFalse(b.gate()['wakeAgent'])
 
     def test_cli_self_only_and_single_test_prefix(self):
@@ -96,7 +99,7 @@ class BriefTests(unittest.TestCase):
         payload = Path(self.temp.name) / 'email.json'
         payload.write_text(json.dumps(email))
         quality = types.SimpleNamespace(validate=lambda path: None)
-        with patch.dict(sys.modules, {'quality': quality}), patch.object(sys, 'argv', ['brief.py', 'send', '--week', '2026-09-21', '--kind', 'test', '--to-self', '--file', str(payload)]), patch.object(b, 'CC', b.CC[:]), patch.object(b, 'RECIPIENTS', b.RECIPIENTS[:]), patch.object(b, 'mailgun', return_value={'id': '<test>'}) as net:
+        with patch.dict(sys.modules, {'quality': quality}), patch.object(sys, 'argv', ['brief.py', 'send', '--week', '2026-09-21', '--kind', 'test', '--to-self', '--file', str(payload)]), patch.object(b, 'TO', b.TO), patch.object(b, 'CC', b.CC[:]), patch.object(b, 'RECIPIENTS', b.RECIPIENTS[:]), patch.object(b, 'mailgun', return_value={'id': '<test>'}) as net:
             b.main()
             sent = net.call_args.args[1]
             self.assertEqual(sent['to'], 'michael@localhealthmarketing.com.au')
@@ -115,8 +118,9 @@ class BriefTests(unittest.TestCase):
             self.assertFalse(b.receipt('2026-09-21').exists())
 
     def test_all_recipients_required(self):
-        b.save(b.receipt('2026-09-21'), {'state': 'queued', 'message_id': '<test>', 'recipients': b.RECIPIENTS})
-        events = [{'event': 'delivered', 'recipient': r, 'message': {'headers': {'message-id': 'test'}}} for r in b.RECIPIENTS]
+        historical_recipients = ['first@example.com', 'second@example.com']
+        b.save(b.receipt('2026-09-21'), {'state': 'queued', 'message_id': '<test>', 'recipients': historical_recipients})
+        events = [{'event': 'delivered', 'recipient': r, 'message': {'headers': {'message-id': 'test'}}} for r in historical_recipients]
         with patch.object(b, 'mailgun', return_value={'items': events[:1]}):
             self.assertEqual(b.verify('2026-09-21')['state'], 'queued')
         with patch.object(b, 'mailgun', return_value={'items': events[1:]}):

@@ -17,8 +17,9 @@ from zoneinfo import ZoneInfo
 
 TZ = ZoneInfo('Australia/Melbourne')
 BASE = Path(os.environ.get('LHM_WEB_BRIEF_STATE', '/opt/data/profiles/lhm_brain/workspace/weekly-web-project-brief'))
-TO = 'michael@localhealthmarketing.com.au'
-CC = ['kristalyn@localhealthmarketing.com.au', 'aiyajobelle.quinones08@gmail.com', 'jaimee@localhealthmarketing.com.au']
+TO = 'support@localhealthmarketing.com.au'
+CC = []
+REPLY_TO = 'michael@localhealthmarketing.com.au'
 RECIPIENTS = [TO] + CC
 FROM = 'Lily | LHM Web Projects <lily@mg.brieflyflow.io>'
 FEEDBACK = ('Open your BasicOps chat with Lily and paste: “Update the weekly web brief for {week}. '
@@ -198,7 +199,7 @@ def send(week, email, kind='brief'):
              'started_at': now().isoformat(), 'content_sha256': hashlib.sha256(json.dumps(email, sort_keys=True).encode()).hexdigest()}
         save(p, r)
         try:
-            result = mailgun('/messages', {'from': FROM, 'to': TO, **({'cc': ','.join(CC)} if CC else {}), 'h:Reply-To': TO,
+            result = mailgun('/messages', {'from': FROM, 'to': TO, **({'cc': ','.join(CC)} if CC else {}), 'h:Reply-To': REPLY_TO,
                               'subject': ('TEST | ' if kind == 'test' and not email['subject'].startswith('TEST | ') else '') + email['subject'],
                               'text': email['text'], 'html': email['html'], 'o:tag': 'lhm-weekly-web-brief',
                               'v:brief_week': week})
@@ -246,7 +247,8 @@ def main():
     if args.to_self:
         if args.kind != 'test':
             parser.error('--to-self requires --kind test')
-        global CC, RECIPIENTS
+        global TO, CC, RECIPIENTS
+        TO = REPLY_TO
         CC = []
         RECIPIENTS = [TO]
     if args.action == 'gate':
