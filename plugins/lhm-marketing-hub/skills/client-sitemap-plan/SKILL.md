@@ -2,6 +2,10 @@
 name: client-sitemap-plan
 description: "Build a visual website content plan for an existing client: the proposed page architecture as an interactive HTML sitemap, colour-coded for what exists, what gets rebuilt, and what is still to be written, grouped in build order. No sales widget and no lead estimates. Use when the user says 'client sitemap', 'sitemap plan', 'content plan for the site', 'what pages do we still need', 'page roadmap', 'site structure for an existing client', or wants to map or expand a current client's site. For a prospect pitch that needs the impressions-to-leads opportunity model, use prospect-sitemap-opportunity instead. For the build-phase IA and 301 redirect map inside a live website project, use the WordPress hub sitemap-architect skill."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Client Sitemap Plan
 

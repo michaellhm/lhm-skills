@@ -2,6 +2,10 @@
 name: lp-deploy-3
 description: "Deploy all remaining landing pages (ad groups 2, 3, etc.) to WordPress after the primary page has been set up. Use this when the user says 'deploy the rest', 'deploy remaining pages', 'lp-deploy-3', 'add the other landing pages', 'build the remaining ad group pages', or 'deploy all pages'. Requires lp-deploy-1 (and ideally lp-deploy-2) to have run on the primary page."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # LP Deploy 3 — Deploy Remaining Landing Pages
 

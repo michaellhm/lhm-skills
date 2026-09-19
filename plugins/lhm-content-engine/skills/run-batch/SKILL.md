@@ -2,6 +2,10 @@
 name: run-batch
 description: "Orchestrate the full content pipeline for all approved rows in a CSV. Use this when the user mentions 'run batch', 'process all articles', 'run the pipeline', 'batch content', 'process CSV', 'start the batch', or 'run content engine'. Iterates through each Approved row, chains all skills (generate-outline, write-blog, generate-social-posts, quality-controller, publish-google-doc, update-csv) with structured JSON handoff, isolates each article execution, and logs results per article."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Run Batch Orchestrator
 

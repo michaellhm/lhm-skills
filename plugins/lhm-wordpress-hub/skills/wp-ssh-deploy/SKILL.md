@@ -2,6 +2,10 @@
 name: wp-ssh-deploy
 description: "Push a local WordPress site to a remote server via SSH and WP-CLI. Use this when the user says 'deploy to server', 'push to production', 'sync to live', 'upload site via SSH', 'deploy via SSH', 'push WordPress to server', or 'wp-ssh-deploy'. Handles theme files, pages, custom post types with meta, media, customizer settings, menus, and options. Requires SSH access to a server with WP-CLI installed."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # WP SSH Deploy
 

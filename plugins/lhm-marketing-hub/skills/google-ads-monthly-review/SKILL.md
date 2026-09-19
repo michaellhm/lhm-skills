@@ -3,6 +3,10 @@ name: google-ads-monthly-review
 description: "Analyse Google Ads performance, determine the AdPulse zone and measurement confidence, reconcile prior commitments, and return up to five evidence-backed actions with specialist skill routes. Use for monthly reviews, zone checks, account health checks, or the review stage of a Google Ads Lead session. The Google Ads Lead owns subsequent action selection and skill chaining."
 license: MIT
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Google Ads Monthly Review
 

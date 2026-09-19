@@ -2,6 +2,10 @@
 name: meta-tags-optimizer
 description: "Creates and optimizes title tags, meta descriptions, Open Graph tags, and Twitter cards for maximum CTR and SERP visibility. Use this when the user mentions 'meta tags,' 'title tags,' 'meta descriptions,' 'Open Graph,' 'OG tags,' 'Twitter cards,' 'SERP snippets,' 'click-through rate,' or 'CTR optimization.' Covers all page types including homepages, blogs, products, and services."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Meta Tags Optimizer
 

@@ -2,6 +2,10 @@
 name: visual-qa
 description: "Pixel-perfect visual regression testing using Playwright MCP. Compares the approved HTML prototype against the live WordPress build at multiple viewport sizes. Use this when the user says 'visual QA', 'check the build', 'compare to prototype', 'pixel perfect check', 'screenshot comparison', 'does it match', 'visual regression', 'test the pages', 'QA the site', or 'check responsive'. Also triggered automatically after every page build, blog post, or site extension."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Visual QA - Pixel-Perfect Design Verification
 

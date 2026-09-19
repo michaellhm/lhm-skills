@@ -9,7 +9,7 @@ Hermes is the manager for this workflow, never the meeting analyst.
 
 ## Preparation flow
 
-1. Resolve the named client to a registered `client_id`. Never invent a folder.
+1. Resolve the named client to a registered `client_id`. Verify its knowledge source is the active shared LHM Knowledge vault or its registered mirror. The separate deliverables root is Claude Workspace/Current Clients/<verified client folder>. Never invent a folder or fall back to legacy work-folder profiles.
 2. Use authenticated Fathom tools to locate the meeting and retrieve metadata,
    summary and complete transcript. If ambiguous, ask one focused question.
 3. Treat Michael's voice-note transcription as founder context: extract explicit
@@ -43,7 +43,7 @@ run exactly one command:
 Do not inspect or reconstruct approval JSON schemas. The helper validates the
 request, creates both closed requests and returns three IDs plus exact status
 commands. Run those returned commands. Report vault success only for
-`vault_applied`, including the exact files. Report Gmail success only when the
+`vault_applied`, including the exact files. Reconcile the meeting record, overview/profile, goals, current-project index and affected service/project notes against the reviewed bundle; report each as updated, unchanged or blocked. A missing registered context file or partial application remains a visible gap. Report Gmail success only when the
 approval is `gmail_draft_queued` and the draft result is `draft_created`.
 If the helper or a status command fails, stop and report the exact error.
 

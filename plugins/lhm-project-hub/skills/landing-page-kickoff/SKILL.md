@@ -2,6 +2,10 @@
 name: landing-page-kickoff
 description: "Kick off a new PPC landing page campaign — intake, state file, BasicOps scaffold with backwards-scheduled milestones, client kickoff email, and handoff to the WordPress hub. Use this when the user says 'landing page kickoff', 'kick off the LP campaign', 'start landing pages', or 'new PPC landing pages'. Follows references/kickoff-pattern.md. Delivery work itself belongs to lhm-wordpress-hub:landing-page-orchestrator, never this skill."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Landing Page Kickoff
 

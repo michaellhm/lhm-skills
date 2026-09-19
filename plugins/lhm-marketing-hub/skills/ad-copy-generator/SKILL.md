@@ -3,6 +3,10 @@ name: ad-copy-generator
 description: Generate AHPRA-compliant responsive search ads (RSAs) for Australian healthcare clients with 15 headlines and 4 descriptions. Use this when users request ad copy, RSA creation, responsive search ads, healthcare ads, AHPRA compliant ads, or ad refresh for physio, chiro, podiatry, optometry, or naturopathy clients.
 license: MIT
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Ad Copy Generator
 

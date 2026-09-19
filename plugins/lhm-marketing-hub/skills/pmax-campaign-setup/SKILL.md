@@ -2,6 +2,10 @@
 name: pmax-campaign-setup
 description: Build a complete Performance Max campaign spec for an Australian local-service business (clinic, allied health, cosmetic, professional services - not eCommerce). Use this when the user mentions "set up a PMax campaign", "new Performance Max", "build a PMax campaign", "PMax setup", "launch Performance Max", "performance max for clinic", "performance max for practice", or "PMax for local business". Outputs a full campaign-build spec ready to enter into Google Ads Editor or the UI, covering objective, conversion goals, geo targeting, bid strategy, asset group structure, audience signals, budget, account-level assets, and a launch checklist.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # PMax Campaign Setup (Local Business)
 

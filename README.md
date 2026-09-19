@@ -323,3 +323,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 "I need to work on [client name]"   # The agent picks up from there
 "Write ad copy for my physio client" # Routes directly to the right skill
 ```
+
+### Client knowledge and work routing
+
+Client-facing skills read and update shared LHM Knowledge client records; deliverables use verified Claude Workspace/Current Clients folders. `client-meeting-email`, `post-meeting-review`, `client-update` and `drive-artifact-delivery` distinguish these roots, preserve meeting approval gates and report canonical-record writeback gaps. Local, Cowork and Hermes runs must use verified platform-specific roots rather than a current-directory fallback.

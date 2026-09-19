@@ -2,6 +2,10 @@
 name: wp-performance
 description: "Performance audit and optimization for WordPress sites. Core Web Vitals, caching, image optimization, and speed improvements. Use this when the user says 'performance audit', 'speed optimization', 'Core Web Vitals', 'page speed', 'site speed', 'LCP', 'CLS', 'FID', 'caching', or 'optimize WordPress'. Phase 6 of the website build. Can also be run standalone on any WordPress site."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # WP Performance
 

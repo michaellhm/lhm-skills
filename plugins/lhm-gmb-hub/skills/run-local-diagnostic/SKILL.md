@@ -2,6 +2,10 @@
 name: run-local-diagnostic
 description: "Run a Local Falcon grid scan and competitor audit to diagnose a client's local SEO position. Use this when the user mentions 'run a local diagnostic for [Client]', 'local diagnostic', 'grid scan', 'baseline diagnostic', 're-run diagnostic', 'Local Falcon scan', '169 point grid', 'Top 3%', or 'competitor audit'. Used during Month 0 (baseline) and Month 2 (re-run comparison)."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Run Local Diagnostic
 

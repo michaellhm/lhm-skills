@@ -113,3 +113,7 @@ Required files per client:
 5. Structured JSON outputs between skills only - no free-text chaining
 6. Isolate each article execution - no cross-contamination between rows in batch processing
 7. Do not fabricate metrics, client data, or file contents
+
+## Client knowledge and work destinations
+
+For client work, read `references/obsidian-context-contract.md`: shared LHM Knowledge is canonical for client facts, goals and project state; verified Claude Workspace/Current Clients folders hold deliverables. Apply this before legacy single-folder instructions. Preserve personal-vault boundaries and workflow-specific approval gates.

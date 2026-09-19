@@ -2,6 +2,10 @@
 name: pr-content-auditor
 description: "Rewrite rejected Digital PR articles to pass distributor quality checks. Audits against 25 PR writing guidelines plus CORE-EEAT, copy editing, and SEO baselines, then rewrites the full article. Use this when the user mentions 'rejected PR', 'PR rewrite', 'PR got rejected', 'fix the PR', 'rewrite the press release', 'digital PR audit', 'PR content audit', 'distributor rejected', 'PR not published', 'unpublished PR', or 'resubmit PR'."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # PR Content Auditor
 

@@ -2,6 +2,10 @@
 name: generate-social-posts
 description: "Generate 3 GMB-style social posts from a finished blog article. Use this when the user mentions 'social posts', 'GMB posts', 'Google Business posts', 'social content from blog', 'generate social', or 'create social posts'. Produces 3 distinct posts (educational hook, problem-focused, quote/bullet style) at 120-200 words each, with emojis, hashtags, and booking CTAs. No exaggerated claims."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Generate Social Posts
 

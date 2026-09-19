@@ -2,6 +2,10 @@
 name: lhm-knowledge-system-review
 description: Audit the previous month of Local Health Marketing's Obsidian knowledge system, including AI conversation captures, lesson dispositions, recurring lessons, contradictions, Attention Queue outcomes, Ideas, Knowledge and SOP promotions, stale notes and capture quality. Use for the monthly knowledge-system review, after four weeks of conversation captures, or when Michael asks whether the LHM vault and AI memory workflow are producing useful, trustworthy context.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # LHM Knowledge System Review
 

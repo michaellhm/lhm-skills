@@ -2,6 +2,10 @@
 name: decap-cms-astro
 description: Add and configure Decap CMS (also called Decap CRM by users) for an Astro website hosted on Cloudflare Pages. Use when asked to add a CMS, client content editing, Git-backed editorial approval, draft or scheduled blog publishing, or full-page deploy previews to an Astro build.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Add Decap CMS to Astro
 

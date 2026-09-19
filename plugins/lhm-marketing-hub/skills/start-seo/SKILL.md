@@ -2,6 +2,10 @@
 name: start-seo
 description: Start or resume reusable staged SEO departmental delivery through an SEO Lead. Use when Head of Production hands over an SEO goal, when an SEO plan must be decomposed into bounded specialist actions, when resuming an SEO workflow, or when coordinating research, briefs, writing, QA and an Astro handoff without combining them into one prompt.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Start SEO
 

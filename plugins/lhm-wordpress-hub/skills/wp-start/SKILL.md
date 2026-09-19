@@ -2,6 +2,10 @@
 name: wp-start
 description: "Start a session in the WordPress hub. Use this when the user wants to begin a website project, asks 'build a website', 'start a WordPress site', 'start an Astro site', mentions 'website build', 'new site', 'landing page', 'LP campaign', or invokes /lhm-wordpress-hub:wp-start. Also use when the user mentions 'contact form', 'form submissions', 'wire up forms', 'set up form handling', 'Cloudflare forms', 'D1 form submissions', or 'Turnstile'. Also use when the user mentions 'QA checklist', 'run the QA', 'pre-launch checklist', 'site QA', 'launch checklist', or 'ready to go live'. This skill is a router — it detects which workflow (full WP build, LP campaign, or standalone utility skill) and hands off to the right orchestrator or skill."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # WP Start — Router
 

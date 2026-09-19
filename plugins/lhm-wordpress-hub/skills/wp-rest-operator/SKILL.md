@@ -2,6 +2,10 @@
 name: wp-rest-operator
 description: "Inspect, create, update, publish, and verify WordPress pages, posts, custom post types, media, metadata, and LeadScale landing-page content through the WordPress REST API. Use when the user mentions 'WordPress API', 'WP REST', 'application password', 'update the live WordPress page', 'publish a CPT', or asks Hermes to implement an existing WordPress or LeadScale page without SSH or WP-CLI."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # WordPress REST Operator
 

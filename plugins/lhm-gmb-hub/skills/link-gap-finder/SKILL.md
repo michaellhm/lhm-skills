@@ -2,6 +2,10 @@
 name: link-gap-finder
 description: "Find pages on a client's site that have zero or insufficient external backlinks. Use this when the user mentions 'find pages missing external links', 'link gap', 'pages without links', 'link audit', 'backlink gap', 'which pages need links', 'link gap analysis', or wants to start Month 3 link building by identifying which pages to prioritise. Crawls the sitemap, pulls backlink data per page, and produces a prioritised report with a tracking spreadsheet."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Link Gap Finder
 

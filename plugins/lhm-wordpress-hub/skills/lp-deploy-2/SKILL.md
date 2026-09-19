@@ -2,6 +2,10 @@
 name: lp-deploy-2
 description: "Convert a landing page from raw Gutenberg HTML blocks to native WordPress blocks for full editor editability. Use this when the user says 'convert to blocks', 'convert to Gutenberg', 'lp-deploy-2', 'make the landing page editable', 'convert the HTML blocks', or 'Gutenberg conversion'. Requires lp-deploy-1 to have run successfully. Produces a native block version of the page that works in the Gutenberg editor."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # LP Deploy 2 -- Convert HTML to Native Gutenberg Blocks
 

@@ -2,6 +2,10 @@
 name: local-authority-finder
 description: "Find local authority link opportunities including Chambers of Commerce, sponsorships, and community organisations. Use this when the user mentions 'find local authority link opportunities', 'chamber of commerce', 'sponsorship links', 'local links', 'authority links', 'community links', '.edu links', 'local sponsorship', or wants to identify high-value local backlink sources during Month 3. Searches within a 70-80km radius and estimates costs."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Local Authority Finder
 

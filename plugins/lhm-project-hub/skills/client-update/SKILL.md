@@ -2,6 +2,10 @@
 name: client-update
 description: "Propagate a client data change across all client files. Use when a client's name, service offering, contact details, branding, or other core details have changed. Finds every reference in the client folder and updates them. Flags downstream strategic work needed. Triggers on: 'client changed their name', 'they rebranded', 'new contact', 'updated their services', 'client update', 'name change', 'Raise the Bar Psychology is now Raise the Bar Clinic'."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Client Update
 
@@ -21,7 +25,7 @@ Otherwise, ask:
 
 ## Step 2: Scan and list references
 
-Scan all files in the client folder for the old value. List every file and occurrence found:
+Scan the canonical Obsidian client root and the separately verified Current Clients work root for the old value. Knowledge changes go to Obsidian; approved forward-looking deliverable edits stay in the work root. Legacy working-folder profiles are migration evidence and must not become parallel active records. List every file and occurrence found:
 
 ```
 Found [N] references across [M] files:

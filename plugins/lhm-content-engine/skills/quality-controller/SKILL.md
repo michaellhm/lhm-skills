@@ -2,6 +2,10 @@
 name: quality-controller
 description: "Apply anti-AI refinement, compliance review, and quality control to blog content and social posts. Use this when the user mentions 'quality check', 'quality control', 'anti-AI pass', 'compliance review', 'refine content', 'content QA', or 'review for AI patterns'. Removes repetitive phrasing, breaks AI sentence rhythm, enforces compliance, ensures distinct positioning from published articles, and outputs a compliance confidence score (high/medium/low). Halts publishing if confidence is low."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Quality Controller
 

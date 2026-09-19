@@ -15,3 +15,7 @@ Do not allow a leaf skill to implement ad hoc Drive logic. The shared delivery s
 Do not recreate a specialist report, copy deck, audit or implementation in BasicOps. Put actionable context in Discussion and include the verified Drive working URL. If no durable artefact is useful, accept `artefact_state: not_required` only with the approved task-specific reason.
 
 Saving internal working material never implies approval to publish, send, merge, deploy or mutate a live advertising/account system.
+
+## Current Clients destination
+
+Client deliverables belong beneath the verified Claude Workspace/Current Clients client folder. Verify registered folder ancestry and flag stale root-level mappings before delivery. Preserve the existing client/service structure. Client facts, goals, meeting records and project state go to the separate shared LHM Knowledge vault, with verified deliverable links. See `obsidian-context-contract.md`.
