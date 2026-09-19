@@ -2,6 +2,10 @@
 name: ga-dashboard-artifact
 description: "Generate an interactive analytics dashboard as a Claude Artifact. Use when the user wants to see how the site is performing, wants a traffic report, analytics dashboard, or monthly analytics review. Pulls GA4 data via the analytics MCP and renders KPI tiles, trend charts, and period comparison as an interactive Artifact. Triggers on: 'analytics dashboard', 'GA dashboard', 'traffic report', 'how is the site performing', 'monthly analytics', 'analytics review', 'site performance'."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # GA Dashboard Artifact
 

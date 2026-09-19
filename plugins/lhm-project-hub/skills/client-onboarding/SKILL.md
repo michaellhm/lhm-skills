@@ -2,6 +2,10 @@
 name: client-onboarding
 description: "Run LHM's resumable new-client onboarding workflow. Use when the user says 'client onboarding', 'onboard [client]', 'continue onboarding', 'where is onboarding up to', 'billing setup', 'strategy call', 'client access', 'tracking setup', or 'service kickoff'. Reads and updates the detailed, scope-aware Obsidian onboarding checklist first, then mirrors only five top-level phases and seven top-level checks to the BasicOps *Client Onboarding board: Payment & Billing, Client Contact & Strategy, Access Assets & Config, Service Kickoff, and Onboarding Complete."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Client Onboarding
 

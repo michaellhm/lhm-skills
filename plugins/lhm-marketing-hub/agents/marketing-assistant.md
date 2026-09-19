@@ -41,3 +41,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `google-ads-monthly-review` — Evidence-led account review, report highlights and Lily’s Monday review-card digest.
 
 `lhm-gmb-hub:monthly-cycle-report` — Goal-led monthly SEO investigation, consolidated multi-location work plan, phase close-out, meeting/task reconciliation and AI coaching pack. Portfolio Monday scheduling uses GMB `monthly-loop-setup` with a dedicated CLI-only analytics, delivery and independent-QA runtime plus a card-first Lily/Mailgun HTML digest.
+
+### Client knowledge and work routing
+
+Client-facing skills read and update shared LHM Knowledge client records; deliverables use verified Claude Workspace/Current Clients folders. `client-meeting-email`, `post-meeting-review`, `client-update` and `drive-artifact-delivery` distinguish these roots, preserve meeting approval gates and report canonical-record writeback gaps. Local, Cowork and Hermes runs must use verified platform-specific roots rather than a current-directory fallback.

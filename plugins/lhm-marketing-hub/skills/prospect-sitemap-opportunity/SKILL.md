@@ -2,6 +2,10 @@
 name: prospect-sitemap-opportunity
 description: "Build a client-ready proposed website sitemap plus opportunity model to win a website rebuild. Crawls the prospect's live site, researches search demand, designs the expanded architecture (unbundled service pages, location pages, audience and funding pages, blog clusters), and generates an interactive HTML sitemap with a live impressions-to-leads widget and ongoing-SEO slider, plus an optional spreadsheet. Use when the user says 'prospect sitemap', 'proposed sitemap', 'sitemap for the pitch', 'website proposal', 'map out the site for a prospect', 'show them what pages we should build', 'website opportunity', or is preparing a pitch for a new website or rebuild. For an existing client where no sales widget is wanted, use client-sitemap-plan instead. For the build-phase IA inside a live website project, use the WordPress hub sitemap-architect skill."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Prospect Sitemap and Opportunity
 

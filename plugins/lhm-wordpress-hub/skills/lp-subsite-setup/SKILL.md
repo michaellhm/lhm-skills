@@ -2,6 +2,10 @@
 name: lp-subsite-setup
 description: "Configure a WordPress multisite subsite for a landing page campaign. Use this when the user says 'set up landing page site', 'configure subsite', 'set up the health theme', 'set up branding on the landing page site', 'configure the multisite for [client]', or 'lp-subsite-setup'. Handles theme activation, site identity, brand colours, typography, social proof, social media URLs, and location CPT entries. Always run this before lp-deploy-1."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # LP Subsite Setup
 

@@ -2,6 +2,10 @@
 name: wp-page-builder
 description: "Build individual pages in WordPress from content and design artefacts. Use this when the user says 'build pages', 'create pages in WordPress', 'page builder', 'add pages to WordPress', 'build the homepage', or 'WP build'. Phase 5 of the website build. Requires content files, design system, and theme installed."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # WP Page Builder
 

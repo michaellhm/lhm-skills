@@ -2,6 +2,10 @@
 name: meta-tag-refresh
 description: "Data-driven title tag and meta description refresh for client websites (new builds, relaunches, or periodic refreshes), with GSC decline analysis, slug audit, and direct push to WordPress via the Rank Math REST API including 301 redirects for slug changes. Use this whenever the user wants to update, review, audit, or rewrite title tags, meta descriptions, SEO metas, or page slugs; mentions 'title tag refresh', 'meta refresh', 'new site metas', 'push metas to WordPress', 'which pages dropped off in GSC', 'declining pages', or 'slug cleanup'; or is launching a new/staging site that needs its metadata reviewed before go-live. Also use for standalone GSC period-over-period decline analysis even if no meta rewrite is requested."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Meta Tag Refresh
 

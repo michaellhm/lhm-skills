@@ -2,6 +2,10 @@
 name: taya-question-discovery
 description: "Run a full 'They Ask, You Answer' question discovery process for a business or industry. Use this when the user mentions 'They Ask You Answer', 'TAYA', 'content questions', 'buyer questions', 'what questions should I answer', 'question bank', 'Big 5 content', 'what are my customers searching for', or wants to build an article marketing plan based on real buyer questions. Also trigger when a user asks to identify content gaps using buyer intent, build a question-driven content calendar, or discover what their audience is asking online."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # They Ask, You Answer — Question Discovery Skill
 

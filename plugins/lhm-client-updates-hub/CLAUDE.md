@@ -74,3 +74,7 @@ Append to the end of the file, one observation per line, newest last:
 Cap the file at 50 entries. When it reaches the cap, consolidate duplicates and drop stale entries before appending.
 
 Prefer running `/lhm-learn:learn` over writing entries by hand, so the learning gets sorted into the right file and confirmed with the user first.
+
+## Client knowledge and work destinations
+
+For client work, read `references/obsidian-context-contract.md`: shared LHM Knowledge is canonical for client facts, goals and project state; verified Claude Workspace/Current Clients folders hold deliverables. Apply this before legacy single-folder instructions. Preserve personal-vault boundaries and workflow-specific approval gates.

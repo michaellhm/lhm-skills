@@ -2,6 +2,10 @@
 name: block-architect
 description: "Evaluate Gutenberg native blocks vs custom blocks for the project. Output block specifications and pattern requirements. Use this when the user says 'block architecture', 'which blocks do I need', 'custom blocks', 'block specs', 'gutenberg blocks', 'block evaluation', or 'native vs custom'. Phase 4 of the website build. Requires content files and design system."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Block Architect
 

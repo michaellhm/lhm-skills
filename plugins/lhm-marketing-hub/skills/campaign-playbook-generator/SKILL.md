@@ -2,6 +2,10 @@
 name: campaign-playbook-generator
 description: "Transform client conversation transcripts into comprehensive Campaign & Sales Playbooks. Use this when the user uploads client transcripts, ChatGPT conversations, or interview notes and wants to create a strategic playbook. Also use when the user mentions 'build a playbook', 'campaign playbook', 'sales playbook', 'brand guidelines from transcript', or 'convert conversation to playbook'. This skill creates the McDonald's-style reference guide for marketing and client-facing teams, ensuring that every single interaction reflects the founder's values, vision, and mission consistently."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Campaign Playbook Generator
 

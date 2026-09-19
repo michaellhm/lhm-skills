@@ -2,6 +2,10 @@
 name: lhm-weekly-flow
 description: Run Local Health Marketing's conversational weekly review and planning interview using its Obsidian vault, WeekFlow context and operating systems. Use when Michael says “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, improve or complete an LHM weekly planning session. Begin with a personal check-in, use evidence to help recall the week, review time and unfinished work, then update Obsidian with decisions, three weekly outcomes and commitments.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # LHM Weekly Flow
 
@@ -9,21 +13,27 @@ Run an evidence-led weekly operating review for Local Health Marketing. Use the 
 
 ## Locate and load context
 
-1. Find the vault directory containing `.obsidian`. Prefer `/Users/michaelcolman/Documents/Obsidian/Local Health Marketing/Local Health Marketing` when accessible.
-2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely and follow them.
-3. Detect the official Obsidian CLI. When available and Obsidian is running, use it for recent files, backlinks, unresolved links, open tasks and contextual search; otherwise use `rg` and direct Markdown reads without blocking the review.
-4. Read these notes completely:
-   - `01 Inbox/Inbox.md` and every unprocessed capture in `01 Inbox`
-   - `05 Weekly/Weekly Flow.md`
-   - `05 Weekly/Attention Queue.md`
-   - `10 Goals/Goals.md` and active goal notes
-   - `30 Projects/Projects.md` and active project notes
-   - `25 Marketing/Marketing.md` and current linked strategy notes
-5. Find and read the most recent completed weekly review, if one exists.
-6. Find and read every AI conversation-capture note created since the previous weekly review, including legacy `Claude Conversation Capture` notes. Collect lessons marked `Needs Michael`, `Promote to Knowledge`, `Update SOP`, or `Observe again`, plus every unresolved recurrence or contradiction.
-7. Search the vault for unresolved checkboxes, explicit blockers, `Still to define`, `Open decisions`, `alignment issue`, and recent material changes. Do not automatically copy ordinary project tasks into the Attention Queue.
-8. When accessible, review the previous week's completed and unfinished WeekFlow tasks. Treat WeekFlow as evidence about Michael's time and work, not as the canonical home for business decisions.
-9. Use Australia/Melbourne dates and ISO week numbers.
+1. Resolve the active vault layout from the user's confirmed configuration and migration notes. Validate every root by its `.obsidian` directory and read its `_System/Vault Boundary.md` when present. Never infer that a discovered staging copy is active.
+   - **Two-vault layout:** resolve Michael's private root and the LHM Knowledge shared root independently. Names and machine paths may change after a Google Drive move; use verified paths, not a hard-coded cloud mount or the first matching folder.
+   - **Legacy combined layout:** use the original combined vault only while it is explicitly still the active source. The historical local candidate is `/Users/michaelcolman/Documents/Obsidian/Local Health Marketing/Local Health Marketing`. Do not mix its notes with a prepared split or silently fall back to it after cutover.
+   - If no authoritative active layout can be established, ask which copy is active before writes. If the private root is unavailable, do not save private notes in the shared vault as a workaround.
+2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` in each root when present. Respect the narrower privacy boundary. Absence of a shared copy of the memory contract does not permit private-to-shared disclosure.
+3. Detect the official Obsidian CLI. When available, target each resolved vault explicitly for searches and links. Otherwise use direct Markdown reads scoped to each root. Obsidian links between vaults do not provide cross-vault search or automatic access.
+4. Read private context completely: `01 Inbox/Inbox.md`, unprocessed Inbox captures, `05 Weekly/Weekly Flow.md`, `05 Weekly/Attention Queue.md`, `10 Goals/Goals.md`, active goals, `30 Projects/Projects.md`, active personal projects and relevant `40 Ideas` notes.
+5. Read relevant shared context: Clients and Client Flow, People, internal Meetings, `25 Marketing/Marketing.md`, current strategy, Sales Pipeline, and applicable `60 Knowledge` and `70 SOPs` notes. Read the actual previous Monday–Sunday client-meeting commitments and current Ads review evidence before allocating delivery time; distinguish scheduled work from carryover.
+6. From the private root, read the most recent completed weekly review and every AI conversation capture since that review. Collect unresolved lessons, recurrences and contradictions. Read `05 Weekly/Weekly Flow.md` for the current sales-review cadence, reporting period and delivery preferences rather than resetting them from memory.
+7. Search the authorised roots separately for relevant unresolved tasks, blockers, open decisions and material changes. Do not automatically copy ordinary delivery tasks into the private Attention Queue. Verify shared files are locally readable and current; a cloud placeholder or inaccessible root is not evidence of no client work.
+8. If shared context is unavailable or freshness is uncertain, continue the personal interview with that limitation explicit. Do not invent client state, create a substitute shared vault or duplicate team notes privately. Reconcile the missing shared evidence before confirming a delivery-dependent plan.
+9. When accessible, review the previous week's completed and unfinished WeekFlow tasks as evidence about time and work, not as canonical business decisions. Use Australia/Melbourne dates and ISO week numbers.
+
+## Write destinations and privacy
+
+- Save the weekly review, personal check-in, energy/capacity, private financial scorecard, reflections, priorities, Attention Queue, personal goals, projects, ideas and dated AI captures in the **private root**. Folder names alone never override the resolved root.
+- Shared client delivery, People, internal Meetings, Marketing and sales-pipeline updates go to the corresponding **shared root** note when the current request authorises that update. Save only the relevant agreed operational decision, not the private interview or founder assessment behind it.
+- `60 Knowledge` may exist in both vaults: founder philosophy, private lessons and personal operating guidance remain private; team-facing Hermes architecture, operating models and reusable delivery guidance belong in LHM Knowledge. Uncertain or mixed material stays private until a team-safe version is explicitly selected.
+- `80 Templates` in LHM Knowledge is canonical. A verified local private template snapshot may be used if the shared template is unavailable; label that limitation and do not silently overwrite or synchronise the shared template.
+- Use ordinary wiki links within a vault. For private-to-shared references, use an encoded `obsidian://open?vault=...&file=...` link with the verified vault name. Do not expose private note titles, paths or links in team-facing notes.
+- During migration, never write to both the original combined vault and its separated copies. Google Drive migration, Hermes routing changes, recurring automation and skill installation are separate actions; a prepared split or source change does not prove live cutover.
 
 Do not ask Michael for information already available in the vault. Briefly surface relevant existing context and ask only for changes, results or judgments that cannot be discovered.
 
@@ -31,7 +41,7 @@ Do not ask Michael for information already available in the vault. Briefly surfa
 
 1. Determine the current ISO week and filename: `YYYY-Www — Weekly Review.md`.
 2. If the note already exists, read it and resume from the first incomplete section.
-3. Otherwise create it in `05 Weekly` using `80 Templates/Weekly Review Template.md`.
+3. Otherwise create it in the resolved private root’s `05 Weekly`, using the shared canonical `80 Templates/Weekly Review Template.md` (or the verified private snapshot described above).
 4. Set `status: draft`, the correct week, Monday start date, Sunday end date, and current `created` and `updated` dates.
 5. Prefill links to active goals and projects. Prefill verified facts only; never invent missing metrics.
 6. Do not pre-commit priority outcomes, commitments or commercial decisions before the interview. Existing suggestions must remain visibly provisional until Michael confirms them.

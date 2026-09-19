@@ -2,6 +2,10 @@
 name: rankmath-redirects
 description: Create, import, clean up, and verify Rank Math 301 redirects on WordPress sites during migrations, sitemap replacements, launch QA, or Squarespace-to-WordPress URL changes. Use when the user asks to set up redirects in Rank Math, import a redirect map, redirect old URLs, verify 301s, or troubleshoot Rank Math redirect matching.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Rank Math Redirects
 

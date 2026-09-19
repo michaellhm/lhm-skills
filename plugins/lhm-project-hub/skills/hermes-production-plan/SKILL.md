@@ -2,6 +2,10 @@
 name: hermes-production-plan
 description: Identify the matching Obsidian AI Operations SOP and prepare, monitor, and verify a concise Hermes execution plan for an existing LHM BasicOps task. Use when someone gives Lily a natural-language production task such as creating website page copy, asks her to "plan this for Ted", asks "where are we at with this task?" or "where are you at?", needs a CTO capability incident explained, or wants Ted's completed work reconciled. This skill plans, reports, and checks specialist work; it does not execute the production work itself.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Hermes Production Plan
 

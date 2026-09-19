@@ -2,6 +2,10 @@
 name: lp-subsite-deploy
 description: "Deploy a LeadScalePro multisite subsite from local Docker to the live server. Use this when the user says 'deploy the subsite', 'push subsite to live', 'deploy to LeadScalePro', 'push to production', 'deploy client site', 'lp-subsite-deploy', 'sync subsite to server', or 'push [client] live'. Exports everything from the local Docker subsite (theme, pages, locations, images, customizer, options) and creates/updates the matching subsite on the remote multisite. Reads SSH credentials from the multisite project's SSH access file."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # LP Subsite Deploy
 

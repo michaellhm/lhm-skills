@@ -2,6 +2,10 @@
 name: service-page-writer
 description: "Write a full service page for a client's GMB optimisation campaign. Use this when the user mentions 'write service page content for [Service] for [Client]', 'write service page', 'create service page', 'service page for [topic]', 'build a service page', or wants to produce a service page as part of Month 1. This skill handles research and context gathering, then hands off to the content-writer agent for the 8-pass writing pipeline."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Service Page Writer
 

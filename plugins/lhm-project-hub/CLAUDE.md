@@ -13,3 +13,7 @@ Before recording, routing or handing off material work, read and follow `${CLAUD
 ## BasicOps
 
 Route every BasicOps mutation through `lhm-project-hub:basicops-task-manager`. Keep actionable context, dependencies, completion conditions and next handoff in Discussion. Use Description only for approved machine-readable metadata and useful working URLs.
+
+## Client knowledge and work destinations
+
+For client work, read `references/obsidian-context-contract.md`: shared LHM Knowledge is canonical for client facts, goals and project state; verified Claude Workspace/Current Clients folders hold deliverables. Apply this before legacy single-folder instructions. Preserve personal-vault boundaries and workflow-specific approval gates.

@@ -2,6 +2,10 @@
 name: obsidian-vault-manager
 description: Create, edit, organise, search, link, archive, or otherwise maintain Markdown notes in an Obsidian vault. Use for any request involving Obsidian notes, the Local Health Marketing knowledge base, vault structure, note templates, properties, internal links, goals, ideas, clients, projects, meetings, knowledge, or SOPs.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Obsidian Vault Manager
 
@@ -11,7 +15,7 @@ Maintain an Obsidian vault as a coherent knowledge base and business operating s
 
 1. Detect `obsidian` with `command -v obsidian`. On macOS, also check `/Applications/Obsidian.app/Contents/MacOS/obsidian-cli`.
 2. The official CLI requires Obsidian 1.12.7+ and a running Obsidian app. If it is unavailable, unregistered or the app is closed, fall back to direct Markdown and `rg` without blocking ordinary vault work.
-3. Target the LHM vault explicitly as the first parameter: `obsidian vault="Local Health Marketing" <command>`.
+3. Target the LHM vault explicitly as the first parameter: `obsidian vault="<verified active vault name>" <command>`.
 4. Prefer the CLI for graph-aware and app-aware reads:
    - `search:context query="..."`
    - `backlinks path="..." format=json`
@@ -32,8 +36,8 @@ Maintain an Obsidian vault as a coherent knowledge base and business operating s
 
 ## Locate the vault
 
-1. Identify the vault root by finding the nearest directory containing `.obsidian`.
-2. For Local Health Marketing, prefer `/Users/michaelcolman/Documents/Obsidian/Local Health Marketing/Local Health Marketing` when accessible.
+1. Resolve the intended vault from confirmed configuration and record ownership, not merely the current directory; verify that its root contains `.obsidian`.
+2. For Local Health Marketing, resolve the confirmed active root(s), using shared LHM Knowledge for client/team context and the authorised private vault for founder planning; do not fall back to the retired combined vault when accessible.
 3. Treat the directory containing `.obsidian`, not its parent, as the vault root.
 4. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely before making structural or content changes. Follow them as the source of truth and shared agent-write contract.
 

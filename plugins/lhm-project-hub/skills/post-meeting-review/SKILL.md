@@ -2,6 +2,10 @@
 name: post-meeting-review
 description: "Review a saved meeting wrap, create one top-level Client Flow meeting card assigned to Michael with the reviewed email and proposed actions in Discussion, and correct proposed actions before Lily distributes them on explicit request. Use for meeting wrap, post-meeting review, meeting follow-up, or client call debrief. Distribution is separate from review and never starts TED."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Post-Meeting Review
 
@@ -22,7 +26,7 @@ recording URL in the notes header.
 
 **Find the record yourself — don't make the user point at it.** If the user
 just said "meeting wrap" without naming a client or meeting, sweep the
-workspace's client folders for `project-management/meetings/*-meeting-notes.md`
+shared Obsidian vault's `20 Clients` folders for `project-management/meetings/*-meeting-notes.md`
 files from the last 14 days whose header says `Triaged: no` (or has no
 `Triaged:` line — older captures predate the marker). Present what you found,
 newest first ("Found an untriaged meeting for Raise the Bar captured yesterday —
@@ -55,6 +59,9 @@ If Fathom MCP is not available or cannot find the meeting:
 the same fields as Option B and save `meeting-notes.md` the same way.
 
 ## Step 2: Update client state files
+
+Resolve all state files below in the shared LHM Knowledge client root. For the hash-bound Josephine capture route, verify the separate vault application receipt first; never bypass its approval by reapplying unapproved proposed changes here. Check the overview/profile, Goals.md, Current Projects.md and affected detailed service/project notes, with each marked updated, unchanged or blocked. Read back applied records and preserve source meeting/date. An email draft or BasicOps card alone is not completion.
+
 
 Everything below reads from the meeting record established in Step 1 (the saved
 `meeting-notes.md`, or the equivalent extraction Step 1's Option B/C just
@@ -101,7 +108,7 @@ Check `client_profile.md` for an `Acronym:` field.
 
 This step **detects**. It does not edit. `client-update` owns the editing.
 
-**1. Grep the whole client folder** for every entity the meeting changed, discontinued, renamed, or added.
+**1. Search both the canonical Obsidian client root and the verified Current Clients working root** for every entity the meeting changed, discontinued, renamed, or added.
 
 **2. Sort the hits into forward-looking artefacts and historical records,** using the pile definitions in `client-update`'s Step 2b. That table is the single source of truth for the split; do not restate it here. Forward-looking artefacts need updating. Historical records stay untouched, because editing them rewrites history and destroys the audit trail.
 

@@ -2,6 +2,10 @@
 name: google-ads-delivery-qa
 description: Verify a bounded Google Ads action before the Google Ads Lead advances. Use after a worker returns keyword, negative, RSA, bid/budget, PMax, landing-page, conversion-tracking or implementation-pack work; when checking whether evidence supports the recommendation; or when Head of Production needs an action-level QA verdict.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Google Ads Delivery QA
 

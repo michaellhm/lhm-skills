@@ -2,6 +2,10 @@
 name: blog-schedule-builder
 description: "Generate a 3-month blog content schedule (topics, target keywords, publish dates) for a client, matching the GMB program's 3-month cycle length. Posts-per-month is client-specific, read from project-management/gmb.md. Use this when the user mentions 'blog schedule for [Client]', 'blog content calendar', 'blog plan', 'quarterly blog schedule', or '3 month blog plan'."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Blog Schedule Builder
 

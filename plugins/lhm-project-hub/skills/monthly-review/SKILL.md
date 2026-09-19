@@ -2,6 +2,10 @@
 name: monthly-review
 description: "Monthly per-client review engine with three modes. Use this when the user says 'monthly review', 'monthly wrap', 'monthly update for [client]', 'end of month review', 'prep for the [client] meeting', 'meeting prep', or 'account review'. Wrap mode (KP): walk through every open task/project/milestone, confirm done/carried/blocked, update all project files and BasicOps, draft the monthly achievement email, and generate the client report with Google Ads and SEO wins. Internal mode (Michael): 30-minute account review with anomaly flags. Pre-meeting mode: brief + timed agenda."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Monthly Review
 

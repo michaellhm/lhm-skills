@@ -2,6 +2,10 @@
 name: seo-content-writer
 description: "Creates high-quality, SEO-optimized content that ranks in search engines. Use this when the user mentions 'write a blog post,' 'SEO content,' 'write an article,' 'content writing,' 'blog writing,' 'SEO copywriting,' 'pillar content,' 'write a guide,' 'comparison article,' or 'listicle.' Applies on-page SEO best practices, keyword optimization, CORE-EEAT quality standards, and optimal content structure."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # SEO Content Writer
 

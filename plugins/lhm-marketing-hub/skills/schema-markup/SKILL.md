@@ -2,6 +2,10 @@
 name: schema-markup
 description: "When the user wants to add, fix, or optimize schema markup and structured data on their site. Also use when the user mentions 'schema markup,' 'structured data,' 'JSON-LD,' 'rich snippets,' 'schema.org,' 'FAQ schema,' 'product schema,' 'review schema,' 'breadcrumb schema,' 'HowTo schema,' 'LocalBusiness schema,' or 'rich results.' Covers all schema types with content-type mapping and validation."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Schema Markup
 

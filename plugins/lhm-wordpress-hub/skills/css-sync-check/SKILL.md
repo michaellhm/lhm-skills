@@ -2,6 +2,10 @@
 name: css-sync-check
 description: "Validate that the WordPress theme CSS matches the approved HTML prototype CSS. Run this after theme installation and before page building. Use this when the user says 'check the CSS', 'CSS sync', 'does the theme match', 'validate theme CSS', 'CSS audit', 'compare CSS', or 'theme CSS check'. Catches styling divergence before pages are built."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # CSS Sync Check
 

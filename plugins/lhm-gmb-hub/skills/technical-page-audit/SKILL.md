@@ -2,6 +2,10 @@
 name: technical-page-audit
 description: "Run a technical SEO audit on a specific page URL. Use this when the user mentions 'run a technical audit on [URL]', 'technical audit', 'check page technical', 'schema check', 'indexing check', 'is the page indexed', 'check schema markup', 'page speed check', or wants to validate that a newly published service page meets all technical requirements. Covers schema validation, broken links, indexing status, page speed, and mobile responsiveness."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Technical Page Audit
 

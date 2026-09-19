@@ -2,6 +2,10 @@
 name: lp-prototype
 description: "Build HTML/CSS landing page prototypes for a PPC campaign. Use this when the user says 'build the prototype', 'create the landing page prototype', 'build the HTML for the landing page', 'lp-prototype', or 'create the landing pages'. Reads from /lp/copy/ and the health theme template to produce a pixel-perfect HTML/CSS file per ad group."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # LP Prototype
 

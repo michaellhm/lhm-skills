@@ -2,6 +2,10 @@
 name: theme-scaffold
 description: "Scaffold a custom WordPress block theme with theme.json, templates, template parts, patterns, and styles. Use this when the user says 'scaffold theme', 'create theme', 'build theme', 'theme.json', 'block theme', 'custom theme', or 'WordPress theme'. Phase 5 of the website build. Requires design system and block specs."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Theme Scaffold
 

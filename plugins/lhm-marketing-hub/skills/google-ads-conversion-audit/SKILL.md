@@ -2,6 +2,10 @@
 name: google-ads-conversion-audit
 description: Audit Google Ads conversion actions, account-default and campaign-specific goals, GA4 event firing, and GA4-to-Ads imports. Use during every Google Ads monthly review and whenever conversion counts, call tracking, primary/secondary status, campaign optimisation goals, attribution, or imports are unclear. Produce a one-page current-to-recommended conversion matrix and exact implementation steps.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Google Ads Conversion Audit
 

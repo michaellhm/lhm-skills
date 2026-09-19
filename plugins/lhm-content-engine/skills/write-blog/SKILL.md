@@ -2,6 +2,10 @@
 name: write-blog
 description: "Write a full blog article in Markdown from a structured outline. Use this when the user mentions 'write blog', 'write article', 'write the post', 'generate blog content', 'draft the article', or 'blog from outline'. Takes the JSON outline from generate-outline, applies brand voice and compliance rules, writes the full article with FAQ schema, and returns structured JSON with blog markdown and JSON-LD."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Write Blog
 

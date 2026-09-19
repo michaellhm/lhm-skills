@@ -2,6 +2,10 @@
 name: wp-blog-publisher
 description: "Publish blog posts to a WordPress site from markdown files via WP-CLI over SSH. Use this when the user says 'publish blog posts', 'upload blog posts', 'schedule blog posts', 'push posts to WordPress', 'publish articles', or 'post to the blog'. Handles markdown-to-HTML conversion, category creation, author assignment, scheduling, and Yoast SEO meta. Requires SSH access and WP-CLI on the server."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # WP Blog Publisher
 

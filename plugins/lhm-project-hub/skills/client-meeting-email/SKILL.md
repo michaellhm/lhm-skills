@@ -31,25 +31,17 @@ when the next meeting is scheduled, and where the recording can be accessed. The
 final output must be professional, concise, client-friendly, and ready to paste
 into Gmail.
 
-## Step 0: Locate the client folder
+## Step 0: Resolve canonical client knowledge
 
-Do this before touching Fathom and before writing any file. Everything this
-skill saves lives inside the client's **existing** folder — creating a stray
-new folder splits the client's records in two and breaks `post-meeting-review`'s
-pickup.
+Use the registered `client_id` and its canonical `20 Clients/<Client>/` root in the active shared LHM Knowledge Obsidian vault. In the isolated worker, use only the supplied immutable `client/` snapshot and registered path mapping; do not discover mounts or read outside the snapshot. The host must verify that the snapshot comes from the active knowledge vault or its verified mirror.
 
-1. List the workspace's client folders (the directory the team keeps clients
-   in — check the current directory and its `clients/` subfolder for folders
-   containing `client_profile.md` or `project-management/`).
-2. Match the client's name against those folders, tolerating naming variants
-   ("Raise the Bar" vs "raise-the-bar-psychology"). One clear match → use it.
-3. Multiple candidates or no match → list what you found and ask. **Never
-   create a new client folder without the user explicitly confirming that this
-   is a brand-new client with no existing folder.**
-4. `project-management/` sits **directly inside the client folder root**
-   (`<client folder>/project-management/meetings/...` — see
-   `references/folder-convention.md`). Never nest it under a subfolder and
-   never create it anywhere else.
+For a local preparation run, resolve the same shared vault from confirmed configuration. Do not discover clients from the current directory, a `clients/` subfolder, Claude Workspace root, a private vault or retired combined vault. Do not create a client folder. Missing or ambiguous identity or source context is a reported gap.
+
+Client overview/profile, Goals.md, Current Projects.md, service/project state and `project-management/meetings/` belong beneath the canonical knowledge client root. Existing `client_profile.md` is also knowledge, not an output in a working directory. Preserve exact existing filenames.
+
+The separate work destination is the verified **Claude Workspace / Current Clients / <existing client folder>/**. Reports, copy, exports and assets belong there when produced by authorised delivery workflows; this preparation run returns a review bundle only. A work folder's old context files are not canonical knowledge. Never create a new root-level client directory.
+
+For every meeting, assess the meeting record, overview/profile, goals, current-project index and each affected detailed project note. Propose evidence-backed changes with source date and recording reference; mark unchanged records and unavailable required records in checks/warnings. If a relevant file is absent from the registered snapshot, report that gap so the registration can be corrected; never guess its contents or bypass the snapshot boundary. Applying the approved bundle must be followed by exact-file readback before claiming those records updated.
 
 ## Step 1: Gather inputs
 
@@ -411,7 +403,7 @@ Return one structured bundle. Do not apply it. The bundle contains:
    ```
 
 4. `proposed_mutations[]` for the meeting note, wrap-email copy, client profile,
-   goals and current projects. Each item includes the canonical registered
+   goals, current-project index and each affected detailed service/project note. Each item includes the canonical registered
    relative path, operation, expected prior SHA-256 (or `null` only for an
    allowed new file), rationale and complete proposed content or patch. Never
    propose creating a client root.
