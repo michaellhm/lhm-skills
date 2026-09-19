@@ -18,6 +18,8 @@ class QualityTest(unittest.TestCase):
         self.write('comparison.json', {'baseline':{'path':'baseline.md','sha256':q.digest(self.p/'baseline.md')},'projects':[{'project':'Example','disposition':'unchanged'}],'unresolved_regressions':[]})
         self.write('inbox-review.json', {'boards':[{'owner':n,'board_id':1,'section_id':2,'status':'complete','terminal':True,'selected_actions':[]} for n in ['Michael','Kristalyn','Aiya']]})
         research=json.loads((self.p/'research-receipt.json').read_text());research['evidence_files'].append({'path':'inbox-review.json','sha256':q.digest(self.p/'inbox-review.json')});self.write('research-receipt.json',research)
+        self.write('brief.json',{'projects':[{'name':'Example'}]})
+        research=json.loads((self.p/'research-receipt.json').read_text());research['project_source_coverage']=[{'project':'Example',**{k:{'status':'complete','evidence':['source.txt']} for k in ('gmail','obsidian','basicops')}}];self.write('research-receipt.json',research)
         self.review()
     def write(self,n,d): (self.p/n).write_text(json.dumps(d))
     def change(self,n,fn):
@@ -25,6 +27,18 @@ class QualityTest(unittest.TestCase):
     def review(self):
         self.write('quality-review.json',{'accepted':True,'reviewer':'controller','issues':[],**{k+'_sha256':q.digest(self.p/n) for k,n in [('email','email.json'),('research','research-receipt.json'),('comparison','comparison.json'),('access','access-receipt.json')]}})
     def test_complete_bound_report(self): self.assertEqual(q.validate(self.p)['state'],'quality_passed')
+    def test_research_check_never_replaces_delivery_review(self):
+        (self.p/'quality-review.json').unlink()
+        self.assertEqual(q.validate(self.p, require_review=False)['state'], 'research_passed')
+        with self.assertRaises(FileNotFoundError): q.validate(self.p)
+        self.change('research-receipt.json',lambda d:d['coverage']['gmail'].update(status='incomplete'))
+        with self.assertRaisesRegex(ValueError,'Incomplete research'): q.validate(self.p, require_review=False)
+    def test_all_sources_are_required_for_every_project(self):
+        self.change('research-receipt.json',lambda d:d['project_source_coverage'][0]['obsidian'].update(evidence=[]))
+        with self.assertRaisesRegex(ValueError,'Incomplete project source'):q.validate(self.p,require_review=False)
+    def test_missing_project_cannot_be_hidden_by_complete_overall_coverage(self):
+        self.write('brief.json',{'projects':[{'name':'Example'},{'name':'Missing'}]})
+        with self.assertRaisesRegex(ValueError,'Per-project source coverage'):q.validate(self.p,require_review=False)
     def test_missing_live_email(self):
         self.change('access-receipt.json',lambda d:d['sources'].pop('gmail'))
         with self.assertRaisesRegex(ValueError,'Live worker read'):q.validate(self.p)
