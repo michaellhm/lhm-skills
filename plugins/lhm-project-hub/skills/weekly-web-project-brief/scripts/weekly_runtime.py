@@ -87,6 +87,32 @@ def safe_files(root):
             if p.stat().st_size>25_000_000:raise ValueError('Oversized output')
             yield p
 
+def retain_raw_reads(work,out):
+    """Keep actual CLI source responses, not only the worker's prose summaries."""
+    evidence=out/'evidence';evidence.mkdir(exist_ok=True)
+    paths=[]
+    for log in sorted(work.glob('events*.jsonl')):
+        records=[]
+        for line in log.read_text().splitlines():
+            try:event=json.loads(line)
+            except json.JSONDecodeError:continue
+            item=event.get('item',{})
+            if event.get('type')!='item.completed':continue
+            if item.get('type')=='mcp_tool_call' or (item.get('type')=='command_execution' and 'source_read.py' in item.get('command','')):
+                records.append(item)
+        if records:
+            p=evidence/('raw-'+log.stem+'.json');save(p,{'provenance':'Actual Codex CLI completed source calls; may include failed attempts. Read result before treating as evidence.','records':records});paths.append(p)
+    receipt=out/'research-receipt.json'
+    if receipt.is_file():
+        value=json.loads(receipt.read_text());files=value.setdefault('evidence_files',[])
+        names={str(p.relative_to(out)) for p in paths}
+        files[:]=[f for f in files if f.get('path') not in names]
+        files.extend({'path':str(p.relative_to(out)),'sha256':digest(p)} for p in paths)
+        owner=receipt.stat()
+        save(receipt,value)
+        os.chown(receipt,owner.st_uid,owner.st_gid)
+    return paths
+
 def run(cfg,week,mode,continue_from=None):
     state=Path(cfg['state']);state.mkdir(parents=True,exist_ok=True)
     key=week if mode=='scheduled' else week+'-'+mode+'-'+cfg['commit'][:8]
@@ -125,12 +151,14 @@ def run(cfg,week,mode,continue_from=None):
             sys.path.insert(0,str(skill/'scripts'))
             from quality import validate
             repair_contract=f"""Continue the authorised research; do not stop merely because more reads remain. Finish missing Gmail bodies, current task discussions/replies and all selected owner actions. A real access failure must be evidenced, with bounded retry for temporary rate limits. Preserve earlier successful source evidence and actual read times; never label unread sources complete. Read the current skill {skill}/SKILL.md and quality.py. All final files must be in {out}, replacing prior partial files there. Do not author quality-review.json or send anything.
+Evidence and ownership: retain complete source text/results, including current task discussions and replies. Actual CLI responses are available in the research directory's events*.jsonl; the controller also retains them under output/evidence/raw-events*.json before review. Use those responses to substantiate every current_evidence_ids mapping, never empty IDs or unsupported summaries. Preserve the real BasicOps assignee. A recommended coordination action for Michael/Kristalyn on Aiya's task must record the real task_assignee separately from action_owner, with explicit ownership_basis='recommended coordination' and source; never relabel another person's task as a personal Inbox assignment. Keep actionable coordination in the brief when justified, and explain it accurately in evidence.
 Schema reminders: access.sources.gmail/obsidian/basicops/meetings use status='passed' and evidence; research.coverage source status='complete' and reason; material_gaps=[] only when resolved. evidence_files is a nonempty list of relative {{path,sha256}} entries including inbox-review.json and primary evidence. Inbox boards must each have owner, board_id, section_id, status='complete', terminal=true, selected_actions list, candidates and excluded reasons. Preserve every selected weekly action in concise client groups; explain every removal from the approved action baseline using current evidence. comparison.baseline must be a relative {{path,sha256}} file, projects nonempty, unresolved_regressions=[] only when resolved. Validate structural research with quality.validate(output, require_review=False); that does not authorise sending."""
             if continue_from:
                 prompt=common+repair_contract+f"\nThis is continuation of {continue_from}, copied into the current research directory, using the same successful live source evidence and original read times. The original CLI session is resumed. Refresh newly relevant records, finish all missing reads and use the CURRENT installed skill path/hash; preserve prior access provenance. Prior independent review failure to resolve: "+str(prior_status.get('error','See prior review result'))
             invoke(cfg,work/'research',prompt,sock,resume=bool(continue_from))
             def core_check():
                 if not (out/'email.json').is_file():raise RuntimeError('No researched payload')
+                retain_raw_reads(work/'research',out)
                 list(safe_files(out))
                 access=json.loads((out/'access-receipt.json').read_text())
                 if access['skill_path']!=str(skill/'SKILL.md') or access['skill_sha256']!=digest(skill/'SKILL.md'):raise ValueError('Wrong worker skill')

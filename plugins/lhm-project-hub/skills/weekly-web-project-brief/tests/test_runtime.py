@@ -1,4 +1,4 @@
-import importlib.util,tempfile,unittest
+import importlib.util,tempfile,unittest,json
 from datetime import datetime
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('runtime',Path(__file__).parents[1]/'scripts/weekly_runtime.py');r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
@@ -15,6 +15,16 @@ class RuntimeTests(unittest.TestCase):
   with self.assertRaises(ValueError):r.source_read({}, {'action':'gmail-get','value':'x;cat /etc/passwd'})
   with self.assertRaises(ValueError):r.source_read({}, {'action':'gmail-search','value':'x','max':999})
   self.assertTrue(all(t.startswith(('get_','list_')) for t in r.READ_TOOLS))
+ def test_retains_actual_source_results_and_binds_them(self):
+  with tempfile.TemporaryDirectory() as d:
+   work=Path(d);out=work/'output';out.mkdir()
+   (out/'research-receipt.json').write_text(json.dumps({'evidence_files':[]}))
+   records=[{'type':'item.completed','item':{'type':'mcp_tool_call','tool':'get_task','result':{'assignee':'Aiya','discussion':'Completed current work'}}},{'type':'item.completed','item':{'type':'command_execution','command':'python source_read.py gmail-get abc','aggregated_output':'Full email body'}},{'type':'item.completed','item':{'type':'command_execution','command':'cat SKILL.md','aggregated_output':'not source evidence'}}]
+   (work/'events.jsonl').write_text('\n'.join(json.dumps(x) for x in records))
+   paths=r.retain_raw_reads(work,out);self.assertEqual(len(paths),1)
+   self.assertEqual(len(json.loads(paths[0].read_text())['records']),2)
+   receipt=json.loads((out/'research-receipt.json').read_text());self.assertEqual(receipt['evidence_files'][0]['sha256'],r.digest(paths[0]))
+   r.retain_raw_reads(work,out);self.assertEqual(len(json.loads((out/'research-receipt.json').read_text())['evidence_files']),1)
  def test_vault_and_output_confinement(self):
   with tempfile.TemporaryDirectory() as d:
    root=Path(d);(root/'20 Clients').mkdir();(root/'20 Clients/test.md').write_text('source')
