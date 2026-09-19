@@ -3,6 +3,10 @@ from datetime import datetime
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('runtime',Path(__file__).parents[1]/'scripts/weekly_runtime.py');r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
 class RuntimeTests(unittest.TestCase):
+ def test_completion_prompt_can_be_constructed(self):
+  prompt=r.repair_prompt(Path('/skill'),Path('/output'))
+  self.assertIn('{project: exact displayed name',prompt)
+  self.assertIn('/output',prompt)
  def test_schedule_and_dst(self):
   for week,stamp in [('2026-09-21','2026-09-21T02:00:00+00:00'),('2026-10-05','2026-10-05T01:00:00+00:00')]:
    self.assertEqual(r.validate_request({'week':week,'mode':'scheduled'},datetime.fromisoformat(stamp)),week)
