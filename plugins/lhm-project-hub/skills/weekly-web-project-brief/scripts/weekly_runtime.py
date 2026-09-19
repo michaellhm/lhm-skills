@@ -224,7 +224,7 @@ def run(cfg,week,mode,continue_from=None):
             from quality import validate
             validate(dest)
             # Expose only reviewed output to the fixed Hermes sender; worker never gets Mailgun credentials.
-            hermes=pwd.getpwnam('hermes')
+            hermes=pwd.getpwnam('hermesagent')
             for p in [dest,*dest.rglob('*')]:os.chown(p,hermes.pw_uid,hermes.pw_gid)
             result={'state':'reviewed_dry_run','week':week,'output':str(dest),'commit':cfg['commit']}
             if mode=='scheduled':
