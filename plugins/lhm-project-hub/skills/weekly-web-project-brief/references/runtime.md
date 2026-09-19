@@ -13,7 +13,7 @@ Native cron script wrapper lives under `/opt/data/profiles/lhm_brain/scripts/wee
 
 State directory: `/opt/data/profiles/lhm_brain/workspace/weekly-web-project-brief` (override LHM_WEB_BRIEF_STATE for local tests only). Save each normal run under runs/<ISO-Monday>/ and comparison history there. This is an internal agency email, not a client Drive deliverable; canonical delivery is the recipient email, backed by message and research receipts. Do not publish client data in Git.
 
-Sender uses the existing Mailgun route at mg.brieflyflow.io. Reads MAILGUN_API_KEY from the process or the existing `/opt/data/.env` inside the helper; never print credentials. To Michael; CC Kristalyn, Aiya, Jaimee, using BasicOps-verified addresses. Reply-To Michael. Read-only Gmail helper:
+Sender uses the existing Mailgun route at mg.brieflyflow.io. Reads MAILGUN_API_KEY from the process or the existing `/opt/data/.env` inside the helper; never print credentials. To support@localhealthmarketing.com.au only; no individual CC/BCC recipients. Michael explicitly approved replacing the four individual recipients with this shared team address on 19 September 2026. Reply-To Michael. Read-only Gmail helper:
 `HERMES_HOME=/opt/data/.hermes /opt/data/.venv/bin/python /opt/data/skills/productivity/google-workspace/scripts/google_api.py gmail --help`
 Use native BasicOps/Fathom reads and configured vault. Do not change global authentication or permission grants.
 
