@@ -2,6 +2,10 @@
 name: quarterly-review
 description: "Quarterly per-client strategy review: pulls three months of GA4/Ads/GSC data plus the quarter's monthly reports, analyses goal progress and channel performance, and drafts the next 3/6-month campaign plan for Michael's approval. Use this when the user says 'quarterly review', 'quarterly strategy', '90 day review', 'next quarter plan', or 'campaign plan for [client]'."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Quarterly Review
 

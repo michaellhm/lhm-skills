@@ -2,6 +2,10 @@
 name: generate-outline
 description: "Generate a structured article outline from an approved CSV row and client context files. Use this when the user mentions 'generate outline', 'create outline', 'article outline', 'plan the article', 'outline from CSV', or 'topic outline'. Reads client-background.md, brand-voice.md, compliance.md, published-articles.json, and the brief file. Detects topic overlap, aligns to ICP and search intent, avoids cannibalisation, and outputs structured JSON with slug, meta fields, section outline, social angles, and internal link plan."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Generate Outline
 

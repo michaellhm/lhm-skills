@@ -3,6 +3,10 @@ name: bid-budget-optimizer
 description: "Campaign-by-campaign Google Ads performance review with bid strategy and budget recommendations. Use this when users request budget optimization, bid strategy changes, budget pacing fixes, spend control, budget reallocation, scaling campaigns, or period-over-period performance comparison."
 license: MIT
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Bid & Budget Optimizer
 

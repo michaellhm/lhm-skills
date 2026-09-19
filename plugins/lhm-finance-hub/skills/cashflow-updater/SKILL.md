@@ -2,6 +2,10 @@
 name: cashflow-updater
 description: "Process weekly bank data and update the 13-week cash flow forecast. Use this when the user mentions 'cash flow update', 'Monday update', 'weekly update', 'bank CSV', 'upload bank data', 'cash flow forecast', or 'update the forecast'. Also triggered automatically by the finance-orchestrator every Monday."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Cash Flow Updater
 

@@ -2,6 +2,10 @@
 name: finance-advisor
 description: "Answer financial questions and model scenarios for LHM. Use this when the user asks 'can I afford', 'what if I', 'should I hire', 'how much can I spend', 'what would happen if', 'model this scenario', 'how many clients do I need', 'what should my wage be', 'can I buy', or any financial planning question. Available anytime, also triggered after weekly/monthly summaries for Q&A."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Finance Advisor
 

@@ -2,6 +2,10 @@
 name: playbook-strategy-session
 description: Prepare and coach theme-led client strategy sessions that gather authentic source material for an LHM Master Campaign & Sales Playbook. Use when the user asks to prepare, plan, run, facilitate or create a prompt for a campaign-playbook meeting, founder interview, business-brain session, strategy call or voice-mode client conversation. Reads existing client context first, produces a tailored meeting pack and a ready-to-paste ChatGPT/Hermes meeting-coach prompt, and can process the completed transcript into a source brief for the campaign-playbook generator.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Playbook Strategy Session
 

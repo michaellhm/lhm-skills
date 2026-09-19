@@ -69,3 +69,7 @@ One line per entry. Dated. Specific. Actionable.
 - Maximum 50 entries per LEARNED.md file
 - Consolidate duplicates, drop entries older than 3 months that weren't referenced
 - Never record session-specific context (file paths, task details for this run)
+
+## Client knowledge and work destinations
+
+For client work, read `references/obsidian-context-contract.md`: shared LHM Knowledge is canonical for client facts, goals and project state; verified Claude Workspace/Current Clients folders hold deliverables. Apply this before legacy single-folder instructions. Preserve personal-vault boundaries and workflow-specific approval gates.

@@ -2,6 +2,10 @@
 name: geo-content-optimizer
 description: "Optimizes content for Generative Engine Optimization (GEO) to increase chances of being cited by AI systems like ChatGPT, Claude, Perplexity, and Google AI Overviews. Use this when the user mentions 'GEO,' 'AI citations,' 'AI overviews,' 'generative engine optimization,' 'get cited by AI,' 'Perplexity optimization,' 'ChatGPT citations,' 'AI-friendly content,' or 'quotable content.' Makes content AI-citeable while maintaining SEO value."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # GEO Content Optimizer
 

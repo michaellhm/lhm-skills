@@ -2,6 +2,10 @@
 name: profit-first-allocator
 description: "Review Profit First allocation percentages and model scenarios. Use this when the user mentions 'Profit First', 'allocation percentages', 'owner's pay review', 'can I pay myself more', 'tax allocation', 'BAS check', 'profit celebration', 'Profit First review', or 'allocation review'. Triggered monthly by finance-orchestrator (Owner's Pay focus) and quarterly (full review)."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Profit First Allocator
 

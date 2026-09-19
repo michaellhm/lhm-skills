@@ -2,6 +2,10 @@
 name: design-system-generator
 description: "Generate design tokens, spacing scale, and component specs for theme.json. Use this when the user says 'design system', 'design tokens', 'spacing scale', 'generate theme.json settings', 'component specs', or 'design variables'. Phase 4 of the website build. Requires brand guidelines from Brand Discovery."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Design System Generator
 

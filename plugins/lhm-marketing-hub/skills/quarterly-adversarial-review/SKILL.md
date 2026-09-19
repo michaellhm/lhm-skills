@@ -3,6 +3,10 @@ name: quarterly-adversarial-review
 description: "Adversarial 90-day Google Ads review that reconstructs last quarter's work from the client folder, red-teams the account and its assumptions against the prior 90 days, and assigns an AdPulse zone. Use this when the user mentions 'quarterly review', '90 day review', 'quarter review', 'adversarial review', 'red team the account', 'stress test the account', or 'Q review'. Runs every 90 days as a critical challenge to the account, not a friendly status update."
 license: MIT
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Quarterly Adversarial Review
 

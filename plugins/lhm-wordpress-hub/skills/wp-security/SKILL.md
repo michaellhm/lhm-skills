@@ -2,6 +2,10 @@
 name: wp-security
 description: "Security hardening checklist for WordPress sites. Headers, permissions, plugin audit, backups, and pre-launch checks. Use this when the user says 'security hardening', 'secure WordPress', 'security audit', 'pre-launch checklist', 'security headers', 'harden WordPress', or 'launch checklist'. Phase 6 of the website build. Can also be run standalone."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # WP Security
 

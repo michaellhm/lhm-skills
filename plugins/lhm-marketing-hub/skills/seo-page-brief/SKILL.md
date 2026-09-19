@@ -2,6 +2,10 @@
 name: seo-page-brief
 description: Create bounded implementation-ready SEO page briefs from accepted upstream keyword, intent and business evidence. Use after research has passed SEO Lead acceptance, when planning one page or an explicitly scoped page batch, or when an SEO content writer needs an approved brief before writing.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # SEO Page Brief
 

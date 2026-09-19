@@ -2,6 +2,10 @@
 name: staff-weekly-flow
 description: Plan and run a personalised LHM weekly-to-daily work flow for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use when an authorised person asks “what should I focus on this week?”, “what should I work on today?”, asks to review, clean up or triage all their BasicOps tasks or inbox, asks for a mini stand-up or WhatsApp-ready team update, asks specifically for business-growth or client-work priorities, wants to review or save their weekly priorities, or wants to configure their weekly/daily reminder time, timezone, channel, delivery mode, focus mode or priority limit. Read the person’s canonical Obsidian profile, verified BasicOps personal-board mapping, authorised project context and current weekly file; prepare a small realistic plan; save only after confirmation; and apply approved BasicOps mutations through basicops-task-manager with read-back verification.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Staff Weekly Flow
 

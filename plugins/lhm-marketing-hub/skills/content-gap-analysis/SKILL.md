@@ -2,6 +2,10 @@
 name: content-gap-analysis
 description: "Identifies gaps in a client's content strategy by analyzing competitors, keywords, and topic coverage. Use this when the user mentions 'content gap,' 'competitor content,' 'what content are we missing,' 'topic gaps,' 'content opportunities,' 'SERP analysis,' or 'what should we write about.' Combines keyword gap analysis, competitor content audits, and audience journey mapping."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Content Gap Analysis
 

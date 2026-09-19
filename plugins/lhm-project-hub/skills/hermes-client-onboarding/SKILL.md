@@ -2,6 +2,10 @@
 name: hermes-client-onboarding
 description: Create, verify, or repair the machine-readable client preflight Hermes needs before autonomous SEO, Google Ads, GA4, website, Drive, BasicOps, or knowledge work. Use for new-client onboarding, missing client access or identifiers, connector readiness checks, and workflows blocked with client_onboarding_required.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Hermes Client Onboarding
 

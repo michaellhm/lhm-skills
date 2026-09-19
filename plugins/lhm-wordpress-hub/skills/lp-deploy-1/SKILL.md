@@ -2,6 +2,10 @@
 name: lp-deploy-1
 description: "Push the first landing page HTML prototype into WordPress as Gutenberg HTML blocks. Use this when the user says 'deploy the landing page', 'push to WordPress', 'lp-deploy-1', 'drop in the prototype', 'set up the subsite and get the page live', or 'deploy deploy-1'. Requires lp-subsite-setup to have run and a prototype at /lp/prototype/. Wraps prototype sections in wp:html blocks and creates the WordPress page."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # LP Deploy 1 — Push HTML Prototype to WordPress
 

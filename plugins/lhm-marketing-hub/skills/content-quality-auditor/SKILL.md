@@ -2,6 +2,10 @@
 name: content-quality-auditor
 description: "Runs a full CORE-EEAT 80-item quality audit on any piece of content, scoring GEO readiness and SEO strength across 8 dimensions. Use this when the user mentions 'content quality,' 'CORE-EEAT audit,' 'content audit,' 'quality score,' 'is this content good enough,' 'GEO readiness,' 'E-E-A-T check,' or 'content benchmark.' Produces dimension scores, weighted totals, and a prioritized action plan."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Content Quality Auditor
 

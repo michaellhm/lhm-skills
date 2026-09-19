@@ -2,6 +2,10 @@
 name: repo-install
 description: "Clone a client project repository onto a new machine or for a new team member. Use this when the user says 'install the repo', 'clone the client project', 'set up my machine for [client]', 'pull down the client repo', 'clone the repos', 'install the client site locally', 'get the client repo', 'repo-install', or needs to access a client project that already has repos set up. Sets up the correct local folder structure and clones the code and/or prototype repos. Also use when someone already has the repo and just needs to pull the latest."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Repo Install
 

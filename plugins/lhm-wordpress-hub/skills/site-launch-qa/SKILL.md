@@ -2,6 +2,10 @@
 name: site-launch-qa
 description: "Pre-launch QA checklist for WordPress and Astro websites. Runs automated checks (links, SSL, robots.txt, sitemap, console errors, PageSpeed, meta tags, favicon) then walks the user through manual checks that AI cannot verify. Updates the project management doc with QA results at the end. Use this when the user says 'run the QA checklist', 'pre-launch QA', 'site QA', 'launch checklist', 'quality assurance check', 'ready to go live checklist', or 'QA the site before launch'."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Site Launch QA
 

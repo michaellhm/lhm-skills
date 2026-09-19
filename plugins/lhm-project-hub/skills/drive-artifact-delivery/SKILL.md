@@ -2,6 +2,10 @@
 name: drive-artifact-delivery
 description: Deliver completed LHM production artefacts from an approved worker staging location into the client’s registered Google Drive folder with exact metadata and content readback. Use whenever a Hermes, Claude or Codex workflow produces a report, brief, copy deck, audit, plan, export or other file that must be retained for a client; when Head of Production reaches durable delivery; or when a result exists only on a VPS, local path, Hermes workspace or Kanban attachment. This is a shared delivery capability, not a specialist content or publishing bot.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Drive Artefact Delivery
 
@@ -30,9 +34,10 @@ If a durable file is genuinely unnecessary, return `artefact_state: not_required
 ## Preflight
 
 1. Read `_System/Hermes/clients/<client-id>/capabilities.json` and require `google_drive.status: verified`, the `file_create` and `file_readback` operations, and an exact folder ID.
-2. Re-read the staging artefact and verify its byte count and SHA-256 against the manifest.
-3. Confirm the producer and QA receipts belong to the same parent, child and artefact digest.
-4. Preserve the source file. Delivery does not authorise deletion, renaming or mutation of staging output.
+2. Verify that the registered destination descends from the configured Claude Workspace/Current Clients client root. A stale root-level registration is a routing gap; do not silently publish there or auto-move it.
+3. Re-read the staging artefact and verify its byte count and SHA-256 against the manifest.
+4. Confirm the producer and QA receipts belong to the same parent, child and artefact digest.
+5. Preserve the source file. Delivery does not authorise deletion, renaming or mutation of staging output.
 
 If the client destination is absent or unverified, return `client_onboarding_required`. If the registered publisher, authentication, transport or readback capability is broken, return `waiting_on_capability` to Head of Production with the exact return point and route a bounded incident to CTO.
 

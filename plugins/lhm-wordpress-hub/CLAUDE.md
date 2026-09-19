@@ -139,3 +139,7 @@ Skills must:
 - Read shared artefacts from the client root, never duplicate them into the workflow folder.
 - Write workflow-specific artefacts only inside the relevant workflow folder.
 - Create directories as needed before writing.
+
+## Client knowledge and work destinations
+
+For client work, read `references/obsidian-context-contract.md`: shared LHM Knowledge is canonical for client facts, goals and project state; verified Claude Workspace/Current Clients folders hold deliverables. Apply this before legacy single-folder instructions. Preserve personal-vault boundaries and workflow-specific approval gates.

@@ -2,6 +2,10 @@
 name: pr-brief-generator
 description: "Generate a press release brief targeting a specific keyword and service page. Use this when the user mentions 'generate a PR brief', 'PR brief', 'press release', 'Signal Genesis', 'write a press release', 'PR distribution', 'press release draft', or wants to create a press release as part of Month 3 link building. Optional skill, only for clients with PR distribution budget."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # PR Brief Generator
 

@@ -2,6 +2,10 @@
 name: monthly-cycle-report
 description: "Investigate monthly SEO and Google Business Profile results, then produce a concise client work plan, evidence report and AI coaching prompt. Use for 'monthly SEO report', 'SEO traffic lights', 'Jaimee SEO brief', 'multi-location GMB report', 'finish Month 0', or 'Month 1/2/3 cycle report'. Preserves each location's programme stage and consolidates shared work. Reporting does not execute the recommended changes or create a recurring schedule."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Monthly SEO and GMB Review
 

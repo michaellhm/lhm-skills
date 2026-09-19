@@ -2,6 +2,10 @@
 name: contact-form-submissions
 description: This skill should be used when the user wants to "set up contact form submissions", "wire up a contact form", "add form handling to Cloudflare Pages", "save form submissions to D1", "upload images or files from a form", "store form uploads in Cloudflare R2", "add Turnstile spam protection", "set up email notifications for forms", "create a thank-you page for a form", "add an admin submissions page", or "integrate a form with Cloudflare Pages Functions". Provides the complete implementation workflow for reliable, spam-protected, tracked contact forms and private file uploads on Astro/Cloudflare Pages sites.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Contact Form Submissions — Cloudflare Pages
 

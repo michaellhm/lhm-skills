@@ -2,6 +2,10 @@
 name: pmax-banner-generator
 description: Generate AHPRA-compliant Performance Max banner ad copy and image prompts for Australian healthcare and cosmetic clinics. Outputs a single CSV file ready for Google Ads Editor import with multiple funnel-based asset groups. Use this when users request PMax banners, performance max assets, display ad copy, image prompts, or banner creative for physio, chiro, podiatry, psychology, or cosmetic clients.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # PMax Banner Generator
 

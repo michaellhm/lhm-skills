@@ -2,6 +2,10 @@
 name: content-refresher
 description: "Identifies outdated or underperforming content and creates a refresh plan to recover lost rankings and traffic. Use this when the user mentions 'content refresh,' 'update old content,' 'declining traffic,' 'outdated blog posts,' 'content decay,' 'recover rankings,' or 'republish strategy.' Covers performance analysis, gap identification, GEO enhancement, and republishing tactics."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Content Refresher
 

@@ -2,6 +2,10 @@
 name: run-hermes-task
 description: Run substantive LHM client or internal work through the governed Hermes workforce from source intake to durable delivery, independent QA and human review. Use when Michael or an LHM team member asks Claude, Codex or another desktop agent to "run this through Hermes", execute a BasicOps task through Hermes, test the Hermes employee chain, supervise delegated AI work, or recover a Hermes-run task that stalls. Routes capability failures to the Hermes CTO with a persisted return point and resumes automatically after verified repair.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Run Hermes Task
 

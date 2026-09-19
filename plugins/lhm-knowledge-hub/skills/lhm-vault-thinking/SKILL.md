@@ -2,6 +2,10 @@
 name: lhm-vault-thinking
 description: Think across Local Health Marketing's Obsidian vault using evidence, note history and the link graph. Use when Michael shares an idea, asks to capture or flesh out an idea, asks for context, wants to trace how thinking evolved, connect two topics, challenge assumptions or contradictions, surface emerging ideas, generate vault-grounded ideas, or graduate a developed idea into a standalone note.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # LHM Vault Thinking
 
@@ -9,10 +13,10 @@ Use the LHM vault as a thinking partner. Distinguish evidence in the vault from 
 
 ## Load the vault safely
 
-1. Locate the directory containing `.obsidian`; prefer `/Users/michaelcolman/Documents/Obsidian/Local Health Marketing/Local Health Marketing`.
+1. Locate the directory containing `.obsidian`; resolve the confirmed active root(s), using shared LHM Knowledge for client/team context and the authorised private vault for founder planning; do not fall back to the retired combined vault.
 2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely.
 3. Detect the official Obsidian CLI with `command -v obsidian`. If unavailable, check `/Applications/Obsidian.app/Contents/MacOS/obsidian-cli` on macOS.
-4. Prefer CLI reads when it responds. Target the vault explicitly as the first parameter: `obsidian vault="Local Health Marketing" <command>`.
+4. Prefer CLI reads when it responds. Target the vault explicitly as the first parameter: `obsidian vault="<verified active vault name>" <command>`.
 5. If the CLI reports that Obsidian is not running or cannot be found, continue with `rg`, `rg --files` and direct Markdown reads. Do not launch a GUI or register the CLI without permission.
 
 ## Select one mode
