@@ -2,7 +2,7 @@
 name: weekly-web-project-brief
 description: "Prepare Lily's Monday website portfolio email or apply Michael's consolidated project corrections. Use for 'weekly web projects', 'website weekly brief', 'Monday website email', 'update the web brief' or 'website brief feedback'. Reconciles Obsidian, BasicOps discussions, email and meeting evidence; produces an HTML table with due dates and red-first traffic lights."
 metadata:
-  version: 1.2.3
+  version: 1.2.4
 ---
 
 # Weekly web project brief

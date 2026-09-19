@@ -25,6 +25,12 @@ class QualityTest(unittest.TestCase):
     def review(self):
         self.write('quality-review.json',{'accepted':True,'reviewer':'controller','issues':[],**{k+'_sha256':q.digest(self.p/n) for k,n in [('email','email.json'),('research','research-receipt.json'),('comparison','comparison.json'),('access','access-receipt.json')]}})
     def test_complete_bound_report(self): self.assertEqual(q.validate(self.p)['state'],'quality_passed')
+    def test_research_check_never_replaces_delivery_review(self):
+        (self.p/'quality-review.json').unlink()
+        self.assertEqual(q.validate(self.p, require_review=False)['state'], 'research_passed')
+        with self.assertRaises(FileNotFoundError): q.validate(self.p)
+        self.change('research-receipt.json',lambda d:d['coverage']['gmail'].update(status='incomplete'))
+        with self.assertRaisesRegex(ValueError,'Incomplete research'): q.validate(self.p, require_review=False)
     def test_missing_live_email(self):
         self.change('access-receipt.json',lambda d:d['sources'].pop('gmail'))
         with self.assertRaisesRegex(ValueError,'Live worker read'):q.validate(self.p)

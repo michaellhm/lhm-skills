@@ -10,7 +10,7 @@ def digest(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
-def validate(directory):
+def validate(directory, require_review=True):
     root = Path(directory).resolve()
     def read(name):
         return json.loads((root / name).read_text())
@@ -22,7 +22,7 @@ def validate(directory):
         if not p.is_absolute():
             p = root / p
         require(p.is_file() and digest(p) == item['sha256'], 'Evidence/baseline file missing or changed')
-    access, research, comparison, review = [read(n) for n in ('access-receipt.json', 'research-receipt.json', 'comparison.json', 'quality-review.json')]
+    access, research, comparison = [read(n) for n in ('access-receipt.json', 'research-receipt.json', 'comparison.json')]
     require(access.get('worker') == 'codex-cli', 'Codex CLI worker required')
     bound_file({'path': access['skill_path'], 'sha256': access['skill_sha256']})
     for source in ('gmail', 'obsidian', 'basicops'):
@@ -52,6 +52,9 @@ def validate(directory):
     bound_file(comparison['baseline'])
     require(bool(comparison.get('projects')), 'No baseline comparison')
     require(comparison.get('unresolved_regressions') == [], 'Unresolved factual regression')
+    if not require_review:
+        return {'state': 'research_passed'}
+    review = read('quality-review.json')
     require(review.get('accepted') is True and review.get('reviewer') and review.get('issues') == [], 'Independent review not accepted')
     for key, name in [('email', 'email.json'), ('research', 'research-receipt.json'), ('comparison', 'comparison.json'), ('access', 'access-receipt.json')]:
         require(review.get(key + '_sha256') == digest(root / name), 'Review invalidated: ' + name)
