@@ -149,7 +149,7 @@ If the destination is missing, dispatch is unavailable, either connector is unav
 
 ### Weekly highlights and Monday email
 
-For the scheduled weekly flow, follow `references/monday-digest.md`. Include a short Highlights section and Start here action in the report and return the matching `ads_digest` JSON block. The registered deterministic email script sends one Lily HTML/text digest only after terminal child results and verified delivery receipts. Report-only requests never send email.
+For the scheduled weekly flow, follow `references/monday-digest.md`. Include a short Highlights section and Start here action in the report and return the matching `ads_digest` JSON block. The registered deterministic email script sends one Lily HTML/text digest only after terminal child results and verified delivery receipts. Report-only requests never send email. The `ads_digest` object must contain exactly the newsletter fields `light`, `status_reason`, `stage`, `highlights` (one to four strings), and `next_action`. Use a literal `ads_digest` fenced block. A large analytics object with `performance_zone`, metrics and actions does not replace this newsletter summary. Before handback, validate that the five fields exist, repeat the human Highlights/Start here, and preserve the actual zone and measurement caveats.
 
 ### Step 8: Hermes overview, BasicOps record and approval gate
 
