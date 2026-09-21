@@ -140,10 +140,21 @@ decision was finalised.
 Keep this section concise. Do not repeat every decision again in the Action Items
 section unless a task is required to implement it.
 
+### Filter LHM scope before proposing actions
+
+Apply the scope check in [the shared meeting-wrap contract](../basicops-task-manager/references/meeting-wrap.md#scope-check-does-lhm-owe-an-action-here)
+before writing action items or extracting the BasicOps proposal. Only explicit LHM
+commitments and necessary client inputs to agreed LHM delivery qualify. Keep client
+internal projects, operations, advice and side conversations in **Other things
+discussed**, preserving their actual ownership without assigning LHM follow-up.
+Check existing project scope before proposing a new card. Unclear scope is a review
+question only when material; it is not an executable task.
+
 ### Action Item rules
 
-Group action items by owner. Typical headings: Local Health Marketing, [Client
-Name], Michael, Clinic Team, External Provider.
+Group qualifying actions by owner. Use Local Health Marketing and Client inputs
+needed for delivery where appropriate. Client internal responsibilities belong in
+Other things discussed unless they meet the scope/dependency check above.
 
 Each action item must:
 

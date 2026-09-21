@@ -41,11 +41,22 @@ For each material task capture:
 
 Distinguish task age from inactivity. A recent metadata edit is not delivery progress. Rank blockers and overdue client commitments ahead of simple age. An old task prompts diagnosis, never automatic closure or a silently extended due date.
 
+## Recheck scope before ownership
+
+Apply [the shared meeting-wrap scope check](../basicops-task-manager/references/meeting-wrap.md#scope-check-does-lhm-owe-an-action-here)
+to every proposed and existing meeting action. First establish whether LHM owes an
+explicit deliverable or needs a client input to agreed work; only then ask who owns
+it. Do not turn client internal projects, operational updates or side conversations
+into coordination/chasing duties for Kristalyn. Keep useful context in the email
+and canonical notes. Propose cancellation of legacy over-capture, preserving its
+history and requiring authorisation. Reuse existing delivery tasks for included
+features. Record scope uncertainty as a question, not a new card.
+
 ## Propose the decisions, then interview
 
 Summarise what exists before changing anything. Present a compact register: outcome | current task/owner | proposed disposition/owner | date or dependency | decision needed. Group related tasks by outcome. Mark proposals and uncertainties clearly.
 
-Ask first: who can own getting this outcome delivered end to end? Separate accountable ownership, execution and approval. A future Michael approval does not make the whole project Michael's task.
+For outcomes that pass the scope check, ask: who can own getting this outcome delivered end to end? Separate accountable ownership, execution and approval. A future Michael approval does not make the whole project Michael's task.
 
 Use a small batch of material questions, usually no more than three. Include a recommendation and its reason. Ask about scope, owner, priority, an unexplained delay or approval boundary; do not ask Michael to dictate information already in sources or write a brief himself. Reuse answers and session authorisation. Continue independent preparation while an answer is pending.
 

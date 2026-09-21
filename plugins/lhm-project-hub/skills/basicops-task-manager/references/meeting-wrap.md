@@ -4,6 +4,43 @@ This is the meeting-wrap exception to generic BasicOps title, parent, Descriptio
 next-handoff and production rules. It governs `post-meeting-review`, Lily and any
 caller writing a meeting card. Other task types keep their existing conventions.
 
+## Scope check: does LHM owe an action here?
+
+Before extracting proposed actions, and again before creating or distributing tasks,
+classify each outcome using the meeting evidence and the client's agreed scope:
+
+| Category | Evidence required | Treatment |
+| --- | --- | --- |
+| LHM action | Explicit LHM request or commitment within agreed services, or separately agreed additional scope | Propose for review; reuse an equivalent existing task or add the requirement to its brief. |
+| Client input needed for LHM delivery | A named approval, access, content or decision that blocks a specific agreed LHM outcome | Keep on the existing delivery task or one consolidated client follow-up. State what it unlocks. |
+| Other things discussed | Client operations, internal projects, brainstorming or advice with no explicit LHM obligation | Summarise as context in the email and relevant Obsidian note; no execution or chasing task. |
+
+LHM's usual services include websites, Google Business Profile/GMB, SEO, content,
+tracking and Google Ads. Being related to marketing does not itself establish scope.
+An explicit, separately agreed LHM commitment may qualify outside those services;
+record the evidence rather than excluding it by keyword.
+
+A client saying they will do something is not automatically an LHM action. Assigning
+Kristalyn to chase it does not bring it into scope. Advice, interest in a tool, and
+brainstorming are not delivery commitments. Do not manufacture an obligation to
+execute, coordinate, monitor or follow up. Ask a material scope question only when
+it affects LHM delivery; keep uncertain items as review questions, not cards.
+
+Keep the email complete with an optional **Other things discussed** section. Preserve
+explicit client-owned intentions there without implying LHM will manage them. Client
+inputs required for LHM work can appear under **Client inputs needed**. An email
+bullet or Obsidian record never creates task authority on its own.
+
+For each proposed task establish: what LHM owes, source evidence, existing task or
+project, and (for client input) the delivery dependency. Existing rebuild features
+belong in the rebuild brief unless a distinct owner, deliverable or approval gate
+justifies a separate task. Do not create a card for every checklist item.
+
+For legacy over-capture, propose cancellation of out-of-scope or duplicate cards;
+apply it only when authorised, preserve history, and clarify that cancellation of
+an LHM card does not mean the client completed or abandoned their internal project.
+Retain operational facts that inform marketing as context, without a chasing task.
+
 ## Capture and review
 
 - Use one top-level task in `*Client Flow` for each client and meeting date. Title:
