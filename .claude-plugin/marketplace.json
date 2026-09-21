@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "2.2.25"
+    "version": "2.2.26"
   },
   "plugins": [
     {
@@ -82,7 +82,7 @@
       "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
       "description": "General marketing orchestration plus direct Google Ads, SEO, Content, and WordPress specialists with governed delegation and shared client context.",
-      "version": "2.2.25",
+      "version": "2.2.26",
       "category": "utilities",
       "tags": [
         "marketing",
@@ -96,7 +96,7 @@
     {
       "name": "lhm-client-updates-hub",
       "source": "./plugins/lhm-client-updates-hub",
-      "description": "DEPRECATED — skills have moved to lhm-project-hub. Shims remain for compatibility. Client communication and meeting-wrap plugin. Fathom meeting debriefs with BasicOps sync and team notifications, client data change propagation with reversed-decision detection, and client-facing update emails.",
+      "description": "DEPRECATED \u2014 skills have moved to lhm-project-hub. Shims remain for compatibility. Client communication and meeting-wrap plugin. Fathom meeting debriefs with BasicOps sync and team notifications, client data change propagation with reversed-decision detection, and client-facing update emails.",
       "version": "1.1.20",
       "category": "utilities",
       "tags": [
@@ -125,7 +125,7 @@
       "name": "lhm-knowledge-hub",
       "source": "./plugins/lhm-knowledge-hub",
       "description": "LHM knowledge system for Obsidian vault management, Claude and Hermes conversation capture, strategic thinking, weekly planning, and monthly quality review.",
-      "version": "1.1.4",
+      "version": "1.1.5",
       "category": "utilities",
       "tags": [
         "obsidian",
@@ -138,7 +138,7 @@
     {
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
-      "description": "LHM project management hub — sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
+      "description": "LHM project management hub \u2014 sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
       "version": "0.1.106",
       "category": "utilities",
       "tags": [

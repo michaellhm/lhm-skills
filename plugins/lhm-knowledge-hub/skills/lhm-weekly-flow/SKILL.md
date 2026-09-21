@@ -1,6 +1,6 @@
 ---
 name: lhm-weekly-flow
-description: Run Local Health Marketing's conversational weekly review and planning interview using its Obsidian vault, WeekFlow context and operating systems. Use when Michael says “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, improve or complete an LHM weekly planning session. Begin with a personal check-in, use evidence to help recall the week, review time and unfinished work, then update Obsidian with decisions, three weekly outcomes and commitments.
+description: Run Local Health Marketing's conversational weekly review and planning interview using its Obsidian vault, WeekFlow context and operating systems. Use when Michael says “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, improve or complete an LHM weekly planning session. Begin with a personal check-in, use evidence to help recall the week, review time and unfinished work, then update Obsidian with decisions, three weekly outcomes and capacity-checked commitments. Keep planning separate from optional action work and verify any authorised WeekFlow scheduling.
 ---
 ## Client file routing
 
@@ -10,6 +10,23 @@ For client-specific work, first read [Client knowledge and working-file routing]
 # LHM Weekly Flow
 
 Run an evidence-led weekly operating review for Local Health Marketing. Use the vault for continuity across conversations and save progress after each interview section.
+
+## Session shape: plan first, act second
+
+Aim for a 30–40 minute core planning conversation, not a compulsory time limit. Keep the personal check-in and useful reflection. Compress unchanged sections; do not make Michael answer questions already resolved by evidence. If he wants to explore a material decision, allow it and make the trade-off visible.
+
+The core session ends with three or fewer outcomes, dependable capacity, chosen commitments and explicit waiting/overflow work. A full board cleanup, client production, email session or opportunity workshop is optional action work, not a prerequisite for completing the weekly review. Ask once at the end whether to continue into an action session; do not invent or invoke a not-yet-installed action-session skill. Use the existing `lhm-project-hub:staff-weekly-flow` for role-specific daily selection and `lhm-project-hub:basicops-task-manager` for authorised task writes.
+
+An explicit request to act during planning can be handled immediately. Keep the current section and next question recorded so the interview resumes without restarting. Do not force a new conversation. When the user chooses a new conversation, provide a bounded handoff with confirmed decisions, source links, pending actions and approval limits; do not assume cross-chat memory.
+
+## Prepare decisions before presenting tasks
+
+- Reuse the existing Monday project briefing and available structured output; verify its generated time, source links and material task changes. Do not create another briefing, JSON store or automation from this skill. If it has not arrived, prepare from accessible live evidence and reconcile later arrivals into the same plan.
+- Reconcile BasicOps, relevant meetings/project digests and WeekFlow before presenting the actionable shortlist. Fetch independent reads together where supported; paginate relevant queries and keep raw payloads out of the conversation. Reading the full backlog does not commit it to the week.
+- Deduplicate by stable task ID AND outcome. Historical meeting-wrap containers, recurring placeholders and a parent plus its execution task are not automatically separate actions. Preserve linked source identities rather than replacing one task's ID with a different parent ID.
+- For each candidate, prepare: current state, source link and freshness, decision needed, recommended next action, dependency, downstream owner, completion condition and rough effort/confidence. Refresh consequential state before applying a change.
+- Present one decision at a time when Michael prefers it: “Here is where it stands; I recommend this; it releases this person/work.” Offer `do now`, `schedule`, `delegate`, `waiting`, `park` or `close`. Show a compact progress count and move to the next prepared item after recording the answer; avoid repeated “shall we continue?” prompts.
+- An ambiguous “add all the other tasks” requires resolving the intended set (discussed commitments, actionable Inbox or whole board) before a bulk import. Silence after a clarification is not selection of the broadest scope.
 
 ## Locate and load context
 
@@ -65,7 +82,7 @@ Then give a compact briefing:
 
 Before the wins review, route the Monday intake in this order:
 
-1. Review every unprocessed `01 Inbox` capture and decide whether to discard it, merge it into a canonical note, convert it into an action, or flesh it out into a structured Idea.
+1. Prepare dispositions for unprocessed `01 Inbox` captures. Discuss only items that materially affect this week; retain the rest in an explicit optional action-session queue. Do not require a full Inbox cleanup before planning.
 2. Review structured `seed` ideas that are relevant now; do not force parked or unrelated ideas into the week.
 3. Review unresolved lessons, recurrences and contradictions from new AI conversation captures.
 4. Surface only urgent Michael-level decisions from the Attention Queue.
@@ -189,7 +206,7 @@ Challenge:
 
 - Vague activity phrased as an outcome
 - More than three primary priorities
-- Commitments without an owner or due date
+- Commitments without an owner, next action or agreed timing; distinguish a planning day from a client deadline
 - Work that does not advance a goal, unblock delivery or protect a live campaign
 - Workload that exceeds known capacity
 
@@ -199,9 +216,34 @@ Agree on no more than three primary outcomes. Each outcome must be observable by
 
 ### 9. Commitments and final check
 
-Turn each outcome into the minimum necessary commitments with owner and due date. End conversationally by asking what could derail the week, what should deliberately not be worked on, and what Michael is most interested in starting first.
+Turn each outcome into the minimum necessary commitments with owner and agreed timing. Do not manufacture due dates for optional work. End conversationally by asking what could derail the week, what should deliberately not be worked on, and what Michael is most interested in starting first.
 
 Confirm the final plan with Michael before marking the review complete.
+
+## Capacity and priority decisions
+
+Rank work using evidence: first actions that unblock another person or protect a client promise/live service, then due client delivery, then agreed opportunities and internal improvements. A genuine immediate client risk can outrank an ordinary handoff. Explain the top choices; do not mark every item high priority.
+
+Read current preferences and reconcile fixed meetings, follow-up time, working hours, hard stops, holidays, energy and effort uncertainty. Prefer three meaningful daily outcomes plus a short admin batch, with buffer; this is a planning default, not a quota or licence to hide distinct tasks in a large batch. Do not require evenings/weekends or infer availability from the current clock. If the user says they can do more today, propose a bounded selection in their actual available window.
+
+Keep `must do`, `if time`, `waiting` and `parked` distinct. Client meeting wraps and project handoffs precede optional internal work when that is Michael's confirmed preference. New work must expose what it displaces. If this-week work will not fit, propose a disposition and obtain Michael's decision before moving it to next week; an estimated schedule is not a revised client promise.
+
+## Authorised action-session handoff
+
+Keep the execution queue separate from the founder review. Carry only relevant task links, decisions and next steps into it, not private reflections. For substantive client work, prepare a bounded handoff into the verified client workspace: task ID/link, client context and working-folder links, inputs, scope, expected output, approval limits and next owner. Do not assume ChatGPT/Claude projects inherit the planning conversation or can access an arbitrary local file.
+
+During action work, route task mutations through `basicops-task-manager`. Draft follow-up emails with exact recipients and text for review before sending. Approval of a draft authorises that exact send; do not ask again unless recipients/content materially change. Task completion, a draft or a BasicOps comment does not prove an email was sent. Verify the send and record its link against the source task. Consolidate related asks to the same recipient when appropriate.
+
+## WeekFlow publication and verification
+
+When Michael authorises adding or scheduling the confirmed plan:
+
+1. Resolve the current app/API and authenticated owner from verified configuration, not a stale hard-coded checkout. Read current tasks, statuses, scheduled blocks and day order immediately before writing.
+2. Import only the authorised selection. Leave historical containers, recurring placeholders, parked work and blocked items out of daily commitments. An explicit whole-board import belongs in a separately labelled review backlog, never a silently scheduled week.
+3. Reuse existing cards by identity and equivalent outcome, checking all statuses. Preserve completed/dismissed decisions and unrelated edits. Never reopen an old completed card merely to bypass a duplicate-ID constraint. Append related source links without silently reassigning its identity.
+4. Distinguish `saved`, `scheduled` and `visible on the intended day`. “Add to the app” does not imply invented times; “schedule by day” requires dated placement. Apply agreed priorities and realistic durations, preserve fixed meetings and existing order, and avoid collisions, past time blocks and protected days. Planning placement must not create or alter a BasicOps deadline.
+5. Read changed records back and verify the app's day-view behaviour using the rendered view when available, or its documented filtering/order rules plus saved data. Check timezone/day, status, priority, task links, duplicate outcomes and total daily load. Old scheduled blocks must not cause newly scheduled work to be automatically marked not-done; preserve history without allowing stale scheduling to override the new state.
+6. Report verified counts and any mismatch separately. If the live view cannot be checked, state that limit; do not call an insertion a verified visible schedule. Keep a retry-safe change receipt so interrupted writes do not duplicate cards or replay completed work.
 
 ## Save progressively
 
@@ -224,7 +266,7 @@ When Michael confirms the plan:
 4. Update canonical goal, marketing and project notes without duplicating detailed task lists.
 5. Set the weekly note to `status: complete`.
 6. Check internal links and avoid duplicate weekly notes.
-7. Finish with a short brief: prior-week result, this week's three outcomes, Michael's decisions, blockers and the first action.
+7. Finish with a short brief: prior-week result, this week's three outcomes, Michael's decisions, blockers and the first action. Report optional action work separately, including what was applied, drafted, sent or still waiting. Measure useful progress by handoffs released and client commitments advanced, not raw task counts. Offer the optional action session once.
 
 ## Guardrails
 
