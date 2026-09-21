@@ -38,7 +38,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `weekly-web-project-brief` — Lily’s Monday HTML website portfolio: project health, inactivity checks, concise client-grouped owner Inbox actions and an unattended Codex route, source freshness and consolidated feedback. One-off fixes stay out of the snapshot.
 
-`google-ads-monthly-review` — Evidence-led account review, report highlights and Lily’s Monday review-card digest.
+`google-ads-monthly-review` — Evidence-led account review, validated report highlights and Lily’s Monday digest with historical summary compatibility.
 
 `lhm-gmb-hub:monthly-cycle-report` — Goal-led monthly SEO investigation, consolidated multi-location work plan, phase close-out, meeting/task reconciliation and AI coaching pack. Portfolio Monday scheduling uses GMB `monthly-loop-setup` with a dedicated CLI-only analytics, delivery and independent-QA runtime plus a card-first Lily/Mailgun HTML digest.
 
