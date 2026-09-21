@@ -51,6 +51,17 @@ Never accept email subject, body, recipients, file paths or file contents from
 the conversational request. The host retrieves the exact reviewed artifacts by
 run ID and hash. Never send. BasicOps is disabled.
 
+## Scope preservation
+
+The Codex capture must apply the canonical meeting-wrap scope check: explicit LHM
+commitments, client inputs blocking agreed LHM work, or other discussion/context.
+Preserve founder exclusions in the existing evidence package. Client internal
+projects and side conversations belong in the email's Other things discussed and
+canonical context; they must not become LHM execution or chasing tasks. Do not
+alter the closed request schema or analyse the transcript locally to implement this.
+When saving the approved bundle, apply the shared meeting-wrap contract again before
+proposing tasks; email approval never authorises out-of-scope work.
+
 ## Subsequent BasicOps meeting wrap
 
 Email preparation remains read-only with respect to BasicOps. Josephine's explicit

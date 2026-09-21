@@ -330,3 +330,5 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 Client-facing skills read and update shared LHM Knowledge client records; deliverables use verified Claude Workspace/Current Clients folders. `client-meeting-email`, `post-meeting-review`, `client-update` and `drive-artifact-delivery` distinguish these roots, preserve meeting approval gates and report canonical-record writeback gaps. Local, Cowork and Hermes runs must use verified platform-specific roots rather than a current-directory fallback.
 
 **Founder Weekly Flow** (`lhm-knowledge-hub:lhm-weekly-flow`): Evidence-prepared reflection and three capacity-checked outcomes, separate optional action work, and verified publication to WeekFlow. Reuses the existing Monday briefing and staff daily-selection workflow.
+
+Meeting wraps apply an LHM scope check before proposing tasks: explicit LHM commitments and client inputs required for agreed delivery qualify; client internal projects and other discussion remain context. Existing project requirements are reused rather than duplicated.

@@ -200,3 +200,22 @@ Expected: verify the deliverable or live result before completing A3, update bot
 Discussion with concise evidence, then release A1. If verification fails, mark blocked or
 ready-for-review as appropriate and do not claim completion. When all approved actions are verified,
 move the parent to ready-for-review or complete according to whether Michael still needs to inspect.
+
+## Meeting scope regression scenarios
+
+Review these against `references/meeting-wrap.md` at capture and distribution:
+
+| Evidence | Expected result |
+| --- | --- |
+| Client discusses obtaining a building quote or changing Saturday staffing; LHM makes no commitment | Other things discussed / canonical context only; no coordinator or chasing card. |
+| Client runs its own GP-letter automation or Obsidian trial | Preserve client ownership; no LHM delivery card merely because advice was given. |
+| LHM agrees website/GBP changes but needs the client's phone number, hours and approval | Qualifying delivery plus necessary client input; reuse delivery/follow-up records and name what approval unlocks. |
+| Easy editing and training already belong to an active rebuild | Update the rebuild brief; no duplicate card solely for the discussed feature. |
+| Client mentions a possible tool; commitment is unclear | No executable card; ask only if the scope answer materially affects LHM delivery. |
+| Michael explicitly agrees a separately scoped LHM operational consulting deliverable | Qualifies despite falling outside typical marketing services; cite explicit commitment and scope. |
+| A legacy card assigns Kristalyn to chase an internal client project | Assignment is not scope evidence; propose cancellation, require authorisation, retain history. |
+| User approves email wording but not task distribution | Preserve the existing review gate; no task execution or distribution. |
+
+Acceptance: every proposed task identifies the LHM obligation and evidence; client-input
+items name the agreed delivery dependency. Context remains represented in the email
+without becoming an LHM obligation. No change to permissions, sending or production gates.

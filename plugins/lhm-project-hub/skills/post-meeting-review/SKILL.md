@@ -83,7 +83,7 @@ Resolve this as the canonical active-project record inside the Obsidian client r
 When the canonical file exists, update it with real projects from this meeting. Do not add placeholder rows.
 
 - Mark completed projects as completed (with date)
-- Add new projects from action items
+- Add new LHM delivery projects only from explicit agreed scope; record client-owned projects as context without an LHM action queue
 - Update status of existing projects if discussed
 - Add new items to backlog if raised but not yet started
 
@@ -137,6 +137,11 @@ is preparation-only. Resolve the approved email from the authenticated email sou
 or its matching saved artifact. If unavailable, report the gap without claiming the
 card replicates the email. Preserve approved corrections separately and link actions
 by verified IDs. Show proposed owners and disputed/existing work for review.
+
+Apply the scope check in `meeting-wrap.md` before populating the proposed register.
+Only explicit LHM commitments or necessary inputs to agreed LHM delivery qualify.
+Client internal projects and side discussions remain context, not coordination or
+chasing tasks. Reuse existing work; flag only material unresolved scope questions.
 
 Keep a compact set of concrete actions with recognisable completion conditions.
 Consolidate related client inputs. Resolve explicit meeting owners first, then
