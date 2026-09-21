@@ -25,7 +25,7 @@ class QualityTest(unittest.TestCase):
     def change(self,n,fn):
         d=json.loads((self.p/n).read_text());fn(d);self.write(n,d);self.review()
     def review(self):
-        self.write('quality-review.json',{'accepted':True,'reviewer':'controller','issues':[],**{k+'_sha256':q.digest(self.p/n) for k,n in [('email','email.json'),('research','research-receipt.json'),('comparison','comparison.json'),('access','access-receipt.json')]}})
+        self.write('quality-review.json',{'accepted':True,'reviewer':'controller','issues':[],**{k+'_sha256':q.digest(self.p/n) for k,n in [('brief','brief.json'),('email','email.json'),('research','research-receipt.json'),('comparison','comparison.json'),('access','access-receipt.json')]}})
     def test_complete_bound_report(self): self.assertEqual(q.validate(self.p)['state'],'quality_passed')
     def test_research_check_never_replaces_delivery_review(self):
         (self.p/'quality-review.json').unlink()

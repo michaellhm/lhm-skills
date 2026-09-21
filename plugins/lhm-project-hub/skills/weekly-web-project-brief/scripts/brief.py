@@ -72,6 +72,13 @@ def gate(at=None):
             'output_directory': str(BASE / 'runs' / week)}
 
 
+def blocker_text(b):
+    fields = ('project', 'issue', 'impact', 'owner', 'next_step')
+    if any(not isinstance(b.get(k), str) or not b[k].strip() for k in fields):
+        raise ValueError('Blocker needs project, issue, impact, owner and next step')
+    return f"{b['project']}: {b['issue']} Impact: {b['impact']} Next: {b['owner']} — {b['next_step']}"
+
+
 def render(d):
     week = monday(d['week']).strftime('%-d %B %Y')
     projects = d['projects']
@@ -149,6 +156,7 @@ def render(d):
     for o in d['owners']:
         section(o['name'], o['actions'], grouped=True)
     section('Older cards to clear up', d.get('older_cards', []))
+    section('Blockers and information needed', [blocker_text(b) for b in d.get('blockers', [])])
     section('Updates or corrections?', [FEEDBACK.format(week=week)])
     tail = 'Evidence checked: ' + d['cutoff'] + '. ' + d.get('limitations', '')
     text += [tail, 'Lily | LHM Web Projects']
