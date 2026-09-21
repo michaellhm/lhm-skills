@@ -2,7 +2,7 @@
 name: weekly-web-project-brief
 description: "Prepare Lily's Monday website portfolio email or apply Michael's consolidated project corrections. Use for 'weekly web projects', 'website weekly brief', 'Monday website email', 'update the web brief' or 'website brief feedback'. Reconciles Obsidian, BasicOps discussions, email and meeting evidence; produces an HTML table with due dates and red-first traffic lights."
 metadata:
-  version: 1.2.10
+  version: 1.2.11
 ---
 ## Client file routing
 
@@ -72,3 +72,10 @@ Before send verify source completeness, all project scopes represented/deduplica
 Before delivery, run scripts/quality.py against the run directory after independent controller review. A changed payload invalidates that review. A warning footer cannot excuse known factual regressions.
 
 Scheduled delivery: save brief.json, email.json, research-receipt.json, comparison.json, access-receipt.json, quality-review.json and preview.html before invoking send. The sender persists a weekly receipt before the network call; never remove it or retry an uncertain send via another route. Verify recipient delivery events; queued is not delivered. Save run outcome with message ID and verification state. Do not send extra team pings.
+
+
+## Autonomous repair and blocked-run alerts
+
+The controller allows two bounded corrections after independent review, each followed by a fresh reviewer. Corrections must address all prior issues, search canonical aliases before declaring records missing, put live-site one-off tasks only in owner action lists, and reconcile each dropped dated baseline commitment explicitly. Missing required client records remain material gaps. Never invent a canonical note, mark missing reads complete, silently drop a substantial project, or weaken QA to produce an email.
+
+When correction is exhausted or the worker fails, record failure and exit unsuccessfully. The separate watchdog checks every five minutes, detects missed starts after 12:15 Monday, interruptions, the three-hour processing limit and unconfirmed delivery after 20 minutes. It sends one clearly labelled failure notice per week to the existing support inbox through the fixed sender. This is distinct from the weekly project report and does not consume its delivery receipt. Raw exception text, client records and credentials never enter the alert. Preserve every attempt and receipt. No automatic resend after an uncertain send; reconcile provider evidence. The watchdog never invokes a model or changes client records. A true missing record or business decision requires a specific human handoff rather than endless retries.

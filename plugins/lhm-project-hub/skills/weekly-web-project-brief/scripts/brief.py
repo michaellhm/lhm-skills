@@ -54,7 +54,7 @@ def save(path, value):
 
 def receipt(week, kind='brief'):
     monday(week)
-    if kind not in ('brief', 'test'):
+    if kind not in ('brief', 'test', 'alert'):
         raise ValueError('Invalid delivery kind')
     # Identity is week + kind, deliberately not recipients/content: configuration
     # changes must never make a second production send possible for the same week.
@@ -179,6 +179,8 @@ def mailgun(path, data=None, query=None):
 
 
 def send(week, email, kind='brief'):
+    if kind not in ('brief', 'test'):
+        raise ValueError('Use the fixed alert action for failure notices')
     p = receipt(week, kind)
     if email.get('week') != week:
         raise ValueError('Email week does not match receipt week')
@@ -190,6 +192,11 @@ def send(week, email, kind='brief'):
         at = now()
         if at.weekday() != 0 or at.date().isoformat() != week or at.hour < 12:
             raise ValueError('Production send allowed only on its Monday after noon')
+    return submit_message(week, email, kind)
+
+
+def submit_message(week, email, kind):
+    p = receipt(week, kind)
     BASE.mkdir(parents=True, exist_ok=True)
     with (BASE / '.send.lock').open('a+') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
@@ -210,6 +217,39 @@ def send(week, email, kind='brief'):
             raise RuntimeError('Delivery uncertain; receipt retained, do not resend') from None
         save(p, r)
         return {'state': r['state'], 'message_id': r['message_id'], 'receipt': str(p)}
+
+
+ALERT_REASONS = {
+    'quality_blocked': 'Independent review still found missing evidence or conflicting project actions after the allowed correction attempts.',
+    'worker_failed': 'The research or delivery worker stopped before the brief could be completed.',
+    'missed_start': 'The scheduled project brief did not start within 15 minutes of its Monday noon start time.',
+    'interrupted': 'The project brief stopped unexpectedly before completing its checks and delivery.',
+    'timeout': 'The project brief exceeded its three-hour processing limit.',
+    'delivery_failed': 'The email provider reported that delivery of the project brief failed.',
+    'delivery_pending': 'The project brief was submitted, but delivery has not been confirmed within 20 minutes.',
+    'delivery_uncertain': 'The send outcome is uncertain. The delivery receipt is retained and no automatic resend will be attempted.'
+}
+
+
+def alert(week, reason):
+    day = monday(week)
+    if not 0 <= (now().date() - day).days < 7:
+        raise ValueError('Alerts belong to the current reporting week')
+    if reason not in ALERT_REASONS:
+        raise ValueError('Unknown alert reason')
+    normal = receipt(week)
+    if normal.exists() and json.loads(normal.read_text()).get('state') == 'delivered':
+        return {'state': 'brief_already_delivered'}
+    text = ('The weekly project email needs attention.\n\nWeek commencing ' + week + '.\n\n' +
+            ALERT_REASONS[reason] + '\n\nThe normal project brief has not been confirmed delivered. '
+            'Research, review findings and delivery receipts have been retained. '
+            'No duplicate project email will be sent automatically.\n\n'
+            'Michael: ask the Hermes maintainer to inspect this week’s blocked project brief and resolve the recorded issue. '
+            'If a client decision or missing record is required, the recovery should ask only for that specific item.\n\n'
+            'This is a failure notice, not the project report.\n\nLily | Local Health Marketing')
+    email = {'week': week, 'subject': 'Action needed | Weekly web projects | ' + week,
+             'text': text, 'html': '<html><body>' + ''.join('<p>' + html.escape(p) + '</p>' for p in text.split('\n\n')) + '</body></html>'}
+    return submit_message(week, email, 'alert')
 
 
 def verify(week, kind='brief'):
@@ -237,9 +277,10 @@ def verify(week, kind='brief'):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=['gate', 'render', 'send', 'verify'])
+    parser.add_argument('action', choices=['gate', 'render', 'send', 'verify', 'alert'])
     parser.add_argument('--week')
-    parser.add_argument('--kind', choices=['brief', 'test'], default='brief')
+    parser.add_argument('--reason', choices=sorted(ALERT_REASONS))
+    parser.add_argument('--kind', choices=['brief', 'test', 'alert'], default='brief')
     parser.add_argument('--file')
     parser.add_argument('--out')
     parser.add_argument('--to-self', action='store_true', help='Michael-only explicitly authorised test')
@@ -260,6 +301,8 @@ def main():
         (out / 'preview.html').write_text(result['html'])
         (out / 'email.txt').write_text(result['text'])
         result = {'state': 'rendered', 'directory': str(out)}
+    elif args.action == 'alert':
+        result = alert(args.week, args.reason)
     elif args.action == 'send':
         from quality import validate
         validate(Path(args.file).parent)
