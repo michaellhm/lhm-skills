@@ -41,3 +41,6 @@ Check actual body content after every Gmail read. Nested multipart messages can 
 When a temporary per-minute Gmail limit interrupts research, pace and retry within runtime.md's bounded policy before stopping. A failed attempt remains in the audit trail; mark coverage complete only after the affected reads actually succeed. Do not abandon an otherwise healthy source after one recoverable minute-limit response.
 
 The delivery gate also requires completed, terminal Michael/Kristalyn/Aiya inbox-review.json coverage, retained in the evidence hash manifest. Independent review checks each selected weekly action is explicit in its owner section.
+
+
+Missing canonical records must trigger an evidence search across shared client aliases and known project paths. If the required record still cannot be found, retain an explicit material gap and let the controller issue the blocked-run notification. A summary limitation cannot substitute for that record. Move isolated live-site actions out of the project snapshot without removing them from owner lists. For dated baseline commitments, newer unrelated activity is not proof of completion or cancellation; preserve the commitment until evidence establishes its disposition.
