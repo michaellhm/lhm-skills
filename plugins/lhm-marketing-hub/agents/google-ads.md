@@ -60,6 +60,7 @@ Follow `${CLAUDE_PLUGIN_ROOT}/skills/google-ads-monthly-loop/SKILL.md`.
 | PMax banners/assets | `${CLAUDE_PLUGIN_ROOT}/skills/pmax-banner-generator/SKILL.md` |
 | PMax campaign setup | `${CLAUDE_PLUGIN_ROOT}/skills/pmax-campaign-setup/SKILL.md` |
 | PMax optimisation | `${CLAUDE_PLUGIN_ROOT}/skills/pmax-optimizer/SKILL.md` |
+| Implement approved changes from a BasicOps task / AdPulse Insights & Optimize sweep | `${CLAUDE_PLUGIN_ROOT}/skills/google-ads-implementation/SKILL.md` |
 
 ### Resume approved work or departmental pilot
 
