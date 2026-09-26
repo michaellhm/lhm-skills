@@ -70,6 +70,12 @@ CSS = """
   .mega .col{display:flex;flex-direction:column}
   .mega .grp{border-bottom:1px solid var(--line);margin-bottom:2px}
   .callbtn{background:var(--green);color:#fff;padding:9px 15px;border-radius:8px;font-weight:700;font-size:14px;white-space:nowrap;text-decoration:none}
+  .utility{display:flex;align-items:center;gap:14px;flex:0 0 auto}
+  .careers-link{font-size:12.5px;font-weight:600;color:var(--grey);text-decoration:none;white-space:nowrap;padding:6px 2px;border-bottom:1px solid transparent}
+  .careers-link:hover{color:var(--green-d);border-bottom-color:var(--green-d)}
+  .verbar{background:#F7F9F7;border-top:1px solid var(--line)}
+  .verbar-inner{max-width:1240px;margin:0 auto;padding:9px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .verbar-lab{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--grey);font-weight:700;white-space:nowrap}
   .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;display:inline-block;vertical-align:middle}
   .dot.new{background:var(--new)} .dot.enh{background:var(--enh)} .dot.have{background:var(--have)}
   .wrap{max-width:1240px;margin:0 auto;padding:26px 22px 60px}
@@ -86,6 +92,7 @@ CSS = """
   .sc .leadu{font-size:12px;color:#CFE3D4;margin-top:-4px}
   .sc .chain{font-size:12px;color:#DDEbe0;border-top:1px dashed rgba(255,255,255,.22);padding-top:7px;margin-top:2px}
   .sc .chain b{color:#fff}
+  .sc .real{font-size:11.5px;color:#CFE3D4;opacity:.9;line-height:1.4;border-top:1px dashed rgba(255,255,255,.22);padding-top:7px;margin-top:2px}
   .arrow{display:flex;align-items:center;justify-content:center;color:#9FC7AC;font-size:22px;font-weight:800}
   .controls{display:flex;flex-wrap:wrap;gap:16px 22px;align-items:flex-end;margin-top:16px;background:rgba(0,0,0,.16);border-radius:12px;padding:14px 16px}
   .ctrl{display:flex;flex-direction:column;gap:4px}
@@ -116,11 +123,28 @@ CSS = """
   .intro{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-bottom:22px}
   .intro h1{font-size:20px;color:var(--green-d);margin-bottom:5px;letter-spacing:-.01em}
   .intro p{color:var(--grey);font-size:14px;max-width:960px}
+  .convbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:22px}
+  .convbox h2{font-size:18px;color:var(--green-d);letter-spacing:-.01em;margin-bottom:3px}
+  .convbox .sub{color:var(--grey);font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:12px}
+  .convtotal{font-size:14.5px;color:var(--dark);margin-bottom:14px}
+  .convtotal b{font-size:28px;color:var(--green-d);margin-right:7px;font-weight:800}
+  .chchart{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+  .chrow{display:grid;grid-template-columns:190px 1fr 34px;align-items:center;gap:10px}
+  .chlab{font-size:12.5px;color:var(--dark)}
+  .chbarwrap{background:var(--bg);border-radius:6px;height:10px;overflow:hidden}
+  .chbar{background:var(--green);height:100%;border-radius:6px}
+  .chbar.weak{background:var(--new)}
+  .chcount{font-size:12.5px;font-weight:700;color:var(--green-d);text-align:right}
+  .convnote{font-size:13px;color:var(--grey);line-height:1.55;border-top:1px solid var(--line);padding-top:13px;margin-top:2px}
   .meta{margin-top:13px;display:flex;gap:24px;flex-wrap:wrap}
   .meta div{font-size:13px;color:var(--grey)}
   .meta b{display:block;font-size:21px;color:var(--green-d);font-weight:800;line-height:1.1}
   .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;padding-top:13px;border-top:1px solid var(--line);font-size:13px;color:var(--grey)}
   .legend span{display:inline-flex;align-items:center;gap:7px}
+  .vertoggle{display:inline-flex;gap:4px;margin-top:14px;padding:4px;background:#F0F3F0;border-radius:10px;width:fit-content}
+  .verbtn{border:none;background:transparent;padding:7px 14px;border-radius:7px;font-size:12.5px;font-weight:700;color:var(--grey);cursor:pointer;transition:background .15s,color .15s;font-family:inherit}
+  .verbtn.active{background:#fff;color:var(--green-d);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .verbtn:hover:not(.active){color:var(--green-d)}
   h2.sec{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin:26px 4px 12px;font-weight:800;display:flex;align-items:center;gap:10px}
   h2.sec:after{content:"";flex:1;height:1px;background:var(--line)}
   .cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
@@ -163,9 +187,13 @@ STATUS_CHANGE = {
 }
 
 def _link(i):
-    """A single dropdown link, with a red dot if the item is new."""
+    """A single dropdown link, with a red dot if the item is new. A "ver" tag
+    (e.g. "V1", "V2", "Phase 1") makes the link show/hide with the version toggle,
+    the same way a card does; an untagged link is never hidden."""
     dot = NEWDOT if i.get("new") else ""
-    return '<a href="#">' + esc(i["label"]) + dot + '</a>'
+    ver = i.get("ver")
+    ver_attr = f' data-ver="{esc(ver)}"' if ver else ""
+    return f'<a href="#"{ver_attr}>' + esc(i["label"]) + dot + '</a>'
 
 def nav_item(item):
     label = esc(item["label"])
@@ -186,12 +214,10 @@ def nav_item(item):
             for g in item["groups"]:
                 parts.append(f'<div class="grp">{esc(g["title"])}</div>')
                 for i in g["items"]:
-                    d = NEWDOT if i.get("new") else ""
-                    parts.append(f'<a href="#">{esc(i["label"])}{d}</a>')
+                    parts.append(_link(i))
         else:
             for i in item["items"]:
-                d = NEWDOT if i.get("new") else ""
-                parts.append(f'<a href="#">{esc(i["label"])}{d}</a>')
+                parts.append(_link(i))
         dd = f'<div class="dropdown">{"".join(parts)}</div>'
         return f'<li><a href="#">{label}{newdot} <span class="caret">▾</span></a>{dd}</li>'
     # plain link
@@ -308,10 +334,21 @@ def page_li(p, changes=None):
             f'<span class="t">{name} {slug}</span>'
             f'{volhtml}{chg}<span class="tag {cls}">{word}</span></li>')
 
+VER_RE = re.compile(r'^(V\d+|Phase\s*\d+)\b', re.I)
+
+def card_ver_tag(head):
+    """Pull a roadmap version/phase tag off a card head, e.g. 'V1 — restructure now' ->
+    'V1', 'Phase 2 — expand after Phase 1' -> 'Phase 2'. Returns None for a plain head
+    like 'Home & key pages', which is never hidden by the version toggle."""
+    m = VER_RE.match((head or "").strip())
+    return re.sub(r'\s+', ' ', m.group(1).strip()) if m else None
+
 def card_html(c, changes=None):
     head_u = f' <span class="u">{esc(c["url"])}</span>' if c.get("url") else ""
     items = "".join(page_li(p, changes) for p in c["items"])
-    return f'<div class="card"><div class="head">{esc(c["head"])}{head_u}</div><ul>{items}</ul></div>'
+    ver = card_ver_tag(c.get("head", ""))
+    ver_attr = f' data-ver="{esc(ver)}"' if ver else ""
+    return f'<div class="card"{ver_attr}><div class="head">{esc(c["head"])}{head_u}</div><ul>{items}</ul></div>'
 
 def section_html(s, changes=None):
     pill = f' <span class="pill">{esc(s["pill"])}</span>' if s.get("pill") else ""
@@ -329,8 +366,9 @@ def opportunity_html(o):
       <div class="sc">
         <div class="lab">Today · current structure</div>
         <div class="leads" id="leadsNow">0</div>
-        <div class="leadu">leads / month · <span id="leadsNowYr">0/yr</span></div>
+        <div class="leadu">{'leads / month, actual' if o.get('now_leads_real') is not None else 'leads / month'} · <span id="leadsNowYr">0/yr</span></div>
         <div class="chain"><b id="impNowT">0</b> searches → <b id="clkNow">0</b> clicks → <b id="leadsNow2">0</b> leads</div>
+        {f'<div class="real">{o["now_note"]}</div>' if o.get('now_note') else ''}
       </div>
       <div class="arrow">→</div>
       <div class="sc win">
@@ -365,16 +403,19 @@ def opportunity_html(o):
 
 def opportunity_js(o):
     """Calculator for the widget. Only emitted when an opportunity block exists."""
+    real_leads = o.get('now_leads_real')
+    real_leads_const = f"const REAL_LEADS_NOW = {float(real_leads)};" if real_leads is not None else ""
     return f"""<script>
   const $ = id => document.getElementById(id);
   const fmt = n => Math.round(n).toLocaleString();
   const leadFmt = n => (n >= 20 ? Math.round(n).toLocaleString() : n.toFixed(1));
   const STEP = {float(o.get('seo_step_pct',10))/100};
+  {real_leads_const}
   function calc(){{
     const impNow=+$('impNow').value||0, impNew=+$('impNew').value||0;
     const ctr=(+$('ctr').value||0)/100, conv=(+$('conv').value||0)/100;
     const steps=+$('seo').value||0, boost=1+STEP*steps;
-    const ldNow=impNow*ctr*conv, clkNow=impNow*ctr;
+    const ldNow=(typeof REAL_LEADS_NOW!=='undefined') ? REAL_LEADS_NOW : impNow*ctr*conv, clkNow=impNow*ctr;
     const ldNew=impNew*ctr*conv, clkNew=impNew*ctr;
     const impSeo=impNew*boost, convSeo=conv*boost, clkSeo=impSeo*ctr, ldSeo=clkSeo*convSeo;
     $('impNowT').textContent=fmt(impNow);$('clkNow').textContent=fmt(clkNow);
@@ -388,6 +429,31 @@ def opportunity_js(o):
   ['impNow','impNew','ctr','conv','seo'].forEach(id=>$(id).addEventListener('input',calc));
   calc();
 </script>"""
+
+def conversion_reality_html(cr):
+    """Evidence box: real conversions in the period and which channel brought each
+    one, so the opportunity widget above isn't the only figure resting on a model.
+    Prospect mode only, and optional even then (only rendered when the spec has it)."""
+    if not cr:
+        return ""
+    channels = cr.get("channels", [])
+    maxc = max((c.get("count", 0) for c in channels), default=1) or 1
+    rows = "".join(
+        f'<div class="chrow"><div class="chlab">{esc(c["label"])}</div>'
+        f'<div class="chbarwrap"><div class="chbar{" weak" if c.get("weak") else ""}" '
+        f'style="width:{max(4, round(c.get("count",0)/maxc*100))}%"></div></div>'
+        f'<div class="chcount">{c.get("count",0)}</div></div>'
+        for c in channels
+    )
+    return f"""
+  <section class="convbox">
+    <h2>{esc(cr.get('title',"What's already converting"))}</h2>
+    <div class="sub">{esc(cr.get('period_label',''))}</div>
+    <div class="convtotal"><b>{esc(str(cr.get('total','')))}</b> {cr.get('total_label','')}</div>
+    <div class="chchart">{rows}</div>
+    <div class="convnote">{cr.get('note','')}</div>
+  </section>
+"""
 
 def build(spec, prev=None):
     b = spec["brand"]
@@ -406,6 +472,7 @@ def build(spec, prev=None):
     opp_section = opportunity_html(o) if o else ""
     opp_script = opportunity_js(o) if o else ""
     title_suffix = " &amp; Opportunity" if o else ""
+    conv_section = conversion_reality_html(spec.get("conversion_reality"))
 
     # Progress band and per-page change chips, when a previous spec was supplied.
     changes, delta_section, summary = None, "", None
@@ -422,6 +489,50 @@ def build(spec, prev=None):
     intro = spec.get("intro", {})
     footer = spec.get("footer", "")
 
+    # Version/phase toggle: only rendered when at least two distinct tags (e.g. V1/V2,
+    # Phase 1/2/3) are found across the spec's cards or nav links. An untagged element
+    # (a plain card like "Home & key pages", an existing nav link) is never hidden by it.
+    ver_tags = []
+    for s in spec["sections"]:
+        for c in s.get("cards", []):
+            t = card_ver_tag(c.get("head", ""))
+            if t and t not in ver_tags:
+                ver_tags.append(t)
+    for i in spec.get("nav", []):
+        groups = i.get("groups") or ([{"items": i["items"]}] if i.get("items") else [])
+        for g in groups:
+            for it in g.get("items", []):
+                t = it.get("ver")
+                if t and t not in ver_tags:
+                    ver_tags.append(t)
+    verbar, ver_script = "", ""
+    if len(ver_tags) >= 2:
+        btns = '<button type="button" class="verbtn active" data-ver="__all__" onclick="setVer(this)">Both versions</button>' + \
+               "".join(f'<button type="button" class="verbtn" data-ver="{esc(t)}" onclick="setVer(this)">{esc(t)}</button>'
+                       for t in ver_tags)
+        verbar = (f'<div class="verbar"><div class="verbar-inner">'
+                  f'<span class="verbar-lab">Viewing</span>'
+                  f'<div class="vertoggle" role="tablist" aria-label="Sitemap version">{btns}</div>'
+                  f'</div></div>')
+        # A single data-ver attribute, on a card or a nav <a>, drives both: this
+        # toggle doubles as a live preview of how the top navigation itself grows
+        # between versions, not just the page tree below it.
+        ver_script = """
+<script>
+  function setVer(btn){
+    document.querySelectorAll('.verbtn').forEach(function(b){b.classList.toggle('active', b===btn)});
+    var chosen = btn.dataset.ver;
+    document.querySelectorAll('[data-ver]').forEach(function(el){
+      if(el.classList.contains('verbtn')){return;}
+      el.style.display = (chosen==='__all__' || el.dataset.ver===chosen) ? '' : 'none';
+    });
+  }
+</script>"""
+
+    careers_link = ('<div class="utility"><a class="careers-link" href="#" '
+                     'title="Candidate-facing content stays off the primary buyer nav, '
+                     'linked here instead">Careers ↗</a>' + phone + '</div>')
+
     doc = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -435,11 +546,12 @@ def build(spec, prev=None):
   <div class="bar">
     <div class="logo">{logo}</div>
     <nav class="top"><ul>{nav}</ul></nav>
-    {phone}
+    {careers_link}
   </div>
+  {verbar}
 </header>
 <div class="wrap">
-{opp_section}{delta_section}
+{opp_section}{conv_section}{delta_section}
   <section class="intro">
     <h1>{esc(intro.get('title','Proposed website sitemap'))}</h1>
     <p>{intro.get('paragraph','')}</p>
@@ -457,6 +569,7 @@ def build(spec, prev=None):
 </div>
 <footer>{footer}</footer>
 {opp_script}
+{ver_script}
 </body>
 </html>
 """

@@ -14,6 +14,12 @@ For client-specific work, first read [Client knowledge and working-file routing]
 
 Generate AHPRA-compliant responsive search ads (RSAs) for Australian healthcare clients. Create 15 headlines and 4 descriptions with built-in compliance checking to ensure your ads meet regulatory requirements before publishing.
 
+## Mandatory Google Ads Copy Rule: No Phone Numbers
+
+Never include a phone number in any Google Ads headline or description. This applies to new copy, refreshed copy, model-generated candidates and final exports for every client. Phone numbers belong in Google Ads call assets, not headline or description text.
+
+Before delivering copy, inspect every headline and description for phone numbers, including numbers with spaces, brackets, hyphens or country codes. Replace any number-bearing line with a relevant service message or a CTA such as "Call Our Team". A CTA inviting a call is allowed; including the phone number is not.
+
 ## When to Use
 
 - **New campaigns** - Creating ads for a new ad group
@@ -69,11 +75,11 @@ Generate 10 headlines and 4 descriptions. Anchor to:
 Use OpenRouter MCP `send-message` with model `openai/gpt-4o`.
 
 Prompt:
-"You are a Google Ads copywriter. Generate 10 RSA headlines and 4 descriptions for the following brief. Deliberately choose different creative angles than you would typically default to — avoid generic benefit statements, focus on specificity, urgency, differentiation, and curiosity. Do NOT use em dashes. Keep headlines under 30 characters, descriptions under 90 characters. Brief: [brief]. [If health client: These ads are for a healthcare business in Australia — do not include testimonials, guaranteed outcomes, before/after claims, or comparative claims.]"
+"You are a Google Ads copywriter. Generate 10 RSA headlines and 4 descriptions for the following brief. Deliberately choose different creative angles than you would typically default to — avoid generic benefit statements, focus on specificity, urgency, differentiation, and curiosity. Do NOT use em dashes. Never include phone numbers in headlines or descriptions; phone numbers belong in call assets. Keep headlines under 30 characters, descriptions under 90 characters. Brief: [brief]. [If health client: These ads are for a healthcare business in Australia — do not include testimonials, guaranteed outcomes, before/after claims, or comparative claims.]"
 
 ### Pass 3 — Claude curates
 From the combined pool of 20 headlines and 8 descriptions:
-1. Remove any that exceed character limits
+1. Remove any that exceed character limits or contain phone numbers
 2. Remove AHPRA violations (health clients only) — flag them to the user as removed and why
 3. Remove obvious duplicates (same idea, different words)
 4. Select the strongest 15 headlines and 4 descriptions based on: specificity, differentiation, relevance to search intent, likely CTR
@@ -282,6 +288,7 @@ Generic,Sports Physio,Sports Physio Gold Coast,15 Years Sports Physio Exp,Univer
 ```
 
 Rules:
+- Never include phone numbers in any headline or description cell. Use call assets for phone numbers.
 - **Descriptions in Title Case** (every major word capitalised).
 - No "AHPRA registered", "specialist", "specialise", or "expert" anywhere in the file.
 - Leave a headline/description cell blank only if you genuinely have fewer than 15/4 — aim for the full set.

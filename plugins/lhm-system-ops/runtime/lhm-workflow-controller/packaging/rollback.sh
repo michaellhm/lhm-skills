@@ -20,6 +20,8 @@ if test -n "$target_release"; then
   ln -sfn "releases/$target_release" /opt/lhm-workflow/current.rollback
   mv -Tf /opt/lhm-workflow/current.rollback /opt/lhm-workflow/current
   printf '%s\n' "$target_release" > "$backup/restored-release"
+  systemctl daemon-reload
+  systemctl enable --now lhm-workflow-bridge.path lhm-workflow-adapter.path lhm-workflow-stage.path lhm-workflow-verifier.path lhm-workflow-verification.path lhm-scheduled-work.path
   exit 0
 fi
 for f in /etc/systemd/system/lhm-workflow-*.service /etc/systemd/system/lhm-workflow-*.path; do

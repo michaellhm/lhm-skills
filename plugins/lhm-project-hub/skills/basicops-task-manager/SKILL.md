@@ -132,6 +132,9 @@ Write directly to the assignee and keep it concise enough to scan. Include, to t
 6. End with the next handoff: who should receive it or what happens when it is complete.
 7. Add a labelled `Next handoff` sentence naming the trigger, next person, next action and channel
    whenever another action follows completion, review, blocking or waiting.
+8. When AI created or materially rewrote the task request, append the exact final one-line footer:
+   `AI authorship: This task was written by <AI name>.` Use the verified AI identity and never
+   attribute AI-written text to a human.
 
 Example:
 
@@ -265,13 +268,16 @@ Use a stable key shaped like `basicops:<client-slug>:<workstream>:<outcome>`. Ke
 ## Create or mutate safely
 
 1. Use BasicOps `get_current_user` before displaying dates or times.
-2. Resolve the exact project, parent/section and assignee through BasicOps. Do not guess IDs except governed fixed routes.
-3. Before creating, search the intended destination and parent for both the stable key when available and a materially equivalent open title.
-4. If an equivalent task exists, return its URL instead of creating a duplicate.
-5. Perform only the approved mutation.
-6. For a new task, write only the approved LHM metadata line and useful working URLs in Description. Put the complete human task explanation in the approved discussion message—always.
-7. Read the task back and verify title, project, parent/section, assignee, due date, metadata, URL description and discussion as applicable.
-8. Return the verified BasicOps URL. If any field differs, report the mismatch and do not claim success.
+2. Before sending a DM, task message or project message in Lily's name, confirm the authenticated
+   BasicOps user is Lily (`user_id=82484`). If not, stop the send and report the identity mismatch;
+   never imitate Lily in copy posted from Michael's or another human's account.
+3. Resolve the exact project, parent/section and assignee through BasicOps. Do not guess IDs except governed fixed routes.
+4. Before creating, search the intended destination and parent for both the stable key when available and a materially equivalent open title.
+5. If an equivalent task exists, return its URL instead of creating a duplicate.
+6. Perform only the approved mutation.
+7. For a new task, write only the approved LHM metadata line and useful working URLs in Description. Put the complete human task explanation in the approved discussion message—always.
+8. Read the task back and verify title, project, parent/section, assignee, due date, metadata, URL description and discussion as applicable. For AI-authored task requests, also verify the footer and named AI identity.
+9. Return the verified BasicOps URL. If any field differs, report the mismatch and do not claim success.
 
 For completion, ready-for-review, blocked or waiting transitions, never stop at the status change.
 Prepare the downstream comment/draft, obtain the relevant approval, verify who was notified and
