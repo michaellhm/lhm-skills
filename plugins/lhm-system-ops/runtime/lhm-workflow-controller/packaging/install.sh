@@ -8,6 +8,10 @@ enable_units=${LHM_WORKFLOW_ENABLE:-0}
 case "$release_id" in (*[!0-9a-f]*|'') echo "LHM_WORKFLOW_RELEASE_ID must be a full lowercase SHA-256" >&2; exit 2;; esac
 test "${#release_id}" -eq 64 || { echo "release id must be 64 hex characters" >&2; exit 2; }
 test "$enable_units" = 0 || test "$enable_units" = 1
+computed_release_id=$("$python_bin" "$repo_dir/packaging/source-tree-digest.py" "$repo_dir")
+test "$computed_release_id" = "$release_id" || { echo "release id does not bind the exact controller source tree" >&2; exit 2; }
+manifest_release_id=$("$python_bin" -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8"))["source_tree_sha256_excluding_manifest"])' "$repo_dir/release-manifest.json")
+test "$manifest_release_id" = "$release_id" || { echo "release manifest digest mismatch" >&2; exit 2; }
 "$python_bin" -c 'import sys; assert sys.version_info >= (3,11), sys.version'
 
 check_group() {
@@ -73,6 +77,7 @@ install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/scheduled-intake
 install -d -o root -g root -m 0755 /etc/lhm-workflow
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/departmental-parents
+install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/delegated-parents
 install -d -o lhmworkflow -g lhmworkflow -m 0750 /var/lib/lhm-workflow/artifacts /var/lib/lhm-workflow/seo-envelope /var/lib/lhm-workflow/seo-failures
 install -d -o root -g root -m 0750 /var/lib/lhm-workflow/department-observations
 for d in parents wal locks receipts operations processed quarantine audit verifier-requests; do install -d -o lhmworkflow -g lhmworkflow -m 0750 "/var/lib/lhm-workflow/$d"; done
@@ -105,10 +110,19 @@ test -f /var/lib/lhm-workflow/secrets/verifier.key || head -c 32 /dev/urandom > 
 test -f /var/lib/lhm-workflow/secrets/approval.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/approval.key
 test -f /var/lib/lhm-workflow/secrets/head-production.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/head-production.key
 test -f /var/lib/lhm-workflow/secrets/production.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/production.key
+test -f /var/lib/lhm-workflow/secrets/project-manager.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/project-manager.key
+test -f /var/lib/lhm-workflow/secrets/human-approval.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/human-approval.key
+test -f /var/lib/lhm-workflow/secrets/chief-of-staff.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/chief-of-staff.key
+test -f /var/lib/lhm-workflow/secrets/basicops.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/basicops.key
+test -f /var/lib/lhm-workflow/secrets/learning-steward.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/learning-steward.key
+test -f /var/lib/lhm-workflow/secrets/cto.key || head -c 32 /dev/urandom > /var/lib/lhm-workflow/secrets/cto.key
 chown root:lhmadapterkey /var/lib/lhm-workflow/secrets/adapter.key; chown root:lhmverifierkey /var/lib/lhm-workflow/secrets/verifier.key
 chmod 0640 /var/lib/lhm-workflow/secrets/adapter.key /var/lib/lhm-workflow/secrets/verifier.key
 chown root:lhmworkflow /var/lib/lhm-workflow/secrets/approval.key /var/lib/lhm-workflow/secrets/head-production.key /var/lib/lhm-workflow/secrets/production.key
 chmod 0640 /var/lib/lhm-workflow/secrets/approval.key /var/lib/lhm-workflow/secrets/head-production.key /var/lib/lhm-workflow/secrets/production.key
+chown root:lhmworkflow /var/lib/lhm-workflow/secrets/project-manager.key /var/lib/lhm-workflow/secrets/human-approval.key /var/lib/lhm-workflow/secrets/chief-of-staff.key /var/lib/lhm-workflow/secrets/basicops.key /var/lib/lhm-workflow/secrets/learning-steward.key
+chmod 0640 /var/lib/lhm-workflow/secrets/project-manager.key /var/lib/lhm-workflow/secrets/human-approval.key /var/lib/lhm-workflow/secrets/chief-of-staff.key /var/lib/lhm-workflow/secrets/basicops.key /var/lib/lhm-workflow/secrets/learning-steward.key
+chown root:lhmworkflow /var/lib/lhm-workflow/secrets/cto.key; chmod 0640 /var/lib/lhm-workflow/secrets/cto.key
 test -f /var/lib/lhm-workflow/secrets/projection.private.pem || openssl genpkey -algorithm ED25519 -out /var/lib/lhm-workflow/secrets/projection.private.pem
 test -f /var/lib/lhm-workflow/secrets/hop.private.pem || openssl genpkey -algorithm ED25519 -out /var/lib/lhm-workflow/secrets/hop.private.pem
 test -f /var/lib/lhm-workflow/secrets/controller-dispatch.private.pem || openssl genpkey -algorithm ED25519 -out /var/lib/lhm-workflow/secrets/controller-dispatch.private.pem

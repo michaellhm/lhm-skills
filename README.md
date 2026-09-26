@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-188 skills across eleven Claude Code plugins (61 marketing, 41 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 29 project hub, 5 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+193 skills across twelve Claude Code plugins (5 inbox, 61 marketing, 41 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 29 project hub, 5 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -185,6 +185,19 @@ plugins/lhm-client-updates-hub/       # (deprecated — skills migrated to lhm-p
     post-meeting-review/                # Post-meeting follow-up triage — state files, BasicOps subtasks, agent routing, team email (shim → lhm-project-hub)
     client-update/                      # Propagate a client data change across all client files
     client-update-email/                # Plain-language client-facing update emails
+plugins/lhm-inbox-hub/                # Michael's inbox system — triage, voice drafts, timed sessions, tidy, corrections loop (drafts only, never sends)
+  .claude-plugin/plugin.json            # Plugin manifest
+  agents/inbox.md                       # Entry point — four-line state summary, routes to a skill
+  commands/start-email.md               # /lhm-inbox-hub:start-email
+  references/                           # voice-profile, routing, labels, brief-format, safety-rules
+  chatgpt/                              # Project instructions + scheduled task prompts for the ChatGPT mirror
+  skills/                               # All 5 skills
+    inbox-triage/                       # Morning pre-work: classify, label, BasicOps tasks, Gmail drafts, weekly-task walk, the brief
+    email-drafts/                       # One Michael-voice draft from the evidence-based voice profile
+    email-session/                      # Timed session through the brief's Reply-today list
+    inbox-tidy/                         # Inventory stale working-state labels, apply approved Done/archive
+    email-learn/                        # Diff drafts vs sent mail, log corrections, propose voice/routing rules
+
 plugins/lhm-project-hub/              # Agency process hub — sales handover through monthly/quarterly reviews
   .claude-plugin/plugin.json            # Plugin manifest
   agents/pm-orchestrator.md             # Main entry point — status, SOP discovery and governed multi-skill coordination
@@ -289,6 +302,8 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 **Session Capture** (1 skill): Scan conversation context for skill learnings and client profile updates, write to the correct LEARNED.md and client_profile.md files.
 
 ### Client Updates Hub (deprecated — moved to Project Hub)
+
+**Inbox Hub** (5 skills): `inbox-triage` — morning brief with labels, tasks and drafts; `email-drafts` — Michael-voice Gmail draft; `email-session` — timed reply session; `inbox-tidy` — stale label cleanup with approval; `email-learn` — corrections loop that proposes voice and routing updates. Entry: `/lhm-inbox-hub:start-email`.
 
 **Client Communication** (3 skills, shims only): All three skills now live in `lhm-project-hub`; the entries here route straight there. See the Project Hub catalog below for current descriptions. Kept in place so existing muscle memory and any external references to `lhm-client-updates-hub:*` keep working.
 

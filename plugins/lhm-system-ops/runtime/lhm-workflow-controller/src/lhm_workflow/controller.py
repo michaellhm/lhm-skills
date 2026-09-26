@@ -15,6 +15,13 @@ from .departmental_state import (DepartmentalStateStore, new_departmental_state,
     issue_next_action, record_candidate, record_qa_acceptance,
     record_lead_acceptance, record_projection, revise_action_inputs)
 from .departmental_state import validate_approval, accept_completion_dossier, record_approval_event
+from .delegated_task import (
+    DelegatedTaskStore, capability_restored, chief_complete, chief_start, correction_fixed, delivery_decision,
+    heartbeat as delegated_heartbeat, new_state as new_delegated_state,
+    plan_decision, post_plan, record_projection as record_delegated_projection,
+    review_ready, steward_disposition,
+)
+from .barney_monitor import evaluate as evaluate_barney
 
 
 class ControllerError(ValueError):
@@ -41,6 +48,7 @@ class WorkflowController:
         self.adapter_root = self.root.parent / "adapter" if test_mode else self.root / "adapter-incoming"
         self.worker_root = self.adapter_root / "artifacts"
         self.departmental = DepartmentalStateStore(self.root / "departmental-parents")
+        self.delegated = DelegatedTaskStore(self.root / "delegated-parents")
         self.verifier_root = self.root.parent / "verifier" if test_mode else self.root / "verifier-results"
         self.expected_adapter_uid = os.getuid() if test_mode else 10005
         self.expected_worker_uid = self.expected_adapter_uid
@@ -49,7 +57,7 @@ class WorkflowController:
                      self.failure_receipts, self.repair_queue, self.diagnostic_queue):
             path.mkdir(parents=True, exist_ok=True, mode=0o750)
         if test_mode:
-            for name in ("adapter.key", "verifier.key", "production.key", "department-lead.key", "projection.key", "approval.key", "head-production.key"):
+            for name in ("adapter.key", "verifier.key", "production.key", "department-lead.key", "projection.key", "approval.key", "head-production.key", "project-manager.key", "human-approval.key", "chief-of-staff.key", "basicops.key", "learning-steward.key", "cto.key"):
                 key_path = self.secrets / name
                 if not key_path.exists():
                     key_path.write_bytes(os.urandom(32))
@@ -362,6 +370,63 @@ class WorkflowController:
         else: raise ControllerError("invalid departmental operation")
         persisted = self.departmental.checkpoint(updated, expected_generation=generation)
         return {"state": persisted, "contract": contract} if operation == "issue" else persisted
+
+    def delegated_init(self, value: dict) -> dict:
+        state = new_delegated_state(**value)
+        return self.delegated.checkpoint(state, expected_generation=None)
+
+    def delegated_transition(self, parent_id: str, operation: str, payload: dict) -> dict:
+        """Apply one CAS-protected delegated-task event or verified BasicOps projection."""
+        current = self.delegated.load(self._safe_name(parent_id))
+        generation = current["generation"]
+        keys = {
+            "post-plan": "project-manager.key",
+            "plan-decision": "human-approval.key",
+            "chief-start": "chief-of-staff.key",
+            "review-ready": "chief-of-staff.key",
+            "delivery-decision": "human-approval.key",
+            "chief-complete": "chief-of-staff.key",
+            "heartbeat": "chief-of-staff.key",
+            "project": "basicops.key",
+            "steward-disposition": "learning-steward.key",
+            "correction-fixed": "chief-of-staff.key",
+            "capability-restored": "cto.key",
+        }
+        def role_key(operation_name: str):
+            if not self.storage.config.test_mode and operation_name in {"plan-decision", "delivery-decision", "project"}:
+                return self.root / "public" / "adapter.public.pem"
+            return (self.secrets / keys[operation_name]).read_bytes()
+        if operation == "post-plan":
+            updated = post_plan(current, payload, (self.secrets / keys[operation]).read_bytes())
+        elif operation == "plan-decision":
+            updated = plan_decision(current, payload, role_key(operation))
+        elif operation == "chief-start":
+            updated = chief_start(current, payload, (self.secrets / keys[operation]).read_bytes())
+        elif operation == "review-ready":
+            updated = review_ready(current, payload, (self.secrets / keys[operation]).read_bytes())
+        elif operation == "delivery-decision":
+            updated = delivery_decision(current, payload, role_key(operation))
+        elif operation == "chief-complete":
+            updated = chief_complete(current, payload, (self.secrets / keys[operation]).read_bytes())
+        elif operation == "heartbeat":
+            updated = delegated_heartbeat(current, payload, (self.secrets / keys[operation]).read_bytes())
+        elif operation == "project":
+            updated = record_delegated_projection(current, payload, role_key(operation))
+        elif operation == "steward-disposition":
+            updated = steward_disposition(current, payload, (self.secrets / keys[operation]).read_bytes())
+        elif operation == "correction-fixed":
+            updated = correction_fixed(current, payload, (self.secrets / keys[operation]).read_bytes())
+        elif operation == "capability-restored":
+            updated = capability_restored(current, payload, (self.secrets / keys[operation]).read_bytes())
+        elif operation == "monitor":
+            updated, actions = evaluate_barney(current, now=payload.get("now"), approaching_minutes=payload.get("approaching_minutes", 60))
+            if updated == current:
+                return {"state": current, "actions": actions}
+            persisted = self.delegated.checkpoint(updated, expected_generation=generation)
+            return {"state": persisted, "actions": actions}
+        else:
+            raise ControllerError("invalid delegated operation")
+        return self.delegated.checkpoint(updated, expected_generation=generation)
 
     def record_failure(self, failure: dict) -> dict:
         """Record a controller-owned failure decision; workers cannot resume themselves."""

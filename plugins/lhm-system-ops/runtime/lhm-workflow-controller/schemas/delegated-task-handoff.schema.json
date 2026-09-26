@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://localhealthmarketing.com.au/schemas/delegated-task-handoff.schema.json",
+  "title": "Delegated Hermes task handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "state", "outcome_owner", "next_action_owner", "review_type", "completed",
+    "evidence", "remaining", "next_action", "resume_trigger", "completion_condition",
+    "calls_made", "decision_required", "notification_receipt"
+  ],
+  "properties": {
+    "state": {"type": "string", "minLength": 1},
+    "outcome_owner": {"const": "chief_of_staff"},
+    "next_action_owner": {"type": "string", "minLength": 1},
+    "review_type": {"enum": ["none", "plan_approval", "delivery_review"]},
+    "completed": {"type": "array"},
+    "evidence": {"type": "array"},
+    "remaining": {"type": "array"},
+    "next_action": {"type": "string", "minLength": 1},
+    "resume_trigger": {"type": "string", "minLength": 1},
+    "completion_condition": {"type": "string", "minLength": 1},
+    "calls_made": {"type": "array", "items": {"type": "object"}},
+    "decision_required": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["question", "reason", "consequence", "authority_required"],
+        "properties": {
+          "question": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1},
+          "consequence": {"type": "string", "minLength": 1},
+          "authority_required": {"enum": ["consequential", "material_judgment", "protected_access", "conflict"]}
+        }
+      }
+    },
+    "notification_receipt": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["channel", "message_id", "verified_at"],
+          "properties": {
+            "channel": {"type": "string", "minLength": 1},
+            "message_id": {"type": "string", "minLength": 1},
+            "verified_at": {"type": "string", "format": "date-time"}
+          }
+        }
+      ]
+    }
+  }
+}

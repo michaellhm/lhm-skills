@@ -57,6 +57,8 @@ Use the Keywords Everywhere MCP (`get_keyword_data`, `get_related_keywords`) for
 
 For a cold prospect you will not have Search Console access. Treat the figures as **demand, not rankings**, and say so on the page. If this is a warm prospect who has granted GSC access, layer in current rankings to sharpen priorities.
 
+If the `gscServer` MCP tool returns a 403 on a domain property despite the client having real Search Console UI access, ask them to export `Queries.csv` and `Pages.csv` from the Performance report and analyse those instead of blocking on API access.
+
 ## Step 4: Design the architecture
 
 Read `references/methodology.md` and apply it: un-bundle services into one page each, add audience and funding pillars, build location pages in tiers, and fold the blog into clusters that feed the money pages.
@@ -91,6 +93,7 @@ Do not report this as complete until you have checked all four:
 - The artefact is saved to the canonical destination and read back, per the delivery contract.
 
 ---
+- If delivering to a client's Drive-synced device with `device_commit_files`: `stagedPath` must sit under `/mnt/user-data/outputs/` (copy the file there via Bash first), and a "written" response can be false — re-stage and verify size/hash after committing, retrying if it still shows the old size.
 
 ## What each generator does
 

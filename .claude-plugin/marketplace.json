@@ -5,9 +5,24 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "2.2.27"
+    "version": "2.2.28"
   },
   "plugins": [
+    {
+      "name": "lhm-inbox-hub",
+      "source": "./plugins/lhm-inbox-hub",
+      "description": "Michael's inbox system - morning triage into a brief, voice-matched Gmail drafts, timed email sessions, label tidy-up, and a corrections loop that learns from sent mail. Drafts only, never sends.",
+      "version": "0.1.0",
+      "category": "operations",
+      "tags": [
+        "email",
+        "gmail",
+        "triage",
+        "drafts",
+        "basicops",
+        "obsidian"
+      ]
+    },
     {
       "name": "lhm-wordpress-hub",
       "source": "./plugins/lhm-wordpress-hub",
@@ -82,7 +97,7 @@
       "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
       "description": "General marketing orchestration plus direct Google Ads, SEO, Content, and WordPress specialists with governed delegation and shared client context.",
-      "version": "2.2.27",
+      "version": "2.2.28",
       "category": "utilities",
       "tags": [
         "marketing",
@@ -96,7 +111,7 @@
     {
       "name": "lhm-client-updates-hub",
       "source": "./plugins/lhm-client-updates-hub",
-      "description": "DEPRECATED \u2014 skills have moved to lhm-project-hub. Shims remain for compatibility. Client communication and meeting-wrap plugin. Fathom meeting debriefs with BasicOps sync and team notifications, client data change propagation with reversed-decision detection, and client-facing update emails.",
+      "description": "DEPRECATED — skills have moved to lhm-project-hub. Shims remain for compatibility. Client communication and meeting-wrap plugin. Fathom meeting debriefs with BasicOps sync and team notifications, client data change propagation with reversed-decision detection, and client-facing update emails.",
       "version": "1.1.20",
       "category": "utilities",
       "tags": [
@@ -138,8 +153,8 @@
     {
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
-      "description": "LHM project management hub \u2014 sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
-      "version": "0.1.107",
+      "description": "LHM project management hub — sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
+      "version": "0.1.108",
       "category": "utilities",
       "tags": [
         "project-management",
@@ -156,7 +171,7 @@
       "name": "lhm-system-ops",
       "source": "./plugins/lhm-system-ops",
       "description": "Governed CTO operations and exact-ID evidence-to-production bridge.",
-      "version": "0.9.100",
+      "version": "0.9.101",
       "category": "utilities",
       "tags": [
         "cto",
