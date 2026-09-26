@@ -1,0 +1,9 @@
+{
+  "name": "lhm-inbox-hub",
+  "version": "0.1.0",
+  "description": "Michael's inbox system: morning triage into a brief, voice-matched draft replies, a timed email session, periodic label tidy-up, and a corrections loop that learns from what actually got sent. Drafts only, never sends.",
+  "author": {
+    "name": "Local Health Marketing"
+  },
+  "keywords": ["email", "gmail", "triage", "drafts", "basicops", "obsidian"]
+}
