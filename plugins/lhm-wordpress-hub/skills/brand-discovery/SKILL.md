@@ -2,6 +2,10 @@
 name: brand-discovery
 description: "Extract or define brand guidelines — colors, typography, tone of voice, imagery direction. Use this when the user says 'brand guidelines', 'define the brand', 'brand discovery', 'color palette', 'brand identity', 'typography choices', 'visual identity', or 'brand direction'. Phase 4 of the website build. Can also be run standalone."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Brand Discovery
 

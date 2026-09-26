@@ -2,6 +2,10 @@
 name: service-page-generator
 description: "Generate SEO-optimized service or condition pages for healthcare and service-based businesses. Use this skill when the user mentions 'condition page', 'service page', 'write a service page', 'create a condition page', 'new page for [condition/service]', 'build out a page for [topic]', or wants to create a dedicated website page for a specific service, treatment, or condition. Also trigger when the user provides a client brief and page layout template and wants a full page written. This skill handles the full pipeline: keyword research, page copywriting, anti-AI refinement, citation sourcing, schema markup, and companion blog post recommendations."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Service Page Generator
 

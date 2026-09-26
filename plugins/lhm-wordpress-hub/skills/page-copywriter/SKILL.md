@@ -2,6 +2,10 @@
 name: page-copywriter
 description: "Write page content from a page brief. Produces complete page copy with YAML frontmatter, SEO metadata, section-by-section content, and component declarations. Use this when the user says 'write page content', 'write the copy', 'write homepage', 'content from brief', 'fill in the content', or 'write [page name] page'. Phase 3 of the website build. Requires page briefs from Phase 2."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Page Copywriter
 

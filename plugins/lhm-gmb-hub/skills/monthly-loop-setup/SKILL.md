@@ -2,8 +2,18 @@
 name: monthly-loop-setup
 description: "Set up (or update) a recurring automated monthly GMB optimisation run for a client — a scheduled task that works the client's project-management/gmb.md checklist, stages any site changes on a branch, creates a BasicOps follow-up task, and notifies the team via Telegram and email. Use this when the user says 'set up the monthly GMB loop for [Client]', 'automate the GMB cycle for [Client]', 'turn on the monthly loop', 'create a scheduled GMB run', or wants to repurpose an existing client's loop for a new client."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Monthly Loop Setup
+
+## Portfolio Monday SEO brief
+
+For "Monday SEO flow", "Jaimee weekly client brief", "SEO highlights email" or "Hermes SEO report automation", use [references/weekly-seo-flow.md](references/weekly-seo-flow.md). This is a portfolio reporting and human-work handoff, not the legacy per-client implementation loop below. Use one schedule and the canonical Obsidian Client Flow rotation. The dedicated runtime lives in `scripts/weekly_runtime.py`, with a no-agent Hermes trigger in `scripts/cron_gate.py`. Deliver a card-first HTML digest from Lily via Mailgun, with coloured-circle status labels. Do not silently add a second per-client schedule.
+
+## Legacy per-client implementation loop
 
 Creates a `create_scheduled_task` cron job that runs the GMB monthly cycle end-to-end for one client: works the outstanding checklist items in `project-management/gmb.md`, stages any site edits on a branch (never merges), updates the PM doc, creates a BasicOps task with per-action sub-tasks, and sends a Telegram + email summary. This skill only sets up the automation — it does not itself run the monthly work.
 

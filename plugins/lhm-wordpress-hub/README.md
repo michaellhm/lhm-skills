@@ -92,7 +92,7 @@ plugins/lhm-wordpress-hub/
     wordpress-builder.md            # Phase 5 agent
     qa-and-launch.md                # Phase 6 agent
     site-extension.md               # Post-launch agent
-  skills/                            # 27 skills (16 full-build, 8 LP, 3 shared utility)
+  skills/                            # 41 skills across full-build, LP and shared utility workflows
     [full build...]
     [LP...]
     [shared utility: wp-start, wp-project-setup, wp-ssh-deploy, css-sync-check, visual-qa, wp-blog-publisher]
@@ -149,6 +149,7 @@ plugins/lhm-wordpress-hub/
 | `theme-scaffold` | Scaffold custom block theme with theme.json, templates, patterns |
 | `css-sync-check` | Verify theme CSS matches prototype CSS |
 | `wp-page-builder` | Build pages in WordPress from content + design artefacts |
+| `wp-rest-operator` | Inspect and implement registered WordPress/LeadScale REST content changes with snapshots and readback |
 | `visual-qa` | Pixel-perfect visual regression via Playwright MCP |
 | `wp-ssh-deploy` | Push local WP site to remote server via SSH + WP-CLI |
 | `wp-blog-publisher` | Publish blog posts via WP-CLI over SSH |

@@ -108,9 +108,11 @@ The worker runs only the selected skill slice. It does not choose the next accou
 | Landing-page dependency | Accepted `content_brief` containing requirement, evidence, source campaign, audience/search intent, exact page and fields, protected copy/offer, CTA destination, constraints, delivery destination and acceptance test. Return it to Head of Production for Content Lead dispatch. |
 | PMax | Asset/audience/listing-group changes, excluded waste, evidence and implementation format supported by the owning skill |
 
-Maintain a single `implementation-checklist-YYYY-MM.md` for the parent. Put approved routine work in
-the main checklist and consequential work in a separate `Michael approval required` section. Update
-it after each accepted specialist result; do not create a new checklist per worker.
+Maintain one implementation checklist for the parent. For a monthly review, embed it in
+`google-ads-monthly-review-YYYY-MM.md`; for other flows use `implementation-checklist-YYYY-MM.md`.
+Put approved routine work in the main checklist and consequential work in a separate
+`Michael approval required` section. Update it after each accepted specialist result; do not create
+a new checklist per worker.
 
 Use the safest sufficient negative-keyword scope. Do not blindly decompose every poor query into single-word negatives; single words require evidence that they are categorically irrelevant across the client's valuable traffic.
 

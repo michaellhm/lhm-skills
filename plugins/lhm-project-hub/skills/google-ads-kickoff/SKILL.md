@@ -2,6 +2,10 @@
 name: google-ads-kickoff
 description: "Kick off a new Google Ads campaign build — gates on conversion tracking, intake, state file, BasicOps scaffold with backwards-scheduled milestones, client kickoff email, and handoff to the Ads specialist. Use this when the user says 'Google Ads kickoff', 'kick off Google Ads', 'start the ads campaign', or 'Ads audit and setup'. Follows references/kickoff-pattern.md. Delivery work itself belongs to the lhm-marketing-hub google-ads agent, never this skill. This is the skill client-onboarding Phase 4 delegates Ads campaign build work to."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Google Ads Kickoff
 

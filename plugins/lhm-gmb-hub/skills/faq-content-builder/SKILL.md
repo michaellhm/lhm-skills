@@ -2,6 +2,10 @@
 name: faq-content-builder
 description: "Discover real questions people ask about a service and build FAQ/supporting content pages. Use this when the user mentions 'build FAQ content for [Service] for [Client]', 'FAQ pages', 'supporting content', 'PAA content', 'build FAQs', 'questions people ask about [Service]', 'create supporting pages', or wants to produce Month 2 content using the FAQ path. Discovers PAA questions and Reddit questions, then hands to content-writer agent for 8-pass writing."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # FAQ Content Builder
 

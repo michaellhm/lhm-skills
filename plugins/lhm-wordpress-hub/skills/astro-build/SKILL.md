@@ -2,6 +2,10 @@
 name: astro-build
 description: "Build an Astro website from the approved HTML prototype. Use this when the user says 'build the Astro site', 'convert the prototype to Astro', 'astro build', 'scaffold the Astro project', 'convert to Astro', 'build out the Astro pages', or 'start Phase 5 for an Astro build'. This is the Phase 5 equivalent for projects where platform is Astro. Requires an approved HTML prototype (html-prototype skill) and a design system. Converts prototype sections to .astro components, extracts copy to content collections, wires up SEO, sitemap, and robots.txt, and configures for deployment."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Astro Build
 

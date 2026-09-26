@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+"""Submit one closed opaque CAP-015 export request without reading the spool."""
+import argparse
+import json
+import os
+import re
+import secrets
+from pathlib import Path
+
+INCOMING = Path('/var/lib/lhm-workflow/claude-artifact-export/incoming')
+SAFE = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$')
+HEX = re.compile(r'^[0-9a-f]{64}$')
+CALLER_LEASE_SECONDS = 630
+
+
+def build_request(run_id, parent_run_id, action_id, action_version, predecessor_sha256):
+    values = (run_id, parent_run_id, action_id)
+    if any(not SAFE.fullmatch(value) for value in values):
+        raise ValueError('invalid opaque identifier')
+    if action_version < 1 or not HEX.fullmatch(predecessor_sha256):
+        raise ValueError('invalid action version or predecessor hash')
+    return {'schema_version': 1, 'kind': 'claude_specialist_artifact_export',
+            'request_id': secrets.token_hex(16), 'run_id': run_id,
+            'parent_run_id': parent_run_id, 'action_id': action_id,
+            'action_version': action_version,
+            'predecessor_sha256': predecessor_sha256}
+
+
+def submit(request, incoming=INCOMING):
+    # O_EXCL is the only interaction: this account cannot open or enumerate spool content.
+    name = f"{request['request_id']}.json"
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, 'O_NOFOLLOW', 0)
+    fd = os.open(incoming / name, flags, 0o600)
+    try:
+        payload = (json.dumps(request, sort_keys=True, separators=(',', ':')) + '\n').encode()
+        os.write(fd, payload); os.fsync(fd)
+    finally:
+        os.close(fd)
+    return request['request_id']
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('run_id'); parser.add_argument('parent_run_id'); parser.add_argument('action_id')
+    parser.add_argument('action_version', type=int); parser.add_argument('predecessor_sha256')
+    args = parser.parse_args()
+    print(submit(build_request(args.run_id, args.parent_run_id, args.action_id,
+                               args.action_version, args.predecessor_sha256)))
+
+
+if __name__ == '__main__':
+    main()

@@ -2,6 +2,10 @@
 name: page-brief-generator
 description: "Generate per-page content briefs with target keywords, search intent, page sections, and CTAs. Use this when the user says 'create page briefs', 'write a brief', 'page brief', 'content brief', 'brief for homepage', 'brief for service page', or 'section outline'. Phase 2 of the website build. Requires sitemap and keyword map from the Sitemap Architect."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Page Brief Generator
 

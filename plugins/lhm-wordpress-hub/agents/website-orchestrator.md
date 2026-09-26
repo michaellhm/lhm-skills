@@ -13,6 +13,7 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/agent-orchestration-contract.md`. Accept 
 |---|---|
 | Full WordPress or Astro build, build status, current phase | `lhm-wordpress-hub:website-build-orchestrator` |
 | PPC landing-page campaign | `lhm-wordpress-hub:landing-page-orchestrator` |
+| Existing WordPress/LeadScale page or CPT via registered REST API | `lhm-wordpress-hub:wordpress-lead` → `wp-rest-operator` |
 | Post-launch page, service, feature or site-code change | `lhm-wordpress-hub:site-extension` |
 | WordPress copy, metadata or blog publishing only | `lhm-marketing-hub:wordpress` |
 | Pre-launch QA, performance, security or launch | `lhm-wordpress-hub:qa-and-launch` |

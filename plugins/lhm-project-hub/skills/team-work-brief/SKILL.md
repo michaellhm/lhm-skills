@@ -2,6 +2,10 @@
 name: team-work-brief
 description: Turn a rough request, client email, message, meeting action or idea into a complete internal team brief and approved BasicOps handoff. Use for any LHM user—including Michael, Josephine, Kristalyn, Jaimee or Aiya—when they say "brief Aiya", "brief AR", "brief Jaimee", "brief Kristalyn", "brief Michael", "brief Josephine", "brief Chris", "hand this to the team", "create a brief", "delegate this", "turn this email into a task", or give feedback that a prior brief was missing context, access, a URL or another requirement. Reads requester, client, assignee and project context; asks one material question at a time; checks access, dependencies, evidence, authority, completion and review; then routes the approved task through lhm-project-hub:basicops-task-manager. Captures controlled person-, client- and process-level handoff learning in the Obsidian Brain.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Team Work Brief
 

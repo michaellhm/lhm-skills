@@ -9,6 +9,9 @@ if test -L /opt/lhm-workflow/current; then
   readlink /opt/lhm-workflow/current > "$backup/current-target"
 fi
 systemctl disable --now lhm-workflow-bridge.path lhm-workflow-adapter.path lhm-workflow-stage.path lhm-workflow-verifier.path lhm-workflow-verification.path lhm-scheduled-work.path 2>/dev/null || true
+for unit in /etc/systemd/system/lhm-scheduled-org-signer-*.path; do
+  test ! -e "$unit" || systemctl disable --now "$(basename "$unit")" 2>/dev/null || true
+done
 systemctl disable --now lhm-department-qa-producer.path lhm-department-lead-producer.path lhm-department-connector-translator.path lhm-department-projection-producer.path lhm-department-hop-producer.path 2>/dev/null || true
 if test -n "$target_release"; then
   case "$target_release" in (*[!0-9a-f]*|'') echo "target must be a full lowercase SHA-256" >&2; exit 2;; esac
@@ -26,6 +29,9 @@ done
 for f in /etc/systemd/system/lhm-scheduled-work.service /etc/systemd/system/lhm-scheduled-work.path; do
   test -e "$f" || continue
   mv "$f" "$backup/"
+done
+for f in /etc/systemd/system/lhm-scheduled-org-signer-*.service /etc/systemd/system/lhm-scheduled-org-signer-*.path; do
+  test ! -e "$f" || rm -f -- "$f"
 done
 for f in /etc/systemd/system/lhm-department-*.service /etc/systemd/system/lhm-department-*.path; do
   test -e "$f" || continue

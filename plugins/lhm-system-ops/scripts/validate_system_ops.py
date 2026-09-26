@@ -12,7 +12,7 @@ REQUIRED_SKILLS = {
     'lhm-qa-tester', 'lhm-security-reviewer', 'lhm-plugin-release-manager',
     'lhm-chief-of-staff-source-handoff', 'lhm-context-research-source-handoff',
     'lhm-cto-source-handoff', 'lhm-head-of-production-source-handoff',
-    'release-publishing-engineer',
+    'release-publishing-engineer', 'lhm-skill-maintainer',
 }
 
 
@@ -81,14 +81,18 @@ def main():
     errors = []
     for relative in generated_bytecode_paths(PLUGIN):
         errors.append(f'generated Python bytecode in plugin release contents: {relative}')
-    for relative in ('.codex-plugin/plugin.json', '.claude-plugin/plugin.json'):
+    expected_manifest_versions = {
+        '.codex-plugin/plugin.json': '0.9.54',
+        '.claude-plugin/plugin.json': '0.9.100',
+    }
+    for relative, expected_version in expected_manifest_versions.items():
         path = PLUGIN / relative
         try:
             manifest = json.loads(path.read_text(encoding='utf-8'))
         except Exception as exc:
             errors.append(f'{relative}: {exc}')
             continue
-        if manifest.get('name') != PLUGIN.name or manifest.get('version') != '0.9.17':
+        if manifest.get('name') != PLUGIN.name or manifest.get('version') != expected_version:
             errors.append(f'{relative}: name/version mismatch')
     found = {p.parent.name for p in (PLUGIN / 'skills').glob('*/SKILL.md')}
     if found != REQUIRED_SKILLS:
@@ -120,6 +124,10 @@ def main():
         'assets/host/lhm-cto-branch-publisher',
         'assets/host/lhm-asp-sitemap-publisher',
         'assets/host/lhm-prototype-publisher',
+        'assets/container/prototype-dispatch',
+        'assets/host/lhm-prototype-publication-runtime',
+        'assets/systemd/lhm-prototype-publication.path',
+        'assets/systemd/lhm-prototype-publication.service',
         'assets/systemd/lhm-cto-result-resumer.path',
         'assets/systemd/lhm-cto-result-resumer.service',
         'assets/systemd/lhm-cto-result-resumer.timer',
@@ -149,6 +157,12 @@ def main():
         'references/project-hub-deployer-release.json',
         'references/hermes-project-hub-readonly-mount.compose.yaml',
         'scripts/build_project_hub_release.py',
+        'assets/container/lhm-codex-dispatch',
+        'assets/host/lhm-codex-execution-worker',
+        'assets/host/lhm-codex-queue-handoff',
+        'assets/systemd/lhm-codex-execution.path',
+        'assets/systemd/lhm-codex-execution.service',
+        'references/codex-execution-release.md',
     }
     for relative in required_assets:
         if not (PLUGIN / relative).is_file():
@@ -183,6 +197,38 @@ def main():
         errors.append('dispatcher is missing the private CTO run-control directory')
     if "subprocess.run(['/usr/sbin/runuser'" not in dispatcher:
         errors.append('dispatcher must use the absolute restricted-worker launcher path')
+    codex_worker = (PLUGIN / 'assets/host/lhm-codex-execution-worker').read_text(encoding='utf-8')
+    codex_handoff = (PLUGIN / 'assets/host/lhm-codex-queue-handoff').read_text(encoding='utf-8')
+    codex_service = (PLUGIN / 'assets/systemd/lhm-codex-execution.service').read_text(encoding='utf-8')
+    codex_path = (PLUGIN / 'assets/systemd/lhm-codex-execution.path').read_text(encoding='utf-8')
+    for required in ("'/usr/bin/env','-i'", "CODEX,'login','status'", "'--ignore-user-config'", "'--sandbox','read-only'", "'selected_provider':'openai-codex'", "'authentication_class':auth", "os.symlink(source,target/'auth.json')", "'stderr_redacted':redact(exc.stderr)", "'stdout_redacted':redact(exc.stdout)"):
+        if required not in codex_worker:
+            errors.append(f'Codex execution worker is missing fail-closed control: {required}')
+    for prohibited_provider in ('OPENROUTER_API_KEY', 'ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'hermes-2'):
+        if prohibited_provider in codex_worker:
+            errors.append(f'Codex execution worker names prohibited metered inference material: {prohibited_provider}')
+    if 'DirectoryNotEmpty=/home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution/incoming' not in codex_path:
+        errors.append('replacement Codex watcher does not implement the generic queue contract')
+    for boundary in ('ProtectSystem=strict','ProtectHome=read-only','/var/run/docker.sock','/run/docker.sock','/root'):
+        if boundary not in codex_service:
+            errors.append(f'Codex execution service is missing isolation boundary: {boundary}')
+    if 'User=codexworker' not in codex_service or '/home/codexworker/.codex' in next(line for line in codex_service.splitlines() if line.startswith('ReadWritePaths=')):
+        errors.append('Codex execution must run as codexworker without writable credential storage')
+    codex_acl_preflight = [line for line in codex_service.splitlines() if line.startswith('ExecStartPre=')]
+    expected_codex_acl_preflight = [
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes',
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain',
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution',
+        'ExecStartPre=+/usr/local/libexec/lhm-codex-queue-handoff',
+    ]
+    if codex_acl_preflight != expected_codex_acl_preflight:
+        errors.append('Codex execution launch must restore the exact bounded codexworker ACLs as root')
+    for required in ("d:m::r--,d:u:codexworker:r--", "m::r--,u:codexworker:r--", "entry.name.endswith('.json')", 'os.O_NOFOLLOW', 'pass_fds=(descriptor,)'):
+        if required not in codex_handoff:
+            errors.append(f'Codex queue handoff is missing bounded control: {required}')
+    for prohibited in ('-R', 'rwx', 'vault', 'claudeworker', 'hermes-2'):
+        if prohibited in codex_handoff:
+            errors.append(f'Codex queue handoff contains prohibited scope: {prohibited}')
     callback = (PLUGIN / 'assets/host/lhm-cto-result-resumer').read_text(encoding='utf-8')
     if 'max_iterations' not in callback or 'questions_for_chief' not in callback:
         errors.append('CTO result resumer is missing the bounded evidence-loop contract')
@@ -204,9 +250,21 @@ def main():
     if '--untracked-files=all' not in dispatcher or '--untracked-files=all' not in publisher:
         errors.append('dispatcher and publisher must enumerate individual untracked files')
     prototype_publisher = (PLUGIN / 'assets/host/lhm-prototype-publisher').read_text(encoding='utf-8')
-    for required in ("REPOSITORY = 'michaellhm/lhm-prototype'", "BRANCH = 'main'", "SOURCE_ROOT = Path('/var/lib/lhm-prototype-publication/incoming')", "SSH_KEY = Path('/etc/lhm-prototype-publisher/id_ed25519')", 'schema_version', 'source_basicops_task', 'governed_parent', 'source_package_sha256', 'file_manifest', 'idempotency_key', 'standing_authority_reference', 'StrictHostKeyChecking=yes', 'actions/workflows/{WORKFLOW["id"]}/runs?', 'public prototype content does not match approved index.html'):
+    for required in ("REPOSITORY = 'michaellhm/lhm-prototype'", "BRANCH = 'main'", "SOURCE_ROOT = Path('/var/lib/lhm-prototype-publication/incoming')", "SSH_KEY = Path('/etc/lhm-prototype-publisher/id_ed25519')", 'schema_version', 'source_basicops_task', 'governed_parent', 'source_package_sha256', 'file_manifest', 'idempotency_key', 'standing_authority_reference', 'StrictHostKeyChecking=yes', 'wait_for_public_deploy', 'public prototype content does not match approved index.html'):
         if required not in prototype_publisher:
             errors.append(f'prototype publisher is missing bounded control: {required}')
+    prototype_runtime = (PLUGIN / 'assets/host/lhm-prototype-publication-runtime').read_text(encoding='utf-8')
+    prototype_path = (PLUGIN / 'assets/systemd/lhm-prototype-publication.path').read_text(encoding='utf-8')
+    prototype_service = (PLUGIN / 'assets/systemd/lhm-prototype-publication.service').read_text(encoding='utf-8')
+    shared_incoming = '/home/hermes/.hermes/profiles/lhm_brain/dispatch/prototype-publication/incoming'
+    for required in (f"QUEUE=Path('{shared_incoming.rsplit('/incoming',1)[0]}')", "STAGING=Path('/var/lib/lhm-prototype-publication/incoming')", "PUBLISHER='/usr/local/libexec/lhm-prototype-publisher'"):
+        if required not in prototype_runtime:
+            errors.append(f'prototype publication runtime is missing bounded control: {required}')
+    if f'DirectoryNotEmpty={shared_incoming}' not in prototype_path:
+        errors.append('prototype publication path unit does not watch the shared incoming directory')
+    for required in (shared_incoming.rsplit('/incoming',1)[0], '/var/lib/lhm-prototype-publication'):
+        if required not in prototype_service:
+            errors.append(f'prototype publication service is missing write boundary: {required}')
     for name in ('prototype-publication.request.schema.json','prototype-publication.result.schema.json','prototype-basicops-handoff.schema.json','capability-restored.schema.json'):
         schema = json.loads((PLUGIN / 'references' / name).read_text(encoding='utf-8'))
         if schema.get('additionalProperties') is not False:

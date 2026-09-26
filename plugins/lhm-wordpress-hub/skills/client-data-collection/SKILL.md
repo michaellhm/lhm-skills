@@ -2,6 +2,10 @@
 name: client-data-collection
 description: "Sets up the Data Collection step of new web client onboarding — creates the client's Drive folder and credentials tracking sheet, files the BasicOps Data Gathering task with the standard access checklist (including Cloudflare), drafts the data-gathering email, and sets up a weekly automated follow-up so nothing gets missed. Use this when the user says 'start client onboarding', 'new client data gathering', 'set up new client folder', 'collect client access', 'chase client for credentials', 'data gathering for [client]', or is starting a new web client right after Michael's welcome email has gone out. Phase 0 of the web project onboarding flow — runs before client-context-intake."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Client Data Collection
 

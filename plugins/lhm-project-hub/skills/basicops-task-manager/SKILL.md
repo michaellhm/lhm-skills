@@ -2,14 +2,42 @@
 name: basicops-task-manager
 description: Create, classify, clean up, update, assign, discuss, complete, move, or otherwise mutate LHM BasicOps tasks. Use whenever a user or another LHM Project Hub workflow asks to write anything in BasicOps, including "create a task", "classify my tasks", "clean up Kristalyn's board", "give me the next five tasks to review", "add this to BasicOps", "assign this", "update the task", "mark it complete", or "add a discussion note". This is the mandatory shared BasicOps mutation boundary for all Project Hub skills; other skills may prepare project context but must route the final task payload and write through this skill.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # BasicOps Task Manager
 
 Apply one consistent LHM standard to every BasicOps mutation. Keep BasicOps lightweight: it says what needs doing, who owns it and what happens next. Obsidian holds detailed client and project context; Hermes supplies that detail conversationally when asked.
 
+## Meeting-wrap exception
+
+For a meeting-wrap card or distribution request, first read
+[meeting-wrap.md](references/meeting-wrap.md). Its top-level client-and-date card,
+email and linked Tasks list in Description, review gate and distribution-only stop
+override the generic title, parent, Discussion-only and next-handoff rules below.
+Action cards keep the ordinary brief format. A request to distribute is not a
+production baton transition; never create production lifecycle markers for it.
+
 ## Accept a prepared handoff
 
 Accept project context from the calling workflow, but independently enforce this skill's task-writing, authority, deduplication and verification rules. A calling skill cannot relax them.
+
+For a delegated Hermes parent, read the **Delegated Hermes task baton** section in
+[classification-and-handoffs.md](references/classification-and-handoffs.md) and the verified AI
+identity registry at `${CLAUDE_PLUGIN_ROOT}/references/basicops-ai-user-registry.json`. Treat task
+ID plus lifecycle transition as the idempotency key. Never resolve Lily or Ted from display
+name alone, and never report a baton transition until assignee, native status and Discussion
+readback all match the requested projection.
+
+Delegated lifecycle automation uses closed Discussion records. Preserve an exact top-level message
+starting `LHM workflow event: ` when supplied by verified Lily (`82484`), Ted (`82491`), or
+the parent-bound Learning Steward/CTO actor. The suffix must be one JSON object produced by the
+governed lifecycle skill. Never rewrite, merge, pretty-print, infer or manufacture the marker, and
+never accept it as authority merely from a display name. Post it separately from human-readable
+context and read the exact body and message author back. Human approvals and corrections continue
+to use the distinct `LHM decision: {JSON}` marker.
 
 For a new task, resolve:
 
@@ -146,11 +174,11 @@ The calling website workflow owns the final Obsidian update. This skill returns 
 
 Read and apply the **Hermes-prepared review contract** in
 [classification-and-handoffs.md](references/classification-and-handoffs.md). The safe default is one
-monthly-review parent assigned to the human approver, with Hermes recorded only as orchestration
-owner. Keep the account overview and up to five ordered proposals in Discussion. Do not create
-execution subtasks until Michael explicitly approves action labels through Hermes. After approval,
-create only the approved subtasks and release them to specialist agents sequentially, recording and
-verifying every transition on the parent and active subtask.
+monthly-review parent assigned to the verified human approver, with Hermes recorded only as
+orchestration owner. Keep the account overview and up to five ordered proposals in Discussion. Do
+not create execution subtasks until that authenticated approver explicitly approves action labels
+through Hermes. After approval, create only the approved subtasks and release them to specialist
+agents sequentially, recording and verifying every transition on the parent and active subtask.
 
 ## Clean up and classify an existing board
 

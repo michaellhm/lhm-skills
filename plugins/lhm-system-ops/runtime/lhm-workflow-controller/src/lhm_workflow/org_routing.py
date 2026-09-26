@@ -20,8 +20,11 @@ HEX = re.compile(r"^[0-9a-f]{64}$")
 
 ROLE_POLICY = {
     "chief_intake": ("lhm_chief_of_staff", "deterministic", [], []),
+    "context": ("lhm_researcher", "hermes", [], ["canonical_sources.read"]),
+    "context_verify": ("lhm_verifier", "verifier", ["lhm-system:workflow-verification"], ["artifact.readback"]),
     "production_plan": ("lhm_head_of_production", "deterministic", [], []),
     "seo_plan": ("lhm_seo_lead", "deterministic", ["lhm-seo-rollout"], []),
+    "seo_plan_verify": ("lhm_verifier", "verifier", ["lhm-system:workflow-verification"], ["artifact.readback"]),
     "seo_accept": ("lhm_seo_lead", "deterministic", ["lhm-seo-rollout"], []),
     "research": ("lhm_researcher", "claude", ["lhm-marketing-hub:seo-audit"], ["google_search_console.property_read"]),
     "research_verify": ("lhm_verifier", "verifier", ["lhm-system:workflow-verification"], ["artifact.readback"]),

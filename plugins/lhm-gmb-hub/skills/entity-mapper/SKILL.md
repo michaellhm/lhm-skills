@@ -2,6 +2,10 @@
 name: entity-mapper
 description: "Extract expert-level entities, concepts, and technical terms from top-ranking competitor content to build an entity map that proves topical authority. Use this when the user mentions 'run entity mapping for [Client]', 'entity mapping', 'entity map', 'extract entities', 'topical authority', 'entity gaps', or 'competitor entities'."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Entity Mapper
 

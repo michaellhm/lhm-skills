@@ -2,6 +2,10 @@
 name: html-prototype
 description: "Generate static HTML prototypes of key pages using the design system. Use this when the user says 'HTML prototype', 'static prototype', 'mockup', 'preview the design', 'HTML preview', or 'prototype the homepage'. Phase 4 of the website build. Optional step — requires brand guidelines and design system."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # HTML Prototype
 

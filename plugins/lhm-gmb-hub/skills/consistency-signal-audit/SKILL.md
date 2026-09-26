@@ -2,6 +2,10 @@
 name: consistency-signal-audit
 description: "Audit the 8 homepage consistency signals that align the client's website with their Google Business Profile. Use this when the user mentions 'audit consistency signals for [Client]', 'homepage audit', 'consistency signals', '8 signals check', 'NAP consistency', 'homepage signals', 'location page audit', or 'GBP website alignment'."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Consistency Signal Audit
 

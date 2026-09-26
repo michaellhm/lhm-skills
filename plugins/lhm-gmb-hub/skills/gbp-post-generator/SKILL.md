@@ -2,6 +2,10 @@
 name: gbp-post-generator
 description: "Generate 13 weekly Google Business Profile posts (one 3-month cycle) for a client, rotating between service highlights, tips, seasonal content, and team spotlights. Use this when the user mentions 'generate GBP posts for [Client]', 'GBP posts', 'weekly posts', 'Google Business posts', 'GBP content calendar', or 'post schedule'. Also use this to shorten an existing 52-week/12-month calendar down to the current 3-month cycle length."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # GBP Post Generator
 

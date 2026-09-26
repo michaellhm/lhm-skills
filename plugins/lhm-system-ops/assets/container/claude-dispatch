@@ -16,11 +16,14 @@ ROUTE_SKILLS = {
     'marketing': 'lhm-marketing-hub:start', 'seo': 'lhm-marketing-hub:seo-audit',
     'seo-lead': 'lhm-marketing-hub:start-seo',
     'keyword-research': 'lhm-marketing-hub:keyword-research',
+    'seo-page-brief': 'lhm-marketing-hub:seo-page-brief',
     'seo-delivery-qa': 'lhm-marketing-hub:seo-delivery-qa',
     'content': 'lhm-marketing-hub:content-strategy', 'project': 'lhm-project-hub:team-work-brief',
+    'project-production-plan': 'lhm-project-hub:hermes-production-plan',
     'gmb': 'lhm-gmb-hub:run-local-diagnostic', 'finance': 'lhm-finance-hub:finance-advisor',
     'website': 'lhm-wordpress-hub:wp-start', 'prototype': 'lhm-wordpress-hub:html-prototype',
     'astro': 'lhm-wordpress-hub:astro-build', 'wordpress': 'lhm-wordpress-hub:wp-start',
+    'wordpress-rest': 'lhm-wordpress-hub:wp-rest-operator',
     'knowledge': 'lhm-knowledge-hub:lhm-vault-thinking',
 }
 
@@ -89,7 +92,8 @@ def submit_gsc(site, urls, objective):
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'seo_gsc_readonly',
                       'agent_id': 'lhm-marketing-hub:seo', 'site': site,
                       'urls': urls, 'objective': objective, 'timeout_seconds': 600,
-                      **contract('seo-gsc-review', ['lhm-marketing-hub:seo-audit'], ['google_search_console.property_read'])})
+                      **contract('seo-gsc-review', ['lhm-marketing-hub:seo-audit'], ['google_search_console.property_read'])},
+                     max_wait_seconds=540)
 
 
 def next_run_id(prefix):
@@ -103,7 +107,7 @@ def next_run_id(prefix):
     return f'{prefix}-{date}-{sequence:02d}'
 
 
-def enqueue_and_wait(request):
+def enqueue_and_wait(request, max_wait_seconds=240):
     run_id = request['run_id']
     incoming = BASE / 'incoming'
     fd, temp_name = tempfile.mkstemp(prefix=f'.{run_id}.', dir=incoming)
@@ -116,7 +120,7 @@ def enqueue_and_wait(request):
     finally:
         if os.path.exists(temp_name):
             os.unlink(temp_name)
-    wait_for_completion(run_id, max_wait_seconds=240)
+    wait_for_completion(run_id, max_wait_seconds=max_wait_seconds)
 
 
 def submit_drive_file(client, artifact_path, file_name):
@@ -124,7 +128,8 @@ def submit_drive_file(client, artifact_path, file_name):
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'google_drive_client_file_create',
                       'agent_id': 'lhm-connector-repair', 'client': client, 'artifact_path': artifact_path,
                       'file_name': file_name, 'timeout_seconds': 600,
-                      **contract('google-drive-file-publish', ['google-drive:google-drive'], ['google_drive.file_create', 'google_drive.file_readback'])})
+                      **contract('google-drive-file-publish', ['google-drive:google-drive'], ['google_drive.file_create', 'google_drive.file_readback'])},
+                     max_wait_seconds=610)
 
 
 def submit_basicops_discussion(client, task_id, discussion):
@@ -132,7 +137,27 @@ def submit_basicops_discussion(client, task_id, discussion):
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'basicops_task_discussion_update',
                       'agent_id': 'lhm-connector-repair', 'client': client, 'task_id': task_id,
                       'discussion': discussion, 'timeout_seconds': 600,
-                      **contract('basicops-task-discussion-update', ['lhm-project-hub:basicops-task-manager'], ['basicops.task_read', 'basicops.discussion_create', 'basicops.discussion_readback'])})
+                      **contract('basicops-task-discussion-update', ['lhm-project-hub:basicops-task-manager'], ['basicops.task_read', 'basicops.discussion_create', 'basicops.discussion_readback'])},
+                     max_wait_seconds=610)
+
+
+def submit_basicops_baton(client, task_id, assignee_user_id, native_status, review_type, discussion):
+    run_id = next_run_id('claude-basicops')
+    enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'basicops_task_baton_transition',
+                      'agent_id': 'lhm-connector-repair', 'client': client, 'task_id': task_id,
+                      'assignee_user_id': assignee_user_id, 'native_status': native_status,
+                      'review_type': review_type, 'discussion': discussion, 'timeout_seconds': 600,
+                      **contract('basicops-task-baton-transition', ['lhm-project-hub:basicops-task-manager'], ['basicops.task_read', 'basicops.task_update', 'basicops.discussion_create', 'basicops.discussion_readback'])},
+                     max_wait_seconds=610)
+
+
+def observe_basicops_human(client, task_id):
+    run_id = next_run_id('claude-basicops')
+    enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'basicops_human_decision_observe',
+                      'agent_id': 'lhm-connector-repair', 'client': client, 'task_id': task_id,
+                      'discussion': 'Read-only closed decision marker observation.', 'timeout_seconds': 600,
+                      **contract('basicops-human-decision-observe', [], ['basicops.task_read', 'basicops.discussion_readback'])},
+                     max_wait_seconds=610)
 
 
 def register_handback_target(target_type, client, name, vault_prefix, drive_folder_id, task_ids):
@@ -146,20 +171,25 @@ def register_handback_target(target_type, client, name, vault_prefix, drive_fold
 
 
 def submit_specialist(route, subject_type, subject_name, objective):
+    if route == 'project' and 'lhm-project-hub:hermes-production-plan' in objective:
+        route = 'project-production-plan'
     agent_ids = {
         'marketing': 'lhm-marketing-hub:start',
         'seo': 'lhm-marketing-hub:seo',
         'seo-lead': 'lhm-marketing-hub:seo',
         'keyword-research': 'lhm-marketing-hub:seo',
+        'seo-page-brief': 'lhm-marketing-hub:seo',
         'seo-delivery-qa': 'lhm-marketing-hub:seo',
         'content': 'lhm-marketing-hub:content',
         'project': 'lhm-project-hub:pm-orchestrator',
+        'project-production-plan': 'lhm-project-hub:pm-orchestrator',
         'gmb': 'lhm-gmb-hub:gmb-orchestrator',
         'finance': 'lhm-finance-hub:finance-orchestrator',
         'website': 'lhm-wordpress-hub:website-orchestrator',
         'prototype': 'lhm-wordpress-hub:prototype-lead',
         'astro': 'lhm-wordpress-hub:astro-lead',
         'wordpress': 'lhm-wordpress-hub:wordpress-lead',
+        'wordpress-rest': 'lhm-wordpress-hub:wordpress-lead',
         'knowledge': 'lhm-knowledge-hub:knowledge-orchestrator',
     }
     if route not in agent_ids:
@@ -241,6 +271,10 @@ def main():
         submit_drive_file(sys.argv[2], sys.argv[3], sys.argv[4])
     elif len(sys.argv) == 5 and sys.argv[1] == 'submit-basicops-task-discussion-update':
         submit_basicops_discussion(sys.argv[2], sys.argv[3], sys.argv[4])
+    elif len(sys.argv) == 8 and sys.argv[1] == 'submit-basicops-task-baton-transition':
+        submit_basicops_baton(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
+    elif len(sys.argv) == 4 and sys.argv[1] == 'observe-basicops-human-decision':
+        observe_basicops_human(sys.argv[2], sys.argv[3])
     elif len(sys.argv) == 8 and sys.argv[1] == 'register-handback-target':
         register_handback_target(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
     elif len(sys.argv) == 6 and sys.argv[1] == 'submit-specialist-readonly':

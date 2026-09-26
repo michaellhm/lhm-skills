@@ -1,29 +1,56 @@
 ---
 name: lhm-weekly-flow
-description: Run Local Health Marketing's conversational weekly review and planning interview using its Obsidian vault, WeekFlow context and operating systems. Use when Michael says “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, improve or complete an LHM weekly planning session. Begin with a personal check-in, use evidence to help recall the week, review time and unfinished work, then update Obsidian with decisions, three weekly outcomes and commitments.
+description: Run Local Health Marketing's conversational weekly review and planning interview using its Obsidian vault, WeekFlow context and operating systems. Use when Michael says “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, improve or complete an LHM weekly planning session. Begin with a personal check-in, use evidence to help recall the week, review time and unfinished work, then update Obsidian with decisions, three weekly outcomes and capacity-checked commitments. Keep planning separate from optional action work and verify any authorised WeekFlow scheduling.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # LHM Weekly Flow
 
 Run an evidence-led weekly operating review for Local Health Marketing. Use the vault for continuity across conversations and save progress after each interview section.
 
+## Session shape: plan first, act second
+
+Aim for a 30–40 minute core planning conversation, not a compulsory time limit. Keep the personal check-in and useful reflection. Compress unchanged sections; do not make Michael answer questions already resolved by evidence. If he wants to explore a material decision, allow it and make the trade-off visible.
+
+The core session ends with three or fewer outcomes, dependable capacity, chosen commitments and explicit waiting/overflow work. A full board cleanup, client production, email session or opportunity workshop is optional action work, not a prerequisite for completing the weekly review. Ask once at the end whether to continue into an action session; do not invent or invoke a not-yet-installed action-session skill. Use the existing `lhm-project-hub:staff-weekly-flow` for role-specific daily selection and `lhm-project-hub:basicops-task-manager` for authorised task writes.
+
+An explicit request to act during planning can be handled immediately. Keep the current section and next question recorded so the interview resumes without restarting. Do not force a new conversation. When the user chooses a new conversation, provide a bounded handoff with confirmed decisions, source links, pending actions and approval limits; do not assume cross-chat memory.
+
+## Prepare decisions before presenting tasks
+
+- Reuse the existing Monday project briefing and available structured output; verify its generated time, source links and material task changes. Do not create another briefing, JSON store or automation from this skill. If it has not arrived, prepare from accessible live evidence and reconcile later arrivals into the same plan.
+- Reconcile BasicOps, relevant meetings/project digests and WeekFlow before presenting the actionable shortlist. Fetch independent reads together where supported; paginate relevant queries and keep raw payloads out of the conversation. Reading the full backlog does not commit it to the week.
+- Deduplicate by stable task ID AND outcome. Historical meeting-wrap containers, recurring placeholders and a parent plus its execution task are not automatically separate actions. Preserve linked source identities rather than replacing one task's ID with a different parent ID.
+- For each candidate, prepare: current state, source link and freshness, decision needed, recommended next action, dependency, downstream owner, completion condition and rough effort/confidence. Refresh consequential state before applying a change.
+- Present one decision at a time when Michael prefers it: “Here is where it stands; I recommend this; it releases this person/work.” Offer `do now`, `schedule`, `delegate`, `waiting`, `park` or `close`. Show a compact progress count and move to the next prepared item after recording the answer; avoid repeated “shall we continue?” prompts.
+- An ambiguous “add all the other tasks” requires resolving the intended set (discussed commitments, actionable Inbox or whole board) before a bulk import. Silence after a clarification is not selection of the broadest scope.
+
 ## Locate and load context
 
-1. Find the vault directory containing `.obsidian`. Prefer `/Users/michaelcolman/Documents/Obsidian/Local Health Marketing/Local Health Marketing` when accessible.
-2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely and follow them.
-3. Detect the official Obsidian CLI. When available and Obsidian is running, use it for recent files, backlinks, unresolved links, open tasks and contextual search; otherwise use `rg` and direct Markdown reads without blocking the review.
-4. Read these notes completely:
-   - `01 Inbox/Inbox.md` and every unprocessed capture in `01 Inbox`
-   - `05 Weekly/Weekly Flow.md`
-   - `05 Weekly/Attention Queue.md`
-   - `10 Goals/Goals.md` and active goal notes
-   - `30 Projects/Projects.md` and active project notes
-   - `25 Marketing/Marketing.md` and current linked strategy notes
-5. Find and read the most recent completed weekly review, if one exists.
-6. Find and read every AI conversation-capture note created since the previous weekly review, including legacy `Claude Conversation Capture` notes. Collect lessons marked `Needs Michael`, `Promote to Knowledge`, `Update SOP`, or `Observe again`, plus every unresolved recurrence or contradiction.
-7. Search the vault for unresolved checkboxes, explicit blockers, `Still to define`, `Open decisions`, `alignment issue`, and recent material changes. Do not automatically copy ordinary project tasks into the Attention Queue.
-8. When accessible, review the previous week's completed and unfinished WeekFlow tasks. Treat WeekFlow as evidence about Michael's time and work, not as the canonical home for business decisions.
-9. Use Australia/Melbourne dates and ISO week numbers.
+1. Resolve the active vault layout from the user's confirmed configuration and migration notes. Validate every root by its `.obsidian` directory and read its `_System/Vault Boundary.md` when present. Never infer that a discovered staging copy is active.
+   - **Two-vault layout:** resolve Michael's private root and the LHM Knowledge shared root independently. Names and machine paths may change after a Google Drive move; use verified paths, not a hard-coded cloud mount or the first matching folder.
+   - **Legacy combined layout:** use the original combined vault only while it is explicitly still the active source. The historical local candidate is `/Users/michaelcolman/Documents/Obsidian/Local Health Marketing/Local Health Marketing`. Do not mix its notes with a prepared split or silently fall back to it after cutover.
+   - If no authoritative active layout can be established, ask which copy is active before writes. If the private root is unavailable, do not save private notes in the shared vault as a workaround.
+2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` in each root when present. Respect the narrower privacy boundary. Absence of a shared copy of the memory contract does not permit private-to-shared disclosure.
+3. Detect the official Obsidian CLI. When available, target each resolved vault explicitly for searches and links. Otherwise use direct Markdown reads scoped to each root. Obsidian links between vaults do not provide cross-vault search or automatic access.
+4. Read private context completely: `01 Inbox/Inbox.md`, unprocessed Inbox captures, `05 Weekly/Weekly Flow.md`, `05 Weekly/Attention Queue.md`, `10 Goals/Goals.md`, active goals, `30 Projects/Projects.md`, active personal projects and relevant `40 Ideas` notes.
+5. Read relevant shared context: Clients and Client Flow, People, internal Meetings, `25 Marketing/Marketing.md`, current strategy, Sales Pipeline, and applicable `60 Knowledge` and `70 SOPs` notes. Read the actual previous Monday–Sunday client-meeting commitments and current Ads review evidence before allocating delivery time; distinguish scheduled work from carryover.
+6. From the private root, read the most recent completed weekly review and every AI conversation capture since that review. Collect unresolved lessons, recurrences and contradictions. Read `05 Weekly/Weekly Flow.md` for the current sales-review cadence, reporting period and delivery preferences rather than resetting them from memory.
+7. Search the authorised roots separately for relevant unresolved tasks, blockers, open decisions and material changes. Do not automatically copy ordinary delivery tasks into the private Attention Queue. Verify shared files are locally readable and current; a cloud placeholder or inaccessible root is not evidence of no client work.
+8. If shared context is unavailable or freshness is uncertain, continue the personal interview with that limitation explicit. Do not invent client state, create a substitute shared vault or duplicate team notes privately. Reconcile the missing shared evidence before confirming a delivery-dependent plan.
+9. When accessible, review the previous week's completed and unfinished WeekFlow tasks as evidence about time and work, not as canonical business decisions. Use Australia/Melbourne dates and ISO week numbers.
+
+## Write destinations and privacy
+
+- Save the weekly review, personal check-in, energy/capacity, private financial scorecard, reflections, priorities, Attention Queue, personal goals, projects, ideas and dated AI captures in the **private root**. Folder names alone never override the resolved root.
+- Shared client delivery, People, internal Meetings, Marketing and sales-pipeline updates go to the corresponding **shared root** note when the current request authorises that update. Save only the relevant agreed operational decision, not the private interview or founder assessment behind it.
+- `60 Knowledge` may exist in both vaults: founder philosophy, private lessons and personal operating guidance remain private; team-facing Hermes architecture, operating models and reusable delivery guidance belong in LHM Knowledge. Uncertain or mixed material stays private until a team-safe version is explicitly selected.
+- `80 Templates` in LHM Knowledge is canonical. A verified local private template snapshot may be used if the shared template is unavailable; label that limitation and do not silently overwrite or synchronise the shared template.
+- Use ordinary wiki links within a vault. For private-to-shared references, use an encoded `obsidian://open?vault=...&file=...` link with the verified vault name. Do not expose private note titles, paths or links in team-facing notes.
+- During migration, never write to both the original combined vault and its separated copies. Google Drive migration, Hermes routing changes, recurring automation and skill installation are separate actions; a prepared split or source change does not prove live cutover.
 
 Do not ask Michael for information already available in the vault. Briefly surface relevant existing context and ask only for changes, results or judgments that cannot be discovered.
 
@@ -31,7 +58,7 @@ Do not ask Michael for information already available in the vault. Briefly surfa
 
 1. Determine the current ISO week and filename: `YYYY-Www — Weekly Review.md`.
 2. If the note already exists, read it and resume from the first incomplete section.
-3. Otherwise create it in `05 Weekly` using `80 Templates/Weekly Review Template.md`.
+3. Otherwise create it in the resolved private root’s `05 Weekly`, using the shared canonical `80 Templates/Weekly Review Template.md` (or the verified private snapshot described above).
 4. Set `status: draft`, the correct week, Monday start date, Sunday end date, and current `created` and `updated` dates.
 5. Prefill links to active goals and projects. Prefill verified facts only; never invent missing metrics.
 6. Do not pre-commit priority outcomes, commitments or commercial decisions before the interview. Existing suggestions must remain visibly provisional until Michael confirms them.
@@ -55,7 +82,7 @@ Then give a compact briefing:
 
 Before the wins review, route the Monday intake in this order:
 
-1. Review every unprocessed `01 Inbox` capture and decide whether to discard it, merge it into a canonical note, convert it into an action, or flesh it out into a structured Idea.
+1. Prepare dispositions for unprocessed `01 Inbox` captures. Discuss only items that materially affect this week; retain the rest in an explicit optional action-session queue. Do not require a full Inbox cleanup before planning.
 2. Review structured `seed` ideas that are relevant now; do not force parked or unrelated ideas into the week.
 3. Review unresolved lessons, recurrences and contradictions from new AI conversation captures.
 4. Surface only urgent Michael-level decisions from the Attention Queue.
@@ -179,7 +206,7 @@ Challenge:
 
 - Vague activity phrased as an outcome
 - More than three primary priorities
-- Commitments without an owner or due date
+- Commitments without an owner, next action or agreed timing; distinguish a planning day from a client deadline
 - Work that does not advance a goal, unblock delivery or protect a live campaign
 - Workload that exceeds known capacity
 
@@ -189,9 +216,34 @@ Agree on no more than three primary outcomes. Each outcome must be observable by
 
 ### 9. Commitments and final check
 
-Turn each outcome into the minimum necessary commitments with owner and due date. End conversationally by asking what could derail the week, what should deliberately not be worked on, and what Michael is most interested in starting first.
+Turn each outcome into the minimum necessary commitments with owner and agreed timing. Do not manufacture due dates for optional work. End conversationally by asking what could derail the week, what should deliberately not be worked on, and what Michael is most interested in starting first.
 
 Confirm the final plan with Michael before marking the review complete.
+
+## Capacity and priority decisions
+
+Rank work using evidence: first actions that unblock another person or protect a client promise/live service, then due client delivery, then agreed opportunities and internal improvements. A genuine immediate client risk can outrank an ordinary handoff. Explain the top choices; do not mark every item high priority.
+
+Read current preferences and reconcile fixed meetings, follow-up time, working hours, hard stops, holidays, energy and effort uncertainty. Prefer three meaningful daily outcomes plus a short admin batch, with buffer; this is a planning default, not a quota or licence to hide distinct tasks in a large batch. Do not require evenings/weekends or infer availability from the current clock. If the user says they can do more today, propose a bounded selection in their actual available window.
+
+Keep `must do`, `if time`, `waiting` and `parked` distinct. Client meeting wraps and project handoffs precede optional internal work when that is Michael's confirmed preference. New work must expose what it displaces. If this-week work will not fit, propose a disposition and obtain Michael's decision before moving it to next week; an estimated schedule is not a revised client promise.
+
+## Authorised action-session handoff
+
+Keep the execution queue separate from the founder review. Carry only relevant task links, decisions and next steps into it, not private reflections. For substantive client work, prepare a bounded handoff into the verified client workspace: task ID/link, client context and working-folder links, inputs, scope, expected output, approval limits and next owner. Do not assume ChatGPT/Claude projects inherit the planning conversation or can access an arbitrary local file.
+
+During action work, route task mutations through `basicops-task-manager`. Draft follow-up emails with exact recipients and text for review before sending. Approval of a draft authorises that exact send; do not ask again unless recipients/content materially change. Task completion, a draft or a BasicOps comment does not prove an email was sent. Verify the send and record its link against the source task. Consolidate related asks to the same recipient when appropriate.
+
+## WeekFlow publication and verification
+
+When Michael authorises adding or scheduling the confirmed plan:
+
+1. Resolve the current app/API and authenticated owner from verified configuration, not a stale hard-coded checkout. Read current tasks, statuses, scheduled blocks and day order immediately before writing.
+2. Import only the authorised selection. Leave historical containers, recurring placeholders, parked work and blocked items out of daily commitments. An explicit whole-board import belongs in a separately labelled review backlog, never a silently scheduled week.
+3. Reuse existing cards by identity and equivalent outcome, checking all statuses. Preserve completed/dismissed decisions and unrelated edits. Never reopen an old completed card merely to bypass a duplicate-ID constraint. Append related source links without silently reassigning its identity.
+4. Distinguish `saved`, `scheduled` and `visible on the intended day`. “Add to the app” does not imply invented times; “schedule by day” requires dated placement. Apply agreed priorities and realistic durations, preserve fixed meetings and existing order, and avoid collisions, past time blocks and protected days. Planning placement must not create or alter a BasicOps deadline.
+5. Read changed records back and verify the app's day-view behaviour using the rendered view when available, or its documented filtering/order rules plus saved data. Check timezone/day, status, priority, task links, duplicate outcomes and total daily load. Old scheduled blocks must not cause newly scheduled work to be automatically marked not-done; preserve history without allowing stale scheduling to override the new state.
+6. Report verified counts and any mismatch separately. If the live view cannot be checked, state that limit; do not call an insertion a verified visible schedule. Keep a retry-safe change receipt so interrupted writes do not duplicate cards or replay completed work.
 
 ## Save progressively
 
@@ -214,7 +266,7 @@ When Michael confirms the plan:
 4. Update canonical goal, marketing and project notes without duplicating detailed task lists.
 5. Set the weekly note to `status: complete`.
 6. Check internal links and avoid duplicate weekly notes.
-7. Finish with a short brief: prior-week result, this week's three outcomes, Michael's decisions, blockers and the first action.
+7. Finish with a short brief: prior-week result, this week's three outcomes, Michael's decisions, blockers and the first action. Report optional action work separately, including what was applied, drafted, sent or still waiting. Measure useful progress by handoffs released and client commitments advanced, not raw task counts. Offer the optional action session once.
 
 ## Guardrails
 

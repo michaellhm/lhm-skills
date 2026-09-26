@@ -2,6 +2,10 @@
 name: lhm-conversation-capture
 description: Review a date range of Michael's local Claude Code and Hermes conversations for Local Health Marketing ideas, decisions, external-resource reviews, unresolved questions, wins, lessons and strategic changes, then update the LHM Obsidian vault without dumping transcripts. Use for the Monday AI conversation review, weekly LHM knowledge capture, recurrence or contradiction detection, or when asked to mine recent AI chats into Ideas, the Attention Queue, Inbox, projects, marketing notes, SOPs or durable knowledge.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # LHM Conversation Capture
 
@@ -17,7 +21,7 @@ Turn useful thinking from recent Claude Code conversations into structured LHM b
 
 ## Prepare
 
-1. Locate the vault directory containing `.obsidian`; prefer `/Users/michaelcolman/Documents/Obsidian/Local Health Marketing/Local Health Marketing`.
+1. Locate the vault directory containing `.obsidian`; resolve the confirmed active root(s), using shared LHM Knowledge for client/team context and the authorised private vault for founder planning; do not fall back to the retired combined vault.
 2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely.
 3. Read `_System/AI Conversation Capture State.md`. If only the legacy `_System/Claude Conversation Capture State.md` exists, migrate its coverage without losing processed session IDs.
 4. Read the relevant indexes and canonical notes before writing: `05 Weekly`, `10 Goals`, `25 Marketing`, `30 Projects`, `40 Ideas`, `60 Knowledge`, and the Attention Queue.

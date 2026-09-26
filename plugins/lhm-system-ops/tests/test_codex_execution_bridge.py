@@ -1,0 +1,159 @@
+import importlib.util, io, json, os, pwd, shutil, subprocess, sys, tempfile
+import pytest
+from importlib.machinery import SourceFileLoader
+from pathlib import Path
+from unittest import mock
+
+ROOT=Path(__file__).resolve().parents[1]
+def load(name,path):
+    spec=importlib.util.spec_from_loader(name,SourceFileLoader(name,str(path))); mod=importlib.util.module_from_spec(spec); spec.loader.exec_module(mod); return mod
+worker=load('codex_execution_worker',ROOT/'assets/host/lhm-codex-execution-worker')
+client=load('codex_execution_client',ROOT/'assets/container/lhm-codex-dispatch')
+
+def request(**overrides):
+    value={'schema_version':1,'request_id':'synthetic-1','parent_run_id':'telegram-parent-1','task_class':'generic_non_mutating','objective':'Summarise this bounded synthetic request.','permission_profile':'default-review-only','timeout_seconds':60,'created_at':'2026-09-01T00:00:00Z'}
+    value.update(overrides); return value
+
+def test_protected_client_accepts_exact_generic_contract(capsys):
+    with tempfile.TemporaryDirectory() as temporary:
+        client.BASE=Path(temporary)
+        with mock.patch.object(sys,'argv',['lhm-codex-dispatch','submit']), mock.patch.object(sys,'stdin',io.StringIO(json.dumps(request()))): client.main()
+        accepted=json.loads(capsys.readouterr().out)
+        assert accepted['selected_worker']=='codex' and accepted['authentication_class']=='subscription-backed'
+        assert (client.BASE/'incoming/synthetic-1.json').is_file()
+
+def test_protected_client_rejects_duplicate_id():
+    with tempfile.TemporaryDirectory() as temporary:
+        client.BASE=Path(temporary)
+        for _ in range(2):
+            try:
+                with mock.patch.object(sys,'argv',['lhm-codex-dispatch','submit']), mock.patch.object(sys,'stdin',io.StringIO(json.dumps(request()))): client.main()
+            except SystemExit as exc:
+                assert 'duplicate request_id' in str(exc); break
+        else: raise AssertionError('duplicate accepted')
+
+def test_generic_request_launches_subscription_codex_and_persists_receipt():
+    with tempfile.TemporaryDirectory() as temporary:
+        worker.BASE=Path(temporary); [ (worker.BASE/n).mkdir() for n in ('incoming','processing','receipts','incidents','failed','worker-runs') ]
+        path=worker.BASE/'incoming/synthetic-1.json'; path.write_text(json.dumps(request()))
+        def fake(args,**kwargs):
+            if 'status' in args: return subprocess.CompletedProcess(args,0,'Logged in using ChatGPT\n','')
+            out=Path(args[args.index('--output-last-message')+1]); out.write_text(json.dumps({'status':'completed','summary':'Synthetic result','worker':'codex'}))
+            return subprocess.CompletedProcess(args,0,'{"type":"turn.completed"}\n','')
+        auth=Path(temporary)/'auth.json'; auth.write_text('{}')
+        with mock.patch.object(worker,'CODEX_HOME',Path(temporary)), mock.patch.object(worker,'run_codex',side_effect=fake) as run: worker.process(path)
+        receipt=json.loads((worker.BASE/'receipts/synthetic-1.json').read_text())
+        assert receipt['selected_worker']=='codex' and receipt['selected_provider']=='openai-codex'
+        assert receipt['authentication_class']=='subscription-backed' and receipt['permission_ceiling']=='review-only'
+        command=run.call_args_list[1].args[0]
+        assert '--ignore-user-config' in command and command[command.index('--sandbox')+1]=='read-only'
+        assert run.call_args_list[1].kwargs['env']['CODEX_HOME'].endswith('/worker-runs/synthetic-1/runtime-home')
+
+def test_codex_0147_runtime_home_is_writable_but_subscription_auth_stays_read_only():
+    with tempfile.TemporaryDirectory() as temporary:
+        root=Path(temporary); credential_home=root/'credential-home'; credential_home.mkdir()
+        auth=credential_home/'auth.json'; auth.write_text('{"tokens":"synthetic"}'); auth.chmod(0o400)
+        run_dir=root/'run'; run_dir.mkdir()
+        with mock.patch.object(worker,'CODEX_HOME',credential_home): runtime=worker.runtime_home(run_dir)
+        assert runtime.is_dir() and os.access(runtime,os.W_OK)
+        link=runtime/'auth.json'; assert link.is_symlink() and link.resolve()==auth
+        assert not os.access(auth,os.W_OK) or auth.stat().st_mode & 0o222 == 0
+
+def test_codex_0147_exec_reproduces_read_only_home_runtime_exit():
+    codex=shutil.which('codex')
+    if not codex: pytest.skip('codex-cli unavailable')
+    version=subprocess.run([codex,'--version'],text=True,capture_output=True,check=True).stdout
+    if 'codex-cli 0.147.0' not in version: pytest.skip(f'0.147.0 required, found {version.strip()}')
+    if os.geteuid()==0: pytest.skip('read-only owner permissions cannot be reproduced as root')
+    with tempfile.TemporaryDirectory() as temporary:
+        root=Path(temporary); home=root/'.codex'; home.mkdir(); schema=root/'schema.json'
+        schema.write_text('{"type":"object"}\n'); home.chmod(0o500)
+        command=[codex,'exec','--ephemeral','--ignore-user-config','--sandbox','read-only','--skip-git-repo-check','--output-schema',str(schema),'--output-last-message',str(root/'result.json'),'--json','synthetic offline prompt']
+        done=subprocess.run(command,env={'HOME':str(root),'CODEX_HOME':str(home),'PATH':os.environ.get('PATH','')},text=True,capture_output=True,timeout=10)
+        assert done.returncode==1
+        assert 'failed to initialize in-process app-server client: Permission denied' in done.stderr
+
+def test_failed_codex_subprocess_persists_bounded_redacted_evidence():
+    with tempfile.TemporaryDirectory() as temporary:
+        worker.BASE=Path(temporary); [ (worker.BASE/n).mkdir() for n in ('incoming','processing','receipts','incidents','failed','worker-runs') ]
+        path=worker.BASE/'processing/synthetic-1.json'; path.write_text(json.dumps(request()))
+        secret='sk-'+'A'*40
+        worker.incident(path,worker.CodexExit(1,'event '+secret,'Authorization: Bearer '+secret+'\npermission denied'))
+        evidence=json.loads((worker.BASE/'incidents/synthetic-1.json').read_text())
+        assert evidence['subprocess_exit_status']==1 and secret not in json.dumps(evidence)
+        assert evidence['stderr_redacted'].endswith('permission denied') and '[REDACTED]' in evidence['stdout_redacted']
+        assert len(evidence['stderr_redacted'])<=4000 and len(evidence['stdout_redacted'])<=4000
+
+def test_marketing_and_knowledge_work_keep_codex_default():
+    with tempfile.TemporaryDirectory() as temporary:
+        for task in ('marketing','knowledge_work'):
+            path=Path(temporary)/f'{task}.json'; value=request(request_id=task,task_class=task); path.write_text(json.dumps(value)); worker.validate(value,path)
+
+def test_unregistered_write_profile_fails_closed():
+    with tempfile.TemporaryDirectory() as temporary:
+        path=Path(temporary)/'synthetic-1.json'; value=request(permission_profile='write-anywhere'); path.write_text(json.dumps(value))
+        try: worker.validate(value,path)
+        except ValueError as exc: assert 'unregistered permission profile' in str(exc)
+        else: raise AssertionError('write profile accepted')
+
+def test_stale_or_api_auth_is_rejected_without_worker_fallback():
+    with mock.patch.object(worker,'run_codex',return_value=subprocess.CompletedProcess([],0,'Logged in with API key','')):
+        try: worker.auth_status()
+        except RuntimeError as exc: assert 'subscription authentication unavailable' in str(exc)
+        else: raise AssertionError('metered auth accepted')
+
+def test_environment_is_allowlisted_and_contains_no_metered_keys():
+    assert set(worker.ENV)=={'HOME','CODEX_HOME','PATH'}
+    source=(ROOT/'assets/host/lhm-codex-execution-worker').read_text()
+    assert all(value not in source for value in ('OPENROUTER_API_KEY','ANTHROPIC_API_KEY','OPENAI_API_KEY','hermes-2'))
+
+def test_service_has_no_docker_vault_root_or_host_shell_exposure():
+    unit=(ROOT/'assets/systemd/lhm-codex-execution.service').read_text()
+    assert 'InaccessiblePaths=' in unit and '/var/run/docker.sock' in unit and '/run/docker.sock' in unit and '/root' in unit
+    assert '/profiles/lhm_brain/vault' in unit and 'ProtectSystem=strict' in unit
+    assert 'ExecStart=/usr/local/libexec/lhm-codex-execution-worker' in unit
+    assert 'User=codexworker' in unit
+    assert '/home/codexworker/.codex' not in next(line for line in unit.splitlines() if line.startswith('ReadWritePaths='))
+
+def test_root_owned_launch_repairs_only_codexworker_traversal_before_worker():
+    unit=(ROOT/'assets/systemd/lhm-codex-execution.service').read_text()
+    lines=unit.splitlines()
+    acl_lines=[line for line in lines if line.startswith('ExecStartPre=')]
+    assert acl_lines == [
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes',
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain',
+        'ExecStartPre=+/usr/bin/setfacl -n -m m::--x,u:codexworker:--x /home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution',
+        'ExecStartPre=+/usr/local/libexec/lhm-codex-queue-handoff',
+    ]
+    assert max(lines.index(line) for line in acl_lines) < lines.index('ExecStart=/usr/local/libexec/lhm-codex-execution-worker')
+    assert all(line.startswith(('ExecStartPre=+/usr/bin/setfacl -n -m ', 'ExecStartPre=+/usr/local/libexec/lhm-codex-queue-handoff')) for line in acl_lines)
+    assert all('m::--x,u:codexworker:--x' in line for line in acl_lines[:-1])
+    assert all('-R' not in line and 'vault' not in line and 'rwx' not in line for line in acl_lines)
+    assert not any(entry in '\n'.join(acl_lines) for entry in ('u:claudeworker:','u:hermes:','u:root:'))
+
+def test_queue_handoff_is_read_only_direct_json_and_survives_submit_chmod():
+    source=(ROOT/'assets/host/lhm-codex-queue-handoff').read_text()
+    assert "d:m::r--,d:u:codexworker:r--" in source
+    assert "m::r--,u:codexworker:r--" in source
+    assert "entry.name.endswith('.json')" in source and 'os.O_NOFOLLOW' in source
+    assert 'pass_fds=(descriptor,)' in source and "f'/proc/self/fd/{descriptor}'" in source
+    assert all(value not in source for value in ('-R','rwx','vault','claudeworker','hermes-2'))
+    if not shutil.which('setfacl') or not shutil.which('getfacl'):
+        return
+    with tempfile.TemporaryDirectory() as temporary:
+        incoming=Path(temporary)/'incoming'; incoming.mkdir()
+        username=pwd.getpwuid(os.getuid()).pw_name
+        subprocess.run(['setfacl','-n','-m',f'd:m::r--,d:u:{username}:r--',str(incoming)],check=True)
+        fd,temp_name=tempfile.mkstemp(prefix='.incident.',dir=incoming)
+        os.write(fd,b'{}\n'); os.close(fd); os.chmod(temp_name,0o640)
+        target=incoming/'codex-smoke-generic-20260901-02.json'; os.replace(temp_name,target)
+        acl=subprocess.run(['getfacl','-cp',str(target)],check=True,text=True,capture_output=True).stdout
+        assert f'user:{username}:r--' in acl and 'mask::r--' in acl and 'other::---' in acl
+        subprocess.run(['setfacl','-b',str(target)],check=True)
+        descriptor=os.open(target,os.O_RDONLY | os.O_NOFOLLOW)
+        try:
+            subprocess.run(['setfacl','-n','-m',f'm::r--,u:{username}:r--',f'/proc/self/fd/{descriptor}'],check=True,pass_fds=(descriptor,))
+        finally:
+            os.close(descriptor)
+        repaired=subprocess.run(['getfacl','-cp',str(target)],check=True,text=True,capture_output=True).stdout
+        assert f'user:{username}:r--' in repaired and 'other::---' in repaired

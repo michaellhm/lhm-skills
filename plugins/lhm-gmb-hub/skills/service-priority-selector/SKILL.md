@@ -2,6 +2,10 @@
 name: service-priority-selector
 description: "Select the top 3 priority services to focus on for the current optimisation cycle based on ranking data, search volume, and the decision framework. Use this when the user mentions 'select priority services for [Client] this cycle', 'pick services', 'which services should we focus on', 'service priorities', 'priority selection', 'what should we work on this cycle', or 'choose services'."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Service Priority Selector
 

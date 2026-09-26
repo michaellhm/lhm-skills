@@ -2,6 +2,10 @@
 name: gbp-optimiser
 description: "Research competitor GBP profiles and generate a full Google Business Profile optimisation plan including categories, services, business description, and profile completion checklist. Use this when the user mentions 'optimise GBP for [Client]', 'GBP optimisation', 'Google Business Profile', 'optimise the profile', 'GBP categories', 'GBP services', 'business description', or 'profile optimisation'."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # GBP Optimiser
 

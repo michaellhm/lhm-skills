@@ -5,6 +5,7 @@
   "vault_relative_root": "20 Clients/Dry Eye Solutions",
   "allowed_context_files": [
     "Dry Eye Solutions.md",
+    "client_profile.md",
     "Goals.md",
     "Current Projects.md",
     "project-management/Google Ads.md",

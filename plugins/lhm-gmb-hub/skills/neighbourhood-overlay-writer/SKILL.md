@@ -2,6 +2,10 @@
 name: neighbourhood-overlay-writer
 description: "Write hyper-local neighbourhood overlay pages targeting specific suburbs and landmarks near a client's business. Use this when the user mentions 'write neighbourhood overlay pages', 'overlay pages', 'geo pages', 'location pages', 'neighbourhood pages', 'suburb pages', 'areas we serve pages', or wants to produce Month 2 content using the overlay/proximity path. Uses Local Falcon grid data to identify yellow grid points (positions 4-6) and targets nearby landmarks."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Neighbourhood Overlay Writer
 

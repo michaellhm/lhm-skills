@@ -141,6 +141,10 @@ chmod 0644 /var/lib/lhm-workflow/public/evidence-attestor.public.pem
 
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-workflow-*.service "$repo_dir"/packaging/lhm-workflow-*.path /etc/systemd/system/
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-scheduled-work.service "$repo_dir"/packaging/lhm-scheduled-work.path /etc/systemd/system/
+install -d -o root -g root -m 0755 "$release_dir/integration"
+install -D -o root -g root -m 0755 "$repo_dir"/integration/lhm-org-role-adapter "$release_dir"/integration/lhm-org-role-adapter
+sh "$repo_dir"/packaging/provision-scheduled-signers.sh
+scheduled_signer_paths=$(printf '%s ' /etc/systemd/system/lhm-scheduled-org-signer-*.path)
 install -o root -g root -m 0644 "$repo_dir"/packaging/lhm-department-*.service "$repo_dir"/packaging/lhm-department-*.path /etc/systemd/system/
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-department-snapshot-dispatch "$repo_dir"/integration/lhm-department-snapshot-broker "$repo_dir"/integration/lhm-department-result-importer /usr/local/libexec/
 install -o root -g root -m 0755 "$repo_dir"/integration/lhm-seo-envelope-runtime /usr/local/libexec/lhm-seo-envelope-runtime
@@ -151,14 +155,25 @@ install -D -o root -g root -m 0755 "$repo_dir"/integration/lhm-scheduled-work-di
 install -D -o root -g root -m 0755 "$repo_dir"/integration/lhm-seo-org-cron-alternate /home/hermes/.hermes/profiles/lhm_brain/bin/lhm-seo-org-cron-alternate
 install -o root -g root -m 0644 "$repo_dir"/integration/scheduled-workflows.json /etc/lhm-workflow/scheduled-workflows.json
 scheduled_base=/home/hermes/.hermes/profiles/lhm_brain/dispatch/scheduled-work
+install -d -o root -g 10000 -m 0710 "$scheduled_base"
 install -d -o root -g 10000 -m 0730 "$scheduled_base/incoming"
+for profile in lhm_chief_of_staff lhm_production lhm_researcher lhm_seo lhm_content lhm_website lhm_verifier lhm_operations_connector lhm_learning_steward; do
+  install -d -o 10000 -g 10000 -m 0700 "/home/hermes/.hermes/profiles/$profile/dispatch"
+  install -d -o root -g 10000 -m 0710 "/home/hermes/.hermes/profiles/$profile/dispatch/scheduled-executor"
+done
 for d in processed failed runs; do install -d -o root -g root -m 0750 "$scheduled_base/$d"; done
 systemctl daemon-reload
 systemd-analyze verify /etc/systemd/system/lhm-workflow-*.service /etc/systemd/system/lhm-workflow-*.path /etc/systemd/system/lhm-scheduled-work.service /etc/systemd/system/lhm-scheduled-work.path
 if test "$enable_units" = 1; then
+  for path in $scheduled_signer_paths; do systemctl enable --now "$(basename "$path")"; done
   systemctl enable --now $units
 else
   for unit in $units; do
+    test "$(systemctl is-enabled "$unit" 2>/dev/null || true)" = disabled
+    state=$(systemctl is-active "$unit" 2>/dev/null || true); test "$state" = inactive || test "$state" = failed
+  done
+  for path in $scheduled_signer_paths; do
+    unit=$(basename "$path")
     test "$(systemctl is-enabled "$unit" 2>/dev/null || true)" = disabled
     state=$(systemctl is-active "$unit" 2>/dev/null || true); test "$state" = inactive || test "$state" = failed
   done

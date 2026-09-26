@@ -2,8 +2,26 @@
 name: run-hermes-task
 description: Run substantive LHM client or internal work through the governed Hermes workforce from source intake to durable delivery, independent QA and human review. Use when Michael or an LHM team member asks Claude, Codex or another desktop agent to "run this through Hermes", execute a BasicOps task through Hermes, test the Hermes employee chain, supervise delegated AI work, or recover a Hermes-run task that stalls. Routes capability failures to the Hermes CTO with a persisted return point and resumes automatically after verified repair.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Run Hermes Task
+
+## Meeting-wrap intent gate
+
+Before production planning or execution, distinguish meeting review and task
+distribution from a request to perform the work. Read the installed sibling skill
+`basicops-task-manager/references/meeting-wrap.md` (in a plugin checkout:
+`${CLAUDE_PLUGIN_ROOT}/skills/basicops-task-manager/references/meeting-wrap.md`).
+For “disperse/distribute these meeting tasks”, apply only that routing procedure
+and STOP. Assign named humans to their verified Inboxes, preserve the meeting
+Description and links, and do not invoke Ted/Chief, production plans, research,
+execution queues or production lifecycle events. A review approval or distribution
+receipt never grants production authority. This gate takes precedence over the
+ordinary production flow below; TED requires a separate explicit work request.
+
 
 Act as the desktop control client for Hermes. Enter the existing governed workforce; do not
 recreate its employee roles locally or do the specialist work merely because dispatch is awkward.
@@ -21,6 +39,47 @@ recreate its employee roles locally or do the specialist work merely because dis
 5. If the user says to run or execute an existing task, ordinary internal production, durable Drive
    delivery and a BasicOps review request are authorised unless the source task narrows them.
    Deployment, publishing and outbound contact still require explicit authority.
+6. Treat delegation as authority to pursue the defined outcome through its normal reversible
+   internal steps, not merely the next visible step. Do not ask whether to continue from research
+   to brief, draft, separate working files, verified Drive delivery or BasicOps progress updates
+   when those steps are already inside the task contract. Stop only for material human judgment,
+   a missing dependency or protected access, conflicting instructions, meaningful scope or
+   commercial change, or a separately consequential approval.
+
+## Route human decisions through BasicOps
+
+A BasicOps-governed task remains governed by BasicOps even when it was activated from Telegram,
+Codex, Claude or another authenticated interface. Keep the task Discussion as the durable decision
+record and use a BasicOps direct message as the attention mechanism when a person must respond.
+
+Before asking, exhaust Context & Research and any documented reversible default. Then resolve the
+respondent from, in order: named approver or decision owner; verified next handoff; current task
+assignee; authenticated requester; verified project manager or account owner. Never hard-code
+Michael. If ownership is ambiguous, ask to confirm ownership rather than guessing a recipient.
+
+Post one decision-ready question in Discussion: what is blocked, why it matters, the recommended
+answer or two to three bounded options, and what resumes after reply. Put the task in the accurate
+blocked, waiting or review state, then send the respondent a concise BasicOps direct message with a
+native task link. Verify the Discussion post and the direct message independently.
+
+To initiate the DM, resolve the respondent's verified BasicOps user ID, list the agent's direct
+chats and reuse the chat whose `user` matches. If none exists, create a chat for that user. Post the
+question with `create_message_in_chat` because there is no incoming parent message, then list/read
+the chat messages to verify the returned message. Use `create_reply_in_message` only when replying
+to an existing incoming BasicOps message ID.
+
+If the configured BasicOps connector cannot send or verify direct messages, preserve the Discussion
+question, open a capability incident for the missing attention route and report that the DM was not
+sent. Do not silently fall back to Telegram or claim that assignment, a `Seen by` marker or a task
+notification is equivalent to a direct message.
+
+If the respondent is already answering that same question in an active authenticated interface, do
+not send a duplicate direct message. Record the answer, source and local timestamp in Discussion
+and resume automatically. Use the BasicOps direct-message loop for a later unattended blocker.
+
+Render human-facing timestamps in the authenticated person's configured IANA timezone. For Michael
+use `Australia/Melbourne`, allowing AEST/AEDT to change automatically; never derive the displayed
+date from server UTC or a fixed offset.
 
 ## Preflight Hermes
 
@@ -34,9 +93,13 @@ successful shell return or armed monitor is not acceptance.
 
 ## Dispatch and supervise
 
-1. Dispatch the parent to `lhm-chief-of-staff` with the full contract and return point.
+1. For a human-delegated BasicOps task, invoke `hermes-production-plan` first. The Project Manager
+   posts the version-bound plan on the existing task and assigns it to the authenticated human in
+   `Under Review` with `Review type: Plan approval`. Dispatch to `lhm-chief-of-staff` only after the
+   current version is explicitly approved and the same task is assigned to verified Ted in `In
+   Progress`. For an already-approved system event, verify its bound approval receipt first.
 2. Require the governed route:
-   `Chief of Staff → Context & Research → Head of Production → specialist worker → independent QA`.
+   `Chief of Staff → Context & Research → Head of Production → specialist worker → producer QA → Drive artefact delivery → independent final QA`.
    Skip a role only when its work is genuinely unnecessary and record why.
 3. Preserve the parent ID through every child. Record child run IDs, dependencies, artefact paths,
    idempotency keys and status evidence.
@@ -78,10 +141,11 @@ providers or spend limits.
 
 1. Require independent QA against the source acceptance test. A worker's self-report is evidence,
    not verification.
-2. Treat Hermes workspaces, container paths, logs and Kanban attachments as staging only.
+2. Treat Hermes workspaces, VPS/container paths, local files, logs and Kanban/BasicOps attachments as staging only.
 3. Resolve the existing authoritative client destination, normally the client's Google Drive
-   project folder. Upload the approved package and verify each expected file by destination listing
-   or metadata/readback. Preserve source files and existing organisation.
+   project folder. Invoke `drive-artifact-delivery` for every required manifest item. Require its
+   exact file, parent, byte-count and content-hash readback receipts. Preserve source files and
+   existing organisation. Never implement one-off upload logic inside this control-client skill.
 4. Record durable folder/file URLs, QA result, remaining exceptions and hashes or revision evidence
    when useful.
 5. Route the BasicOps write through `basicops-task-manager`. Put actionable handoff context and
@@ -92,6 +156,11 @@ providers or spend limits.
 7. Never mark a human-owned BasicOps task `Complete` unless the authenticated accountable human
    explicitly requests that exact mutation after reviewing the outcome.
 8. Read back the task status, reviewer, board/list, assignee, metadata, Discussion and URLs.
+
+When the reviewer requests correction, record a durable correction event, return the same task to
+verified Ted in `In Progress`, and resume from the saved return point. Do not create a replacement
+parent or require another start approval unless the plan materially changes. After current delivery
+is corrected, route the event to the Learning Steward for governed wider improvement.
 
 ## Hand back
 
@@ -107,7 +176,6 @@ Return one concise receipt containing:
 - exact next handoff;
 - CTO incident, repair and automatic-resume evidence when recovery occurred.
 
-Call the outcome complete only when the source acceptance condition, durable delivery and review
+Call the outcome complete only when the source acceptance condition, every required Drive delivery receipt and review
 request are all verified. Describe work awaiting human inspection as `ready for review`, not
 completed.
-

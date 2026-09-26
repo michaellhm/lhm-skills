@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-161 skills across ten Claude Code plugins (5 inbox, 60 marketing, 36 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates (deprecated — moved to project hub), 2 skill ops, 22 project hub) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+193 skills across twelve Claude Code plugins (5 inbox, 61 marketing, 41 WordPress, 19 GMB/local SEO, 7 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 29 project hub, 5 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -28,13 +28,13 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/content.md                     # Direct content specialist entry
   agents/wordpress.md                   # Direct WordPress content specialist entry
   agents/marketing-assistant.md         # (legacy alias) — routes to start agent
-  skills/                              # All 60 skills
+  skills/                              # All 61 skills
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
     bid-budget-optimizer/              # Budget and bid strategy
     keyword-optimizer/                 # Keyword and wasted spend analysis
     landing-page-optimizer/            # Landing page audits
-    google-ads-monthly-review/          # Account health check and zone analysis
+    google-ads-monthly-review/          # Account health, zone analysis and Monday highlights digest
     google-ads-delivery-qa/             # Independent action-level evidence, artefact and completion gate
     google-ads-implementation/          # Apply approved changes from a BasicOps task via AdPulse or guided Chrome, plus AdPulse Insights/Optimize sweep
     quarterly-adversarial-review/       # 90-day red-team review: reconstructs prior work, tests assumptions, assigns AdPulse zone
@@ -81,7 +81,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     wordpress-builder.md                # Phase E — theme scaffold and page build
     qa-and-launch.md                    # Phase F — QA, performance, security and launch
     site-extension.md                   # Post-launch page management
-  skills/                               # All 36 skills
+  skills/                               # All 41 skills
     wp-start/                           # Entry point — /wp-start command
     wp-project-setup/                   # Initialize project folder structure (platform choice)
     wp-project-manager/                 # PM doc — create, read, mark complete, gate-check
@@ -98,6 +98,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     theme-scaffold/                     # Custom block theme scaffolding
     css-sync-check/                     # Validate theme CSS matches prototype
     wp-page-builder/                    # Build pages in WordPress
+    wp-rest-operator/                   # Operate registered WordPress REST content safely
     wp-blog-publisher/                  # Publish blog posts via WP-CLI
     visual-qa/                          # Pixel-perfect visual regression testing
     wp-performance/                     # Performance audit and optimization
@@ -127,7 +128,7 @@ plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
     content-expansion-agent.md          # Month 2 — FAQ or overlay pages
     link-building-agent.md              # Month 3 — link acquisition
     content-writer.md                   # 8-pass writing utility
-  skills/                               # All 18 skills
+  skills/                               # All 19 skills
     gmb-project-manager/                # Project tracking and status
     run-local-diagnostic/               # Grid scans + competitor audit
     gbp-optimiser/                      # GBP profile optimisation
@@ -136,7 +137,7 @@ plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
     entity-mapper/                      # Competitor entity extraction
     site-architecture-mapper/           # GBP-mirrored silo
     blog-schedule-builder/              # 3-month blog content schedule
-    monthly-loop-setup/                 # Scheduled automation for the monthly GMB cycle
+    monthly-loop-setup/                 # Monthly GMB automation and CLI-only Monday SEO runtime, verified delivery and Lily HTML digest
     service-priority-selector/          # Pick 3 services per cycle
     consistency-signal-audit/           # 8 homepage signals
     service-page-writer/                # Goal-completion content
@@ -146,7 +147,7 @@ plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
     link-gap-finder/                    # Pages missing links
     local-authority-finder/             # Chambers, sponsorships
     pr-brief-generator/                 # Press release drafts
-    monthly-cycle-report/               # Monthly/cycle reports
+    monthly-cycle-report/               # Client SEO reports, local phase status and AI coaching
   references/                           # 10 reference files
     anti-ai-writing-guidelines.json
     ahpra-compliance-framework.md
@@ -173,6 +174,7 @@ plugins/lhm-knowledge-hub/             # Knowledge and operating-rhythm hub
   .claude-plugin/plugin.json            # Plugin manifest
   agents/knowledge-orchestrator.md      # Weekly Flow, vault thinking, capture and review entry point
   skills/                               # Knowledge-system workflows
+    lhm-weekly-flow/                    # Focused founder planning, optional action handoff and verified WeekFlow scheduling
 plugins/lhm-learn/                    # Session learning capture plugin
   .claude-plugin/plugin.json            # Plugin manifest
   skills/                               # All 1 skill
@@ -198,10 +200,12 @@ plugins/lhm-inbox-hub/                # Michael's inbox system — triage, voice
 
 plugins/lhm-project-hub/              # Agency process hub — sales handover through monthly/quarterly reviews
   .claude-plugin/plugin.json            # Plugin manifest
-  agents/pm-orchestrator.md             # Main entry point — status, cadence checks and governed multi-skill coordination
-  skills/                               # All 22 skills
+  agents/pm-orchestrator.md             # Main entry point — status, SOP discovery and governed multi-skill coordination
+  skills/                               # All 29 skills
     basicops-task-manager/              # Shared BasicOps boundary — discussion-first briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
+    hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
+    drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
     staff-weekly-flow/                  # Personal weekly/daily focus, full BasicOps inbox triage/write-back and reminder preferences
     sales-handover/                     # Hand a newly-closed client from sales to delivery
     client-onboarding/                  # Scope-aware Obsidian-first onboarding — 5 top-level BasicOps gates
@@ -214,11 +218,13 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     google-ads-kickoff/                 # New Google Ads campaign build kickoff — gates on conversion tracking
     monthly-review/                     # Monthly per-client review engine (3 modes: wrap, prep, account review)
     quarterly-review/                   # Quarterly strategy review — 3-month data pull + next-quarter plan
-    client-meeting-email/               # Client-ready meeting follow-up email + meeting capture — saves notes, stands up the BasicOps card
-    post-meeting-review/                # Post-meeting follow-up triage — state files, BasicOps subtasks, team email (migrated from client updates hub; shim remains)
+    client-meeting-email/               # Review-only meeting email preparation; authorised post-meeting-review owns the BasicOps card
+    meeting-to-action/                 # Interactive reconciliation, delegation, execution and verified session close-out
+    post-meeting-review/                # Josephine captures one card with the full email in Discussion; Michael reviews and delegates through meeting-to-action
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
     wp-project-manager/                 # Website PM state plus verified BasicOps handoff reconciliation
+    weekly-web-project-brief/           # Lily Monday HTML portfolio: project health, inactivity checks and concise client-grouped owner inbox actions and an unattended Codex route
     website-project-cockpit/            # Website status and three-layer Obsidian/Web Projects/personal-task stage handoffs
     lp-project-manager/                 # Landing page campaign PM doc (migrated from WordPress hub; shim remains)
     gmb-project-manager/                # GMB optimisation cycle PM doc (migrated from GMB hub; shim remains)
@@ -235,13 +241,21 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
   skills/                               # All 2 skills
     sync-observations/                  # Push local Task Observer logs to observations/<person>/
     weekly-skill-review/                # Cross-team review — applies learnings on a branch, opens a PR
+plugins/lhm-system-ops/               # Governed CTO engineering and release operations
+  .claude-plugin/plugin.json            # Claude plugin manifest
+  .codex-plugin/plugin.json             # Codex plugin manifest
+  skills/                               # All 12 skills
+    lhm-cto/                            # Capability incident owner and team router
+    lhm-skill-maintainer/               # Canonical skill edits, tests, PR, approved deployment and hotfix reconciliation
+    lhm-plugin-release-manager/         # Immutable GitHub and Hermes release handoff
+    ... and 9 specialised engineering, QA, security and source-handoff skills
 ```
 
 ## Skills Catalog
 
 **Client Management** (3 skills): Client onboarding and profile setup, theme-led campaign-playbook strategy session preparation and coaching, and campaign playbook generation from transcripts.
 
-**Google Ads & PPC** (11 skills): Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), independent action-level delivery QA, BasicOps-driven implementation of approved changes through AdPulse with a guided Chrome fallback plus an AdPulse Insights/Optimize triage sweep, quarterly adversarial 90-day review, PMax banner creative, PMax campaign setup for local businesses, PMax monthly + 90-day optimisation.
+**Google Ads & PPC** (11 skills): BasicOps-driven implementation of approved changes through AdPulse with a guided Chrome fallback plus an AdPulse Insights/Optimize triage sweep, Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), independent action-level delivery QA, quarterly adversarial 90-day review, PMax banner creative, PMax campaign setup for local businesses, PMax monthly + 90-day optimisation.
 
 **Strategy & Research** (3 skills): Competitive analysis with Porter's 5 Forces, keyword research with intent analysis and topic clustering, They Ask You Answer question discovery.
 
@@ -253,6 +267,8 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 **Pricing** (1 skill): Standalone pricing strategy and monetization.
 
+**System Operations** (12 skills): Governed CTO incident ownership, capability research, platform engineering, QA, security review, canonical skill maintenance, immutable plugin release management, release publishing and bounded source handoffs.
+
 ### GMB Hub (Local SEO)
 
 **Month 0 — Onboarding** (8 skills): Project management and tracking, 169-point grid scan diagnostics, GBP profile optimisation, weekly post generation (13 posts, matched to the 3-month cycle), citation audit, competitor entity mapping, GBP-mirrored site architecture, 3-month blog content schedule builder.
@@ -263,11 +279,11 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 **Month 3 — Link Building** (3 skills): Link gap analysis, local authority opportunities (chambers, sponsorships, .edu links), PR brief generation.
 
-**Cross-Phase** (2 skills): Adaptive monthly/cycle reporting with ranking trends, scheduled automation setup for the recurring monthly GMB cycle (Telegram + email notifications, BasicOps task creation, site-change staging).
+**Cross-Phase** (2 skills): Goal-led monthly SEO investigation, per-location phase close-out, consolidated work plans and AI coaching, scheduled automation setup for the recurring monthly GMB cycle (Telegram + email notifications, BasicOps task creation, site-change staging).
 
 ### WordPress Hub
 
-**Website Build Pipeline** (23 skills): Project setup (with WordPress/Astro platform choice), Phase 0 client data collection (Drive folder, BasicOps access checklist, data-gathering email, weekly automated follow-up), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), Decap CMS setup for Astro on Cloudflare Pages (Git-backed editing, drafts, scheduled publishing, deploy previews), the pre-launch QA checklist (automated + guided, for both WordPress and Astro), Rank Math 301 redirect management, and the Phase 4 digital audit (automated GA4 checks — data, key events, Ads link — plus a manual GTM/Search Console checklist).
+**Website Build Pipeline** (24 skills): Project setup (with WordPress/Astro platform choice), Phase 0 client data collection (Drive folder, BasicOps access checklist, data-gathering email, weekly automated follow-up), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, registered WordPress REST operation, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), Decap CMS setup for Astro on Cloudflare Pages (Git-backed editing, drafts, scheduled publishing, deploy previews), the pre-launch QA checklist (automated + guided, for both WordPress and Astro), Rank Math 301 redirect management, and the Phase 4 digital audit (automated GA4 checks — data, key events, Ads link — plus a manual GTM/Search Console checklist).
 
 **Git Repo Workflow** (2 skills): First-time client repo setup — creates GitHub repos, scaffolds docs/ context folder, commits the initial scaffold, and invites confirmed default LHM collaborators with write access (`repo-init`). Clones an existing client project onto a new machine or pulls the latest (`repo-install`).
 
@@ -295,15 +311,15 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 
 **Personal Work Flow** (1 skill): Personal weekly planning and daily selection for Michael and the team, with overwhelmed mode, project/client priority ranking, optional mini stand-ups and a full BasicOps inbox review. The inbox flow presents client-risk rescue, stale/likely closure, delegate, keep and needs-decision groups, then applies only confirmed mutations through the shared BasicOps task manager with read-back verification.
 
-**Team Handoffs** (2 skills): A universal team-work briefing flow reads requester, client, assignee and project context; checks access, dependencies, authority, completion and review; asks one material question at a time; and learns carefully from assignee feedback. The shared BasicOps task manager then applies LHM naming, discussion-first actionable next steps, existing-client website routing, parent-discussion subtask links, personal-board confirmation, approval, deduplication and read-back verification to every task mutation.
+**Team Handoffs** (4 skills): A universal team-work briefing flow reads requester, client, assignee and project context; checks access, dependencies, authority, completion and review; asks one material question at a time; and learns carefully from assignee feedback. The Hermes production-plan flow lets Monica preflight an existing BasicOps outcome, prepare a concise version-bound execution chain for Waylon, answer “where are we at?” from authoritative checkpoints, explain CTO blockers in plain English, verify durable artefact delivery and reconcile the returned work. The shared Drive artefact delivery capability moves approved files from bounded staging into the registered client folder and proves exact metadata and content through readback. The shared BasicOps task manager then applies LHM naming, discussion-first actionable next steps, existing-client website routing, parent-discussion subtask links, personal-board confirmation, approval, deduplication and read-back verification to every task mutation.
 
 **Client Lifecycle** (3 skills): Sales-to-delivery handover; Tier 1 client onboarding; and an existing-client website handover that transfers a newly scoped website project from Michael to Kristalyn without restarting general onboarding.
 
 **Delivery Kickoffs** (6 skills): Website build kickoff (WordPress or Astro), PPC landing page campaign kickoff, SEO engagement kickoff, GMB/local SEO cycle kickoff, blog/article content pipeline kickoff, and Google Ads campaign build kickoff (gated on conversion tracking being live). Each follows the same shared pattern: intake, a project-management state file, a BasicOps scaffold with backwards-scheduled milestones, a client kickoff email, and handoff to the delivery specialist hub.
 
-**Client Success** (6 skills): Monthly per-client review engine with three modes (KP wrap-up, meeting prep, full account review). Quarterly strategy review — pulls three months of GA4/Ads/GSC data plus the quarter's monthly reports and drafts the next 3/6-month plan. Client-ready meeting follow-up email and meeting capture — turns the Fathom summary and transcript into a polished Gmail-ready wrap with decisions verified against the transcript, action items grouped by owner, and next steps; also saves the structured meeting record and stands up the client's BasicOps card with a matching summary note. Post-meeting follow-up triage — reads that saved meeting record to update client state files, sweep the client folder for stale artefacts, and turn action items into BasicOps subtasks, walking through each one to propose an owner and offer to run research or prepare a live-system handoff plan before drafting a team summary email (migrated from Client Updates Hub). Propagates a client data change across every file that references it (migrated from Client Updates Hub). Plain-language client-facing update emails after completing work (migrated from Client Updates Hub).
+**Client Success** (7 skills): `meeting-to-action` guides Michael through evidence-led task reconciliation, end-to-end delegation, his retained actions and verified BasicOps/Obsidian/Drive session close-out. Monthly per-client review engine with three modes (KP wrap-up, meeting prep, full account review). Quarterly strategy review — pulls three months of GA4/Ads/GSC data plus the quarter's monthly reports and drafts the next 3/6-month plan. Client-ready meeting follow-up email and meeting capture — turns the Fathom summary and transcript into a polished Gmail-ready wrap with decisions verified against the transcript, action items grouped by owner, and next steps; also saves the structured meeting record and stands up the client's BasicOps card with a matching summary note. Post-meeting follow-up triage — reads that saved meeting record to update client state files, sweep the client folder for stale artefacts, and capture one review card assigned to Michael, who uses meeting-to-action to reconcile existing work and approve complete task briefs and delegation (migrated from Client Updates Hub). Propagates a client data change across every file that references it (migrated from Client Updates Hub). Plain-language client-facing update emails after completing work (migrated from Client Updates Hub).
 
-**Project Managers** (4 skills): Website project cockpit for concise, evidence-based status and handoff readiness; website build PM doc; landing page campaign PM doc; and GMB optimisation cycle PM doc. The three state-file managers are migrated from their originating hubs; shims remain in place there so existing routing keeps working.
+**Project Managers** (5 skills): Weekly website portfolio email with project-only traffic lights, inactivity checks, concise client-grouped owner Inbox actions, source reconciliation, approval-based targets and a BasicOps feedback loop; Website project cockpit for concise, evidence-based status and handoff readiness; website build PM doc; landing page campaign PM doc; and GMB optimisation cycle PM doc. The three state-file managers are migrated from their originating hubs; shims remain in place there so existing routing keeps working.
 
 ### Skill Ops
 
@@ -324,3 +340,11 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
 "I need to work on [client name]"   # The agent picks up from there
 "Write ad copy for my physio client" # Routes directly to the right skill
 ```
+
+### Client knowledge and work routing
+
+Client-facing skills read and update shared LHM Knowledge client records; deliverables use verified Claude Workspace/Current Clients folders. `client-meeting-email`, `post-meeting-review`, `client-update` and `drive-artifact-delivery` distinguish these roots, preserve meeting approval gates and report canonical-record writeback gaps. Local, Cowork and Hermes runs must use verified platform-specific roots rather than a current-directory fallback.
+
+**Founder Weekly Flow** (`lhm-knowledge-hub:lhm-weekly-flow`): Evidence-prepared reflection and three capacity-checked outcomes, separate optional action work, and verified publication to WeekFlow. Reuses the existing Monday briefing and staff daily-selection workflow.
+
+Meeting wraps apply an LHM scope check before proposing tasks: explicit LHM commitments and client inputs required for agreed delivery qualify; client internal projects and other discussion remain context. Existing project requirements are reused rather than duplicated.

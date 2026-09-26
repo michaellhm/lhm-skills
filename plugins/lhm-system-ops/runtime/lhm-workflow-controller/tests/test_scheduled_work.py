@@ -37,7 +37,8 @@ def event(**overrides):
 def test_registered_cron_creates_governed_parent_with_shared_contract(tmp_path):
     definition = load_definition(REGISTRY, "local-health-marketing-seo", test_mode=True)
     parent = create_parent(definition, event(), "seo-weekly-20260825")
-    assert parent["stage_order"][:3] == ["chief_intake", "production_plan", "seo_plan"]
+    assert parent["stage_order"][:6] == ["chief_intake", "context", "context_verify", "research", "research_verify", "production_plan"]
+    assert parent["stage_order"][6:9] == ["seo_plan", "seo_plan_verify", "seo_accept"]
     assert parent["scheduled_contract"]["department"] == "seo"
     assert parent["scheduled_contract"]["destinations"]["basicops_task_id"] == "2192596"
     first = persist_parent(tmp_path, parent, test_mode=True)
@@ -98,21 +99,23 @@ def test_host_runtime_validates_closed_request_and_writes_final_receipt(tmp_path
     source = runtime.INCOMING / f"{request['parent_run_id']}.json"
     source.write_text(json.dumps(request))
 
-    class Done:
-        returncode = 0
-        stdout = json.dumps({"status": "accepted", "work_state": "running"})
-        stderr = ""
-
     observed = {}
     def runner(argv, **kwargs):
-        observed["argv"] = argv
+        observed.setdefault("argv", []).append(argv)
+        class Done:
+            returncode = 0
+            stdout = json.dumps({"status": "accepted", "work_state": "running"}) if len(observed["argv"]) == 1 else json.dumps({"business_state": "closed"})
+            stderr = ""
         return Done()
 
     runtime.process(source, runner=runner)
-    assert observed["argv"][1] == "local-health-marketing-seo"
+    assert observed["argv"][0][1] == "local-health-marketing-seo"
+    assert "lhm_workflow.scheduled_executor" in observed["argv"][1]
+    acceptance = json.loads((runtime.RUNS / request["parent_run_id"] / "acceptance.json").read_text())
+    assert acceptance["scheduler"] == "accepted"
     final = json.loads((runtime.RUNS / request["parent_run_id"] / "final.json").read_text())
     assert final["scheduler"] == "accepted"
-    assert final["receipt"]["work_state"] == "running"
+    assert final["business"]["business_state"] == "closed"
     assert not source.exists()
 
 

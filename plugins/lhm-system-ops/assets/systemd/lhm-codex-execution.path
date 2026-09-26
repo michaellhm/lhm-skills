@@ -1,0 +1,7 @@
+[Unit]
+Description=Watch the protected lhm_brain Codex execution queue
+[Path]
+DirectoryNotEmpty=/home/hermes/.hermes/profiles/lhm_brain/dispatch/codex-execution/incoming
+Unit=lhm-codex-execution.service
+[Install]
+WantedBy=multi-user.target

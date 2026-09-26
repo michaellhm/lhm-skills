@@ -2,6 +2,10 @@
 name: sales-handover
 description: "Hand a newly closed client from Michael or Marlon into LHM delivery. Use after a sale closes or when the user says 'sales handover', 'handover to KP', 'we signed a client', 'closed a deal', 'new client handover', or 'hand this client over'. Captures sales context in canonical Obsidian records, drafts Michael's client introduction, creates one client-level card on the BasicOps *Client Onboarding board assigned first to Josephine, adds seven top-level checks, and hands the detailed workflow to client-onboarding."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Sales Handover
 

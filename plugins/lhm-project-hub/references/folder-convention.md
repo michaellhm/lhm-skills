@@ -1,6 +1,6 @@
 # Client Folder Convention (Project Hub contract)
 
-Every PM skill reads/writes client state using this structure:
+Every PM skill reads/writes client state beneath the active **shared LHM Knowledge Obsidian vault** using this structure. This is separate from the client work folder under **Claude Workspace/Current Clients/<verified client folder>/**. Read `obsidian-context-contract.md` first.
 
     20 Clients/<Client>/
     ├── <Client>.md                  # canonical client overview
@@ -21,12 +21,7 @@ Every PM skill reads/writes client state using this structure:
    status, phase, owner, next action, and a link into `project-management/`.
    Read the index first; then open only the file your skill owns.
 2. Per-process Obsidian files are canonical for detailed context, checklist state, evidence and decisions. BasicOps owns visible stage, assignment and due action. Google Drive owns assets, working files and deliverables.
-3. Lazy legacy migration: if your skill's state file exists at a legacy
-   location (e.g. `wordpress/project-management.md`,
-   `landing-pages/landing-page-project-management.md`, a GMB cycle file),
-   move it to the path above, leave a one-line pointer file at the old path
-   ("Moved to ../project-management/<file> on YYYY-MM-DD"), and add/update
-   the index block in `current-projects.md`. Never migrate files you don't own.
+3. Legacy work-folder state is migration evidence. Resolve the existing canonical Obsidian record first. Reconcile differing facts and provenance before a separately authorised migration; never move over a canonical record or leave a second active profile. Do not treat lowercase legacy examples as permission to create case-variant duplicates.
 4. Never store credentials in any of these files — reference the password
    manager entry by name instead.
 

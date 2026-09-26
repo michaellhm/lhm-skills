@@ -2,6 +2,10 @@
 name: client-context-intake
 description: "Extract structured facts from client call notes, Fathom transcripts, meeting recordings, or uploaded documents. Use this when the user says 'process call notes', 'extract client info', 'intake from transcript', 'add client context', 'process Fathom notes', 'client discovery', or 'client onboarding'. Outputs facts only — no marketing copy. Phase 1 of the website build."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Client Context Intake
 

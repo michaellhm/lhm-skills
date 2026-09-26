@@ -9,7 +9,7 @@ Hermes is the manager for this workflow, never the meeting analyst.
 
 ## Preparation flow
 
-1. Resolve the named client to a registered `client_id`. Never invent a folder.
+1. Resolve the named client to a registered `client_id`. Verify its knowledge source is the active shared LHM Knowledge vault or its registered mirror. The separate deliverables root is Claude Workspace/Current Clients/<verified client folder>. Never invent a folder or fall back to legacy work-folder profiles.
 2. Use authenticated Fathom tools to locate the meeting and retrieve metadata,
    summary and complete transcript. If ambiguous, ask one focused question.
 3. Treat Michael's voice-note transcription as founder context: extract explicit
@@ -43,10 +43,41 @@ run exactly one command:
 Do not inspect or reconstruct approval JSON schemas. The helper validates the
 request, creates both closed requests and returns three IDs plus exact status
 commands. Run those returned commands. Report vault success only for
-`vault_applied`, including the exact files. Report Gmail success only when the
+`vault_applied`, including the exact files. Reconcile the meeting record, overview/profile, goals, current-project index and affected service/project notes against the reviewed bundle; report each as updated, unchanged or blocked. A missing registered context file or partial application remains a visible gap. Report Gmail success only when the
 approval is `gmail_draft_queued` and the draft result is `draft_created`.
 If the helper or a status command fails, stop and report the exact error.
 
 Never accept email subject, body, recipients, file paths or file contents from
 the conversational request. The host retrieves the exact reviewed artifacts by
 run ID and hash. Never send. BasicOps is disabled.
+
+## Scope preservation
+
+The Codex capture must apply the canonical meeting-wrap scope check: explicit LHM
+commitments, client inputs blocking agreed LHM work, or other discussion/context.
+Preserve founder exclusions in the existing evidence package. Client internal
+projects and side conversations belong in the email's Other things discussed and
+canonical context; they must not become LHM execution or chasing tasks. Do not
+alter the closed request schema or analyse the transcript locally to implement this.
+When saving the approved bundle, apply the shared meeting-wrap contract again before
+proposing tasks; email approval never authorises out-of-scope work.
+
+## Subsequent BasicOps meeting wrap
+
+Email preparation remains read-only with respect to BasicOps. Josephine's explicit
+request to save the reviewed wrap authorises a separate `post-meeting-review`
+operation through `basicops-task-manager`: create or reuse one top-level
+`<Client name> meeting <day> <month>` card on Client Flow, assigned to Michael.
+Put the full reviewed email, recording/source link and **Proposed actions — awaiting
+Michael's review** in Discussion. Description holds metadata and working URLs only.
+Do not create separate action cards, nested meeting notes, delegate or start work.
+Preserve the distinction between reviewed/drafted and verified-sent email.
+
+Next handoff: Michael runs `meeting-to-action` against the card to reconcile
+existing work, resolve decisions and approve tasks and delegation. Kristalyn then
+coordinates assigned delivery. Email approval alone does not release actions.
+A request to do both stages must explicitly authorise the task/delegation stage.
+Use the authenticated BasicOps connector if available; do not change permissions
+or route BasicOps through the read-only meeting-dispatch worker. If unavailable,
+return the ready-to-save card and precise connector gap without claiming creation.
+The controlling rules are `basicops-task-manager/references/meeting-wrap.md`.

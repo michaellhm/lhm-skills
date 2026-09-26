@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch the closed CAP-015 artifact export spool
+
+[Path]
+PathExistsGlob=/var/lib/lhm-workflow/claude-artifact-export/incoming/*.json
+Unit=lhm-claude-artifact-export.service
+
+[Install]
+WantedBy=multi-user.target

@@ -2,6 +2,10 @@
 name: google-ads-existing-client-adoption
 description: Adopt an established Google Ads client into LHM's governed monthly review system without treating it as a new campaign build. Use when Michael asks to onboard, adopt, migrate, prepare, or make an existing Ads client monthly-flow-ready, including a one-client pilot before portfolio rollout.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Existing Google Ads Client Adoption
 

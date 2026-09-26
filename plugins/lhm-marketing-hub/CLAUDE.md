@@ -115,3 +115,7 @@ One line per entry. Dated. Specific. Actionable.
 - Information already documented in SKILL.md, client_profile.md, or reference files
 - Speculative conclusions from a single observation (wait until a pattern recurs)
 - Anything the user explicitly told you not to remember
+
+## Client knowledge and work destinations
+
+For client work, read `references/obsidian-context-contract.md`: shared LHM Knowledge is canonical for client facts, goals and project state; verified Claude Workspace/Current Clients folders hold deliverables. Apply this before legacy single-folder instructions. Preserve personal-vault boundaries and workflow-specific approval gates.

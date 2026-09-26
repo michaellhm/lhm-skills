@@ -2,6 +2,10 @@
 name: existing-client-website-handover
 description: "Capture and transfer a new website project for an existing LHM client from Michael to Kristalyn. Use when Michael says an existing client needs a website, website rebuild, website handover, project handover to KP, or asks to start the website flow without repeating client onboarding. Interviews Michael one question at a time, prepares a canonical Obsidian handover for confirmation, routes it to Kristalyn for acceptance, then hands the accepted project to website-kickoff."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Existing Client Website Handover
 

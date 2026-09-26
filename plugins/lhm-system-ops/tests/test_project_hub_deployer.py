@@ -17,7 +17,7 @@ spec = importlib.util.spec_from_loader('project_hub_deployer', SourceFileLoader(
 deployer = importlib.util.module_from_spec(spec); spec.loader.exec_module(deployer)
 
 
-def archive(path, *, version='0.1.74', prefix='lhm-project-hub'):
+def archive(path, *, version='0.1.88', prefix='lhm-project-hub'):
     with zipfile.ZipFile(path, 'w') as bundle:
         bundle.writestr(f'{prefix}/.claude-plugin/plugin.json', json.dumps({'name':'lhm-project-hub','version':version}))
         bundle.writestr(f'{prefix}/skills/basicops-task-manager/SKILL.md', '---\nname: basicops-task-manager\n---\n')
@@ -31,6 +31,28 @@ class ProjectHubDeployerTests(unittest.TestCase):
         self.assertEqual(release['sha256'],hashlib.sha256(DEPLOYER.read_bytes()).hexdigest())
         self.assertEqual(release['size_bytes'],DEPLOYER.stat().st_size)
         self.assertEqual(release['mode'],'0755')
+
+    def test_meeting_router_sources_exist_in_package(self):
+        plugin = ROOT.parent / 'lhm-project-hub'
+        paths = deployer.profile_asset_links()
+        self.assertEqual(len(paths), 3)
+        for link, relative in paths:
+            self.assertTrue((plugin / relative / 'SKILL.md').is_file())
+            self.assertIn(link.parent.parent.name, {'lhm_brain', 'lhm_project_manager'})
+        self.assertTrue((plugin / 'skills/basicops-task-manager/references/meeting-wrap.md').is_file())
+
+    def test_profile_directory_backup_link_and_restore(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); live = root/'profile/skills/router'
+            live.mkdir(parents=True); (live/'SKILL.md').write_text('previous router')
+            release = root/'release/router'; release.mkdir(parents=True)
+            (release/'SKILL.md').write_text('review and distribute only')
+            saved = deployer.snapshot(live, root/'backup')
+            shutil.rmtree(live); deployer.atomic_symlink(release, live)
+            self.assertEqual((live/'SKILL.md').read_text(), 'review and distribute only')
+            deployer.restore(live, saved)
+            self.assertFalse(live.is_symlink())
+            self.assertEqual((live/'SKILL.md').read_text(), 'previous router')
 
     def approval_fixture(self, root, *, action='install'):
         approvals=root/'approvals'; approvals.mkdir(); key=approvals/'project-hub-approval.key'; key.write_bytes(b'k'*32)
@@ -90,7 +112,7 @@ class ProjectHubDeployerTests(unittest.TestCase):
             existing.chmod(0o777)
             with self.assertRaisesRegex(SystemExit,'secure directory'):
                 deployer.verify_existing_release(existing,source,uid=os.getuid())
-            existing.chmod(0o755); (existing/'hardlink').hardlink_to(existing/'SKILL.md')
+            existing.chmod(0o755); os.link(existing/'SKILL.md', existing/'hardlink')
             (source/'hardlink').write_text('approved\n')
             with self.assertRaisesRegex(SystemExit,'hard-linked'):
                 deployer.verify_existing_release(existing,source,uid=os.getuid())
@@ -113,8 +135,8 @@ class ProjectHubDeployerTests(unittest.TestCase):
 
     def test_rejects_wrong_version_or_plugin(self):
         for version, prefix, error in (
-            ('0.1.72','lhm-project-hub','identity or version mismatch'),
-            ('0.1.74','lhm-system-ops','unsafe plugin archive path'),
+            ('0.1.78','lhm-project-hub','identity or version mismatch'),
+            ('0.1.88','lhm-system-ops','unsafe plugin archive path'),
         ):
             with self.subTest(version=version,prefix=prefix), tempfile.TemporaryDirectory() as temporary:
                 root=Path(temporary); source=root/'release.zip'; archive(source,version=version,prefix=prefix)
@@ -130,6 +152,7 @@ class ProjectHubDeployerTests(unittest.TestCase):
             deployer.restore(link,record); self.assertEqual(link.resolve(),first.resolve())
 
     def test_release_and_profile_links_share_readonly_container_visible_tree(self):
+        self.assertEqual(deployer.REPO, Path('/srv/lhm-plugin-release-source/project-hub-0.1.88'))
         self.assertEqual(deployer.RELEASES, Path('/opt/lhm-plugin-releases/lhm-project-hub'))
         self.assertEqual(deployer.CURRENT, Path('/opt/lhm-plugin-releases/current/lhm-project-hub'))
         self.assertEqual(deployer.VISIBLE_ROOT, Path('/home/hermes/.hermes/immutable-plugin-releases'))

@@ -1,0 +1,4 @@
+interface:
+  display_name: "LHM Skill Maintainer"
+  short_description: "Safely update, test, publish, and deploy LHM skills."
+  default_prompt: "Update the specified LHM skill from its canonical source, validate it, and prepare the governed release handoff."

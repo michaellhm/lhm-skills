@@ -2,6 +2,10 @@
 name: digital-audit
 description: "Runs the GA4-checkable portion of the client's Digital Audit — confirms GA4 is receiving data, lists conversion/key events, checks the Google Ads link, writes a report to the client's Drive folder, and files a BasicOps checklist task (including manual GTM/GSC items). Use this when the user says 'digital audit', 'audit analytics', 'check GA4 setup', 'check tracking', 'verify conversions', or 'digital audit for [client]'. Step 4 of the web project onboarding flow — GA4 checks are automated, GTM and Search Console stay manual (no connector exists for either)."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Digital Audit
 

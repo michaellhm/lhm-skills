@@ -2,6 +2,10 @@
 name: repo-init
 description: "Set up Git repositories for a new client project. Use this when the user says 'set up the repo', 'init the client repo', 'create the client repos', 'initialise the project repo', 'set up GitHub for this client', 'create repos for a client', 'new client repo', 'repo-init', or is starting a new client project and needs Git set up. Creates both client-site and client-prototype repos on GitHub, scaffolds the code repo's docs/ folder with context documents pulled from existing client files, and commits the initial scaffold."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Repo Init
 

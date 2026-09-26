@@ -2,6 +2,10 @@
 name: seo-delivery-qa
 description: Independently verify one bounded SEO specialist handback before the SEO Lead accepts and advances. Use after keyword research, content-gap analysis, page briefs, SEO writing, content refresh, metadata, technical SEO preparation or an SEO implementation package is returned.
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # SEO Delivery QA
 

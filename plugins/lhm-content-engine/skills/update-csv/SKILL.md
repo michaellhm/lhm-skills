@@ -2,6 +2,10 @@
 name: update-csv
 description: "Update the content pipeline CSV with slug, meta fields, Google Doc URL, and new status after article processing. Use this when the user mentions 'update CSV', 'update the spreadsheet', 'mark as drafted', 'update tracking', or 'CSV status update'. Writes back to the source CSV file, updating the processed row with generated metadata and status."
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Update CSV
 

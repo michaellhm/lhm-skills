@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "capability_id": "LHM-PROJECT-HUB-DEPLOYER",
-  "release_version": "1.0.5",
+  "release_version": "1.0.12",
   "source": "assets/host/lhm-approved-project-hub-deployer",
   "destination": "/usr/local/libexec/lhm-approved-project-hub-deployer",
-  "sha256": "ae62e3323ea9834ed9c6778964c8063db686b13f6b87e3b4ffbc88cee8a18af0",
-  "size_bytes": 19291,
+  "sha256": "1365d0e8e7493bb355559245e7dba0aabdefd276d082a4942681e0b290f839e5",
+  "size_bytes": 21182,
   "owner": "root",
   "group": "root",
   "mode": "0755"

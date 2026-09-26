@@ -3,6 +3,10 @@ name: keyword-optimizer
 description: Identify wasted spend on poor-performing keywords, find top performers with 80/20 analysis, generate negative keyword lists, and recommend match type changes. Use this when users request keyword optimization, wasted spend audit, negative keywords, search terms analysis, or keyword performance review.
 license: MIT
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Keyword Optimizer
 
@@ -105,6 +109,12 @@ Three deliverables:
 1. **Short 1-pager** (Markdown) — summary only, one page maximum
 2. **Google Ads Editor CSV** — keyword status (pause/enable) and match-type changes, ready to import into Google Ads Editor
 3. **Negative keywords TXT** — categorised, phrase-match, quoted, n-gram decomposed
+
+When invoked as the mandatory active-Search diagnostic inside `google-ads-monthly-review`, return
+the one-page findings to the monthly Lead for embedding under `Keyword Findings`; do not save a
+separate Markdown summary. Generate the Editor CSV only when keyword status or match-type changes
+are supported, and generate the negative TXT only when reviewed negative additions are supported.
+An evidence-backed keep/no-change result is valid and produces neither implementation file.
 
 ## Expected Interaction Flow
 

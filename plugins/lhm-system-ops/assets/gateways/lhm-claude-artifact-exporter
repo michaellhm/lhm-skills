@@ -1,0 +1,167 @@
+#!/usr/bin/env python3
+"""Root-only, descriptor-safe bridge from protected CAP-015 runs to workflow artifacts."""
+import hashlib
+import hmac
+import json
+import os
+import re
+import stat
+import time
+import fcntl
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path('/var/lib/lhm-workflow/claude-artifact-export')
+RUNS = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/claude/runs')
+HANDBACK = Path('/var/lib/lhm-workflow/adapter-incoming')
+SAFE = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$')
+HEX = re.compile(r'^[0-9a-f]{64}$')
+REQUEST_KEYS = {'schema_version','kind','request_id','run_id','parent_run_id','action_id','action_version','predecessor_sha256'}
+FINAL_KEYS = {'run_id','status','profile','agent_id','completed_at','result_file','workflow_contract','skill_provenance_file'}
+PROVENANCE_KEYS = {'verification','workflow_id','entrypoint','required_skills','observed_skill_calls'}
+
+
+class PermanentError(ValueError): pass
+class TransientError(RuntimeError): pass
+
+
+def canonical(value): return json.dumps(value, sort_keys=True, separators=(',', ':')).encode()
+def digest(data): return hashlib.sha256(data).hexdigest()
+def now(): return datetime.now(timezone.utc).isoformat()
+
+
+def _dirfd(path):
+    fd = os.open(path, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    info = os.fstat(fd)
+    if not stat.S_ISDIR(info.st_mode): os.close(fd); raise PermanentError('unsafe directory')
+    return fd
+
+
+def read_regular_at(directory_fd, name, maximum=1_000_000):
+    if not SAFE.fullmatch(name): raise PermanentError('unsafe terminal filename')
+    fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory_fd)
+    try:
+        before = os.fstat(fd)
+        if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or before.st_size > maximum:
+            raise PermanentError('unsafe terminal artifact')
+        chunks=[]; remaining=maximum + 1
+        while remaining:
+            chunk=os.read(fd, min(65536, remaining))
+            if not chunk: break
+            chunks.append(chunk); remaining-=len(chunk)
+        data=b''.join(chunks); after=os.fstat(fd)
+        if len(data)>maximum or (before.st_dev,before.st_ino,before.st_size,before.st_mtime_ns)!=(after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns):
+            raise PermanentError('terminal artifact changed while read')
+        return data
+    finally: os.close(fd)
+
+
+def strict_json(data, label):
+    try: value=json.loads(data)
+    except (UnicodeDecodeError,json.JSONDecodeError) as exc: raise PermanentError(f'invalid {label}') from exc
+    if not isinstance(value,dict): raise PermanentError(f'invalid {label}')
+    return value
+
+
+def validate_request(request):
+    if set(request)!=REQUEST_KEYS or request['schema_version']!=1 or request['kind']!='claude_specialist_artifact_export': raise PermanentError('invalid closed request schema')
+    if any(not SAFE.fullmatch(str(request[k])) for k in ('request_id','run_id','parent_run_id','action_id')): raise PermanentError('invalid request identifier')
+    if not isinstance(request['action_version'],int) or request['action_version']<1 or not HEX.fullmatch(str(request['predecessor_sha256'])): raise PermanentError('invalid request binding')
+
+
+def load_run(request, runs=RUNS):
+    run_root=_dirfd(runs)
+    try: run_fd=os.open(request['run_id'],os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW,dir_fd=run_root)
+    except FileNotFoundError as exc: os.close(run_root); raise TransientError('protected run not yet present') from exc
+    finally:
+        try: os.close(run_root)
+        except OSError: pass
+    try:
+        final_bytes=read_regular_at(run_fd,'final.json'); provenance_bytes=read_regular_at(run_fd,'skill-provenance.json'); result_bytes=read_regular_at(run_fd,'result.md')
+    finally: os.close(run_fd)
+    final=strict_json(final_bytes,'final.json'); provenance=strict_json(provenance_bytes,'skill-provenance.json')
+    if set(final)!=FINAL_KEYS or final['run_id']!=request['run_id'] or final['status']!='needs_review' or final['profile']!='specialist_readonly' or final['result_file']!='result.md' or final['skill_provenance_file']!='skill-provenance.json': raise PermanentError('final.json is not the current specialist terminal schema')
+    contract=final['workflow_contract']
+    if not isinstance(contract,dict) or set(contract)!={'workflow_id','required_skills','required_capabilities','skill_provenance'} or contract['skill_provenance']!='observed': raise PermanentError('invalid workflow contract')
+    calls=provenance.get('observed_skill_calls')
+    if (set(provenance)!=PROVENANCE_KEYS or provenance['verification']!='passed'
+            or provenance['workflow_id']!=contract['workflow_id'] or not isinstance(calls,list)
+            or any(not isinstance(x,str) for x in calls) or len(calls)!=len(set(calls))
+            or not set(contract['required_skills']).issubset(set(calls))): raise PermanentError('invalid skill provenance')
+    return final_bytes,provenance_bytes,result_bytes,final,provenance
+
+
+def atomic_create(path, data, mode=0o440):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    fd=os.open(path,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,mode)
+    try: os.write(fd,data);os.fsync(fd);os.fchmod(fd,mode)
+    finally: os.close(fd)
+
+
+def append_event(root, request_id, event, signing_key):
+    ledger=root/'operations'/f'{request_id}.jsonl'; ledger.parent.mkdir(parents=True,exist_ok=True)
+    previous='0'*64
+    if ledger.exists():
+        lines=ledger.read_bytes().splitlines(); previous=digest(lines[-1]) if lines else previous
+    body={**event,'request_id':request_id,'previous_event_sha256':previous,'recorded_at':now()}
+    body['signature']=hmac.new(signing_key,canonical(body),hashlib.sha256).hexdigest()
+    fd=os.open(ledger,os.O_WRONLY|os.O_APPEND|os.O_CREAT|os.O_NOFOLLOW,0o600)
+    try: os.write(fd,canonical(body)+b'\n');os.fsync(fd)
+    finally: os.close(fd)
+    return body
+
+
+def incident(root, request, error, signing_key):
+    path=root/'incidents'/f"{request['request_id']}.json"
+    if path.exists(): return
+    event=append_event(root,request['request_id'],{'type':'incident','error':str(error)},signing_key)
+    record={'schema_version':1,'kind':'immutable_export_incident','request_sha256':digest(canonical(request)),'operation_event_sha256':digest(canonical(event)),'error':str(error)}
+    atomic_create(path,canonical(record)+b'\n',0o400)
+
+
+def export(request, root=ROOT, runs=RUNS, handback=HANDBACK, signing_key=b'test-only'):
+    validate_request(request); final_b,prov_b,result_b,final,prov=load_run(request,runs)
+    blobs={'final.json':final_b,'skill-provenance.json':prov_b,'result.md':result_b}; artifacts=[]
+    for logical,data in blobs.items():
+        sha=digest(data); target=root/'artifacts'/'sha256'/sha[:2]/sha
+        try: atomic_create(target,data)
+        except FileExistsError:
+            if target.read_bytes()!=data: raise PermanentError('content address conflict')
+        artifacts.append({'logical_name':logical,'sha256':sha,'size_bytes':len(data),'media_type':'application/json' if logical.endswith('.json') else 'text/markdown'})
+    receipt={'schema_version':1,'kind':'claude_specialist_export','request_id':request['request_id'],'parent_run_id':request['parent_run_id'],'action_id':request['action_id'],'action_version':request['action_version'],'predecessor_sha256':request['predecessor_sha256'],'workflow_id':final['workflow_contract']['workflow_id'],'artifacts':artifacts,'result_sha256':digest(result_b),'provenance_sha256':digest(prov_b),'source_disclosure':'none','drive_published':False}
+    receipt['receipt_sha256']=digest(canonical(receipt)); sealed=canonical(receipt)+b'\n'
+    destination=handback/f"claude-export-{request['request_id']}.json"
+    try: atomic_create(destination,sealed,0o640)
+    except FileExistsError:
+        if destination.read_bytes()!=sealed: raise PermanentError('conflicting replay')
+    append_event(root,request['request_id'],{'type':'completed','receipt_sha256':receipt['receipt_sha256']},signing_key)
+    return receipt
+
+
+def process(path, root=ROOT, runs=RUNS, handback=HANDBACK):
+    key=(root/'locks'/'exporter.key').read_bytes(); request={}
+    try:
+        request=strict_json(path.read_bytes(),'request'); validate_request(request)
+        attempts=sum(1 for line in (root/'operations'/f"{request['request_id']}.jsonl").read_text().splitlines() if '"type":"retry"' in line) if (root/'operations'/f"{request['request_id']}.jsonl").exists() else 0
+        try: export(request,root,runs,handback,key)
+        except TransientError as exc:
+            if attempts==0: append_event(root,request['request_id'],{'type':'retry','attempt':1,'error':str(exc)},key); return False
+            incident(root,request,exc,key)
+        except PermanentError as exc: incident(root,request,exc,key)
+    except Exception as exc:
+        if request and request.get('request_id'): incident(root,request,exc,key)
+    os.replace(path,root/'accepted'/path.name); return True
+
+
+def main():
+    incoming=ROOT/'incoming'
+    lease=os.open(ROOT/'locks'/'exporter.lease',os.O_WRONLY|os.O_CREAT|os.O_NOFOLLOW,0o600)
+    try:
+        try: fcntl.flock(lease,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        except BlockingIOError: return
+        for name in os.listdir(incoming):
+            if SAFE.fullmatch(name) and name.endswith('.json'): process(incoming/name)
+    finally: os.close(lease)
+
+
+if __name__=='__main__': main()

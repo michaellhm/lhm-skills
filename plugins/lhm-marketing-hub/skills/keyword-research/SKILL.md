@@ -3,6 +3,10 @@ name: keyword-research
 description: "Discovers high-value keywords with search intent analysis, difficulty assessment, and content opportunity mapping. Use this when the user mentions 'keyword research', 'find keywords', 'keyword opportunities', 'search intent', 'topic clusters', 'keyword difficulty', 'content keywords', 'SEO keywords', 'long-tail keywords', 'keyword gap', or needs help planning which keywords to target for content or ads."
 license: MIT
 ---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
 
 # Keyword Research
 

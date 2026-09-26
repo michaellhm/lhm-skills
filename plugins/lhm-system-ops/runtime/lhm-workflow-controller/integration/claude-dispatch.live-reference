@@ -16,11 +16,14 @@ ROUTE_SKILLS = {
     'marketing': 'lhm-marketing-hub:start', 'seo': 'lhm-marketing-hub:seo-audit',
     'seo-lead': 'lhm-marketing-hub:start-seo',
     'keyword-research': 'lhm-marketing-hub:keyword-research',
+    'seo-page-brief': 'lhm-marketing-hub:seo-page-brief',
     'seo-delivery-qa': 'lhm-marketing-hub:seo-delivery-qa',
     'content': 'lhm-marketing-hub:content-strategy', 'project': 'lhm-project-hub:team-work-brief',
+    'project-production-plan': 'lhm-project-hub:hermes-production-plan',
     'gmb': 'lhm-gmb-hub:run-local-diagnostic', 'finance': 'lhm-finance-hub:finance-advisor',
     'website': 'lhm-wordpress-hub:wp-start', 'prototype': 'lhm-wordpress-hub:html-prototype',
     'astro': 'lhm-wordpress-hub:astro-build', 'wordpress': 'lhm-wordpress-hub:wp-start',
+    'wordpress-rest': 'lhm-wordpress-hub:wp-rest-operator',
     'knowledge': 'lhm-knowledge-hub:lhm-vault-thinking',
 }
 
@@ -89,7 +92,8 @@ def submit_gsc(site, urls, objective):
     enqueue_and_wait({'schema_version': 1, 'run_id': run_id, 'profile': 'seo_gsc_readonly',
                       'agent_id': 'lhm-marketing-hub:seo', 'site': site,
                       'urls': urls, 'objective': objective, 'timeout_seconds': 600,
-                      **contract('seo-gsc-review', ['lhm-marketing-hub:seo-audit'], ['google_search_console.property_read'])})
+                      **contract('seo-gsc-review', ['lhm-marketing-hub:seo-audit'], ['google_search_console.property_read'])},
+                     max_wait_seconds=540)
 
 
 def next_run_id(prefix):
@@ -103,7 +107,7 @@ def next_run_id(prefix):
     return f'{prefix}-{date}-{sequence:02d}'
 
 
-def enqueue_and_wait(request):
+def enqueue_and_wait(request, max_wait_seconds=240):
     run_id = request['run_id']
     incoming = BASE / 'incoming'
     fd, temp_name = tempfile.mkstemp(prefix=f'.{run_id}.', dir=incoming)
@@ -116,7 +120,7 @@ def enqueue_and_wait(request):
     finally:
         if os.path.exists(temp_name):
             os.unlink(temp_name)
-    wait_for_completion(run_id, max_wait_seconds=240)
+    wait_for_completion(run_id, max_wait_seconds=max_wait_seconds)
 
 
 def submit_drive_file(client, artifact_path, file_name):
@@ -146,20 +150,25 @@ def register_handback_target(target_type, client, name, vault_prefix, drive_fold
 
 
 def submit_specialist(route, subject_type, subject_name, objective):
+    if route == 'project' and 'lhm-project-hub:hermes-production-plan' in objective:
+        route = 'project-production-plan'
     agent_ids = {
         'marketing': 'lhm-marketing-hub:start',
         'seo': 'lhm-marketing-hub:seo',
         'seo-lead': 'lhm-marketing-hub:seo',
         'keyword-research': 'lhm-marketing-hub:seo',
+        'seo-page-brief': 'lhm-marketing-hub:seo',
         'seo-delivery-qa': 'lhm-marketing-hub:seo',
         'content': 'lhm-marketing-hub:content',
         'project': 'lhm-project-hub:pm-orchestrator',
+        'project-production-plan': 'lhm-project-hub:pm-orchestrator',
         'gmb': 'lhm-gmb-hub:gmb-orchestrator',
         'finance': 'lhm-finance-hub:finance-orchestrator',
         'website': 'lhm-wordpress-hub:website-orchestrator',
         'prototype': 'lhm-wordpress-hub:prototype-lead',
         'astro': 'lhm-wordpress-hub:astro-lead',
         'wordpress': 'lhm-wordpress-hub:wordpress-lead',
+        'wordpress-rest': 'lhm-wordpress-hub:wordpress-lead',
         'knowledge': 'lhm-knowledge-hub:knowledge-orchestrator',
     }
     if route not in agent_ids:

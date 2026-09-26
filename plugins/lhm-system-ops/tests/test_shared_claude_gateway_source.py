@@ -21,7 +21,7 @@ def digest(path):
 
 def test_shared_gateway_sources_match_verified_inventory():
     assert MANIFEST["capability_id"] == "CAP-015"
-    assert MANIFEST["release_version"] == "0.9.6"
+    assert MANIFEST["release_version"] == "0.9.25"
     for name in MANIFEST["assets"]:
         item = MANIFEST["assets"][name]
         source = PLUGIN / item["source"]
@@ -44,7 +44,7 @@ def test_container_client_is_governed_at_exact_bind_mount_target():
     client = MANIFEST["assets"]["container_client"]
     assert client["destination"] == "/home/hermes/.hermes/profiles/lhm_brain/bin/claude-dispatch"
     assert client["container_destination"] == "/opt/data/profiles/lhm_brain/bin/claude-dispatch"
-    assert client["previous_sha256"] == "d78705d9105be3608f04a3181368bd41b4e56400353f75a3b8c83520bb7043ac"
+    assert client["previous_sha256"] == "e4bda18077b44db63af704530d781433a120e7ba31336945c5332bce96648a5f"
     assert client["owner"] == client["group"] == 10000
     assert client["mode"] == "0755"
 
@@ -161,6 +161,10 @@ def test_seo_lead_route_is_distinct_and_preserves_existing_seo_contracts():
     assert dispatcher.SPECIALIST_SKILLS["seo-lead"] == "lhm-marketing-hub:start-seo"
     assert dispatcher.SPECIALIST_ROUTES["keyword-research"] == ("lhm-marketing-hub:seo", "seo")
     assert dispatcher.SPECIALIST_SKILLS["keyword-research"] == "lhm-marketing-hub:keyword-research"
+    assert dispatcher.SPECIALIST_ROUTES["seo-page-brief"] == ("lhm-marketing-hub:seo", "seo")
+    assert dispatcher.SPECIALIST_SKILLS["seo-page-brief"] == "lhm-marketing-hub:seo-page-brief"
+    assert dispatcher.admitted_contract("specialist_readonly", "seo-page-brief") == (
+        "seo-page-brief-review", ("lhm-marketing-hub:seo-page-brief",), ())
     assert dispatcher.SPECIALIST_ROUTES["seo-delivery-qa"] == ("lhm-marketing-hub:seo", "seo")
     assert dispatcher.SPECIALIST_SKILLS["seo-delivery-qa"] == "lhm-marketing-hub:seo-delivery-qa"
     assert dispatcher.admitted_contract("specialist_readonly", "seo-lead") == (
@@ -170,6 +174,29 @@ def test_seo_lead_route_is_distinct_and_preserves_existing_seo_contracts():
     assert dispatcher.admitted_contract("seo_gsc_readonly") == (
         "seo-gsc-review", ("lhm-marketing-hub:seo-audit",),
         ("google_search_console.property_read",))
+
+
+def test_project_production_plan_route_is_closed_and_preserves_team_brief_route():
+    dispatcher = load_dispatcher()
+    assert dispatcher.SPECIALIST_ROUTES["project"] == (
+        "lhm-project-hub:pm-orchestrator", "pm-orchestrator")
+    assert dispatcher.SPECIALIST_SKILLS["project"] == "lhm-project-hub:team-work-brief"
+    assert dispatcher.SPECIALIST_ROUTES["project-production-plan"] == (
+        "lhm-project-hub:pm-orchestrator", "pm-orchestrator")
+    assert dispatcher.SPECIALIST_SKILLS["project-production-plan"] == (
+        "lhm-project-hub:hermes-production-plan")
+    assert dispatcher.admitted_contract("specialist_readonly", "project-production-plan") == (
+        "project-production-plan-review", ("lhm-project-hub:hermes-production-plan",), ())
+
+
+def test_wordpress_rest_route_uses_wordpress_lead_and_operator_skill():
+    dispatcher = load_dispatcher()
+    assert dispatcher.SPECIALIST_ROUTES["wordpress-rest"] == (
+        "lhm-wordpress-hub:wordpress-lead", "wordpress-lead")
+    assert dispatcher.SPECIALIST_SKILLS["wordpress-rest"] == (
+        "lhm-wordpress-hub:wp-rest-operator")
+    assert dispatcher.admitted_contract("specialist_readonly", "wordpress-rest") == (
+        "wordpress-rest-review", ("lhm-wordpress-hub:wp-rest-operator",), ())
 
 
 def test_container_client_submits_exact_seo_lead_contract(monkeypatch):
@@ -197,6 +224,23 @@ def test_container_client_submits_exact_seo_lead_contract(monkeypatch):
         "required_skills": ["lhm-marketing-hub:start-seo"],
         "required_capabilities": [],
     }]
+
+
+def test_container_client_selects_production_plan_for_exact_pm_skill(monkeypatch):
+    client_path = PLUGIN / MANIFEST["assets"]["container_client"]["source"]
+    spec = importlib.util.spec_from_loader(
+        "shared_client_project_plan", SourceFileLoader("shared_client_project_plan", str(client_path)))
+    client = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(client)
+    captured = []
+    monkeypatch.setattr(client, "next_run_id", lambda prefix: "claude-delegate-20260826-01")
+    monkeypatch.setattr(client, "enqueue_and_wait", captured.append)
+    client.submit_specialist(
+        "project", "general", "page-copy",
+        "Invoke lhm-project-hub:hermes-production-plan and select the canonical SOP.")
+    assert captured[0]["route"] == "project-production-plan"
+    assert captured[0]["workflow_id"] == "project-production-plan-review"
+    assert captured[0]["required_skills"] == ["lhm-project-hub:hermes-production-plan"]
 
 
 def test_dispatcher_rejects_forged_contract_before_any_worker_run(tmp_path, monkeypatch):
@@ -489,6 +533,31 @@ def test_internal_handback_registration_is_exactly_bounded(tmp_path, monkeypatch
         "basicops_task_ids": ["2199999"],
     }
     assert final["workflow_contract"]["skill_provenance"] == "declared_only_no_worker"
+
+
+def test_seo_internal_handback_uses_a_distinct_service_slug(tmp_path, monkeypatch):
+    dispatcher, incoming, runs, registry = registration_fixture(tmp_path, monkeypatch)
+    request = registration_request(
+        run_id="claude-register-20260902-01",
+        client="local-health-marketing-seo",
+        name="Local Health Marketing SEO",
+        drive_folder_id="1t3aUHy1ZSMiHophhJQsQC-cDjcZiMxUA",
+        basicops_task_ids=["2192596"],
+    )
+    queued = incoming / "seo.json"
+    queued.write_text(json.dumps(request))
+    dispatcher.complete_registration(queued, request)
+    final = json.loads((runs / request["run_id"] / "final.json").read_text())
+    assert final["status"] == "completed"
+    targets = json.loads(registry.read_text())["clients"]
+    assert "local-health-marketing" not in targets
+    assert targets["local-health-marketing-seo"]["drive_folder_query"].endswith("1t3aUHy1ZSMiHophhJQsQC-cDjcZiMxUA")
+
+
+def test_specialist_exact_artifact_transport_has_bounded_30000_character_ceiling():
+    source = (PLUGIN / "assets/gateways/lhm-shared-claude-dispatcher").read_text()
+    specialist = source.split("if request.get('approval_state') != 'review_only':", 1)[1]
+    assert "not 10 <= len(objective) <= 30000" in specialist.split("elif profile == 'seo_gsc_readonly':", 1)[0]
 
 
 def test_registry_backup_fsyncs_base_on_first_creation_and_backup_dir_every_time(tmp_path, monkeypatch):
