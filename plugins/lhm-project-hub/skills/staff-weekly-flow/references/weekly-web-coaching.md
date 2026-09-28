@@ -31,10 +31,10 @@ weekly plan. Verify current task state before proposing work so completed items 
 1. Show the small set of decisions, promises and handoffs that need Michael to release another
    person. Ask what has changed or already been done.
 2. Record confirmed priority/context corrections in the shared note. Keep founder/private capacity
-   and business planning out of the team note; preserve the separate business lane in his own plan.
+   and business planning out of the team note; keep the founder business review separate from this staff flow.
 3. Identify the handoff Kristalyn or Aiya needs and its output/link. Do not treat Michael's early
    review as a mandatory gate before the team may begin planning or as a reason to delay the email.
-4. Fit his own delivery commitments alongside his confirmed business outcomes and capacity.
+4. Fit his chosen delivery commitments to his available capacity. Do not require or re-run the separate business review.
 
 ### Kristalyn: prepare and move the week
 
@@ -70,6 +70,9 @@ weekly plan. Verify current task state before proposing work so completed items 
    short handback when useful; sending a team message requires explicit instruction.
 
 Other team members use their actual role, owner section and authority; no filler work is required.
+
+Read `commitments-and-review.md` for the shared per-person commitment register, Monday review of
+last week and voluntary acceptance/non-commitment rules.
 
 ## Feedback writes and continuity
 

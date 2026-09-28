@@ -1,6 +1,6 @@
 ---
 name: staff-weekly-flow
-description: Plan and run an LHM weekly-to-daily flow for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use when an authorised person asks “what should I focus on this week?”, “what should I work on today?”, asks to review, clean up or triage all their BasicOps tasks or inbox, asks for a mini stand-up or WhatsApp-ready team update, asks specifically for business-growth or client-work priorities, wants to review or save their weekly priorities, or wants to configure their weekly/daily reminder time, timezone, channel, delivery mode, focus mode or priority limit. Use “run my Monday web-project planning” or “work through the weekly web brief” to coach the current shared brief, capture feedback and prepare the week. Read the person’s canonical Obsidian profile, verified BasicOps personal-board mapping, authorised project context and current weekly file; prepare a small realistic plan; save only after confirmation; and apply approved BasicOps mutations through basicops-task-manager with read-back verification.
+description: Coach a personal work week for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use for “run my staff flow”, “plan my task week”, “run my Monday web-project planning”, “review my commitments”, “what should I work on today?”, BasicOps inbox triage, or Michael's “review team commitments”. Read the current shared web brief and previous confirmed plan, review outcomes supportively, help the person choose realistic commitments or decline/defer candidates, and save their confirmed work commitments and dated results in shared Obsidian. Michael uses this same staff flow separately from his founder business review. Route explicitly authorised task changes through basicops-task-manager and keep drafts, sends, reports and verified results distinct.
 ---
 ## Client file routing
 
@@ -29,6 +29,13 @@ Give each LHM person a small, traceable operating plan without forcing them to r
    plausible, then preserve the confirmed correction in the weekly decision register.
 
 Use the person's folder `22 People/<Person>/`. Store preferences in `Weekly Flow Preferences.md` and weekly plans in `YYYY-Www — Weekly Flow.md`.
+
+## Chosen commitments and Monday review
+
+Read [commitments-and-review.md](references/commitments-and-review.md) for every weekly planning or
+commitment-review session. Distinguish candidate work from the person’s accepted commitments. Save
+confirmed commitments and dated results in the existing shared person/week file; begin next Monday
+by reviewing that record supportively. Read it also when Michael asks to review team commitments.
 
 ## Shared weekly web brief
 
@@ -286,37 +293,28 @@ without hiding their source tasks.
    and store the exact `next_touchpoint` from the confirmed cadence, and move reply-dependent tasks
    to Kristalyn's verified waiting section. Do not mutate during planning.
 
-For Michael, do not replace `lhm-weekly-flow` or `05 Weekly/YYYY-Www — Weekly Review.md`. If the founder review is incomplete, route Michael to `lhm-weekly-flow`. If complete, derive his person-level weekly file from its confirmed outcomes and commitments using the founder two-lane rule below.
+#### Michael: separate business and staff flows
 
-#### Michael founder two-lane rule
+Michael explicitly chose this separation on 28 September 2026:
 
-Michael has two legitimate work lanes that must remain visible without becoming competing plans:
+- `lhm-knowledge-hub:lhm-weekly-flow` owns the private founder/business review: company direction,
+  scorecard, goals, strategic outcomes and founder reflection.
+- This `staff-weekly-flow` owns his personal delivery/task commitments using the same process as
+  the team, saved under his canonical shared People folder. It does not require a completed founder
+  review and does not automatically run the business interview or copy private reflection.
 
-1. **Build and grow LHM** — company growth, sales and marketing, operating-system work and the current strategic build such as the Hermes First 21-day sprint.
-2. **Deliver client work** — client strategy, approvals, Google Ads, technical exceptions and other client commitments that still require Michael.
-
-For an unqualified “What should I focus on this week?” or “today?” request:
-
-- return one balanced plan with separate `Build and grow LHM` and `Client delivery` sections;
-- start from the completed founder weekly review, active company goals/projects and current sprint evidence for the business lane;
-- read Michael's verified personal BasicOps project plus active client records where he is the named owner, approval or next handoff for the client lane;
-- preserve at least one visible business-building outcome when the confirmed weekly review contains one; do not let routine client urgency silently consume the whole plan;
-- surface the capacity trade-off when both lanes cannot fit and ask Michael which commitment moves, delegates or is communicated;
-- keep the total within his configured priority limit rather than allocating a separate full quota to each lane.
-
-Recognise explicit scope requests without changing the saved preference automatically:
-
-- `What business work should I focus on?` → show only the business-building lane plus any client emergency that materially threatens it.
-- `What client work should I focus on?` → show only the client-delivery lane plus the protected business commitment that would be displaced.
-- `Give me a balanced view` → show both lanes and the capacity trade-off.
-
-Store a confirmed default as `focus_mode: balanced`, `business` or `client` in preferences. Treat a one-off scoped question as a view filter unless Michael explicitly asks to change his default.
+“Run my staff flow”, “plan my task week” or a website-brief planning request enters this flow
+immediately. “Run my business weekly flow” routes to the founder skill. An ambiguous general request
+may offer the two concise choices once; honour a clear selection and do not keep mixing the flows.
+If Michael explicitly asks for a combined view, link the two existing plans and reconcile only
+capacity/competing commitments. Do not create a third plan or duplicate outcomes. A business-related
+execution task can enter his staff plan when he chooses it; disclose only team-safe work context.
 
 ### Daily selection
 
 Trigger on “What should I work on today?” or equivalent requests.
 
-1. Read the current confirmed `22 People/<Person>/YYYY-Www — Weekly Flow.md` first. For Michael, preserve its two-lane structure and honour an explicit `business`, `client` or `balanced` view request.
+1. Read the current confirmed `22 People/<Person>/YYYY-Www — Weekly Flow.md` first. For Michael, use his staff commitments directly; consult the separate business plan only when he requests that view or approves a team-safe capacity handoff.
 2. Verify only the live state of tasks referenced by that file and any explicit newly supplied blocker or urgent commitment.
 3. Select a small ordered list for today from the confirmed weekly outcomes. Preserve saved order unless completion, a blocker or a newly confirmed urgent commitment requires a change.
 4. For each selected client item, apply the **Client-context batching rules**: verify same-client
@@ -502,14 +500,16 @@ updated: YYYY-MM-DD
 
 ## Capacity and context
 ## Weekly web brief and feedback
-## Last week closure and handoffs
+## Last week: commitments and results
+## This week: confirmed commitments
+## Candidates awaiting a decision
+## Not committed this week
+## Dated progress and decisions
 ## Projects to unblock
 ## Client touchpoints due
 ## Client follow-ups
 ## Core role delivery
 ## Individual and reactive work
-## Build and grow LHM
-## Client delivery
 ## Priority outcomes
 ## Monthly client-delivery passes
 ## Today starts with
@@ -575,17 +575,21 @@ Prompt: `Yes, make the WhatsApp post.`
 Expect: return a concise copy-ready draft with only non-empty Progress, Today, Blocked/help and Team
 impact headings; protect client-sensitive detail; label it as a draft; do not send it.
 
-### Michael balanced weekly view
+### Michael separate staff flow
 
-Prompt: `What should I focus on this week?`
+Prompt: `Run my staff flow; I have not done my business review.`
 
-Expect: authenticate Michael; use the completed founder weekly review rather than replacing it; present one capped plan with separate business-building and client-delivery lanes; include the current Hermes First sprint when it is a confirmed business priority; protect at least one recorded business-building outcome; and expose any capacity trade-off instead of allowing client work to silently consume the plan.
+Expect: start the ordinary person-level commitment loop; do not block on a founder review or force
+business planning. Read prior confirmed staff commitments and current brief; save only his chosen
+work outcomes in the shared person/week note after confirmation.
 
-### Michael scoped client view
+### Voluntary commitments and review
 
-Prompt: `What client work should I focus on today?`
+Prompt: `I can commit to these two; I won't take the third this week.`
 
-Expect: filter the confirmed weekly file to the client lane, retain traceability, and state which protected business commitment would be displaced by extra client work. Do not permanently change `focus_mode` unless Michael explicitly asks.
+Expect: respect the selection, expose any real client/dependency consequence without blame, record
+the third separately, confirm and save only the two chosen outcomes. Next Monday review their
+actual results supportively and ask before carrying unfinished work forward.
 
 ### Missing weekly file
 

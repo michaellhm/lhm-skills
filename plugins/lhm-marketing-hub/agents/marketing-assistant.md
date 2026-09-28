@@ -48,6 +48,6 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 Client-facing skills read and update shared LHM Knowledge client records; deliverables use verified Claude Workspace/Current Clients folders. `client-meeting-email`, `post-meeting-review`, `client-update` and `drive-artifact-delivery` distinguish these roots, preserve meeting approval gates and report canonical-record writeback gaps. Local, Cowork and Hermes runs must use verified platform-specific roots rather than a current-directory fallback.
 
-`staff-weekly-flow` — Role-specific Monday coaching from the current shared web brief: Michael’s decisions, Kristalyn’s reviews/client follow-ups, Aiya’s last-week closure and realistic commitments; save attributed feedback and verify authorised task changes.
+`staff-weekly-flow` — Role-specific Monday coaching from the current shared web brief: Michael’s decisions, Kristalyn’s reviews/client follow-ups, Aiya’s last-week closure and realistic commitments; save voluntarily chosen commitments and dated results in shared Obsidian, review last week supportively and verify authorised task changes. Michael’s business review is separate.
 
-`lhm-knowledge-hub:lhm-weekly-flow` — Founder weekly planning with a prepared decision shortlist, a separate optional action session and verified WeekFlow scheduling; use staff-weekly-flow for role-specific daily selection.
+`lhm-knowledge-hub:lhm-weekly-flow` — Separate founder/business weekly review with strategic outcomes and private reflection; use staff-weekly-flow independently for Michael’s and the team’s chosen work commitments and daily selection.
