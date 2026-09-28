@@ -23,6 +23,8 @@ clearly labelled provisional plan. Never silently present last week's note as cu
 Resolve identity, role, task board and exact section mapping under SKILL.md. Use the relevant owner
 section plus dependencies that affect that person, not the entire portfolio. Offer the next useful
 question, accept voice/freeform answers, summarise decisions and move on. Avoid a large questionnaire.
+Respect the requested review batch size; when Michael asks for three projects at a time, present
+three concise numbered items and save each clear answer before continuing. Do not repeat settled questions.
 Start by checking what changed since the brief and what carried over from the previous confirmed
 weekly plan. Verify current task state before proposing work so completed items are not resurrected.
 
@@ -62,12 +64,12 @@ weekly plan. Verify current task state before proposing work so completed items 
 3. Compare this week's relevant brief actions with actual capacity, dependencies and current Inbox.
    Ask what she can commit to. Surface overload and trade-offs; do not transfer all open work into
    the week or invent revised dates for overdue client promises.
-4. Once she explicitly commits and asks to organise the board, show/apply the exact authorised
+4. As she accepts each outcome and its shown board disposition, apply the exact authorised
    task moves using her verified semantic section IDs. Distinguish action versus project sections
    when her board has both. Keep nested tasks in their owning projects unless a specific authorised
    move requires otherwise. Route changes through `basicops-task-manager` and verify read-back.
-5. End with agreed outcomes, moved/closed tasks, waiting items and who needs an update. Prepare a
-   short handback when useful; sending a team message requires explicit instruction.
+5. End with the Tuesday meeting document required by `board-and-tuesday-meeting.md`, including
+   verified board results and pending writes; sending a team message requires explicit instruction.
 
 Other team members use their actual role, owner section and authority; no filler work is required.
 

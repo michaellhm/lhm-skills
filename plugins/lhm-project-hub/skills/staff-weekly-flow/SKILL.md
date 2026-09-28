@@ -1,6 +1,6 @@
 ---
 name: staff-weekly-flow
-description: Coach a personal work week for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use for “run my staff flow”, “plan my task week”, “run my Monday web-project planning”, “review my commitments”, “what should I work on today?”, BasicOps inbox triage, or Michael's “review team commitments”. Read the current shared web brief and previous confirmed plan, review outcomes supportively, help the person choose realistic commitments or decline/defer candidates, and save their confirmed work commitments and dated results in shared Obsidian. Michael uses this same staff flow separately from his founder business review. Route explicitly authorised task changes through basicops-task-manager and keep drafts, sends, reports and verified results distinct.
+description: Coach a personal work week for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use for “run my staff flow”, “plan my task week”, “run my Monday web-project planning”, “review my commitments”, “what should I work on today?”, BasicOps inbox triage, or Michael's “review team commitments”. Read the current shared web brief and previous confirmed plan, review outcomes supportively, help the person choose realistic commitments or decline/defer candidates, and save their confirmed work commitments and dated results in shared Obsidian. Michael uses this same staff flow separately from his founder business review. Reconcile accepted weekly, review and waiting board moves through basicops-task-manager, then save a Tuesday web meeting document; keep drafts, sends, reports and verified results distinct.
 ---
 ## Client file routing
 
@@ -82,7 +82,7 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
    Treat `urgent=true` as a prompt for an
    explicit urgency and displacement review, not automatic priority one; verify the deadline or
    consequence from discussion or canonical context. Keep unclassified tasks in consideration.
-6. Classify unfinished or overdue work as `do`, `delegate`, `reschedule`, `communicate`, `redesign` or `drop`. Never complete, move, assign or edit a BasicOps task while planning.
+6. Classify unfinished or overdue work as `do`, `delegate`, `reschedule`, `communicate`, `redesign` or `drop`. Unaccepted candidates do not authorise BasicOps changes; route each accepted exact disposition through the board-reconciliation contract below.
    For each overdue task, also ask whether its commitment is still valid and whether it should be
    rescheduled, delegated, marked blocked/waiting, communicated or dropped. Never invent a new due
    date or silently carry an overdue date forward.
@@ -125,6 +125,8 @@ When committed, overdue or newly arrived work cannot fit:
 7. Record the decision and who must communicate it in the weekly file. Do not represent a draft as
    sent or a proposed date as agreed.
 
+Read [board-and-tuesday-meeting.md](references/board-and-tuesday-meeting.md) for item-by-item board reconciliation and the end-of-flow Tuesday meeting document.
+
 #### Personal-board section rules
 
 - Read the exact semantic section map from the person's profile. Never infer a section ID from its
@@ -136,7 +138,7 @@ When committed, overdue or newly arrived work cannot fit:
 - Some boards have two valid this-week meanings (for example actions versus projects). Ask which
   applies when task evidence does not make it clear.
 - If the profile says a semantic section is absent or the live board contradicts the saved map,
-  stop and ask; do not create a section or choose the nearest name.
+  verify the live board and reconcile the mapping first. Ask only if the exact semantic destination remains ambiguous; do not create a section or choose the nearest name.
 - A recommendation is not a mutation. Present task, source section, destination section and any due
   date/status change as an exact preview. Apply only through `basicops-task-manager` after approval,
   then read back project, section, assignee, due date and status.
@@ -630,8 +632,8 @@ change the date, section or send either message automatically.
 Prompt: `Move my confirmed work out of Inbox and into this week.`
 
 Expect: use the authenticated person's exact saved section IDs; distinguish Aiya's actions versus
-projects when required; fail closed for Michael's missing general this-week section; preview and
-approve exact moves separately; read back the result.
+projects when required; verify live sections when a saved map reports a missing destination; preview exact moves and use
+existing item-specific authority without a duplicate generic approval; read back the result.
 
 ### Overwhelmed mode
 

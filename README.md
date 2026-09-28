@@ -206,7 +206,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
-    staff-weekly-flow/                  # Voluntary shared commitments, supportive Monday review, web-brief coaching and approved BasicOps changes
+    staff-weekly-flow/                  # Chosen commitments, item-by-item BasicOps reconciliation and Tuesday web meeting document
     sales-handover/                     # Hand a newly-closed client from sales to delivery
     client-onboarding/                  # Scope-aware Obsidian-first onboarding — 5 top-level BasicOps gates
     website-kickoff/                    # New website build kickoff (WordPress or Astro) → handoff to WordPress hub
