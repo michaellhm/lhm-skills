@@ -22,10 +22,11 @@ CC = []
 REPLY_TO = 'michael@localhealthmarketing.com.au'
 RECIPIENTS = [TO] + CC
 FROM = 'Lily | LHM Web Projects <lily@mg.brieflyflow.io>'
-FEEDBACK = ('Open your BasicOps chat with Lily and paste: “Update the weekly web brief for {week}. '
-            'Here are my project corrections: [notes]. Update the existing BasicOps discussions '
-            'and Obsidian project records, then tell me what changed and what still needs my decision.” '
-            'One message or voice note covering several projects is fine. Email replies are not automatically processed by Lily.')
+FEEDBACK = ('For Monday planning, open your connected ChatGPT project or BasicOps chat with Lily and ask: '
+            '“Run my Monday web-project planning for {week}. Read the current brief and dated feedback in '
+            'LHM Knowledge / 60 Knowledge / Weekly Web Projects, then coach me through my actions.” '
+            'Clear project corrections are saved as dated feedback. Task changes and email sends follow your '
+            'explicit instructions and are verified separately. Email replies are not automatically processed by Lily.')
 LIGHTS = {'red': ('Red', '#b42318', '#fff1f0'), 'orange': ('Orange', '#925800', '#fff8e6'), 'green': ('Green', '#18733b', '#edf8ef')}
 OWNERS = {'Michael', 'Kristalyn', 'Aiya', 'Jaimee', 'Josephine'}
 
@@ -54,7 +55,7 @@ def save(path, value):
 
 def receipt(week, kind='brief'):
     monday(week)
-    if kind not in ('brief', 'test'):
+    if kind not in ('brief', 'test', 'alert'):
         raise ValueError('Invalid delivery kind')
     # Identity is week + kind, deliberately not recipients/content: configuration
     # changes must never make a second production send possible for the same week.
@@ -63,13 +64,20 @@ def receipt(week, kind='brief'):
 
 def gate(at=None):
     at = (at or now()).astimezone(TZ)
-    if at.weekday() != 0 or at.hour != 12:
-        return {'wakeAgent': False, 'reason': 'outside_monday_noon_melbourne'}
+    if at.weekday() != 0 or at.hour != 7:
+        return {'wakeAgent': False, 'reason': 'outside_monday_0700_melbourne'}
     week = at.date().isoformat()
     if receipt(week).exists():
         return {'wakeAgent': False, 'reason': 'existing_delivery_record', 'week': week}
     return {'wakeAgent': True, 'week': week, 'timezone': str(TZ), 'cutoff': at.isoformat(),
             'output_directory': str(BASE / 'runs' / week)}
+
+
+def blocker_text(b):
+    fields = ('project', 'issue', 'impact', 'owner', 'next_step')
+    if any(not isinstance(b.get(k), str) or not b[k].strip() for k in fields):
+        raise ValueError('Blocker needs project, issue, impact, owner and next step')
+    return f"{b['project']}: {b['issue']} Impact: {b['impact']} Next: {b['owner']} — {b['next_step']}"
 
 
 def render(d):
@@ -149,6 +157,7 @@ def render(d):
     for o in d['owners']:
         section(o['name'], o['actions'], grouped=True)
     section('Older cards to clear up', d.get('older_cards', []))
+    section('Blockers and information needed', [blocker_text(b) for b in d.get('blockers', [])])
     section('Updates or corrections?', [FEEDBACK.format(week=week)])
     tail = 'Evidence checked: ' + d['cutoff'] + '. ' + d.get('limitations', '')
     text += [tail, 'Lily | LHM Web Projects']
@@ -179,6 +188,8 @@ def mailgun(path, data=None, query=None):
 
 
 def send(week, email, kind='brief'):
+    if kind not in ('brief', 'test'):
+        raise ValueError('Use the fixed alert action for failure notices')
     p = receipt(week, kind)
     if email.get('week') != week:
         raise ValueError('Email week does not match receipt week')
@@ -188,8 +199,13 @@ def send(week, email, kind='brief'):
         raise ValueError('Required table or feedback footer missing')
     if kind == 'brief':
         at = now()
-        if at.weekday() != 0 or at.date().isoformat() != week or at.hour < 12:
-            raise ValueError('Production send allowed only on its Monday after noon')
+        if at.weekday() != 0 or at.date().isoformat() != week or at.hour < 8:
+            raise ValueError('Production send allowed only on its Monday at or after 08:00 Melbourne')
+    return submit_message(week, email, kind)
+
+
+def submit_message(week, email, kind):
+    p = receipt(week, kind)
     BASE.mkdir(parents=True, exist_ok=True)
     with (BASE / '.send.lock').open('a+') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
@@ -210,6 +226,39 @@ def send(week, email, kind='brief'):
             raise RuntimeError('Delivery uncertain; receipt retained, do not resend') from None
         save(p, r)
         return {'state': r['state'], 'message_id': r['message_id'], 'receipt': str(p)}
+
+
+ALERT_REASONS = {
+    'quality_blocked': 'Independent review still found missing evidence or conflicting project actions after the allowed correction attempts.',
+    'worker_failed': 'The research or delivery worker stopped before the brief could be completed.',
+    'missed_start': 'The scheduled project brief did not start within 15 minutes of its Monday 07:00 Melbourne preparation time.',
+    'interrupted': 'The project brief stopped unexpectedly before completing its checks and delivery.',
+    'timeout': 'The project brief exceeded its three-hour processing limit.',
+    'delivery_failed': 'The email provider reported that delivery of the project brief failed.',
+    'delivery_pending': 'The project brief was submitted, but delivery has not been confirmed within 20 minutes.',
+    'delivery_uncertain': 'The send outcome is uncertain. The delivery receipt is retained and no automatic resend will be attempted.'
+}
+
+
+def alert(week, reason):
+    day = monday(week)
+    if not 0 <= (now().date() - day).days < 7:
+        raise ValueError('Alerts belong to the current reporting week')
+    if reason not in ALERT_REASONS:
+        raise ValueError('Unknown alert reason')
+    normal = receipt(week)
+    if normal.exists() and json.loads(normal.read_text()).get('state') == 'delivered':
+        return {'state': 'brief_already_delivered'}
+    text = ('The weekly project email needs attention.\n\nWeek commencing ' + week + '.\n\n' +
+            ALERT_REASONS[reason] + '\n\nThe normal project brief has not been confirmed delivered. '
+            'Research, review findings and delivery receipts have been retained. '
+            'No duplicate project email will be sent automatically.\n\n'
+            'Michael: ask the Hermes maintainer to inspect this week’s blocked project brief and resolve the recorded issue. '
+            'If a client decision or missing record is required, the recovery should ask only for that specific item.\n\n'
+            'This is a failure notice, not the project report.\n\nLily | Local Health Marketing')
+    email = {'week': week, 'subject': 'Action needed | Weekly web projects | ' + week,
+             'text': text, 'html': '<html><body>' + ''.join('<p>' + html.escape(p) + '</p>' for p in text.split('\n\n')) + '</body></html>'}
+    return submit_message(week, email, 'alert')
 
 
 def verify(week, kind='brief'):
@@ -237,9 +286,10 @@ def verify(week, kind='brief'):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=['gate', 'render', 'send', 'verify'])
+    parser.add_argument('action', choices=['gate', 'render', 'send', 'verify', 'alert'])
     parser.add_argument('--week')
-    parser.add_argument('--kind', choices=['brief', 'test'], default='brief')
+    parser.add_argument('--reason', choices=sorted(ALERT_REASONS))
+    parser.add_argument('--kind', choices=['brief', 'test', 'alert'], default='brief')
     parser.add_argument('--file')
     parser.add_argument('--out')
     parser.add_argument('--to-self', action='store_true', help='Michael-only explicitly authorised test')
@@ -260,6 +310,8 @@ def main():
         (out / 'preview.html').write_text(result['html'])
         (out / 'email.txt').write_text(result['text'])
         result = {'state': 'rendered', 'directory': str(out)}
+    elif args.action == 'alert':
+        result = alert(args.week, args.reason)
     elif args.action == 'send':
         from quality import validate
         validate(Path(args.file).parent)

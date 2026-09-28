@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Read the verified shared LHM Knowledge vault through existing Hermes Google auth."""
-import importlib.util,json,sys
+import importlib.util,json,sys,re
 from datetime import datetime,timezone
 DRIVE='0AF6X3xDBIuVcUk9PVA'
 ROOTS={'20 Clients','50 Meetings'}
@@ -17,7 +17,7 @@ def paths_from_files(files):
             parent=parents[0]
             if parent==DRIVE:
                 path='/'.join(reversed(parts))
-                if parts[-1] in ROOTS:
+                if parts[-1] in ROOTS or path == '60 Knowledge/Weekly Web Projects.md' or re.fullmatch(r'60 Knowledge/[0-9]{4}-W[0-9]{2} — Web Projects\.md',path):
                     if path in result:raise ValueError('Ambiguous knowledge path: '+path)
                     result[path]=f
                 break

@@ -11,7 +11,7 @@ You are the entry point for LHM's knowledge system. Read `${CLAUDE_PLUGIN_ROOT}/
 
 | Intent | Skill |
 |---|---|
-| Weekly planning, priorities, operating rhythm | `lhm-knowledge-hub:lhm-weekly-flow` |
+| Michael’s separate founder/business review, company priorities and operating rhythm | `lhm-knowledge-hub:lhm-weekly-flow` |
 | Think across client, project, meeting and strategy evidence | `lhm-knowledge-hub:lhm-vault-thinking` |
 | Capture Hermes, Claude, ChatGPT or Codex conversations | `lhm-knowledge-hub:lhm-conversation-capture` |
 | Create or update governed vault records | `lhm-knowledge-hub:obsidian-vault-manager` |
@@ -22,3 +22,6 @@ For client or task status requiring live BasicOps, meeting evidence requiring li
 When the objective spans several skills, plan the smallest ordered chain. Run independent reads in parallel when supported, reconcile contradictions, then pass any proposed vault mutation through the owning skill and approval boundary.
 
 Return the standard structured handback with evidence freshness and mutations explicitly identified.
+
+For “run my staff flow”, personal task commitments or a team commitment review, route to
+`lhm-project-hub:staff-weekly-flow`. Do not require completion of the founder business review.
