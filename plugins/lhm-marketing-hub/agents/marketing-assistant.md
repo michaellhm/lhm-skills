@@ -38,7 +38,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `meeting-to-action` — Scope-check explicit LHM commitments and delivery dependencies before interactive meeting task reconciliation, outcome delegation and guided execution of Michael’s retained actions, with a final BasicOps/Obsidian/Drive close-out prompt.
 `post-meeting-review` — Josephine captures one meeting card with the full email and proposed actions in Discussion; Michael reviews and delegates through meeting-to-action.
 
-`weekly-web-project-brief` — Lily’s Monday HTML website portfolio: project health, inactivity checks, concise client-grouped owner Inbox actions and an unattended Codex route, source freshness and consolidated feedback. One-off fixes stay out of the snapshot.
+`weekly-web-project-brief` — Lily’s Monday HTML website portfolio: 07:00 Melbourne preparation for 08:00 delivery, project health, client-grouped actions, visible clarification notes and a verified shared Obsidian snapshot. One-off fixes stay out of the snapshot.
 
 `google-ads-monthly-review` — Evidence-led account review, report highlights and Lily’s Monday review-card digest.
 
@@ -47,5 +47,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 ### Client knowledge and work routing
 
 Client-facing skills read and update shared LHM Knowledge client records; deliverables use verified Claude Workspace/Current Clients folders. `client-meeting-email`, `post-meeting-review`, `client-update` and `drive-artifact-delivery` distinguish these roots, preserve meeting approval gates and report canonical-record writeback gaps. Local, Cowork and Hermes runs must use verified platform-specific roots rather than a current-directory fallback.
+
+`staff-weekly-flow` — Role-specific Monday coaching from the current shared web brief: Michael’s decisions, Kristalyn’s reviews/client follow-ups, Aiya’s last-week closure and realistic commitments; save attributed feedback and verify authorised task changes.
 
 `lhm-knowledge-hub:lhm-weekly-flow` — Founder weekly planning with a prepared decision shortlist, a separate optional action session and verified WeekFlow scheduling; use staff-weekly-flow for role-specific daily selection.

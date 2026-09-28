@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Native Hermes no-agent scheduler: queue only during Monday noon Melbourne."""
+"""Native Hermes no-agent scheduler: queue only during Monday 07:00 Melbourne."""
 import importlib.util,json,os
 from pathlib import Path
 SKILL=Path('/opt/data/profiles/lhm_brain/skills/weekly-web-project-brief')

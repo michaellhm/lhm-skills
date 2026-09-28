@@ -24,7 +24,7 @@ class BriefTests(unittest.TestCase):
         return {'week': '2026-09-21', 'cutoff': '19 September', 'intro': 'Fixture only', 'priorities': [], 'new_projects': [], 'owners': [{'name': 'Jaimee', 'actions': ['No immediate action.']}], 'projects': [{'name': name, 'url': 'https://example.org/project', 'light': light, 'state': '<script>alert(1)</script>', 'target': 'To confirm', 'next': 'Michael: check date'} for name, light in [('Green project', 'green'), ('Red project', 'red'), ('Orange project', 'orange')]]}
 
     def test_dst_gate(self):
-        for stamp in ['2026-09-21T02:00:00+00:00', '2026-10-05T01:00:00+00:00']:
+        for stamp in ['2026-09-20T21:00:00+00:00', '2026-10-04T20:00:00+00:00']:
             self.assertTrue(b.gate(datetime.fromisoformat(stamp))['wakeAgent'])
         for stamp in ['2026-09-21T01:00:00+00:00', '2026-10-05T02:00:00+00:00', '2026-09-22T02:00:00+00:00']:
             self.assertFalse(b.gate(datetime.fromisoformat(stamp))['wakeAgent'])

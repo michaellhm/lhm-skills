@@ -206,7 +206,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
-    staff-weekly-flow/                  # Personal weekly/daily focus, full BasicOps inbox triage/write-back and reminder preferences
+    staff-weekly-flow/                  # Current-week web-brief coaching, role-specific planning, dated feedback and approved BasicOps write-back
     sales-handover/                     # Hand a newly-closed client from sales to delivery
     client-onboarding/                  # Scope-aware Obsidian-first onboarding — 5 top-level BasicOps gates
     website-kickoff/                    # New website build kickoff (WordPress or Astro) → handoff to WordPress hub
@@ -224,7 +224,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
     wp-project-manager/                 # Website PM state plus verified BasicOps handoff reconciliation
-    weekly-web-project-brief/           # Lily Monday HTML portfolio: project health, inactivity checks and concise client-grouped owner inbox actions and an unattended Codex route
+    weekly-web-project-brief/           # Lily Monday 08:00 Melbourne brief: 07:00 preparation, visible clarifications and verified shared weekly Obsidian archive
     website-project-cockpit/            # Website status and three-layer Obsidian/Web Projects/personal-task stage handoffs
     lp-project-manager/                 # Landing page campaign PM doc (migrated from WordPress hub; shim remains)
     gmb-project-manager/                # GMB optimisation cycle PM doc (migrated from GMB hub; shim remains)

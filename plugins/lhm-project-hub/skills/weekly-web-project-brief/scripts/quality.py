@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fail closed on incomplete research or an unreviewed/changed email payload."""
 import hashlib
+import html
 import json
 import sys
 from pathlib import Path
@@ -37,13 +38,41 @@ def validate(directory, require_review=True):
     else:
         require(meeting_access.get('status') == 'not_required' and meeting_access.get('reason'), 'Meeting access exemption missing')
     require(research.get('material_gaps') == [], 'Material research gaps')
-    names={p['name'] for p in read('brief.json')['projects']}
+    brief = read('brief.json')
+    names={p['name'] for p in brief['projects']}
+    gaps = research.get('project_gaps', [])
+    blockers = brief.get('blockers', [])
+    require(isinstance(gaps, list) and isinstance(blockers, list), 'Project gaps/blockers must be lists')
+    ids = [b.get('id') for b in blockers]
+    require(all(isinstance(i, str) and i.strip() for i in ids) and len(ids) == len(set(ids)), 'Unique blocker IDs required')
+    gap_ids = [g.get('id') for g in gaps]
+    require(len(gap_ids) == len(set(gap_ids)) and set(gap_ids) <= set(ids), 'Every project gap needs a visible blocker')
+    file_names = {f['path'] for f in research.get('evidence_files', [])}
+    for gap in gaps:
+        require(gap.get('scope') == 'project' and gap.get('source') in ('gmail', 'obsidian', 'basicops'), 'Only scoped project gaps may be disclosed')
+        require(gap.get('evidence') and isinstance(gap['evidence'], list) and all(e in file_names for e in gap['evidence']), 'Project gap search evidence must be retained')
+        blocker = next(b for b in blockers if b['id'] == gap['id'])
+        require(gap.get('project') == blocker.get('project'), 'Project gap/blocker mismatch')
+    if blockers:
+        from brief import blocker_text
+        email = read('email.json')
+        require(all('Blockers and information needed' in email.get(k, '') for k in ('html', 'text')), 'Visible blocker section required')
+        for blocker in blockers:
+            label = blocker_text(blocker)
+            require(label in email.get('text', '') and html.escape(label) in email.get('html', ''), 'Blocker disclosure missing from email')
     coverage=research.get('project_source_coverage',[])
     require(len(coverage)==len(names) and {p.get('project') for p in coverage}==names, 'Per-project source coverage required')
     for project in coverage:
         for source in ('gmail','obsidian','basicops'):
             item=project.get(source,{})
-            require(item.get('status')=='complete' and isinstance(item.get('evidence'),list) and bool(item['evidence']), 'Incomplete project source: '+project['project']+' / '+source)
+            evidence = isinstance(item.get('evidence'), list) and bool(item['evidence'])
+            disclosed = item.get('status') == 'limited' and any(g.get('id') == item.get('gap_id') and g.get('project') == project['project'] and g.get('source') == source for g in gaps)
+            require(evidence and (item.get('status') == 'complete' or disclosed), 'Incomplete project source: '+project['project']+' / '+source)
+        require(any(project.get(source, {}).get('status') == 'complete' for source in ('gmail','obsidian','basicops')), 'Project needs verified source evidence')
+    for gap in gaps:
+        if gap['project'] in names:
+            entry = next(p for p in coverage if p['project'] == gap['project'])[gap['source']]
+            require(entry.get('status') == 'limited' and entry.get('gap_id') == gap['id'], 'Disclosed gap cannot claim complete project coverage')
     files = research.get('evidence_files', [])
     require(bool(files), 'No retained primary evidence')
     for f in files:
@@ -63,7 +92,7 @@ def validate(directory, require_review=True):
         return {'state': 'research_passed'}
     review = read('quality-review.json')
     require(review.get('accepted') is True and review.get('reviewer') and review.get('issues') == [], 'Independent review not accepted')
-    for key, name in [('email', 'email.json'), ('research', 'research-receipt.json'), ('comparison', 'comparison.json'), ('access', 'access-receipt.json')]:
+    for key, name in [('brief', 'brief.json'), ('email', 'email.json'), ('research', 'research-receipt.json'), ('comparison', 'comparison.json'), ('access', 'access-receipt.json')]:
         require(review.get(key + '_sha256') == digest(root / name), 'Review invalidated: ' + name)
     return {'state': 'quality_passed', 'email_sha256': digest(root / 'email.json')}
 

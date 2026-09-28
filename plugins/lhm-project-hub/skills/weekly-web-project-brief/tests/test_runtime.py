@@ -8,7 +8,7 @@ class RuntimeTests(unittest.TestCase):
   self.assertIn('{project: exact displayed name',prompt)
   self.assertIn('/output',prompt)
  def test_schedule_and_dst(self):
-  for week,stamp in [('2026-09-21','2026-09-21T02:00:00+00:00'),('2026-10-05','2026-10-05T01:00:00+00:00')]:
+  for week,stamp in [('2026-09-21','2026-09-20T21:00:00+00:00'),('2026-10-05','2026-10-04T20:00:00+00:00')]:
    self.assertEqual(r.validate_request({'week':week,'mode':'scheduled'},datetime.fromisoformat(stamp)),week)
   for v in [{'week':'2026-09-21','mode':'test'},{'week':'2026-09-21','mode':'scheduled','command':'anything'}]:
    with self.assertRaises(ValueError):r.validate_request(v)

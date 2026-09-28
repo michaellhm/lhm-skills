@@ -1,6 +1,6 @@
 ---
 name: staff-weekly-flow
-description: Plan and run a personalised LHM weekly-to-daily work flow for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use when an authorised person asks “what should I focus on this week?”, “what should I work on today?”, asks to review, clean up or triage all their BasicOps tasks or inbox, asks for a mini stand-up or WhatsApp-ready team update, asks specifically for business-growth or client-work priorities, wants to review or save their weekly priorities, or wants to configure their weekly/daily reminder time, timezone, channel, delivery mode, focus mode or priority limit. Read the person’s canonical Obsidian profile, verified BasicOps personal-board mapping, authorised project context and current weekly file; prepare a small realistic plan; save only after confirmation; and apply approved BasicOps mutations through basicops-task-manager with read-back verification.
+description: Plan and run an LHM weekly-to-daily flow for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use when an authorised person asks “what should I focus on this week?”, “what should I work on today?”, asks to review, clean up or triage all their BasicOps tasks or inbox, asks for a mini stand-up or WhatsApp-ready team update, asks specifically for business-growth or client-work priorities, wants to review or save their weekly priorities, or wants to configure their weekly/daily reminder time, timezone, channel, delivery mode, focus mode or priority limit. Use “run my Monday web-project planning” or “work through the weekly web brief” to coach the current shared brief, capture feedback and prepare the week. Read the person’s canonical Obsidian profile, verified BasicOps personal-board mapping, authorised project context and current weekly file; prepare a small realistic plan; save only after confirmation; and apply approved BasicOps mutations through basicops-task-manager with read-back verification.
 ---
 ## Client file routing
 
@@ -14,7 +14,7 @@ Give each LHM person a small, traceable operating plan without forcing them to r
 ## Resolve the operating identity
 
 1. Resolve the requester from the authenticated Hermes/Codex profile or channel binding. Never infer identity from a display name alone.
-2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` completely.
+2. Read the shared `_System/Vault Conventions.md` and available `_System/Multi-Agent Memory Contract.md` completely. If the latter is absent from the shared vault, record that gap and use the shared conventions and boundary; never substitute Michael’s private contract or disclose private content.
 3. Read `22 People/<Person>.md` and verify:
    - canonical name and role;
    - `basicops_project_name`;
@@ -29,6 +29,15 @@ Give each LHM person a small, traceable operating plan without forcing them to r
    plausible, then preserve the confirmed correction in the weekly decision register.
 
 Use the person's folder `22 People/<Person>/`. Store preferences in `Weekly Flow Preferences.md` and weekly plans in `YYYY-Www — Weekly Flow.md`.
+
+## Shared weekly web brief
+
+For Monday planning, website/project planning, or feedback on the weekly web brief, read
+[weekly-web-coaching.md](references/weekly-web-coaching.md). Resolve the current ISO-week note in
+the shared LHM Knowledge vault, including all dated corrections. Use its role-specific Michael,
+Kristalyn and Aiya coaching paths alongside the ordinary capacity and authority rules below.
+Clear authenticated feedback may be appended to the shared brief as part of this flow; that does
+not itself send an email, mutate a task or confirm an entire personal plan.
 
 ## Choose the intent
 
@@ -48,6 +57,7 @@ Trigger on “What should I focus on this week?”, equivalent planning requests
    Ask one material question at a time. A user may provide these areas conversationally over several
    turns; do not mistake an early partial timetable for the final plan.
 4. Read only the minimum relevant context:
+   - the current shared weekly web brief and its dated corrections under the coaching contract above;
    - the person's canonical profile and quarterly commitment, if present;
    - their previous and current weekly files, if present;
    - open work from their verified BasicOps personal project;
@@ -491,6 +501,8 @@ updated: YYYY-MM-DD
 # YYYY-Www — <Person> Weekly Flow
 
 ## Capacity and context
+## Weekly web brief and feedback
+## Last week closure and handoffs
 ## Projects to unblock
 ## Client touchpoints due
 ## Client follow-ups
