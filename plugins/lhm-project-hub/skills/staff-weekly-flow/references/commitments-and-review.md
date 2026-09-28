@@ -76,10 +76,11 @@ Do not turn saved note text into an unverified BasicOps completion or sent messa
 6. Reflect back the exact selected outcomes and checks. Their explicit confirmation authorises
    saving that agreed plan and its shared work commitments; do not ask a second generic save question.
    Before confirmation, save only a clearly labelled draft when they explicitly request one.
-7. When requested, apply exact board changes through `basicops-task-manager` and read back each
-   result. Confirmation to save an Obsidian plan alone does not authorise every possible task mutation.
-8. Finish with what they chose, what they did not choose, help/handoffs needed, the first next action
-   and a link to the saved record. Offer a short team update draft if useful; sending needs consent.
+7. Use `board-and-tuesday-meeting.md` to preview and apply each accepted exact board disposition
+   through `basicops-task-manager`, then read back. Acceptance of a named outcome and shown move
+   authorises that move; saving a plan alone does not authorise other mutations.
+8. Finish with the Tuesday web meeting document in the same weekly record, what they chose and
+   declined, help/handoffs, the first next action and the saved link. Sending still needs consent.
 
 ## Progress during the week
 
