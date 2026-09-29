@@ -11,6 +11,15 @@ For client-specific work, first read [Client knowledge and working-file routing]
 
 Apply one consistent LHM standard to every BasicOps mutation. Keep BasicOps lightweight: it says what needs doing, who owns it and what happens next. Obsidian holds detailed client and project context; Hermes supplies that detail conversationally when asked.
 
+## 20x task intake and handback
+
+For a task executed in 20x, read [20x task handback](references/20x-task-handback.md)
+at intake and again before final delivery. This applies to all specialist roles and
+all task origins. Retain a verified BasicOps source binding, choose one handback
+owner, deduplicate retries and verify the Discussion/status readback. A completed
+20x run alone does not prove that BasicOps was updated. The reference does not
+create a task-source integration or grant new permissions.
+
 ## Meeting-wrap exception
 
 For a meeting-wrap card or distribution request, first read

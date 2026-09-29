@@ -11,6 +11,8 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 ## Skill Catalog
 
+`lhm-project-hub:basicops-task-manager` — Shared BasicOps mutation boundary, including source-linked 20x intake, verified result handback, review gates and retry deduplication.
+
 `playbook-strategy-session` — Prepare and coach theme-led client strategy calls for campaign playbooks.
 
 `prospect-sitemap-opportunity` — Proposed sitemap and interactive opportunity model for a prospect website pitch.
