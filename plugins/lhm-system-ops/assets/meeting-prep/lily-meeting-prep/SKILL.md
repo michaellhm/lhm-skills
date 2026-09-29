@@ -1,15 +1,15 @@
 ---
 name: lily-meeting-prep
-description: Prepare Lily's internal client-meeting briefs from Calendar, BasicOps discussions, Fathom and Gmail, or improve those briefs from Michael's feedback. Identifies the next person who must act and produces a short, non-repetitive email. Supports scheduled send, authorised one-off tests and draft-only review.
+description: Prepare Lily's internal client-meeting briefs from Calendar, BasicOps discussions, Fathom, Gmail meeting wraps and shared Obsidian client notes, or improve those briefs from Michael's feedback. Identifies the next person who must act and produces a short, non-repetitive email. Supports scheduled send, authorised one-off tests and draft-only review.
 metadata:
-  version: 1.0.3
+  version: 1.0.4
 ---
 
 # Lily meeting preparation
 
 Help Michael see what needs his attention before a client meeting, what to ask the client, and which promises remain unresolved. A task list or meeting recap is not the output.
 
-Read [editorial-feedback.md](references/editorial-feedback.md) on every run. Read [runtime.md](references/runtime.md) for the deployed calendar, mail and receipt procedure. The scheduler supplies the date and calendar file; do not rediscover setup or delegate the job.
+Read [source-reconciliation.md](references/source-reconciliation.md) for the required last-wrap → BasicOps → shared-vault reconciliation. Read [editorial-feedback.md](references/editorial-feedback.md) on every run. Read [runtime.md](references/runtime.md) for the deployed calendar, mail and receipt procedure. The scheduler supplies the date and calendar file; do not rediscover setup or delegate the job.
 
 ## Mode and scope
 
@@ -24,18 +24,21 @@ Sources are read-only. Exclude Cliniko, patient information, secrets, and unrela
 
 Use event title, attendee domains and verified client aliases. Exclude internal/personal events and declined meetings. Classify personal events from calendar context only; never search their attendees or appointment details in email or other sources. Keep ambiguous business meetings visibly uncertain. If the calendar failed, report the failure; do not infer no meetings.
 
-Start with the three live sources. Do not spend the research budget on broad vault discovery.
+Start with the latest client wrap in Michael’s meeting-wrap Gmail label, then reconcile its commitments against current BasicOps discussions, newer mail and the shared Obsidian client notes. Use Fathom to check unresolved meeting evidence. Keep vault reads targeted to that client.
 
-Cover all three sources before deepening any one. Batch independent reads and
+Cover all five source categories (meeting wrap, BasicOps, Gmail, Fathom and Obsidian) before deepening any one. Batch independent reads and
 prioritise 5–8 material issues. Reserve the final ten turns for reconciliation
 and outputs. Save a partial research receipt after each source so a bounded
 retry resumes useful work. Budget exhaustion is `incomplete`, never delivery.
 
-1. **BasicOps:** many clients live in shared boards and staff tasks. Search task titles workspace-wide using name/domain/abbreviation, then specific issue words discovered in meetings/emails. Example: Dry Eye Solution / DryEyeSolution / DES, followed by “moving eye”, not just a project named Dry Eye. Read relevant parent/child records. For every item considered for the brief, read its latest discussion and any newer replies, not only status/title/description. Follow a review URL or linked handoff record when it resolves who acts next. Paginate until the relevant latest discussion is covered; if a bounded read is incomplete, say so in the research receipt.
-2. **Fathom:** use the last two or three relevant meetings to identify promises and decisions. Read transcripts before quoting specifics. Turn each important unresolved promise into a targeted task/email search. An old meeting statement is not the current status.
-3. **Gmail:** search client-domain correspondence AND issue-specific internal mail/BasicOps notifications. Domain-only searches miss internal delivery and review handoffs. Read the newest reply, not just the search snippet. Carry forward decisions already answered (for example notification recipients) instead of asking again. Invoice notices alone do not prove a current unpaid balance; omit financial claims without authoritative current verification. Exclude Lily-generated briefs from factual evidence. Use the last 30 days initially, extend only for a material unresolved item.
+1. **Latest meeting wrap:** resolve the actual Gmail label rather than guessing its punctuation. Read the newest prior client wrap in full and newer thread replies. Extract each in-scope action/decision, then account for each in the receipt, including items omitted from the short email. A sent wrap records a commitment, not proof of execution.
+2. **BasicOps:** many clients live in shared boards and staff tasks. Search task titles workspace-wide using name/domain/abbreviation, then specific issue words discovered in meetings/emails. Example: Dry Eye Solution / DryEyeSolution / DES, followed by “moving eye”, not just a project named Dry Eye. Read relevant parent/child records. For every item considered for the brief, read its latest discussion and any newer replies, not only status/title/description. Follow a review URL or linked handoff record when it resolves who acts next. Paginate until the relevant latest discussion is covered; if a bounded read is incomplete, say so in the research receipt.
+3. **Fathom:** use the last two or three relevant meetings to identify promises and decisions. Read transcripts before quoting specifics. Turn each important unresolved promise into a targeted task/email search. An old meeting statement is not the current status.
+4. **Gmail:** search client-domain correspondence AND issue-specific internal mail/BasicOps notifications. Domain-only searches miss internal delivery and review handoffs. Read the newest reply, not just the search snippet. Carry forward decisions already answered (for example notification recipients) instead of asking again. Invoice notices alone do not prove a current unpaid balance; omit financial claims without authoritative current verification. Exclude Lily-generated briefs from factual evidence. Use the last 30 days initially, extend only for a material unresolved item.
 
-If a source fails, retry once, then continue with a clearly scoped gap. Missing optional vault notes do not mean BasicOps/Fathom/Gmail failed. Do not report live analytics or live deployment as verified from correspondence alone.
+5. **Obsidian:** read the verified shared LHM Knowledge client overview/profile, goals, current projects and relevant recent meeting/project notes. Record note paths and evidence dates; stale notes cannot override newer discussions or replies. Never use the private founder vault as a substitute.
+
+If a source fails, retry once, then continue with a clearly scoped gap. A searched-for absent note or wrap is not a connector failure. Report each category separately. Fathom authentication errors require reauthorisation; do not turn them into empty meeting history or attempt to change credentials. Do not report live analytics or live deployment as verified from correspondence alone.
 
 ## Reconcile before writing
 
@@ -56,6 +59,8 @@ Distinguish:
 **Follow the handoff chain.** If Aiya says a deployed mockup is ready for Michael and she will email Liz after his go-ahead, the current action is Michael's review. Aiya remains the implementer; Liz is a later step. Do not classify it as waiting on Aiya, waiting on Liz, or fully complete merely from the board status. If no reviewer is named, mark an inferred review assignment rather than presenting it as fact. Describe unperformed handoffs as actions (“Aiya to email Liz”), not as activity already happening. Internal approval does not prove a client email was sent; do not move the wait to the client until there is a send/request receipt. Do not invent a publication approval gate beyond the source evidence.
 
 Verify staging/mockup versus live production, review approval versus publication, and task section versus status. Exact dates only, converted to Melbourne time. Avoid creating urgency from a legacy due date without current evidence that the work remains outstanding.
+
+Flag a material wrap commitment with no matching task as “No matching BasicOps task found in the checked scope; confirm/create follow-up”, never “the team forgot this”. A truncated sweep is “not fully checked”. Do not create/update tasks, vault notes or Gmail labels during briefing preparation.
 
 ## Write once per issue
 

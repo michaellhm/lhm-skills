@@ -242,7 +242,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
     sync-observations/                  # Push local Task Observer logs to observations/<person>/
     weekly-skill-review/                # Cross-team review — applies learnings on a branch, opens a PR
 plugins/lhm-system-ops/               # Governed CTO engineering and release operations
-  assets/meeting-prep/                  # Lily profile skill, bounded recovery, verified email delivery
+  assets/meeting-prep/                  # Lily profile skill, wrap/task/vault reconciliation, verified delivery
   .claude-plugin/plugin.json            # Claude plugin manifest
   .codex-plugin/plugin.json             # Codex plugin manifest
   skills/                               # All 12 skills

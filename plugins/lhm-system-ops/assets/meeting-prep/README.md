@@ -38,7 +38,7 @@ export hashes, then as root run `python3 install.py --commit FULL_SHA`. Michael'
 instruction to fix the named production incident authorises this scoped
 profile repair; it does not merge the feature branch or install other plugins.
 The installer backs up every prior file, mode/owner and target job, writes only
-the five allowlisted files, and uses native `cron.jobs.update_job` for the one
+the six allowlisted files, and uses native `cron.jobs.update_job` for the one
 job. Installation readback verifies content hashes and unchanged cadence,
 delivery target, enabled state, skills and working directory. No gateway restart.
 
@@ -52,3 +52,11 @@ An authorised recovery uses the installed runner with `--date YYYY-MM-DD` under
 the existing Hermes user/profile. Use a durable supervisor; retain its exit
 state and verify the fixed sender's recipient events. Do not claim success
 from a queued run or a child's final prose.
+
+## Preparation sources
+
+The current flow reconciles the latest client meeting-wrap email against every
+in-scope commitment in BasicOps, newer correspondence and shared Obsidian notes.
+Fathom gaps retain their actual cause; server reauthorisation is an operator step.
+See the skill source-reconciliation reference for bounded searches, receipt
+fields and the distinction between no match and an incomplete search.
