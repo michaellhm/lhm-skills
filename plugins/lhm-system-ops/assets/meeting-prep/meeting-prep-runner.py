@@ -101,6 +101,36 @@ def validate_research(data, date, attempt):
             raise ValueError('Included issue lacks current evidence or next actor')
 
 
+
+def validate_email(data, email):
+    """Bind every body paragraph to the reconciled, included issue ledger."""
+    if not isinstance(email, dict) or set(email) != {'subject', 'body'}:
+        raise ValueError('Current brief email is missing or invalid')
+    entries = []
+    for item in data['issues']:
+        if not item.get('included'):
+            continue
+        if not item.get('email_entry'):
+            raise ValueError('Included issue needs its exact email entry')
+        if any('app.basicops.com/' in url for url in item['evidence_urls']):
+            discussion = item.get('latest_discussion', {})
+            if not all(discussion.get(k) for k in ('task_id', 'message_id', 'created_at', 'read_at')):
+                raise ValueError('Task issue requires latest discussion message evidence')
+        entries.append(item['email_entry'])
+    if not data.get('email_opening') or not entries:
+        raise ValueError('Missing calendar opening or included email entries')
+    gap = any(data['source_coverage'][s]['status'] == 'unavailable'
+              for s in ('basicops', 'fathom', 'gmail'))
+    if gap and not data.get('limitation_sentence'):
+        raise ValueError('Source gap must be disclosed in the email')
+    parts = [data['email_opening'], *entries]
+    if data.get('limitation_sentence'):
+        parts.append(data['limitation_sentence'])
+    expected = '\n\n'.join([*parts, 'Lily'])
+    if email['body'] != expected:
+        raise ValueError('Email contains material outside the reconciled issue ledger')
+
+
 def reconcile_send(date):
     stored = read(runtime.receipt(date))
     if stored is None:
@@ -172,6 +202,9 @@ source_coverage: basicops/fathom/gmail each with status=checked or unavailable
 and evidence describing queries, newest reads, pagination bounds or exact failure;
 calendar_classification: one event_id, classification=client/excluded/uncertain
 and reason per supplied event; issues: the skill's per-issue evidence records.
+Follow runtime.md's exact email_entry/email_opening body contract. Read the latest
+discussion for every included task and record its message ID and timestamp.
+Never research personal attendees: exclude personal events from calendar context.
 If a source is unavailable after one retry, explicitly scope the gap in the receipt
 and brief; do not invent evidence or spend the whole run retrying. If research
 cannot support a useful brief, save status=incomplete and the exact missing step.
@@ -196,6 +229,7 @@ Report success only after saving both current-attempt files.'''
             if any(data['source_coverage'][s]['status'] == 'unavailable' for s in ('basicops','fathom','gmail')):
                 if not data.get('limitation_sentence') or data['limitation_sentence'] not in email['body']:
                     raise ValueError('Source gap must be disclosed in the email')
+            validate_email(data, email)
             checkpoint('ready', child_exit_code=result)
             runtime.send(date, email['subject'], email['body'])
             for n in range(4):

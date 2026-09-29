@@ -2,7 +2,7 @@
 name: lily-meeting-prep
 description: Prepare Lily's internal client-meeting briefs from Calendar, BasicOps discussions, Fathom and Gmail, or improve those briefs from Michael's feedback. Identifies the next person who must act and produces a short, non-repetitive email. Supports scheduled send, authorised one-off tests and draft-only review.
 metadata:
-  version: 1.0.2
+  version: 1.0.3
 ---
 
 # Lily meeting preparation
@@ -22,7 +22,7 @@ Sources are read-only. Exclude Cliniko, patient information, secrets, and unrela
 
 ## Find the relevant work
 
-Use event title, attendee domains and verified client aliases. Exclude internal/personal events and declined meetings. Keep ambiguous business meetings visibly uncertain. If the calendar failed, report the failure; do not infer no meetings.
+Use event title, attendee domains and verified client aliases. Exclude internal/personal events and declined meetings. Classify personal events from calendar context only; never search their attendees or appointment details in email or other sources. Keep ambiguous business meetings visibly uncertain. If the calendar failed, report the failure; do not infer no meetings.
 
 Start with the three live sources. Do not spend the research budget on broad vault discovery.
 
@@ -33,7 +33,7 @@ retry resumes useful work. Budget exhaustion is `incomplete`, never delivery.
 
 1. **BasicOps:** many clients live in shared boards and staff tasks. Search task titles workspace-wide using name/domain/abbreviation, then specific issue words discovered in meetings/emails. Example: Dry Eye Solution / DryEyeSolution / DES, followed by “moving eye”, not just a project named Dry Eye. Read relevant parent/child records. For every item considered for the brief, read its latest discussion and any newer replies, not only status/title/description. Follow a review URL or linked handoff record when it resolves who acts next. Paginate until the relevant latest discussion is covered; if a bounded read is incomplete, say so in the research receipt.
 2. **Fathom:** use the last two or three relevant meetings to identify promises and decisions. Read transcripts before quoting specifics. Turn each important unresolved promise into a targeted task/email search. An old meeting statement is not the current status.
-3. **Gmail:** search client-domain correspondence AND issue-specific internal mail/BasicOps notifications. Domain-only searches miss internal delivery and review handoffs. Read the newest reply, not just the search snippet. Exclude Lily-generated briefs from factual evidence. Use the last 30 days initially, extend only for a material unresolved item.
+3. **Gmail:** search client-domain correspondence AND issue-specific internal mail/BasicOps notifications. Domain-only searches miss internal delivery and review handoffs. Read the newest reply, not just the search snippet. Carry forward decisions already answered (for example notification recipients) instead of asking again. Invoice notices alone do not prove a current unpaid balance; omit financial claims without authoritative current verification. Exclude Lily-generated briefs from factual evidence. Use the last 30 days initially, extend only for a material unresolved item.
 
 If a source fails, retry once, then continue with a clearly scoped gap. Missing optional vault notes do not mean BasicOps/Fathom/Gmail failed. Do not report live analytics or live deployment as verified from correspondence alone.
 

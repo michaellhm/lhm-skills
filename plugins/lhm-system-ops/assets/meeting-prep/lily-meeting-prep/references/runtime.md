@@ -41,7 +41,17 @@ attempt, plus `research-receipt.json` containing:
 - `source_coverage`: `basicops`, `fathom`, `gmail`, each with `status` (`checked`
   or `unavailable`) and `evidence` describing searches, latest reads, pagination
   bounds or the exact failure. An unattempted source is not unavailable.
-- `issues`: the skill's per-issue evidence and handoff records.
+- `issues`: the skill's per-issue evidence and handoff records. Every included
+  issue has `email_entry`, its exact final paragraph/bullet including source link.
+  For BasicOps-linked issues, also include `latest_discussion` with `task_id`,
+  `message_id`, `created_at` and `read_at` from the newest discussion actually read.
+  A task's updated timestamp, status or description cannot substitute for this.
+- `email_opening`: calendar-only introduction (meeting name/date/time). No task
+  claims, financial assertions or additional issues in this opening.
+- Construct body exactly as `"\n\n".join([email_opening, *included_email_entries,
+  limitation_sentence_if_present, "Lily"])`, preserving issue order. No other
+  paragraphs: every substantive point must belong to an included evidence record.
+  The wrapper rejects untracked additions and missing discussion evidence.
 - `limitation_sentence` when any source is unavailable; include that exact
   sentence in the email body so the reader can judge the gap.
 

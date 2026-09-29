@@ -23,7 +23,7 @@ No-client classification must account for every supplied event.
 
 ## QA
 
-Sixteen behavioural tests cover successful recovery after budget exhaustion,
+Eighteen behavioural tests cover successful recovery after budget exhaustion,
 bounded calendar failure, overlapping attempts, stale research/email rejection,
 source coverage, disclosed source failures, calendar completeness, no-client
 outcomes, DST/window selection, Calendar credential-home isolation, uncertain sends and both-recipient verification.
@@ -50,3 +50,18 @@ Live acceptance requires the original missed meeting-date brief and both
 recipient delivery events. Keep the installation and send receipts on the host;
 never put client research or credentials into Git. The feature commit alone is
 not evidence of live delivery.
+
+
+## Live editorial correction
+
+The first recovery draft was held before sending: an older task handoff was
+mistaken for the latest decision, a reply's answered question was repeated, and
+extra claims appeared outside the issue ledger. The operator read the newest
+source messages directly and corrected the date's briefing. No initial send
+receipt existed. The wrapper now requires a latest-discussion message record
+for every included BasicOps issue and binds body paragraphs to included evidence
+records; tests reject absent discussion evidence and untracked additions.
+These checks enforce traceability, not independent semantic truth. Today's
+acceptance includes manual editorial review; unattended editorial quality is
+not proven by delivery. Personal calendar events must be excluded without
+researching their attendees. Current billing state needs authoritative evidence.

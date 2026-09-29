@@ -40,18 +40,29 @@ class RecoveryTests(unittest.TestCase):
         return {'meeting_date': self.date, 'attempt': attempt, 'status': status,
                 'calendar_classification': [{'event_id':'one', 'classification':'client', 'reason':'verified alias'}],
                 'source_coverage': {s:{'status':'checked','evidence':'latest source read'} for s in ('basicops','fathom','gmail')},
+                'email_opening':'Meeting preparation.',
                 'issues': [{'issue_key':'review', 'latest_evidence_at':'2026-09-30',
                     'evidence_urls':['https://example.org/task'], 'next_actor':'reviewer',
                     'next_action':'review draft', 'owner_basis':'explicit',
-                    'confidence':'high','included':True}]}
+                    'confidence':'high','included':True,'email_entry':'Review the delivered draft.'}]}
 
     def gate(self, **kwargs):
         return {'wakeAgent':True, 'calendar_file':str(self.calendar)}
 
     def write_outputs(self, prompt, directory, attempt):
         runtime.save(directory/'research-receipt.json', self.research(attempt))
-        runtime.save(directory/'email.json', {'subject':'Meeting preparation','body':'Review the delivered draft.'})
+        runtime.save(directory/'email.json', {'subject':'Meeting preparation','body':'Meeting preparation.\n\nReview the delivered draft.\n\nLily'})
         return 0
+
+    def test_untracked_body_claim_is_rejected(self):
+        data=self.research()
+        with self.assertRaisesRegex(ValueError,'outside the reconciled'):
+            runner.validate_email(data, {'subject':'Brief', 'body':'Meeting preparation.\n\nReview the delivered draft.\n\nUnverified invoice overdue.\n\nLily'})
+
+    def test_task_status_without_discussion_evidence_is_rejected(self):
+        data=self.research();data['issues'][0]['evidence_urls']=['https://app.basicops.com/task']
+        with self.assertRaisesRegex(ValueError,'latest discussion'):
+            runner.validate_email(data, {'subject':'Brief','body':'Meeting preparation.\n\nReview the delivered draft.\n\nLily'})
 
     def test_recovery_windows_and_dst(self):
         for stamp, expected in [('2026-09-29T13:00','2026-09-30'),
