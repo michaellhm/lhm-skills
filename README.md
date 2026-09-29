@@ -242,6 +242,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
     sync-observations/                  # Push local Task Observer logs to observations/<person>/
     weekly-skill-review/                # Cross-team review — applies learnings on a branch, opens a PR
 plugins/lhm-system-ops/               # Governed CTO engineering and release operations
+  assets/meeting-prep/                  # Lily profile skill, bounded recovery, verified email delivery
   .claude-plugin/plugin.json            # Claude plugin manifest
   .codex-plugin/plugin.json             # Codex plugin manifest
   skills/                               # All 12 skills
@@ -252,6 +253,8 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 ```
 
 ## Skills Catalog
+
+**Hermes profile assets:** System Ops also governs Lily meeting preparation with bounded research, retry checkpoints and verified email delivery. This deployed profile asset does not add a desktop skill.
 
 **Client Management** (3 skills): Client onboarding and profile setup, theme-led campaign-playbook strategy session preparation and coaching, and campaign playbook generation from transcripts.
 
