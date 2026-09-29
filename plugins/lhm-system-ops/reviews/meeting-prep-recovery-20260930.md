@@ -23,10 +23,10 @@ No-client classification must account for every supplied event.
 
 ## QA
 
-Fifteen behavioural tests cover successful recovery after budget exhaustion,
+Sixteen behavioural tests cover successful recovery after budget exhaustion,
 bounded calendar failure, overlapping attempts, stale research/email rejection,
 source coverage, disclosed source failures, calendar completeness, no-client
-outcomes, DST/window selection, uncertain sends and both-recipient verification.
+outcomes, DST/window selection, Calendar credential-home isolation, uncertain sends and both-recipient verification.
 Plugin version, script parity, System Ops validation and frontmatter checks pass.
 LEARNED.md files were scanned and contained no unabsorbed entries. Desktop skill
 counts and existing maintainer catalogue entry remain accurate; this package is

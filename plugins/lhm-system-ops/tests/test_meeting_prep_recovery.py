@@ -62,6 +62,13 @@ class RecoveryTests(unittest.TestCase):
                                 ('2026-10-05T07:00',None)]:
             self.assertEqual(runner.selected_date(self.at(stamp)), expected)
 
+    def test_calendar_credential_home_does_not_leak_to_child(self):
+        with patch.dict(os.environ,{'HERMES_HOME':'/opt/data/.hermes','HERMES_PROFILE':'wrong'}), patch.object(runner.subprocess,'Popen') as launch:
+            launch.return_value.wait.return_value=0
+            self.assertEqual(runner.child_run('prepare',self.directory,1),0)
+            self.assertEqual(launch.call_args.kwargs['env']['HERMES_HOME'],'/opt/data')
+            self.assertNotIn('HERMES_PROFILE',launch.call_args.kwargs['env'])
+
     def test_budget_exhaustion_fails_and_can_resume(self):
         with patch.object(runtime,'gate',side_effect=self.gate), patch.object(runner,'child_run',return_value=0), patch.object(runtime,'send') as send:
             with self.assertRaisesRegex(ValueError,'receipt'):

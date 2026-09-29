@@ -49,10 +49,15 @@ def child_run(prompt, directory, attempt):
            '--max-turns', str(MAX_TURNS), '--run-budget', str(RUN_BUDGET),
            '--in', str(directory)]
     # Child output is private evidence, not an email or an implicit success.
+    # The Calendar helper selects the shared Google credential home in-process.
+    # Restore the real Hermes root for the CLI's explicit profile selection.
+    environment = dict(os.environ, HERMES_HOME='/opt/data')
+    environment.pop('HERMES_PROFILE', None)
     with (directory/f'agent-{attempt}.log').open('w') as log:
         os.chmod(log.name, 0o600)
         child = subprocess.Popen(cmd, stdout=log, stderr=subprocess.STDOUT,
-                                 stdin=subprocess.DEVNULL, start_new_session=True)
+                                 stdin=subprocess.DEVNULL, start_new_session=True,
+                                 env=environment)
         try:
             return child.wait(timeout=HARD_TIMEOUT)
         except subprocess.TimeoutExpired:
