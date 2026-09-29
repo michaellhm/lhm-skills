@@ -171,7 +171,7 @@
       "name": "lhm-system-ops",
       "source": "./plugins/lhm-system-ops",
       "description": "Governed CTO operations and exact-ID evidence-to-production bridge.",
-      "version": "0.9.101",
+      "version": "0.9.104",
       "category": "utilities",
       "tags": [
         "cto",
