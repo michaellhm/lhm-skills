@@ -22,6 +22,7 @@ MAX_ATTEMPTS = 3
 MAX_TURNS = 60
 RUN_BUDGET = 1500
 HARD_TIMEOUT = 1650
+SOURCES = ('basicops', 'fathom', 'gmail', 'meeting_wrap', 'obsidian')
 
 
 def read(path, default=None):
@@ -87,10 +88,12 @@ def validate_research(data, date, attempt):
             raise ValueError('Cannot skip client or uncertain meetings')
         return
     coverage = data.get('source_coverage', {})
-    for name in ('basicops', 'fathom', 'gmail'):
+    for name in SOURCES:
         item = coverage.get(name, {})
-        if item.get('status') not in ('checked', 'unavailable') or not item.get('evidence'):
+        allowed = ('checked', 'unavailable', 'not_found') if name in ('meeting_wrap', 'obsidian') else ('checked', 'unavailable')
+        if item.get('status') not in allowed or not item.get('evidence'):
             raise ValueError(f'{name} coverage missing: research must try every source')
+    validate_wrap_reconciliation(data)
     issues = data.get('issues')
     if not isinstance(issues, list):
         raise ValueError('Issue reconciliation missing')
@@ -100,6 +103,50 @@ def validate_research(data, date, attempt):
                  'next_action', 'owner_basis', 'confidence')):
             raise ValueError('Included issue lacks current evidence or next actor')
 
+
+
+
+def validate_wrap_reconciliation(data):
+    clients = {x.get('client_key') for x in data['calendar_classification']
+               if x['classification'] == 'client'}
+    if not clients or None in clients or '' in clients:
+        raise ValueError('Client events require a verified client_key')
+    checks = data.get('meeting_wrap_checks')
+    if not isinstance(checks, list) or len(checks) != len(clients) or {x.get('client_key') for x in checks} != clients:
+        raise ValueError('Latest meeting wrap must be checked for every client')
+    for check in checks:
+        if check.get('status') not in ('found', 'not_found', 'unavailable') or not check.get('search_evidence'):
+            raise ValueError('Meeting wrap search evidence missing')
+        if check['status'] == 'found':
+            if not all(check.get(k) for k in ('message_id', 'thread_id', 'sent_at', 'url', 'label_name', 'extraction_evidence')):
+                raise ValueError('Latest wrap full-message evidence missing')
+        commitments = check.get('commitments')
+        if not isinstance(commitments, list):
+            raise ValueError('Wrap commitment reconciliation missing')
+        if check['status'] != 'found' and commitments:
+            raise ValueError('Cannot infer commitments from an unavailable wrap')
+        seen = set()
+        for item in commitments:
+            if not all(item.get(k) for k in ('commitment_id', 'summary', 'disposition', 'evidence')) or item['commitment_id'] in seen:
+                raise ValueError('Invalid or duplicate wrap commitment')
+            seen.add(item['commitment_id'])
+            if item['disposition'] not in ('tracked', 'complete', 'superseded', 'deferred', 'no_matching_task_found', 'search_incomplete'):
+                raise ValueError('Invalid wrap commitment disposition')
+            if not item.get('basicops_queries'):
+                raise ValueError('Every wrap commitment requires a targeted BasicOps sweep')
+            if item['disposition'] in ('tracked', 'complete') and not item.get('task_urls'):
+                raise ValueError('Tracked commitment requires task evidence')
+            if item['disposition'] == 'no_matching_task_found' and item.get('search_complete') is not True:
+                raise ValueError('Incomplete sweep cannot prove a missing task')
+    found = any(x['status'] == 'found' for x in checks)
+    coverage = data['source_coverage']['meeting_wrap']['status']
+    failed = any(x['status'] == 'unavailable' for x in checks)
+    if failed and coverage != 'unavailable':
+        raise ValueError('Unavailable client wrap must remain a visible source gap')
+    if found and not failed and coverage != 'checked':
+        raise ValueError('Wrap coverage contradicts found message evidence')
+    if coverage == 'not_found' and any(x['status'] != 'not_found' for x in checks):
+        raise ValueError('Wrap search failure is not a not-found result')
 
 
 def validate_email(data, email):
@@ -120,7 +167,7 @@ def validate_email(data, email):
     if not data.get('email_opening') or not entries:
         raise ValueError('Missing calendar opening or included email entries')
     gap = any(data['source_coverage'][s]['status'] == 'unavailable'
-              for s in ('basicops', 'fathom', 'gmail'))
+              for s in SOURCES)
     if gap and not data.get('limitation_sentence'):
         raise ValueError('Source gap must be disclosed in the email')
     parts = [data['email_opening'], *entries]
@@ -192,16 +239,24 @@ RESEARCH-ONLY MODE: do not call send, verify, Mailgun, or another email tool.
 The deterministic parent validates your files and owns authorised delivery.
 Read existing research/checkpoint files first. Reuse verified evidence, refresh
 newer material discussions and replies, and continue at the first incomplete source.
-Visit BasicOps, Fathom and Gmail before deepening any one source. Batch independent
-reads, use targeted queries, and focus on 5-8 material issues, not the full backlog.
+Read references/source-reconciliation.md. Resolve the actual meeting-wrap Gmail
+label, read each client's latest full wrap and newer replies, then sweep BasicOps
+for every in-scope commitment. Record missing matches only after bounded targeted
+searches; incomplete searches are uncertainties. Read the verified shared Obsidian
+client overview, goals/current projects and recent meeting notes. Use Fathom for
+unresolved promises and decisions; an authentication failure is not no meetings.
+Cover all five source categories before deepening any one. Batch reads and focus
+the email on 5-8 material issues; preserve the full commitment sweep in the receipt.
 Reserve the final 10 turns for reconciliation and saving output. Save partial
 research after each source so a retry can continue. Do not delegate or change setup.
 Write email.json with exactly subject and body, and research-receipt.json with:
 meeting_date={date}, attempt={attempt}, status=ready (or incomplete),
-source_coverage: basicops/fathom/gmail each with status=checked or unavailable
+source_coverage: basicops/fathom/gmail/meeting_wrap/obsidian with status=checked
+or unavailable (meeting_wrap and obsidian may also be not_found after a search)
 and evidence describing queries, newest reads, pagination bounds or exact failure;
 calendar_classification: one event_id, classification=client/excluded/uncertain
-and reason per supplied event; issues: the skill's per-issue evidence records.
+and reason per supplied event, plus client_key for each client event; issues: the skill's per-issue evidence records.
+Include meeting_wrap_checks per client using source-reconciliation.md's schema.
 Follow runtime.md's exact email_entry/email_opening body contract. Read the latest
 discussion for every included task and record its message ID and timestamp.
 Never research personal attendees: exclude personal events from calendar context.
@@ -226,7 +281,7 @@ Report success only after saving both current-attempt files.'''
                 raise ValueError('Current brief email is missing or invalid')
             if (directory/'email.json').stat().st_mtime < produced_after:
                 raise ValueError('Email was not saved by the current attempt')
-            if any(data['source_coverage'][s]['status'] == 'unavailable' for s in ('basicops','fathom','gmail')):
+            if any(data['source_coverage'][s]['status'] == 'unavailable' for s in SOURCES):
                 if not data.get('limitation_sentence') or data['limitation_sentence'] not in email['body']:
                     raise ValueError('Source gap must be disclosed in the email')
             validate_email(data, email)

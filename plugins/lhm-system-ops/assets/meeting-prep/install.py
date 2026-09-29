@@ -16,6 +16,7 @@ FILES = {
     'meeting_prep.py': 'scripts/meeting_prep.py',
     'meeting-prep-runner.py': 'scripts/meeting-prep-runner.py',
     'lily-meeting-prep/SKILL.md': 'skills/lily-meeting-prep/SKILL.md',
+    'lily-meeting-prep/references/source-reconciliation.md': 'skills/lily-meeting-prep/references/source-reconciliation.md',
     'lily-meeting-prep/references/runtime.md': 'skills/lily-meeting-prep/references/runtime.md',
     'lily-meeting-prep/references/editorial-feedback.md': 'skills/lily-meeting-prep/references/editorial-feedback.md',
 }

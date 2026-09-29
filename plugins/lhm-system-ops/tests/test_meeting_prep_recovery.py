@@ -38,9 +38,18 @@ class RecoveryTests(unittest.TestCase):
 
     def research(self, attempt=1, status='ready'):
         return {'meeting_date': self.date, 'attempt': attempt, 'status': status,
-                'calendar_classification': [{'event_id':'one', 'classification':'client', 'reason':'verified alias'}],
-                'source_coverage': {s:{'status':'checked','evidence':'latest source read'} for s in ('basicops','fathom','gmail')},
+                'calendar_classification': [{'event_id':'one', 'classification':'client', 'reason':'verified alias', 'client_key':'client-a'}],
+                'source_coverage': {s:{'status':'checked','evidence':'latest source read'} for s in runner.SOURCES},
                 'email_opening':'Meeting preparation.',
+                'meeting_wrap_checks':[{'client_key':'client-a','status':'found',
+                    'search_evidence':'Resolved label; bounded client search; newest prior wrap read',
+                    'message_id':'wrap-one','thread_id':'thread-one','sent_at':'2026-09-23',
+                    'url':'https://example.org/wrap','label_name':'*** MEETING WRAP',
+                    'extraction_evidence':'Full message read; one in-scope action',
+                    'commitments':[{'commitment_id':'review','summary':'Review draft',
+                        'disposition':'tracked','evidence':'Latest task discussion',
+                        'basicops_queries':['client-a review'], 'search_complete':True,
+                        'task_urls':['https://example.org/task']}]}],
                 'issues': [{'issue_key':'review', 'latest_evidence_at':'2026-09-30',
                     'evidence_urls':['https://example.org/task'], 'next_actor':'reviewer',
                     'next_action':'review draft', 'owner_basis':'explicit',
@@ -63,6 +72,64 @@ class RecoveryTests(unittest.TestCase):
         data=self.research();data['issues'][0]['evidence_urls']=['https://app.basicops.com/task']
         with self.assertRaisesRegex(ValueError,'latest discussion'):
             runner.validate_email(data, {'subject':'Brief','body':'Meeting preparation.\n\nReview the delivered draft.\n\nLily'})
+
+    def test_wrap_and_obsidian_coverage_are_required(self):
+        for source in ('meeting_wrap', 'obsidian'):
+            data=self.research();del data['source_coverage'][source]
+            with self.assertRaisesRegex(ValueError,source+' coverage'):
+                runner.validate_research(data,self.date,1)
+
+    def test_latest_wrap_required_for_each_client(self):
+        data=self.research();data['calendar_classification'].append({'event_id':'two','classification':'client','client_key':'client-b','reason':'verified'})
+        with self.assertRaisesRegex(ValueError,'every client'):
+            runner.validate_research(data,self.date,1)
+
+    def test_wrap_snippet_cannot_substitute_for_full_message(self):
+        data=self.research();del data['meeting_wrap_checks'][0]['extraction_evidence']
+        with self.assertRaisesRegex(ValueError,'full-message'):
+            runner.validate_research(data,self.date,1)
+
+    def test_missing_task_requires_completed_targeted_search(self):
+        data=self.research();item=data['meeting_wrap_checks'][0]['commitments'][0]
+        item.update(disposition='no_matching_task_found',search_complete=False)
+        with self.assertRaisesRegex(ValueError,'Incomplete sweep'):
+            runner.validate_research(data,self.date,1)
+        item['search_complete']=True
+        runner.validate_research(data,self.date,1)
+        item['basicops_queries']=[]
+        with self.assertRaisesRegex(ValueError,'targeted BasicOps'):
+            runner.validate_research(data,self.date,1)
+
+    def test_incomplete_sweep_is_uncertainty_not_missing(self):
+        data=self.research();data['meeting_wrap_checks'][0]['commitments'][0].update(disposition='search_incomplete',search_complete=False)
+        runner.validate_research(data,self.date,1)
+
+    def test_unavailable_wrap_cannot_invent_commitments(self):
+        data=self.research();data['meeting_wrap_checks'][0]['status']='unavailable'
+        with self.assertRaisesRegex(ValueError,'Cannot infer commitments'):
+            runner.validate_research(data,self.date,1)
+
+    def test_search_failure_cannot_be_not_found(self):
+        data=self.research();data['source_coverage']['meeting_wrap']['status']='not_found'
+        data['meeting_wrap_checks'][0].update(status='unavailable',commitments=[])
+        with self.assertRaisesRegex(ValueError,'visible source gap'):
+            runner.validate_research(data,self.date,1)
+
+    def test_missing_notes_after_search_are_not_connector_failure(self):
+        data=self.research();data['source_coverage']['obsidian']={'status':'not_found','evidence':'Verified shared client root searched; no relevant notes'}
+        runner.validate_research(data,self.date,1)
+        runner.validate_email(data,{'subject':'Brief','body':'Meeting preparation.\n\nReview the delivered draft.\n\nLily'})
+
+    def test_partial_client_wrap_failure_remains_visible(self):
+        data=self.research()
+        data['calendar_classification'].append({'event_id':'two','classification':'client','client_key':'client-b','reason':'verified'})
+        data['meeting_wrap_checks'].append({'client_key':'client-b','status':'unavailable','search_evidence':'Gmail request failed after retry','commitments':[]})
+        with self.assertRaisesRegex(ValueError,'visible source gap'):
+            runner.validate_research(data,self.date,1)
+        data['source_coverage']['meeting_wrap']['status']='unavailable'
+        runner.validate_research(data,self.date,1)
+        with self.assertRaisesRegex(ValueError,'Source gap'):
+            runner.validate_email(data,{'subject':'Brief','body':'Meeting preparation.\n\nReview the delivered draft.\n\nLily'})
 
     def test_recovery_windows_and_dst(self):
         for stamp, expected in [('2026-09-29T13:00','2026-09-30'),

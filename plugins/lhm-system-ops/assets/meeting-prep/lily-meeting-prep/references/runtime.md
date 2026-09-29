@@ -26,7 +26,7 @@ Use native read-only BasicOps/Fathom tools. For Gmail use a separate process:
 `HERMES_HOME=/opt/data/.hermes /opt/data/.venv/bin/python /opt/data/skills/productivity/google-workspace/scripts/google_api.py gmail --help`
 
 Never change the parent profile or expose credentials. Exclude Lily-generated
-briefs from factual evidence. Read BasicOps, Fathom and Gmail before deepening
+briefs from factual evidence. Check the meeting wrap, BasicOps, Fathom, Gmail and shared Obsidian before deepening
 any one source, and reserve ten turns for reconciliation and saving. Resume
 from saved evidence after checking for newer material discussion/replies.
 
@@ -37,10 +37,11 @@ attempt, plus `research-receipt.json` containing:
 
 - `meeting_date`, `attempt`, `status` (`ready`, `incomplete`, or `no_client_meetings`).
 - `calendar_classification`: one entry per supplied event with `event_id`,
-  `classification` (`client`, `excluded`, `uncertain`) and a reason.
-- `source_coverage`: `basicops`, `fathom`, `gmail`, each with `status` (`checked`
-  or `unavailable`) and `evidence` describing searches, latest reads, pagination
+  `classification` (`client`, `excluded`, `uncertain`) and a reason; client entries also have a verified `client_key`.
+- `source_coverage`: `basicops`, `fathom`, `gmail`, `meeting_wrap`, `obsidian`, each with `status` (`checked`
+  or `unavailable`; `meeting_wrap`/`obsidian` also permit `not_found` after a completed search) and `evidence` describing searches, latest reads, pagination
   bounds or the exact failure. An unattempted source is not unavailable.
+- `meeting_wrap_checks`: one per verified client, using the full-message and commitment reconciliation schema in [source-reconciliation.md](source-reconciliation.md).
 - `issues`: the skill's per-issue evidence and handoff records. Every included
   issue has `email_entry`, its exact final paragraph/bullet including source link.
   For BasicOps-linked issues, also include `latest_discussion` with `task_id`,
