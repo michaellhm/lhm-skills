@@ -40,7 +40,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `weekly-web-project-brief` — Lily’s Monday HTML website portfolio: 07:00 Melbourne preparation for 08:00 delivery, project health, client-grouped actions, visible clarification notes and a verified shared Obsidian snapshot. One-off fixes stay out of the snapshot.
 
-`lhm-content-engine:weekly-social-carousel` — Turn safe Fathom meeting insights, recurring clinic-owner problems, and verified Search, Ads or practical AI developments into reviewed LHM HTML and PNG carousel packages.
+`lhm-content-engine:weekly-social-carousel` — Build a privacy-safe editorial backlog from Fathom and current developments, rank ideas by audience frequency and value, then turn selected topics into reviewed LHM HTML and PNG carousel packages.
 
 `google-ads-monthly-review` — Evidence-led account review, report highlights and Lily’s Monday review-card digest.
 

@@ -20,6 +20,8 @@ Do not generate those controls inside the carousel package. Add the package to `
 - package path: `content/YYYY/MM/YYYY-MM-DD-slug/`
 - build command: `npm run build`
 - deployable output: `dist/`
+- editorial backlog: `planning/editorial-backlog.md`
+- private backlog provenance: `planning/editorial-backlog.private.json`
 
 Verify the remote and local clone before writing. If the clone is unavailable, dirty with overlapping changes, points to another remote, or the requested branch is not explicit, return `blocked` rather than creating a fallback folder.
 
@@ -84,3 +86,11 @@ Do not report the review site as built when any acceptance check fails.
 Before committing, inspect repository status, preserve unrelated changes, run the build checks, scan changed text files for secrets and review the final diff. After pushing, verify the remote SHA and return the commit URL.
 
 Never enable hosting, change Cloudflare settings, modify access permissions or publish to social accounts as an implied part of this delivery.
+
+## Editorial backlog delivery
+
+Weekly and historical source sweeps update `planning/editorial-backlog.md` before selecting posts. The Markdown file is the human review surface and contains safe, anonymised topic summaries only. It must not contain meeting titles, people, clinics, locations, private metrics, transcript quotes, Fathom links or recording IDs.
+
+Store durable source provenance separately in `planning/editorial-backlog.private.json`. The site build must not copy either planning file to `dist/`; the `.private.json` file must also pass the repository's private-file exclusion checks.
+
+After creating posts, mark the selected backlog IDs as `published` and record the package slug. Keep unselected `ready`, `review` and `hold-low-frequency` entries so Michael can choose future posts. Do not remove an idea simply because it was not used that week.

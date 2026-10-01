@@ -40,7 +40,7 @@ function checkPublicText(value, field) {
 }
 
 function validate(data) {
-  const lanes = new Set(['client-question', 'practical-shortcut', 'search-ads-update', 'ai-experiment']);
+  const lanes = new Set(['client-question', 'practice-question', 'practical-shortcut', 'search-ads-update', 'ai-experiment']);
   const coverStyles = new Set(['typography', 'image']);
   const slideTypes = new Set(['cover', 'statement', 'labels', 'checklist', 'callout']);
 

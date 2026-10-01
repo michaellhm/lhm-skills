@@ -1,6 +1,6 @@
 ---
 name: weekly-social-carousel
-description: "Turn useful clinic-owner conversations, recurring operational questions, Google Search or Ads changes, and practical AI developments into concise Local Health Marketing carousel packages. Use this when the user mentions 'weekly social carousel', 'Fathom conversations into posts', 'client questions into content', 'carousel from meeting notes', 'Friday social content', or asks for an LHM HTML carousel preview. Do not use it for client-facing clinical social posts or automatic social publishing."
+description: "Turn useful practice-owner conversations, recurring operational questions, Google Search or Ads changes, and practical AI developments into a prioritised editorial backlog and concise Local Health Marketing carousel packages. Use this when the user mentions 'weekly social carousel', 'Fathom conversations into posts', 'content idea backlog', 'carousel from meeting notes', 'Friday social content', or asks for an LHM HTML carousel preview. Do not use it for client-facing clinical social posts or automatic social publishing."
 ---
 
 # Weekly Social Carousel
@@ -18,6 +18,7 @@ Before writing content:
 5. Read [editorial strategy](references/editorial-strategy.md) and [privacy rules](references/privacy-rules.md).
 6. When creating the visual package, also read [carousel design system](references/carousel-design-system.md) and [input and output contract](references/input-output-contract.md).
 7. When delivering to the LHM Social review site, read [LHM Social delivery](references/lhm-social-delivery.md).
+8. For weekly or historical source sweeps, read [editorial backlog](references/editorial-backlog.md).
 
 Never create a fallback client folder or store a material deliverable inside the plugin source tree.
 
@@ -36,7 +37,13 @@ Use when asked to review a date range, commonly the previous seven days.
 3. Extract candidate questions, misconceptions, shortcuts, recurring problems, or decisions that another allied-health practice owner could learn from.
 4. Apply the privacy gate before scoring. Discard unsafe candidates rather than attempting cosmetic anonymisation.
 5. Add timely Search, Ads, or AI candidates only when they have a practical clinic-owner implication.
-6. Score the safe candidates using the editorial strategy and select one. If nothing clears the quality floor, return `no_publishable_topic`; do not manufacture a post.
+6. Add every safe, distinct candidate to the editorial backlog before selecting posts. Do not discard a strong idea merely because it was not chosen in the week it appeared.
+7. Score backlog candidates using the editorial strategy, including audience frequency. Select the requested number from the full ready backlog, not only from that week's meetings.
+8. Mark selected ideas in the backlog and keep unused ideas available for Michael's review. If too few candidates clear the quality floor, report the shortfall; do not manufacture filler.
+
+### Historical backlog
+
+Use when asked to recover older ideas or build an idea bank. Sweep the authorised date range in manageable batches, deduplicate recurring themes and update the same editorial backlog. A historical sweep prepares and scores ideas; it does not create carousels unless the request also authorises production.
 
 ## Research
 
@@ -48,18 +55,19 @@ Use when asked to review a date range, commonly the previous seven days.
 
 ## Create the carousel
 
-1. Select one lane: `client-question`, `practical-shortcut`, `search-ads-update`, or `ai-experiment`.
+1. Select one lane: `practice-question`, `practical-shortcut`, `search-ads-update`, or `ai-experiment`.
 2. Write a 5-7 slide sequence. Each slide should communicate one idea and remain useful when skimmed on a phone.
 3. Use the editorial pattern for the selected lane. Translate news into what changed, why it matters to a clinic, and what to do or watch.
 4. Keep the first-slide hook short. Do not place paragraphs on the cover.
 5. Use the typography cover unless the current test plan calls for an image cover. An image must add context and use a dark LHM overlay; generic AI or cyber imagery is not acceptable.
 6. Build a caption that adds context instead of repeating every slide.
-7. Run the privacy check again on the final slide copy, caption, HTML, filenames, image metadata, and public source note.
-8. Create the input JSON described in the input and output contract.
-9. Save the durable package under `<work_root>/weekly-social-carousel/YYYY-MM/YYYY-MM-DD-slug/` unless the verified destination has an established equivalent structure.
-10. Run `node scripts/build-carousel.mjs <input.json> <output-directory>`.
-11. Run `node scripts/render-carousel.mjs <output-directory>` when a compatible browser renderer is available. If PNG rendering is unavailable, preserve the verified HTML and return `needs_review` with the exact limitation.
-12. Open or otherwise inspect `carousel-preview.png` when rendered. Also read back `manifest.json`, `caption.md`, and the HTML metadata before reporting completion.
+7. Keep public copy source-blind. Never say that a client asked, a clinic said, or the idea came from a meeting. Present the useful issue directly. Meeting provenance belongs only in private source records. A public source note is appropriate for a verified product or platform announcement, not for a meeting-derived idea.
+8. Run the privacy check again on the final slide copy, caption, HTML, filenames, image metadata, public source note and backlog entry.
+9. Create the input JSON described in the input and output contract.
+10. Save the durable package under `<work_root>/weekly-social-carousel/YYYY-MM/YYYY-MM-DD-slug/` unless the verified destination has an established equivalent structure.
+11. Run `node scripts/build-carousel.mjs <input.json> <output-directory>`.
+12. Run `node scripts/render-carousel.mjs <output-directory>` when a compatible browser renderer is available. If PNG rendering is unavailable, preserve the verified HTML and return `needs_review` with the exact limitation.
+13. Open or otherwise inspect `carousel-preview.png` when rendered. Also read back `manifest.json`, `caption.md`, and the HTML metadata before reporting completion.
 
 Do not call image generation merely to decorate a cover. Use it only when the user wants a generated image and the concept is specific enough to add meaning.
 
@@ -73,6 +81,8 @@ Reject or revise a package when any condition is true:
 - A news post lacks a current first-party verification source.
 - An AI-tool post does not connect to bookings, content, administration, patient communication, reporting, or another concrete practice workflow.
 - The design uses a copied HeyTony identity instead of the LHM system.
+- The public copy mentions a client, meeting, transcript or private source context without explicit approval.
+- A meeting-derived topic scores below 2 for audience frequency unless Michael explicitly selects it from the backlog.
 - Required artefacts were not saved and read back.
 
 ## GitHub delivery
@@ -108,6 +118,8 @@ Approval for the protected review site is not approval to publish the post on In
   "period": {"start": "YYYY-MM-DD", "end": "YYYY-MM-DD"},
   "topic": "optional manual-mode topic",
   "source_scope": {"fathom": true, "last30days": "selective"},
+  "requested_post_count": 1,
+  "backlog": {"mode": "none | update | historical", "path": "optional verified Markdown path"},
   "cover_style": "typography | image | auto",
   "work_root": "/verified/durable/destination",
   "github": {
@@ -130,7 +142,7 @@ Return one JSON object:
   "run_result": "completed | needs_review | no_publishable_topic | blocked",
   "work_state": "prepared | verified | pushed",
   "artefact_state": "verified | partial | not_required",
-  "content_lane": "client-question | practical-shortcut | search-ads-update | ai-experiment | null",
+  "content_lane": "practice-question | practical-shortcut | search-ads-update | ai-experiment | null",
   "topic": "selected topic or null",
   "privacy_review": {"status": "passed | failed", "notes": []},
   "research_review": {"status": "verified | not_required | partial", "notes": []},
@@ -143,6 +155,13 @@ Return one JSON object:
     "week_label": null,
     "slide_zip_verified": false,
     "private_files_excluded": false
+  },
+  "editorial_backlog": {
+    "state": "not_requested | updated | blocked",
+    "path": null,
+    "safe_candidates_added": 0,
+    "ready_count": 0,
+    "selected_ids": []
   },
   "approval_required": ["human review before social publishing"],
   "next_owner": "Michael",

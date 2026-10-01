@@ -16,7 +16,7 @@ The build step uses only Node standard-library modules. It writes a portable HTM
   "schema_version": "1.0",
   "slug": "ai-and-clinic-seo",
   "title": "AI and clinic SEO",
-  "lane": "client-question",
+  "lane": "practice-question",
   "cover_style": "typography",
   "cover_image": null,
   "brand": {
@@ -26,7 +26,7 @@ The build step uses only Node standard-library modules. It writes a portable HTM
   "slides": [
     {
       "type": "cover",
-      "kicker": "A client asked",
+      "kicker": "A common practice question",
       "eyebrow": "The AI question",
       "headline_segments": [
         {"text": "Where are ", "tone": "default"},
@@ -70,7 +70,7 @@ The build step uses only Node standard-library modules. It writes a portable HTM
 
 `headline_segments` supports tones `default`, `accent`, and `blue`. Use it only when meaningful emphasis improves the hook. `headline` is the simpler default.
 
-Allowed slide types: `cover`, `statement`, `labels`, `checklist`, and `callout`. The first slide must be `cover`. Supply 5-7 slides.
+Allowed slide types: `cover`, `statement`, `labels`, `checklist`, and `callout`. The first slide must be `cover`. Supply 5-7 slides. Public copy must not identify the private source or say that a client or meeting supplied the idea. Use `practice-question` for meeting-derived audience questions.
 
 For `cover_style: image`, `cover_image` must be an existing local PNG, JPEG, or WebP file. The build script copies it into the output directory and never embeds the original path in public HTML.
 
