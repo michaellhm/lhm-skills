@@ -12,7 +12,7 @@
       "name": "lhm-inbox-hub",
       "source": "./plugins/lhm-inbox-hub",
       "description": "Michael's inbox system - morning triage into a brief, voice-matched Gmail drafts, timed email sessions, label tidy-up, and a corrections loop that learns from sent mail. Drafts only, never sends.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "category": "operations",
       "tags": [
         "email",

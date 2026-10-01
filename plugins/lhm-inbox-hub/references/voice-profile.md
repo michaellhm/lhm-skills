@@ -72,3 +72,7 @@ Drafts should aim for the *approved* register (tidy grammar, no typos, no lowerc
 
 ## Learned adjustments
 (Appended by email-learn from the corrections log. Newest at the bottom.)
+
+- (2026-10-02) Use commas and full stops instead of em dashes in drafted emails, especially partner replies. Preserve informal hyphens Michael adds himself. Evidence: three Shane replies on 30 September and one on 1 October, plus Michael's explicit request when reviewing Liz's results email; approved 2 October.
+- (2026-10-02) Keep client acknowledgements direct: action and timing can be enough. Omit unnecessary administrative narration and explanatory clauses, including explaining why someone is copied. Retain useful context and an apology when warranted; do not add a thank-you or apology opener automatically. Evidence: Gabi's two replies and Liz's tracking explanation on 30 September; approved 2 October.
+- (2026-10-02) Use short bullets for client results and tracking updates, with one clear point per bullet and concise explanations. This reinforces the existing list rule. Evidence: Michael's explicit request while reviewing Liz's results email on 30 September; approved 2 October.
