@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-194 skills across twelve Claude Code plugins (5 inbox, 61 marketing, 41 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 29 project hub, 5 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+195 skills across twelve Claude Code plugins (5 inbox, 61 marketing, 41 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 29 project hub, 6 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -174,7 +174,8 @@ plugins/lhm-finance-hub/               # Financial operating rhythm
 plugins/lhm-knowledge-hub/             # Knowledge and operating-rhythm hub
   .claude-plugin/plugin.json            # Plugin manifest
   agents/knowledge-orchestrator.md      # Weekly Flow, vault thinking, capture and review entry point
-  skills/                               # Knowledge-system workflows
+  skills/                               # All 6 knowledge-system skills
+    lhm-daily-flow/                     # Daily attention sweep, resumable work and end-of-day learning
     lhm-weekly-flow/                    # Separate founder/business review, strategic outcomes and optional action handoff
 plugins/lhm-learn/                    # Session learning capture plugin
   .claude-plugin/plugin.json            # Plugin manifest
@@ -303,7 +304,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 ### Learn
 
-**Session Capture** (1 skill): Scan conversation context for skill learnings and client profile updates, write to the correct LEARNED.md and client_profile.md files.
+**Session Capture** (1 skill): Capture evidenced client context in canonical shared Obsidian records, private daily/weekly reflections and approved reusable skill improvements; supports end-of-day close without duplicate approval interviews.
 
 ### Client Updates Hub (deprecated — moved to Project Hub)
 
@@ -352,3 +353,5 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 **Founder Weekly Flow** (`lhm-knowledge-hub:lhm-weekly-flow`): Evidence-prepared reflection and three capacity-checked outcomes, separate optional action work, and verified publication to WeekFlow. Uses the Monday briefing for material business decisions; the independent staff flow records chosen work commitments and reviews results without requiring a founder review.
 
 Meeting wraps apply an LHM scope check before proposing tasks: explicit LHM commitments and client inputs required for agreed delivery qualify; client internal projects and other discussion remain context. Existing project requirements are reused rather than duplicated.
+
+**Daily Flow** (`lhm-knowledge-hub:lhm-daily-flow`): MCP-first BasicOps and email review, one decision at a time, durable private resume checkpoint, specialist action handoffs and end-of-day Learn. Reuses weekly commitments and saves verified client context to shared Obsidian. Portable to Your Dot after access and continuity checks.
