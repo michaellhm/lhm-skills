@@ -174,7 +174,7 @@ plugins/lhm-knowledge-hub/             # Knowledge and operating-rhythm hub
   .claude-plugin/plugin.json            # Plugin manifest
   agents/knowledge-orchestrator.md      # Weekly Flow, vault thinking, capture and review entry point
   skills/                               # Knowledge-system workflows
-    lhm-weekly-flow/                    # Focused founder planning, optional action handoff and verified WeekFlow scheduling
+    lhm-weekly-flow/                    # Separate founder/business review, strategic outcomes and optional action handoff
 plugins/lhm-learn/                    # Session learning capture plugin
   .claude-plugin/plugin.json            # Plugin manifest
   skills/                               # All 1 skill
@@ -206,7 +206,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
-    staff-weekly-flow/                  # Personal weekly/daily focus, full BasicOps inbox triage/write-back and reminder preferences
+    staff-weekly-flow/                  # Chosen commitments, item-by-item BasicOps reconciliation and Tuesday web meeting document
     sales-handover/                     # Hand a newly-closed client from sales to delivery
     client-onboarding/                  # Scope-aware Obsidian-first onboarding — 5 top-level BasicOps gates
     website-kickoff/                    # New website build kickoff (WordPress or Astro) → handoff to WordPress hub
@@ -224,7 +224,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
     wp-project-manager/                 # Website PM state plus verified BasicOps handoff reconciliation
-    weekly-web-project-brief/           # Lily Monday HTML portfolio: project health, inactivity checks and concise client-grouped owner inbox actions and an unattended Codex route
+    weekly-web-project-brief/           # Lily Monday 08:00 Melbourne brief: 07:00 preparation, visible clarifications and verified shared weekly Obsidian archive
     website-project-cockpit/            # Website status and three-layer Obsidian/Web Projects/personal-task stage handoffs
     lp-project-manager/                 # Landing page campaign PM doc (migrated from WordPress hub; shim remains)
     gmb-project-manager/                # GMB optimisation cycle PM doc (migrated from GMB hub; shim remains)
@@ -242,6 +242,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
     sync-observations/                  # Push local Task Observer logs to observations/<person>/
     weekly-skill-review/                # Cross-team review — applies learnings on a branch, opens a PR
 plugins/lhm-system-ops/               # Governed CTO engineering and release operations
+  assets/meeting-prep/                  # Lily profile skill, wrap/task/vault reconciliation, verified delivery
   .claude-plugin/plugin.json            # Claude plugin manifest
   .codex-plugin/plugin.json             # Codex plugin manifest
   skills/                               # All 12 skills
@@ -252,6 +253,8 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 ```
 
 ## Skills Catalog
+
+**Hermes profile assets:** System Ops also governs Lily meeting preparation with bounded research, retry checkpoints and verified email delivery. This deployed profile asset does not add a desktop skill.
 
 **Client Management** (3 skills): Client onboarding and profile setup, theme-led campaign-playbook strategy session preparation and coaching, and campaign playbook generation from transcripts.
 
@@ -345,6 +348,6 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 Client-facing skills read and update shared LHM Knowledge client records; deliverables use verified Claude Workspace/Current Clients folders. `client-meeting-email`, `post-meeting-review`, `client-update` and `drive-artifact-delivery` distinguish these roots, preserve meeting approval gates and report canonical-record writeback gaps. Local, Cowork and Hermes runs must use verified platform-specific roots rather than a current-directory fallback.
 
-**Founder Weekly Flow** (`lhm-knowledge-hub:lhm-weekly-flow`): Evidence-prepared reflection and three capacity-checked outcomes, separate optional action work, and verified publication to WeekFlow. Reuses the existing Monday briefing and staff daily-selection workflow.
+**Founder Weekly Flow** (`lhm-knowledge-hub:lhm-weekly-flow`): Evidence-prepared reflection and three capacity-checked outcomes, separate optional action work, and verified publication to WeekFlow. Uses the Monday briefing for material business decisions; the independent staff flow records chosen work commitments and reviews results without requiring a founder review.
 
 Meeting wraps apply an LHM scope check before proposing tasks: explicit LHM commitments and client inputs required for agreed delivery qualify; client internal projects and other discussion remain context. Existing project requirements are reused rather than duplicated.

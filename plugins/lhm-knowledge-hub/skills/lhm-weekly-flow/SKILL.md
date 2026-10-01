@@ -1,6 +1,6 @@
 ---
 name: lhm-weekly-flow
-description: Run Local Health Marketing's conversational weekly review and planning interview using its Obsidian vault, WeekFlow context and operating systems. Use when Michael says “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, improve or complete an LHM weekly planning session. Begin with a personal check-in, use evidence to help recall the week, review time and unfinished work, then update Obsidian with decisions, three weekly outcomes and capacity-checked commitments. Keep planning separate from optional action work and verify any authorised WeekFlow scheduling.
+description: Run Michael’s separate founder/business weekly review and planning interview using its Obsidian vault, WeekFlow context and operating systems. Use when Michael says “run my business weekly flow”, “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, improve or complete an LHM weekly planning session. Begin with a personal check-in, use evidence to help recall the week, review time and unfinished work, then update Obsidian with decisions, three weekly outcomes and capacity-checked commitments. Keep planning separate from optional action work and verify any authorised WeekFlow scheduling.
 ---
 ## Client file routing
 
@@ -11,11 +11,27 @@ For client-specific work, first read [Client knowledge and working-file routing]
 
 Run an evidence-led weekly operating review for Local Health Marketing. Use the vault for continuity across conversations and save progress after each interview section.
 
+## Separate business review from the staff task flow
+
+Michael confirmed this split on 28 September 2026. This skill owns the private founder/business
+conversation: company performance, goals, strategy, growth, systems, decisions and chosen business
+outcomes. `lhm-project-hub:staff-weekly-flow` owns his personal task/delivery planning using the same
+commitment-and-review process as the team, with confirmed work commitments saved in shared People.
+
+A request for “my staff flow”, “my task workflow”, or the Monday web-project coaching session routes
+directly to that skill. Do not require this business review to be completed first. Keep the two
+records distinct; link an explicitly agreed team-safe handoff rather than copying private context.
+For a business review, surface only client/task issues that materially affect company decisions or
+capacity; leave task-by-task selection, board cleanup and last-week staff commitments to the staff
+flow. If Michael asks for a combined view, reconcile the two existing plans without creating a third
+plan or double-counting commitments. A plain ambiguous “weekly flow” can offer business versus staff
+once, then follow the chosen mode.
+
 ## Session shape: plan first, act second
 
 Aim for a 30–40 minute core planning conversation, not a compulsory time limit. Keep the personal check-in and useful reflection. Compress unchanged sections; do not make Michael answer questions already resolved by evidence. If he wants to explore a material decision, allow it and make the trade-off visible.
 
-The core session ends with three or fewer outcomes, dependable capacity, chosen commitments and explicit waiting/overflow work. A full board cleanup, client production, email session or opportunity workshop is optional action work, not a prerequisite for completing the weekly review. Ask once at the end whether to continue into an action session; do not invent or invoke a not-yet-installed action-session skill. Use the existing `lhm-project-hub:staff-weekly-flow` for role-specific daily selection and `lhm-project-hub:basicops-task-manager` for authorised task writes.
+The core session ends with three or fewer outcomes, dependable capacity, chosen commitments and explicit waiting/overflow work. A full board cleanup, client production, email session or opportunity workshop is optional action work, not a prerequisite for completing the weekly review. Ask once at the end whether to continue into an action session; do not invent or invoke a not-yet-installed action-session skill. Use the existing `lhm-project-hub:staff-weekly-flow` for separate personal delivery planning and daily selection and `lhm-project-hub:basicops-task-manager` for authorised task writes.
 
 An explicit request to act during planning can be handled immediately. Keep the current section and next question recorded so the interview resumes without restarting. Do not force a new conversation. When the user chooses a new conversation, provide a bounded handoff with confirmed decisions, source links, pending actions and approval limits; do not assume cross-chat memory.
 
