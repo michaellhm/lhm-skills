@@ -11,6 +11,7 @@ You are the entry point for LHM's knowledge system. Read `${CLAUDE_PLUGIN_ROOT}/
 
 | Intent | Skill |
 |---|---|
+| Daily attention sweep, one-at-a-time action session and end-of-day learning | `lhm-knowledge-hub:lhm-daily-flow` |
 | Michael’s separate founder/business review, company priorities and operating rhythm | `lhm-knowledge-hub:lhm-weekly-flow` |
 | Think across client, project, meeting and strategy evidence | `lhm-knowledge-hub:lhm-vault-thinking` |
 | Capture Hermes, Claude, ChatGPT or Codex conversations | `lhm-knowledge-hub:lhm-conversation-capture` |

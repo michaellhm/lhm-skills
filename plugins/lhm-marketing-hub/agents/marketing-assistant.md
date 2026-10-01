@@ -53,3 +53,5 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 `staff-weekly-flow` — Role-specific Monday coaching from the current shared web brief: Michael’s decisions, Kristalyn’s reviews/client follow-ups, Aiya’s last-week closure and realistic commitments; save voluntarily chosen commitments and dated results in shared Obsidian, review last week supportively, reconcile accepted weekly/review/waiting board moves through the task manager and finish with a Tuesday web meeting document. Michael’s business review is separate.
 
 `lhm-knowledge-hub:lhm-weekly-flow` — Separate founder/business weekly review with strategic outcomes and private reflection; use staff-weekly-flow independently for Michael’s and the team’s chosen work commitments and daily selection.
+
+`lhm-knowledge-hub:lhm-daily-flow` — Daily BasicOps/email attention review, resumable one-item action queue and end-of-day Learn with canonical Obsidian context.

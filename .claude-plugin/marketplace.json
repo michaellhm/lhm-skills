@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "2.2.32"
+    "version": "2.2.33"
   },
   "plugins": [
     {
@@ -56,7 +56,7 @@
       "name": "lhm-learn",
       "source": "./plugins/lhm-learn",
       "description": "Session learning capture - scans conversation context, identifies skill learnings and client profile updates, writes to the correct LEARNED.md and client_profile.md files.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "category": "utilities",
       "tags": [
         "learning",
@@ -97,7 +97,7 @@
       "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
       "description": "General marketing orchestration plus direct Google Ads, SEO, Content, and WordPress specialists with governed delegation and shared client context.",
-      "version": "2.2.32",
+      "version": "2.2.33",
       "category": "utilities",
       "tags": [
         "marketing",
@@ -140,7 +140,7 @@
       "name": "lhm-knowledge-hub",
       "source": "./plugins/lhm-knowledge-hub",
       "description": "LHM knowledge system for Obsidian vault management, Claude and Hermes conversation capture, strategic thinking, weekly planning, and monthly quality review.",
-      "version": "1.1.6",
+      "version": "1.1.7",
       "category": "utilities",
       "tags": [
         "obsidian",
