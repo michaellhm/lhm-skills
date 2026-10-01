@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "2.2.31"
+    "version": "2.2.32"
   },
   "plugins": [
     {
@@ -40,8 +40,8 @@
     {
       "name": "lhm-content-engine",
       "source": "./plugins/lhm-content-engine",
-      "description": "Automated multi-asset content pipeline for allied health clinics - CSV-driven batch processing, blog generation, GMB social posts, anti-AI refinement, Google Doc publishing, and tracking updates.",
-      "version": "1.0.4",
+      "description": "Automated multi-asset content pipeline for allied health clinics - CSV-driven articles, GMB posts, safe weekly insight-to-carousel production, anti-AI refinement, Google Doc publishing, and tracking updates.",
+      "version": "1.0.5",
       "category": "content",
       "tags": [
         "content",
@@ -97,7 +97,7 @@
       "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
       "description": "General marketing orchestration plus direct Google Ads, SEO, Content, and WordPress specialists with governed delegation and shared client context.",
-      "version": "2.2.31",
+      "version": "2.2.32",
       "category": "utilities",
       "tags": [
         "marketing",
