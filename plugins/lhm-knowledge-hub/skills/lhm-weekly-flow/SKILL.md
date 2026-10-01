@@ -27,6 +27,10 @@ flow. If Michael asks for a combined view, reconcile the two existing plans with
 plan or double-counting commitments. A plain ambiguous “weekly flow” can offer business versus staff
 once, then follow the chosen mode.
 
+## Daily action and learning handoff
+
+For morning attention sweeps, ongoing “what’s next?” sessions and end-of-day capture, use `lhm-daily-flow`. Read its private daily checkpoints and linked weekly learning dispositions during preparation; reuse confirmed decisions and do not reopen completed or delegated work without new evidence. Keep this founder review and the staff commitment review distinct.
+
 ## Session shape: plan first, act second
 
 Aim for a 30–40 minute core planning conversation, not a compulsory time limit. Keep the personal check-in and useful reflection. Compress unchanged sections; do not make Michael answer questions already resolved by evidence. If he wants to explore a material decision, allow it and make the trade-off visible.
