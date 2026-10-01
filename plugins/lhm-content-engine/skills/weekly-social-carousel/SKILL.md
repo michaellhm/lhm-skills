@@ -60,7 +60,7 @@ Use when asked to recover older ideas or build an idea bank. Sweep the authorise
 3. Use the editorial pattern for the selected lane. Translate news into what changed, why it matters to a clinic, and what to do or watch.
 4. Keep the first-slide hook short. Do not place paragraphs on the cover.
 5. Use the typography cover unless the current test plan calls for an image cover. An image must add context and use a dark LHM overlay; generic AI or cyber imagery is not acceptable.
-6. Build a caption that adds context instead of repeating every slide.
+6. Build a caption that adds context instead of repeating every slide. For LHM Social, follow the verified editorial-preferences file, finish with one topic-specific DM call to action, then add two or three focused hashtags.
 7. Keep public copy source-blind. Never say that a client asked, a clinic said, or the idea came from a meeting. Present the useful issue directly. Meeting provenance belongs only in private source records. A public source note is appropriate for a verified product or platform announcement, not for a meeting-derived idea.
 8. Run the privacy check again on the final slide copy, caption, HTML, filenames, image metadata, public source note and backlog entry.
 9. Create the input JSON described in the input and output contract.
@@ -80,6 +80,8 @@ Reject or revise a package when any condition is true:
 - The cover exceeds the copy limits or the slides read like a mini blog article.
 - A news post lacks a current first-party verification source.
 - An AI-tool post does not connect to bookings, content, administration, patient communication, reporting, or another concrete practice workflow.
+- A product or feature is framed as an LHM recommendation even though it is not part of LHM's working approach, unless Michael approved a clearly labelled watchlist angle.
+- A generic workflow is presented as exclusive to one AI product when several relevant tools support the same approach.
 - The design uses a copied HeyTony identity instead of the LHM system.
 - The public copy mentions a client, meeting, transcript or private source context without explicit approval.
 - A meeting-derived topic scores below 2 for audience frequency unless Michael explicitly selects it from the backlog.
@@ -98,15 +100,16 @@ GitHub versioning is optional and separate from social publishing.
 
 ### LHM Social review site
 
-The governed LHM review destination is the private repository `lhmorg/lhm-social`. Its site builder owns the weekly-row layout, in-page slide navigation, caption copy control and slide ZIP. Do not recreate or manually edit that interface for each post.
+The governed LHM review destination is the private repository `lhmorg/lhm-social`. Its site builder owns the weekly accordion layout, in-page slide navigation, caption copy control and slide ZIP. Do not recreate or manually edit that interface for each post.
 
 When `github.mode` is `commit_push` and `github.repository` is `lhmorg/lhm-social`:
 
 1. Follow [LHM Social delivery](references/lhm-social-delivery.md).
 2. Save the canonical package under `content/YYYY/MM/YYYY-MM-DD-slug/` in the verified clone.
-3. Add the protected-preview gate file only after the privacy, rendering and artefact checks pass.
-4. Run the repository build and verify the weekly row, caption, slide ZIP and private-file exclusion.
-5. Push only through the branch and workflow explicitly authorised by the structured input.
+3. Read `planning/editorial-preferences.md` before final topic selection, caption writing and CTA selection. When the file is absent, stop and ask Michael to confirm the current offer priority rather than inventing one.
+4. Add the protected-preview gate file only after the privacy, rendering and artefact checks pass.
+5. Run the repository build and verify the newest weekly accordion is open, older weeks are folded, and the caption, slide ZIP and private-file exclusion pass.
+6. Push only through the branch and workflow explicitly authorised by the structured input.
 
 Approval for the protected review site is not approval to publish the post on Instagram, Facebook, LinkedIn or another social platform.
 

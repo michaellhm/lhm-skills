@@ -84,6 +84,8 @@ Do not change the topic lane, cover system, caption style, and CTA all at once. 
 - non-cover headline: maximum 16 words
 - body copy: normally 8-32 words
 - caption: add context, do not transcribe the carousel
+- LHM Social caption: finish with one relevant DM call to action followed by two or three focused hashtags
+- use the offer and DM keyword in the destination's editorial-preferences file; do not improvise a competing offer
 - public copy must not mention clients, meetings or transcript provenance
 - use Australian English
 - use no em dashes
