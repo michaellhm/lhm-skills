@@ -17,6 +17,7 @@ Before writing content:
 4. For client-derived material, read `${CLAUDE_PLUGIN_ROOT}/references/obsidian-context-contract.md`, resolve the canonical client record, and keep knowledge and work destinations distinct.
 5. Read [editorial strategy](references/editorial-strategy.md) and [privacy rules](references/privacy-rules.md).
 6. When creating the visual package, also read [carousel design system](references/carousel-design-system.md) and [input and output contract](references/input-output-contract.md).
+7. When delivering to the LHM Social review site, read [LHM Social delivery](references/lhm-social-delivery.md).
 
 Never create a fallback client folder or store a material deliverable inside the plugin source tree.
 
@@ -85,6 +86,20 @@ GitHub versioning is optional and separate from social publishing.
 - Do not enable Pages, merge a branch, open a public preview, or publish to a social account without separate authorisation.
 - After a push, verify the remote commit and return its URL. A local commit is not a published package.
 
+### LHM Social review site
+
+The governed LHM review destination is the private repository `lhmorg/lhm-social`. Its site builder owns the weekly-row layout, in-page slide navigation, caption copy control and slide ZIP. Do not recreate or manually edit that interface for each post.
+
+When `github.mode` is `commit_push` and `github.repository` is `lhmorg/lhm-social`:
+
+1. Follow [LHM Social delivery](references/lhm-social-delivery.md).
+2. Save the canonical package under `content/YYYY/MM/YYYY-MM-DD-slug/` in the verified clone.
+3. Add the protected-preview gate file only after the privacy, rendering and artefact checks pass.
+4. Run the repository build and verify the weekly row, caption, slide ZIP and private-file exclusion.
+5. Push only through the branch and workflow explicitly authorised by the structured input.
+
+Approval for the protected review site is not approval to publish the post on Instagram, Facebook, LinkedIn or another social platform.
+
 ## Structured input
 
 ```json
@@ -95,7 +110,12 @@ GitHub versioning is optional and separate from social publishing.
   "source_scope": {"fathom": true, "last30days": "selective"},
   "cover_style": "typography | image | auto",
   "work_root": "/verified/durable/destination",
-  "github": {"mode": "none | prepare | commit_push", "repository": "optional owner/repo"}
+  "github": {
+    "mode": "none | prepare | commit_push",
+    "repository": "optional owner/repo",
+    "branch": "optional explicit branch",
+    "protected_preview": true
+  }
 }
 ```
 
@@ -118,6 +138,12 @@ Return one JSON object:
     {"type": "html | preview | slide | caption | manifest | private_source_receipt", "path_or_url": "...", "verified": true}
   ],
   "github": {"state": "not_requested | prepared | pushed | blocked", "commit_url": null},
+  "review_site": {
+    "state": "not_requested | built | pushed | blocked",
+    "week_label": null,
+    "slide_zip_verified": false,
+    "private_files_excluded": false
+  },
   "approval_required": ["human review before social publishing"],
   "next_owner": "Michael",
   "next_action": "Review the carousel package"
