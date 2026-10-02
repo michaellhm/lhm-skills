@@ -15,7 +15,7 @@ updated: ISO timestamp
 # Daily flow
 ## Capacity and chosen outcomes
 ## Coverage
-Source, time window, checked-at time, remaining cursor or gap.
+Source, time window, checked-at time, remaining cursor or gap; task discussion/reply-chain and sent-thread coverage per candidate.
 ## Items
 | Source ID/link | Outcome | State | Owner | Evidence/date | Next action or revisit |
 | --- | --- | --- | --- | --- | --- |
@@ -24,7 +24,7 @@ Current item, detour, return item, pending draft/reference and approval scope.
 ## Close
 Wins, unfinished restart steps and tomorrow's proposed first action.
 ## Learning handback
-Source range; each observation's disposition, destination and verified write result.
+Source range; corrections and accepted/edited/rejected suggestions; distinguish confirmed client decisions from reusable interaction preferences; each observation's disposition, destination and verified write result.
 ```
 
 States: proposed, active, draft-ready, sent, user-reported-done, verified-done, delegated, waiting, deferred, skipped. Add a reason and revisit condition where useful. Sending a message completes the reply action, not necessarily the underlying client work. An archived task alone does not prove its outcome. Never save credentials, raw transcripts or private data in team-facing notes.
@@ -45,3 +45,9 @@ Review these against the candidate instructions before publishing changes:
 10. Shared vault unavailable: preserve client-write gap, no substitute profile in private vault/current directory.
 11. A new reusable rule is suggested: prepare a concrete proposal, do not silently update, merge or install skills.
 12. Dot cannot access BasicOps: report capability gap; keep the current coordinator and don't claim the migration complete.
+
+13. A stale Alpha-style notification asks for copy direction, but Michael already answered in a nested reply: read the reply chain, record the current disposition and skip the old request without asking him to repeat it.
+14. A task API returns top-level comments without the referenced reply: use the exact link through an available read route; keep coverage incomplete and the candidate out of the actionable queue until reconciled. Never treat an empty unrelated reply list as proof of no response.
+15. A verified request needs a reply: read current client context and bring a suggested response or specific next action with the remaining decision. Preparation alone must not send/post or create a provider draft.
+16. Michael reports that a reviewed CMS cannot log in and he left its owner a note: record review done and login waiting with the owner; do not claim the CMS works or re-present owner setup as today’s unanswered request.
+17. During triage Michael corrects a stale item and edits a proposed response: record the correction and draft disposition once; at session close Learn routes confirmed client decisions to client context and reusable interaction preferences to the owning workflow, without automatically publishing new skill changes.
