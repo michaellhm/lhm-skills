@@ -354,6 +354,7 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 
 Meeting wraps apply an LHM scope check before proposing tasks: explicit LHM commitments and client inputs required for agreed delivery qualify; client internal projects and other discussion remain context. Existing project requirements are reused rather than duplicated.
 
-**Daily Flow** (`lhm-knowledge-hub:lhm-daily-flow`): MCP-first full task/reply and email-thread pre-sweep, prepared suggested replies or next actions, one verified decision at a time, durable private resume checkpoint, specialist action handoffs, outcome-based email filing, reviewed 5/10-day Waiting On follow-ups and end-of-day Learn for confirmed client decisions and reusable interaction preferences. Reuses weekly commitments and saves verified client context to shared Obsidian. Portable to Your Dot after access and continuity checks.
+**Daily Flow** (`lhm-knowledge-hub:lhm-daily-flow`): MCP-first full task/reply and email-thread pre-sweep, prepared suggested replies or next actions, team blockers first, two or three chosen BasicOps tasks with portable execution prompts before emails, durable private resume checkpoint, specialist action handoffs, outcome-based email filing, reviewed 5/10-day Waiting On follow-ups and end-of-day Learn for confirmed client decisions and reusable interaction preferences. Reuses weekly commitments and saves verified client context to shared Obsidian. Portable to Your Dot after access and continuity checks.
+
 
 Daily Flow returns an unsaved delta and restart point on checkpoint failure, and bounds native-app access with authorised capability fallbacks that cannot bypass permission denials.
