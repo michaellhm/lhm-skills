@@ -54,4 +54,4 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 
 `lhm-knowledge-hub:lhm-weekly-flow` — Separate founder/business weekly review with strategic outcomes and private reflection; use staff-weekly-flow independently for Michael’s and the team’s chosen work commitments and daily selection.
 
-`lhm-knowledge-hub:lhm-daily-flow` — Daily full task/reply and email-thread pre-sweep, prepared responses, resumable one-item action queue, email filing, reviewed 5/10-day Waiting On follow-ups and end-of-day Learn for client context and interaction preferences.
+`lhm-knowledge-hub:lhm-daily-flow` — Daily full task/reply and email-thread pre-sweep, prepared responses, resumable one-item action queue, email filing, reviewed 5/10-day Waiting On follow-ups and end-of-day Learn for client context and interaction preferences. Reports unsaved checkpoint deltas and bounds app access without bypassing denials.

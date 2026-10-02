@@ -60,3 +60,9 @@ Review these against the candidate instructions before publishing changes:
 23. A recipient promised a later date: no premature five-day nudge; use the promised date and prepare a reminder only once overdue and still unresolved.
 24. New incoming action on a Done conversation: reconcile current thread and reopen To Respond within filing authority; a thank-you alone does not reopen it.
 25. Waiting date unknown, second reminder already sent, or Michael deferred it: recover evidence or propose a deliberate next step; no guessed clock, endless loop or background sending.
+
+## Persistence and access recovery acceptance cases
+
+1. Checkpoint write is denied after a verified action: return the unsaved delta and exact restart step in the conversation, retain the intended private path and last saved coverage, and leave the write pending. Do not create a shared/local substitute or switch tools to bypass the denial.
+2. Checkpoint write returns an uncertain result: report unverified persistence and read the same canonical record before an authorised retry. An already-present source/outcome is merged once; saved coverage advances only after successful readback.
+3. Native-app access exceeds a supported 60-second bound: report the delay and use an available authorised connector/browser route. If the call cannot be bounded, prefer an available authorised route before starting it. An access denial is not a timeout and must not trigger a bypass. Check an uncertain mutation's result before repeating it.
