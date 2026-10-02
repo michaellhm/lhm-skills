@@ -171,7 +171,7 @@ const html = `<!doctype html>
   <title>${escapeHtml(data.title)} | ${escapeHtml(brand.name)}</title>
   <style>${css}</style>
 </head>
-<body>
+<body class="lane-${escapeHtml(data.lane)}">
 ${slides}
 </body>
 </html>
@@ -189,6 +189,12 @@ const manifest = {
   slug: data.slug,
   title: data.title,
   lane: data.lane,
+  content_format: 'feed-post',
+  accent: ['practice-question', 'client-question'].includes(data.lane)
+    ? 'soft-blue'
+    : ['rotating-opportunity', 'search-ads-update', 'ai-experiment'].includes(data.lane)
+      ? 'seafoam'
+      : 'orange',
   cover_style: data.cover_style,
   slide_count: data.slides.length,
   generated_at: new Date().toISOString(),

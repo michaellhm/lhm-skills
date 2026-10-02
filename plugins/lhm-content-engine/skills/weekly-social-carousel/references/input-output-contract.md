@@ -91,4 +91,4 @@ output-directory/
 
 The private source receipt is not a public asset. Exclude `*.private.json` from Pages, public websites, social uploads, and client-facing exports.
 
-`manifest.json` records the lane, cover style, slide count, generated files, and verification state. Read it back after both build and render.
+`manifest.json` records the lane, `content_format: feed-post`, lane-derived accent, cover style, slide count, generated files, and verification state. Orange identifies quick-win SOPs, soft blue identifies question-led content, and seafoam identifies rotating opportunities. Read it back after both build and render.

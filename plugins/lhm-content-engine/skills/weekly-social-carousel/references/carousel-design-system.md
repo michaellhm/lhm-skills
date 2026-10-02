@@ -11,10 +11,21 @@ Core colours:
 - navy 800: `#122B49`
 - orange: `#F58A47`
 - soft blue: `#7FB3FF`
+- seafoam: `#63C7B2`
 - white: `#F8FAFC`
 - muted text: `#B7C3D4`
 
 Use Avenir Next when available, then Avenir, Helvetica Neue, Arial, sans-serif.
+
+## Content colour key
+
+Keep navy, white, typography, spacing and composition consistent. Colour is a small recognition cue, not a separate visual identity.
+
+- `quick-win-sop` and practical how-to content use orange.
+- anonymous questions and Story cards use soft blue.
+- `rotating-opportunity`, Search/Ads updates and practical AI workflows use seafoam.
+
+Label every review item as `Feed post` or `Story`. Do not rely on colour alone to communicate the format.
 
 ## Canvas and safe area
 

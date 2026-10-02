@@ -10,6 +10,7 @@ The repository build creates:
 - one interactive slide carousel per approved review package
 - expandable caption and optional first-comment panels with separate copy controls
 - a downloadable ZIP containing the public slide PNG files
+- explicit `Feed post` labels and a safe anonymous `Story` queue for Nina
 
 Do not generate those controls inside the carousel package. Add the package to `content/` and let the repository build create the review interface.
 
@@ -30,6 +31,8 @@ Verify the remote and local clone before writing. If the clone is unavailable, d
 Read `planning/editorial-preferences.md` before selecting the final topic, writing the caption or choosing a call to action. It records Michael's current commercial priority, offers, DM keywords, topic exclusions and AI safety preferences. Keep strategic preferences out of public copy unless they become the chosen CTA.
 
 Read `planning/content-sop.md` when present. For LHM Social it defines the two weekly publishing slots, quick-win slide pattern, first-comment purpose, Story routing and DM boundary.
+
+When safe Story candidates are prepared, save them in the repository's governed Story queue. Each item must contain only anonymous public-ready copy, a week, a topic label, three or four frames, and an interaction prompt. The review site may render this data, but the source file itself remains outside `dist/`. Never put provenance in a Story queue item.
 
 ## Package contract
 
@@ -80,6 +83,7 @@ From the verified repository root:
 6. Confirm `dist/carousels/YYYY/MM/YYYY-MM-DD-slug/caption.md`, optional `first-comment.md`, `carousel.html` and every slide PNG exist.
 7. When `first-comment.md` exists, confirm the review card exposes it separately and the copy control copies only the first comment.
 8. When browser inspection is available, verify week expand/collapse behaviour, next/previous navigation, one visible slide at a time, caption copy, optional first-comment copy and the ZIP link.
+9. Confirm every carousel is labelled `Feed post`, every Story candidate is labelled `Story`, and the orange, soft-blue and seafoam cues match the governed format key.
 
 Do not report the review site as built when any acceptance check fails.
 

@@ -83,6 +83,8 @@ Weekly selection considers the full ready backlog. A useful idea can be selected
 
 For LHM Social, select two feed posts by default: one quick-win SOP and one rotating opportunity. Questions found in private meetings normally become anonymous Story candidates first. Promote one to the feed only when it is recurring, broadly relevant and practical enough to become an SOP or clear decision guide.
 
+Every delivery must label the intended format explicitly. Use `Feed post` for the two weekly carousel slots and `Story` for the anonymous question queue. The label remains authoritative when a reader cannot distinguish the colour cue.
+
 ## Testing plan
 
 Run the two-post system for eight weeks:

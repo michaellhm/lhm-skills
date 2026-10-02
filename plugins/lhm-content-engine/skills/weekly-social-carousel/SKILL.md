@@ -40,6 +40,7 @@ Use when asked to review a date range, commonly the previous seven days.
 6. Add every safe, distinct candidate to the editorial backlog before selecting posts. Do not discard a strong idea merely because it was not chosen in the week it appeared.
 7. Score backlog candidates using the editorial strategy, including audience frequency. Select the requested number from the full ready backlog, not only from that week's meetings. For LHM Social, the default weekly target is two: one `quick-win-sop` and one `rotating-opportunity`.
 8. Mark selected ideas in the backlog and keep unused ideas available for Michael's review. If too few candidates clear the quality floor, report the shortfall; do not manufacture filler.
+9. Label every produced carousel as a `Feed post`. Route safe meeting questions that are not promoted to the feed into the anonymous `Story` queue with a short frame sequence and interaction prompt.
 
 ### Historical backlog
 
@@ -162,6 +163,11 @@ Return one JSON object:
     "week_label": null,
     "slide_zip_verified": false,
     "private_files_excluded": false
+  },
+  "story_queue": {
+    "state": "not_requested | updated | blocked",
+    "safe_candidates_added": 0,
+    "ids": []
   },
   "editorial_backlog": {
     "state": "not_requested | updated | blocked",
