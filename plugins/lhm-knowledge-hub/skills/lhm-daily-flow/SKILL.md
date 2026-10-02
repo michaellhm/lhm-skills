@@ -60,9 +60,10 @@ For each selected task, deliver one self-contained, copyable execution prompt be
 
 - The concrete outcome, BasicOps task link/ID, current owner and verified latest state.
 - Relevant source links and a concise evidence summary, agreed client decisions, constraints, unresolved questions and any access gap. Do not assume another model inherits this chat, vault or connectors; provide enough context to begin and explain what it must read or request if access is unavailable.
-- A bounded first step, appropriate specialist skill when available, expected deliverable, meaningful checks and what done looks like.
+- A bounded first step, verified owning agent and exact specialist skills using [specialist routing](references/specialist-routing.md), expected deliverable, meaningful checks and what done looks like. Prefer an existing executable skill over a generic invented workflow; distinguish full coverage, partial coverage and a genuine skill gap.
 - Actual action authority and approval boundaries. Do not grant sending, posting, deployment or permission changes merely by including them in a prompt. No credentials or unnecessary private information.
 - A completion handback: output/evidence links, verified versus incomplete checks, blockers and exact next step. BasicOps remains the task authority; reconcile results before marking work complete or changing labels.
+- End every execution prompt with: “When the session finishes, run `/learn` (`lhm-learn:learn`) if installed. Capture verified client facts in their canonical records and reusable methods, corrections and skill gaps with evidence. Prefer improving the existing owning skill; propose a new skill only for an evidenced uncovered workflow. Apply only already authorised source changes; merge/install need separate authority. If Learn is unavailable, return a concise learning handback for the coordinator.” Do not trigger Learn while work is still running or count the same session twice.
 
 Michael chooses ChatGPT or Claude and starts the work himself. Preparing a prompt is not execution, dispatch, a new chat or proof that a task is running. Checkpoint selected → prompt-ready → user-reported-running → verified-result separately, with external chat links when supplied. Do not spawn agents, create chats, message other chats or schedule work merely to implement this flow.
 
