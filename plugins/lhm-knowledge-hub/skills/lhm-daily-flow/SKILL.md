@@ -27,7 +27,7 @@ Read [client knowledge routing](../../references/obsidian-context-contract.md) b
 
 ## Prepare the attention sweep
 
-Default order: BasicOps items needing Michael, actionable email, then chosen work. Follow Michael's requested order when different.
+Default order: clear BasicOps decisions blocking the team, review Michael's own BasicOps work and launch two or three chosen tasks with prepared prompts, then process emails while those tasks run. Follow Michael's requested order when different. Check calendar/deadlines early; genuinely urgent email may interrupt this order, but routine inbox work must not delay getting chosen tasks running.
 
 - Discover and use connected MCP/API tools first. Browser use is a fallback after a concrete missing capability or failure, explained briefly. Missing access is not a clear inbox.
 - Check available calendar commitments and near-term deadlines; read relevant BasicOps mentions/discussions, approvals and blockers. If notifications are available only in email, use them to locate the task and verify its latest discussion before presenting it.
@@ -42,7 +42,7 @@ Default order: BasicOps items needing Michael, actionable email, then chosen wor
 
 Present the next verified item in a few sentences: current state, what needs Michael, and a ready-to-review suggested reply or concrete next action with a source link. Make the smallest unresolved decision clear; do not merely repeat the notification or ask him to reconstruct the task. Do not dump the whole backlog unless asked.
 
-- 'What's next?' advances to the next unresolved, actionable item. It does not start a new sweep or re-ask a settled question.
+- 'What's next?' advances within the current phase, then moves from team blockers to task selection/prompt handoff to emails. It does not restart a sweep, jump straight into the inbox before task selection, or re-ask settled questions.
 - 'Done' records user-reported completion for the unambiguous current item. Ask only if multiple plausible items are active. Do not mark the remote task complete unless that mutation is authorised and verified.
 - 'Leave it with Jaimee' records delegated/waiting with the existing owner. 'Move on' records skipped/parked, not completed. 'Next week' records the agreed timing; create/schedule the task only within given authority and report the actual result.
 - For replies, gather the recipient's full questions and let Michael answer a related bundle in one go. Draft first unless he explicitly requests direct sending. Preserve his manual edits exactly. Send the latest approved text to verified recipients/CCs in the correct thread; only report sent after provider confirmation. Keep draft-ready, sent and user-sent distinct; do not apply WAITING ON merely because a draft exists.
@@ -50,7 +50,21 @@ Present the next verified item in a few sentences: current state, what needs Mic
 - When Michael says he already responded, accept and checkpoint that report immediately, reconcile the source when available, remove the old request from the queue and continue. Do not infer his exact reply, client decision or overall task completion. Treat a missed reply as pre-sweep friction to learn from, not another question for him.
 - After each material decision/action, update and read back the checkpoint. Record verified output IDs/links, approval scope and exact pending question. Never store secrets or full email bodies in this record; email-specific logs belong to the inbox skills.
 
-Once triage is done, suggest one or two realistic work outcomes from chosen weekly commitments, deadlines and available time. Distinguish committed work from optional stretch work. Avoid another inbox scan when Michael is trying to finish the day unless requested or a known urgent update merits it.
+## Select work and prepare execution prompts before emails
+
+After clearing team blockers, review Michael's own BasicOps work task by task using the same full discussion/reply pre-sweep. Reconcile chosen weekly commitments, deadlines, dependencies and available time. Recommend two or three realistic tasks, distinguish committed work from optional stretch work, and let Michael choose; fewer is fine if capacity or dependencies warrant it. Do not take delegated team work back from its owner merely to fill the shortlist.
+
+For each selected task, deliver one self-contained, copyable execution prompt before moving to routine emails. Use a writing block with variant `standard` where supported; otherwise a clearly delimited plain-text prompt. Include:
+
+- The concrete outcome, BasicOps task link/ID, current owner and verified latest state.
+- Relevant source links and a concise evidence summary, agreed client decisions, constraints, unresolved questions and any access gap. Do not assume another model inherits this chat, vault or connectors; provide enough context to begin and explain what it must read or request if access is unavailable.
+- A bounded first step, appropriate specialist skill when available, expected deliverable, meaningful checks and what done looks like.
+- Actual action authority and approval boundaries. Do not grant sending, posting, deployment or permission changes merely by including them in a prompt. No credentials or unnecessary private information.
+- A completion handback: output/evidence links, verified versus incomplete checks, blockers and exact next step. BasicOps remains the task authority; reconcile results before marking work complete or changing labels.
+
+Michael chooses ChatGPT or Claude and starts the work himself. Preparing a prompt is not execution, dispatch, a new chat or proof that a task is running. Checkpoint selected → prompt-ready → user-reported-running → verified-result separately, with external chat links when supplied. Do not spawn agents, create chats, message other chats or schedule work merely to implement this flow.
+
+Once Michael confirms the chosen tasks are running, continue emails one at a time while he monitors them. Do not wait for all tasks to finish before starting emails or repeatedly ask for progress. Record any user-supplied updates and pause the email queue for a task question when needed, preserving the return point. When results come back, review the evidence and complete the authorised task handoff; no blind completion from a model's success claim. Avoid another inbox scan when Michael is trying to finish the day unless requested or a known urgent update merits it.
 
 ## Email filing and Waiting On follow-ups
 

@@ -60,3 +60,9 @@ Review these against the candidate instructions before publishing changes:
 23. A recipient promised a later date: no premature five-day nudge; use the promised date and prepare a reminder only once overdue and still unresolved.
 24. New incoming action on a Done conversation: reconcile current thread and reopen To Respond within filing authority; a thank-you alone does not reopen it.
 25. Waiting date unknown, second reminder already sent, or Michael deferred it: recover evidence or propose a deliberate next step; no guessed clock, endless loop or background sending.
+
+26. Team decisions are clear and routine emails await: review Michael's BasicOps tasks and help choose two or three before processing inbox items.
+27. A task is selected: produce a self-contained prompt with verified context, sources, constraints, authority, deliverable/checks and handback; Michael chooses ChatGPT or Claude. Do not create another chat or dispatch an agent.
+28. Prompts are ready but no task was launched: record prompt-ready, not running. Michael confirms two tasks are running: move to emails without waiting for results or demanding a third task.
+29. An external model cannot access BasicOps or the vault: prompt supplies the relevant summary and links, records the gap and requires evidence; never invent inherited access or credentials.
+30. A result arrives during email work: preserve current email/draft return point, reconcile result evidence and authorised handoff, then resume. No blind task completion or unsent draft labelled Waiting On.
