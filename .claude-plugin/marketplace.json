@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "2.2.34"
+    "version": "2.2.35"
   },
   "plugins": [
     {
       "name": "lhm-inbox-hub",
       "source": "./plugins/lhm-inbox-hub",
       "description": "Michael's inbox system - morning triage into a brief, voice-matched Gmail drafts, timed email sessions, label tidy-up, and a corrections loop that learns from sent mail. Drafts only, never sends.",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "category": "operations",
       "tags": [
         "email",
@@ -97,7 +97,7 @@
       "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
       "description": "General marketing orchestration plus direct Google Ads, SEO, Content, and WordPress specialists with governed delegation and shared client context.",
-      "version": "2.2.34",
+      "version": "2.2.35",
       "category": "utilities",
       "tags": [
         "marketing",
@@ -140,7 +140,7 @@
       "name": "lhm-knowledge-hub",
       "source": "./plugins/lhm-knowledge-hub",
       "description": "LHM knowledge system for Obsidian vault management, Claude and Hermes conversation capture, strategic thinking, weekly planning, and monthly quality review.",
-      "version": "1.1.7",
+      "version": "1.1.9",
       "category": "utilities",
       "tags": [
         "obsidian",
