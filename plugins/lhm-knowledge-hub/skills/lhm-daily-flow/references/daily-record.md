@@ -51,3 +51,12 @@ Review these against the candidate instructions before publishing changes:
 15. A verified request needs a reply: read current client context and bring a suggested response or specific next action with the remaining decision. Preparation alone must not send/post or create a provider draft.
 16. Michael reports that a reviewed CMS cannot log in and he left its owner a note: record review done and login waiting with the owner; do not claim the CMS works or re-present owner setup as today’s unanswered request.
 17. During triage Michael corrects a stale item and edits a proposed response: record the correction and draft disposition once; at session close Learn routes confirmed client decisions to client context and reusable interaction preferences to the owning workflow, without automatically publishing new skill changes.
+
+18. A verified reply leaves Michael owning work: move To Respond to Ongoing within filing authority; do not mark Done merely because SENT exists.
+19. Michael explicitly closes a conversation: Done plus archive all current messages, remove working states, preserve contextual labels and verify/log reversal evidence.
+20. A Waiting On request is five days old but Josephine resolved it in BasicOps: no follow-up; reconcile the completed outcome.
+21. A five-day reminder is only drafted: preserve the original age and pending approval; no send, reset or repeated daily proposal.
+22. A first reminder was sent five days after the original request: reset to that SENT time, retain reminder stage, and check five days later for the second reminder. A direct ten-day first check without an earlier send prepares the first reminder, not an invented second.
+23. A recipient promised a later date: no premature five-day nudge; use the promised date and prepare a reminder only once overdue and still unresolved.
+24. New incoming action on a Done conversation: reconcile current thread and reopen To Respond within filing authority; a thank-you alone does not reopen it.
+25. Waiting date unknown, second reminder already sent, or Michael deferred it: recover evidence or propose a deliberate next step; no guessed clock, endless loop or background sending.

@@ -52,6 +52,25 @@ Present the next verified item in a few sentences: current state, what needs Mic
 
 Once triage is done, suggest one or two realistic work outcomes from chosen weekly commitments, deadlines and available time. Distinguish committed work from optional stretch work. Avoid another inbox scan when Michael is trying to finish the day unless requested or a known urgent update merits it.
 
+## Email filing and Waiting On follow-ups
+
+Keep Josephine's existing intake workflow. Resolve actual Gmail label names and IDs before changes; reuse Michael To Respond, Michael Ongoing Tasks, Waiting On and Done rather than creating duplicates. Exactly one working state per conversation; preserve client, financial and other contextual labels.
+
+- **Michael To Respond:** Michael owes a reply or decision.
+- **Michael Ongoing Tasks:** Michael has replied but still owns executable work. BasicOps owns the task and next action; Gmail retains the correspondence.
+- **Waiting On:** an identified person owes a specific response or deliverable. Record who owes what, the request's verified sent time and any promised date.
+- **Done:** the conversation is finished or Michael explicitly closes it. Within authorised filing scope, remove working-state labels, add Done and archive all current messages. Archiving retains the mail. A sent reply alone is never proof of completion.
+
+After a verified send or explicit disposition, reconcile the next owner and file within existing authority using the inbox skills. A draft never starts Waiting On. An ordinary sweep still does not authorise bulk filing. Apply conversation-wide state to all verified current message IDs and read back the result; log original labels and affected IDs for reversal. New messages may not inherit old labels: actionable replies reopen Michael To Respond and remove obsolete Done/Waiting On within filing authority; acknowledgements do not automatically reopen finished work.
+
+Include Waiting On in the daily attention sweep, even when its conversations are archived:
+
+1. Measure **5 and 10 calendar days** in Australia/Melbourne from the verified sent request or latest verified sent follow-up, not label age or draft time. If the person promised a specific date, honour it instead of nudging beforehand; once overdue, prepare the first appropriate reminder. Unknown request/date means reconcile evidence, not guess an age.
+2. At **5 days**, read the full current thread, sent replies and relevant BasicOps/client context. Check whether Josephine or the team handled it elsewhere, the work finished, or a response/date changed the dependency. Only if still waiting, prepare a brief, gentle follow-up naming the outstanding request.
+3. At **10 days**, recheck the same evidence and previous follow-up disposition. Prepare a second follow-up only if a first was actually sent; otherwise present the first reminder as overdue. Suggest another contact method or parking the item when more suitable. If a reminder is sent at day 5, its verified sent time resets the clock: next check is five days later, not an immediate repeat triggered by the original request.
+4. Present one prepared follow-up at a time with source link, elapsed time, who owes what and a recommended action. Michael approves the latest text before sending. Do not automatically send follow-ups, create schedules, contact someone through another channel or infer future sending authority from approval of this workflow.
+5. Checkpoint the waiting baseline, promised/revisit date, first/second reminder stage, draft/sent ID and accepted/edited/rejected/deferred disposition. Do not resurface a pending draft or declined reminder every sweep; revisit only on the agreed date or material new evidence. Reset age only after verified sending; retain reminder stage so a second reminder is distinguishable from the first. After a second reminder, propose a deliberate next step rather than an endless reminder loop.
+
 ## End-of-day close and Learn
 
 On 'wrap up', 'end of day', or a requested Learn close:
