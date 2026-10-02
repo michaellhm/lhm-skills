@@ -54,4 +54,4 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 
 `lhm-knowledge-hub:lhm-weekly-flow` — Separate founder/business weekly review with strategic outcomes and private reflection; use staff-weekly-flow independently for Michael’s and the team’s chosen work commitments and daily selection.
 
-`lhm-knowledge-hub:lhm-daily-flow` — Daily BasicOps/email attention review, resumable one-item action queue and end-of-day Learn with canonical Obsidian context.
+`lhm-knowledge-hub:lhm-daily-flow` — Daily BasicOps/email attention review, resumable one-item action queue and end-of-day Learn with canonical Obsidian context; reports unsaved checkpoint deltas and bounds app access without bypassing denials.
