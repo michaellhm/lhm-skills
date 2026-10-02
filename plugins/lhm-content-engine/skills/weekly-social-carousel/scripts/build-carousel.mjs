@@ -40,7 +40,7 @@ function checkPublicText(value, field) {
 }
 
 function validate(data) {
-  const lanes = new Set(['client-question', 'practice-question', 'practical-shortcut', 'search-ads-update', 'ai-experiment']);
+  const lanes = new Set(['client-question', 'quick-win-sop', 'rotating-opportunity', 'practice-question', 'practical-shortcut', 'search-ads-update', 'ai-experiment']);
   const coverStyles = new Set(['typography', 'image']);
   const slideTypes = new Set(['cover', 'statement', 'labels', 'checklist', 'callout']);
 
@@ -76,6 +76,10 @@ function validate(data) {
 
   requireString(data.caption, 'caption');
   checkPublicText(data.caption, 'caption');
+  if (data.first_comment !== undefined && data.first_comment !== null && data.first_comment !== '') {
+    requireString(data.first_comment, 'first_comment');
+    checkPublicText(data.first_comment, 'first_comment');
+  }
   checkPublicText(data.public_source_note, 'public_source_note');
   if (data.cover_style === 'image') requireString(data.cover_image, 'cover_image');
 }
@@ -189,11 +193,12 @@ const manifest = {
   slide_count: data.slides.length,
   generated_at: new Date().toISOString(),
   render_state: 'html_built',
-  files: ['carousel.html', 'caption.md', 'manifest.json', 'source-receipt.private.json', ...(coverImageName ? [coverImageName] : [])]
+  files: ['carousel.html', 'caption.md', ...(data.first_comment?.trim() ? ['first-comment.md'] : []), 'manifest.json', 'source-receipt.private.json', ...(coverImageName ? [coverImageName] : [])]
 };
 
 await writeFile(path.join(outputDir, 'carousel.html'), html, 'utf8');
 await writeFile(path.join(outputDir, 'caption.md'), caption, 'utf8');
+if (data.first_comment?.trim()) await writeFile(path.join(outputDir, 'first-comment.md'), `${data.first_comment.trim()}\n`, 'utf8');
 await writeFile(path.join(outputDir, 'source-receipt.private.json'), `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
 await writeFile(path.join(outputDir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 

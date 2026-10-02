@@ -16,7 +16,7 @@ The build step uses only Node standard-library modules. It writes a portable HTM
   "schema_version": "1.0",
   "slug": "ai-and-clinic-seo",
   "title": "AI and clinic SEO",
-  "lane": "practice-question",
+  "lane": "quick-win-sop",
   "cover_style": "typography",
   "cover_image": null,
   "brand": {
@@ -61,6 +61,7 @@ The build step uses only Node standard-library modules. It writes a portable HTM
     }
   ],
   "caption": "Caption copy in Markdown.",
+  "first_comment": "Optional first comment for the LHM account.",
   "public_source_note": "Inspired by a recurring clinic-owner question.",
   "private_sources": [
     {"type": "fathom", "url": "https://...", "timestamp_seconds": 515, "note": "Question paraphrased."}
@@ -80,6 +81,7 @@ For `cover_style: image`, `cover_image` must be an existing local PNG, JPEG, or 
 output-directory/
   carousel.html
   caption.md
+  first-comment.md                 # when first_comment is supplied
   manifest.json
   source-receipt.private.json
   cover-image.ext                 # image variant only

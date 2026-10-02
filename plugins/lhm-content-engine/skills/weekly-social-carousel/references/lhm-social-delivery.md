@@ -8,7 +8,7 @@ The repository build creates:
 
 - one review accordion per calendar week, newest first; only the newest week opens by default
 - one interactive slide carousel per approved review package
-- an expandable caption with a copy control
+- expandable caption and optional first-comment panels with separate copy controls
 - a downloadable ZIP containing the public slide PNG files
 
 Do not generate those controls inside the carousel package. Add the package to `content/` and let the repository build create the review interface.
@@ -23,10 +23,13 @@ Do not generate those controls inside the carousel package. Add the package to `
 - editorial backlog: `planning/editorial-backlog.md`
 - private backlog provenance: `planning/editorial-backlog.private.json`
 - editorial preferences: `planning/editorial-preferences.md`
+- content SOP: `planning/content-sop.md`
 
 Verify the remote and local clone before writing. If the clone is unavailable, dirty with overlapping changes, points to another remote, or the requested branch is not explicit, return `blocked` rather than creating a fallback folder.
 
 Read `planning/editorial-preferences.md` before selecting the final topic, writing the caption or choosing a call to action. It records Michael's current commercial priority, offers, DM keywords, topic exclusions and AI safety preferences. Keep strategic preferences out of public copy unless they become the chosen CTA.
+
+Read `planning/content-sop.md` when present. For LHM Social it defines the two weekly publishing slots, quick-win slide pattern, first-comment purpose, Story routing and DM boundary.
 
 ## Package contract
 
@@ -35,6 +38,7 @@ Copy the completed carousel artefacts into the package directory:
 ```text
 carousel.html
 caption.md
+first-comment.md                   # optional
 manifest.json
 source-receipt.private.json
 slide-01.png ... slide-N.png
@@ -73,8 +77,9 @@ From the verified repository root:
 3. Confirm `dist/carousels/YYYY/MM/YYYY-MM-DD-slug/slides.zip` exists.
 4. Test the ZIP and confirm it contains exactly the `slide-NN.png` files recorded by `manifest.json`.
 5. Confirm no file ending in `.private.json` exists anywhere under `dist/`.
-6. Confirm `dist/carousels/YYYY/MM/YYYY-MM-DD-slug/caption.md`, `carousel.html` and every slide PNG exist.
-7. When browser inspection is available, verify week expand/collapse behaviour, next/previous navigation, one visible slide at a time, caption copy and the ZIP link.
+6. Confirm `dist/carousels/YYYY/MM/YYYY-MM-DD-slug/caption.md`, optional `first-comment.md`, `carousel.html` and every slide PNG exist.
+7. When `first-comment.md` exists, confirm the review card exposes it separately and the copy control copies only the first comment.
+8. When browser inspection is available, verify week expand/collapse behaviour, next/previous navigation, one visible slide at a time, caption copy, optional first-comment copy and the ZIP link.
 
 Do not report the review site as built when any acceptance check fails.
 
