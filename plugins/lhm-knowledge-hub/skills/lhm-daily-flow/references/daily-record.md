@@ -66,3 +66,9 @@ Review these against the candidate instructions before publishing changes:
 28. Prompts are ready but no task was launched: record prompt-ready, not running. Michael confirms two tasks are running: move to emails without waiting for results or demanding a third task.
 29. An external model cannot access BasicOps or the vault: prompt supplies the relevant summary and links, records the gap and requires evidence; never invent inherited access or credentials.
 30. A result arrives during email work: preserve current email/draft return point, reconcile result evidence and authorised handoff, then resume. No blind task completion or unsent draft labelled Waiting On.
+
+## Persistence and access recovery acceptance cases
+
+1. Checkpoint write is denied after a verified action: return the unsaved delta and exact restart step in the conversation, retain the intended private path and last saved coverage, and leave the write pending. Do not create a shared/local substitute or switch tools to bypass the denial.
+2. Checkpoint write returns an uncertain result: report unverified persistence and read the same canonical record before an authorised retry. An already-present source/outcome is merged once; saved coverage advances only after successful readback.
+3. Native-app access exceeds a supported 60-second bound: report the delay and use an available authorised connector/browser route. If the call cannot be bounded, prefer an available authorised route before starting it. An access denial is not a timeout and must not trigger a bypass. Check an uncertain mutation's result before repeating it.
