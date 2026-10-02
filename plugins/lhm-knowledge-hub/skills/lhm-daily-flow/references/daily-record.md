@@ -72,3 +72,12 @@ Review these against the candidate instructions before publishing changes:
 1. Checkpoint write is denied after a verified action: return the unsaved delta and exact restart step in the conversation, retain the intended private path and last saved coverage, and leave the write pending. Do not create a shared/local substitute or switch tools to bypass the denial.
 2. Checkpoint write returns an uncertain result: report unverified persistence and read the same canonical record before an authorised retry. An already-present source/outcome is merged once; saved coverage advances only after successful readback.
 3. Native-app access exceeds a supported 60-second bound: report the delay and use an available authorised connector/browser route. If the call cannot be bounded, prefer an available authorised route before starting it. An access denial is not a timeout and must not trigger a bypass. Check an uncertain mutation's result before repeating it.
+
+## Specialist routing acceptance cases
+
+1. Conversion duplication plus missing website events: route the Ads audit and analytics/site work to their distinct owners; do not call the entire workflow a skill gap or claim an audit repairs the website.
+2. A skill exists in source but is absent in ChatGPT: name the unavailable capability and provide a portable procedure; no invented slash command, inherited access or successful invocation.
+3. A selected task has no exact executable skill: use the closest supported route, bound uncovered work and include an evidenced skill-gap handback. Do not fabricate a new skill before execution proves the method.
+4. Every selected-task prompt ends with Learn or its unavailable-runtime fallback. A failed or unfinished run preserves uncertainty; it does not produce a proven success rule.
+5. Worker Learn and daily close cover the same run: merge by source/outcome; no duplicate observation or automatic publish/merge/install.
+6. A team member executes the prompt: retain existing owner, context, authority, deliverable checks and next handoff; do not restart founder discovery or dispatch another agent without authority.
