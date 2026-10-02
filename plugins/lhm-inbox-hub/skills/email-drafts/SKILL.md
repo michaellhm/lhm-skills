@@ -19,6 +19,7 @@ Any of: a thread (link or ID), a recipient plus what to say, or a task completed
 2. Decide the shape: quick reply (1 to 4 lines), status (three beats), ask (list with reasons plus a soft yes/no), pushback (constraint then workaround), miss (one-line own, fix, timing), brief (CAPS headings, numbered Please), prospect (price plain, call offered, phone in body).
 3. Write the first line as a thank-you or context anchor tied to the thread. Never a generic pleasantry. For a simple client acknowledgement, start directly with the action and timing when sufficient; do not automatically add a thank-you or apology.
 4. Write the body in the length band. Bullets past two items. Bold lead-in labels for confirmations. Reasons attached to asks. Use short bullets for client results and tracking updates; omit unnecessary administrative narration and explanatory clauses. Use commas and full stops instead of em dashes, especially for partners, while preserving informal hyphens Michael adds himself.
+When reporting enquiries or leads, ask how many became actual appointments or jobs, unless that outcome is already known. Use the client’s business terminology.
 5. Close per audience. "Thanks,\nMichael" for asks, "Cheers,\nMichael" for updates.
 6. Run the Never list. If any phrase on it is present, rewrite that sentence.
 7. If a fact is needed that is not in the thread or the client's Obsidian profile (a price, a date, a decision), leave `[confirm: ...]` in the draft. Do not invent.
