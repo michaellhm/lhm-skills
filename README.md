@@ -175,7 +175,7 @@ plugins/lhm-knowledge-hub/             # Knowledge and operating-rhythm hub
   .claude-plugin/plugin.json            # Plugin manifest
   agents/knowledge-orchestrator.md      # Weekly Flow, vault thinking, capture and review entry point
   skills/                               # All 6 knowledge-system skills
-    lhm-daily-flow/                     # Daily attention sweep, resumable work and end-of-day learning
+    lhm-daily-flow/                     # Verified task/reply pre-sweep, prepared responses and daily learning
     lhm-weekly-flow/                    # Separate founder/business review, strategic outcomes and optional action handoff
 plugins/lhm-learn/                    # Session learning capture plugin
   .claude-plugin/plugin.json            # Plugin manifest
@@ -354,4 +354,6 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 
 Meeting wraps apply an LHM scope check before proposing tasks: explicit LHM commitments and client inputs required for agreed delivery qualify; client internal projects and other discussion remain context. Existing project requirements are reused rather than duplicated.
 
-**Daily Flow** (`lhm-knowledge-hub:lhm-daily-flow`): MCP-first BasicOps and email review, one decision at a time, durable private resume checkpoint, specialist action handoffs and end-of-day Learn. Reuses weekly commitments and saves verified client context to shared Obsidian. Returns an unsaved delta and restart point on checkpoint failure; bounds native-app access and uses authorised capability fallbacks without bypassing denials. Portable to Your Dot after access and continuity checks.
+**Daily Flow** (`lhm-knowledge-hub:lhm-daily-flow`): MCP-first full task/reply and email-thread pre-sweep, prepared suggested replies or next actions, one verified decision at a time, durable private resume checkpoint, specialist action handoffs, outcome-based email filing, reviewed 5/10-day Waiting On follow-ups and end-of-day Learn for confirmed client decisions and reusable interaction preferences. Reuses weekly commitments and saves verified client context to shared Obsidian. Portable to Your Dot after access and continuity checks.
+
+Daily Flow returns an unsaved delta and restart point on checkpoint failure, and bounds native-app access with authorised capability fallbacks that cannot bypass permission denials.
