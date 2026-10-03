@@ -40,8 +40,8 @@
     {
       "name": "lhm-content-engine",
       "source": "./plugins/lhm-content-engine",
-      "description": "Automated multi-asset content pipeline for allied health clinics - CSV-driven articles, GMB posts, safe weekly insight-to-carousel production, anti-AI refinement, Google Doc publishing, and tracking updates.",
-      "version": "1.0.5",
+      "description": "Automated multi-asset content pipeline for allied health clinics - CSV-driven articles, GMB posts, a privacy-safe social idea backlog, two-post SOP-led carousel production, first-comment packages, anti-AI refinement, Google Doc publishing, and tracking updates.",
+      "version": "1.0.12",
       "category": "content",
       "tags": [
         "content",

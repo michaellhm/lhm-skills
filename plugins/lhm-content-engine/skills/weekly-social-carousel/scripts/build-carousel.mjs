@@ -40,7 +40,7 @@ function checkPublicText(value, field) {
 }
 
 function validate(data) {
-  const lanes = new Set(['client-question', 'practical-shortcut', 'search-ads-update', 'ai-experiment']);
+  const lanes = new Set(['client-question', 'quick-win-sop', 'rotating-opportunity', 'practice-question', 'practical-shortcut', 'search-ads-update', 'ai-experiment']);
   const coverStyles = new Set(['typography', 'image']);
   const slideTypes = new Set(['cover', 'statement', 'labels', 'checklist', 'callout']);
 
@@ -72,10 +72,20 @@ function validate(data) {
     checkPublicText(slide.body, `${prefix}.body`);
     checkPublicText(slide.callout, `${prefix}.callout`);
     (slide.items ?? []).forEach((item, itemIndex) => checkPublicText(item, `${prefix}.items[${itemIndex}]`));
+    if (slide.image !== undefined && slide.image !== null && slide.image !== '') {
+      requireString(slide.image, `${prefix}.image`);
+      requireString(slide.image_alt, `${prefix}.image_alt`);
+      checkPublicText(slide.image_alt, `${prefix}.image_alt`);
+      checkPublicText(slide.image_caption, `${prefix}.image_caption`);
+    }
   });
 
   requireString(data.caption, 'caption');
   checkPublicText(data.caption, 'caption');
+  if (data.first_comment !== undefined && data.first_comment !== null && data.first_comment !== '') {
+    requireString(data.first_comment, 'first_comment');
+    checkPublicText(data.first_comment, 'first_comment');
+  }
   checkPublicText(data.public_source_note, 'public_source_note');
   if (data.cover_style === 'image') requireString(data.cover_image, 'cover_image');
 }
@@ -96,17 +106,20 @@ function renderHeadline(slide) {
   }).join('');
 }
 
-function renderBody(slide) {
+function renderBody(slide, visualName) {
+  const visual = visualName
+    ? `<figure class="slide-visual"><img src="${encodeURI(visualName)}" alt="${escapeHtml(slide.image_alt || '')}">${slide.image_caption ? `<figcaption>${escapeHtml(slide.image_caption)}</figcaption>` : ''}</figure>`
+    : '';
   if (slide.type === 'labels') {
-    return `<div class="labels">${slide.items.map((item) => `<div class="label">${escapeHtml(item)}</div>`).join('')}</div>${slide.body ? `<p class="body">${escapeHtml(slide.body)}</p>` : ''}`;
+    return `<div class="labels">${slide.items.map((item) => `<div class="label">${escapeHtml(item)}</div>`).join('')}</div>${slide.body ? `<p class="body">${escapeHtml(slide.body)}</p>` : ''}${visual}`;
   }
   if (slide.type === 'checklist') {
-    return `<div class="checklist">${slide.items.map((item) => `<div class="check-item"><span class="dot"></span>${escapeHtml(item)}</div>`).join('')}</div>`;
+    return `<div class="checklist">${slide.items.map((item) => `<div class="check-item"><span class="dot"></span>${escapeHtml(item)}</div>`).join('')}</div>${visual}`;
   }
-  return `${slide.body ? `<p class="body">${escapeHtml(slide.body)}</p>` : ''}${slide.callout ? `<div class="callout">${escapeHtml(slide.callout)}</div>` : ''}`;
+  return `${slide.body ? `<p class="body">${escapeHtml(slide.body)}</p>` : ''}${slide.callout ? `<div class="callout">${escapeHtml(slide.callout)}</div>` : ''}${visual}`;
 }
 
-function renderSlide(slide, index, count, brand, coverImageName) {
+function renderSlide(slide, index, count, brand, coverImageName, visualName) {
   const headline = headlineText(slide);
   const isCover = index === 0;
   const coverClass = isCover && coverImageName ? ' cover--image' : '';
@@ -118,7 +131,7 @@ function renderSlide(slide, index, count, brand, coverImageName) {
     <div class="topline"><div class="series">${escapeHtml(slide.kicker)}</div><div class="number">${String(index + 1).padStart(2, '0')} / ${String(count).padStart(2, '0')}</div></div>
     ${slide.eyebrow ? `<div class="eyebrow">${escapeHtml(slide.eyebrow)}</div>` : ''}
     <${tag} class="${headlineClass(headline)}">${renderHeadline(slide)}</${tag}>
-    ${renderBody(slide)}
+    ${renderBody(slide, visualName)}
     <div class="footer"><div class="brand"><div class="brand-mark"><span>+</span></div>${escapeHtml(brand.name)}</div><div>${escapeHtml(endLabel)}</div></div>
   </article>`;
 }
@@ -152,12 +165,28 @@ if (data.cover_style === 'image') {
   await copyFile(source, path.join(outputDir, coverImageName));
 }
 
+const slideVisualNames = [];
+for (let index = 0; index < data.slides.length; index += 1) {
+  const sourceValue = data.slides[index].image;
+  if (!sourceValue) {
+    slideVisualNames.push(null);
+    continue;
+  }
+  const source = path.resolve(sourceValue);
+  if (!(await pathExists(source))) fail(`slides[${index}].image does not exist`);
+  const extension = path.extname(source).toLowerCase();
+  if (!['.png', '.jpg', '.jpeg', '.webp'].includes(extension)) fail(`slides[${index}].image must be PNG, JPEG, or WebP`);
+  const visualName = `slide-visual-${String(index + 1).padStart(2, '0')}${extension}`;
+  await copyFile(source, path.join(outputDir, visualName));
+  slideVisualNames.push(visualName);
+}
+
 const css = await readFile(cssPath, 'utf8');
 const brand = {
   name: data.brand?.name || 'Local Health Marketing',
   website: data.brand?.website || 'localhealthmarketing.com'
 };
-const slides = data.slides.map((slide, index) => renderSlide(slide, index, data.slides.length, brand, coverImageName)).join('\n');
+const slides = data.slides.map((slide, index) => renderSlide(slide, index, data.slides.length, brand, coverImageName, slideVisualNames[index])).join('\n');
 const html = `<!doctype html>
 <html lang="en">
 <head>
@@ -167,16 +196,17 @@ const html = `<!doctype html>
   <title>${escapeHtml(data.title)} | ${escapeHtml(brand.name)}</title>
   <style>${css}</style>
 </head>
-<body>
+<body class="lane-${escapeHtml(data.lane)}">
 ${slides}
 </body>
 </html>
 `;
 
-const caption = `${data.caption.trim()}${data.public_source_note ? `\n\n## Source note\n\n${data.public_source_note.trim()}` : ''}\n`;
+const caption = `${data.caption.trim()}\n`;
 const receipt = {
   schema_version: '1.0',
   slug: data.slug,
+  source_note: data.public_source_note?.trim() || null,
   private_sources: Array.isArray(data.private_sources) ? data.private_sources : [],
   warning: 'Private source receipt. Exclude from public deployment and social uploads.'
 };
@@ -185,15 +215,22 @@ const manifest = {
   slug: data.slug,
   title: data.title,
   lane: data.lane,
+  content_format: 'feed-post',
+  accent: ['practice-question', 'client-question'].includes(data.lane)
+    ? 'soft-blue'
+    : ['rotating-opportunity', 'search-ads-update', 'ai-experiment'].includes(data.lane)
+      ? 'seafoam'
+      : 'orange',
   cover_style: data.cover_style,
   slide_count: data.slides.length,
   generated_at: new Date().toISOString(),
   render_state: 'html_built',
-  files: ['carousel.html', 'caption.md', 'manifest.json', 'source-receipt.private.json', ...(coverImageName ? [coverImageName] : [])]
+  files: ['carousel.html', 'caption.md', ...(data.first_comment?.trim() ? ['first-comment.md'] : []), 'manifest.json', 'source-receipt.private.json', ...(coverImageName ? [coverImageName] : []), ...slideVisualNames.filter(Boolean)]
 };
 
 await writeFile(path.join(outputDir, 'carousel.html'), html, 'utf8');
 await writeFile(path.join(outputDir, 'caption.md'), caption, 'utf8');
+if (data.first_comment?.trim()) await writeFile(path.join(outputDir, 'first-comment.md'), `${data.first_comment.trim()}\n`, 'utf8');
 await writeFile(path.join(outputDir, 'source-receipt.private.json'), `${JSON.stringify(receipt, null, 2)}\n`, 'utf8');
 await writeFile(path.join(outputDir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 
