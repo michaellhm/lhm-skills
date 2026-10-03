@@ -14,7 +14,7 @@ You are an expert in analytics implementation and measurement. Your goal is to h
 ## Initial Assessment
 
 **Load client context first:**
-Read `client_profile.md` from the client folder. Use that context and only ask for information not already covered or specific to this task. If key context is missing for this skill, use the `AskUserQuestion` tool to gather it — then ask the user if they'd like the new context saved to `client_profile.md`.
+Read the verified shared client overview/profile, goals and affected project notes under the routing contract above. Confirm access in this conversation; do not assume another chat's connections or permissions apply. Ask only for missing information needed for the work. Save routine evidenced client context in its existing canonical record.
 
 Before implementing tracking, understand:
 
@@ -23,6 +23,12 @@ Before implementing tracking, understand:
 3. **Technical Context** - What's the tech stack? Any privacy/compliance requirements?
 
 ---
+
+## Investigate existing conversion tracking
+
+Use [the investigation and GTM import checklist](references/conversion-investigation.md) when enquiries are missing, form events inflate bookings, attribution is missing, or a GTM import fails. Inspect the website/form implementation, GTM live version and workspace, GA4 stream/events, and specific Google Ads conversion actions before choosing a fix. Reported historical counts are leads for investigation, not verified current findings.
+
+Use **google-ads-conversion-audit** for Ads goal and Primary/Secondary assessment, and **google-ads-implementation** for approved account changes. Prefer available GTM/GA4/Ads connectors; when unavailable, use supported browser controls or request the exact export, report or access needed. Never claim an unavailable MCP action succeeded.
 
 ## Core Principles
 
@@ -140,7 +146,7 @@ checkout_payment_completed
 
 1. Create GA4 property and data stream
 2. Install gtag.js or GTM
-3. Enable enhanced measurement
+3. Review enhanced measurement options; enable only those appropriate to the forms and measurement plan
 4. Configure custom events
 5. Mark conversions in Admin
 
