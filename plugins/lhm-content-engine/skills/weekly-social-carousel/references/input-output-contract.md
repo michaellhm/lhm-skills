@@ -105,4 +105,4 @@ The private source receipt is not a public asset. Exclude `*.private.json` from 
 
 ## Story input and output
 
-The Story builder accepts one queue item containing `id`, `title`, `category`, two to six `frames`, and an optional `interaction` object with `type`, `prompt` and `options`. It writes `story.html`, `story-manifest.json`, `story-01.png ... story-N.png`, and `story-preview.png`. `story-manifest.json` records the ordered upload frames in `export_files`; the Story ZIP must contain exactly those files. The final rendered frame reserves a labelled placement area for Nina to add the native Instagram sticker after upload.
+The Story builder accepts one queue item containing `id`, `title`, `category`, two to six `frames`, and an optional `interaction` object with `type`, `prompt` and `options`. It writes `story.html`, `story-manifest.json`, `story-01.png ... story-N.png`, and `story-preview.png`. `story-manifest.json` records the ordered upload frames in `export_files`; the Story ZIP must contain exactly those files. Interaction suggestions remain review metadata and are never embedded into the exported Story frames.

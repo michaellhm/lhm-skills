@@ -59,11 +59,11 @@ Use one of the supported structures:
 
 Do not shrink text until a paragraph technically fits. Reduce the copy. A slide that needs text below the minimum type scale has failed editorial review.
 
-For click-by-click SOPs, add interface visuals only on steps where the menu or control is genuinely easier to recognise than describe. Remove all account names, locations, profile photos, metrics and other private data. When a safe live capture is unavailable, use a neutral interface visual and label it `Illustrative view` rather than fabricating a live account screenshot.
+For click-by-click SOPs, add interface visuals only on steps where the menu or control is genuinely easier to recognise than describe. When an authorised Chrome session is available, prefer a current first-party interface capture from a neutral or safely sanitised view. Remove all account names, locations, profile photos, metrics and other private data. When a safe live capture is unavailable, use a neutral interface visual and label it `Illustrative view` rather than fabricating a live account screenshot.
 
 ## Story packages
 
-Create finished Story images rather than handing Nina unformatted text. Keep each frame to one short idea. The final frame may reserve a clear visual area for a native Instagram poll or question sticker, but do not bake a fake interactive sticker into the image. Nina adds the native sticker after upload so responses remain interactive.
+Create finished Story images rather than handing Nina unformatted text. Keep each frame to one short idea. Do not embed a poll, question box, sticker or sticker placeholder in the exported image. Keep any optional interaction suggestion in the review interface only. Nina may add the native Instagram sticker after upload when it adds genuine value.
 
 Each approved Story package should include 1080 x 1920 PNG frames, a contact preview and a ZIP containing exactly those frames. The review site heading is `Stories`; workflow ownership should not appear in public-facing labels.
 
