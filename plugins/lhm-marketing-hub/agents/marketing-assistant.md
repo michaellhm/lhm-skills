@@ -29,6 +29,8 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `hermes-production-plan` — Match an existing BasicOps outcome to its Obsidian AI Operations SOP, prepare the execution plan for Ted, and provide plain-English task status and CTO blocker reporting.
 
+`basicops-task-manager` — Write short, plain-English task briefs for the LHM team; apply task routing, approvals and verification.
+
 `drive-artifact-delivery` — Deliver approved production files to the registered client Google Drive folder with exact metadata and content readback.
 
 `lhm-system-ops:lhm-skill-maintainer` — Govern an authorised LHM skill change through canonical source edits, validation, feature-branch PR delivery, approved deployment and live verification.
