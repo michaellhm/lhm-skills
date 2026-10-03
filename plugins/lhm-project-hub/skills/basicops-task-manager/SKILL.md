@@ -11,6 +11,29 @@ For client-specific work, first read [Client knowledge and working-file routing]
 
 Apply one consistent LHM standard to every BasicOps mutation. Keep BasicOps lightweight: it says what needs doing, who owns it and what happens next. Obsidian holds detailed client and project context; Hermes supplies that detail conversationally when asked.
 
+## Use plain English for task briefs
+
+Michael’s standing preference: write for the LHM team, including Filipino staff who use English as an additional language. Keep the wording natural and respectful. Do not simplify the technical work itself.
+
+- Start with the action and the client. Use short sentences with one clear instruction each.
+- Use everyday words and active verbs: check, set up, test, send, approve and finish.
+- Keep only the context, steps, approvals and completion checks needed to do the task. Do not add filler, repeat the outcome or explain the agency’s internal process.
+- Keep technical names and account IDs when the assignee needs them. Explain unfamiliar terms briefly instead of stacking jargon.
+- Avoid phrases such as “establish the success signal”, “retain attribution”, “surface dependencies” and “return the evidence”. Prefer “check what happens after the form is sent”, “keep the traffic source”, “list anything still needed” and “send Michael the test results”.
+- Use a short numbered list when there are several steps. Keep the next handoff to one plain sentence naming who receives what and where.
+- Treat Michael’s edited draft as the baseline. Preserve his cuts unless removing an item would hide a necessary approval, privacy rule or completion check. State that requirement in one short sentence.
+- Read the brief once before presenting it. The assignee should know what to do without rereading it.
+
+Example:
+
+> Jamie, please set up tracking for the enquiry form on the client’s contact page.
+>
+> Check what happens after the form is sent. Agree a test submission with the clinic first. Set up tracking so each successful enquiry is counted once. Ask Michael to approve the changes before publishing.
+>
+> Next handoff: When testing passes, send Michael the results and anything still needed in the BasicOps discussion.
+
+These writing rules do not change the required metadata, approval, privacy, authorship or verification rules below. Keep those controls concise in the human brief.
+
 ## Meeting-wrap exception
 
 For a meeting-wrap card or distribution request, first read
