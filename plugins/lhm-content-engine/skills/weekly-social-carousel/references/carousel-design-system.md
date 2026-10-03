@@ -34,6 +34,8 @@ Label every review item as `Feed post` or `Story`. Do not rely on colour alone t
 - retain generous negative space
 - footer remains quiet and secondary
 
+Instagram Stories use a 1080 x 1920 canvas with at least 90 pixels of horizontal safe area and generous top and bottom clearance for the app interface. Question-led Stories use soft blue as the recognition cue while retaining the navy, white and LHM typography system.
+
 ## Cover variants
 
 ### Typography
@@ -56,6 +58,14 @@ Use one of the supported structures:
 - `callout`: headline plus one bordered takeaway
 
 Do not shrink text until a paragraph technically fits. Reduce the copy. A slide that needs text below the minimum type scale has failed editorial review.
+
+For click-by-click SOPs, add interface visuals only on steps where the menu or control is genuinely easier to recognise than describe. Remove all account names, locations, profile photos, metrics and other private data. When a safe live capture is unavailable, use a neutral interface visual and label it `Illustrative view` rather than fabricating a live account screenshot.
+
+## Story packages
+
+Create finished Story images rather than handing Nina unformatted text. Keep each frame to one short idea. The final frame may reserve a clear visual area for a native Instagram poll or question sticker, but do not bake a fake interactive sticker into the image. Nina adds the native sticker after upload so responses remain interactive.
+
+Each approved Story package should include 1080 x 1920 PNG frames, a contact preview and a ZIP containing exactly those frames. The review site heading is `Stories`; workflow ownership should not appear in public-facing labels.
 
 ## Review
 

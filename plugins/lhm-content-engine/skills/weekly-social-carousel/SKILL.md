@@ -40,7 +40,7 @@ Use when asked to review a date range, commonly the previous seven days.
 6. Add every safe, distinct candidate to the editorial backlog before selecting posts. Do not discard a strong idea merely because it was not chosen in the week it appeared.
 7. Score backlog candidates using the editorial strategy, including audience frequency. Select the requested number from the full ready backlog, not only from that week's meetings. For LHM Social, the default weekly target is two: one `quick-win-sop` and one `rotating-opportunity`.
 8. Mark selected ideas in the backlog and keep unused ideas available for Michael's review. If too few candidates clear the quality floor, report the shortfall; do not manufacture filler.
-9. Label every produced carousel as a `Feed post`. Route safe meeting questions that are not promoted to the feed into the anonymous `Story` queue with a short frame sequence and interaction prompt.
+9. Label every produced carousel as a `Feed post`. Route safe meeting questions that are not promoted to the feed into the anonymous `Story` queue with a short frame sequence and interaction prompt. Produce finished 1080 x 1920 Story images; reserve the final interaction area for Nina to add the native Instagram sticker after upload.
 
 ### Historical backlog
 
@@ -63,7 +63,7 @@ Use when asked to recover older ideas or build an idea bank. Sweep the authorise
 5. Use the typography cover unless the current test plan calls for an image cover. An image must add context and use a dark LHM overlay; generic AI or cyber imagery is not acceptable.
 6. Build a caption that adds context instead of repeating every slide. For LHM Social, follow the verified editorial-preferences file, finish with one topic-specific DM call to action, then add two or three focused hashtags.
 7. Create `first-comment.md` when a useful first comment can clarify a likely sticking point, offer a prepared resource, invite the reader to identify where they are stuck, or move a diagnostic question towards a call. Do not repeat the caption, manufacture a customer question or pretend LHM does not understand the subject.
-8. Keep public copy source-blind. Never say that a client asked, a clinic said, or the idea came from a meeting. Present the useful issue directly. Meeting provenance belongs only in private source records. A public source note is appropriate for a verified product or platform announcement, not for a meeting-derived idea.
+8. Keep public copy source-blind. Never say that a client asked, a clinic said, or the idea came from a meeting. Present the useful issue directly. Meeting provenance and verification notes belong only in private source records. Do not append source-note sections to captions.
 9. Run the privacy check again on the final slide copy, caption, first comment, HTML, filenames, image metadata, public source note and backlog entry.
 10. Create the input JSON described in the input and output contract.
 11. Save the durable package under `<work_root>/weekly-social-carousel/YYYY-MM/YYYY-MM-DD-slug/` unless the verified destination has an established equivalent structure.
@@ -85,6 +85,7 @@ Reject or revise a package when any condition is true:
 - A product or feature is framed as an LHM recommendation even though it is not part of LHM's working approach, unless Michael approved a clearly labelled watchlist angle.
 - A generic workflow is presented as exclusive to one AI product when several relevant tools support the same approach.
 - A quick-win SOP lacks an actionable sequence, safe completion check or current interface verification where screenshots or click paths are used.
+- A screenshot or interface visual exposes an account name, location, profile photo, metric or other private data, or an illustrative visual is presented as a live capture.
 - A comment-keyword post promises a resource that has not been prepared and verified.
 - A first comment imitates a customer, manufactures confusion or offers an open-ended free audit.
 - The design uses a copied HeyTony identity instead of the LHM system.
@@ -105,7 +106,7 @@ GitHub versioning is optional and separate from social publishing.
 
 ### LHM Social review site
 
-The governed LHM review destination is the private repository `lhmorg/lhm-social`. Its site builder owns the weekly accordion layout, in-page slide navigation, caption and first-comment copy controls, and slide ZIP. Do not recreate or manually edit that interface for each post.
+The governed LHM review destination is the private repository `lhmorg/lhm-social`. Its site builder owns the weekly accordion layout, in-page slide navigation, caption and first-comment copy controls, Story image previews, and feed/Story ZIP downloads. Do not recreate or manually edit that interface for each post.
 
 When `github.mode` is `commit_push` and `github.repository` is `lhmorg/lhm-social`:
 
