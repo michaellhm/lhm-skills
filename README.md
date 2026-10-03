@@ -268,7 +268,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 **Analytics & Reporting** (2 skills): GA4 event discovery and conversion classification, analytics dashboard artifact with period comparison and visual output.
 
-**SaaS & Growth Marketing** (25 skills): A/B testing, analytics tracking, competitor pages, content strategy, copy editing, copywriting, email sequences, form CRO, free tool strategy, launch strategy, marketing ideas, marketing psychology, onboarding CRO, page CRO, paid ads, paywall CRO, popup CRO, pricing strategy, product marketing, programmatic SEO, referral programs, schema markup, SEO audit, signup flow CRO, social content.
+**SaaS & Growth Marketing** (25 skills): A/B testing, analytics tracking (GTM/GA4/Ads source investigation, success tracking and import validation), competitor pages, content strategy, copy editing, copywriting, email sequences, form CRO, free tool strategy, launch strategy, marketing ideas, marketing psychology, onboarding CRO, page CRO, paid ads, paywall CRO, popup CRO, pricing strategy, product marketing, programmatic SEO, referral programs, schema markup, SEO audit, signup flow CRO, social content.
 
 **Pricing** (1 skill): Standalone pricing strategy and monetization.
 
