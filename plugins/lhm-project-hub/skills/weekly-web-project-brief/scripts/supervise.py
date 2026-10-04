@@ -38,9 +38,11 @@ def decision(at, status, receipt, service, started=None):
         if service not in ('activating', 'active'):
             return 'interrupted'
         return None
-    if service == 'failed':
-        return 'worker_failed'
     due = at.replace(hour=7, minute=15, second=0, microsecond=0) - timedelta(days=at.weekday())
+    # systemd retains the previous invocation's failure across reporting weeks.
+    # Before the start deadline, only this week's status/receipt proves failure.
+    if service == 'failed' and at >= due:
+        return 'worker_failed'
     if at >= due and not status:
         return 'missed_start'
     return None

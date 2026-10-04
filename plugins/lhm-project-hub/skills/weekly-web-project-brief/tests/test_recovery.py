@@ -90,6 +90,14 @@ class RecoveryTests(unittest.TestCase):
             self.assertIsNone(w.decision(at,{}, {}, 'inactive'))
             self.assertEqual(w.decision(at+timedelta(minutes=1),{}, {}, 'inactive'),'missed_start')
 
+    def test_previous_service_failure_before_current_week_start(self):
+        for stamp in ['2026-09-21T07:00:00+10:00', '2026-10-05T07:00:00+11:00']:
+            at = datetime.fromisoformat(stamp)
+            self.assertIsNone(w.decision(at, {}, {}, 'failed'))
+            self.assertIsNone(w.decision(at + timedelta(minutes=14), {}, {}, 'failed'))
+            self.assertEqual(w.decision(at + timedelta(minutes=15), {}, {}, 'failed'), 'worker_failed')
+            self.assertEqual(w.decision(at, {'state': 'failed'}, {}, 'failed'), 'worker_failed')
+
     def test_watchdog_worker_and_delivery_states(self):
         running={'state':'running','started_at':self.at.isoformat()}
         self.assertIsNone(w.decision(self.at,running,{},'activating'))
