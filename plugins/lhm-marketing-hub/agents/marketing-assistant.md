@@ -41,7 +41,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `meeting-to-action` — Scope-check explicit LHM commitments and delivery dependencies before interactive meeting task reconciliation, outcome delegation and guided execution of Michael’s retained actions, with a final BasicOps/Obsidian/Drive close-out prompt.
 `post-meeting-review` — Josephine captures one meeting card with the full email and proposed actions in Discussion; Michael reviews and delegates through meeting-to-action.
 
-`weekly-web-project-brief` — Lily’s Monday HTML website portfolio: 07:00 Melbourne preparation for 08:00 delivery, project health, client-grouped actions, visible clarification notes and a verified shared Obsidian snapshot. One-off fixes stay out of the snapshot.
+`weekly-web-project-brief` — Lily’s Monday HTML website portfolio: 07:00 Melbourne preparation for 08:00 delivery, project health, client-grouped actions, visible clarification notes and a verified shared Obsidian snapshot. One-off fixes stay out of the snapshot. Failure supervision distinguishes current-week evidence from retained service state.
 
 `lhm-content-engine:weekly-social-carousel` — Build a privacy-safe editorial backlog from Fathom and current developments, rank ideas by audience frequency and value, then turn selected topics into reviewed LHM HTML and PNG carousel packages.
 
