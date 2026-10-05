@@ -12,7 +12,7 @@
       "name": "lhm-inbox-hub",
       "source": "./plugins/lhm-inbox-hub",
       "description": "Michael's inbox system - morning triage into a brief, voice-matched Gmail drafts, timed email sessions, label tidy-up, and a corrections loop that learns from sent mail. Drafts only, never sends.",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "category": "operations",
       "tags": [
         "email",
@@ -140,7 +140,7 @@
       "name": "lhm-knowledge-hub",
       "source": "./plugins/lhm-knowledge-hub",
       "description": "LHM knowledge system for Obsidian vault management, Claude and Hermes conversation capture, strategic thinking, weekly planning, and monthly quality review.",
-      "version": "1.1.12",
+      "version": "1.1.13",
       "category": "utilities",
       "tags": [
         "obsidian",

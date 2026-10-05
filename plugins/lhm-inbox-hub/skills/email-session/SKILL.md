@@ -20,10 +20,10 @@ For each item:
 - Show: who, what they asked, how long they have waited, and the full draft text.
 - Ask for one of: send as is, edit (take the change, show the revised draft), skip, or hand to work (return the work prompt block for ChatGPT and move the item to "carried").
 - On "send as is" or after edits: update the Gmail draft to the final text and confirm it is ready in Gmail. Do not send. Tell Michael the draft is in Gmail ready to go; if ChatGPT with Gmail is his sending surface, the draft text is in the chat to paste.
-- Record the final text against the draft ID in `inbox-log/session.jsonl`: `{"date","thread_id","draft_id","outcome": "sent-as-is|edited|skipped|carried","final_text"}`. email-learn uses this.
+- Record the original and latest reviewed text using email-drafts' evidence handoff. In the established `inbox-log/session.jsonl` or private-vault `Inbox Briefs/log/session.jsonl`, include date, thread_id, draft_id (null for chat-only drafts), writing_block_id or conversation reference, draft_text, final_text, review_outcome `unchanged|edited|skipped|carried` and delivery_outcome `draft-ready|approved|sent|uncertain`. Review approval or a saved final draft is not a send. Only an authorised sending coordinator with verified provider readback may set `sent` and record sent_message_id; retain the original draft for comparison.
 
 Keep each item to one exchange where possible. No summaries between items.
 
 ## Close
 
-At the end of the budget or the list: three lines. Replied N, carried N (with the work prompts collected in one block for pasting), skipped N. Then set WAITING ON on every thread that got a final draft, and remove ONGOING TASKS from those threads only if no task exists for them.
+At the end of the budget or the list: three lines. Draft-ready N (verified sent N only if a sending coordinator supplied evidence), carried N (with work prompts collected for pasting), skipped N. Preparing a draft does not make its recipient the waiting owner. Set WAITING ON only after verified sending establishes a recipient dependency and filing is authorised; remove ONGOING TASKS only if no underlying task remains. Follow Michael's draft-before-send preference even when the initial request names a recipient and says to send something over.

@@ -31,6 +31,10 @@ States: proposed, active, draft-ready, sent, user-reported-done, verified-done, 
 
 ## Behavioural acceptance cases
 
+- A general request to send a handoff to a named person without a reviewed draft: prepare and show the full draft, retain draft-ready, and wait for explicit approval of that text.
+- A chat-only draft is edited and approved: retain its writing-block/conversation reference with null provider draft ID, show the revision, send once through the authorised coordinator, verify SENT and record the actual message ID and final text. Do not count draft creation or approval as delivery or apply Waiting On before sending.
+- A send result is uncertain: keep delivery unverified, inspect the original thread before retrying, and record SENT only when verified.
+
 Review these against the candidate instructions before publishing changes:
 
 1. Michael says 'done' after one payment item: record user-reported done privately; no bank action or automatic BasicOps completion.

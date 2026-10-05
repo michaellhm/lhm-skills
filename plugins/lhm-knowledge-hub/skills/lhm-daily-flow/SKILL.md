@@ -17,6 +17,8 @@ Read [client knowledge routing](../../references/obsidian-context-contract.md) b
 - An ordinary sweep authorises reads and session checkpointing, not bulk labels, archiving, sending, delegation or live campaign changes. Honour explicit action authority already given; do not ask again. Tag verified people in authorised BasicOps comments when notification is intended, then verify the mention and write result.
 - Never create an automation, move work to another chat, message another agent, or change account permissions merely because this workflow mentions daily or end-of-day work.
 
+- Always show the complete email draft for Michael's review before sending. A general request to reply, hand work over or send something to a person first produces a draft; only explicit approval of the latest reviewed text authorises sending. Show revisions before using them, then honour that approval without asking again. Use email-drafts' artifact logging contract for chat and provider drafts; after sending, verify SENT and record the final text and sent message ID against the same artifact. A prepared or approved draft is not sent or Waiting On. Reconcile an uncertain send before retrying.
+
 ## Start or resume
 
 1. Establish today's date in Australia/Melbourne and the user's requested scope. Correct relative dates gently where material; calculate time zones for actual event dates, including daylight saving.

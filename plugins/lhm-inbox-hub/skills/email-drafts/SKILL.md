@@ -25,6 +25,14 @@ When reporting enquiries or leads, ask how many became actual appointments or jo
 7. If a fact is needed that is not in the thread or the client's Obsidian profile (a price, a date, a decision), leave `[confirm: ...]` in the draft. Do not invent.
 8. Save as a Gmail draft on the thread (or a new draft with the subject given). Return the draft link and the full text.
 
+## Review and evidence handoff
+
+Always show Michael the full draft before any email is sent. A general request to reply, hand something over or send it to someone starts draft preparation; it does not skip review. A sending coordinator may send only after Michael explicitly approves the latest reviewed text. This skill remains draft-only. After edits, show the revised draft; approval of an earlier version does not approve a later change.
+
+Record every reviewable draft, including chat-only drafts, in the existing `inbox-log/drafts.jsonl` or verified private-vault `Inbox Briefs/log/drafts.jsonl`. Reuse the established log destination; never write personal email text into the source repository or installed plugin cache. Include date, recipient, audience_register, thread_id when known, draft_id when a provider draft exists, writing_block_id or conversation reference for chat drafts, draft_text and word_count. Use null for unavailable IDs; never invent a Gmail draft ID. Append revisions with the same artifact reference so email-learn can recover the original and latest text without counting one artifact twice.
+
+Hand the artifact reference and latest text to the sending coordinator. After an authorised send, that coordinator records final_text, sent_message_id and outcome `sent` only after provider readback confirms delivery. Until then record `draft-ready` or `approved`, not sent. An uncertain send must be reconciled before retrying.
+
 ## Client-update emails
 
 When the input is "we did X for client Y", use `lhm-project-hub:client-update-email` for the substance (plain-language explanation of the work) and this skill for the voice. Do not restate the technical detail; Michael's clients get the outcome and what it means for them.
