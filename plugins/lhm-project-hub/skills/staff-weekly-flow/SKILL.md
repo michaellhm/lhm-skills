@@ -1,6 +1,6 @@
 ---
 name: staff-weekly-flow
-description: Coach a personal work week for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use for “run my staff flow”, “plan my task week”, “run my Monday web-project planning”, “review my commitments”, “what should I work on today?”, BasicOps inbox triage, or Michael's “review team commitments”. Read the current shared web brief and previous confirmed plan, review outcomes supportively, help the person choose realistic commitments or decline/defer candidates, and save their confirmed work commitments and dated results in shared Obsidian. Michael uses this same staff flow separately from his founder business review. Reconcile accepted weekly, review and waiting board moves through basicops-task-manager, then save a Tuesday web meeting document; keep drafts, sends, reports and verified results distinct.
+description: Coach a personal work week for Michael, Kristalyn, Aiya, Jaimee or Josephine. Use for “run my staff flow”, “plan my task week”, “run my Monday web-project planning”, “review my commitments”, “what should I work on today?”, BasicOps inbox triage, or Michael's “review team commitments”. Read the current shared web brief and previous confirmed plan, review outcomes supportively, help the person choose realistic commitments or decline/defer candidates, and save their confirmed work commitments and dated results in shared Obsidian. Michael uses this same staff flow separately from his founder business review. Reconcile accepted weekly, review and waiting board moves through basicops-task-manager, then save a Tuesday web meeting document and verify incremental canonical client-context and BasicOps handback; keep drafts, sends, reports and verified results distinct.
 ---
 ## Client file routing
 
@@ -45,6 +45,15 @@ the shared LHM Knowledge vault, including all dated corrections. Use its role-sp
 Kristalyn and Aiya coaching paths alongside the ordinary capacity and authority rules below.
 Clear authenticated feedback may be appended to the shared brief as part of this flow; that does
 not itself send an email, mutate a task or confirm an entire personal plan.
+
+## Save project updates as the conversation progresses
+
+Read [project-context-handback.md](references/project-context-handback.md) for every project-review,
+weekly-planning and progress session. After each settled item, save evidenced project context in
+its canonical shared client records, route authorised execution changes through
+`basicops-task-manager`, and read back both destinations. Weekly notes are the session trail, not
+substitutes for client records or live task state. Keep a destination register and reconcile it
+before wrapping up or handing off an interrupted flow.
 
 ## Choose the intent
 
