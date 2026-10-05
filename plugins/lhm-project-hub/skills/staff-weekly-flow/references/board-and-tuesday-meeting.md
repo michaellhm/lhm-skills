@@ -48,6 +48,9 @@ meeting document. Do not misfile it merely to make the weekly list look clean. W
 blocked but another is actionable, define that smaller accepted outcome rather than moving the
 whole project blindly. Every removed weekly item retains a traceable disposition and next owner.
 
+Before the closing document, complete [project-context-handback.md](project-context-handback.md):
+verify canonical client records and BasicOps destinations for every settled item.
+
 ## Tuesday web meeting document
 
 At the end, write a concise **Tuesday web meeting** section in the existing
