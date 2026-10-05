@@ -309,7 +309,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 ### Client Updates Hub (deprecated — moved to Project Hub)
 
-**Inbox Hub** (5 skills): `inbox-triage` — morning brief with labels, tasks and drafts; `email-drafts` — Michael-voice Gmail draft; `email-session` — timed reply session; `inbox-tidy` — stale label cleanup with approval; `email-learn` — corrections loop that proposes voice and routing updates. Entry: `/lhm-inbox-hub:start-email`.
+**Inbox Hub** (5 skills): `inbox-triage` — morning brief with labels, tasks and drafts; `email-drafts` — reviewed Michael-voice draft with chat/provider artifact logging; `email-session` — timed reply session with verified delivery counts; `inbox-tidy` — stale label cleanup with approval; `email-learn` — corrections loop that proposes voice and routing updates. Entry: `/lhm-inbox-hub:start-email`.
 
 **Client Communication** (3 skills, shims only): All three skills now live in `lhm-project-hub`; the entries here route straight there. See the Project Hub catalog below for current descriptions. Kept in place so existing muscle memory and any external references to `lhm-client-updates-hub:*` keep working.
 
@@ -355,7 +355,7 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 
 Meeting wraps apply an LHM scope check before proposing tasks: explicit LHM commitments and client inputs required for agreed delivery qualify; client internal projects and other discussion remain context. Existing project requirements are reused rather than duplicated.
 
-**Daily Flow** (`lhm-knowledge-hub:lhm-daily-flow`): MCP-first full task/reply and email-thread pre-sweep, prepared suggested replies or next actions, team blockers first, two or three chosen BasicOps tasks with portable execution prompts with verified agent/skill routing and per-task Learn before emails, durable private resume checkpoint, specialist action handoffs, outcome-based email filing, reviewed 5/10-day Waiting On follow-ups and end-of-day Learn for confirmed client decisions and reusable interaction preferences. Reuses weekly commitments and saves verified client context to shared Obsidian. Portable to Your Dot after access and continuity checks.
+**Daily Flow** (`lhm-knowledge-hub:lhm-daily-flow`): MCP-first full task/reply and email-thread pre-sweep, prepared suggested replies or next actions, full draft review before every email send and linked verified-send evidence, team blockers first, two or three chosen BasicOps tasks with portable execution prompts with verified agent/skill routing and per-task Learn before emails, durable private resume checkpoint, specialist action handoffs, outcome-based email filing, reviewed 5/10-day Waiting On follow-ups and end-of-day Learn for confirmed client decisions and reusable interaction preferences. Reuses weekly commitments and saves verified client context to shared Obsidian. Portable to Your Dot after access and continuity checks.
 
 
 Daily Flow returns an unsaved delta and restart point on checkpoint failure, and bounds native-app access with authorised capability fallbacks that cannot bypass permission denials.
