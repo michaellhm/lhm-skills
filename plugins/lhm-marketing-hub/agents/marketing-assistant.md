@@ -40,7 +40,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `lhm-wordpress-hub:wp-rest-operator` — Inspect and implement registered WordPress or LeadScale content changes through the REST API with snapshots, publish separation and readback verification.
 
-`pre-client-meeting` — Sweep wraps, client replies, boards, Obsidian and implementation evidence into short meeting speaking bullets: progress, next work, decisions and campaign wins/watch-outs.
+`pre-client-meeting` — Sweep wraps, client replies, boards, Obsidian and implementation evidence into short meeting speaking bullets: progress, next work, decisions and campaign wins/watch-outs; finalise the shared Google Doc and calendar link after host feedback.
 
 `meeting-to-action` — Scope-check explicit LHM commitments and delivery dependencies before interactive meeting task reconciliation, outcome delegation and guided execution of Michael’s retained actions, with a final BasicOps/Obsidian/Drive close-out prompt.
 `post-meeting-review` — Josephine captures one meeting card with the full email and proposed actions in Discussion; Michael reviews and delegates through meeting-to-action.
