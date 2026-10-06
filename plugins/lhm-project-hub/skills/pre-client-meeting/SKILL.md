@@ -5,7 +5,9 @@ description: "Prepare short, evidence-backed speaking bullets before an existing
 
 # Pre-client meeting
 
-Give Michael a brief he can read directly in the meeting: what the client sent, what LHM has done about it, what is underway, what comes next and what needs a decision. Use short, sharp bullets throughout the speaking notes. The evidence sweep supports the conversation; it is not the conversation itself.
+Give the meeting host a brief they can read directly in the meeting: what the client sent, what LHM has done about it, what is underway, what comes next and what needs a decision. Use short, sharp bullets throughout the speaking notes. The evidence sweep supports the conversation; it is not the conversation itself.
+
+This skill works for any existing LHM client. Discover their contacts, delivery team, services and reporting sources from current context. Do not carry over names, locations, budgets, campaign structures or agenda topics from another client.
 
 ## Resolve the client and meeting
 
@@ -28,7 +30,7 @@ Use available read-only connectors or verified local sources. A missing source d
 
 ### BasicOps across boards
 
-- Verify current user, team roster and actual board names/IDs. Sweep Client Flow, relevant delivery/project boards and personal boards containing this client's work. Include Michael, Jaimee, Kristalyn and Aiya when relevant or requested; do not hard-code their IDs or assume every client uses the same team.
+- Verify current user, team roster and actual board names/IDs. Sweep Client Flow, relevant delivery/project boards and personal boards containing this client's work. Discover the relevant assignees from the client's current projects and task ownership; include any additional people/boards the user requests. Do not hard-code staff names or IDs, or assume every client uses the same team.
 - Paginate task inventories or use an equivalent complete client-filtered search. Match aliases, linked project parents and delivery-specific titles, not only the client acronym. Inspect relevant archived/completed work when needed to establish a recent outcome.
 - Read task descriptions, discussions, relevant replies and linked subtasks. Follow evidence links to the delivered work where completion matters.
 - Accepted means assigned/accepted, not finished. A completed card without an artefact may still need verification; an open card may have documented implementation. Reconcile dates and delivery evidence rather than copying status labels.
@@ -41,15 +43,15 @@ Use available read-only connectors or verified local sources. A missing source d
 - When the user asks about Claude/Cowork, use an available authorised conversation route if useful. If only saved Claude files are available, identify them as saved logs; do not claim to have read the chat itself.
 - Resolve conflicting facts by recency, source purpose and actual evidence. Client correspondence establishes approval; implementation logs establish reported execution; direct platform or artefact inspection verifies current state. Preserve unresolved differences and source dates.
 
-## Campaign wins and losses, when relevant
+## Results, wins and watch-outs, when relevant
 
-If campaign changes or performance are part of the meeting, prepare a quick balanced snapshot rather than a full audit.
+Use only the workstreams relevant to this client: for example website delivery, SEO/local visibility, content, paid campaigns or another agreed service. Do not require Google Ads or a fixed set of topics. When performance is part of the meeting, prepare a quick balanced snapshot rather than a full audit.
 
 - Find what changed, when, approval evidence and verification evidence. Separate completed changes from recommendations and follow-up checks.
 - Read fresh platform metrics when available. Confirm the correct account, currency, timezone, conversion definitions and comparable date windows. Use existing reports if access is unavailable, with explicit dates and limits.
-- Compare like-for-like periods. Keep full calendar months separate from rolling windows. State spend, meaningful outcomes and cost per outcome; calculate straightforward differences from retrieved figures.
+- Compare like-for-like periods. Keep full calendar months separate from rolling windows. Select meaningful measures for the service and client goals, such as delivery milestones, traffic, enquiries, bookings, sales or paid-campaign spend/cost per outcome. Calculate straightforward differences from retrieved figures.
 - Split bookings, phone actions and other conversions where the distinction changes the story. Do not label blended conversions as unique leads, bookings or patients. Identify attributed/fractional values and round sensibly for speaking notes.
-- Show wins and losses/watch-outs together. Improved blended CPA can coexist with falling online bookings. Account cleanup is a completed improvement in configuration, not proof of more patients.
+- Show wins and losses/watch-outs together. Improved blended CPA can coexist with falling online bookings. Account cleanup is a completed improvement in configuration, not proof of more leads, customers or patients.
 - Do not attribute a full month's improvement to changes made at month-end. A short post-change window is an early signal; allow for conversion lag and volume before drawing conclusions.
 - End with the next monitoring/check action and any decision genuinely needed. Do not change campaigns, bidding, tracking, budgets or live assets during preparation.
 
