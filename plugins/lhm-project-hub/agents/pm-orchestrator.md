@@ -81,7 +81,8 @@ All Project Hub skills, and when to route to each:
 | `lhm-project-hub:gmb-kickoff` | A new GMB/local SEO optimisation cycle needs to start. |
 | `lhm-project-hub:blog-kickoff` | A new blog/article content pipeline needs to start. |
 | `lhm-project-hub:google-ads-kickoff` | A new Google Ads campaign build needs to start (gates on conversion tracking). |
-| `lhm-project-hub:monthly-review` | Monthly wrap, internal account review, or meeting-prep brief is due — three modes, ask which if unclear. |
+| `lhm-project-hub:pre-client-meeting` | Prepare for an upcoming client meeting: sweep wraps, client correspondence, cross-board tasks, Obsidian and implementation evidence; produce short progress/next-step speaking bullets with decisions and campaign wins/watch-outs. |
+| `lhm-project-hub:monthly-review` | Monthly wrap or internal account review is due; retain its existing prep mode when explicitly requested. For a source sweep and read-aloud meeting brief, route to pre-client-meeting. |
 | `lhm-project-hub:quarterly-review` | Quarterly strategy review and next 3/6-month campaign plan is due. |
 | `lhm-project-hub:meeting-to-action` | Michael wants to reconcile meeting tasks, delegate complete outcomes and work through his retained actions interactively. |
 | `lhm-project-hub:post-meeting-review` | Review the saved meeting wrap on a top-level Client Flow card; email and linked task list in Description; Lily distributes only on explicit request, without TED. |

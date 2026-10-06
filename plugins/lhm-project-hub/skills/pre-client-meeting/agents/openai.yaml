@@ -1,0 +1,4 @@
+interface:
+  display_name: "Pre-client Meeting"
+  short_description: "Sweep client work into short meeting speaking bullets"
+  default_prompt: "Use $pre-client-meeting to prepare my meeting for the client I specify: sweep the latest wrap, client emails, boards and project notes, then give short progress, next-step and decision bullets with relevant results, wins and watch-outs."
