@@ -28,7 +28,7 @@ Provide these options:
 | User says | Route to |
 |-----------|----------|
 | Google Ads, zone check, monthly review, quarterly review, AdPulse, ad copy, keywords, bid/budget, PMax | `google-ads` agent |
-| SEO, ranking, keyword research, content gap, audit | `seo` agent |
+| SEO, ranking, keyword research, content gap, audit, AI recommendations, ChatGPT visibility, AI visibility baseline | `seo` agent |
 | Blog post, service page, landing page, copywriting, content writing, copy edit | `content` agent |
 | WordPress, update the site, publish a post, meta tags, page copy | `wordpress` agent |
 | Analytics, GA dashboard, GA4, traffic report | `ga-dashboard-artifact` skill |

@@ -46,6 +46,7 @@ Classify the current action against this table. Read the selected SKILL.md in fu
 - Ranking check → pull GSC data, compare to prior snapshots in client folder
 - SEO audit → `${CLAUDE_PLUGIN_ROOT}/skills/seo-audit/SKILL.md`
 - Content gap → `${CLAUDE_PLUGIN_ROOT}/skills/content-gap-analysis/SKILL.md`
+- AI recommendation baseline, diagnosis, staged improvement or recurring scoreboard → `${CLAUDE_PLUGIN_ROOT}/skills/ai-recommendation-loop/SKILL.md`
 - GEO optimisation → `${CLAUDE_PLUGIN_ROOT}/skills/geo-content-optimizer/SKILL.md`
 - Content quality audit → `${CLAUDE_PLUGIN_ROOT}/skills/content-quality-auditor/SKILL.md`
 - Content refresh → `${CLAUDE_PLUGIN_ROOT}/skills/content-refresher/SKILL.md`
