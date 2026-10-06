@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-196 skills across twelve Claude Code plugins (5 inbox, 62 marketing, 41 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 29 project hub, 6 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+197 skills across twelve Claude Code plugins (5 inbox, 63 marketing, 41 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 29 project hub, 6 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -28,7 +28,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/content.md                     # Direct content specialist entry
   agents/wordpress.md                   # Direct WordPress content specialist entry
   agents/marketing-assistant.md         # (legacy alias) — routes to start agent
-  skills/                              # All 62 skills
+  skills/                              # All 63 skills
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
     bid-budget-optimizer/              # Budget and bid strategy
@@ -43,6 +43,7 @@ plugins/lhm-marketing-hub/             # The plugin
     start-seo/                         # Reusable SEO Lead and staged departmental entry point
     seo-page-brief/                    # Page briefs from accepted keyword research
     seo-delivery-qa/                   # Independent SEO artefact and handoff verification
+    website-content-agent/            # Client website orchestration, independent reviews, content tracker and feedback learning
     lhm-page-rollout/                  # End-to-end website page batches: research, copy, FAQ and schema, internal links, staging build and review email
     content-gap-analysis/              # Keyword, topic, and content gap identification
     prospect-sitemap-opportunity/      # Prospect pitch: proposed sitemap + interactive impressions-to-leads widget
@@ -265,7 +266,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 **Strategy & Research** (3 skills): Competitive analysis with Porter's 5 Forces, keyword research with intent analysis and topic clustering, They Ask You Answer question discovery.
 
-**SEO & Content** (15 skills): Reusable staged SEO department entry and Lead, accepted-research page briefs, independent SEO delivery QA, proposed sitemap and opportunity model for prospect pitches (live site crawl, demand research, interactive HTML sitemap with an editable impressions-to-leads widget and ongoing-SEO slider, optional workbook), phased website content plan for existing clients (same architecture, build-order grouping, no sales widget, and a `--since` mode that renders a progress band and per-page change chips against a previous version so monthly reviews show what moved), content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, meta tags optimization, site-wide meta tag refresh (Ads conversion + GSC decline data, slug audit, Rank Math REST push with 301 redirects), CORE-EEAT content quality auditing, PR content rewriting for rejected distributions, content refresh planning. End-to-end website page batch rollout to staging (`lhm-page-rollout`): research, copy, FAQ and schema, internal links, build and review email.
+**SEO & Content** (16 skills): Reusable staged SEO department entry and Lead, accepted-research page briefs, independent SEO delivery QA, proposed sitemap and opportunity model for prospect pitches (live site crawl, demand research, interactive HTML sitemap with an editable impressions-to-leads widget and ongoing-SEO slider, optional workbook), phased website content plan for existing clients (same architecture, build-order grouping, no sales widget, and a `--since` mode that renders a progress band and per-page change chips against a previous version so monthly reviews show what moved), content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, meta tags optimization, site-wide meta tag refresh (Ads conversion + GSC decline data, slug audit, Rank Math REST push with 301 redirects), CORE-EEAT content quality auditing, PR content rewriting for rejected distributions, content refresh planning. End-to-end website page batch rollout to staging (`lhm-page-rollout`): research, copy, FAQ and schema, internal links, build and review email. Client website content orchestration (`website-content-agent`) adds source comparison, family templates, independent editing and healthcare review, Astro integration, revision-bound client approvals and feedback learning.
 
 **Analytics & Reporting** (2 skills): GA4 event discovery and conversion classification, analytics dashboard artifact with period comparison and visual output.
 
@@ -359,3 +360,5 @@ Meeting wraps apply an LHM scope check before proposing tasks: explicit LHM comm
 
 
 Daily Flow returns an unsaved delta and restart point on checkpoint failure, and bounds native-app access with authorised capability fallbacks that cannot bypass permission denials.
+
+`website-content-agent` orchestrates reusable client website content batches with persistent page plans, client approval history, template contracts, independent editing and healthcare review, Astro integration and project-local feedback learning.

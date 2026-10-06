@@ -26,6 +26,8 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `seo-page-brief` — Turn accepted SEO research into a bounded, implementation-ready page brief package.
 
 `seo-delivery-qa` — Independently verify SEO scope, evidence, artefact delivery, approval boundaries and completion before the Lead advances.
+`website-content-agent` — Client website content orchestration: source comparison, family templates, briefs, copy, independent editing and healthcare review, Astro integration, client approvals and feedback learning.
+
 `lhm-page-rollout` — Build a batch of LHM website pages end to end (research, brief, copy, FAQ and schema, internal links, images, staging build, verification and review email). Staging only.
 
 `hermes-production-plan` — Match an existing BasicOps outcome to its Obsidian AI Operations SOP, prepare the execution plan for Ted, and provide plain-English task status and CTO blocker reporting.
