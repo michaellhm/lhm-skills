@@ -69,7 +69,7 @@
       "name": "lhm-gmb-hub",
       "source": "./plugins/lhm-gmb-hub",
       "description": "Google Business Profile optimisation system - repeating 3-month cycle of GBP foundation, service page optimisation, content expansion, and strategic link building with per-client project management tracking.",
-      "version": "1.4.11",
+      "version": "1.4.12",
       "category": "local-seo",
       "tags": [
         "gmb",
