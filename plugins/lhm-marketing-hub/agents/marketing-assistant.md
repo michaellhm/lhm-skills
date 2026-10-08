@@ -68,3 +68,5 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 ## AI recommendation visibility
 
 - `ai-recommendation-loop` — Generic buyer-question baseline, diagnosis, authorised staging changes and review handoff, monthly recommendation scoreboard. Route to the SEO Lead.
+
+`lhm-gmb-hub:monthly-backlink-listings` — Monthly relevant business listings, source refresh, verified links and secure account references; target 2–5 placements.

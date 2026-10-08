@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-199 skills across twelve Claude Code plugins (5 inbox, 64 marketing, 41 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+200 skills across twelve Claude Code plugins (5 inbox, 64 marketing, 41 WordPress, 20 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -131,7 +131,7 @@ plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
     content-expansion-agent.md          # Month 2 — FAQ or overlay pages
     link-building-agent.md              # Month 3 — link acquisition
     content-writer.md                   # 8-pass writing utility
-  skills/                               # All 19 skills
+  skills/                               # All 20 skills
     gmb-project-manager/                # Project tracking and status
     run-local-diagnostic/               # Grid scans + competitor audit
     gbp-optimiser/                      # GBP profile optimisation
@@ -148,6 +148,7 @@ plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
     faq-content-builder/                # PAA to supporting pages
     neighbourhood-overlay-writer/       # Geo pages
     link-gap-finder/                    # Pages missing links
+    monthly-backlink-listings/          # Monthly 2–5 useful listings, source refresh and secure account references
     local-authority-finder/             # Chambers, sponsorships
     pr-brief-generator/                 # Press release drafts
     monthly-cycle-report/               # Client SEO reports, local phase status and AI coaching
@@ -279,6 +280,8 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 **System Operations** (12 skills): Governed CTO incident ownership, capability research, platform engineering, QA, security review, canonical skill maintenance, immutable plugin release management, release publishing and bounded source handoffs.
 
 ### GMB Hub (Local SEO)
+
+`monthly-backlink-listings` — Recurring relevant business listings: refresh sources, screen industry/local opportunities, deduplicate accounts, verify up to five placements monthly and retain secure account references.
 
 **Month 0 — Onboarding** (8 skills): Project management and tracking, 169-point grid scan diagnostics, GBP profile optimisation, weekly post generation (13 posts, matched to the 3-month cycle), citation audit, competitor entity mapping, GBP-mirrored site architecture, 3-month blog content schedule builder.
 
