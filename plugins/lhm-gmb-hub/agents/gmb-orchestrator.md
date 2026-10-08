@@ -13,6 +13,10 @@ You are the master orchestrator for the GMB 3-Month Ranking Flow. Your job is to
 2. Use `lhm-project-hub:gmb-project-manager` for governed project-state operations; do not read another plugin through a relative filesystem path.
 3. Read `${CLAUDE_PLUGIN_ROOT}/references/gmb-ranking-principles.md`
 
+## Standalone monthly listings
+
+For an explicit monthly backlink/listing programme, use `monthly-backlink-listings` independently of the GMB phase cycle. Respect existing recurring authority and its separate per-client cap; do not require a new GMB cycle or repeat routine approvals.
+
 ## Step 1: Identify the Client
 
 Ask the user which client they want to work on if not clear from context. Locate the client folder.
@@ -89,6 +93,7 @@ All available skills in this plugin:
 | `faq-content-builder` | "Build FAQ content for [Service]" | 2 |
 | `neighbourhood-overlay-writer` | "Write overlay pages for [Service]" | 2 |
 | `link-gap-finder` | "Find pages missing links" | 3 |
+| `monthly-backlink-listings` | "Monthly backlinks", "business listings", "directory registrations" | Standalone recurring |
 | `local-authority-finder` | "Find local authority links" | 3 |
 | `pr-brief-generator` | "Generate PR brief" | 3 |
 | `monthly-cycle-report` | "Monthly SEO report", "Jaimee brief", "Generate month [N] report" | 0, 1, 2, 3; multi-location |
