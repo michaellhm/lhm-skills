@@ -21,6 +21,8 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `google-ads-implementation` — Apply approved Google Ads changes from a BasicOps task through AdPulse (Chrome fallback for PMax signals and conversion settings), verify, log to BasicOps, and triage AdPulse Insights/Optimize.
 
+`search-console-indexing-review` — Monthly Search Console URL review, authorised redirect/canonical repairs, crawled-not-indexed diagnosis and Google validation.
+
 `start-seo` — Start or resume the reusable staged SEO department from a governed production envelope.
 
 `seo-page-brief` — Turn accepted SEO research into a bounded, implementation-ready page brief package.
