@@ -43,3 +43,7 @@ Keep private learning records outside public assets and route generation. This s
 ## Complete or resume
 
 Read the tracker and artifacts before resuming; verify repo/deployment state instead of assuming prior agent output landed. Update `action-plan.md` with completed pages, next batch, blockers and exact resume instruction. Report drafts, client approvals, integrated pages and deployed pages separately. For a new chat, hand off project record paths and the next task; do not create the chat unless asked.
+
+## Return the batch to project coordination
+
+After every batch, return exact page revisions and review URLs, draft/checked/client-approved/integrated/deployed states, verified checks, feedback and client learnings, blockers, next batch and next review owner. Save confirmed client facts and durable decisions in shared Obsidian under the client routing contract; retain repository production trackers without treating them as the shared client brain. Prepare a concise handback for the existing BasicOps execution task through basicops-task-manager when authorised; otherwise return it ready for posting. Do not mark the website complete from a finished content batch or post client messages without authority. Kristalyn retains project/board coordination; Aiya's production work does not automatically transfer client communication ownership.

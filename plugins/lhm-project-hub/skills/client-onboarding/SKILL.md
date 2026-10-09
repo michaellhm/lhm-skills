@@ -144,3 +144,7 @@ If the BasicOps update fails, keep the canonical Obsidian state, record the pend
 - Credentials are references only, never plaintext.
 - Never fabricate data, access, dates or completion.
 - Instantiated client checklists are version-stable; propose reference improvements separately rather than silently rewriting active onboarding files.
+
+## Shared-board accountability
+
+Kristalyn owns Client Onboarding board accuracy and unresolved handoffs; the immediate assignee still owns the current action. During a weekly reconciliation, use the [Monday reconciliation contract](../weekly-web-project-brief/references/board-reconciliation.md). Require independent live onboarding coverage and verified evidence before stage changes. Summarise on the enduring onboarding overview, not every child task; verify all authorised writes.

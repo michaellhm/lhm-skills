@@ -86,3 +86,7 @@ After verified normal email delivery, the controller saves the exact report as
 `60 Knowledge/YYYY-Www — Web Projects.md` in the shared LHM Knowledge vault. See
 [weekly-coaching.md](references/weekly-coaching.md). Archive failure is retried separately and
 never triggers another email. The research worker has no archive-write or send authority.
+
+## Separate Monday board reconciliation
+
+Read [board reconciliation](references/board-reconciliation.md) when asked to post weekly project summaries or reconcile boards after the report. This is a separate explicitly invoked execution job, never part of Scheduled report generation. Require the verified report dependency, live rereads, identity, owning-skill authority, deduplication and per-task readback in that contract.

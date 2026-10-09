@@ -26,7 +26,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `seo-page-brief` — Turn accepted SEO research into a bounded, implementation-ready page brief package.
 
 `seo-delivery-qa` — Independently verify SEO scope, evidence, artefact delivery, approval boundaries and completion before the Lead advances.
-`website-content-agent` — Client website content orchestration: source comparison, family templates, briefs, copy, independent editing and healthcare review, Astro integration, client approvals and feedback learning.
+`website-content-agent` — Client website content orchestration: source comparison, family templates, briefs, copy, independent editing and healthcare review, Astro integration, client approvals, feedback learning and canonical project handback.
 
 `lhm-page-rollout` — Build a batch of LHM website pages end to end (research, brief, copy, FAQ and schema, internal links, images, staging build, verification and review email). Staging only.
 
@@ -68,3 +68,6 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 ## AI recommendation visibility
 
 - `ai-recommendation-loop` — Generic buyer-question baseline, diagnosis, authorised staging changes and review handoff, monthly recommendation scoreboard. Route to the SEO Lead.
+
+
+Monday coordination uses a separate receipt-gated board reconciliation after the read-only website report. It posts deduplicated project summaries; Kristalyn owns shared-board accuracy, and Staff Weekly Flow confirms personal weekly commitments.
