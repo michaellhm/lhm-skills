@@ -165,7 +165,7 @@ plugins/lhm-content-engine/            # Content pipeline plugin
     generate-outline/                   # Structured article outline from CSV row
     write-blog/                         # Full blog article from outline
     generate-social-posts/              # GMB social posts from blog content
-    weekly-social-carousel/             # Two-post SOP-led social workflow plus prioritised idea backlog
+    weekly-social-carousel/             # Two weekly SOP carousels, two Stories and prioritised idea backlog
     quality-controller/                 # Anti-AI refinement and compliance gate
     publish-google-doc/                 # Create formatted Google Doc for review
     update-csv/                         # Update tracking CSV with results

@@ -2,4 +2,4 @@ interface:
   display_name: "Weekly Social Carousel"
   short_description: "Turn weekly insights into branded carousels"
   brand_color: "#F58A47"
-  default_prompt: "Use $weekly-social-carousel to turn this week’s useful clinic conversations and timely marketing updates into a reviewed LHM carousel package."
+  default_prompt: "Use $weekly-social-carousel to turn this week’s useful clinic conversations and timely marketing updates into two reviewed SOP feed posts and two Story sequences."

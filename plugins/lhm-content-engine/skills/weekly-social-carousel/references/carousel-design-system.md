@@ -21,7 +21,7 @@ Use Avenir Next when available, then Avenir, Helvetica Neue, Arial, sans-serif.
 
 Keep navy, white, typography, spacing and composition consistent. Colour is a small recognition cue, not a separate visual identity.
 
-- `quick-win-sop` and practical how-to content use orange.
+- `quick-win-sop` and practical how-to content use orange, including both standard weekly feed posts.
 - anonymous questions and Story cards use soft blue.
 - `rotating-opportunity`, Search/Ads updates and practical AI workflows use seafoam.
 

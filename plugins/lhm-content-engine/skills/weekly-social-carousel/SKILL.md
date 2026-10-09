@@ -5,7 +5,7 @@ description: "Turn useful practice-owner conversations, recurring operational qu
 
 # Weekly Social Carousel
 
-Create one reviewed LHM carousel package from a supplied topic or from the strongest safe idea found in a weekly source sweep. The skill prepares content and durable artefacts. It does not publish to social platforms.
+Create reviewed LHM carousel and Story packages from supplied topics or from the strongest safe ideas found in a weekly source sweep. The skill prepares content and durable artefacts. It does not publish to social platforms.
 
 ## Required context
 
@@ -38,9 +38,9 @@ Use when asked to review a date range, commonly the previous seven days.
 4. Apply the privacy gate before scoring. Discard unsafe candidates rather than attempting cosmetic anonymisation.
 5. Add timely Search, Ads, or AI candidates only when they have a practical clinic-owner implication.
 6. Add every safe, distinct candidate to the editorial backlog before selecting posts. Do not discard a strong idea merely because it was not chosen in the week it appeared.
-7. Score backlog candidates using the editorial strategy, including audience frequency. Select the requested number from the full ready backlog, not only from that week's meetings. For LHM Social, the default weekly target is two: one `quick-win-sop` and one `rotating-opportunity`.
+7. Score backlog candidates using the editorial strategy, including audience frequency. Select the requested number from the full ready backlog, not only from that week's meetings. For LHM Social, the default weekly feed target is two distinct `quick-win-sop` posts. Vary the subject area, such as Search, Ads, websites, booking flow or practical AI, without weakening the step-by-step format.
 8. Mark selected ideas in the backlog and keep unused ideas available for Michael's review. If too few candidates clear the quality floor, report the shortfall; do not manufacture filler.
-9. Label every produced carousel as a `Feed post`. Route safe meeting questions that are not promoted to the feed into the anonymous `Story` queue with a short frame sequence and optional interaction suggestion. Produce finished 1080 x 1920 Story images without an embedded poll, question box or sticker placeholder. Nina may add a native Instagram sticker after upload only when it improves the conversation.
+9. Label every produced carousel as a `Feed post`. The default weekly Story target is two safe, source-blind sequences drawn primarily from recurring questions or misconceptions. Produce finished 1080 x 1920 Story images without an embedded poll, question box or sticker placeholder. Nina may add a native Instagram sticker after upload only when it improves the conversation. If fewer than two Story candidates clear the privacy and usefulness gates, report the shortfall rather than adding filler.
 
 ### Historical backlog
 
@@ -56,7 +56,7 @@ Use when asked to recover older ideas or build an idea bank. Sweep the authorise
 
 ## Create the carousel
 
-1. Select one lane: `quick-win-sop`, `rotating-opportunity`, `practice-question`, `practical-shortcut`, `search-ads-update`, or `ai-experiment`. For LHM Social, use the first two as the weekly publishing slots and retain the other values as topic classifications where helpful.
+1. Select one lane: `quick-win-sop`, `rotating-opportunity`, `practice-question`, `practical-shortcut`, `search-ads-update`, or `ai-experiment`. For the standard LHM weekly feed, both publishing slots use `quick-win-sop`; retain the other values for manual packages and topic classification where helpful.
 2. Write a 5-7 slide sequence. Each slide should communicate one idea and remain useful when skimmed on a phone.
 3. Use the editorial pattern for the selected lane. Translate news into what changed, why it matters to a clinic, and what to do or watch.
 4. Keep the first-slide hook short. Do not place paragraphs on the cover.
@@ -128,6 +128,7 @@ Approval for the protected review site is not approval to publish the post on In
   "topic": "optional manual-mode topic",
   "source_scope": {"fathom": true, "last30days": "selective"},
   "requested_post_count": 2,
+  "requested_story_count": 2,
   "backlog": {"mode": "none | update | historical", "path": "optional verified Markdown path"},
   "cover_style": "typography | image | auto",
   "work_root": "/verified/durable/destination",
@@ -168,6 +169,8 @@ Return one JSON object:
   "story_queue": {
     "state": "not_requested | updated | blocked",
     "safe_candidates_added": 0,
+    "target_count": 0,
+    "produced_count": 0,
     "ids": []
   },
   "editorial_backlog": {
