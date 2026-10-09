@@ -51,6 +51,26 @@ whole project blindly. Every removed weekly item retains a traceable disposition
 Before the closing document, complete [project-context-handback.md](project-context-handback.md):
 verify canonical client records and BasicOps destinations for every settled item.
 
+## Required weekly-board closing check
+
+Before closing, reconcile every accepted outcome and its specific executable task links against
+live BasicOps. Include all agreed actionable tasks, even when several support one weekly outcome.
+Record each as `moved and verified`, `already correctly placed and verified`, `linked in owning
+project — verified`, or `pending — exact change, reason and next owner`. Apply every authorised
+missing move; a saved Obsidian plan is not proof the board was updated. Preserve owning projects,
+assignees and due dates unless their exact changes were accepted.
+
+Inspect every card already in the weekly sections, not just newly selected work. Resolve each as
+accepted this week, completed, awaiting review, waiting, deferred, or pending a decision. Preview
+and apply accepted moves out of active weekly work; do not silently carry forward leftovers.
+Keep unselected Inbox work available for future triage rather than forcing the whole Inbox into
+this week. A missing section or failed write is a visible gap, not a reason to claim a clean board.
+
+Finish with a concise receipt: plan saved/verified, tasks moved into this week, already correct,
+linked project actions, items moved out, communications sent versus drafted, and exact pending
+changes. Distinguish confirmed commitments from fully reconciled board state. If gaps remain,
+report the board reconciliation as partial and retain the restart point in the same weekly note.
+
 ## Tuesday web meeting document
 
 At the end, write a concise **Tuesday web meeting** section in the existing
@@ -86,3 +106,9 @@ from the same decisions. Empty sections say 'None reported' or 'Evidence unavail
   acceptance or bulk-move their boards.
 - A move fails or is retried: keep chosen commitment, report pending once, re-read before retry,
   avoid duplicate tasks/comments and preserve due dates and nested-task ownership.
+
+- Three outcomes cover seven actionable tasks: verify all seven task placements, not only three
+  representative cards; leave waiting parents in Waiting and link their selected follow-up action.
+- One accepted move fails: save the commitment, report the exact pending move and partial board
+  reconciliation; never report the weekly board clean solely because Obsidian was saved.
+- A stale weekly card is not selected: obtain its disposition; do not silently carry or close it.

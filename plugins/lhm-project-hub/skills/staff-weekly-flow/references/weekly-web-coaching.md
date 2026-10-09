@@ -23,7 +23,7 @@ clearly labelled provisional plan. Never silently present last week's note as cu
 Resolve identity, role, task board and exact section mapping under SKILL.md. Use the relevant owner
 section plus dependencies that affect that person, not the entire portfolio. Offer the next useful
 question, accept voice/freeform answers, summarise decisions and move on. Avoid a large questionnaire.
-Respect the requested review batch size; when Michael asks for three projects at a time, present
+Respect the requested review batch size for every person; when they ask for three projects at a time, present
 three concise numbered items and save each clear answer before continuing. Do not repeat settled questions.
 Start by checking what changed since the brief and what carried over from the previous confirmed
 weekly plan. Verify current task state before proposing work so completed items are not resurrected.
@@ -72,6 +72,9 @@ weekly plan. Verify current task state before proposing work so completed items 
    verified board results and pending writes; sending a team message requires explicit instruction.
 
 Other team members use their actual role, owner section and authority; no filler work is required.
+Apply SKILL.md's immediate unblock-action flow to every role: offer a verified client follow-up
+through the contact owner or a specific internal request during planning, act on exact approval,
+verify the communication and task/record handback, then resume the next planning decision.
 
 Read `commitments-and-review.md` for the shared per-person commitment register, Monday review of
 last week and voluntary acceptance/non-commitment rules.
@@ -131,3 +134,11 @@ planning. Do not claim automatic task writes, sends or note updates from plain c
 - Aiya says "probably done": record reported/unverified, ask what remains; do not mark Complete.
 - Two people give feedback: re-read/merge/deduplicate; preserve both entries and flag conflicts.
 - No current brief or connector: continue provisional planning; disclose unavailable reads/writes.
+
+- Red mhealth row with a missing client input: check recent correspondence and promised dates,
+  offer the authorised contact owner a concrete reminder now; keep the project waiting and place
+  only the accepted follow-up action in this week's work. Without send approval it remains a draft.
+- Aiya needs Michael's decision: prepare the exact internal ask, verify any approved post and save
+  the next owner; do not treat a board move or an unposted draft as notification.
+- Any person asks for three at a time: show three concise candidates, settle/save each answer and
+  keep that pace until changed; a later "one at a time" takes effect immediately.
