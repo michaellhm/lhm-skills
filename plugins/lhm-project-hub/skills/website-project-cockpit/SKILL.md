@@ -189,3 +189,7 @@ For existing-client website work, use the enduring parent on `*Web Projects` (`6
 - When an action exceeds the recorded authority, say what is prepared and name the approval or authorised workflow needed next.
 
 End status answers with one natural prompt such as: `Want me to prepare that handoff for review?` Do not offer several competing next steps.
+
+## Weekly board accountability
+
+Kristalyn owns Web Projects board accuracy, exceptions, handoff readiness and milestone risk. The immediate assignee owns execution. For Monday summary comments and evidence-backed reconciliation use the [separate reconciliation contract](../weekly-web-project-brief/references/board-reconciliation.md). Keep project-stage changes separate from confirmed personal weekly commitments and verify writes through the existing owner skills.

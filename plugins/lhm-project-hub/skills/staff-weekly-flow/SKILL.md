@@ -704,3 +704,7 @@ Expect: inspect authorised `*Client Flow` and contact evidence; count a complete
 as the weekly touchpoint where appropriate; recommend Michael's missing Google Ads updates and
 Kristalyn/Jaimee-owned touchpoints only through the correct owner; do not propose duplicate generic
 messages or claim unverified contact occurred.
+
+## Kristalyn shared-board review
+
+For Kristalyn, review both Client Onboarding and Web Projects before confirming her week. Reconcile the Monday report and subsequent Lily summaries against live records. Identify wrong stages, missing immediate owners, overdue inputs, launch risks and uncovered handoffs. Kristalyn owns shared-board accuracy; do not assume she owns every execution task. Resolve authorised corrections through client-onboarding or website-project-cockpit and basicops-task-manager. Confirm personal commitments separately before moving tasks into Working on This Week. Missing onboarding coverage must be disclosed, not inferred from the website report.
