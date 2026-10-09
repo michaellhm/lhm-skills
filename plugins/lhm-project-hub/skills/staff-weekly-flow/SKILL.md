@@ -22,6 +22,12 @@ Give each LHM person a small, traceable operating plan without forcing them to r
    - `basicops_project_url`;
    - `basicops_assignee_id`.
    - the exact `basicops_sections` names and IDs, plus `basicops_section_mapping_status`.
+   Use the profile's current responsibilities, decision authority, inputs/outputs and handoffs,
+   recurring rhythm, and documented working preferences to recommend priorities and next actions;
+   do not treat the profile as only a source of BasicOps identifiers. Distinguish current duties
+   from proposed or unapproved role changes. Read the linked submitted job description only when
+   more detail is needed; if it conflicts with the current profile, surface the conflict rather
+   than silently expanding the person's role or authority.
 4. Use only that person's authorised client/project scope. Do not expose another person's private preferences or unrelated client context.
 5. Fail closed when the identity, profile, project ID or assignee ID is missing or contradictory.
 6. Treat voice transcription and informal aliases as unverified until they resolve to one canonical
