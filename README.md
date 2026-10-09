@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-199 skills across twelve Claude Code plugins (5 inbox, 64 marketing, 41 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+200 skills across thirteen Claude Code plugins (5 inbox, 64 marketing, 41 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -16,10 +16,16 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 Use `/start` to begin a session, or just describe what you need.
 
+## Loops
+
+`/lhm-loops-hub:website-project-loop` runs the receipt-gated Monday board review. Hermes schedules it; the skill can prepare the same review manually in Claude or ChatGPT. Domain delivery stays in the existing hubs. Only the website loop is implemented; GMB, meta, article and social loops are future additions.
+
 ## Structure
 
 ```
 .claude-plugin/marketplace.json         # Marketplace manifest
+plugins/lhm-loops-hub/                  # 1 reusable loop skill
+  skills/website-project-loop/          # Monday dependency, snapshots and verified summaries
 plugins/lhm-marketing-hub/             # The plugin
   .claude-plugin/plugin.json            # Plugin manifest
   agents/start.md                       # General/cross-domain marketing orchestrator
@@ -367,3 +373,9 @@ Daily Flow returns an unsaved delta and restart point on checkpoint failure, and
 
 
 Monday coordination uses a separate receipt-gated board reconciliation after the read-only website report. It posts deduplicated project summaries; Kristalyn owns shared-board accuracy, and Staff Weekly Flow confirms personal weekly commitments.
+
+### Agency loops
+
+| Skill | Purpose |
+| --- | --- |
+| `website-project-loop` | Read-only evidence snapshot, report dependency gate and one verified weekly summary per mapped project overview. |

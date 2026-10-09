@@ -17,7 +17,7 @@ Manages the per-client `project-management/website.md` file that tracks the full
 
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/wp-project-manager/LEARNED.md`
 2. Identify the project location from platform: `[client_root]/wordpress/` or `[client_root]/astro/`
-3. Check whether `project-management/website.md` exists at `[client_root]/project-management/website.md`
+3. Resolve the existing canonical note using [completion reconciliation](../../references/website-completion-reconciliation.md). Every `website.md` example below means that resolved path. Never create or migrate another note when a canonical Website Rebuild/Build/Redevelopment note already exists.
 4. Read `platform:` from `[client_root]/client_profile.md` YAML frontmatter. Surface this at session start: "Platform: WordPress" or "Platform: Astro". For Astro, follow the Astro PM template and never route through WordPress-only build skills.
 
 ## Legacy migration
@@ -78,7 +78,7 @@ When called for status display:
 
 1. Read the PM doc
 2. Read `platform:` from `../client_profile.md` YAML frontmatter
-3. Identify the lowest-numbered phase containing `[ ]` items
+3. Identify the active phase and next ready action from recorded dependencies and approval gates; checkbox order alone does not establish readiness.
 4. Display:
 
 ```
@@ -100,7 +100,7 @@ Approval gates outstanding:
 
 ## Mode 3: Mark Complete
 
-Called by phase agents (or any skill) after a discrete task completes. Per the plugin's "Mandatory: Project Doc Updates" rule, the calling skill must first ask the user via AskUserQuestion whether to mark off — this skill assumes that confirmation has happened.
+Called after a discrete task completes. Follow [completion reconciliation](../../references/website-completion-reconciliation.md). An authenticated team member’s explicit request to record the named completion is confirmation; do not ask again. A worker merely producing an artefact is not approval of downstream review or launch.
 
 Inputs:
 - `task_id` (e.g. "5.2.3" or unique task description)
@@ -112,9 +112,9 @@ Action:
 2. Replace with `- [x] (YYYY-MM-DD) [original task text]`
 3. If notes provided, append a dated line to the Notes & Decisions section
 4. Update the "Last Updated" field in Overview
-5. Recalculate the `[auto-filled]` placeholder in the Continuation Prompt — find the lowest-numbered remaining `[ ]` item, write its phase/step/task name into the prompt
+5. Recalculate the `[auto-filled]` placeholder in the Continuation Prompt — find the next action whose dependencies and approvals allow it, write its phase/step/task name and owner into the prompt; record the blocker when none is ready
 6. Save the file
-7. Report: "Marked Step X.Y complete in PM doc."
+7. Read the saved canonical note back, verify the exact checkbox/date/evidence and untouched approval gates, then report the verified result. Never claim success from a write response alone.
 
 ## Mode 4: Phase Gate-Check
 

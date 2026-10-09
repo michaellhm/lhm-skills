@@ -31,7 +31,7 @@ Do not reproduce the full project plan in BasicOps. Do not create one BasicOps s
 
 Read, when present:
 
-1. `<client>/project-management/Website Rebuild.md`; otherwise `<client>/project-management/website.md`
+1. `<client>/client_profile.md` and the existing canonical website note, resolved through the overview/Current Projects pointer; tolerate Website Rebuild, Website Redevelopment, Website Build, Website and Landing Pages, or website.md. If ambiguous, clarify; never create a second note.
 2. `<client>/Current Projects.md`
 3. `<client>/Copy Learning Guide.md` only when the current or next gate concerns scaled copy
 4. A specifically linked evidence file only when needed to verify the active gate
@@ -59,6 +59,10 @@ Approval rules:
 - Client approval does not grant merge, deployment, publishing, or launch authority.
 - If the record and checklist conflict, state the contradiction and prefer the evidence-backed fact.
 - The first incomplete checkbox is not automatically the next action; dependencies and gates decide priority.
+
+## Explicit completion updates
+
+For “completed … reconcile/update the project”, follow [completion reconciliation](../../references/website-completion-reconciliation.md). This mode reads the relevant task discussion and reconciles individual items with write/readback receipts; it does not automatically execute a whole stage handoff.
 
 ## Response modes
 
