@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-199 skills across twelve Claude Code plugins (5 inbox, 64 marketing, 41 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+200 skills across twelve Claude Code plugins (5 inbox, 64 marketing, 41 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 31 project hub, 6 knowledge and 12 system operations) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -206,7 +206,8 @@ plugins/lhm-inbox-hub/                # Michael's inbox system — triage, voice
 plugins/lhm-project-hub/              # Agency process hub — sales handover through monthly/quarterly reviews
   .claude-plugin/plugin.json            # Plugin manifest
   agents/pm-orchestrator.md             # Main entry point — status, SOP discovery and governed multi-skill coordination
-  skills/                               # All 30 skills
+  skills/                               # All 31 skills
+    ask-lily/                          # AI-first team help, source-grounded context and existing-skill routing
     basicops-task-manager/              # Shared BasicOps boundary — plain-English task briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
@@ -317,6 +318,8 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 **Client Communication** (3 skills, shims only): All three skills now live in `lhm-project-hub`; the entries here route straight there. See the Project Hub catalog below for current descriptions. Kept in place so existing muscle memory and any external references to `lhm-client-updates-hub:*` keep working.
 
 ### Project Hub
+
+**Team Help** (1 skill): `ask-lily` — priorities/overwhelm routing, client promises and scope evidence, SOP/skill discovery, and explicit wider-context Lily-in-BasicOps fallback when source access is missing.
 
 **Personal Work Flow** (1 skill): Personal weekly planning and daily selection for Michael and the team, with overwhelmed mode, project/client priority ranking, optional mini stand-ups and a full BasicOps inbox review. The inbox flow presents client-risk rescue, stale/likely closure, delegate, keep and needs-decision groups, then applies only confirmed mutations through the shared BasicOps task manager with read-back verification.
 
