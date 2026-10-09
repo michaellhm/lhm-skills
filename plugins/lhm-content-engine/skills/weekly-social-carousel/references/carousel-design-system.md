@@ -54,7 +54,7 @@ Use one of the supported structures:
 
 - `statement`: headline with optional short body
 - `labels`: three or four short examples
-- `checklist`: four to six scannable items
+- `checklist`: four to six scannable items shown as one vertical tick list. Use this for SOP actions and completion checks. Do not split an SOP checklist into two columns. Reserve multi-column cards for comparisons or grouped examples.
 - `callout`: headline plus one bordered takeaway
 
 Do not shrink text until a paragraph technically fits. Reduce the copy. A slide that needs text below the minimum type scale has failed editorial review.

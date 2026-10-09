@@ -47,7 +47,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `weekly-web-project-brief` — Lily’s Monday HTML website portfolio: 07:00 Melbourne preparation for 08:00 delivery, project health, client-grouped actions, visible clarification notes and a verified shared Obsidian snapshot. One-off fixes stay out of the snapshot. Failure supervision distinguishes current-week evidence from retained service state.
 
-`lhm-content-engine:weekly-social-carousel` — Build a privacy-safe editorial backlog from Fathom and current developments, then turn selected topics into two weekly SOP carousel packages and two source-blind Story sequences.
+`lhm-content-engine:weekly-social-carousel` — Build a privacy-safe editorial backlog from Fathom and current developments, then turn selected topics into two weekly tick-list SOP carousel packages and two source-blind Story sequences.
 
 `google-ads-monthly-review` — Evidence-led account review, report highlights and Lily’s Monday review-card digest.
 
