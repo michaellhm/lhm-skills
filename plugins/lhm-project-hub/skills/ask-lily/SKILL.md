@@ -72,7 +72,45 @@ If route/identity is unavailable, return the draft and exact gap. Preparing/post
 not mean Lily received, answered or completed it. Never post or message another system merely
 because this skill recommends asking Lily.
 
-## 5. Keep the handback focused
+## 5. Resolve and retain missing knowledge
+
+Do not stop at "we don't know". Reuse the question and checked-source links to pursue the smallest
+missing fact through available authorised sources. Read relevant full discussions, email replies,
+meeting evidence and linked canonical records before escalating. Use an existing authorised
+research route when available; otherwise return a source-specific request under section 4.
+An unavailable source is a coverage gap, not evidence that the answer does not exist.
+
+If the answer requires a person, identify the responsible owner from verified role/task context and
+prepare one exact question with evidence, why it matters and what it releases. Ask the current user
+only when they are the appropriate source. External contact, posting, task creation or assignment
+still requires the owning workflow's authority; missing knowledge does not grant sending permission.
+Record the unresolved question under Open questions in its existing shared client/project record,
+with date, checked sources, next owner (or owner unconfirmed), pending request state and checkpoint
+only if known. Reuse an equivalent open question instead of creating another. Missing canonical
+records remain a routing gap for onboarding/client-update, not a new substitute folder.
+
+Michael's standing direction for this skill includes bounded knowledge capture during normal help:
+save evidenced client facts and explicit operational decisions in their existing canonical shared
+Obsidian home without an extra generic save question. An explicit review-only/do-not-save request
+wins. Do not record private reflections, unapproved proposals or speculative answers as facts.
+
+When the answer arrives in this session or a later resumed session, verify its source and authority,
+re-read the existing note, reconcile newer facts and save the dated answer with evidence and any
+material owner/next action. Mark the existing open question resolved with a link to the answer;
+preserve its history. If action is needed, route the exact authorised BasicOps update through the
+task manager and read it back. Do not close a task merely because its knowledge question is answered.
+
+For LHM-method questions, use the existing relevant Knowledge/SOP record. A one-off workaround stays
+attributed project evidence; a new agency-wide method or skill rule remains a proposal until the
+required approval. Do not rewrite executable skills or install updates automatically.
+
+Read back every changed record and show the saved link. If retrieval, authority, writing or read-back
+fails, retain the exact unresolved question, destination, next owner and restart step as pending;
+never say "learned/saved" for a draft or failed write. Future lookups read the canonical answer first,
+check freshness and later corrections, and reuse it instead of asking the same settled question.
+No background follow-up or automatic monitoring is created merely by leaving a question open.
+
+## 6. Keep the handback focused
 
 Default to one decision at a time; honour a requested small batch. Overwhelmed requests use staff
 flow's shortlist and help/pushback handling, not a full-board dump or mandatory client interview.
@@ -81,10 +119,10 @@ Escalate a genuine human scope/approval/capacity decision with a concise recomme
 For an access/capability gap identify the system owner/repair need rather than telling staff to
 keep retrying or bypass a denial.
 
-An ordinary lookup is read-only. On an authorised save or settled operational handback, use the
-owning workflow to update the existing shared client record and relevant task, verify read-back,
-and distinguish proposed/saved/sent/applied states. Reusable learning goes through `lhm-learn:learn`
-when requested; do not self-modify skills or expose private founder/staff context.
+Normal help includes the bounded knowledge capture in section 5; explicit review-only help stays
+read-only. Distinguish retrieved, unanswered, proposed, saved/verified, sent and task-applied states.
+Reusable learning goes through `lhm-learn:learn` when requested; do not self-modify skills or expose
+private founder/staff context.
 
 ## Acceptance scenarios
 
@@ -99,3 +137,12 @@ when requested; do not self-modify skills or expose private founder/staff contex
 - "Ask Lily" without explicit posting: return a draft, no BasicOps write. Explicit posting with
   unknown bot ID: do not invent a mention; surface the exact route gap before claiming delivery.
 - Matching skill unavailable: report route_unavailable and its verified identifier, no fake execution.
+
+- Missing client fact: exhaust authorised relevant evidence, save one open question with source
+  coverage and next owner, prepare a specific request; no implicit message send or task assignment.
+- Confirmed reply resolves the question: save/read back the canonical answer and resolution link,
+  preserve history and unrelated edits; a later lookup reuses it after a freshness check.
+- Repeated query or interrupted write: re-read and deduplicate by question/source; failed persistence
+  stays pending, no duplicate note or claim of successful learning.
+- New cross-client method or explicit review-only request: propose the rule without publishing it;
+  review-only help writes no note. No task is completed solely because an answer was found.

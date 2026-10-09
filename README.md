@@ -207,7 +207,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
   .claude-plugin/plugin.json            # Plugin manifest
   agents/pm-orchestrator.md             # Main entry point — status, SOP discovery and governed multi-skill coordination
   skills/                               # All 31 skills
-    ask-lily/                          # AI-first team help, source-grounded context and existing-skill routing
+    ask-lily/                          # AI-first help, missing-knowledge resolution, verified Obsidian answers and skill routing
     basicops-task-manager/              # Shared BasicOps boundary — plain-English task briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
@@ -319,7 +319,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 ### Project Hub
 
-**Team Help** (1 skill): `ask-lily` — priorities/overwhelm routing, client promises and scope evidence, SOP/skill discovery, and explicit wider-context Lily-in-BasicOps fallback when source access is missing.
+**Team Help** (1 skill): `ask-lily` — priorities/overwhelm routing, client promises and scope evidence, SOP/skill discovery, missing-question tracking and verified canonical answer capture, and explicit wider-context Lily-in-BasicOps fallback when source access is missing.
 
 **Personal Work Flow** (1 skill): Personal weekly planning and daily selection for Michael and the team, with overwhelmed mode, project/client priority ranking, optional mini stand-ups and a full BasicOps inbox review. The inbox flow presents client-risk rescue, stale/likely closure, delegate, keep and needs-decision groups, then applies only confirmed mutations through the shared BasicOps task manager with read-back verification.
 
