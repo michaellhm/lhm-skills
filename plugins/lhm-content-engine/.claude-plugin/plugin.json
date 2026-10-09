@@ -1,7 +1,7 @@
 {
   "name": "lhm-content-engine",
-  "description": "Automated multi-asset content pipeline for allied health clinics. Reads approved topics from CSV, generates blog articles and GMB posts, maintains a privacy-safe social idea backlog, produces two weekly SOP-led carousel packages with optional first comments, applies anti-AI refinement, publishes Google Docs, and updates tracking CSV.",
-  "version": "1.0.12",
+  "description": "Automated multi-asset content pipeline for allied health clinics. Reads approved topics from CSV, generates blog articles and GMB posts, maintains a privacy-safe social idea backlog, produces two weekly SOP carousels and two Story sequences with optional first comments, applies anti-AI refinement, publishes Google Docs, and updates tracking CSV.",
+  "version": "1.0.14",
   "author": {
     "name": "LHM Digital"
   },

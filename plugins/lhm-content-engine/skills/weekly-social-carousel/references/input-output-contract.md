@@ -101,8 +101,8 @@ output-directory/
 
 The private source receipt is not a public asset. Exclude `*.private.json` from Pages, public websites, social uploads, and client-facing exports.
 
-`manifest.json` records the lane, `content_format: feed-post`, lane-derived accent, cover style, slide count, generated files, and verification state. Orange identifies quick-win SOPs, soft blue identifies question-led content, and seafoam identifies rotating opportunities. Read it back after both build and render.
+`manifest.json` records the lane, `content_format: feed-post`, lane-derived accent, cover style, slide count, generated files, and verification state. Orange identifies the two standard weekly quick-win SOPs, soft blue identifies question-led content, and seafoam remains available for manually requested rotating-opportunity packages. Read it back after both build and render.
 
 ## Story input and output
 
-The Story builder accepts one queue item containing `id`, `title`, `category`, two to six `frames`, and an optional `interaction` object with `type`, `prompt` and `options`. It writes `story.html`, `story-manifest.json`, `story-01.png ... story-N.png`, and `story-preview.png`. `story-manifest.json` records the ordered upload frames in `export_files`; the Story ZIP must contain exactly those files. Interaction suggestions remain review metadata and are never embedded into the exported Story frames.
+The Story builder accepts one queue item containing `id`, `title`, `category`, two to six `frames`, and an optional `interaction` object with `type`, `prompt` and `options`. The standard weekly delivery runs it for two approved Story sequences. It writes `story.html`, `story-manifest.json`, `story-01.png ... story-N.png`, and `story-preview.png`. `story-manifest.json` records the ordered upload frames in `export_files`; the Story ZIP must contain exactly those files. Interaction suggestions remain review metadata and are never embedded into the exported Story frames.

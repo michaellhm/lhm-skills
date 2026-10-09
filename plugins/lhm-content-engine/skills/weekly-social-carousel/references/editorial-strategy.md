@@ -18,11 +18,11 @@ Suggested flow: outcome and honest time estimate, where to go, what to find, wha
 
 Use screenshots when the interface is essential. Verify current menus and product behaviour before giving click-by-click instructions. Do not guarantee rankings, bookings or revenue.
 
-### Rotating opportunity
+### Second SOP win
 
-This is the second weekly feed post. Choose the strongest of: a prepared prompt or checklist, a practical AI workflow, a genuinely useful Search or Ads update, or a website and booking-flow improvement.
+This is the second weekly feed post. It follows the same practical, step-by-step standard as the first post, but should normally cover a different subject area. Good sources include a prepared prompt or checklist, a practical AI workflow, a useful Search or Ads task, or a website and booking-flow improvement.
 
-Breaking news is optional. Use another evergreen opportunity when no update clears the quality floor.
+Breaking news is optional and must be translated into a safe action a practice owner can complete. Use another evergreen SOP when no update clears the quality floor.
 
 ## Topic classifications
 
@@ -81,7 +81,7 @@ Hold a meeting-derived candidate with a frequency score below 2 in the backlog u
 
 Weekly selection considers the full ready backlog. A useful idea can be selected weeks after the source conversation. Record the score and selection status so an unselected topic is not lost or repeatedly rediscovered.
 
-For LHM Social, select two feed posts by default: one quick-win SOP and one rotating opportunity. Questions found in private meetings normally become anonymous Story candidates first. Promote one to the feed only when it is recurring, broadly relevant and practical enough to become an SOP or clear decision guide.
+For LHM Social, select two distinct quick-win SOP feed posts by default. Questions found in private meetings normally become anonymous Story candidates first. Prepare two safe Story sequences each week when the source material clears the privacy and usefulness gates. Promote a question to the feed only when it is recurring, broadly relevant and practical enough to become an SOP or clear decision guide.
 
 Every delivery must label the intended format explicitly. Use `Feed post` for the two weekly carousel slots and `Story` for the anonymous question queue. The label remains authoritative when a reader cannot distinguish the colour cue.
 
@@ -89,8 +89,9 @@ Every delivery must label the intended format explicitly. Use `Feed post` for th
 
 Run the two-post system for eight weeks:
 
-- publish one quick-win SOP each week
-- rotate prompts/resources, practical AI, meaningful platform updates and website or booking improvements through the second slot
+- publish two quick-win SOPs each week
+- vary the subject areas across prompts/resources, practical AI, meaningful platform tasks and website or booking improvements
+- prepare two source-blind Story sequences from useful recurring questions or misconceptions
 - keep internal slide styling and publishing cadence stable
 - compare saves, shares, Story replies, keyword comments, DMs and qualified conversations
 

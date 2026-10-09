@@ -21,7 +21,7 @@ Use Avenir Next when available, then Avenir, Helvetica Neue, Arial, sans-serif.
 
 Keep navy, white, typography, spacing and composition consistent. Colour is a small recognition cue, not a separate visual identity.
 
-- `quick-win-sop` and practical how-to content use orange.
+- `quick-win-sop` and practical how-to content use orange, including both standard weekly feed posts.
 - anonymous questions and Story cards use soft blue.
 - `rotating-opportunity`, Search/Ads updates and practical AI workflows use seafoam.
 
@@ -54,7 +54,7 @@ Use one of the supported structures:
 
 - `statement`: headline with optional short body
 - `labels`: three or four short examples
-- `checklist`: four to six scannable items
+- `checklist`: four to six scannable items shown as one vertical tick list. Use this for SOP actions and completion checks. Do not split an SOP checklist into two columns. Reserve multi-column cards for comparisons or grouped examples.
 - `callout`: headline plus one bordered takeaway
 
 Do not shrink text until a paragraph technically fits. Reduce the copy. A slide that needs text below the minimum type scale has failed editorial review.

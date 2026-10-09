@@ -30,9 +30,9 @@ Verify the remote and local clone before writing. If the clone is unavailable, d
 
 Read `planning/editorial-preferences.md` before selecting the final topic, writing the caption or choosing a call to action. It records Michael's current commercial priority, offers, DM keywords, topic exclusions and AI safety preferences. Keep strategic preferences out of public copy unless they become the chosen CTA.
 
-Read `planning/content-sop.md` when present. For LHM Social it defines the two weekly publishing slots, quick-win slide pattern, first-comment purpose, Story routing and DM boundary.
+Read `planning/content-sop.md` when present. For LHM Social it defines the two weekly SOP feed slots, two-Story target, quick-win slide pattern, first-comment purpose, Story routing and DM boundary.
 
-When safe Story candidates are prepared, save them in the repository's governed Story queue. Each item must contain only anonymous public-ready copy, a week, a topic label, three or four frames, and an interaction prompt. The review site may render this data, but the source file itself remains outside `dist/`. Never put provenance in a Story queue item.
+When safe Story candidates are prepared, save them in the repository's governed Story queue. The weekly target is two finished Story sequences. Each item must contain only anonymous public-ready copy, a week, a topic label, three or four frames, and an optional interaction prompt. The review site may render this data, but the source file itself remains outside `dist/`. Never put provenance in a Story queue item. Report a shortfall when fewer than two candidates pass review.
 
 ## Package contract
 
