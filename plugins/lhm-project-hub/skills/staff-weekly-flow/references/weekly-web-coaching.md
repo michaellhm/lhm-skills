@@ -14,9 +14,29 @@ Compare its evidence cutoff with current time. The delivered snapshot is histori
 corrections and verified current task discussions may supersede it. Retain the original snapshot.
 
 The email target is Monday 08:00 Melbourne; research starts at 07:00. This is not a staff start-time
-setting. Do not assume Philippine working hours or create personal reminders. If the current brief
-is absent or not delivered, say so and continue from authorised live task/project evidence with a
-clearly labelled provisional plan. Never silently present last week's note as current.
+setting. Do not assume Philippine working hours or create personal reminders.
+
+Before proposing weekly commitments, visibly confirm the brief's week-start date, source link,
+evidence cutoff and whether dated corrections were read. Show the authenticated person's relevant
+suggested actions and dependencies, checking current BasicOps discussions/status before recommending
+work. Use one decision or the person's chosen small batch at a time; listed actions are candidates,
+not automatic commitments. An empty person section means no report actions listed, not no work.
+
+If the current archive is missing, unreadable or lacks delivery evidence, search the person's
+actually authorised Gmail/mailbox for Lily's current-week website brief. Verify sender, report week,
+message date and content; read the full matching report rather than a search snippet. Do not assume
+access to another person's inbox or infer delivery to everyone from one mailbox. If a verified email
+is available, use it as labelled email-fallback planning evidence and record the missing archive as
+a pending handoff to the report/archive owner; do not recreate the archive or resend the report.
+If no current report can be verified or mail access is unavailable, state the exact gap and continue
+from authorised live task/project evidence with a clearly labelled provisional plan. Never silently
+present last week's note as current or claim the report was read from its filename alone.
+
+Record the source week, Obsidian link or verified email message link/ID, evidence cutoff, correction
+coverage and source status (`archive verified`, `email fallback — archive pending`, or
+`report unavailable — provisional`) in the existing person/week note. Read back that receipt with
+the saved plan. On resumption reuse the receipt and check new corrections without repeating settled
+choices. This receipt is evidence of this session's read, not proof other staff installations are current.
 
 ## Coach one decision at a time
 
@@ -142,3 +162,10 @@ planning. Do not claim automatic task writes, sends or note updates from plain c
   the next owner; do not treat a board move or an unposted draft as notification.
 - Any person asks for three at a time: show three concise candidates, settle/save each answer and
   keep that pace until changed; a later "one at a time" takes effect immediately.
+
+- Current archive exists: read its report and corrections, show the date/link and relevant actions,
+  verify live task state, then save/read back the source receipt with the confirmed plan.
+- Archive missing but verified current email exists: use labelled email fallback and record the
+  archive gap; do not duplicate the report, resend it or access another person's mailbox.
+- Only last week's email or no mailbox access: declare the exact report gap and provisional plan;
+  never claim current-week report coverage.
