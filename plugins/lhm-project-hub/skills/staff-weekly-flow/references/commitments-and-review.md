@@ -24,6 +24,12 @@ record, not a copy of every BasicOps field or the person's full board.
 
 Use these sections in the existing weekly note:
 
+### Weekly report used
+
+Record the verified report week, source link/message ID, evidence cutoff, correction coverage and
+source status under weekly-web-coaching.md. Keep missing archive/report access and the responsible
+next owner visible. A source link alone does not prove the full report or corrections were read.
+
 ### Last week: commitments and results
 
 | Prior commitment/link | What happened | Evidence/confidence | What we learned or need next |

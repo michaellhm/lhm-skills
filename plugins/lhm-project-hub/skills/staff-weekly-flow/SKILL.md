@@ -22,6 +22,12 @@ Give each LHM person a small, traceable operating plan without forcing them to r
    - `basicops_project_url`;
    - `basicops_assignee_id`.
    - the exact `basicops_sections` names and IDs, plus `basicops_section_mapping_status`.
+   Use the profile's current responsibilities, decision authority, inputs/outputs and handoffs,
+   recurring rhythm, and documented working preferences to recommend priorities and next actions;
+   do not treat the profile as only a source of BasicOps identifiers. Distinguish current duties
+   from proposed or unapproved role changes. Read the linked submitted job description only when
+   more detail is needed; if it conflicts with the current profile, surface the conflict rather
+   than silently expanding the person's role or authority.
 4. Use only that person's authorised client/project scope. Do not expose another person's private preferences or unrelated client context.
 5. Fail closed when the identity, profile, project ID or assignee ID is missing or contradictory.
 6. Treat voice transcription and informal aliases as unverified until they resolve to one canonical
@@ -135,6 +141,30 @@ When committed, overdue or newly arrived work cannot fit:
    sent or a proposed date as agreed.
 
 Read [board-and-tuesday-meeting.md](references/board-and-tuesday-meeting.md) for item-by-item board reconciliation and the end-of-flow Tuesday meeting document.
+
+#### Focused decisions and immediate unblock actions
+
+For every person, default to one actionable decision at a time. Honour a request for a compact
+three-item overview or batch, then settle and save each decision before moving on. Reuse the
+person's documented presentation preference; do not repeatedly ask for a batch size or reopen
+settled items. Pause planning for a bounded unblock action when the person chooses to do it now,
+then resume at the recorded next item rather than restarting the week.
+
+When a project is red, stalled or waiting, verify the latest task discussion, client correspondence
+and promised response date before recommending contact. Identify who owes what, the authorised
+contact owner and the work it would release. Offer a concrete client follow-up or internal request
+now, rather than only adding "follow up" to the plan. Use the relevant email/task workflow; prepare
+exact recipients, requested input and reviewable wording. Send or post only after the person's
+explicit instruction within their role authority; honour existing exact approval without asking
+again. Verify the send/post and save its evidence, next owner and checkpoint to the canonical
+client record, relevant BasicOps task and weekly note. A red report alone never authorises contact.
+If another role owns client contact, prepare a handoff to that owner instead of bypassing them.
+
+Keep a waiting project in its honest waiting/review state. A chosen follow-up is separate actionable
+work for this week: reuse an existing suitable task/action, or propose a bounded new one through
+basicops-task-manager after deduplication. Do not move the whole waiting project into active work
+merely because a reminder is planned. If the person defers sending, preserve the draft and exact
+next action as pending; do not describe the request as sent or the dependency as released.
 
 #### Personal-board section rules
 
@@ -298,11 +328,12 @@ without hiding their source tasks.
    sensible. List each client, exact ask, source task, channel and downstream work released.
 3. Present the batch as one weekly execution block while retaining every underlying BasicOps link.
    It may contain many quick emails without consuming one priority slot per email.
-4. Draft or prepare the emails only when requested. Never claim they were sent without a separate
-   authorised sending route and approval.
+4. Offer concrete drafts during planning when they unblock chosen work; prepare them when accepted.
+   Never claim they were sent without an authorised sending route and explicit send instruction.
 5. After verified sending, propose through `basicops-task-manager`: update `last_touchpoint`, compute
    and store the exact `next_touchpoint` from the confirmed cadence, and move reply-dependent tasks
-   to Kristalyn's verified waiting section. Do not mutate during planning.
+   to Kristalyn's verified waiting section. Apply accepted exact changes during the flow and verify
+   read-back; planning or a draft alone does not authorise mutation.
 
 #### Michael: separate business and staff flows
 
@@ -326,7 +357,12 @@ execution task can enter his staff plan when he chooses it; disclose only team-s
 Trigger on “What should I work on today?” or equivalent requests.
 
 1. Read the current confirmed `22 People/<Person>/YYYY-Www — Weekly Flow.md` first. For Michael, use his staff commitments directly; consult the separate business plan only when he requests that view or approves a team-safe capacity handoff.
-2. Verify only the live state of tasks referenced by that file and any explicit newly supplied blocker or urgent commitment.
+2. Verify live state of the referenced tasks and the person's mapped weekly action/project sections,
+   plus any explicitly supplied new blocker or urgent commitment. Reconcile completed, waiting and
+   missing/misplaced agreed work against the saved plan. Surface unmatched weekly cards as a small
+   discrepancy list; do not silently add them to today's commitments or scan the full backlog.
+   Apply only accepted exact corrections through basicops-task-manager, verify read-back and save
+   material progress/dispositions to the existing weekly and canonical client records.
 3. Select a small ordered list for today from the confirmed weekly outcomes. Preserve saved order unless completion, a blocker or a newly confirmed urgent commitment requires a change.
 4. For each selected client item, apply the **Client-context batching rules**: verify same-client
    adjacent candidates, offer at most a 15–20 minute quick-win batch, and state the stop condition.
