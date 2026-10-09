@@ -79,6 +79,10 @@ If another simultaneous comment asks for a list, report only observed routing st
 never race the original move request by fabricating completion. The routing manifest
 and verified read-backs are the completion evidence, not another assistant's reply.
 
+## Website completion from a task discussion
+
+For an authenticated team member reporting completed website work and asking to reconcile/update the project, load `website-project-cockpit` and follow its explicit completion mode and `references/website-completion-reconciliation.md`. This branch overrides the fast-response limit and production-planning branch: read the client profile, canonical checklist and task discussion/replies, reconcile exact items, verify writes/readback and reply through `create_reply_in_message`. Do not dispatch production or infer approval/launch. If a required skill/file/tool is unavailable, name the missing dependency and leave unsupported changes open.
+
 ## Production planning from a task discussion
 
 When Michael asks to plan, prepare, resume, hand off or proceed with a task whose outcome requires production work, apply the `lhm-project-manager-dispatch` rules already injected into this webhook route. Do not try to open a skill path with `web_extract`, a browser or a `file://` URL. This branch overrides the generic fast-response limit because a production plan requires the task discussion, dependencies and canonical links.

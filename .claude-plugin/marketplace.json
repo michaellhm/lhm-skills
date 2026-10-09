@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "2.2.53"
+    "version": "2.2.54"
   },
   "plugins": [
     {
@@ -97,7 +97,7 @@
       "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
       "description": "General marketing orchestration plus direct Google Ads, SEO, Content, and WordPress specialists with governed delegation and shared client context.",
-      "version": "2.2.53",
+      "version": "2.2.54",
       "category": "utilities",
       "tags": [
         "marketing",
@@ -154,7 +154,7 @@
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
       "description": "LHM project management hub \u2014 sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
-      "version": "0.1.123",
+      "version": "0.1.124",
       "category": "utilities",
       "tags": [
         "project-management",
@@ -178,6 +178,19 @@
         "source-retrieval",
         "production",
         "reliability"
+      ]
+    },
+    {
+      "name": "lhm-loops-hub",
+      "source": "./plugins/lhm-loops-hub",
+      "description": "Reusable agency loops with dependency gates, evidence snapshots, idempotent updates and readback receipts. Website loop first.",
+      "version": "0.1.0",
+      "category": "operations",
+      "tags": [
+        "loops",
+        "hermes",
+        "scheduling",
+        "basicops"
       ]
     }
   ]

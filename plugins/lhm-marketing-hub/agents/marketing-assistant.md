@@ -71,3 +71,7 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 
 
 Monday coordination uses a separate receipt-gated board reconciliation after the read-only website report. It posts deduplicated project summaries; Kristalyn owns shared-board accuracy, and Staff Weekly Flow confirms personal weekly commitments.
+
+### Agency loops (`lhm-loops-hub`)
+
+- `website-project-loop` — Monday website board review after verified report delivery/archive; receipt-backed summary comments. Explicit checklist completion stays in `website-project-cockpit`.
