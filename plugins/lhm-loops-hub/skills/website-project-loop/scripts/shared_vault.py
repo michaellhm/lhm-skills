@@ -2,17 +2,32 @@
 import hashlib
 import importlib.util
 import io
+import os
 import re
+import threading
 from pathlib import PurePosixPath
 
 DRIVE = '0AF6X3xDBIuVcUk9PVA'
+_AUTH_LOCK=threading.Lock()
+
+
+def drive_service(config):
+    """Use the existing operator-owned Google credential home in every profile."""
+    with _AUTH_LOCK:
+        previous=os.environ.get('HERMES_HOME')
+        os.environ['HERMES_HOME']=config.get('google_auth_home','/opt/data')
+        try:
+            spec=importlib.util.spec_from_file_location('google_api',config['google_api'])
+            module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+            return module.build_service('drive','v3')
+        finally:
+            if previous is None:os.environ.pop('HERMES_HOME',None)
+            else:os.environ['HERMES_HOME']=previous
 
 
 class Vault:
     def __init__(self, config):
-        spec = importlib.util.spec_from_file_location('google_api', config['google_api'])
-        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
-        self.service = module.build_service('drive', 'v3')
+        self.service = drive_service(config)
         drive = self.service.drives().get(driveId=DRIVE, fields='id,name').execute()
         if drive != {'id': DRIVE, 'name': 'LHM Knowledge'}:
             raise ValueError('Wrong shared knowledge drive')
