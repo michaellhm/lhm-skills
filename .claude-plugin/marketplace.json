@@ -154,7 +154,7 @@
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
       "description": "LHM project management hub \u2014 sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
-      "version": "0.1.124",
+      "version": "0.1.125",
       "category": "utilities",
       "tags": [
         "project-management",
@@ -184,7 +184,7 @@
       "name": "lhm-loops-hub",
       "source": "./plugins/lhm-loops-hub",
       "description": "Reusable agency loops with dependency gates, evidence snapshots, idempotent updates and readback receipts. Website loop first.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "category": "operations",
       "tags": [
         "loops",
