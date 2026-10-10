@@ -2,17 +2,33 @@
 import hashlib
 import importlib.util
 import io
+import json
+import os
 import re
+import threading
 from pathlib import PurePosixPath
 
 DRIVE = '0AF6X3xDBIuVcUk9PVA'
+_AUTH_LOCK=threading.Lock()
+
+
+def drive_service(config):
+    """Use the existing operator-owned Google credential home in every profile."""
+    with _AUTH_LOCK:
+        previous=os.environ.get('HERMES_HOME')
+        os.environ['HERMES_HOME']=config.get('google_auth_home','/opt/data')
+        try:
+            spec=importlib.util.spec_from_file_location('google_api',config['google_api'])
+            module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+            return module.build_service('drive','v3')
+        finally:
+            if previous is None:os.environ.pop('HERMES_HOME',None)
+            else:os.environ['HERMES_HOME']=previous
 
 
 class Vault:
     def __init__(self, config):
-        spec = importlib.util.spec_from_file_location('google_api', config['google_api'])
-        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
-        self.service = module.build_service('drive', 'v3')
+        self.service = drive_service(config)
         drive = self.service.drives().get(driveId=DRIVE, fields='id,name').execute()
         if drive != {'id': DRIVE, 'name': 'LHM Knowledge'}:
             raise ValueError('Wrong shared knowledge drive')
@@ -82,6 +98,17 @@ def complete(vault, path, item, day, evidence, source, actor, next_action=None):
     if re.match(r'^\s*- \[[xX]\]',lines[i]): raise ValueError('Already complete; preserve existing evidence')
     lines[i]=lines[i].replace('[ ]','[x]',1)+f' — completed {day}; reported by {actor}; evidence: {evidence}'
     after='\n'.join(lines)+'\n\n'+f'## Completion reconciliation — {day}\n\n{marker}\nSource: {source}\nRecorded only: {item}. Approval and dependent work remain separate.\n'
-    if next_action:after+='Next action (confirmed request): '+next_action+'\n'
+    if next_action:
+        next_action=' '.join(next_action.split())
+        after+='Next action (confirmed request): '+next_action+'\n'
+        after=re.sub(r'(?m)^(Next:|- Next action:)\s*[^\n]*$',lambda found:found[1]+' '+next_action,after)
+        if after.startswith('---\n'):
+            end=after.find('\n---',4)
+            if end!=-1:
+                header=after[4:end]
+                for key,value in [('updated',day),('next_action',json.dumps(next_action,ensure_ascii=False))]:
+                    if re.search(r'(?m)^'+key+r':',header):header=re.sub(r'(?m)^'+key+r':[^\n]*$',key+': '+value,header)
+                    else:header+='\n'+key+': '+value
+                after='---\n'+header+after[end:]
     sha=vault.write(path,before,after)
     return {'state':'verified','path':path,'item':lines[i],'sha256':sha,'source':source}

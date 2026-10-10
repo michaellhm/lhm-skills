@@ -210,9 +210,8 @@ def apply(cfg, api, week, plan):
 
 
 def verify_archive(cfg, dep):
-    spec = importlib.util.spec_from_file_location('google_api', cfg['google_api'])
-    google = importlib.util.module_from_spec(spec); spec.loader.exec_module(google)
-    text = google.build_service('drive', 'v3').files().get_media(fileId=dep['archive']['file_id'], supportsAllDrives=True).execute().decode('utf-8-sig')
+    from shared_vault import drive_service
+    text = drive_service(cfg).files().get_media(fileId=dep['archive']['file_id'], supportsAllDrives=True).execute().decode('utf-8-sig')
     marker = re.search(r'<!-- weekly-web-snapshot-sha256:([a-f0-9]{64}) -->', text)
     if dep['week'] not in text or dep['delivery_message_id'] not in text or not marker or hashlib.sha256(text[:marker.start()].encode()).hexdigest() != marker.group(1):
         raise ValueError('Shared archive readback does not match week')
