@@ -81,6 +81,8 @@ and verified read-backs are the completion evidence, not another assistant's rep
 
 ## Website completion from a task discussion
 
+The webhook exposes bounded BasicOps MCP tools `read_website_project_context` and `record_website_completion`; no filesystem/terminal tool is required. First call the read tool with the mapped overview `task_id`. For a supported exact production item, call the completion tool with that task ID, the unique checkbox ID/text, supplied HTTPS evidence and the triggering `source_message_id`. It verifies the current team member request in Discussion, writes the actual shared Drive note and returns readback plus remaining open items. Never substitute a local cached note. Reply with the verified changed items, pending approvals, unchanged or authorised BasicOps state and next owner; do not merely report missing filesystem access when these tools are available. Missing mapping is a real blocker.
+
 For an authenticated team member reporting completed website work and asking to reconcile/update the project, load `website-project-cockpit` and follow its explicit completion mode and `references/website-completion-reconciliation.md`. This branch overrides the fast-response limit and production-planning branch: read the client profile, canonical checklist and task discussion/replies, reconcile exact items, verify writes/readback and reply through `create_reply_in_message`. Do not dispatch production or infer approval/launch. If a required skill/file/tool is unavailable, name the missing dependency and leave unsupported changes open.
 
 ## Production planning from a task discussion
