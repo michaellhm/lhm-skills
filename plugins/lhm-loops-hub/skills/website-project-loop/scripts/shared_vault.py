@@ -65,7 +65,13 @@ def complete(vault, path, item, day, evidence, source, actor):
     if not evidence.startswith('https://') or not source.startswith('https://') or not actor:
         raise ValueError('Completion requires evidence, source and attributed actor')
     before=vault.read(path)['text']; lines=before.splitlines()
-    candidates=[i for i,line in enumerate(lines) if re.match(r'^\s*- \[[ xX]\]',line) and item in line]
+    candidates=[]
+    for index,line in enumerate(lines):
+        if not re.match(r'^\s*- \[[ xX]\]',line): continue
+        label=re.sub(r'^\s*- \[[ xX]\]\s*','',line)
+        label=re.sub(r'^\(\d{4}-\d{2}-\d{2}\)\s*','',label)
+        label=label.split(' — ',1)[0].split(';',1)[0]
+        if label==item or re.match(r'^'+re.escape(item)+r'(?:\s|$)',label):candidates.append(index)
     if len(candidates)!=1: raise ValueError('Missing or ambiguous checklist match')
     i=candidates[0]
     if re.search(r'approval|approve|sign.off|launch|publish|deploy|merge',lines[i],re.I):
