@@ -13,5 +13,8 @@ class RouteTests(unittest.TestCase):
         self.assertIsNone(m.parse('What is next on the website?'))
     def test_missing_evidence_not_captured(self):
         self.assertIsNone(m.parse('website done: TEST-1'))
+    def test_next_action_stops_at_paragraph_boundary(self):
+        r=m.parse('<p>website done: TEST-1 | evidence: https://example.com/test | next: Kristalyn reviews the homepage</p><p>Internal test notes.</p>')
+        self.assertEqual(r['next_action'],'Kristalyn reviews the homepage')
 
 if __name__=='__main__':unittest.main()

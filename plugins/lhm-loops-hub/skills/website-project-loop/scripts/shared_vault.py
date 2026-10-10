@@ -2,6 +2,7 @@
 import hashlib
 import importlib.util
 import io
+import json
 import os
 import re
 import threading
@@ -97,6 +98,17 @@ def complete(vault, path, item, day, evidence, source, actor, next_action=None):
     if re.match(r'^\s*- \[[xX]\]',lines[i]): raise ValueError('Already complete; preserve existing evidence')
     lines[i]=lines[i].replace('[ ]','[x]',1)+f' — completed {day}; reported by {actor}; evidence: {evidence}'
     after='\n'.join(lines)+'\n\n'+f'## Completion reconciliation — {day}\n\n{marker}\nSource: {source}\nRecorded only: {item}. Approval and dependent work remain separate.\n'
-    if next_action:after+='Next action (confirmed request): '+next_action+'\n'
+    if next_action:
+        next_action=' '.join(next_action.split())
+        after+='Next action (confirmed request): '+next_action+'\n'
+        after=re.sub(r'(?m)^(Next:|- Next action:)\s*[^\n]*$',lambda found:found[1]+' '+next_action,after)
+        if after.startswith('---\n'):
+            end=after.find('\n---',4)
+            if end!=-1:
+                header=after[4:end]
+                for key,value in [('updated',day),('next_action',json.dumps(next_action,ensure_ascii=False))]:
+                    if re.search(r'(?m)^'+key+r':',header):header=re.sub(r'(?m)^'+key+r':[^\n]*$',key+': '+value,header)
+                    else:header+='\n'+key+': '+value
+                after='---\n'+header+after[end:]
     sha=vault.write(path,before,after)
     return {'state':'verified','path':path,'item':lines[i],'sha256':sha,'source':source}

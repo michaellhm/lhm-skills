@@ -12,6 +12,7 @@ ROOT=Path('/opt/data/profiles/lhm_project_manager')
 
 
 def parse(text):
+    text=re.sub(r'</(?:p|div)>|<br\s*/?>','\n',text,flags=re.I)
     plain=html.unescape(re.sub('<[^>]+>',' ',text))
     found=re.search(r'\bwebsite done:\s*([^|\n]{1,200})\s*\|\s*evidence:\s*(https://[^\s|<>]+)(?:\s*\|\s*next:\s*([^\n]{1,500}))?',plain,re.I)
     if not found:return None

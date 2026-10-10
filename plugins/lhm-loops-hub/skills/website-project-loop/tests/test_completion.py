@@ -24,5 +24,12 @@ class CompletionTests(unittest.TestCase):
             v=Vault()
             with self.assertRaises(ValueError):m.complete(v,'note',item,'2026-10-10','https://evidence','https://discussion','Michael')
             self.assertEqual(v.writes,0)
+    def test_confirmed_next_action_replaces_stale_current_pointer(self):
+        v=Vault();v.text='---\ntype: client-project\nupdated: 2026-10-01\n---\n'+v.text+'\nNext: Michael produces homepage\n'
+        m.complete(v,'note','TEST-1','2026-10-10','https://evidence','https://discussion','Michael','Kristalyn reviews the homepage')
+        self.assertIn('\nNext: Kristalyn reviews the homepage\n',v.text)
+        self.assertNotIn('Next: Michael produces homepage',v.text)
+        self.assertIn('updated: 2026-10-10',v.text)
+        self.assertIn('- [ ] TEST-2 Client approval',v.text)
 
 if __name__=='__main__':unittest.main()
