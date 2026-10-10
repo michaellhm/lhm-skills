@@ -26,6 +26,8 @@ def config(task):
         api=loop.BasicOps(cfg);api.identity();record=api.call('get_task',{'taskId':task})
         parent=record.get('parentTask',record.get('parent',record.get('parentTaskId')))
         if isinstance(parent,dict):parent=parent.get('id')
+        if str(parent) in test['projects'] and parent in test.get('test_task_ids',[]):
+            test['projects'][str(task)]=test['projects'][str(parent)];return test
         if str(parent) in cfg['projects']:
             cfg['projects'][str(task)]=cfg['projects'][str(parent)];return cfg
         # A personal execution task can also be explicitly linked from the
@@ -57,7 +59,9 @@ def operation(name,args):
         raise ValueError('Source request does not explicitly support this completion and evidence')
     day=datetime.now(ZoneInfo('Australia/Melbourne')).date().isoformat()
     source_url=record['url']+'#'+mid
-    result=complete(loop._VAULT,context['project']['path'],args['item'],day,args['evidence'],source_url,PEOPLE[actor])
+    next_action=args.get('next_action')
+    if next_action and next_action not in text:raise ValueError('Next action must be stated in the source request')
+    result=complete(loop._VAULT,context['project']['path'],args['item'],day,args['evidence'],source_url,PEOPLE[actor],next_action)
     result['note_url']='https://drive.google.com/file/d/'+context['project']['id']+'/view'
     result['remaining_checklist']=[line for line in loop._VAULT.read(context['project']['path'])['text'].splitlines() if re.match(r'^\s*- \[ \]',line)]
     result['basicops_state']='Unchanged; use the owning task manager for any explicitly authorised state change.'
@@ -68,7 +72,7 @@ async def list_tools(ctx,params):
     upstream=await base.list_tools(ctx,params)
     for name,description,properties,required in [
       ('read_website_project_context','Read the actual shared LHM Knowledge profile and canonical website checklist plus task Discussion. Accepts a mapped overview or an execution task explicitly parented/linked to its canonical record; never guesses from titles.',{'task_id':{'type':'integer'}},['task_id']),
-      ('record_website_completion','Record one exact production checkbox completion in the actual shared Obsidian note and verify readback. Requires a current team member source request in this task Discussion explicitly naming the item and evidence. Refuses approvals/launch and leaves BasicOps state unchanged.',{'task_id':{'type':'integer'},'item':{'type':'string'},'evidence':{'type':'string'},'source_message_id':{'type':'string'}},['task_id','item','evidence','source_message_id'])]:
+      ('record_website_completion','Record one exact production checkbox completion in the actual shared Obsidian note and verify readback. Requires a current team member source request in this task Discussion explicitly naming the item and evidence. Refuses approvals/launch and leaves BasicOps state unchanged.',{'task_id':{'type':'integer'},'item':{'type':'string'},'evidence':{'type':'string'},'source_message_id':{'type':'string'},'next_action':{'type':'string'}},['task_id','item','evidence','source_message_id'])]:
         upstream.tools.append(base.types.Tool.model_validate({'name':name,'description':description,'inputSchema':{'type':'object','properties':properties,'required':required,'additionalProperties':False}}))
     return upstream
 
