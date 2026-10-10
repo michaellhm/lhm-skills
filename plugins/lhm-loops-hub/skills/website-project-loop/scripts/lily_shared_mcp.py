@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Add two bounded shared-record tools to Lily's existing BasicOps proxy."""
 import importlib.util
+import html
 import json
 import re
 import sys
@@ -54,8 +55,8 @@ def operation(name,args):
     source=sources[0];actor=source.get('user',source.get('userId'))
     if isinstance(actor,dict):actor=actor.get('id')
     if actor not in PEOPLE:raise ValueError('Source actor is not a verified current LHM team member')
-    text=re.sub('<[^>]+>',' ',source.get('message',''))
-    if args['item'] not in text or args['evidence'] not in source.get('message','') or not re.search(r'\b(completed?|finished|done)\b',text,re.I) or re.search(r'\b(not|never|not yet)\s+(complete[ds]?|finished|done)\b',text,re.I):
+    text=html.unescape(re.sub('<[^>]+>',' ',source.get('message','')))
+    if args['item'] not in text or args['evidence'] not in html.unescape(source.get('message','')) or not re.search(r'\b(completed?|finished|done)\b',text,re.I) or re.search(r'\b(not|never|not yet)\s+(complete[ds]?|finished|done)\b',text,re.I):
         raise ValueError('Source request does not explicitly support this completion and evidence')
     day=datetime.now(ZoneInfo('Australia/Melbourne')).date().isoformat()
     source_url=record['url']+'#'+mid
