@@ -122,7 +122,10 @@ def context(cfg, task_id):
         from shared_vault import Vault
         global _VAULT
         if _VAULT is None: _VAULT = Vault(cfg)
-        return {key:_VAULT.read(mapping[key]) for key in ['profile','project']}
+        out={key:_VAULT.read(mapping[key]) for key in ['profile','project']}
+        current=str(Path(mapping['profile']).parent / 'Current Projects.md')
+        if current in _VAULT.files:out['current_projects']=_VAULT.read(current)
+        return out
     root = Path(cfg['vault']).resolve()
     out = {}
     for key in ['profile', 'project']:
