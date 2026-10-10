@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Add two bounded shared-record tools to Lily's existing BasicOps proxy."""
 import importlib.util
+import html
 import json
 import re
 import sys
@@ -22,8 +23,25 @@ def config(task):
     cfg=json.loads((PROFILE/'website-loop.json').read_text())
     if str(task) not in cfg['projects']:
         test=json.loads((PROFILE/'website-loop-test.json').read_text())
-        if task not in test.get('test_task_ids',[]):raise ValueError('Unmapped website overview; resolve the canonical record first')
-        cfg=test
+        if task in test.get('test_task_ids',[]):return test
+        api=loop.BasicOps(cfg);api.identity();record=api.call('get_task',{'taskId':task})
+        parent=record.get('parentTask',record.get('parent',record.get('parentTaskId')))
+        if isinstance(parent,dict):parent=parent.get('id')
+        if str(parent) in test['projects'] and parent in test.get('test_task_ids',[]):
+            test['projects'][str(task)]=test['projects'][str(parent)];return test
+        if str(parent) in cfg['projects']:
+            cfg['projects'][str(task)]=cfg['projects'][str(parent)];return cfg
+        # A personal execution task can also be explicitly linked from the
+        # canonical note. Never infer client identity from a title abbreviation.
+        matches=[]
+        for overview,mapping in list(cfg['projects'].items()):
+            if mapping['project'].endswith('/Onboarding.md'):continue
+            try: note=loop.context(cfg,overview)['project']['text']
+            except ValueError:continue
+            if record.get('url') and record['url'] in note:matches.append(mapping)
+        unique={x['project']:x for x in matches}
+        if len(unique)!=1:raise ValueError('Missing or ambiguous canonical task link; resolve the overview first')
+        cfg['projects'][str(task)]=next(iter(unique.values()))
     return cfg
 
 
@@ -37,12 +55,14 @@ def operation(name,args):
     source=sources[0];actor=source.get('user',source.get('userId'))
     if isinstance(actor,dict):actor=actor.get('id')
     if actor not in PEOPLE:raise ValueError('Source actor is not a verified current LHM team member')
-    text=re.sub('<[^>]+>',' ',source.get('message',''))
-    if args['item'] not in text or args['evidence'] not in source.get('message','') or not re.search(r'\b(completed?|finished|done)\b',text,re.I) or re.search(r'\b(not|never|not yet)\s+(complete[ds]?|finished|done)\b',text,re.I):
+    text=html.unescape(re.sub('<[^>]+>',' ',source.get('message','')))
+    if args['item'] not in text or args['evidence'] not in html.unescape(source.get('message','')) or not re.search(r'\b(completed?|finished|done)\b',text,re.I) or re.search(r'\b(not|never|not yet)\s+(complete[ds]?|finished|done)\b',text,re.I):
         raise ValueError('Source request does not explicitly support this completion and evidence')
     day=datetime.now(ZoneInfo('Australia/Melbourne')).date().isoformat()
     source_url=record['url']+'#'+mid
-    result=complete(loop._VAULT,context['project']['path'],args['item'],day,args['evidence'],source_url,PEOPLE[actor])
+    next_action=args.get('next_action')
+    if next_action and next_action not in text:raise ValueError('Next action must be stated in the source request')
+    result=complete(loop._VAULT,context['project']['path'],args['item'],day,args['evidence'],source_url,PEOPLE[actor],next_action)
     result['note_url']='https://drive.google.com/file/d/'+context['project']['id']+'/view'
     result['remaining_checklist']=[line for line in loop._VAULT.read(context['project']['path'])['text'].splitlines() if re.match(r'^\s*- \[ \]',line)]
     result['basicops_state']='Unchanged; use the owning task manager for any explicitly authorised state change.'
@@ -52,8 +72,8 @@ def operation(name,args):
 async def list_tools(ctx,params):
     upstream=await base.list_tools(ctx,params)
     for name,description,properties,required in [
-      ('read_website_project_context','Read the actual shared LHM Knowledge client profile and canonical website checklist plus this mapped overview Discussion. Use before website completion reconciliation.',{'task_id':{'type':'integer'}},['task_id']),
-      ('record_website_completion','Record one exact production checkbox completion in the actual shared Obsidian note and verify readback. Requires a current team member source request in this task Discussion explicitly naming the item and evidence. Refuses approvals/launch and leaves BasicOps state unchanged.',{'task_id':{'type':'integer'},'item':{'type':'string'},'evidence':{'type':'string'},'source_message_id':{'type':'string'}},['task_id','item','evidence','source_message_id'])]:
+      ('read_website_project_context','Read the actual shared LHM Knowledge profile and canonical website checklist plus task Discussion. Accepts a mapped overview or an execution task explicitly parented/linked to its canonical record; never guesses from titles.',{'task_id':{'type':'integer'}},['task_id']),
+      ('record_website_completion','Record one exact production checkbox completion in the actual shared Obsidian note and verify readback. Requires a current team member source request in this task Discussion explicitly naming the item and evidence. Refuses approvals/launch and leaves BasicOps state unchanged.',{'task_id':{'type':'integer'},'item':{'type':'string'},'evidence':{'type':'string'},'source_message_id':{'type':'string'},'next_action':{'type':'string'}},['task_id','item','evidence','source_message_id'])]:
         upstream.tools.append(base.types.Tool.model_validate({'name':name,'description':description,'inputSchema':{'type':'object','properties':properties,'required':required,'additionalProperties':False}}))
     return upstream
 

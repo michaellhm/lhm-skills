@@ -184,7 +184,7 @@
       "name": "lhm-loops-hub",
       "source": "./plugins/lhm-loops-hub",
       "description": "Reusable agency loops with dependency gates, evidence snapshots, idempotent updates and readback receipts. Website loop first.",
-      "version": "0.1.2",
+      "version": "0.1.5",
       "category": "operations",
       "tags": [
         "loops",

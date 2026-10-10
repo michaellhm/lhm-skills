@@ -58,7 +58,7 @@ class Vault:
         return hashlib.sha256(actual.encode()).hexdigest()
 
 
-def complete(vault, path, item, day, evidence, source, actor):
+def complete(vault, path, item, day, evidence, source, actor, next_action=None):
     """Exact production checkbox only; approvals require their separate workflow."""
     from datetime import date
     date.fromisoformat(day)
@@ -82,5 +82,6 @@ def complete(vault, path, item, day, evidence, source, actor):
     if re.match(r'^\s*- \[[xX]\]',lines[i]): raise ValueError('Already complete; preserve existing evidence')
     lines[i]=lines[i].replace('[ ]','[x]',1)+f' — completed {day}; reported by {actor}; evidence: {evidence}'
     after='\n'.join(lines)+'\n\n'+f'## Completion reconciliation — {day}\n\n{marker}\nSource: {source}\nRecorded only: {item}. Approval and dependent work remain separate.\n'
+    if next_action:after+='Next action (confirmed request): '+next_action+'\n'
     sha=vault.write(path,before,after)
     return {'state':'verified','path':path,'item':lines[i],'sha256':sha,'source':source}

@@ -20,6 +20,14 @@ No `prepare` success or model statement is proof of a write. Preserve receipts. 
 
 ## Manual Claude / ChatGPT fallback
 
-Invoke `/lhm-loops-hub:website-project-loop` in a session with shared Obsidian and BasicOps access. Follow the same evidence, overview deduplication, source attribution and weekly-marker rules. Without the Hermes receipt/writer, prepare summaries for review and state that automatic reconciliation is unavailable. To apply an explicit completion, invoke `/lhm-project-hub:website-project-cockpit`; do not describe a manually drafted summary as a completed loop.
+Invoke `/lhm-loops-hub:website-project-loop` in a session with shared Obsidian and BasicOps access. Follow the same evidence, overview deduplication, source attribution and weekly-marker rules. When Hermes is unavailable, complete a fresh read-only review across both boards and the shared records, disclose unavailable email/Fathom sources, and show the summaries/corrections for confirmation. After the user confirms the precise summaries, route posting through `lhm-project-hub:basicops-task-manager`, checking existing markers and reading back each result. Missing source coverage blocks the affected summary; do not claim an automatic scheduled run occurred. To apply an explicit completion, invoke `/lhm-project-hub:website-project-cockpit`; do not describe a manually drafted summary as a completed loop.
 
 Kristalyn owns board accuracy and unresolved exceptions. Delivery owners supply completion evidence. Lily assists with reconciliation. Future GMB, meta, article and social loops should reuse this contract while keeping their domain skills in the relevant hubs; do not enable unimplemented placeholder schedules.
+
+## Exact BasicOps completion command
+
+For a reliable completion update, select the real **@Lily** mention and write:
+
+`website done: <checkbox ID or exact leading label> | evidence: <https URL> | next: <person and next action>`
+
+The signed route queues this exact command for `completion_worker.py`, which uses the same shared-record writer, verifies the source author/item/evidence, reads back the note and posts one verified reply. The optional `next` text is saved only when stated in the source request. General questions keep the conversational Lily route. Queue receipts prevent duplicate replies and preserve partial failures; an uncertain reply requires readback before retry. This command records a production item; separate approvals, launches and whole-task completion require their own authorised workflow.
