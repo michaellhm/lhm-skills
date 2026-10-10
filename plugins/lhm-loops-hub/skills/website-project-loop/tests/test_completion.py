@@ -6,7 +6,7 @@ spec=importlib.util.spec_from_file_location('vault',Path(__file__).parents[1]/'s
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 
 class Vault:
-    def __init__(self): self.text='- [ ] TEST-1 Produce homepage\n- [ ] TEST-2 Client approval\n- [ ] TEST-3 Build remaining pages\n';self.writes=0
+    def __init__(self): self.text='- [ ] TEST-1 Produce homepage — Owner: Michael\n- [ ] TEST-2 Client approval — dependency: TEST-1\n- [ ] TEST-3 Build remaining pages — dependency: TEST-2\n';self.writes=0
     def read(self,path):return {'text':self.text}
     def write(self,path,before,after):
         if self.text!=before:raise ValueError('Changed')
