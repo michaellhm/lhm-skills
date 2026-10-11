@@ -7,6 +7,18 @@ class RuntimeTests(unittest.TestCase):
   prompt=r.repair_prompt(Path('/skill'),Path('/output'))
   self.assertIn('{project: exact displayed name',prompt)
   self.assertIn('/output',prompt)
+ def test_baseline_must_match_supplied_approved_bytes(self):
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d);out=root/'output';out.mkdir();approved=root/'approved.json'
+   approved.write_text(json.dumps({'owners':[{'name':'Michael','actions':['Keep this commitment']}]}))
+   copied=out/'baseline.json';copied.write_bytes(approved.read_bytes())
+   item={'path':'baseline.json','sha256':r.digest(copied)}
+   r.validate_baseline(out,item,approved)
+   copied.write_text(json.dumps({'owners':[]}));item['sha256']=r.digest(copied)
+   with self.assertRaisesRegex(ValueError,'differs from supplied'):
+    r.validate_baseline(out,item,approved)
+   with self.assertRaisesRegex(ValueError,'inside run'):
+    r.validate_baseline(out,{'path':'../approved.json'},approved)
  def test_schedule_and_dst(self):
   for week,stamp in [('2026-09-21','2026-09-20T21:00:00+00:00'),('2026-10-05','2026-10-04T20:00:00+00:00')]:
    self.assertEqual(r.validate_request({'week':week,'mode':'scheduled'},datetime.fromisoformat(stamp)),week)

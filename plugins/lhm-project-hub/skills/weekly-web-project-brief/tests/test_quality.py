@@ -12,6 +12,7 @@ class QualityTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup); self.p = Path(self.tmp.name)
         for n in ('source.txt', 'baseline.md', 'SKILL.md'): (self.p/n).write_text(n)
+        self.write('baseline.md', {'owners': []})
         self.write('email.json', {'html': '<table>approved</table>'})
         self.write('access-receipt.json', {'worker':'codex-cli','skill_path':str(self.p/'SKILL.md'),'skill_sha256':q.digest(self.p/'SKILL.md'),'sources':{k:{'status':'passed','evidence':'live read'} for k in ['gmail','obsidian','basicops']} | {'meetings':{'status':'not_required','reason':'No relevant meeting'}}})
         self.write('research-receipt.json', {'coverage':{**{k:{'status':'complete'} for k in ['gmail','obsidian','basicops']},'meetings':{'status':'not_required','reason':'No relevant meeting'}},'material_gaps':[],'evidence_files':[{'path':'source.txt','sha256':q.digest(self.p/'source.txt')}]})

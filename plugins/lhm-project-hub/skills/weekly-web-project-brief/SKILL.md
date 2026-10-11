@@ -2,7 +2,7 @@
 name: weekly-web-project-brief
 description: "Prepare Lily's Monday website portfolio email or apply Michael's consolidated project corrections. Use for 'weekly web projects', 'website weekly brief', 'Monday website email', 'update the web brief' or 'website brief feedback'. Reconciles Obsidian, BasicOps discussions, email and meeting evidence; produces an HTML table with due dates and red-first traffic lights."
 metadata:
-  version: 1.3.1
+  version: 1.3.2
 ---
 ## Client file routing
 
@@ -68,6 +68,8 @@ Content order: short opening; main things to move this week; new projects this w
 Use direct names and verbs: “Kristalyn: send David the prototype and ask for feedback on the design, wording and clinic details”; “Aiya: finish the next service pages and share the link”; “Michael: finalise Johnson's feedback.” Avoid “coordinate agreed refinements”, “reconcile the delivery gate”, “confirm batch progress” or vague “handoff” without naming the output and recipient.
 
 Before send verify source completeness, all project scopes represented/deduplicated, next actors, approval anchors, due-date types, red-first sorting, new-project dates, completed-child suppression, no AI Support, no secrets/patient details, working evidence links, HTML and text outputs, approved recipients, and feedback instructions. If a core board cannot be read, save failure and do not send a seemingly complete portfolio. For a partial optional source, label affected rows orange and include the precise limitation.
+
+Before independent review, mechanically validate exact selected-action ownership, wording and execution-task links, unresolved dependency prerequisites and one evidenced disposition for every approved baseline owner action. Reconcile the latest weekly archive actions as well, including one-offs. Read available canonical records for owner-only clients. See references/weekly-actions.md and references/freshness.md for schemas. Reviewers must complete the whole checklist and report all discoverable issues together.
 
 Before delivery, run scripts/quality.py against the run directory after independent controller review. A changed payload invalidates that review. A warning footer cannot excuse known factual regressions.
 

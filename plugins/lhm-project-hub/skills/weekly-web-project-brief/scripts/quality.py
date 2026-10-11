@@ -11,6 +11,45 @@ def digest(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
+def validate_actions(brief, boards, baseline, comparison):
+    """Bind selected execution cards and account for every approved baseline action."""
+    def require(test, message):
+        if not test:
+            raise ValueError(message)
+    owners = {o['name']: o.get('actions', []) for o in brief.get('owners', [])}
+    for board in boards:
+        for selected in board['selected_actions']:
+            owner = selected.get('action_owner', board['owner'])
+            require(selected.get('selection_kind') in ('execution', 'prerequisite'),
+                    'Selected action needs execution/prerequisite classification')
+            require(selected.get('dependency_state') in ('clear', 'unresolved', 'not_applicable'),
+                    'Selected action needs dependency state')
+            require(not (selected['selection_kind'] == 'execution' and selected['dependency_state'] == 'unresolved'),
+                    'Future-gated execution must be replaced by its immediate prerequisite')
+            require(selected.get('url') and selected.get('client') and selected.get('rendered_action'),
+                    'Selected action needs exact client, task/evidence URL and rendered action')
+            require(any(isinstance(a, dict) and all(a.get(k) == selected.get(v)
+                    for k, v in (('client', 'client'), ('url', 'url'), ('text', 'rendered_action')))
+                    for a in owners.get(owner, [])),
+                    'Selected action missing or mapped to a different task/owner: ' + str(selected.get('task_id', selected['url'])))
+    def key(owner, action):
+        return json.dumps([owner, action], sort_keys=True, ensure_ascii=False)
+    expected = {key(o['name'], a) for o in baseline.get('owners', []) for a in o.get('actions', [])}
+    dispositions = comparison.get('action_dispositions', [])
+    require(isinstance(dispositions, list), 'Baseline action dispositions must be a list')
+    actual = []
+    for item in dispositions:
+        require(isinstance(item, dict) and 'owner' in item and 'baseline_action' in item,
+                'Baseline action disposition needs exact owner and original action')
+        actual.append(key(item['owner'], item['baseline_action']))
+        require(item.get('disposition') in ('retained', 'completed', 'cancelled', 'superseded', 'prerequisite')
+                and item.get('reason') and isinstance(item.get('current_evidence_ids'), list)
+                and item['current_evidence_ids'] and all(isinstance(x, str) and x.strip() for x in item['current_evidence_ids']),
+                'Every baseline action needs an evidenced disposition')
+    require(len(actual) == len(set(actual)) and set(actual) == expected,
+            'Every approved baseline action needs exactly one disposition; do not silently drop commitments')
+
+
 def validate(directory, require_review=True):
     root = Path(directory).resolve()
     def read(name):
@@ -86,6 +125,12 @@ def validate(directory, require_review=True):
         require(board.get('status') == 'complete' and board.get('terminal') is True and board.get('board_id') and board.get('section_id'), 'Incomplete owner inbox sweep: ' + str(board.get('owner')))
         require(isinstance(board.get('selected_actions'), list), 'Selected weekly actions missing')
     bound_file(comparison['baseline'])
+    baseline_path = Path(comparison['baseline']['path'])
+    if not baseline_path.is_absolute():
+        baseline_path = root / baseline_path
+    baseline = json.loads(baseline_path.read_text())
+    require(isinstance(baseline, dict) and isinstance(baseline.get('owners'), list), 'Approved baseline must contain owner actions')
+    validate_actions(brief, boards, baseline, comparison)
     require(bool(comparison.get('projects')), 'No baseline comparison')
     require(comparison.get('unresolved_regressions') == [], 'Unresolved factual regression')
     if not require_review:
