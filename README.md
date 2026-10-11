@@ -185,7 +185,7 @@ plugins/lhm-knowledge-hub/             # Knowledge and operating-rhythm hub
   agents/knowledge-orchestrator.md      # Weekly Flow, vault thinking, capture and review entry point
   skills/                               # All 6 knowledge-system skills
     lhm-daily-flow/                     # Verified task/reply pre-sweep, prepared responses and daily learning
-    lhm-weekly-flow/                    # Separate founder/business review, strategic outcomes and optional action handoff
+    lhm-weekly-flow/                    # CEO, business growth and sales review; client/day planning uses staff flow
 plugins/lhm-learn/                    # Session learning capture plugin
   .claude-plugin/plugin.json            # Plugin manifest
   skills/                               # All 1 skill
@@ -360,7 +360,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 Client-facing skills read and update shared LHM Knowledge client records; deliverables use verified Claude Workspace/Current Clients folders. `client-meeting-email`, `post-meeting-review`, `client-update` and `drive-artifact-delivery` distinguish these roots, preserve meeting approval gates and report canonical-record writeback gaps. Local, Cowork and Hermes runs must use verified platform-specific roots rather than a current-directory fallback.
 
-**Founder Weekly Flow** (`lhm-knowledge-hub:lhm-weekly-flow`): Evidence-prepared reflection and three capacity-checked outcomes, separate optional action work, and verified publication to WeekFlow. Uses the Monday briefing for material business decisions; the independent staff flow records chosen work commitments and reviews results without requiring a founder review.
+**Founder Weekly Flow** (`lhm-knowledge-hub:lhm-weekly-flow`): CEO, business growth and sales review with private reflection, a commercial scorecard and up to three capacity-checked business outcomes. Client delivery, staff commitments and daily planning route independently to staff-weekly-flow. Client context appears only for material CEO decisions; optional business execution and authorised WeekFlow publication remain separate.
 
 Meeting wraps apply an LHM scope check before proposing tasks: explicit LHM commitments and client inputs required for agreed delivery qualify; client internal projects and other discussion remain context. Existing project requirements are reused rather than duplicated.
 

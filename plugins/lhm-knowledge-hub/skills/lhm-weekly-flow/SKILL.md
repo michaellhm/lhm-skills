@@ -1,10 +1,12 @@
 ---
 name: lhm-weekly-flow
-description: Run Michael’s separate founder/business weekly review and planning interview using its Obsidian vault, WeekFlow context and operating systems. Use when Michael says “run my business weekly flow”, “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, improve or complete an LHM weekly planning session. Begin with a personal check-in, use evidence to help recall the week, review time and unfinished work, then update Obsidian with decisions, three weekly outcomes and capacity-checked commitments. Keep planning separate from optional action work and verify any authorised WeekFlow scheduling.
+description: Run Michael’s CEO, business growth and sales weekly review using private Obsidian continuity and verified commercial evidence. Use when Michael says “run my business weekly flow”, “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, or “what needs my attention?”. Review sales, cash, company marketing, strategy, leadership and business systems; agree up to three capacity-checked business outcomes. Route client delivery, personal task selection and daily planning to lhm-project-hub:staff-weekly-flow, independently of this review.
 ---
-## Client file routing
+## CEO, business and sales scope
 
-For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+Michael confirmed on 12 October 2026 that this flow is for CEO, business and sales work only. Cover company strategy, revenue, sales pipeline and follow-up, LHM's own marketing, cash, hiring, leadership, commercial offers and business systems. Do not run a client-work sweep, review client meetings or Ads accounts, triage delivery boards, prepare client deliverables, or plan Michael's delivery day.
+
+Route client work, staff commitments and daily task planning to `lhm-project-hub:staff-weekly-flow`. Do not launch it automatically or require this review first. A client issue belongs here only when it requires a material CEO decision about revenue, retention, reputation, staffing or company capacity; discuss that decision and hand operational follow-through to the staff flow. This scope overrides any legacy delivery fields in a template or historical weekly note.
 
 
 # LHM Weekly Flow
@@ -35,14 +37,14 @@ For morning attention sweeps, ongoing “what’s next?” sessions and end-of-d
 
 Aim for a 30–40 minute core planning conversation, not a compulsory time limit. Keep the personal check-in and useful reflection. Compress unchanged sections; do not make Michael answer questions already resolved by evidence. If he wants to explore a material decision, allow it and make the trade-off visible.
 
-The core session ends with three or fewer outcomes, dependable capacity, chosen commitments and explicit waiting/overflow work. A full board cleanup, client production, email session or opportunity workshop is optional action work, not a prerequisite for completing the weekly review. Ask once at the end whether to continue into an action session; do not invent or invoke a not-yet-installed action-session skill. Use the existing `lhm-project-hub:staff-weekly-flow` for separate personal delivery planning and daily selection and `lhm-project-hub:basicops-task-manager` for authorised task writes.
+The core session ends with three or fewer business outcomes, dependable capacity, chosen commitments and explicit waiting/overflow work. Business opportunity workshops and sales execution are optional follow-on work. Client production, delivery-board cleanup and daily selection belong in the staff flow. Ask once at the end whether to continue into a business action session; do not invent or invoke a not-yet-installed action-session skill. Use `lhm-project-hub:basicops-task-manager` for authorised business task writes.
 
 An explicit request to act during planning can be handled immediately. Keep the current section and next question recorded so the interview resumes without restarting. Do not force a new conversation. When the user chooses a new conversation, provide a bounded handoff with confirmed decisions, source links, pending actions and approval limits; do not assume cross-chat memory.
 
 ## Prepare decisions before presenting tasks
 
-- Reuse the existing Monday project briefing and available structured output; verify its generated time, source links and material task changes. Do not create another briefing, JSON store or automation from this skill. If it has not arrived, prepare from accessible live evidence and reconcile later arrivals into the same plan.
-- Reconcile BasicOps, relevant meetings/project digests and WeekFlow before presenting the actionable shortlist. Fetch independent reads together where supported; paginate relevant queries and keep raw payloads out of the conversation. Reading the full backlog does not commit it to the week.
+- Use an existing Monday briefing only if it contains a material CEO decision; do not fetch or wait for a delivery briefing as a prerequisite. Do not create another briefing, JSON store or automation.
+- Reconcile relevant business and sales records, commercial meetings and CEO commitments before presenting the shortlist. Scope BasicOps and WeekFlow reads to business work; do not read the full delivery backlog. Fetch independent reads together where supported; paginate relevant queries and keep raw payloads out of the conversation.
 - Deduplicate by stable task ID AND outcome. Historical meeting-wrap containers, recurring placeholders and a parent plus its execution task are not automatically separate actions. Preserve linked source identities rather than replacing one task's ID with a different parent ID.
 - For each candidate, prepare: current state, source link and freshness, decision needed, recommended next action, dependency, downstream owner, completion condition and rough effort/confidence. Refresh consequential state before applying a change.
 - Present one decision at a time when Michael prefers it: “Here is where it stands; I recommend this; it releases this person/work.” Offer `do now`, `schedule`, `delegate`, `waiting`, `park` or `close`. Show a compact progress count and move to the next prepared item after recording the answer; avoid repeated “shall we continue?” prompts.
@@ -57,11 +59,11 @@ An explicit request to act during planning can be handled immediately. Keep the 
 2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` in each root when present. Respect the narrower privacy boundary. Absence of a shared copy of the memory contract does not permit private-to-shared disclosure.
 3. Detect the official Obsidian CLI. When available, target each resolved vault explicitly for searches and links. Otherwise use direct Markdown reads scoped to each root. Obsidian links between vaults do not provide cross-vault search or automatic access.
 4. Read private context completely: `01 Inbox/Inbox.md`, unprocessed Inbox captures, `05 Weekly/Weekly Flow.md`, `05 Weekly/Attention Queue.md`, `10 Goals/Goals.md`, active goals, `30 Projects/Projects.md`, active personal projects and relevant `40 Ideas` notes.
-5. Read relevant shared context: Clients and Client Flow, People, internal Meetings, `25 Marketing/Marketing.md`, current strategy, Sales Pipeline, and applicable `60 Knowledge` and `70 SOPs` notes. Read the actual previous Monday–Sunday client-meeting commitments and current Ads review evidence before allocating delivery time; distinguish scheduled work from carryover.
+5. Read relevant shared business context: `25 Marketing/Marketing.md`, current strategy, Sales Pipeline, commercial meetings, leadership/People decisions and applicable business `60 Knowledge` and `70 SOPs` notes. Do not load Clients, Client Flow, client-meeting commitments or client Ads review evidence by default. Read narrowly linked client evidence only for a material CEO decision.
 6. From the private root, read the most recent completed weekly review and every AI conversation capture since that review. Collect unresolved lessons, recurrences and contradictions. Read `05 Weekly/Weekly Flow.md` for the current sales-review cadence, reporting period and delivery preferences rather than resetting them from memory.
 7. Search the authorised roots separately for relevant unresolved tasks, blockers, open decisions and material changes. Do not automatically copy ordinary delivery tasks into the private Attention Queue. Verify shared files are locally readable and current; a cloud placeholder or inaccessible root is not evidence of no client work.
-8. If shared context is unavailable or freshness is uncertain, continue the personal interview with that limitation explicit. Do not invent client state, create a substitute shared vault or duplicate team notes privately. Reconcile the missing shared evidence before confirming a delivery-dependent plan.
-9. When accessible, review the previous week's completed and unfinished WeekFlow tasks as evidence about time and work, not as canonical business decisions. Use Australia/Melbourne dates and ISO week numbers.
+8. If shared business context is unavailable or freshness is uncertain, continue the interview with that limitation explicit. Do not invent commercial state, create a substitute shared vault or duplicate team notes privately. Keep evidence-dependent business commitments provisional until reconciled.
+9. When accessible, review the previous week's CEO/business WeekFlow tasks as evidence about time and work, not as canonical business decisions. Use aggregate delivery load only to establish available capacity; leave delivery-task review to the staff flow. Use Australia/Melbourne dates and ISO week numbers.
 
 ## Write destinations and privacy
 
@@ -115,10 +117,10 @@ Then run the interview one section at a time. Ask one main question per message;
 
 ### 1. Wins
 
-Ask what went well in the previous week. Do not rely on unaided recall. Offer brief evidence-based memory prompts from the vault, campaign data and WeekFlow across:
+Ask what went well in the previous week. Do not rely on unaided recall. Offer brief evidence-based memory prompts from the vault, LHM's own marketing data and business WeekFlow commitments across:
 
 - Sales, leads and cash
-- Client launches, results and positive feedback
+- Revenue, retention or company reputation changes requiring CEO attention
 - Marketing progress
 - Systems, AI tools and the LHM Brain
 - Team delegation and completed work
@@ -143,7 +145,7 @@ After the answer:
 
 ### 3. Time and unfinished work
 
-Review the previous week's completed and unfinished WeekFlow tasks when accessible. Use the review to understand where Michael's time went, not to copy a task list into Obsidian.
+Review the previous week's completed and unfinished CEO/business WeekFlow tasks when accessible. Use the review to understand where Michael's business time went, not to copy a task list into Obsidian. Leave client-task carryover and staff commitment review to the staff flow.
 
 Workshop only material unfinished work using one disposition:
 
@@ -227,7 +229,7 @@ Challenge:
 - Vague activity phrased as an outcome
 - More than three primary priorities
 - Commitments without an owner, next action or agreed timing; distinguish a planning day from a client deadline
-- Work that does not advance a goal, unblock delivery or protect a live campaign
+- Work that does not advance a company goal, sales opportunity or material CEO decision
 - Workload that exceeds known capacity
 
 Use Michael's opening energy and capacity check when judging workload. A free week permits deeper work, but still turn broad intentions such as `smash through the Brain` into one or more observable deliverables.
@@ -242,15 +244,15 @@ Confirm the final plan with Michael before marking the review complete.
 
 ## Capacity and priority decisions
 
-Rank work using evidence: first actions that unblock another person or protect a client promise/live service, then due client delivery, then agreed opportunities and internal improvements. A genuine immediate client risk can outrank an ordinary handoff. Explain the top choices; do not mark every item high priority.
+Rank business work using evidence: urgent cash or revenue risks and consequential CEO decisions, then sales commitments and growth opportunities, then agreed strategic and business-system improvements. Escalate material client risks as CEO decisions and route their delivery tasks to the staff flow. Explain the top choices; do not mark every item high priority.
 
-Read current preferences and reconcile fixed meetings, follow-up time, working hours, hard stops, holidays, energy and effort uncertainty. Prefer three meaningful daily outcomes plus a short admin batch, with buffer; this is a planning default, not a quota or licence to hide distinct tasks in a large batch. Do not require evenings/weekends or infer availability from the current clock. If the user says they can do more today, propose a bounded selection in their actual available window.
+Read current preferences and reconcile fixed meetings, sales follow-up time, existing staff commitments, working hours, hard stops, holidays, energy and effort uncertainty. Capacity-check the weekly business outcomes with buffer. Leave daily task selection to the staff flow. Do not require evenings/weekends or infer availability from the current clock.
 
-Keep `must do`, `if time`, `waiting` and `parked` distinct. Client meeting wraps and project handoffs precede optional internal work when that is Michael's confirmed preference. New work must expose what it displaces. If this-week work will not fit, propose a disposition and obtain Michael's decision before moving it to next week; an estimated schedule is not a revised client promise.
+Keep `must do`, `if time`, `waiting` and `parked` distinct. Account for existing staff-flow commitments as capacity constraints without reselecting or rescheduling them. New business work must expose what it displaces. If this-week work will not fit, propose a disposition and obtain Michael's decision before moving it to next week.
 
 ## Authorised action-session handoff
 
-Keep the execution queue separate from the founder review. Carry only relevant task links, decisions and next steps into it, not private reflections. For substantive client work, prepare a bounded handoff into the verified client workspace: task ID/link, client context and working-folder links, inputs, scope, expected output, approval limits and next owner. Do not assume ChatGPT/Claude projects inherit the planning conversation or can access an arbitrary local file.
+Keep optional business execution separate from the founder review. Carry only relevant task links, decisions and next steps into it, not private reflections. Route client execution and daily planning to the staff flow with only an explicitly agreed team-safe decision and source links. Do not prepare client production from this skill or assume another chat inherits this conversation.
 
 During action work, route task mutations through `basicops-task-manager`. Draft follow-up emails with exact recipients and text for review before sending. Approval of a draft authorises that exact send; do not ask again unless recipients/content materially change. Task completion, a draft or a BasicOps comment does not prove an email was sent. Verify the send and record its link against the source task. Consolidate related asks to the same recipient when appropriate.
 
@@ -286,7 +288,7 @@ When Michael confirms the plan:
 4. Update canonical goal, marketing and project notes without duplicating detailed task lists.
 5. Set the weekly note to `status: complete`.
 6. Check internal links and avoid duplicate weekly notes.
-7. Finish with a short brief: prior-week result, this week's three outcomes, Michael's decisions, blockers and the first action. Report optional action work separately, including what was applied, drafted, sent or still waiting. Measure useful progress by handoffs released and client commitments advanced, not raw task counts. Offer the optional action session once.
+7. Finish with a short brief: prior-week business result, this week's three outcomes, Michael's CEO decisions, blockers and the first business action. Report optional action work separately, including what was applied, drafted, sent or still waiting. Measure progress by commercial results and business outcomes. Offer an optional business action session once; leave the staff flow for Michael to run separately.
 
 ## Guardrails
 
