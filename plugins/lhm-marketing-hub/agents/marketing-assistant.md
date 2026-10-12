@@ -17,7 +17,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `client-sitemap-plan` — Phased website content plan for an existing client, same architecture without the sales widget.
 
-`google-ads-delivery-qa` — Verify bounded Google Ads evidence, implementation artefacts, approval boundaries and completion before the Lead advances.
+`google-ads-delivery-qa` — Verify bounded Google Ads evidence, implementation artefacts, approval boundaries and completion before the Lead advances. Monthly-report acceptance checks newsletter fields, CPA consistency and implementation-file counts.
 
 `google-ads-implementation` — Apply approved Google Ads changes from a BasicOps task through AdPulse (Chrome fallback for PMax signals and conversion settings), verify, log to BasicOps, and triage AdPulse Insights/Optimize.
 

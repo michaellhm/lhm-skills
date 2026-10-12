@@ -33,3 +33,10 @@ Use `ads-weekly-digest.py status YYYY-MM-DD` to reconcile provider events. Queue
 Reuse the SEO newsletter layout with 🔴 Red, 🟠 Orange, 🟡 Yellow, 🔵 Blue, 🟢 Green or ⚪ Unverified and a text reason. Each successful client has up to four highlights, comparison/confidence context, Start here and one Open review card button. Failed clients have their blocker and no fabricated button. Escape all HTML. Send HTML and plain text through the existing Mailgun helper as Lily, to Michael only, Reply-To Michael. Credentials remain in the existing secret route.
 
 Install the scripts from the published immutable commit, preserve prior router/cron configuration and record hashes. Extend the existing Ads cron rather than creating a duplicate schedule. Dry-run validation must cover all zones, failed clients, unsafe links, missing receipts, cohort mismatches and uncertain-send deduplication. Do not send a sample email unless requested. Rollback restores only the Ads router prompt/skill and prior report skill; preserve send receipts.
+
+
+## Fresh report acceptance
+
+Before any delivery dispatch, run the installed `validate-report.py REPORT_PATH`. It reads only the prepared report and requires one literal `ads_digest` fence, exactly the five newsletter fields and agreement with human Highlights/Start here. An ordinary JSON fence under a digest heading and a large analytics object are rejected. Keep failed test reports and worker IDs. Do not rewrite a test result into a pass or synthesize a delivery receipt.
+
+This format check does not prove metric accuracy, source completeness or write permissions. Monthly report QA must check the complete corrected report, recalculate displayed CPA with the stated spend/conversion cohort, and count CSV changes. A no-send test may prove fresh analysis and renderer compatibility plus authenticated destination reads; it cannot claim upload/task-write success without actual writes.

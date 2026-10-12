@@ -151,6 +151,19 @@ If the destination is missing, dispatch is unavailable, either connector is unav
 
 For the scheduled weekly flow, follow `references/monday-digest.md`. Include a short Highlights section and Start here action in the report and return the matching `ads_digest` JSON block. The registered deterministic email script sends one Lily HTML/text digest only after terminal child results and verified delivery receipts. Report-only requests never send email.
 
+The returned report must contain this literal fenced block with these five newsletter fields. Replace every example value with evidence already stated in the human Highlights and Start here sections:
+
+```ads_digest
+{"light":"orange","status_reason":"Evidence-backed zone reason","stage":"Actual comparison windows; measurement confidence and caveat","highlights":["Exact human highlight"],"next_action":"Exact human Start here action"}
+```
+
+Use one to four highlights. Do not replace this object with an analytics object containing `zone`, budgets, campaign metrics or action registers, and do not put an ordinary `json` fence beneath an `ads_digest` heading. Keep analytical receipts separate. The human text and newsletter summary must agree.
+
+Before returning the completed monthly review, pass the whole report and its implementation-file counts to `google-ads-delivery-qa`. QA must check the literal fence, all five fields, matching human text, internally consistent CPA calculations with explicit spend/conversion cohorts, and advertised CSV row counts. A skill invocation or an analysis-only verdict is not report acceptance. Resolve any correction before final handback; disclose unavailable GA4/AdPulse reads without claiming measurement verification.
+
+The router runs `python3 /opt/data/profiles/lhm_brain/scripts/ads-weekly-digest/validate-report.py REPORT_PATH` before submitting delivery. This deterministic read-only check is permitted by the router contract and never sends. A failure keeps the report at correction-required; preserve the run ID and request one bounded format correction using its existing evidence. Do not manufacture newsletter fields, deliver a rejected report, or mark it complete. A no-send rehearsal validates and renders without submitting Drive/BasicOps delivery.
+
+
 ### Step 8: Hermes overview, BasicOps record and approval gate
 
 Return the compact overview and structured handback defined in the operating model after the delivery

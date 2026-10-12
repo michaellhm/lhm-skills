@@ -22,6 +22,7 @@ MANDATORY FIRST ACTION PER CLIENT
 DELIVERY
 - Read the registered client's `report_directory` from `/opt/data/profiles/lhm_brain/config/google-ads-clients.json`.
 - When Claude returns a complete QA-passed report, write that returned report body to `REPORT_DIRECTORY/google-ads-monthly-review-YYYY-MM.md` beneath the LHM vault.
+- Validate the whole report before dispatch with `python3 /opt/data/profiles/lhm_brain/scripts/ads-weekly-digest/validate-report.py REPORT_PATH`. This read-only validator is permitted. A failed report requires correction and must not be submitted or marked complete.
 - Submit it once with `/opt/data/profiles/lhm_brain/bin/monthly-review-delivery submit CLIENT_SLUG YYYY-MM RELATIVE_REPORT_PATH`, where `RELATIVE_REPORT_PATH` is the vault-relative path beginning `20 Clients/`. Do not pass an absolute path or a workspace path.
 - Preserve the delivery run ID; poll `monthly-review-delivery status RUN_ID` and retrieve `monthly-review-delivery result RUN_ID`.
 - Delivery is complete only when the Codex worker returns verified Google Drive and BasicOps URLs.
