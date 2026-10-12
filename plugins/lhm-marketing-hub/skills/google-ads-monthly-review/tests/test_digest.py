@@ -128,4 +128,23 @@ class DigestTests(unittest.TestCase):
         for at in [datetime(2026,9,21,3),datetime(2026,9,22,5)]:
             with self.assertRaises(ValueError):m.send_once('2026-09-21',self.render(),None,self.base/'receipts',at)
 
+    def test_malformed_analytical_types_stay_visible_without_crashing_cohort(self):
+        for payload in [
+            {'period':'2026-09-12 to 2026-10-11'},
+            {'period':{'current':'2026-09-12 to 2026-10-11'}},
+            {'period':{'prior':[]}},
+            {'metrics':[]},
+            {'totals':{'current':'invalid'}}
+        ]:
+            valid={'performance_zone':'orange','measurement_confidence':'low',
+                   'measurement_confidence_reason':'Cross-check unavailable',
+                   'period':{'current':{'start':'2026-08-22','end':'2026-09-20'},
+                             'prior':{'start':'2026-07-23','end':'2026-08-21'}},
+                   'metrics':{'conversions_current':1,'conversions_prior':2},
+                   'actions':[{'title':'Verify measurement'}]}
+            self.summary={**valid,**payload};self.write()
+            result=self.render()
+            self.assertIn('Report or delivery incomplete',result['text'])
+            self.assertNotIn('href=',result['html'])
+
 if __name__=='__main__':unittest.main()

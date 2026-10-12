@@ -59,8 +59,12 @@ def digest_card(digest):
         confidence = digest.get('measurement_confidence')
         reason = digest.get('measurement_confidence_reason')
         period = digest.get('period', {})
+        if not isinstance(period, dict):
+            raise ValueError('Invalid recorded comparison period object')
         current = period.get('current', digest.get('current_window', {}))
         prior = period.get('prior', digest.get('prior_window', {}))
+        if not isinstance(current, dict) or not isinstance(prior, dict):
+            raise ValueError('Invalid recorded comparison window object')
         dates = [current.get('start'), current.get('end'), prior.get('start'), prior.get('end')]
         if any(not isinstance(v, str) for v in dates):
             raise ValueError('Missing recorded comparison period')
@@ -73,6 +77,9 @@ def digest_card(digest):
             raise ValueError('Missing measurement confidence reason')
         metrics = digest.get('metrics', digest.get('account_metrics', {}))
         totals = digest.get('totals', {})
+        if not isinstance(metrics, dict) or not isinstance(totals, dict) or any(
+                not isinstance(totals.get(k, {}), dict) for k in ('current', 'prior')):
+            raise ValueError('Invalid recorded comparison metrics object')
         pairs = [('Recorded conversions', metrics.get('conversions_current', metrics.get('conversions', totals.get('current', {}).get('conversions'))),
                   metrics.get('conversions_prior', totals.get('prior', {}).get('conversions'))),
                  ('Recorded cost per conversion', metrics.get('cpa_current', metrics.get('cpa', totals.get('current', {}).get('cpa_aud'))),
