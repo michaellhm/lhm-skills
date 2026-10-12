@@ -2,7 +2,7 @@
 name: weekly-web-project-brief
 description: "Prepare Lily's Monday website portfolio email or apply Michael's consolidated project corrections. Use for 'weekly web projects', 'website weekly brief', 'Monday website email', 'update the web brief' or 'website brief feedback'. Reconciles Obsidian, BasicOps discussions, email and meeting evidence; produces an HTML table with due dates and red-first traffic lights."
 metadata:
-  version: 1.3.1
+  version: 1.3.4
 ---
 ## Client file routing
 
@@ -69,6 +69,8 @@ Use direct names and verbs: “Kristalyn: send David the prototype and ask for f
 
 Before send verify source completeness, all project scopes represented/deduplicated, next actors, approval anchors, due-date types, red-first sorting, new-project dates, completed-child suppression, no AI Support, no secrets/patient details, working evidence links, HTML and text outputs, approved recipients, and feedback instructions. If a core board cannot be read, save failure and do not send a seemingly complete portfolio. For a partial optional source, label affected rows orange and include the precise limitation.
 
+Before independent review, mechanically validate both directions of the final action mapping: every rendered action has one exact selected record and every selected record is rendered, including supplemental owner sweeps. Reject duplicate actions and completed/cancelled execution. Compare selected task URLs, statuses and actual assignees against the controller’s index of native get_task responses; retain evidence for cross-owner coordination. The controller recomputes the final counts from actual files; stale model-authored totals are not proof. Every retained/prerequisite baseline or archive disposition must map to exact visible current actions. A saved weekly plan or completed board moves do not complete its still-open delivery commitments. Preserve named confirmations unless same-scope evidence establishes completion, cancellation or replacement. Validate exact selected-action ownership, wording, execution-task links and unresolved dependency prerequisites. Reconcile the latest weekly archive actions as well, including one-offs. Read available canonical records for owner-only clients. See references/weekly-actions.md and references/freshness.md for schemas. Reviewers must complete the whole checklist and report all discoverable issues together.
+
 Before delivery, run scripts/quality.py against the run directory after independent controller review. A changed payload invalidates that review. A warning footer cannot excuse known factual regressions.
 
 Scheduled delivery: save brief.json, email.json, research-receipt.json, comparison.json, access-receipt.json, quality-review.json and preview.html before invoking send. The sender persists a weekly receipt before the network call; never remove it or retry an uncertain send via another route. Verify recipient delivery events; queued is not delivered. Save run outcome with message ID and verification state. Do not send extra team pings.
@@ -90,3 +92,12 @@ never triggers another email. The research worker has no archive-write or send a
 ## Separate Monday board reconciliation
 
 Read [board reconciliation](references/board-reconciliation.md) when asked to post weekly project summaries or reconcile boards after the report. This is a separate explicitly invoked execution job, never part of Scheduled report generation. Require the verified report dependency, live rereads, identity, owning-skill authority, deduplication and per-task readback in that contract.
+
+
+## Source-owned email search audit and timing
+
+Start every displayed project's Gmail coverage with an exact client/domain query containing `newer_than:30d`, without an additional narrower date restriction. Record `initial_query` and `followup_queries` in that project's Gmail source-coverage entry. The broker returns `query`, actual `read_at`, `result_count`, `truncated` and bounded `messages`, not a bare list. It fetches one extra metadata result to prove whether the requested page is capped. Resolve `truncated=true` through narrower terminal queries that collectively cover relevant client aliases and date ranges; the independent reviewer must check that coverage. A generic first name is not a client identity filter.
+
+The controller binds its own successful search log as `gmail_source_index`; researcher coverage assertions cannot replace it. Search results omit snippets and contact fields. Known booking/patient-form subjects are excluded and their IDs cannot be fetched through this run's broker. These exclusions do not establish that arbitrary email content is free of patient details. Read only relevant project correspondence and keep the independent privacy check.
+
+Use an actual ISO timestamp with timezone in `research.cutoff`, never a planned future time. For every project with a known `last_substantive_basicops_at`, calculate `inactivity_days` from its own dated activity in Melbourne; copied generic dates/reasons are not evidence. Retain website-related excluded Inbox candidates individually with task ID, current status and reason. Preserve unresolved prior project gaps and distinguish supplied files from verified platform access. Dedicated research and review use high reasoning effort on the existing Codex route, without changing global model/provider settings.

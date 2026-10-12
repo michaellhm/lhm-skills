@@ -11,7 +11,7 @@ brief.json schema (all content plain text, no embedded HTML):
 - priorities: list of strings.
 - new_projects: list of strings, identifying kickoff/handover dates; empty produces “No new website projects this week.”
 - projects: list of {name, url, light: red|orange|green, state, target, next}. Use verified https source links. Include owner in next. Order among equal lights is supplied by the researcher.
-- owners: list of {name, actions: list of strings or {client, text, url} objects}; allowed names Michael, Kristalyn, Aiya, Jaimee, Josephine. Use {client, text, url} objects for task-linked actions so the HTML shows readable linked text rather than long raw URLs. Omit Josephine when no current dependency requires her.
+- owners: list of {name, actions: list of strings or {client, text, url} objects}; allowed names Michael, Kristalyn, Aiya, Jaimee, Josephine. Actionable owner work must use {client, text, url} objects; plain strings are limited to “No immediate website action identified for this week” (or “No immediate action”). Use {client, text, url} objects for task-linked actions so the HTML shows readable linked text rather than long raw URLs. Omit Josephine when no current dependency requires her.
 - older_cards: list of strings, optional; identify actual remaining uncertainty, not allegations of inactivity.
 - limitations: string, optional, only limitations affecting interpretation.
 

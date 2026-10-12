@@ -31,8 +31,9 @@ Return `needs_evidence` when a required input is absent. Do not reconstruct miss
    - budget/bid recommendations state current value, proposed value, rationale and measurement/capacity dependency;
    - tracking work states the current definition, proposed definition, systems affected and verification event/query;
    - landing-page dependencies state the owning department, exact requirement and acceptance test.
-7. **Verification:** completion is supported by live readback, an observed artefact readback, or explicit human confirmation for a manual UI action. Instructions alone are not completion.
-8. **Next state:** the result has one exact next owner, action and handoff trigger.
+7. **Monthly report acceptance:** when the output is a monthly review or a weekly rehearsal, inspect the final combined report, not only individual proposed actions. Require exactly one literal `ads_digest` fence containing the five fields `light`, `status_reason`, `stage`, `highlights` (one to four nonempty strings) and `next_action`. Match highlights and first action to the human sections, preserve the mechanical zone and measurement caveats, and reject a large analytics object used instead. Recompute each displayed CPA from its stated spend and conversion cohort; reject conflicting summary figures. Require the actual diagnostic sections and required CSV/TXT bodies in the returned combined report; a reference to “above” in an earlier tool result is not a delivered section. Count implementation CSV rows and reconcile any excluded keyword against the advertised count. Check required available diagnostic reads before accepting a recommendation; an omitted available query is not an unavailable connector. Return `correction_required` for any mismatch and require the corrected whole report before `pass`. Missing GA4 or other required capability must remain an explicit measurement limitation, never a passed source check.
+8. **Verification:** completion is supported by live readback, an observed artefact readback, or explicit human confirmation for a manual UI action. Instructions alone are not completion.
+9. **Next state:** the result has one exact next owner, action and handoff trigger.
 
 ## Verdict
 

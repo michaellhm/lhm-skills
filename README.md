@@ -40,8 +40,8 @@ plugins/lhm-marketing-hub/             # The plugin
     bid-budget-optimizer/              # Budget and bid strategy
     keyword-optimizer/                 # Keyword and wasted spend analysis
     landing-page-optimizer/            # Landing page audits
-    google-ads-monthly-review/          # Account health, zone analysis and Monday highlights digest
-    google-ads-delivery-qa/             # Independent action-level evidence, artefact and completion gate
+    google-ads-monthly-review/          # Account health, zone analysis and validated Monday highlights digest
+    google-ads-delivery-qa/             # Action and monthly-report evidence, figures and completion gate
     google-ads-implementation/          # Apply approved changes from a BasicOps task via AdPulse or guided Chrome, plus AdPulse Insights/Optimize sweep
     quarterly-adversarial-review/       # 90-day red-team review: reconstructs prior work, tests assumptions, assigns AdPulse zone
     competitive-analysis/               # Competitor evaluation and market positioning
@@ -236,7 +236,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
     wp-project-manager/                 # Website PM state plus verified BasicOps handoff reconciliation
-    weekly-web-project-brief/           # Lily Monday 08:00 Melbourne brief: 07:00 preparation, visible clarifications, current-week failure supervision and verified shared weekly Obsidian archive
+    weekly-web-project-brief/           # Lily Monday 08:00 Melbourne brief: 07:00 preparation, visible clarifications, two-way selected-task mapping, supplemental-owner checks, complete baseline/archive action reconciliation, source-owned Gmail cap checks and verified shared weekly Obsidian archive
     website-project-cockpit/            # Website status and three-layer Obsidian/Web Projects/personal-task stage handoffs
     lp-project-manager/                 # Landing page campaign PM doc (migrated from WordPress hub; shim remains)
     gmb-project-manager/                # GMB optimisation cycle PM doc (migrated from GMB hub; shim remains)

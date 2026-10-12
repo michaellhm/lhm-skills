@@ -7,6 +7,18 @@ class RuntimeTests(unittest.TestCase):
   prompt=r.repair_prompt(Path('/skill'),Path('/output'))
   self.assertIn('{project: exact displayed name',prompt)
   self.assertIn('/output',prompt)
+ def test_baseline_must_match_supplied_approved_bytes(self):
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d);out=root/'output';out.mkdir();approved=root/'approved.json'
+   approved.write_text(json.dumps({'owners':[{'name':'Michael','actions':['Keep this commitment']}]}))
+   copied=out/'baseline.json';copied.write_bytes(approved.read_bytes())
+   item={'path':'baseline.json','sha256':r.digest(copied)}
+   r.validate_baseline(out,item,approved)
+   copied.write_text(json.dumps({'owners':[]}));item['sha256']=r.digest(copied)
+   with self.assertRaisesRegex(ValueError,'differs from supplied'):
+    r.validate_baseline(out,item,approved)
+   with self.assertRaisesRegex(ValueError,'inside run'):
+    r.validate_baseline(out,{'path':'../approved.json'},approved)
  def test_schedule_and_dst(self):
   for week,stamp in [('2026-09-21','2026-09-20T21:00:00+00:00'),('2026-10-05','2026-10-04T20:00:00+00:00')]:
    self.assertEqual(r.validate_request({'week':week,'mode':'scheduled'},datetime.fromisoformat(stamp)),week)
@@ -42,4 +54,36 @@ class RuntimeTests(unittest.TestCase):
    (root/'20 Clients/escape.md').symlink_to('/etc/passwd')
    with self.assertRaises(ValueError):r.vault_path(root,'20 Clients/escape.md')
    with self.assertRaises(ValueError):list(r.safe_files(root))
+ def test_task_index_keeps_latest_successful_native_read_and_ignores_errors(self):
+  with tempfile.TemporaryDirectory() as d:
+   work=Path(d);out=work/'output';out.mkdir();(out/'research-receipt.json').write_text(json.dumps({'evidence_files':[]}))
+   def call(status):
+    task={'id':7,'url':'https://example.com/task/7','status':status,'assignee':{'firstName':'Aiya'}}
+    return {'type':'item.completed','item':{'type':'mcp_tool_call','server':'basicops','tool':'get_task',
+      'arguments':{'taskId':7},'status':'completed','error':None,'result':{'content':[{'type':'text','text':json.dumps(task)}]}}}
+   for n,status in [(1,'New'),(2,'In Progress'),(10,'Complete')]:
+    name='events.jsonl' if n==1 else 'events-'+str(n)+'.jsonl';(work/name).write_text(json.dumps(call(status)))
+   bad=call('Cancelled');bad['item']['result']['isError']=True;(work/'events-11.jsonl').write_text(json.dumps(bad))
+   paths=r.retain_raw_reads(work,out);item=r.retain_task_index(paths,out)
+   task=json.loads((out/item['path']).read_text())['tasks']['7']['task']
+   self.assertEqual(task['status'],'Complete');self.assertEqual(r.digest(out/item['path']),item['sha256'])
+   self.assertEqual(item,r.retain_task_index(paths,out))
+ def test_search_metadata_is_bounded_and_omits_contact_and_snippet(self):
+  rows=[{'id':'a','subject':'Website review','from':'private@example.test','to':'person@example.test','date':'today','snippet':'private phone and health information'},
+        {'id':'b','subject':'New booking enquiry','snippet':'private health details','from':'patient@example.test'},
+        {'id':'c','subject':'Another result'}]
+  result=r.gmail_search_result(rows,'newer_than:30d ExactClient',2)
+  self.assertTrue(result['truncated']);self.assertEqual(result['result_count'],2)
+  self.assertEqual(result['messages'][1],{'id':'b','excluded':'patient_or_booking_form'})
+  text=json.dumps(result);self.assertNotIn('private',text);self.assertNotIn('patient@example',text)
+  self.assertFalse(r.gmail_search_result(rows[:2],'query',2)['truncated'])
+ def test_excluded_patient_form_cannot_be_fetched(self):
+  with self.assertRaisesRegex(ValueError,'outside project research'):
+   r.source_read({'_excluded_gmail_ids':{'abc'}},{'action':'gmail-get','value':'abc'})
+ def test_search_fetches_one_extra_result_to_prove_truncation(self):
+  from unittest.mock import patch
+  import types
+  with patch.object(r.subprocess,'run',return_value=types.SimpleNamespace(returncode=0,stdout=json.dumps([{'id':str(x),'subject':'Website'} for x in range(11)]),stderr='')) as run:
+   value=r.source_read({}, {'action':'gmail-search','value':'newer_than:30d Example','max':10})
+   self.assertEqual(run.call_args.args[0][-1],'11');self.assertTrue(value['truncated']);self.assertEqual(len(value['messages']),10)
 if __name__=='__main__':unittest.main()
