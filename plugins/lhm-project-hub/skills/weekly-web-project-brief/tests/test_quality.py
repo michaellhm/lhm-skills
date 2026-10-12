@@ -20,7 +20,7 @@ class QualityTest(unittest.TestCase):
         self.write('inbox-review.json', {'boards':[{'owner':n,'board_id':1,'section_id':2,'status':'complete','terminal':True,'selected_actions':[]} for n in ['Michael','Kristalyn','Aiya']]})
         research=json.loads((self.p/'research-receipt.json').read_text());research['evidence_files'].append({'path':'inbox-review.json','sha256':q.digest(self.p/'inbox-review.json')});self.write('research-receipt.json',research)
         self.write('brief.json',{'projects':[{'name':'Example'}]})
-        research=json.loads((self.p/'research-receipt.json').read_text());research['project_source_coverage']=[{'project':'Example',**{k:{'status':'complete','evidence':['source.txt']} for k in ('gmail','obsidian','basicops')}}];self.write('research-receipt.json',research)
+        research=json.loads((self.p/'research-receipt.json').read_text());research['project_source_coverage']=[{'project':'Example',**{k:{'status':'complete','evidence':['source.txt']} for k in ('gmail','obsidian','basicops')}}];research['mechanical_action_check']=q.action_check(self.p);self.write('research-receipt.json',research)
         self.review()
     def write(self,n,d): (self.p/n).write_text(json.dumps(d))
     def change(self,n,fn):
@@ -72,5 +72,35 @@ class QualityTest(unittest.TestCase):
     def test_missing_meeting_reason(self):
         self.change('research-receipt.json',lambda d:d['coverage']['meetings'].pop('reason'))
         with self.assertRaisesRegex(ValueError,'Meeting coverage'):q.validate(self.p)
+
+
+    def test_stale_final_count_fails_even_with_accepted_review(self):
+        self.change('research-receipt.json', lambda d:d['mechanical_action_check'].update(count=32))
+        with self.assertRaisesRegex(ValueError, 'receipt missing or stale'):
+            q.validate(self.p)
+
+    def test_supplemental_owner_is_checked_and_counted(self):
+        a={'client':'Example','text':'Verify current QA result','url':'https://example.com/task/9'}
+        self.write('brief.json',{'projects':[{'name':'Example'}],'owners':[{'name':'Jaimee','actions':[a]}]})
+        inbox=json.loads((self.p/'inbox-review.json').read_text())
+        supplemental={'owner':'Jaimee','board_id':9,'section_id':3,'status':'complete','terminal':True,
+                      'selected_actions':[{'action_owner':'Jaimee','client':a['client'],'url':a['url'],
+                                           'rendered_action':a['text'],'selection_kind':'prerequisite','dependency_state':'unresolved',
+                                           'task_id':9,'status':'Under Review','task_assignee':'Jaimee Test'}]}
+        inbox['additional_owner_sweeps']=[supplemental];self.write('inbox-review.json',inbox)
+        self.write('task-index.json',{'tasks':{'9':{'task':{'id':9,'url':a['url'],'status':'Under Review',
+                                                                  'assignee':{'firstName':'Jaimee','lastName':'Test'}}}}})
+        def bind(d):
+            next(x for x in d['evidence_files'] if x['path']=='inbox-review.json')['sha256']=q.digest(self.p/'inbox-review.json')
+            index={'path':'task-index.json','sha256':q.digest(self.p/'task-index.json')}
+            d['task_source_index']=index
+            if index not in d['evidence_files']:d['evidence_files'].append(index)
+            d['mechanical_action_check']=q.action_check(self.p)
+        self.change('research-receipt.json',bind)
+        self.assertEqual(q.validate(self.p)['state'],'quality_passed')
+        inbox['additional_owner_sweeps'][0]['terminal']=False;self.write('inbox-review.json',inbox)
+        self.change('research-receipt.json',bind)
+        with self.assertRaisesRegex(ValueError,'Incomplete owner inbox'):
+            q.validate(self.p)
 
 if __name__=='__main__':unittest.main()

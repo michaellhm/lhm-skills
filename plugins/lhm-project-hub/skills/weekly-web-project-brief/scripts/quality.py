@@ -3,6 +3,7 @@
 import hashlib
 import html
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -17,21 +18,38 @@ def validate_actions(brief, boards, baseline, comparison):
         if not test:
             raise ValueError(message)
     owners = {o['name']: o.get('actions', []) for o in brief.get('owners', [])}
+    require(len(owners) == len(brief.get('owners', [])), 'Duplicate owner sections')
+    for actions in owners.values():
+        for action in actions:
+            require(isinstance(action, dict) or (isinstance(action, str) and action.strip().rstrip('.') in
+                    ('No immediate website action identified for this week', 'No immediate action')),
+                    'Actionable owner work needs a linked action object, not unchecked prose')
+    rendered = [(owner, a.get('client'), a.get('text'), a.get('url'))
+                for owner, actions in owners.items() for a in actions if isinstance(a, dict)]
+    require(len(rendered) == len(set(rendered)), 'Duplicate rendered action')
+    selected_keys = []
     for board in boards:
         for selected in board['selected_actions']:
             owner = selected.get('action_owner', board['owner'])
+            selected_keys.append((owner, selected.get('client'), selected.get('rendered_action'), selected.get('url')))
             require(selected.get('selection_kind') in ('execution', 'prerequisite'),
                     'Selected action needs execution/prerequisite classification')
             require(selected.get('dependency_state') in ('clear', 'unresolved', 'not_applicable'),
                     'Selected action needs dependency state')
             require(not (selected['selection_kind'] == 'execution' and selected['dependency_state'] == 'unresolved'),
                     'Future-gated execution must be replaced by its immediate prerequisite')
+            require(not (selected['selection_kind'] == 'execution' and
+                         selected.get('status') in ('Complete', 'Cancelled', 'Decline')),
+                    'Completed or cancelled task cannot select execution')
             require(selected.get('url') and selected.get('client') and selected.get('rendered_action'),
                     'Selected action needs exact client, task/evidence URL and rendered action')
             require(any(isinstance(a, dict) and all(a.get(k) == selected.get(v)
                     for k, v in (('client', 'client'), ('url', 'url'), ('text', 'rendered_action')))
                     for a in owners.get(owner, [])),
                     'Selected action missing or mapped to a different task/owner: ' + str(selected.get('task_id', selected['url'])))
+    require(len(selected_keys) == len(set(selected_keys)), 'Duplicate selected action')
+    require(set(rendered) == set(selected_keys),
+            'Every rendered action needs an exact verified selection; include supplemental owner sweeps')
     def key(owner, action):
         return json.dumps([owner, action], sort_keys=True, ensure_ascii=False)
     expected = {key(o['name'], a) for o in baseline.get('owners', []) for a in o.get('actions', [])}
@@ -48,6 +66,62 @@ def validate_actions(brief, boards, baseline, comparison):
                 'Every baseline action needs an evidenced disposition')
     require(len(actual) == len(set(actual)) and set(actual) == expected,
             'Every approved baseline action needs exactly one disposition; do not silently drop commitments')
+
+    for group in ('action_dispositions', 'archive_action_dispositions', 'archive_correction_dispositions'):
+        require(isinstance(comparison.get(group, []), list), 'Action disposition group must be a list')
+        for item in comparison.get(group, []):
+            require(item.get('disposition') in ('retained', 'completed', 'cancelled', 'superseded', 'prerequisite')
+                    and item.get('reason') and item.get('current_evidence_ids'),
+                    'Every historical commitment needs an evidenced disposition')
+            links = item.get('current_actions', [])
+            if item['disposition'] in ('retained', 'prerequisite'):
+                require(isinstance(links, list) and links,
+                        'Retained commitment needs exact current_actions mappings: ' + group)
+            require(isinstance(links, list), 'Current action mappings must be a list')
+            for link in links:
+                require(isinstance(link, dict) and isinstance(link.get('action'), dict)
+                        and link.get('action') in owners.get(link.get('owner'), []),
+                        'Historical commitment maps to an absent or changed current action: ' + group)
+    return {'count': len(rendered), 'selected_count': len(selected_keys),
+            'unique_task_urls': len({a[3] for a in rendered}), 'unmatched': 0}
+
+
+def action_check(directory):
+    """Compute final reconciliation from the files, never a model's claimed count."""
+    root = Path(directory)
+    def read(name):
+        return json.loads((root / name).read_text())
+    comparison, inbox = read('comparison.json'), read('inbox-review.json')
+    baseline = json.loads((root / comparison['baseline']['path']).read_text())
+    return validate_actions(read('brief.json'), inbox['boards'] + inbox.get('additional_owner_sweeps', []),
+                            baseline, comparison)
+
+
+def validate_task_bindings(boards, tasks, gaps=()):
+    """Compare draft fields with controller-retained native get_task responses."""
+    for board in boards:
+        for selected in board['selected_actions']:
+            if selected.get('missing_execution_task') is True:
+                if not any(g.get('id') == selected.get('gap_id') and g.get('source') == 'basicops' for g in gaps):
+                    raise ValueError('Missing execution card needs a disclosed BasicOps project gap')
+                continue
+            source = tasks.get(str(selected.get('task_id')), {}).get('task')
+            if not isinstance(source, dict):
+                raise ValueError('No actual worker get_task response for selected action')
+            assignee = source.get('assignee') or {}
+            name = ' '.join(assignee.get(k, '') for k in ('firstName', 'lastName')).strip()
+            if (selected.get('url') != source.get('url') or selected.get('status') != source.get('status')
+                    or selected.get('task_assignee') != name):
+                raise ValueError('Selected URL, status or assignee differs from native task response')
+            owner = selected.get('action_owner', board['owner'])
+            given = assignee.get('firstName', '').split()
+            assigned = bool(given) and owner in (assignee.get('firstName'), given[0])
+            orchestrates = bool(re.search(r'\borchestration_owner=' + re.escape(owner) + r'(?=[;\s<]|$)',
+                                          source.get('description', '')))
+            basis = selected.get('ownership_basis', '')
+            if not assigned and not (basis and selected.get('source') and
+                    ('coordination' in basis.lower() or orchestrates)):
+                raise ValueError('Cross-owner action needs evidenced recommended coordination')
 
 
 def validate(directory, require_review=True):
@@ -121,7 +195,11 @@ def validate(directory, require_review=True):
     inbox = read('inbox-review.json')
     boards = inbox.get('boards', [])
     require(len(boards) == 3 and {b.get('owner') for b in boards} == {'Michael', 'Kristalyn', 'Aiya'}, 'Three owner inbox sweeps required')
-    for board in boards:
+    supplemental = inbox.get('additional_owner_sweeps', [])
+    require(isinstance(supplemental, list), 'Supplemental owner sweeps must be a list')
+    all_boards = boards + supplemental
+    require(len({b.get('owner') for b in all_boards}) == len(all_boards), 'Duplicate owner inbox sweep')
+    for board in all_boards:
         require(board.get('status') == 'complete' and board.get('terminal') is True and board.get('board_id') and board.get('section_id'), 'Incomplete owner inbox sweep: ' + str(board.get('owner')))
         require(isinstance(board.get('selected_actions'), list), 'Selected weekly actions missing')
     bound_file(comparison['baseline'])
@@ -130,7 +208,14 @@ def validate(directory, require_review=True):
         baseline_path = root / baseline_path
     baseline = json.loads(baseline_path.read_text())
     require(isinstance(baseline, dict) and isinstance(baseline.get('owners'), list), 'Approved baseline must contain owner actions')
-    validate_actions(brief, boards, baseline, comparison)
+    result = validate_actions(brief, all_boards, baseline, comparison)
+    require(research.get('mechanical_action_check') == result,
+            'Final mechanical action receipt missing or stale; controller must recompute it')
+    if result['count']:
+        index = research.get('task_source_index', {})
+        require(index.get('path') in file_names, 'Controller task-source index must be hash-bound')
+        bound_file(index)
+        validate_task_bindings(all_boards, read(index['path'])['tasks'], gaps)
     require(bool(comparison.get('projects')), 'No baseline comparison')
     require(comparison.get('unresolved_regressions') == [], 'Unresolved factual regression')
     if not require_review:

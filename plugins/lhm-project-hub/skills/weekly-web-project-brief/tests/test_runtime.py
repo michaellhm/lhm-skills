@@ -54,4 +54,18 @@ class RuntimeTests(unittest.TestCase):
    (root/'20 Clients/escape.md').symlink_to('/etc/passwd')
    with self.assertRaises(ValueError):r.vault_path(root,'20 Clients/escape.md')
    with self.assertRaises(ValueError):list(r.safe_files(root))
+ def test_task_index_keeps_latest_successful_native_read_and_ignores_errors(self):
+  with tempfile.TemporaryDirectory() as d:
+   work=Path(d);out=work/'output';out.mkdir();(out/'research-receipt.json').write_text(json.dumps({'evidence_files':[]}))
+   def call(status):
+    task={'id':7,'url':'https://example.com/task/7','status':status,'assignee':{'firstName':'Aiya'}}
+    return {'type':'item.completed','item':{'type':'mcp_tool_call','server':'basicops','tool':'get_task',
+      'arguments':{'taskId':7},'status':'completed','error':None,'result':{'content':[{'type':'text','text':json.dumps(task)}]}}}
+   for n,status in [(1,'New'),(2,'In Progress'),(10,'Complete')]:
+    name='events.jsonl' if n==1 else 'events-'+str(n)+'.jsonl';(work/name).write_text(json.dumps(call(status)))
+   bad=call('Cancelled');bad['item']['result']['isError']=True;(work/'events-11.jsonl').write_text(json.dumps(bad))
+   paths=r.retain_raw_reads(work,out);item=r.retain_task_index(paths,out)
+   task=json.loads((out/item['path']).read_text())['tasks']['7']['task']
+   self.assertEqual(task['status'],'Complete');self.assertEqual(r.digest(out/item['path']),item['sha256'])
+   self.assertEqual(item,r.retain_task_index(paths,out))
 if __name__=='__main__':unittest.main()
