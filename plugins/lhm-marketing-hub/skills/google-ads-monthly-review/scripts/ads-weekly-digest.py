@@ -4,6 +4,7 @@ import fcntl
 import hashlib
 import importlib.util
 import json
+import math
 import re
 import sys
 from datetime import date, datetime
@@ -20,10 +21,93 @@ SENDER = 'Lily | Local Health Marketing <lily@mg.brieflyflow.io>'
 
 
 def block(text, kind):
-    found = re.findall(r'```' + kind + r'\s*\n(.*?)\n```', text, re.S)
-    if len(found) != 1:
-        raise ValueError('Expected exactly one ' + kind + ' receipt')
-    return json.loads(found[0])
+    # Accept the two labelled fences and a JSON envelope emitted by older workers.
+    # Count every explicit candidate: ambiguity must never select the first receipt.
+    labelled = re.findall(r'^```(?:json[ \t]+)?' + re.escape(kind) +
+                          r'[ \t]*\r?\n(.*?)(?=^```|\Z)', text, re.S | re.M)
+    found = [json.loads(body) for body in labelled]
+    for body in re.findall(r'^```json[ \t]*\r?\n(.*?)(?=^```|\Z)', text, re.S | re.M):
+        try:
+            value = json.loads(body)
+        except ValueError:
+            if re.search(r'"' + re.escape(kind) + r'"\s*:', body):
+                raise ValueError('Malformed ' + kind + ' receipt')
+            continue
+        if isinstance(value, dict) and kind in value:
+            found.append(value[kind])
+    if len(found) != 1 or not isinstance(found[0], dict):
+        raise ValueError('Expected exactly one ' + kind + ' receipt object')
+    value = found[0]
+    if kind in value:
+        if len(value) != 1 or not isinstance(value[kind], dict):
+            raise ValueError('Ambiguous ' + kind + ' envelope')
+        value = value[kind]
+    return value
+
+
+def digest_card(digest):
+    """Normalize recorded summaries only; never infer zones, approvals or new findings."""
+    required = {'light', 'status_reason', 'stage', 'highlights', 'next_action'}
+    if required & digest.keys():
+        if not required <= digest.keys():
+            raise ValueError('Incomplete email summary fields')
+        card = {k: digest[k] for k in required}
+    else:
+        # Historical analytical receipts contain evidence instead of newsletter fields.
+        # Copy a bounded set of recorded facts with neutral labels, not fresh analysis.
+        zone = digest.get('performance_zone')
+        confidence = digest.get('measurement_confidence')
+        reason = digest.get('measurement_confidence_reason')
+        period = digest.get('period', {})
+        current = period.get('current', digest.get('current_window', {}))
+        prior = period.get('prior', digest.get('prior_window', {}))
+        dates = [current.get('start'), current.get('end'), prior.get('start'), prior.get('end')]
+        if any(not isinstance(v, str) for v in dates):
+            raise ValueError('Missing recorded comparison period')
+        parsed = [date.fromisoformat(v) for v in dates]
+        if parsed[0] > parsed[1] or parsed[2] > parsed[3] or parsed[3] >= parsed[0]:
+            raise ValueError('Invalid recorded comparison period')
+        if not isinstance(confidence, str) or not confidence.strip():
+            raise ValueError('Missing measurement confidence')
+        if not isinstance(reason, str) or not reason.strip():
+            raise ValueError('Missing measurement confidence reason')
+        metrics = digest.get('metrics', digest.get('account_metrics', {}))
+        totals = digest.get('totals', {})
+        pairs = [('Recorded conversions', metrics.get('conversions_current', metrics.get('conversions', totals.get('current', {}).get('conversions'))),
+                  metrics.get('conversions_prior', totals.get('prior', {}).get('conversions'))),
+                 ('Recorded cost per conversion', metrics.get('cpa_current', metrics.get('cpa', totals.get('current', {}).get('cpa_aud'))),
+                  metrics.get('cpa_prior', totals.get('prior', {}).get('cpa_aud')))]
+        highlights = []
+        for label, now, before in pairs:
+            if all(isinstance(v, (int, float)) and not isinstance(v, bool) and
+                   math.isfinite(v) and v >= 0 for v in (now, before)):
+                highlights.append(f'{label}: {now:g} current; {before:g} prior.')
+        if not highlights:
+            raise ValueError('Missing recorded comparison metrics')
+        highlights.append('Measurement caveat: ' + reason)
+        actions = digest.get('actions')
+        if not isinstance(actions, list) or not actions or not isinstance(actions[0], dict):
+            raise ValueError('Missing recorded first action')
+        title = actions[0].get('title')
+        if not isinstance(title, str) or not title.strip():
+            raise ValueError('Missing recorded first action title')
+        caution = digest.get('zone_caution') or digest.get('operational_caution')
+        if caution is not None and not isinstance(caution, str):
+            raise ValueError('Invalid recorded zone caution')
+        card = {'light': zone,
+                'status_reason': caution or 'Performance zone recorded in the completed review',
+                'stage': f'{dates[0]} to {dates[1]} versus {dates[2]} to {dates[3]}; measurement confidence: {confidence}',
+                'highlights': highlights,
+                'next_action': 'Review proposed action: ' + title}
+    for key in ('light', 'status_reason', 'stage', 'next_action'):
+        if not isinstance(card[key], str) or not card[key].strip():
+            raise ValueError('Invalid email summary field: ' + key)
+    if card['light'].lower() not in ('red', 'orange', 'yellow', 'blue', 'green', 'unknown'):
+        raise ValueError('Invalid recorded performance zone')
+    if not isinstance(card['highlights'], list) or not 1 <= len(card['highlights']) <= 4 or any(
+            not isinstance(v, str) or not v.strip() for v in card['highlights']):
+        raise ValueError('Invalid email highlights')
+    return card
 
 
 def week_date(value):
@@ -74,7 +158,7 @@ def assemble(manifest, registry, runs=RUNS):
             digest = block(report, 'ads_digest')
             if not isinstance(receipt.get('verified_basicops_url'), str) or not receipt['verified_basicops_url']:
                 raise ValueError('Verified BasicOps card URL missing')
-            card = {**digest, 'name': name, 'task_url': receipt['verified_basicops_url']}
+            card = {**digest_card(digest), 'name': name, 'task_url': receipt['verified_basicops_url']}
             render({'subject':'Validation','heading':'Validation','intro':'','footer':'','clients':[card]})
             cards.append(card)
         except (ValueError, KeyError, OSError, IndexError) as exc:

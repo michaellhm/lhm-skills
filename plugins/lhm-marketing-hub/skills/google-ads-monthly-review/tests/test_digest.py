@@ -73,6 +73,57 @@ class DigestTests(unittest.TestCase):
         for _ in range(2):m.send_once('2026-09-21',self.render(),mail,self.base/'receipts',at)
         self.assertEqual(len(calls),1);self.assertEqual(calls[0][1]['to'],m.RECIPIENT)
         self.assertNotIn('cc',calls[0][1])
+    def test_supported_receipt_encodings(self):
+        for text in ['```ads_digest\n'+json.dumps(self.summary)+'\n```',
+                     '```json ads_digest\n'+json.dumps(self.summary)+'\n```',
+                     '```json ads_digest\n'+json.dumps(self.summary)+'\n',
+                     '```json\n'+json.dumps({'ads_digest':self.summary})+'\n```']:
+            (self.run/'prompt.txt').write_text('REPORT CONTENT\n---\n'+text)
+            self.assertIn(self.summary['highlights'][0],self.render()['text'])
+            self.assertEqual(self.render()['html'].count('href='),1)
+    def legacy(self):
+        return {'performance_zone':'blue','measurement_confidence':'low',
+                'measurement_confidence_reason':'Conversion events are not verified patients.',
+                'period':{'current':{'start':'2026-08-22','end':'2026-09-20'},
+                          'prior':{'start':'2026-07-23','end':'2026-08-21'}},
+                'metrics':{'conversions_current':4,'conversions_prior':8,'cpa_current':90,'cpa_prior':45},
+                'actions':[{'title':'Check conversion settings','status':'approved'}]}
+    def test_legacy_analytical_schemas(self):
+        for shape in ['metrics','totals','account_metrics']:
+            d=self.legacy()
+            if shape=='totals':
+                del d['metrics'];d['totals']={'current':{'conversions':4,'cpa_aud':90},'prior':{'conversions':8,'cpa_aud':45}}
+            elif shape=='account_metrics':
+                del d['metrics'];d['account_metrics']={'conversions':4,'conversions_prior':8,'cpa':90,'cpa_prior':45}
+                d['current_window']=d['period']['current'];d['prior_window']=d.pop('period')['prior']
+                d['zone_caution']='Alternate budget changes the zone; decision required.'
+            card=m.digest_card(d)
+            self.assertEqual(card['light'],'blue')
+            self.assertIn('4 current; 8 prior',card['highlights'][0])
+            self.assertEqual(card['next_action'],'Review proposed action: Check conversion settings')
+            self.assertNotIn('approved',json.dumps(card))
+            self.assertIn('2026-08-22',card['stage'])
+            if shape=='account_metrics':self.assertEqual(card['status_reason'],d['zone_caution'])
+    def test_duplicate_and_malformed_receipts_fail_closed(self):
+        one='```ads_digest\n'+json.dumps(self.summary)+'\n```'
+        for text in [one+'\n```json\n'+json.dumps({'ads_digest':self.summary})+'\n```',
+                     '```json\n{"ads_digest": broken}\n```',
+                     '```ads_digest\n[]\n```',
+                     '```json ads_digest\n{"light":',
+                     '```json ads_digest\n'+json.dumps(self.summary)+'\nUnrelated trailing prose']:
+            with self.assertRaises(ValueError):m.block(text,'ads_digest')
+    def test_incomplete_legacy_data_never_invents_summary(self):
+        for key in ['performance_zone','measurement_confidence','period','actions','metrics']:
+            d=self.legacy();del d[key]
+            with self.assertRaises(ValueError):m.digest_card(d)
+        d=self.legacy();d['light']='green'
+        with self.assertRaises(ValueError):m.digest_card(d)
+        d=self.legacy();d['performance_zone']='unsupported'
+        with self.assertRaises(ValueError):m.digest_card(d)
+    def test_malformed_types_become_visible_gap(self):
+        self.summary['highlights']='not a list';self.write()
+        self.assertIn('Invalid email highlights',self.render()['text'])
+
     def test_time_guard(self):
         for at in [datetime(2026,9,21,3),datetime(2026,9,22,5)]:
             with self.assertRaises(ValueError):m.send_once('2026-09-21',self.render(),None,self.base/'receipts',at)
