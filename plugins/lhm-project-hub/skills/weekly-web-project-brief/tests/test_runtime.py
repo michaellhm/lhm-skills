@@ -68,4 +68,22 @@ class RuntimeTests(unittest.TestCase):
    task=json.loads((out/item['path']).read_text())['tasks']['7']['task']
    self.assertEqual(task['status'],'Complete');self.assertEqual(r.digest(out/item['path']),item['sha256'])
    self.assertEqual(item,r.retain_task_index(paths,out))
+ def test_search_metadata_is_bounded_and_omits_contact_and_snippet(self):
+  rows=[{'id':'a','subject':'Website review','from':'private@example.test','to':'person@example.test','date':'today','snippet':'private phone and health information'},
+        {'id':'b','subject':'New booking enquiry','snippet':'private health details','from':'patient@example.test'},
+        {'id':'c','subject':'Another result'}]
+  result=r.gmail_search_result(rows,'newer_than:30d ExactClient',2)
+  self.assertTrue(result['truncated']);self.assertEqual(result['result_count'],2)
+  self.assertEqual(result['messages'][1],{'id':'b','excluded':'patient_or_booking_form'})
+  text=json.dumps(result);self.assertNotIn('private',text);self.assertNotIn('patient@example',text)
+  self.assertFalse(r.gmail_search_result(rows[:2],'query',2)['truncated'])
+ def test_excluded_patient_form_cannot_be_fetched(self):
+  with self.assertRaisesRegex(ValueError,'outside project research'):
+   r.source_read({'_excluded_gmail_ids':{'abc'}},{'action':'gmail-get','value':'abc'})
+ def test_search_fetches_one_extra_result_to_prove_truncation(self):
+  from unittest.mock import patch
+  import types
+  with patch.object(r.subprocess,'run',return_value=types.SimpleNamespace(returncode=0,stdout=json.dumps([{'id':str(x),'subject':'Website'} for x in range(11)]),stderr='')) as run:
+   value=r.source_read({}, {'action':'gmail-search','value':'newer_than:30d Example','max':10})
+   self.assertEqual(run.call_args.args[0][-1],'11');self.assertTrue(value['truncated']);self.assertEqual(len(value['messages']),10)
 if __name__=='__main__':unittest.main()

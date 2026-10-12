@@ -5,6 +5,8 @@ import html
 import json
 import re
 import sys
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 
@@ -124,6 +126,40 @@ def validate_task_bindings(boards, tasks, gaps=()):
                 raise ValueError('Cross-owner action needs evidenced recommended coordination')
 
 
+def validate_gmail_searches(coverage, searches):
+    """Check source-owned search limits instead of trusting a coverage assertion."""
+    observed={x['query']:x for x in searches}
+    for project in coverage:
+        item=project['gmail'];initial=item.get('initial_query')
+        if not isinstance(initial,str) or not re.search(r'(?<!\S)newer_than:30d(?!\S)',initial) or initial not in observed or len(re.findall(r'newer_than:',initial))!=1 or re.search(r'(?<!\S)(?:after|newer):',initial):
+            raise ValueError('Project needs an observed initial 30-day Gmail search: '+project['project'])
+        followups=item.get('followup_queries',[])
+        if not isinstance(followups,list) or any(not isinstance(q,str) or q not in observed for q in followups):
+            raise ValueError('Gmail follow-up query was not observed')
+        if observed[initial]['truncated'] and not followups:
+            raise ValueError('Capped Gmail search needs terminal narrower follow-ups')
+        if any(observed[q]['truncated'] for q in followups):
+            raise ValueError('Gmail follow-up is still capped')
+
+
+def validate_activity(research, now=None):
+    cutoff=research.get('cutoff')
+    if not cutoff:
+        raise ValueError('Actual ISO evidence cutoff required')
+    at=datetime.fromisoformat(cutoff);now=now or datetime.now(ZoneInfo('Australia/Melbourne'))
+    if at.tzinfo is None or at>now:
+        raise ValueError('Evidence cutoff must be an actual past read time')
+    for item in research.get('projects',[]):
+        last=item.get('last_substantive_basicops_at')
+        if last:
+            timestamp=datetime.fromisoformat(last)
+            if timestamp.tzinfo is None or timestamp>at:
+                raise ValueError('BasicOps activity timestamp is invalid or after cutoff')
+            days=(at.astimezone(ZoneInfo('Australia/Melbourne')).date()-timestamp.astimezone(ZoneInfo('Australia/Melbourne')).date()).days
+            if type(item.get('inactivity_days')) is not int or item['inactivity_days']!=days:
+                raise ValueError('BasicOps inactivity must be calculated from actual project dates')
+
+
 def validate(directory, require_review=True):
     root = Path(directory).resolve()
     def read(name):
@@ -151,6 +187,7 @@ def validate(directory, require_review=True):
     else:
         require(meeting_access.get('status') == 'not_required' and meeting_access.get('reason'), 'Meeting access exemption missing')
     require(research.get('material_gaps') == [], 'Material research gaps')
+    validate_activity(research)
     brief = read('brief.json')
     names={p['name'] for p in brief['projects']}
     gaps = research.get('project_gaps', [])
@@ -186,6 +223,10 @@ def validate(directory, require_review=True):
         if gap['project'] in names:
             entry = next(p for p in coverage if p['project'] == gap['project'])[gap['source']]
             require(entry.get('status') == 'limited' and entry.get('gap_id') == gap['id'], 'Disclosed gap cannot claim complete project coverage')
+    gmail_index=research.get('gmail_source_index',{})
+    require(gmail_index.get('path') in file_names,'Controller Gmail search index must be hash-bound')
+    bound_file(gmail_index)
+    validate_gmail_searches(coverage,read(gmail_index['path'])['searches'])
     files = research.get('evidence_files', [])
     require(bool(files), 'No retained primary evidence')
     for f in files:

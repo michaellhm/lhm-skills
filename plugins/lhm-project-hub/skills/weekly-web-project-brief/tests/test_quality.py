@@ -21,6 +21,13 @@ class QualityTest(unittest.TestCase):
         research=json.loads((self.p/'research-receipt.json').read_text());research['evidence_files'].append({'path':'inbox-review.json','sha256':q.digest(self.p/'inbox-review.json')});self.write('research-receipt.json',research)
         self.write('brief.json',{'projects':[{'name':'Example'}]})
         research=json.loads((self.p/'research-receipt.json').read_text());research['project_source_coverage']=[{'project':'Example',**{k:{'status':'complete','evidence':['source.txt']} for k in ('gmail','obsidian','basicops')}}];research['mechanical_action_check']=q.action_check(self.p);self.write('research-receipt.json',research)
+        self.write('gmail-searches.json',{'searches':[{'query':'newer_than:30d Example','truncated':False}]})
+        research=json.loads((self.p/'research-receipt.json').read_text())
+        research['cutoff']='2026-09-21T08:00:00+10:00'
+        index={'path':'gmail-searches.json','sha256':q.digest(self.p/'gmail-searches.json')}
+        research['gmail_source_index']=index;research['evidence_files'].insert(0,index)
+        research['project_source_coverage'][0]['gmail'].update(initial_query='newer_than:30d Example',followup_queries=[])
+        self.write('research-receipt.json',research)
         self.review()
     def write(self,n,d): (self.p/n).write_text(json.dumps(d))
     def change(self,n,fn):
@@ -102,5 +109,33 @@ class QualityTest(unittest.TestCase):
         self.change('research-receipt.json',bind)
         with self.assertRaisesRegex(ValueError,'Incomplete owner inbox'):
             q.validate(self.p)
+
+class SourceAuditTests(unittest.TestCase):
+    def test_initial_window_and_actual_query_required(self):
+        coverage=[{'project':'Example','gmail':{'initial_query':'newer_than:30d ExactClient','followup_queries':[]}}]
+        q.validate_gmail_searches(coverage,[{'query':'newer_than:30d ExactClient','truncated':False}])
+        for query in ['newer_than:14d ExactClient','newer_than:30d newer_than:14d ExactClient','newer_than:30d after:2026/10/10 ExactClient','newer_than:30d Unobserved']:
+            coverage[0]['gmail']['initial_query']=query
+            with self.assertRaises(ValueError):q.validate_gmail_searches(coverage,[{'query':'newer_than:30d ExactClient','truncated':False}])
+    def test_capped_initial_needs_observed_terminal_followup(self):
+        coverage=[{'project':'Example','gmail':{'initial_query':'newer_than:30d ExactClient','followup_queries':[]}}]
+        reads=[{'query':'newer_than:30d ExactClient','truncated':True}]
+        with self.assertRaises(ValueError):q.validate_gmail_searches(coverage,reads)
+        coverage[0]['gmail']['followup_queries']=['newer_than:30d from:exact-client.test']
+        with self.assertRaises(ValueError):q.validate_gmail_searches(coverage,reads)
+        reads.append({'query':coverage[0]['gmail']['followup_queries'][0],'truncated':True})
+        with self.assertRaises(ValueError):q.validate_gmail_searches(coverage,reads)
+        reads[-1]['truncated']=False;q.validate_gmail_searches(coverage,reads)
+    def test_future_cutoff_and_incorrect_inactivity_rejected(self):
+        from datetime import datetime
+        now=datetime.fromisoformat('2026-10-12T14:00:00+11:00')
+        value={'cutoff':'2026-10-12T13:00:00+11:00','projects':[{'last_substantive_basicops_at':'2026-10-05T12:00:00+11:00','inactivity_days':7}]}
+        q.validate_activity(value,now)
+        value['projects'][0]['inactivity_days']=0
+        with self.assertRaises(ValueError):q.validate_activity(value,now)
+        value['projects'][0]['inactivity_days']=7;value['cutoff']='2026-10-12T14:15:00+11:00'
+        with self.assertRaises(ValueError):q.validate_activity(value,now)
+        value['cutoff']='2026-10-12T13:00:00'
+        with self.assertRaises(ValueError):q.validate_activity(value,now)
 
 if __name__=='__main__':unittest.main()

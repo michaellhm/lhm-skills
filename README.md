@@ -236,7 +236,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     client-update/                      # Propagate a client data change across all client files (migrated from client updates hub; shim remains)
     client-update-email/                # Plain-language client-facing update emails (migrated from client updates hub; shim remains)
     wp-project-manager/                 # Website PM state plus verified BasicOps handoff reconciliation
-    weekly-web-project-brief/           # Lily Monday 08:00 Melbourne brief: 07:00 preparation, visible clarifications, two-way selected-task mapping, supplemental-owner checks, complete baseline/archive action reconciliation and verified shared weekly Obsidian archive
+    weekly-web-project-brief/           # Lily Monday 08:00 Melbourne brief: 07:00 preparation, visible clarifications, two-way selected-task mapping, supplemental-owner checks, complete baseline/archive action reconciliation, source-owned Gmail cap checks and verified shared weekly Obsidian archive
     website-project-cockpit/            # Website status and three-layer Obsidian/Web Projects/personal-task stage handoffs
     lp-project-manager/                 # Landing page campaign PM doc (migrated from WordPress hub; shim remains)
     gmb-project-manager/                # GMB optimisation cycle PM doc (migrated from GMB hub; shim remains)

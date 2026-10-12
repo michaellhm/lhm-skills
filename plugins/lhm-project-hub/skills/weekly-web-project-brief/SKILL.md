@@ -2,7 +2,7 @@
 name: weekly-web-project-brief
 description: "Prepare Lily's Monday website portfolio email or apply Michael's consolidated project corrections. Use for 'weekly web projects', 'website weekly brief', 'Monday website email', 'update the web brief' or 'website brief feedback'. Reconciles Obsidian, BasicOps discussions, email and meeting evidence; produces an HTML table with due dates and red-first traffic lights."
 metadata:
-  version: 1.3.3
+  version: 1.3.4
 ---
 ## Client file routing
 
@@ -92,3 +92,12 @@ never triggers another email. The research worker has no archive-write or send a
 ## Separate Monday board reconciliation
 
 Read [board reconciliation](references/board-reconciliation.md) when asked to post weekly project summaries or reconcile boards after the report. This is a separate explicitly invoked execution job, never part of Scheduled report generation. Require the verified report dependency, live rereads, identity, owning-skill authority, deduplication and per-task readback in that contract.
+
+
+## Source-owned email search audit and timing
+
+Start every displayed project's Gmail coverage with an exact client/domain query containing `newer_than:30d`, without an additional narrower date restriction. Record `initial_query` and `followup_queries` in that project's Gmail source-coverage entry. The broker returns `query`, actual `read_at`, `result_count`, `truncated` and bounded `messages`, not a bare list. It fetches one extra metadata result to prove whether the requested page is capped. Resolve `truncated=true` through narrower terminal queries that collectively cover relevant client aliases and date ranges; the independent reviewer must check that coverage. A generic first name is not a client identity filter.
+
+The controller binds its own successful search log as `gmail_source_index`; researcher coverage assertions cannot replace it. Search results omit snippets and contact fields. Known booking/patient-form subjects are excluded and their IDs cannot be fetched through this run's broker. These exclusions do not establish that arbitrary email content is free of patient details. Read only relevant project correspondence and keep the independent privacy check.
+
+Use an actual ISO timestamp with timezone in `research.cutoff`, never a planned future time. For every project with a known `last_substantive_basicops_at`, calculate `inactivity_days` from its own dated activity in Melbourne; copied generic dates/reasons are not evidence. Retain website-related excluded Inbox candidates individually with task ID, current status and reason. Preserve unresolved prior project gaps and distinguish supplied files from verified platform access. Dedicated research and review use high reasoning effort on the existing Codex route, without changing global model/provider settings.
