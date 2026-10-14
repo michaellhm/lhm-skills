@@ -1,6 +1,6 @@
 ---
 name: site-launch-qa
-description: "Pre-launch QA checklist for WordPress and Astro websites. Runs automated checks (links, SSL, robots.txt, sitemap, console errors, PageSpeed, meta tags, favicon) then walks the user through manual checks that AI cannot verify. Updates the project management doc with QA results at the end. Use this when the user says 'run the QA checklist', 'pre-launch QA', 'site QA', 'launch checklist', 'quality assurance check', 'ready to go live checklist', or 'QA the site before launch'."
+description: "Combined website completion and pre-launch QA for WordPress and Astro, with Jaimee’s real-phone review and tests derived from approved client requests. Runs automated checks (links, SSL, robots.txt, sitemap, console errors, PageSpeed, meta tags, favicon) then walks the user through manual checks that AI cannot verify. Updates the project management doc with QA results at the end. Use this when the user says 'run the QA checklist', 'pre-launch QA', 'site QA', 'launch checklist', 'quality assurance check', 'ready to go live checklist', or 'QA the site before launch'."
 ---
 ## Client file routing
 
@@ -10,6 +10,12 @@ For client-specific work, first read [Client knowledge and working-file routing]
 # Site Launch QA
 
 Run the full pre-launch QA checklist for a WordPress or Astro site. Automate every check possible using Playwright, then walk the user through the manual items that require human eyes or external system access. Write a QA results summary and update the project management doc.
+
+## Combined completion workflow
+
+Read and follow [Website completion QA](../../references/website-completion-qa.md) before the phases below. It governs source-based requirements, Jaimee’s real-device checks, tracking evidence, staging/live distinctions and completion status where older checklist wording differs.
+
+Use this as the single completion-QA entry point: gather project requirements, run the automated checks below and `visual-qa` for browser/design evidence, guide Jaimee through the phone and client-request tests, then use `website-delivery-qa` to verify the combined handback. Keep a single report with linked specialist evidence. Do not automatically message Jaimee or assign a task merely because a report was prepared.
 
 ## Before Starting
 
@@ -122,10 +128,12 @@ If the page fails to load, stop and tell the user the site is not reachable at t
 - **Fail**: GTM snippet missing entirely
 - **Warning**: Script present but noscript fallback missing (degraded tracking for users with JS disabled)
 
+The GTM presence result above is only the installation check. Complete the account-ID, published-container, duplicate and firing checks in the combined protocol before marking tracking passed.
+
 ### 1.13 Copyright Footer
 
 - On homepage, use `browser_evaluate` to check for copyright text in the footer
-- Look for current year (2025 or 2026)
+- Look for the current year at execution time
 - **Pass**: Copyright text with correct year found
 - **Fail**: Missing or stale year
 
@@ -173,6 +181,10 @@ Flag any failures clearly. Do not proceed to Phase 3 until the user has acknowle
 
 Work through manual items in grouped batches. Present each group as an `AskUserQuestion` with checkboxes. Wait for the user to respond before moving to the next group.
 
+### Group 0: Jaimee’s phone and client requirements
+
+Run the guided real-device review and the source-linked client requirements matrix in `../../references/website-completion-qa.md`. Ask for exact observations: menu behaviour, dialler number, booking destination and new-tab behaviour where required. Record pending, failed and blocked items; unanswered items are not passes. Browser screenshots do not replace this group.
+
 ### Group A: Content & Communication
 
 Present as a single AskUserQuestion (multiSelect: true):
@@ -212,6 +224,8 @@ Present as a single AskUserQuestion (multiSelect: true):
 - Environment variables are set in the hosting dashboard (not committed to repo)"
 
 ### Group D: Analytics & Tracking
+
+Apply the tracking/search verification protocol before accepting these confirmations. Record IDs, tested actions and received-event evidence; snippet presence and broad tick boxes alone cannot pass this group.
 
 "**Analytics & Tracking** — please tick off:
 - GA4 tracking is installed and recording sessions (check Real-Time in GA4)
@@ -275,10 +289,7 @@ Present as a single AskUserQuestion (multiSelect: true):
 
 ## Phase 4: QA Results File
 
-After collecting all manual responses, write a QA results file at:
-
-`[client_root]/wordpress/qa-launch-results.md` (WordPress)
-`[client_root]/astro/qa-launch-results.md` (Astro)
+Save and incrementally update the combined report under the verified `work_root/site-launch-qa/YYYY-MM/qa-launch-results.md`, including pending checks even if the session ends early. Include the source-linked requirements matrix, tester/device details, automated and real-device evidence, tracking/search results, fix owners, accepted exceptions and retest history from the combined protocol. Do not save a full deliverable in the knowledge root.
 
 Structure:
 
@@ -321,7 +332,7 @@ Structure:
 
 ## Phase 5: PM Doc Update
 
-After writing the QA results file:
+After writing and reading back the QA results file, run `website-delivery-qa` on the combined handback. Pending mandatory checks, unresolved failures or missing required evidence prevent a completion claim; update progress truthfully instead. Only when eligible for sign-off:
 
 1. Ask the user: "Happy for me to mark the QA checklist as complete in the project management doc?"
 2. If yes, invoke `lhm-project-hub:wp-project-manager` skill in "mark complete" mode for the QA/launch task

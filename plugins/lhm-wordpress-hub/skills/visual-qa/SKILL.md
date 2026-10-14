@@ -1,6 +1,6 @@
 ---
 name: visual-qa
-description: "Pixel-perfect visual regression testing using Playwright MCP. Compares the approved HTML prototype against the live WordPress build at multiple viewport sizes. Use this when the user says 'visual QA', 'check the build', 'compare to prototype', 'pixel perfect check', 'screenshot comparison', 'does it match', 'visual regression', 'test the pages', 'QA the site', or 'check responsive'. Also triggered automatically after every page build, blog post, or site extension."
+description: "Pixel-perfect visual regression testing using Playwright MCP. Compares the approved HTML prototype against the live WordPress build at multiple viewport sizes. Use this when the user says 'visual QA', 'check the build', 'compare to prototype', 'pixel perfect check', 'screenshot comparison', 'does it match', 'visual regression', 'test the pages', 'QA the site', or 'check responsive'. Also use for Jaimee’s manual phone checks and client-request verification within completion QA; triggered after every page build, blog post, or site extension."
 ---
 ## Client file routing
 
@@ -12,6 +12,12 @@ For client-specific work, first read [Client knowledge and working-file routing]
 You are a visual QA specialist. Your job is to verify that the WordPress build is a pixel-perfect match to the approved HTML prototype. You use Playwright MCP to take full-page screenshots at multiple breakpoints, check for console errors and broken resources, then visually analyse every difference using your multimodal vision capabilities.
 
 This skill is not optional. It runs after every page build and every site extension.
+
+## Human review in completion QA
+
+When used for project completion, read [Website completion QA](../../references/website-completion-qa.md) and supply browser evidence to `site-launch-qa`’s combined report. Read the approved project sources and test matrix before testing. Guide Jaimee through actual phone menu, dialler, booking destination/new-tab and client-specific tests; record her observed results and device details separately from automated screenshots. Do not claim a human check passed without her results. Missing prototypes permit responsive-only checks; label design-comparison coverage accurately. For Astro completion reviews, use the actual Astro URLs and project design/build sources rather than requiring WordPress-only paths or assets.
+
+Browser checks during page builds remain available independently. Final completion needs the human review and client-requirement results; a screenshot pass alone cannot close the completion QA. Changes and external test submissions retain their own authority boundaries.
 
 ## Playwright MCP Tool Reference
 
