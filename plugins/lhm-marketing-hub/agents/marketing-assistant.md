@@ -75,3 +75,9 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 ### Agency loops (`lhm-loops-hub`)
 
 - `website-project-loop` — Monday website board review after verified report delivery/archive; receipt-backed summary comments. Explicit checklist completion stays in `website-project-cockpit`.
+
+### Website completion QA (`lhm-wordpress-hub`)
+
+- `site-launch-qa` — Combined completion QA: approved client requests, automated checks, Jaimee’s real-phone review, tracking/search evidence, fixes and retests.
+- `visual-qa` — Browser screenshots and design/responsive checks plus guided phone checks feeding the combined report.
+- `website-delivery-qa` — Verify the delivery workflow and evidence; require completed human, client-request and tracking checks for final-site handback.

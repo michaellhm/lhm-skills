@@ -109,10 +109,10 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     wp-page-builder/                    # Build pages in WordPress
     wp-rest-operator/                   # Operate registered WordPress REST content safely
     wp-blog-publisher/                  # Publish blog posts via WP-CLI
-    visual-qa/                          # Pixel-perfect visual regression testing
+    visual-qa/                          # Browser design checks + Jaimee’s real-device review
     wp-performance/                     # Performance audit and optimization
     wp-security/                        # Security hardening checklist
-    site-launch-qa/                     # Automated + guided pre-launch QA checklist (WordPress & Astro)
+    site-launch-qa/                     # Combined completion QA: client requests, phone, tracking and launch
     repo-init/                          # Create GitHub repos and scaffold docs/ for a new client
     repo-install/                       # Clone client repos onto a new machine
     astro-build/                        # Phase 5 for Astro — scaffold, convert prototype, SEO, deploy
@@ -298,7 +298,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 ### WordPress Hub
 
-**Website Build Pipeline** (24 skills): Project setup (with WordPress/Astro platform choice), Phase 0 client data collection (Drive folder, BasicOps access checklist, data-gathering email, weekly automated follow-up), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, registered WordPress REST operation, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), Decap CMS setup for Astro on Cloudflare Pages (Git-backed editing, drafts, scheduled publishing, deploy previews), the pre-launch QA checklist (automated + guided, for both WordPress and Astro), Rank Math 301 redirect management, and the Phase 4 digital audit (automated GA4 checks — data, key events, Ads link — plus a manual GTM/Search Console checklist).
+**Website Build Pipeline** (24 skills): Project setup (with WordPress/Astro platform choice), Phase 0 client data collection (Drive folder, BasicOps access checklist, data-gathering email, weekly automated follow-up), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, registered WordPress REST operation, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), Decap CMS setup for Astro on Cloudflare Pages (Git-backed editing, drafts, scheduled publishing, deploy previews), the combined site-launch-qa workflow (automated checks, Jaimee’s manual phone review, source-linked client requirements, tracking/search evidence and website-delivery-qa handback, for WordPress and Astro), Rank Math 301 redirect management, and the Phase 4 digital audit (automated GA4 checks — data, key events, Ads link — plus a manual GTM/Search Console checklist).
 
 **Git Repo Workflow** (2 skills): First-time client repo setup — creates GitHub repos, scaffolds docs/ context folder, commits the initial scaffold, and invites confirmed default LHM collaborators with write access (`repo-init`). Clones an existing client project onto a new machine or pulls the latest (`repo-install`).
 
