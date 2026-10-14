@@ -27,6 +27,7 @@ Route to **individual skills** when the user wants just one thing:
 - "Generate an outline" → `generate-outline` skill directly
 - "Write a blog post" → `write-blog` skill directly
 - "Create social posts" → `generate-social-posts` skill directly
+- "Turn this post into a reel" or "script and voice preview" → `social-reel` directly, with script/audio review before video production
 - "Review this content" → `quality-controller` skill directly
 
 ## Workflow
