@@ -138,3 +138,7 @@ Full item list with instructions for each check. Used by the site-launch-qa skil
 | All URL versions redirect to same format | Test: http://, https://, www., non-www — all should end at same canonical |
 | robots.txt not blocking crawlers | Visit `/robots.txt` — no `Disallow: /` for Googlebot |
 | Search engine indexing enabled | WP Admin → Settings → Reading → uncheck "Discourage search engines from indexing this site" |
+
+## Combined SEO and coaching protocol
+
+For completion QA, [Website SEO QA](../../../references/website-seo-qa.md) governs full page coverage, headings, image semantics, sitemap discovery/repair, robots rules and GSC verification where older checklist shortcuts differ. Use [Website completion QA](../../../references/website-completion-qa.md) for Jaimee’s choice of self-led checks, step-by-step coaching or delegated accessible checks. Prepared fixes and untested pages cannot pass the live review.

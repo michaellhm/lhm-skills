@@ -10,7 +10,7 @@ Full item list for Astro static/SSR sites deployed to Vercel or Netlify. Used by
 |------|-------------|
 | Text checked (spelling, grammar, formatting) | Human review of all pages. Use Grammarly or similar. |
 | Page titles and meta descriptions unique and descriptive | Inspect `<title>` and `<meta name="description">` on each page via browser DevTools |
-| Images have appropriate alt text | Inspect `<img>` tags — each should have a non-empty `alt` attribute |
+| Images have appropriate alt text | Inspect `<img>` tags — meaningful images need contextual alt; decorative images use empty alt |
 | Navigation easy to find, all links working | Click every nav and footer link manually |
 | 404 page created and serving correctly | Visit `/this-page-does-not-exist` — should show custom `404.astro` page |
 | Footer copyright notice included and year correct | Check footer component across page templates |
@@ -130,3 +130,7 @@ Full item list for Astro static/SSR sites deployed to Vercel or Netlify. Used by
 | Hydration directives correct | Interactive components use `client:load`, `client:visible`, or `client:idle` as appropriate |
 | No hydration errors in console | Load each page with JS components — DevTools Console should be clean |
 | Image optimisation working | Check built pages — images should have `srcset`, `width`, `height`, and `loading="lazy"` |
+
+## Combined SEO and coaching protocol
+
+For completion QA, [Website SEO QA](../../../references/website-seo-qa.md) governs full page coverage, headings, image semantics, sitemap discovery/repair, robots rules and GSC verification where older checklist shortcuts differ. Use [Website completion QA](../../../references/website-completion-qa.md) for Jaimee’s choice of self-led checks, step-by-step coaching or delegated accessible checks. Prepared fixes and untested pages cannot pass the live review.
