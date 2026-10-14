@@ -1,6 +1,6 @@
 ---
 name: site-launch-qa
-description: "Combined website completion and pre-launch QA for WordPress and Astro, with Jaimee’s real-phone review and tests derived from approved client requests. Runs automated checks (links, SSL, robots.txt, sitemap, console errors, PageSpeed, meta tags, favicon) then walks the user through manual checks that AI cannot verify. Updates the project management doc with QA results at the end. Use this when the user says 'run the QA checklist', 'pre-launch QA', 'site QA', 'launch checklist', 'quality assurance check', 'ready to go live checklist', or 'QA the site before launch'."
+description: "Combined website completion and pre-launch QA for WordPress and Astro, with adaptive coaching for Jaimee, full-site SEO, sitemap generation/repair and GSC verification, real-phone review and tests derived from approved client requests. Runs automated checks (links, SSL, robots.txt, sitemap, console errors, PageSpeed, meta tags, favicon) then walks the user through manual checks that AI cannot verify. Updates the project management doc with QA results at the end. Use this when the user says 'run the QA checklist', 'pre-launch QA', 'site QA', 'launch checklist', 'quality assurance check', 'ready to go live checklist', or 'QA the site before launch'."
 ---
 ## Client file routing
 
@@ -9,7 +9,7 @@ For client-specific work, first read [Client knowledge and working-file routing]
 
 # Site Launch QA
 
-Run the full pre-launch QA checklist for a WordPress or Astro site. Automate every check possible using Playwright, then walk the user through the manual items that require human eyes or external system access. Write a QA results summary and update the project management doc.
+Run the full pre-launch QA checklist for a WordPress or Astro site. Offer self-led checks, step-by-step coaching or delegated accessible checks. Use browser automation according to that choice, then guide the reviewer through remaining human/device or account steps. Write a QA results summary and update the project management doc.
 
 ## Combined completion workflow
 
@@ -29,7 +29,7 @@ Use this as the single completion-QA entry point: gather project requirements, r
 
 ## Phase 1: Automated Checks
 
-Use the Playwright MCP (`mcp__plugin_playwright_playwright__*`) to run automated checks. Navigate to the site URL and work through each check below. Run all automated checks **before** presenting manual items to the user.
+Use the Playwright MCP (`mcp__plugin_playwright_playwright__*`) to run automated checks. Navigate to the site URL and work through each check below. Offer the coaching mode first. Run authorised automated checks before requesting their related manual confirmations; in self-led or coaching mode, let Jaimee perform checks with guidance and review her evidence rather than silently taking over.
 
 ### 1.1 Setup
 
@@ -82,26 +82,15 @@ If the page fails to load, stop and tell the user the site is not reachable at t
 
 ### 1.7 Robots.txt
 
-- Navigate to `[site_url]/robots.txt`
-- Confirm it exists and does NOT contain `Disallow: /` (which would block all crawlers)
-- **Pass**: robots.txt exists, no blanket disallow
-- **Fail**: Missing, or blocks all crawlers
+Follow [Website SEO QA](../../references/website-seo-qa.md): check the root file, effective rules for intended pages and resources, staging/live restrictions and the production Sitemap directive. Prepare precise corrections for missing or unsuitable rules, then apply only within the established authority and verify live readback. Do not reduce this check to searching for `Disallow: /`.
 
-### 1.8 Sitemap
+### 1.8 Sitemap, repair and GSC
 
-- Navigate to `[site_url]/sitemap.xml` (WordPress) or `[site_url]/sitemap-index.xml` / `[site_url]/sitemap.xml` (Astro)
-- Confirm the sitemap is present and contains URLs
-- **Pass**: Sitemap found with at least 1 URL
-- **Fail**: 404 or empty sitemap
+Discover the actual sitemap/index and child sitemaps, validate XML and compare all entries against the intended canonical page inventory. If missing or invalid, prepare a platform-appropriate generator/configuration repair and validate it. Follow the bounded repair workflow for application/deployment and verify the resulting live sitemap before authorised GSC submission. Record site-side, deployment and GSC processing results separately. A missing default path, prepared XML or submission acknowledgement alone cannot pass this check.
 
-### 1.9 Meta Tags Spot-Check
+### 1.9 Full-site SEO audit
 
-- On the homepage, use `browser_evaluate` to extract:
-  - `document.title`
-  - `document.querySelector("meta[name='description']")?.content`
-  - `document.querySelector("link[rel='canonical']")?.href`
-- **Pass**: Title present (not "Just another WordPress site" or default), description present, canonical present
-- **Fail**: Missing or default values
+Follow the complete inventory and per-page checks in `../../references/website-seo-qa.md`, covering titles, descriptions, canonicals, LHM’s one-H1 convention, heading structure, indexing and image loading/appropriate alt text. Include every agreed public HTML page and cross-page duplicates. Record coverage gaps; the homepage is only the first page, never a substitute for the full inventory.
 
 ### 1.10 Mobile Viewport
 
@@ -166,7 +155,7 @@ After completing all automated checks, present a clean summary table:
 | Console Errors | ⚠️ Warning | 1 error on /contact |
 | robots.txt | ✅ Pass | |
 | Sitemap | ✅ Pass | |
-| Meta Tags | ✅ Pass | |
+| Full-site SEO | Pass / Fail / Pending / Blocked | Checked / expected pages; inventory link |
 | Mobile Viewport | ✅ Pass | |
 | PageSpeed (mobile/desktop) | ⚠️ 48 / 72 | Mobile below threshold |
 | Google Tag Manager | ✅ Pass | GTM-XXXXXXX |
@@ -179,7 +168,7 @@ Flag any failures clearly. Do not proceed to Phase 3 until the user has acknowle
 
 ## Phase 3: Manual Checklist
 
-Work through manual items in grouped batches. Present each group as an `AskUserQuestion` with checkboxes. Wait for the user to respond before moving to the next group.
+Follow the coaching mode chosen in the combined protocol. In self-led mode give a short section checklist; in coaching mode give one practical step and wait for the result; in delegated mode run available authorised checks and ask only for human/access-dependent observations. Use the available question/chat interface; the example checklists below are prompts, not mandatory checkbox-tool calls. Never demand blanket confirmation for checks already evidenced.
 
 ### Group 0: Jaimee’s phone and client requirements
 
@@ -187,12 +176,12 @@ Run the guided real-device review and the source-linked client requirements matr
 
 ### Group A: Content & Communication
 
-Present as a single AskUserQuestion (multiSelect: true):
+In self-led mode, offer this compact checklist; in coaching mode, work through its items one at a time:
 
 "**Content & Communication** — please tick off what you've confirmed:
 - Text is checked and free from spelling, grammatical, and formatting errors
 - Page titles and meta descriptions are unique and descriptive across all pages
-- All images have appropriate alt text
+- Meaningful images have appropriate alt text; decorative images use empty alt
 - Contact details are correct and easy to find
 - Social media links are set up and pointing to the right profiles
 - Comments and pings are turned off (WordPress: Settings > Discussion)"
@@ -289,7 +278,7 @@ Apply the tracking/search verification protocol before accepting these confirmat
 
 ## Phase 4: QA Results File
 
-Save and incrementally update the combined report under the verified `work_root/site-launch-qa/YYYY-MM/qa-launch-results.md`, including pending checks even if the session ends early. Include the source-linked requirements matrix, tester/device details, automated and real-device evidence, tracking/search results, fix owners, accepted exceptions and retest history from the combined protocol. Do not save a full deliverable in the knowledge root.
+Save and incrementally update the combined report under the verified `work_root/site-launch-qa/YYYY-MM/qa-launch-results.md`, including pending checks even if the session ends early. Include the source-linked requirements matrix, tester/device details, automated and real-device evidence, tracking/search results, full-site SEO inventory and coverage, sitemap/robots repairs and GSC state, coaching mode/resume step, fix owners, accepted exceptions and retest history from the combined protocol. Do not save a full deliverable in the knowledge root.
 
 Structure:
 
@@ -310,10 +299,10 @@ Structure:
 ## Manual Checks
 
 ### Content & Communication
-[list each item with ✅ or ❌]
+[list each item with pass, fail, pending, blocked or not_applicable and evidence]
 
 ### Forms & Thank You Pages
-[list each item with ✅ or ❌]
+[list each item with pass, fail, pending, blocked or not_applicable and evidence]
 
 [... all groups ...]
 
@@ -342,5 +331,6 @@ After writing and reading back the QA results file, run `website-delivery-qa` on
 
 ## Additional Resources
 
+- `../../references/website-seo-qa.md` — Full-site SEO, sitemap repair, robots.txt and GSC evidence
 - `references/checklist-wp.md` — Full WordPress checklist item reference with instructions
 - `references/checklist-astro.md` — Full Astro checklist item reference
