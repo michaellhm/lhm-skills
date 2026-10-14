@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "client": "Replace with verified client name",
+  "lhm_contact": "",
+  "repository_url": "",
+  "production_branch": "",
+  "cloudflare_project": "",
+  "dependency_mapping_verified": false,
+  "shared_dependencies": [],
+  "resolved_dynamic_routes": [],
+  "pages": []
+}

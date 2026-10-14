@@ -81,3 +81,7 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 - `site-launch-qa` — Combined coached completion QA: client requests, full-site SEO, sitemap/robots repair and GSC verification, Jaimee’s phone review, tracking evidence, fixes and retests.
 - `visual-qa` — Browser screenshots and design/responsive checks plus guided phone checks feeding the combined report.
 - `website-delivery-qa` — Verify the delivery workflow and evidence; require completed human, client-request and tracking checks for final-site handback.
+
+### Client website review releases (`lhm-wordpress-hub`)
+
+- `client-review-release` — Install portable client review skills, scan new/changed/pending pages, propose release questions for operator approval, preserve explicit client approvals and prepare preview/email handbacks.
