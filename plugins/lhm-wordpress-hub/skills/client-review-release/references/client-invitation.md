@@ -14,39 +14,74 @@ Record account state and repository-access state separately as confirmed yes, co
 
 On later releases reuse verified access evidence unless new errors or account changes require rechecking. Do not repeatedly ask an already settled question. Asking for a GitHub username is fine; never ask for a password/token. Use individual authorised accounts, not shared LHM credentials.
 
-## First invitation / round one
-Suggested subject: Your website is ready for its first review
+## First-time onboarding: three emails
 
-Hi [verified client name],
+Default to separate drafts, preserving actual recipients/CCs. Access email can be sent first; hold installation until account and specific repository access are confirmed, and hold the batch email until setup is working. Never send automatically. Explain local preview versus sharing accurately; actual page sources may be JSON/Astro rather than Markdown. The following wording is reusable; replace verified placeholders, not by copying client-specific correspondence into the skill.
 
-We've prepared the first round of your website review. We'd like you to check the design and content of these [verified count] pages:
+### Email 1: GitHub access
+Subject: [Client] website | First step: GitHub access
 
-[Exact approved page list, with verified review links where available. Mention any explicit review limitations.]
+Hi [verified greeting],
 
-[Insert the matching access paragraph below.]
+We're getting ready for you to give us feedback on the website. As discussed, we're setting this up so you can review and edit it using your preferred AI tool: ChatGPT through Codex, or Claude through Claude Code.
 
-Once you can open the repository, open Codex or Claude Code and paste this first prompt:
+It will open a local version of the website, basically a test site running on your computer. You can chat to the assistant and say “this paragraph doesn't sound like us” or “could you change this service description?” It can make the change and show you how it looks on the page as you work. Nothing goes live at this stage.
 
-> Help me install this website from [verified repository URL] on my computer. Read its README and .lhm-review/workflows.md. Check the required tools for my operating system, preserve existing work and use the project's declared package manager. Start the site locally and open it in my preferred browser, or give me the working URL. If access or setup is missing, explain exactly what I need to do. Do not publish any changes.
+You can also ask it to open the page's content file and edit a few words yourself, a little like editing a Word document.
 
-When the website is running, paste this second prompt:
+Changes appear on your computer first. When you're ready to share them, the assistant saves them to GitHub so we can see your edits and check the updated preview. Explain the verified publishing route: review branch by default; explicitly approved pre-launch main may deploy the prototype automatically. Never promise automatic deployment without evidence. Draft changes can remain unshared; live publication follows the configured approval process.
 
-> Run review-website for release [verified release ID]. Read client-review.json and CLIENT-REVIEW.md. Guide me through the pages in this release one at a time. Help me check both the design and the content, and ask the questions LHM included. Let me describe changes in chat or open the actual content file so I can edit it directly. Preview saved changes before asking me whether I approve the design and content, want to revisit the page or need LHM's help. Record only my explicit decisions. At the end, run finish-review and prepare an email to LHM with my progress, questions and anything unfinished. Ask before sharing changes and keep live publication separate.
+To give you access to the website files, you'll each need a free GitHub account. Think of it as a shared Google Drive for the website, with a history of changes. The private website folder is called a repository.
 
-You can work through a few pages and return later; your progress is saved. If you get stuck, let the assistant record what happened so we can help.
+Could you please create an account at https://github.com/signup if you don't already have one, and send through your username so we can arrange access? Once you've accepted the invitation and confirmed the repository opens, I'll send instructions for running the website with your AI assistant and the review features we've built in.
 
 Thanks,
-[verified LHM sender]
+[verified sender]
 
-### Conditional access paragraphs
-No GitHub account:
-“First, please create your own GitHub account at https://github.com/signup and send us your username. We'll arrange access to the website repository. Once you've accepted the invitation and can open [verified repository URL], you can follow the prompts below. Please don't send us your password or any access tokens.”
+### Email 2: install and use the review tools
+Subject: [Client] website | Installing the website and using the review tools
 
-Account exists but access missing/unknown:
-“Please check whether you can open [verified repository URL] while signed in to GitHub. If you can't, send us your GitHub username so we can arrange access. If you've received an invitation, accept it first. Once you can open the repository, follow the prompts below.”
+Use Codex (for ChatGPT users) or Claude Code with the website folder open. Emphasise that an ordinary chat cannot run this local workflow. These apps can work with the files on the client's computer.
 
-Access confirmed:
-“You already have access to the website repository: [verified repository URL]. The prompts below will help you run it on your computer and work through the review.”
+**First step: paste this prompt**
+
+> Help me install this website from [verified repository URL] on my computer. Read README.md and .lhm-review/workflows.md. Check required tools for my operating system and guide me through anything missing. Preserve existing work and use the declared package manager. Verify all four project skills under .agents/skills and .claude/skills, start the local website and give me the working browser link. Explain how to reopen the website project/session so the skills appear. Do not publish changes.
+
+Explain that cloning brings the committed skills; the prompt verifies them, it does not guarantee discovery or install missing plugin files. Reopen the website project/session after setup if needed.
+
+**Using the review tools**
+
+Skills are saved instructions the assistant can follow. Claude Code uses `/start-website`; Codex uses `$start-website` or the skill picker. Use a forward slash, not backslash; dollar sign, not star. At each new chat in the website project: start-website safely syncs files and opens the local site; review-website guides the current batch/questions one page at a time; finish-review records explicit decisions and drafts a handback. Share-preview saves authorised changes through the configured route. Finish can offer that sharing step but must not claim automatic pushing. For an approved pre-launch-main setup, explain that sharing updates the prototype through the named branch; after launch keep live publication separate.
+
+Ask the client to confirm setup works before sending the batch email. Do not repeat the full page list here.
+
+### Email 3: the approved review batch
+Subject: [Client] website | [Verified round and page count] to review
+
+Hi [verified greeting],
+
+We've put together [verified count] pages for you to review under [verified batch/menu label]:
+
+[Exact approved page list.]
+
+**First step: open your website project in Codex or Claude Code, start a new chat and paste this prompt**
+
+Use the following prompt with the exact release ID and configured sharing route:
+
+> Run start-website safely, then review-website for release [verified release ID]. Read client-review.json, CLIENT-REVIEW.md and .lhm-review/workflows.md. Guide me through the pages and included questions one at a time. Let me give feedback in chat or edit the actual content file. Preview changes and ask for explicit design/content approval. At the end, run finish-review and prepare an email to [verified LHM contact] with progress, questions and unfinished work. Ask before sharing through the configured route and keep live publication separate.
+
+The assistant will open each page and guide you through the review. Please check:
+- **Design:** the layout, images and how the page looks.
+- **Content:** whether the wording sounds like your clinic and accurately describes services, practitioners, clinic availability and FAQs.
+
+[Include the actual page-specific questions, explicit exclusions and unresolved coverage. Mention unbuilt menu destinations only where verified.]
+
+No need to write polished copy. Tell the assistant what feels wrong or what you'd like changed, and it can help you work through it. You can review a few pages and return later, with your progress saved.
+
+Thanks,
+[verified sender]
+
+Edits and answers alone do not approve a page. Keep all three draft IDs, access/setup evidence and actual sent state distinct. If the operator reports sending the access email, preserve it as sent; do not recreate it as a new draft unless explicitly requested. Save the remaining approved emails as drafts and respect the access/setup gates.
 
 ## Later review rounds
 Suggested subject: Website review, round [verified round label]

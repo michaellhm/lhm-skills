@@ -8,5 +8,12 @@
   "dependency_mapping_verified": false,
   "shared_dependencies": [],
   "resolved_dynamic_routes": [],
-  "pages": []
+  "pages": [],
+  "sharing": {
+    "mode": "review-branch",
+    "site_stage": "unknown",
+    "branch": "",
+    "deployment_url": "",
+    "operator_evidence": ""
+  }
 }
