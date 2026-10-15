@@ -84,4 +84,4 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 
 ### Client website review releases (`lhm-wordpress-hub`)
 
-- `client-review-release` — Install portable client review skills, scan new/changed/pending pages, propose release questions for operator approval, preserve explicit client approvals and prepare preview/email handbacks.
+- `client-review-release` — Install portable client review skills, scan new/changed/pending pages, propose release questions for operator approval, preserve explicit client approvals and prepare staged GitHub-access, local-setup and review emails with verified sharing routes.

@@ -11,7 +11,7 @@ spec = importlib.util.spec_from_file_location('review_release', BASE / 'scripts/
 r = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(r)
 START, END = '<!-- LHM-REVIEW:START -->', '<!-- LHM-REVIEW:END -->'
-VERSION = '1'
+VERSION = '2'
 
 
 def install(root, approval_evidence):
