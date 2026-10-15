@@ -58,11 +58,30 @@ Ask the client to confirm setup works before sending the batch email. Do not rep
 ### Email 3: the approved review batch
 Subject: [Client] website | [Verified round and page count] to review
 
-List exact approved pages, separate design/content questions, page-specific questions, exclusions and unresolved coverage honestly. Include one prompt:
+Hi [verified greeting],
+
+We've put together [verified count] pages for you to review under [verified batch/menu label]:
+
+[Exact approved page list.]
+
+**First step: open your website project in Codex or Claude Code, start a new chat and paste this prompt**
+
+Use the following prompt with the exact release ID and configured sharing route:
 
 > Run start-website safely, then review-website for release [verified release ID]. Read client-review.json, CLIENT-REVIEW.md and .lhm-review/workflows.md. Guide me through the pages and included questions one at a time. Let me give feedback in chat or edit the actual content file. Preview changes and ask for explicit design/content approval. At the end, run finish-review and prepare an email to [verified LHM contact] with progress, questions and unfinished work. Ask before sharing through the configured route and keep live publication separate.
 
-Clients can pause and return; edits and answers alone do not approve a page. Keep all three draft IDs, access/setup evidence and actual sent state distinct.
+The assistant will open each page and guide you through the review. Please check:
+- **Design:** the layout, images and how the page looks.
+- **Content:** whether the wording sounds like your clinic and accurately describes services, practitioners, clinic availability and FAQs.
+
+[Include the actual page-specific questions, explicit exclusions and unresolved coverage. Mention unbuilt menu destinations only where verified.]
+
+No need to write polished copy. Tell the assistant what feels wrong or what you'd like changed, and it can help you work through it. You can review a few pages and return later, with your progress saved.
+
+Thanks,
+[verified sender]
+
+Edits and answers alone do not approve a page. Keep all three draft IDs, access/setup evidence and actual sent state distinct. If the operator reports sending the access email, preserve it as sent; do not recreate it as a new draft unless explicitly requested. Save the remaining approved emails as drafts and respect the access/setup gates.
 
 ## Later review rounds
 Suggested subject: Website review, round [verified round label]
