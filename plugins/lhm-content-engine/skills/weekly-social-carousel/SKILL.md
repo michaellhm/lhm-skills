@@ -60,7 +60,7 @@ Use when asked to recover older ideas or build an idea bank. Sweep the authorise
 2. Write a 5-7 slide sequence. Each slide should communicate one idea and remain useful when skimmed on a phone.
 3. Use the editorial pattern for the selected lane. Translate news into what changed, why it matters to a clinic, and what to do or watch.
 4. Keep the first-slide hook short. Do not place paragraphs on the cover.
-5. Use the typography cover unless the current test plan calls for an image cover. An image must add context and use a dark LHM overlay; generic AI or cyber imagery is not acceptable.
+5. For LHM feed carousels, default to a human-led photographic cover using the image-cover rules in the design system. Use a typography cover only when Michael requests it, a safe and relevant image cannot be produced, or the topic is genuinely clearer without photography. The image must add human context and use a dark LHM overlay; generic AI, cyber or decorative stock imagery is not acceptable.
 6. Build a caption that adds context instead of repeating every slide. For LHM Social, follow the verified editorial-preferences file, finish with one topic-specific DM call to action, then add two or three focused hashtags.
 7. Create `first-comment.md` when a useful first comment can clarify a likely sticking point, offer a prepared resource, invite the reader to identify where they are stuck, or move a diagnostic question towards a call. Do not repeat the caption, manufacture a customer question or pretend LHM does not understand the subject.
 8. Keep public copy source-blind. Never say that a client asked, a clinic said, or the idea came from a meeting. Present the useful issue directly. Meeting provenance and verification notes belong only in private source records. Do not append source-note sections to captions.
@@ -71,7 +71,7 @@ Use when asked to recover older ideas or build an idea bank. Sweep the authorise
 13. Run `node scripts/render-carousel.mjs <output-directory>` when a compatible browser renderer is available. If PNG rendering is unavailable, preserve the verified HTML and return `needs_review` with the exact limitation.
 14. Open or otherwise inspect `carousel-preview.png` when rendered. Also read back `manifest.json`, `caption.md`, optional `first-comment.md`, and the HTML metadata before reporting completion.
 
-Do not call image generation merely to decorate a cover. Use it only when the user wants a generated image and the concept is specific enough to add meaning.
+For LHM feed carousels, the approved human-led cover treatment is part of the editorial system rather than optional decoration. Generate or source it when it can be made safely and specifically. For non-LHM work, do not call image generation merely to decorate a cover. Stories remain image-free typographic cards by default unless Michael explicitly requests imagery or a visual materially improves the instruction.
 
 ## Quality gate
 
@@ -89,6 +89,8 @@ Reject or revise a package when any condition is true:
 - A comment-keyword post promises a resource that has not been prepared and verified.
 - A first comment imitates a customer, manufactures confusion or offers an open-ended free audit.
 - The design uses a copied HeyTony identity instead of the LHM system.
+- A feed-cover portrait looks like generic glossy stock, repeats the same kind of person or setting week after week, lacks useful negative space for the hook, or implies a real client, practitioner or testimonial.
+- A Story uses decorative photography even though the idea works as a clean typographic sequence.
 - The public copy mentions a client, meeting, transcript or private source context without explicit approval.
 - A meeting-derived topic scores below 2 for audience frequency unless Michael explicitly selects it from the backlog.
 - Required artefacts were not saved and read back.

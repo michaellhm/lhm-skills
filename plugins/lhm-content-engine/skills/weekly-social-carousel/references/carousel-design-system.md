@@ -48,6 +48,16 @@ Use a relevant, licensed, user-supplied, first-party product, or deliberately ge
 
 Good image subjects include a verified product interface, an analytics screen, a practice-owner workflow, or a specific visual metaphor. Avoid generic robots, glowing brains, hooded hackers, random code screens, and decorative stock imagery.
 
+#### Default LHM feed cover
+
+For an LHM feed carousel, default to `cover_style: image` and use one original, commercially safe, non-recognisable adult in an authentic allied-health clinic or modern small-business workflow. A useful starting point is a practice owner or practitioner in their 30s or 40s, but vary age, gender, appearance and setting over time so the feed represents a broad Australian audience. Describe contemporary Australian professional styling and the setting; do not infer or prescribe ethnicity or nationality from appearance.
+
+Aim for natural editorial photography rather than glossy stock photography: authentic skin texture, credible smart-casual clothing, warm but restrained lighting and a relevant action such as discussing a content brief, reviewing a booking journey or explaining a practice workflow. Place the subject to one side or in the upper-right area and preserve deliberate negative space through the lower-left or centre for the hook. The photograph must support the topic without pretending the subject is a real client, practitioner, patient or testimonial.
+
+Do not include visible brands, logos, watermarks, readable account screens, patient information, private metrics or implied clinical outcomes. Copy the approved source image into the package, apply the navy readability overlay and inspect the final cover at normal mobile size. Use a typography cover when the photograph cannot be made relevant, safe or visually credible.
+
+Stories remain soft-blue typographic cards without decorative photography by default. Add Story imagery only when Michael requests it or when a visual is necessary to understand the instruction.
+
 ## Internal slides
 
 Use one of the supported structures:
