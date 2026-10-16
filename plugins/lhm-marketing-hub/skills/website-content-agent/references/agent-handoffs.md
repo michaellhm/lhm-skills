@@ -1,6 +1,6 @@
 # Agent handoffs
 
-The orchestrator owns the tracker, scope and scheduling. All subagents inherit project instructions but receive explicit file paths and a bounded page assignment. No worker can approve its own output as independent review.
+The orchestrator owns the tracker, scope and scheduling. All subagents inherit project instructions but receive explicit file paths and a bounded page assignment. No worker can approve its own output as independent review. Every brief, writer, editor and integrator receives the user-selected reference contract and exact accepted sitemap row, primary keyword and H1; none may substitute a generic outline or infer keywords. Brief acceptance requires both mappings, and technical acceptance includes recorded template-fidelity and sitemap/H1 checks.
 
 | Agent | Inputs | Saved output | Acceptance |
 |---|---|---|---|

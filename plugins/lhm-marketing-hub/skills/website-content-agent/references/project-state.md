@@ -12,6 +12,12 @@ Keep the source of truth in the website repo under `docs/website-content/`, outs
 - `templates/<family>.md`: discovered page family contract and approved reference URLs/source files. Approval may be pending; record it rather than invent it.
 - `pages/<page-key>/`: stage outputs with source references and reviewed revision identifier.
 
+## Template and SEO evidence
+
+Each template contract records `selectedBy`, selection evidence, reference URL, inspected revision/date, section/page scope, ordered modules, card/grid counts, responsive rules, source components and explicitly accepted exceptions. A discovered reference without user selection does not unlock production. On resume, reuse a valid explicit selection for the same scope; ask for new sections without one.
+
+Each page stores an `seo` object with sitemap source, version/date, row/page ID, canonical route, primary keyword, intent, secondary/location terms, H1 and any user override/evidence. Keep missing fields null and record blockers. Add `templateReview` and `seoReview` results bound to the integrated revision; `draftReady` also requires those checks to pass. Existing records can be extended without deleting approval history. A changed template selection or SEO mapping invalidates affected briefs and checks before further production; approved pages remain unchanged unless revision scope is authorised.
+
 ## Page entry
 
 ```json
