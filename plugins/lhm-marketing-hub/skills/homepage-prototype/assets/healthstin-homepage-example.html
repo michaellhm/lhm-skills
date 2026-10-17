@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en-AU" class="js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Healthstin | Physiotherapy, Exercise Physiology and Hydrotherapy</title>
+<meta name="description" content="Physiotherapy, exercise physiology and hydrotherapy across NSW, VIC, SA and WA. Registered NDIS provider. In our pool-based clinics, in your home or online.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#161E1D;          /* Healthstin charcoal: headings, dark bands, footer */
+    --green:#3B7D23;        /* buttons and links (5.1:1 on white) */
+    --green-hover:#2F6B1B;
+    --brand:#65CA48;        /* Healthstin green, accents on dark */
+    --purple:#712C7C;       /* Healthstin referral purple (8.9:1 on white) */
+    --purple-hover:#5C2265;
+    --purple-tint:#F3EAF4;
+    --text:#1F2726;
+    --muted:#5F6B6A;
+    --surface:#F1F2F3;
+    --tint:#EDF5E8;
+    --line:#E2E5E5;
+    --white:#FFFFFF;
+    --radius:8px;
+    --shadow:0 1px 2px rgba(22,30,29,.06),0 4px 16px rgba(22,30,29,.05);
+    --font-head:'Lexend',system-ui,sans-serif;
+    --font-body:'Source Sans 3',system-ui,sans-serif;
+    --wrap:1400px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  body{font-family:var(--font-body);font-size:17px;line-height:1.6;color:var(--text);background:var(--white);-webkit-font-smoothing:antialiased}
+  img{max-width:100%;display:block}
+  a{color:var(--green)}
+  h1,h2,h3,h4{font-family:var(--font-head);color:var(--ink);font-weight:500;line-height:1.2;letter-spacing:-.01em}
+  .wrap{max-width:var(--wrap);margin:0 auto;padding:0 24px}
+  .eyebrow{font-family:var(--font-head);font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:14px;display:block}
+  .lead{font-size:19px;color:var(--muted);max-width:640px}
+  section{padding:96px 0}
+  .sec-head{max-width:720px;margin-bottom:48px}
+  .sec-head h2{font-size:clamp(28px,3.2vw,40px);margin-bottom:14px}
+  .sec-head h2::before,.cond-intro h2::before,.ref-layout h2::before{content:"";display:block;width:44px;height:4px;border-radius:2px;background:var(--brand);margin-bottom:20px}
+  .skip{position:absolute;left:-9999px;top:8px;background:var(--ink);color:#fff;padding:10px 16px;border-radius:6px;z-index:200}
+  .skip:focus{left:8px}
+  :focus-visible{outline:3px solid var(--brand);outline-offset:2px;border-radius:4px}
+  .icon{width:20px;height:20px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:12px 24px;border-radius:var(--radius);font-family:var(--font-head);font-weight:500;font-size:16px;text-decoration:none;cursor:pointer;border:1.5px solid transparent;transition:background-color .2s,color .2s,border-color .2s}
+  .btn-primary{background:var(--green);color:#fff}
+  .btn-primary:hover{background:var(--green-hover)}
+  .btn-secondary{background:#fff;color:var(--ink);border-color:var(--line)}
+  .btn-secondary:hover{border-color:var(--ink)}
+  .btn-purple{background:var(--purple);color:#fff}
+  .btn-purple:hover{background:var(--purple-hover)}
+  .btn-light{background:#fff;color:var(--ink)}
+  .btn-light:hover{background:var(--tint)}
+  .btn-ghost-light{color:#fff;border-color:rgba(255,255,255,.45)}
+  .btn-ghost-light:hover{border-color:#fff}
+  .link-arrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-head);font-weight:500;font-size:15px;text-decoration:none;color:var(--green)}
+  .link-arrow .icon{width:18px;height:18px;transition:transform .2s}
+  .link-arrow:hover .icon{transform:translateX(3px)}
+
+  /* utility strip */
+  .strip{background:var(--ink);color:#fff;font-size:14px}
+  .strip .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:44px}
+  .strip-note{color:#C3CBCA;display:flex;align-items:center;gap:8px}
+  .strip-note .dot{width:7px;height:7px;border-radius:50%;background:var(--brand)}
+  .strip-actions{display:flex;align-items:center;gap:6px}
+  .strip a{color:#fff;text-decoration:none;font-family:var(--font-head);font-weight:500;font-size:14px;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:6px;min-height:36px}
+  .strip a.tel{padding-left:0}
+  .strip a.tel .icon{width:16px;height:16px;color:var(--brand)}
+  .strip a.s-book{background:var(--brand);color:var(--ink)}
+  .strip a.s-book:hover{background:#7BD860}
+  .strip a.s-ref{background:var(--purple)}
+  .strip a.s-ref:hover{background:#86378F}
+
+  /* header */
+  header.site{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.97);backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid var(--line)}
+  header.site .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:80px}
+  .logo img{height:42px;width:auto}
+  nav.main>ul{list-style:none;display:flex;align-items:center;gap:2px}
+  nav.main>ul>li{position:relative}
+  nav.main>ul>li>a,nav.main>ul>li>button{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;line-height:1;font-family:var(--font-head);font-size:15px;font-weight:500;color:var(--ink);text-decoration:none;background:none;border:0;cursor:pointer;border-radius:6px;white-space:nowrap}
+  nav.main>ul>li>a:hover,nav.main>ul>li>button:hover,nav.main>ul>li:focus-within>button{color:var(--green)}
+  nav.main .chev{width:14px;height:14px;stroke-width:2}
+  .dd{position:absolute;top:calc(100% + 8px);left:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 40px rgba(22,30,29,.12);padding:22px 24px;display:grid;gap:28px;opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .15s,transform .15s,visibility .15s}
+  nav.main>ul>li:hover .dd,nav.main>ul>li:focus-within .dd{opacity:1;visibility:visible;transform:none}
+  nav.main>ul>li.r .dd{left:auto;right:0}
+  .dd.c2{grid-template-columns:repeat(2,minmax(190px,1fr))}
+  .dd.c3{grid-template-columns:repeat(3,minmax(180px,1fr))}
+  .dd.c1{grid-template-columns:minmax(200px,1fr)}
+  .dd h4{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .dd ul{list-style:none}
+  .dd li a{display:block;padding:6px 0;font-size:15.5px;color:var(--text);text-decoration:none}
+  .dd li a:hover{color:var(--green)}
+  .menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:8px;width:48px;height:48px;align-items:center;justify-content:center;cursor:pointer;color:var(--ink)}
+  .mobile-nav{display:none}
+
+  /* hero */
+  .hero{padding:80px 0 88px;background:var(--surface);border-bottom:1px solid var(--line)}
+  /* video hero (default) */
+  .hero-video{position:relative;overflow:hidden;background:var(--ink);color:#fff;min-height:620px;display:flex;align-items:center;padding:96px 0}
+  .hero-video .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
+  /* clip is taller than the hero and anchored to the top, so the burned-in captions in the lower third sit out of view */
+  .hero-video video{position:absolute;left:0;top:0;width:100%;height:150%;object-fit:cover;object-position:center top}
+  .hero-video::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(22,30,29,.94) 0%,rgba(22,30,29,.86) 38%,rgba(22,30,29,.45) 70%,rgba(22,30,29,.25) 100%)}
+  .hero-video .wrap{position:relative;z-index:2;width:100%}
+  .hero-video .inner{max-width:640px}
+  .hero-video .eyebrow{color:var(--brand)}
+  .hero-video h1{color:#fff;font-size:clamp(40px,5.6vw,72px);font-weight:500;letter-spacing:-.02em;margin-bottom:22px}
+  .hero-video h1 span{color:var(--brand)}
+  .hero-video .lead{color:#DDE3E2;margin-bottom:34px;max-width:560px}
+  .hero-video .btn-secondary{background:transparent;color:#fff;border-color:rgba(255,255,255,.55)}
+  .hero-video .btn-secondary:hover{border-color:#fff}
+  .vid-toggle{position:absolute;right:24px;bottom:24px;z-index:3;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(22,30,29,.5);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .vid-toggle .icon{width:18px;height:18px}
+  body.hero-photo .hero-video{display:none}
+  body:not(.hero-photo) .hero-split{display:none}
+  .proto-note button{font:inherit;color:#5A4500;background:#fff;border:1px solid #E5D18F;border-radius:6px;padding:3px 10px;margin-left:6px;cursor:pointer}
+  .proto-note button[aria-pressed="true"]{background:#5A4500;color:#fff;border-color:#5A4500}
+  @media (prefers-reduced-motion:reduce){.hero-video video{display:none}}
+  .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+  .hero h1{font-size:clamp(40px,5.2vw,64px);font-weight:500;letter-spacing:-.02em;margin-bottom:22px}
+  .hero h1 span{color:var(--green)}
+  .hero .lead{margin-bottom:32px}
+  .hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px}
+  .hero-trust{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:15px;color:var(--muted)}
+  .hero-trust span{display:inline-flex;align-items:center;gap:8px}
+  .hero-trust .icon{width:18px;height:18px;color:var(--green)}
+  .hero-media{position:relative}
+  .hero-media .photo{border-radius:10px;overflow:hidden;aspect-ratio:4/3;background:var(--tint)}
+  .hero-media .photo img{width:100%;height:100%;object-fit:cover}
+  .hero-card{position:absolute;left:-36px;bottom:32px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 20px;box-shadow:var(--shadow);display:flex;gap:14px;align-items:center;max-width:280px}
+  .hero-card b{font-family:var(--font-head);font-size:26px;font-weight:600;color:var(--ink);line-height:1}
+  .hero-card span{font-size:14px;color:var(--muted);line-height:1.35}
+
+  /* path selector */
+  .paths{padding:72px 0 32px}
+  .paths h2{font-size:clamp(24px,2.4vw,30px);margin-bottom:24px}
+  .path-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .path{display:flex;flex-direction:column;gap:12px;padding:26px 24px;border:1px solid var(--line);border-radius:10px;background:#fff;text-decoration:none;color:var(--text);transition:border-color .2s,box-shadow .2s;min-height:100%}
+  .path:hover{border-color:var(--green);box-shadow:var(--shadow)}
+  .path .ic{width:44px;height:44px;border-radius:8px;background:var(--tint);color:var(--green);display:flex;align-items:center;justify-content:center}
+  .path .ic .icon{width:22px;height:22px}
+  .path h3{font-size:19px}
+  .path p{font-size:15.5px;color:var(--muted);flex:1}
+  .path .link-arrow{margin-top:4px}
+  .path.ref .ic{background:var(--purple-tint);color:var(--purple)}
+  .path.ref .link-arrow{color:var(--purple)}
+  .path.ref:hover{border-color:var(--purple)}
+
+  /* logos */
+  .logos{padding:40px 0 56px;border-bottom:1px solid var(--line)}
+  .logos p{text-align:center;font-size:14px;color:var(--muted);margin-bottom:22px;letter-spacing:.02em}
+  .logo-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:20px 44px}
+  .logo-row img{height:44px;width:auto;max-width:130px;object-fit:contain;filter:grayscale(1);opacity:.75;transition:filter .2s,opacity .2s}
+  .logo-row img:hover{filter:none;opacity:1}
+
+  /* services */
+  .svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .svc{border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;background:#fff;overflow:hidden;transition:box-shadow .25s,transform .25s}
+  .svc:hover{box-shadow:0 18px 40px rgba(22,30,29,.10);transform:translateY(-3px)}
+  .svc-img{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--tint)}
+  /* zoomed towards the bottom right so the baked-in logo badge in each source photo is cropped out */
+  .svc-img img{width:100%;height:100%;object-fit:cover;transform-origin:75% 85%;transform:scale(1.18);transition:transform .5s}
+  .svc:hover .svc-img img{transform:scale(1.23)}
+  .svc-img::after{content:'';position:absolute;inset:auto 0 0 0;height:4px;background:var(--brand)}
+  .svc-body{padding:28px 28px 30px;display:flex;flex-direction:column;flex:1}
+  .svc .num{font-family:var(--font-head);font-size:13px;color:var(--green);letter-spacing:.1em;margin-bottom:18px}
+  .svc h3{font-size:24px;margin-bottom:12px}
+  .svc-body>p{color:var(--muted);font-size:16px;margin-bottom:20px}
+  .svc ul{list-style:none;border-top:1px solid var(--line);margin-bottom:24px;flex:1}
+  .svc li{border-bottom:1px solid var(--line)}
+  .svc li a{display:flex;justify-content:space-between;align-items:center;padding:11px 0;font-size:15.5px;color:var(--text);text-decoration:none}
+  .svc li a:hover{color:var(--green)}
+  .svc li .icon{width:16px;height:16px;color:var(--muted)}
+  .svc-also{margin-top:20px;font-size:15.5px;color:var(--muted)}
+  .svc-also a{font-weight:600}
+  .compare{margin-top:48px;display:grid;grid-template-columns:280px 1fr 1fr;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+  .compare>div{padding:28px}
+  .compare .q{background:var(--ink);color:#fff}
+  .compare .q h3{color:#fff;font-size:21px;margin-bottom:10px}
+  .compare .q p{color:#C3CBCA;font-size:15.5px}
+  .compare h4{font-size:17px;margin-bottom:8px}
+  .compare p{font-size:15.5px;color:var(--muted)}
+  .compare>div+div+div{border-left:1px solid var(--line)}
+
+  /* ways */
+  .ways{background:var(--surface)}
+  .way-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .way{background:#fff;border-radius:12px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column}
+  .way .img{aspect-ratio:16/10;background:var(--tint);overflow:hidden}
+  .way .img img{width:100%;height:100%;object-fit:cover}
+  .way .body{padding:26px 26px 28px;display:flex;flex-direction:column;gap:12px;flex:1}
+  .way h3{font-size:21px}
+  .way p{font-size:15.5px;color:var(--muted)}
+  .way ul{list-style:none;display:grid;gap:8px;margin:4px 0 8px;flex:1}
+  .way li{display:flex;gap:10px;font-size:15.5px}
+  .way li .icon{width:18px;height:18px;color:var(--green);margin-top:3px}
+
+  /* stats */
+  .stats{background:var(--ink);color:#fff;padding:72px 0}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+  .stat{padding:8px 32px;border-left:1px solid rgba(255,255,255,.14)}
+  .stat:first-child{border-left:0;padding-left:0}
+  .stat b{display:block;font-family:var(--font-head);font-weight:500;font-size:46px;line-height:1.1;color:#fff;letter-spacing:-.02em}
+  .stat span{font-size:15.5px;color:#C3CBCA}
+
+  /* conditions */
+  .conditions{background:var(--ink);color:#fff}
+  .cond-layout{display:grid;grid-template-columns:.8fr 1.6fr;gap:72px;align-items:start}
+  .conditions h2{color:#fff;font-size:clamp(28px,3.2vw,40px);margin-bottom:16px}
+  .conditions .lead{color:#C3CBCA;margin-bottom:32px}
+  .cond-call{font-size:16px;color:#C3CBCA}
+  .cond-call a{display:inline-flex;align-items:center;gap:10px;margin-top:6px;font-family:var(--font-head);font-weight:500;font-size:24px;color:#fff;text-decoration:none}
+  .cond-call .icon{color:var(--brand);width:22px;height:22px}
+  .tablist{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap}
+  .tablist button{font-family:var(--font-head);font-weight:500;font-size:15px;color:#C3CBCA;background:transparent;border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:10px 20px;min-height:44px;cursor:pointer;transition:background-color .2s,color .2s,border-color .2s}
+  .tablist button:hover{border-color:#fff;color:#fff}
+  .tablist button[aria-selected="true"]{background:var(--brand);border-color:var(--brand);color:var(--ink)}
+  .cond-panel{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:stretch}
+  .cond-panel[hidden]{display:none}
+  .cond-list{list-style:none;border-top:1px solid rgba(255,255,255,.14)}
+  .cond-list li a{display:flex;justify-content:space-between;align-items:center;padding:15px 4px;border-bottom:1px solid rgba(255,255,255,.14);color:#fff;text-decoration:none;font-size:17px;transition:color .2s,padding-left .2s}
+  .cond-list li a:hover{color:var(--brand);padding-left:10px}
+  .cond-list .icon{width:18px;height:18px;color:var(--brand)}
+  .cond-img{border-radius:12px;overflow:hidden;min-height:320px;background:#222}
+  .cond-img img{width:100%;height:100%;object-fit:cover}
+
+  /* funding */
+  .funding{background:var(--surface)}
+  .fund-layout{display:grid;grid-template-columns:1fr 2fr;gap:56px;align-items:start}
+  .first-steps{background:#fff;border:1px solid var(--line);border-radius:12px;padding:30px}
+  .first-steps h3{font-size:21px;margin-bottom:6px}
+  .first-steps>p{font-size:15.5px;color:var(--muted);margin-bottom:20px}
+  .steps{list-style:none;counter-reset:s;display:grid;gap:16px;margin-bottom:24px}
+  .steps li{counter-increment:s;display:flex;gap:14px;font-size:15.5px}
+  .steps li::before{content:counter(s);flex:0 0 28px;height:28px;border-radius:50%;background:var(--tint);color:var(--green);font-family:var(--font-head);font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .steps b{display:block;color:var(--ink);font-weight:600}
+  .fund-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .fund{background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px 24px;text-decoration:none;color:var(--text);display:flex;flex-direction:column;gap:6px;transition:border-color .2s}
+  .fund:hover{border-color:var(--green)}
+  .fund h4{font-size:18px;display:flex;justify-content:space-between;align-items:center}
+  .fund-logos{display:flex;align-items:center;gap:10px;height:34px;margin-bottom:8px}
+  .fund-logos img{height:30px;width:auto;max-width:96px;object-fit:contain}
+  .fund h4 .icon{width:18px;height:18px;color:var(--green)}
+  .fund p{font-size:15px;color:var(--muted)}
+
+  /* reviews */
+  .rev-top{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:40px;flex-wrap:wrap}
+  .rating{display:flex;align-items:center;gap:14px;padding:14px 20px;border:1px solid var(--line);border-radius:10px}
+  .stars{display:flex;gap:2px;color:#E8A317}
+  .stars svg{width:18px;height:18px;fill:currentColor}
+  .rating b{font-family:var(--font-head);font-weight:500;color:var(--ink)}
+  .rating span{font-size:14px;color:var(--muted)}
+  .rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .rev{border:1px solid var(--line);border-radius:12px;padding:28px;display:flex;flex-direction:column;gap:16px;background:#fff}
+  .rev-meta{display:flex;justify-content:space-between;align-items:center}
+  .rev-meta .stars svg{width:16px;height:16px}
+  .gmark{font-family:var(--font-head);font-weight:600;font-size:15px;letter-spacing:-.02em}
+  .gmark b:nth-child(1),.gmark b:nth-child(4){color:#4285F4}.gmark b:nth-child(2),.gmark b:nth-child(6){color:#EA4335}.gmark b:nth-child(3){color:#FBBC05}.gmark b:nth-child(5){color:#34A853}
+  .rev blockquote{font-size:16.5px;line-height:1.65;color:var(--text);flex:1}
+  .rev cite{font-style:normal;font-size:14.5px;color:var(--muted)}
+  .rev cite b{display:block;color:var(--ink);font-family:var(--font-head);font-weight:500;font-size:15.5px}
+
+  /* team strip */
+  .team{padding-top:0}
+  .tm-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;margin-bottom:28px}
+  .tm-controls{display:flex;align-items:center;gap:8px}
+  .tm-controls .link-arrow{margin-right:12px}
+  .tm-arrow[data-dir="-1"] .icon{transform:rotate(180deg)}
+  .tm-track{list-style:none;display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding-bottom:14px;scrollbar-width:thin}
+  .tm-card{flex:0 0 210px;scroll-snap-align:start}
+  .tm-card a{display:block;text-decoration:none;color:var(--text)}
+  .tm-photo{aspect-ratio:4/5;border-radius:12px;overflow:hidden;background:var(--tint);margin-bottom:12px}
+  .tm-photo img{width:100%;height:100%;object-fit:cover;object-position:center 20%;transition:transform .4s}
+  .tm-card a:hover .tm-photo img{transform:scale(1.04)}
+  .tm-card b{display:block;font-family:var(--font-head);font-weight:500;font-size:17px;color:var(--ink)}
+  .tm-card span{display:block;font-size:14.5px;color:var(--muted);line-height:1.4}
+  @media (prefers-reduced-motion:reduce){.tm-track{scroll-behavior:auto}}
+
+  /* referrers */
+  .referrers{background:var(--ink);color:#fff}
+  .ref-layout{display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center}
+  .referrers h2{color:#fff;font-size:clamp(28px,3.2vw,40px);margin-bottom:16px}
+  .referrers .eyebrow{color:var(--brand)}
+  .referrers .lead{color:#C3CBCA;margin-bottom:28px}
+  .ref-list{list-style:none;display:grid;gap:14px;margin-bottom:32px}
+  .ref-list li{display:flex;gap:12px;font-size:16.5px;color:#E4E8E7}
+  .ref-list .icon{color:var(--brand);margin-top:3px}
+  .ref-ctas{display:flex;flex-wrap:wrap;gap:12px}
+  .ref-quote{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:36px}
+  .ref-quote blockquote{font-family:var(--font-head);font-weight:400;font-size:21px;line-height:1.5;color:#fff;margin-bottom:22px}
+  .ref-quote cite{font-style:normal;font-size:15px;color:#C3CBCA}
+  .ref-quote cite b{color:#fff;display:block;font-weight:600}
+  .ref-quote+.ref-quote{margin-top:16px;padding:24px 28px}
+  .ref-quote+.ref-quote blockquote{font-size:17px}
+
+  /* locations */
+  .loc-layout{display:grid;grid-template-columns:2fr 1fr;gap:48px}
+  .state-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:36px 40px}
+  .state h3{font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;padding-bottom:12px;border-bottom:2px solid var(--ink);margin-bottom:6px}
+  .state ul{list-style:none}
+  .state li a{display:block;padding:10px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--text)}
+  .state li a b{display:block;font-weight:600;color:var(--ink)}
+  .state li a span{font-size:14px;color:var(--muted)}
+  .state li a:hover b{color:var(--green)}
+  .homevisit{background:var(--surface);border-radius:12px;padding:30px;border:1px solid var(--line)}
+  .homevisit h3{font-size:21px;margin-bottom:8px}
+  .homevisit p{font-size:15.5px;color:var(--muted);margin-bottom:18px}
+  .homevisit ul{list-style:none;margin-bottom:22px}
+  .homevisit li a{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--text)}
+  .homevisit li a:hover{color:var(--green)}
+  .homevisit .icon{width:16px;height:16px}
+
+  /* partners */
+  .partners{background:var(--surface);padding-bottom:32px}
+  .partner-layout{display:grid;grid-template-columns:1fr 1.4fr;gap:64px;align-items:start}
+  .partner-quote blockquote{font-family:var(--font-head);font-weight:400;font-size:20px;line-height:1.55;color:var(--ink);margin-bottom:18px}
+  .partner-quote cite{font-style:normal;font-size:15px;color:var(--muted)}
+  .partner-quote cite b{display:block;color:var(--ink);font-weight:600}
+  .partner-logos{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .partner-logos div{background:#fff;border:1px solid var(--line);border-radius:8px;height:88px;display:flex;align-items:center;justify-content:center;padding:14px}
+  .partner-logos img{max-height:56px;max-width:100%;object-fit:contain}
+  .awards{margin-top:56px;padding-top:40px;border-top:1px solid var(--line)}
+  .aw-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;margin-bottom:24px}
+  .aw-head h3{font-size:22px;margin-bottom:6px}
+  .aw-head p{font-size:15.5px;color:var(--muted);max-width:560px}
+  .aw-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .aw-years{display:flex;gap:6px;flex-wrap:wrap;margin-right:8px}
+  .aw-years button{font-family:var(--font-head);font-weight:500;font-size:14px;min-height:40px;min-width:56px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:background-color .2s,color .2s,border-color .2s}
+  .aw-years button:hover{border-color:var(--ink)}
+  .aw-years button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .aw-arrow{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s}
+  .aw-arrow:hover{border-color:var(--ink)}
+  .aw-arrow[data-dir="-1"] .icon{transform:rotate(180deg)}
+  .aw-track{list-style:none;display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding-bottom:12px;scrollbar-width:thin}
+  .aw-slide{flex:0 0 auto;scroll-snap-align:start;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;max-width:min(560px,86vw)}
+  .aw-img{height:220px;background:#fff;display:flex;align-items:center;justify-content:center;padding:16px;border-bottom:1px solid var(--line)}
+  .aw-img img{height:100%;width:auto;max-width:100%;object-fit:contain}
+  .aw-text{padding:18px 22px 22px}
+  .aw-text b{display:block;font-family:var(--font-head);font-weight:600;font-size:22px;color:var(--ink);margin-bottom:8px}
+  .aw-text ul{list-style:none;display:grid;gap:6px}
+  .aw-text li{font-size:14.5px;color:var(--muted);padding-left:16px;position:relative}
+  .aw-text li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--brand)}
+  @media (prefers-reduced-motion:reduce){.aw-track{scroll-behavior:auto}}
+
+  /* faq */
+  .faq{background:var(--surface)}
+  .faq-layout{display:grid;grid-template-columns:1fr 2fr;gap:56px}
+  details{border-bottom:1px solid var(--line);background:transparent}
+  details:first-of-type{border-top:1px solid var(--line)}
+  summary{list-style:none;cursor:pointer;padding:20px 40px 20px 0;font-family:var(--font-head);font-weight:500;font-size:18px;color:var(--ink);position:relative}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:'';position:absolute;right:6px;top:50%;width:10px;height:10px;border-right:2px solid var(--green);border-bottom:2px solid var(--green);transform:translateY(-70%) rotate(45deg);transition:transform .2s}
+  details[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+  details p{padding:0 40px 22px 0;color:var(--muted);font-size:16.5px}
+
+  /* final cta */
+  /* final call to action: Healthstin green band with the team cut-out breaking out of the top */
+  /* full-width green band; the grey strip above it continues the partners section so the team breaks out over it */
+  .final{padding:96px 0 0;background:var(--surface)}
+  .cta-band{position:relative;color:#fff;background:linear-gradient(100deg,#62C64A 0%,#3E8F31 30%,#2F7A3A 55%,#23683F 100%)}
+  .cta-band::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(0,0,0,.12));pointer-events:none}
+  .cta-grid{position:relative;display:grid;grid-template-columns:minmax(300px,520px) 1fr auto;gap:48px;align-items:center;min-height:260px}
+  .cta-team{align-self:end;margin-top:-90px;line-height:0}
+  .cta-team img{display:block;width:100%;height:auto}
+  .cta-copy{padding:36px 0}
+  .final h2{color:#fff;font-size:clamp(28px,3.2vw,42px);font-weight:600;margin-bottom:12px}
+  .final .lead{color:#fff;font-size:18px;max-width:520px;margin:0}
+  .final .ctas{display:flex;flex-direction:column;gap:12px;min-width:250px}
+  .final .ctas .btn{width:100%}
+  .final .btn-white{background:#fff;color:var(--ink)}
+  .final .btn-white:hover{background:var(--surface)}
+  .final .phone{display:block;margin-top:6px;text-align:center;font-size:15px;color:#fff}
+  .final .phone a{font-family:var(--font-head);font-weight:500;font-size:20px;color:#fff;text-decoration:none}
+
+  /* footer */
+  footer{background:#111716;color:#B8C2C0;padding:64px 0 32px;font-size:15px}
+  .foot-grid{display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:40px;margin-bottom:48px}
+  footer h4{color:#fff;font-size:14px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;margin-bottom:16px}
+  footer ul{list-style:none;display:grid;gap:9px}
+  footer a{color:#B8C2C0;text-decoration:none}
+  footer a:hover{color:#fff}
+  .foot-brand img{height:40px;width:auto;margin-bottom:18px;background:#fff;padding:6px 10px;border-radius:6px}
+  .foot-brand p{margin-bottom:16px;max-width:300px}
+  .foot-base{border-top:1px solid rgba(255,255,255,.12);padding-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13.5px;color:#8D9897}
+  .ack{font-size:13.5px;color:#8D9897;max-width:820px;margin-bottom:24px}
+  .proto-note{background:#FFF8E5;color:#5A4500;font-size:13.5px;text-align:center;padding:10px 16px;border-top:1px solid #F0DFA8}
+
+  /* scroll reveal */
+  .js .reveal{opacity:0;transform:translateY(16px);transition:opacity .5s ease-out,transform .5s ease-out}
+  .js .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.js .reveal{opacity:1;transform:none;transition:none}}
+
+  /* responsive */
+  @media (max-width:1200px){
+    nav.main{display:none}
+    .menu-btn{display:inline-flex}
+    .mobile-nav.open{display:block;border-top:1px solid var(--line);background:#fff;max-height:calc(100vh - 124px);overflow:auto}
+    header.site .mobile-nav .wrap{display:block;min-height:0;padding-top:8px;padding-bottom:24px}
+    .mobile-nav details summary{font-size:17px;padding:16px 36px 16px 0}
+    .mobile-nav details ul{list-style:none;padding:0 0 14px 12px}
+    .mobile-nav details li a{display:block;padding:8px 0;color:var(--text);text-decoration:none}
+    .mobile-nav>.wrap>a{display:block;padding:16px 0;border-bottom:1px solid var(--line);font-family:var(--font-head);font-weight:500;color:var(--ink);text-decoration:none}
+    .path-grid{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:960px){
+    section{padding:72px 0}
+    .hero-grid,.ref-layout,.fund-layout,.loc-layout,.faq-layout,.partner-layout{grid-template-columns:1fr;gap:40px}
+    .partner-logos{grid-template-columns:repeat(4,1fr)}
+    .hero-media{max-width:520px}
+    .hero-card{left:16px}
+    .svc-grid,.way-grid,.rev-grid{grid-template-columns:1fr}
+    .compare{grid-template-columns:1fr}
+    .compare>div+div+div{border-left:0;border-top:1px solid var(--line)}
+    .compare>div:nth-child(2){border-top:0}
+    .stat-grid{grid-template-columns:repeat(2,1fr);gap:28px 0}
+    .stat:nth-child(3){border-left:0;padding-left:0}
+    .cond-layout{grid-template-columns:1fr;gap:36px}
+    .cta-grid{grid-template-columns:1fr;gap:8px;padding-bottom:40px;text-align:center;justify-items:center}
+    .cta-team{max-width:420px;margin-top:-80px}
+    .cta-copy{padding:8px 0 16px}
+    .final .lead{margin:0 auto}
+    .final .ctas{min-width:0;width:100%;max-width:360px}
+    .cta-band{background:linear-gradient(180deg,#4FA33A 0%,#2F7A3A 45%,#23683F 100%)}
+    .cond-panel{grid-template-columns:1fr}
+    .cond-img{min-height:220px}
+    .state-grid{grid-template-columns:repeat(2,1fr)}
+    .foot-grid{grid-template-columns:repeat(2,1fr)}
+    .foot-brand{grid-column:1/-1}
+  }
+  @media (max-width:640px){
+    .wrap{padding:0 16px}
+    .strip-note{display:none}
+    .strip .wrap{justify-content:center}
+    .strip a{padding:6px 10px;font-size:13px}
+    .strip a.tel span{display:none}
+    header.site .wrap{min-height:68px}
+    .logo img{height:34px}
+    .hero{padding-top:48px}
+    .path-grid,.fund-grid,.state-grid{grid-template-columns:1fr}
+    .partner-logos{grid-template-columns:repeat(3,1fr);gap:8px}
+    .tm-card{flex-basis:160px}
+    .tm-controls .link-arrow{margin-right:auto}
+    .tm-controls{width:100%}
+    .partner-logos div{height:72px;padding:10px}
+    .hero-ctas .btn,.ref-ctas .btn{width:100%}
+    .hero-card{position:static;margin-top:16px;max-width:none}
+    .stat{padding:0 16px}
+    .stat b{font-size:36px}
+    .foot-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<!-- icon sprite (Lucide-style, 1.75 stroke) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-hands" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14M15 5v14"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></symbol>
+</svg>
+
+<div class="strip">
+  <div class="wrap">
+    <span class="strip-note"><span class="dot"></span>Registered NDIS provider · Clinics in NSW, VIC, SA and WA</span>
+    <div class="strip-actions">
+      <a class="tel" href="tel:1300090931"><svg class="icon"><use href="#i-phone"/></svg><span>1300 090 931</span></a>
+      <a class="s-book" href="#">Book an Appointment</a>
+      <a class="s-ref" href="#referrers">Refer a Patient</a>
+    </div>
+  </div>
+</div>
+
+<header class="site">
+  <div class="wrap">
+    <a class="logo" href="#" aria-label="Healthstin home"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/12/healthstin-logo-300px.png" alt="Healthstin" width="168" height="42"></a>
+    <nav class="main" aria-label="Main">
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><button aria-haspopup="true">What We Do <svg class="icon chev"><use href="#i-chev"/></svg></button>
+          <div class="dd c3">
+            <div><h4>Physiotherapy</h4><ul><li><a href="#">Physiotherapy</a></li><li><a href="#">Neurological Physio</a></li><li><a href="#">Aged Care Physio</a></li><li><a href="#">Falls Prevention</a></li><li><a href="#">Post-Surgery Rehab</a></li></ul></div>
+            <div><h4>Exercise Physiology</h4><ul><li><a href="#">Exercise Physiology</a></li><li><a href="#">Active Ageing</a></li><li><a href="#">Group Classes</a></li><li><a href="#">NDIS &amp; Aged Care Gym</a></li><li><a href="#">Chronic Disease</a></li><li><a href="#">Mental Health</a></li></ul></div>
+            <div><h4>Hydrotherapy &amp; more</h4><ul><li><a href="#">Hydrotherapy</a></li><li><a href="#">Hydro for Arthritis</a></li><li><a href="#">Aqua Classes for Seniors</a></li><li><a href="#">Remedial Massage</a></li><li><a href="#">Acupuncture</a></li><li><a href="#">Dry Needling</a></li></ul></div>
+          </div></li>
+        <li><button aria-haspopup="true">Who We Support <svg class="icon chev"><use href="#i-chev"/></svg></button>
+          <div class="dd c2">
+            <div><h4>Clients</h4><ul><li><a href="#">NDIS Participants</a></li><li><a href="#">Older Australians</a></li><li><a href="#">Veterans</a></li><li><a href="#">Injured Workers</a></li><li><a href="#">Children &amp; Young People</a></li></ul></div>
+            <div><h4>Referrers</h4><ul><li><a href="#">Support Coordinators</a></li><li><a href="#">GPs &amp; Health Professionals</a></li><li><a href="#">Refer a Patient</a></li></ul></div>
+          </div></li>
+        <li class="r"><button aria-haspopup="true">Conditions <svg class="icon chev"><use href="#i-chev"/></svg></button>
+          <div class="dd c3">
+            <div><h4>Neurological</h4><ul><li><a href="#">Stroke</a></li><li><a href="#">Multiple Sclerosis</a></li><li><a href="#">Spinal Cord Injury</a></li><li><a href="#">Parkinson's</a></li><li><a href="#">Brain Injury</a></li><li><a href="#">Motor Neurone Disease</a></li><li><a href="#">Dementia</a></li></ul></div>
+            <div><h4>Disability</h4><ul><li><a href="#">Cerebral Palsy</a></li><li><a href="#">Autism</a></li><li><a href="#">Intellectual Disability</a></li><li><a href="#">Down Syndrome</a></li><li><a href="#">Psychosocial &amp; PTSD</a></li></ul></div>
+            <div><h4>Chronic &amp; MSK</h4><ul><li><a href="#">Arthritis</a></li><li><a href="#">Anxiety &amp; Depression</a></li><li><a href="#">Obesity</a></li><li><a href="#">Osteoporosis</a></li><li><a href="#">Type 2 Diabetes</a></li><li><a href="#">Back &amp; Chronic Pain</a></li></ul></div>
+          </div></li>
+        <li class="r"><button aria-haspopup="true">Getting Started <svg class="icon chev"><use href="#i-chev"/></svg></button>
+          <div class="dd c2">
+            <div><h4>First steps</h4><ul><li><a href="#">Free 10-Minute Phone Consultation</a></li><li><a href="#">New Patient Form</a></li><li><a href="#">Refer a Patient</a></li></ul></div>
+            <div><h4>Getting started with</h4><ul><li><a href="#">NDIS</a></li><li><a href="#">Support at Home</a></li><li><a href="#">Home Care Packages</a></li><li><a href="#">CHSP</a></li><li><a href="#">DVA</a></li><li><a href="#">Workers Compensation</a></li><li><a href="#">Medicare &amp; GP Plans</a></li><li><a href="#">Private Health</a></li></ul></div>
+          </div></li>
+        <li class="r"><button aria-haspopup="true">Locations <svg class="icon chev"><use href="#i-chev"/></svg></button>
+          <div class="dd c2">
+            <div><h4>Our Clinics</h4><ul><li><a href="#">Hurstville</a></li><li><a href="#">Sans Souci</a></li><li><a href="#">Bexley</a></li><li><a href="#">Melton</a></li><li><a href="#">Keilor Downs</a></li><li><a href="#">Salisbury</a></li><li><a href="#">Elizabeth</a></li><li><a href="#">Belmont</a></li></ul></div>
+            <div><h4>Home Visits</h4><ul><li><a href="#">Mobile Physio Sydney</a></li><li><a href="#">Mobile Physio Melbourne</a></li><li><a href="#">Mobile Physio Adelaide</a></li><li><a href="#">Mobile Physio Perth</a></li><li><a href="#">All Home Visit Areas</a></li></ul></div>
+          </div></li>
+        <li class="r"><button aria-haspopup="true">Meet Us <svg class="icon chev"><use href="#i-chev"/></svg></button>
+          <div class="dd c1"><div><ul><li><a href="#">Why Choose Us</a></li><li><a href="#">Our Team</a></li><li><a href="#">Blog</a></li><li><a href="#">FAQs</a></li></ul></div></div></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+    <button class="menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><svg class="icon"><use href="#i-menu"/></svg></button>
+  </div>
+  <div class="mobile-nav" id="mnav">
+    <div class="wrap">
+      <a href="#">Home</a>
+      <details><summary>What We Do</summary><ul><li><a href="#">Physiotherapy</a></li><li><a href="#">Exercise Physiology</a></li><li><a href="#">Hydrotherapy</a></li><li><a href="#">Remedial Massage</a></li><li><a href="#">Acupuncture</a></li></ul></details>
+      <details><summary>Who We Support</summary><ul><li><a href="#">NDIS Participants</a></li><li><a href="#">Older Australians</a></li><li><a href="#">Veterans</a></li><li><a href="#">Injured Workers</a></li><li><a href="#">Support Coordinators</a></li><li><a href="#">GPs &amp; Health Professionals</a></li></ul></details>
+      <details><summary>Conditions</summary><ul><li><a href="#">Neurological</a></li><li><a href="#">Disability</a></li><li><a href="#">Chronic &amp; MSK</a></li></ul></details>
+      <details><summary>Getting Started</summary><ul><li><a href="#">Free 10-Minute Phone Consultation</a></li><li><a href="#">NDIS</a></li><li><a href="#">Support at Home</a></li><li><a href="#">DVA</a></li><li><a href="#">Workers Compensation</a></li><li><a href="#">Medicare &amp; GP Plans</a></li></ul></details>
+      <details><summary>Locations</summary><ul><li><a href="#">Our Clinics</a></li><li><a href="#">Home Visits</a></li></ul></details>
+      <details><summary>Meet Us</summary><ul><li><a href="#">Why Choose Us</a></li><li><a href="#">Our Team</a></li><li><a href="#">Blog</a></li><li><a href="#">FAQs</a></li></ul></details>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- HERO -->
+<section class="hero-video" aria-labelledby="hero-h">
+  <img class="poster" src="https://www.healthstin.com.au/wp-content/uploads/2025/04/Pool.webp" alt="">
+  <video id="heroVid" muted playsinline preload="auto" poster="https://www.healthstin.com.au/wp-content/uploads/2025/04/Pool.webp" aria-hidden="true">
+    <source src="https://www.healthstin.com.au/wp-content/uploads/2023/11/Healthstin_DSG_Video_Nick-and-Bryce_compressed.mp4#t=8" type="video/mp4">
+  </video>
+  <div class="wrap">
+    <div class="inner">
+      <span class="eyebrow">Physiotherapy · Exercise Physiology · Hydrotherapy</span>
+      <h1 id="hero-h">Movement is <span>for everyone.</span></h1>
+      <p class="lead">Allied health care for people living with disability, injury, ageing and long-term conditions. In our clinics across NSW, VIC, SA and WA, in your home, or online.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#">Book an Appointment</a>
+        <a class="btn btn-secondary" href="#">Free 10-Minute Phone Consultation</a>
+      </div>
+    </div>
+  </div>
+  <button class="vid-toggle" type="button" aria-label="Pause background video"><svg class="icon"><use href="#i-pause"/></svg></button>
+</section>
+
+<section class="hero hero-split" aria-label="Introduction">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Physiotherapy · Exercise Physiology · Hydrotherapy</span>
+      <p class="h1" role="presentation" style="font-family:var(--font-head);font-size:clamp(40px,5.2vw,64px);font-weight:500;letter-spacing:-.02em;line-height:1.2;color:var(--ink);margin-bottom:22px">Movement is <span style="color:var(--green)">for everyone.</span></p>
+      <p class="lead">Allied health care for people living with disability, injury, ageing and long-term conditions. In our clinics across NSW, VIC, SA and WA, in your home, or online.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#">Book an Appointment</a>
+        <a class="btn btn-secondary" href="#">Free 10-Minute Phone Consultation</a>
+      </div>
+    </div>
+    <div class="hero-media">
+      <div class="photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/04/5d78add0c12e522d03f7c5b18a6cec68fb75f783.jpg" alt="Clinician supporting a client during a hydrotherapy session" width="1200" height="738"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PATH SELECTOR -->
+<section class="paths" aria-labelledby="paths-h">
+  <div class="wrap">
+    <h2 id="paths-h">How can we help you today?</h2>
+    <div class="path-grid">
+      <a class="path reveal" href="#">
+        <span class="ic"><svg class="icon"><use href="#i-user"/></svg></span>
+        <h3>I'm a private patient</h3>
+        <p>Recovering from injury or surgery, or managing a long-term condition. Private health rebates and Medicare care plans accepted.</p>
+        <span class="link-arrow">Book an appointment <svg class="icon"><use href="#i-arrow"/></svg></span>
+      </a>
+      <a class="path reveal" href="#">
+        <span class="ic"><svg class="icon"><use href="#i-hands"/></svg></span>
+        <h3>I'm on the NDIS</h3>
+        <p>Self-managed, plan-managed or NDIA-managed. Physiotherapy, exercise physiology and hydrotherapy under Capacity Building.</p>
+        <span class="link-arrow">Getting started with NDIS <svg class="icon"><use href="#i-arrow"/></svg></span>
+      </a>
+      <a class="path reveal" href="#">
+        <span class="ic"><svg class="icon"><use href="#i-home"/></svg></span>
+        <h3>I'm on an aged-care package</h3>
+        <p>Support at Home, Home Care Packages or CHSP. Strength, balance and falls prevention at home or in the pool.</p>
+        <span class="link-arrow">Getting started with aged care <svg class="icon"><use href="#i-arrow"/></svg></span>
+      </a>
+      <a class="path ref reveal" href="#referrers">
+        <span class="ic"><svg class="icon"><use href="#i-send"/></svg></span>
+        <h3>I'm referring a client</h3>
+        <p>Support coordinators, GPs, case managers and DVA or WorkCover referrers. NDIS, aged care, DVA and workers compensation.</p>
+        <span class="link-arrow">Refer a patient <svg class="icon"><use href="#i-arrow"/></svg></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<div class="logos">
+  <div class="wrap">
+    <p>Registered, accredited and approved across Australia's funding schemes</p>
+    <div class="logo-row">
+      <img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/We-support-NDIS_2020-1.png" alt="NDIS registered provider" loading="lazy">
+      <img src="https://www.healthstin.com.au/wp-content/uploads/2024/11/ESSA-Horizontal-Complex-Blue-1.png" alt="Exercise and Sports Science Australia" loading="lazy">
+      <img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/DVA-Logo-1.png" alt="Department of Veterans' Affairs" loading="lazy">
+      <img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/medicare-logo-1.png" alt="Medicare" loading="lazy">
+      <img src="https://www.healthstin.com.au/wp-content/uploads/2025/02/Aged-Care-Generic-Icon_UPDATED-1-1.png" alt="Aged care" loading="lazy">
+      <img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/worksafe-victoria-logo-1.png" alt="WorkSafe Victoria" loading="lazy">
+      <img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/img-thumb-news-return-to-work-SA-1.png" alt="ReturnToWorkSA" loading="lazy">
+      <img src="https://www.healthstin.com.au/wp-content/uploads/2025/01/WorkCover-WA-1.png" alt="WorkCover WA" loading="lazy">
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section aria-labelledby="svc-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="svc-h">Our services</h2>
+      <p class="lead">Physiotherapy, exercise physiology and hydrotherapy, delivered by the same team.</p>
+    </div>
+    <div class="svc-grid">
+      <article class="svc reveal">
+        <div class="svc-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/01/Physiotherapy.webp" alt="Physiotherapist treating a client&#39;s back" loading="lazy" width="1200" height="630"></div>
+        <div class="svc-body">
+        <h3>Physiotherapy</h3>
+        <p>Hands-on treatment and targeted exercise to recover from injury, surgery or neurological change, and to restore movement.</p>
+        <ul>
+          <li><a href="#">Neurological physiotherapy <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">Aged care physiotherapy <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">Falls prevention and balance <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">Post-surgery and joint replacement <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+        </ul>
+        <a class="link-arrow" href="#">About physiotherapy <svg class="icon"><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>
+      <article class="svc reveal">
+        <div class="svc-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/01/Exercise-Physiology.webp" alt="Exercise physiologist supervising a gym session" loading="lazy" width="1200" height="630"></div>
+        <div class="svc-body">
+        <h3>Exercise Physiology</h3>
+        <p>Structured, clinically prescribed exercise for long-term conditions, disability, mental health and healthy ageing.</p>
+        <ul>
+          <li><a href="#">Active ageing programs <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">NDIS and aged care gym <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">Chronic disease management <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">Group classes <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+        </ul>
+        <a class="link-arrow" href="#">About exercise physiology <svg class="icon"><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>
+      <article class="svc reveal">
+        <div class="svc-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/01/Hydrotherapy.webp" alt="Client exercising in a warm water pool" loading="lazy" width="1200" height="630"></div>
+        <div class="svc-body">
+        <h3>Hydrotherapy</h3>
+        <p>Warm water exercise in the pools at the aquatic centres where our clinics are based. Easier on sore joints and good for building confidence.</p>
+        <ul>
+          <li><a href="#">Hydrotherapy for arthritis <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">Aqua classes for seniors <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">NDIS hydrotherapy <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">Find a pool near you <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+        </ul>
+        <a class="link-arrow" href="#">About hydrotherapy <svg class="icon"><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>
+    </div>
+    <p class="svc-also">Also available: <a href="#">remedial massage</a>, <a href="#">acupuncture</a> and <a href="#">dry needling</a>. Our Hurstville clinic also offers <a href="#">cupping</a>, <a href="#">gua sha</a> and <a href="#">low-level laser therapy</a>.</p>
+
+  </div>
+</section>
+
+<!-- WAYS WE CARE -->
+<section class="ways" aria-labelledby="ways-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="ways-h">How you can access our services</h2>
+      <p class="lead">Come to one of our clinics, have us visit you at home, or see us online.</p>
+    </div>
+    <div class="way-grid">
+      <article class="way reveal">
+        <div class="img"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/02/Image-53.webp" alt="Hurstville Aquatic Leisure Centre, home of Healthstin Hurstville" loading="lazy" width="467" height="440"></div>
+        <div class="body">
+          <h3>In clinic</h3>
+          <p>Eight clinics inside aquatic and leisure centres.</p>
+          <ul>
+            <li><svg class="icon"><use href="#i-check"/></svg>Warm water hydrotherapy pools</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Fully equipped gyms</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Private consultation rooms</li>
+          </ul>
+          <a class="link-arrow" href="#">Find a clinic <svg class="icon"><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>
+      <article class="way reveal">
+        <div class="img"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/04/Rectangle-1271.webp" alt="Healthstin mobile allied health car" loading="lazy" width="467" height="440"></div>
+        <div class="body">
+          <h3>Home visits</h3>
+          <p>Mobile physiotherapy and exercise physiology.</p>
+          <ul>
+            <li><svg class="icon"><use href="#i-check"/></svg>Sydney, Melbourne, Adelaide and Perth</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Ideal for limited mobility and aged care</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Programs built around your home</li>
+          </ul>
+          <a class="link-arrow" href="#">Check home visit areas <svg class="icon"><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>
+      <article class="way reveal">
+        <div class="img"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/04/Pool-2.webp" alt="Telehealth session on a laptop" loading="lazy" width="467" height="440"></div>
+        <div class="body">
+          <h3>Telehealth and community</h3>
+          <p>Telehealth sessions and local community programs.</p>
+          <ul>
+            <li><svg class="icon"><use href="#i-check"/></svg>Telehealth physio and exercise physiology</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>15,000+ guided exercise videos</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Sessions at your local community centre</li>
+          </ul>
+          <a class="link-arrow" href="#">About telehealth <svg class="icon"><use href="#i-arrow"/></svg></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- CONDITIONS -->
+<section class="conditions" aria-labelledby="cond-h">
+  <div class="wrap cond-layout">
+    <div class="cond-intro reveal">
+      <h2 id="cond-h">Conditions we treat</h2>
+      <p class="lead">Our clinicians work with complex neurological, disability and long-term conditions every day. Every program starts with an assessment and is built around your goals.</p>
+      <p class="cond-call">Not sure if we can help?<br><a href="tel:1300090931"><svg class="icon"><use href="#i-phone"/></svg>1300 090 931</a></p>
+    </div>
+    <div class="cond-tabs reveal">
+      <div class="tablist" role="tablist" aria-label="Condition groups"><button type="button" role="tab" id="t-neuro" aria-controls="p-neuro" aria-selected="true" tabindex="0">Neurological</button><button type="button" role="tab" id="t-dis" aria-controls="p-dis" aria-selected="false" tabindex="-1">Disability</button><button type="button" role="tab" id="t-chronic" aria-controls="p-chronic" aria-selected="false" tabindex="-1">Chronic and musculoskeletal</button></div>
+        <div class="cond-panel" role="tabpanel" id="p-neuro" aria-labelledby="t-neuro">
+          <ul class="cond-list"><li><a href="#">Stroke rehabilitation<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Multiple sclerosis<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Parkinson's disease<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Spinal cord injury<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Acquired brain injury<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Motor neurone disease<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Dementia<svg class="icon"><use href="#i-arrow"/></svg></a></li></ul>
+          <div class="cond-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/05/Healthstin_Blog_Brain-Injury-Recovery_Header-Photo.jpg" alt="Client doing rehabilitation exercises on a mat" loading="lazy"></div>
+        </div>
+        <div class="cond-panel" role="tabpanel" id="p-dis" aria-labelledby="t-dis" hidden>
+          <ul class="cond-list"><li><a href="#">Cerebral palsy<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Autism<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Intellectual disability<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Down syndrome<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Psychosocial disability and PTSD<svg class="icon"><use href="#i-arrow"/></svg></a></li></ul>
+          <div class="cond-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2021/08/Healthstin_Blog_NDIS-Exercise-Physiology_Header-Photo.jpg" alt="Wheelchair user training in a gym" loading="lazy"></div>
+        </div>
+        <div class="cond-panel" role="tabpanel" id="p-chronic" aria-labelledby="t-chronic" hidden>
+          <ul class="cond-list"><li><a href="#">Arthritis<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Osteoporosis<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Type 2 diabetes<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Back and chronic pain<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Anxiety and depression<svg class="icon"><use href="#i-arrow"/></svg></a></li><li><a href="#">Obesity<svg class="icon"><use href="#i-arrow"/></svg></a></li></ul>
+          <div class="cond-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2023/05/Group-6593.webp" alt="Older client working with a clinician" loading="lazy"></div>
+        </div>
+    </div>
+  </div>
+</section>
+
+<!-- FUNDING -->
+<section class="funding" aria-labelledby="fund-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="fund-h">Funding and getting started</h2>
+      <p class="lead">We work with the NDIS, aged-care packages, DVA, workers compensation, Medicare and private health. Call us and we will explain what your funding covers.</p>
+    </div>
+    <div class="fund-layout">
+      <div class="first-steps reveal">
+        <h3>Your first steps</h3>
+        <p>Starting with Healthstin takes one phone call.</p>
+        <ol class="steps">
+          <li><div><b>Free 10-minute phone consultation</b>Ask questions and check your funding with our team.</div></li>
+          <li><div><b>Complete the new patient form</b>Or ask your coordinator or GP to refer you.</div></li>
+          <li><div><b>Initial assessment</b>In clinic, at home or online, with a plan built around your goals.</div></li>
+        </ol>
+        <a class="btn btn-primary" href="#" style="width:100%">Book a free phone consultation</a>
+      </div>
+      <div class="fund-grid">
+        <a class="fund reveal" href="#"><span class="fund-logos"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/We-support-NDIS_2020-1.png" alt="NDIS" loading="lazy"></span><h4>NDIS <svg class="icon"><use href="#i-arrow"/></svg></h4><p>Self, plan and NDIA-managed participants. Physio, exercise physiology and hydrotherapy.</p></a>
+        <a class="fund reveal" href="#"><span class="fund-logos"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/02/Aged-Care-Generic-Icon_UPDATED-1-1.png" alt="Aged care" loading="lazy"></span><h4>Support at Home <svg class="icon"><use href="#i-arrow"/></svg></h4><p>The new aged-care program. Allied health to keep you strong and independent at home.</p></a>
+        <a class="fund reveal" href="#"><span class="fund-logos"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/02/Aged-Care-Generic-Icon_UPDATED-1-1.png" alt="Aged care" loading="lazy"></span><h4>Home Care Packages and CHSP <svg class="icon"><use href="#i-arrow"/></svg></h4><p>Already on a package? We help you use it well and move across to Support at Home.</p></a>
+        <a class="fund reveal" href="#"><span class="fund-logos"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/DVA-Logo-1.png" alt="Department of Veterans' Affairs" loading="lazy"></span><h4>DVA <svg class="icon"><use href="#i-arrow"/></svg></h4><p>Gold and White Card holders. Physiotherapy and exercise physiology for veterans.</p></a>
+        <a class="fund reveal" href="#"><span class="fund-logos"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/worksafe-victoria-logo-1.png" alt="WorkSafe Victoria" loading="lazy"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/img-thumb-news-return-to-work-SA-1.png" alt="ReturnToWorkSA" loading="lazy"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/01/WorkCover-WA-1.png" alt="WorkCover WA" loading="lazy"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/image-8.png" alt="SafeWork NSW" loading="lazy"></span><h4>Workers compensation <svg class="icon"><use href="#i-arrow"/></svg></h4><p>WorkSafe Victoria, ReturnToWorkSA and WorkCover WA claims.</p></a>
+        <a class="fund reveal" href="#"><span class="fund-logos"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/medicare-logo-1.png" alt="Medicare" loading="lazy"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/Screenshot-2024-07-29-090337-1.png" alt="HICAPS" loading="lazy"></span><h4>Medicare and private health <svg class="icon"><use href="#i-arrow"/></svg></h4><p>GP chronic disease management plans and private health rebates.</p></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section aria-labelledby="rev-h">
+  <div class="wrap">
+    <div class="rev-top">
+      <div class="sec-head" style="margin-bottom:0">
+        <h2 id="rev-h">What our clients say</h2>
+      </div>
+      <div class="rating" aria-label="Rated Excellent from more than 260 Google reviews">
+        <div class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div>
+        <div><b>Excellent</b><br><span>260+ Google reviews</span></div>
+      </div>
+    </div>
+    <div class="rev-grid">
+      <figure class="rev reveal">
+        <div class="rev-meta"><div class="stars" aria-label="5 stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div><span class="gmark" aria-label="Google"><b>G</b><b>o</b><b>o</b><b>g</b><b>l</b><b>e</b></span></div>
+        <blockquote>"Many years ago, I swore I would never enter a gym again. I was wrong! All the exercise physiologists are eager and extremely knowledgeable, very helpful... My balance has improved, but I can also feel my body strength improving, and I have a lot more energy."</blockquote>
+        <cite><b>Wendy B.</b>Google review</cite>
+      </figure>
+      <figure class="rev reveal">
+        <div class="rev-meta"><div class="stars" aria-label="5 stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div><span class="gmark" aria-label="Google"><b>G</b><b>o</b><b>o</b><b>g</b><b>l</b><b>e</b></span></div>
+        <blockquote>"Healthstin have been wonderful during my recovery from a broken arm. Punctual, knowledgeable, courteous, reliable, convenient home service. 5 stars from me!"</blockquote>
+        <cite><b>Susan W.</b>Google review, home visits</cite>
+      </figure>
+      <figure class="rev reveal">
+        <div class="rev-meta"><div class="stars" aria-label="5 stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div><span class="gmark" aria-label="Google"><b>G</b><b>o</b><b>o</b><b>g</b><b>l</b><b>e</b></span></div>
+        <blockquote>"The Exercise Physiologists at Healthstin have been wonderful in helping with my knee replacement physio. I attend the group sessions, however as the classes are not huge, you still receive one on one help."</blockquote>
+        <cite><b>Marilyn S.</b>Google review, group hydrotherapy</cite>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team" aria-labelledby="team-h">
+  <div class="wrap">
+    <div class="tm-head">
+      <div class="sec-head" style="margin-bottom:0">
+        <h2 id="team-h">Meet our clinicians</h2>
+        <p class="lead">The physiotherapists, exercise physiologists and therapists you will see in our clinics, at home and online.</p>
+      </div>
+      <div class="tm-controls">
+        <a class="link-arrow" href="#">Meet the full team <svg class="icon"><use href="#i-arrow"/></svg></a>
+        <button type="button" class="aw-arrow tm-arrow" data-dir="-1" aria-label="Scroll team left"><svg class="icon"><use href="#i-arrow"/></svg></button>
+        <button type="button" class="aw-arrow tm-arrow" data-dir="1" aria-label="Scroll team right"><svg class="icon"><use href="#i-arrow"/></svg></button>
+      </div>
+    </div>
+    <ul class="tm-track" tabindex="0" aria-label="Our clinicians, scroll sideways">
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/10/New-Employee-Image_Jordan-1024x1024.jpg" alt="Jordan, Physiotherapist" loading="lazy" width="400" height="400"></div>
+          <b>Jordan</b><span>Physiotherapist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/01/Team-Jack-T.png" alt="Jack, Physiotherapist" loading="lazy" width="400" height="400"></div>
+          <b>Jack</b><span>Physiotherapist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/10/Niamh_Our-team-1.webp" alt="Niamh, Physiotherapist" loading="lazy" width="400" height="400"></div>
+          <b>Niamh</b><span>Physiotherapist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/05/Megan-Our-team.webp" alt="Megan, Physiotherapist" loading="lazy" width="400" height="400"></div>
+          <b>Megan</b><span>Physiotherapist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/01/Team-Jessica.jpg" alt="Jessica, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Jessica</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/01/Team-Liam.jpg" alt="Liam, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Liam</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/02/Rochelle-Main-Photo-v1.webp" alt="Rochelle, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Rochelle</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/09/New-Employee-Image_Manar-100kb-1024x1024.jpeg" alt="Manar, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Manar</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/03/Abbey-Our-team.webp" alt="Abbey, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Abbey</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/09/New-Employee-Image_Isabell-100kb-768x768.jpeg" alt="Isabelle, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Isabelle</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/03/Jessica-Our-team.webp" alt="Jessica N., Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Jessica N.</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/09/New-Employee-Image_Jaslyn-100kb-1024x1024.jpeg" alt="Jaslyn, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Jaslyn</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/10/Scott-Our-team.webp" alt="Scott, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Scott</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/11/Trent-Our-team.webp" alt="Trent, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Trent</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/11/Dennis-Our-team.webp" alt="Dennis, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Dennis</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/01/Mona-Our-team.webp" alt="Mona, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Mona</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/01/Gemma-Our-team.webp" alt="Gemma, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Gemma</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/02/Zahraa-Our-team.webp" alt="Zahraa, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Zahraa</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/02/Anthony-Our-team.webp" alt="Anthony, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Anthony</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/06/Yohan-Our-team.webp" alt="Yohan, Exercise Physiologist" loading="lazy" width="400" height="400"></div>
+          <b>Yohan</b><span>Exercise Physiologist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/07/Nicholas-Our-team.webp" alt="Nicholas, Exercise Scientist" loading="lazy" width="400" height="400"></div>
+          <b>Nicholas</b><span>Exercise Scientist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/01/Team-Mr.-Bing-1.png" alt="Mr. Bing, Remedial Massage Therapist and Acupuncturist" loading="lazy" width="400" height="400"></div>
+          <b>Mr. Bing</b><span>Remedial Massage Therapist and Acupuncturist</span>
+        </a></li>
+        <li class="tm-card"><a href="#">
+          <div class="tm-photo"><img src="https://www.healthstin.com.au/wp-content/uploads/2024/01/Team-Rachelle-1.png" alt="Dr. Rachelle, Allied Health Coordinator" loading="lazy" width="400" height="400"></div>
+          <b>Dr. Rachelle</b><span>Allied Health Coordinator</span>
+        </a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- REFERRERS -->
+<section class="referrers" id="referrers" aria-labelledby="ref-h">
+  <div class="wrap ref-layout">
+    <div>
+      <h2 id="ref-h">For support coordinators, GPs and case managers</h2>
+      <p class="lead">We accept NDIS, aged-care, DVA and workers compensation referrals in NSW, VIC, SA and WA, and match each client to the right clinician.</p>
+      <ul class="ref-list">
+        <li><svg class="icon"><use href="#i-check"/></svg>Refer online, by phone or through HealthLink</li>
+        <li><svg class="icon"><use href="#i-check"/></svg>Clinics, home visits and telehealth from one provider</li>
+        <li><svg class="icon"><use href="#i-check"/></svg>Physiotherapists and ESSA accredited exercise physiologists working together</li>
+        <li><svg class="icon"><use href="#i-check"/></svg>Experience with complex neurological and disability presentations</li>
+      </ul>
+      <div class="ref-ctas">
+        <a class="btn btn-purple" href="#">Refer a Patient <svg class="icon"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-ghost-light" href="#">HealthLink referral</a>
+      </div>
+    </div>
+    <div>
+      <figure class="ref-quote">
+        <blockquote>"Thank you for always responding to my emails or phone calls and thank you for always matching the right clinicians to my Participants."</blockquote>
+        <cite><b>Branka C.</b>Support Coordinator</cite>
+      </figure>
+      <figure class="ref-quote">
+        <blockquote>"We've received consistent praise from clients and staff alike about his professionalism, warmth, and the genuine care he shows during each session."</blockquote>
+        <cite><b>Ming Z.</b>Support Coordinator</cite>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATIONS -->
+<section aria-labelledby="loc-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="loc-h">Our clinics</h2>
+      <p class="lead">Most of our clinics are inside local aquatic and leisure centres, with a pool and gym on site.</p>
+    </div>
+    <div class="loc-layout">
+      <div class="state-grid">
+        <div class="state"><h3>New South Wales</h3><ul>
+          <li><a href="#"><b>Hurstville</b><span>Forest Rd</span></a></li>
+          <li><a href="#"><b>Sans Souci</b><span>Sans Souci Leisure Centre</span></a></li>
+          <li><a href="#"><b>Bexley</b><span>Bexley, NSW</span></a></li>
+        </ul></div>
+        <div class="state"><h3>Victoria</h3><ul>
+          <li><a href="#"><b>Melton</b><span>Melton Waves Leisure Centre</span></a></li>
+          <li><a href="#"><b>Keilor Downs</b><span>Brimbank Aquatic and Wellness Centre</span></a></li>
+        </ul></div>
+        <div class="state"><h3>South Australia</h3><ul>
+          <li><a href="#"><b>Salisbury</b><span>Salisbury Aquatic Centre</span></a></li>
+          <li><a href="#"><b>Elizabeth</b><span>Playford Aquadome</span></a></li>
+        </ul></div>
+        <div class="state"><h3>Western Australia</h3><ul>
+          <li><a href="#"><b>Belmont</b><span>Belmont Oasis Leisure Centre</span></a></li>
+        </ul></div>
+      </div>
+      <div class="homevisit">
+        <h3>Home visits</h3>
+        <p>Mobile physiotherapy and exercise physiology in your home.</p>
+        <ul>
+          <li><a href="#">Sydney <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">Melbourne <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">Adelaide <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">Perth <svg class="icon"><use href="#i-arrow"/></svg></a></li>
+        </ul>
+        <a class="btn btn-secondary" href="#" style="width:100%"><svg class="icon"><use href="#i-pin"/></svg>Check your suburb</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERS -->
+<section class="partners" aria-labelledby="part-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="part-h">Our community partners</h2>
+      <p class="lead">We work alongside hospitals, sporting bodies, leisure centres, plan managers and disability organisations in every state we serve.</p>
+    </div>
+    <div class="partner-layout">
+      <figure class="partner-quote">
+        <blockquote>"Their team is fantastic at what they do... always have the best interest for the Participants at heart in order to build their capacity to the point where the Participants won't need them again."</blockquote>
+        <cite><b>James</b>Victoria People Solution</cite>
+      </figure>
+      <div class="partner-logos">
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2022/08/1200px-Logo_of_Western_Sydney_Wanderers_FC.svg_.png" alt="Western Sydney Wanderers" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2023/08/13-1.png" alt="Hurstville Private Hospital" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2023/08/14-1.png" alt="Parkinson's NSW" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/BAWC_master-logo_master_colour_CMYK-1.png" alt="Brimbank Aquatic and Wellness Centre" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2022/08/Group-6266.png" alt="Bluefit" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2024/08/Untitled-design-1.png" alt="Collective Leisure" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2022/08/Rectangle-1753.png" alt="Arthritis NSW" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2022/08/Rectangle-1756.png" alt="Disability Sports Australia" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2022/08/Rectangle-1755.png" alt="Sport NSW" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2022/08/active-ageing-australia-logo-supporting-foot.png" alt="Active Ageing Australia" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2022/08/MHFA-Stacked-logo-Gradient.png" alt="Mental Health First Aid Australia" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2025/04/Logo-5.png" alt="Scope" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2022/08/Untitled-design-2022-07-28T082558.934.png" alt="NDSP Plan Managers" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2025/06/HAPM-1.png" alt="HealthAssure Plan Management" loading="lazy"></div>
+        <div><img src="https://www.healthstin.com.au/wp-content/uploads/2022/08/logo-image.png" alt="Mambourin" loading="lazy"></div>
+      </div>
+    </div>
+    <div class="awards" aria-roledescription="carousel" aria-labelledby="aw-h">
+      <div class="aw-head">
+        <div>
+          <h3 id="aw-h">Achievements and recognition</h3>
+          <p>Six years of industry recognition, including winning the Allied Health category at the 2022 Australian Small Business Champion Awards.</p>
+        </div>
+        <div class="aw-controls">
+          <div class="aw-years" role="group" aria-label="Jump to year"><button type="button" data-goto="2026" aria-pressed="true">2026</button><button type="button" data-goto="2025" aria-pressed="false">2025</button><button type="button" data-goto="2024" aria-pressed="false">2024</button><button type="button" data-goto="2023" aria-pressed="false">2023</button><button type="button" data-goto="2022" aria-pressed="false">2022</button><button type="button" data-goto="2021" aria-pressed="false">2021</button></div>
+          <button type="button" class="aw-arrow" data-dir="-1" aria-label="Previous year"><svg class="icon"><use href="#i-arrow"/></svg></button>
+          <button type="button" class="aw-arrow" data-dir="1" aria-label="Next year"><svg class="icon"><use href="#i-arrow"/></svg></button>
+        </div>
+      </div>
+      <ul class="aw-track" tabindex="0" aria-label="Awards by year, scroll sideways">
+          <li class="aw-slide" role="group" aria-roledescription="slide" aria-label="2026, 1 of 6" data-year="2026">
+            <div class="aw-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/03/2026-Awards-1.webp" alt="Healthstin award badges, 2026" loading="lazy" width="807" height="349"></div>
+            <div class="aw-text"><b>2026</b><ul><li>Finalist, Australian Small Business Champion Awards (Allied Health)</li><li>Finalist, WA Disability Support Awards (Allied Health Professionals Award)</li><li>Finalist, Australian Women's Small Business Champion Awards</li></ul></div>
+          </li>
+          <li class="aw-slide" role="group" aria-roledescription="slide" aria-label="2025, 2 of 6" data-year="2025">
+            <div class="aw-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/06/2025-Awards-1-1.webp" alt="Healthstin award badges, 2025" loading="lazy" width="528" height="349"></div>
+            <div class="aw-text"><b>2025</b><ul><li>Finalist, Local Business Awards, Georges River (Health Improvement Services)</li><li>Finalist, Australian Small Business Champion Awards (Allied Health)</li></ul></div>
+          </li>
+          <li class="aw-slide" role="group" aria-roledescription="slide" aria-label="2024, 3 of 6" data-year="2024">
+            <div class="aw-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/01/Awards.webp" alt="Healthstin award badges, 2024" loading="lazy" width="1086" height="349"></div>
+            <div class="aw-text"><b>2024</b><ul><li>Finalist, Australian Small Business Champion Awards (Allied Health)</li><li>Finalist, Local Business Awards, Bayside (Health Improvement Services)</li><li>Finalist, Australian Women's Small Business Champion Awards</li></ul></div>
+          </li>
+          <li class="aw-slide" role="group" aria-roledescription="slide" aria-label="2023, 4 of 6" data-year="2023">
+            <div class="aw-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/01/Group-37326.webp" alt="Healthstin award badges, 2023" loading="lazy" width="1321" height="349"></div>
+            <div class="aw-text"><b>2023</b><ul><li>Winner, ESSA Client of the Year</li><li>Finalist, Australian Small Business Champion Awards (Allied Health)</li><li>Finalist, Australian Women's Small Business Champion Awards</li><li>Finalist, Local Business Awards, St George</li></ul></div>
+          </li>
+          <li class="aw-slide" role="group" aria-roledescription="slide" aria-label="2022, 5 of 6" data-year="2022">
+            <div class="aw-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/01/2022-1.webp" alt="Healthstin award badges, 2022" loading="lazy" width="1524" height="349"></div>
+            <div class="aw-text"><b>2022</b><ul><li>Winner, Australian Small Business Champion Awards (Allied Health)</li><li>Finalist, Australian Women's Small Business Champion Awards (Allied Health)</li><li>Nominated, ESSA Industry Awards: Accredited Exercise Physiologist and Practice of the Year</li><li>Finalist, Local Business Awards, St George</li></ul></div>
+          </li>
+          <li class="aw-slide" role="group" aria-roledescription="slide" aria-label="2021, 6 of 6" data-year="2021">
+            <div class="aw-img"><img src="https://www.healthstin.com.au/wp-content/uploads/2025/01/2021-1.webp" alt="Healthstin award badges, 2021" loading="lazy" width="479" height="349"></div>
+            <div class="aw-text"><b>2021</b><ul><li>Finalist, Local Business Awards, St George</li></ul></div>
+          </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final" aria-labelledby="final-h">
+    <div class="cta-band">
+      <div class="wrap cta-grid">
+        <div class="cta-team"><img src="https://www.healthstin.com.au/wp-content/uploads/2026/04/Images-1-1.png" alt="Members of the Healthstin clinical team" width="508" height="298" loading="lazy"></div>
+        <div class="cta-copy">
+          <h2 id="final-h">Talk to our team</h2>
+          <p class="lead">Book an appointment or refer a patient. We will help you work out the right service and how to fund it.</p>
+        </div>
+        <div class="ctas">
+          <a class="btn btn-white" href="#">Book an Appointment <svg class="icon"><use href="#i-arrow"/></svg></a>
+          <a class="btn btn-purple" href="#referrers">Refer a Patient</a>
+          <span class="phone">Or call <a href="tel:1300090931">1300 090 931</a></span>
+        </div>
+      </div>
+    </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <img src="https://www.healthstin.com.au/wp-content/uploads/2025/12/healthstin-logo-300px.png" alt="Healthstin" loading="lazy">
+        <p>Physiotherapy, exercise physiology and hydrotherapy across NSW, VIC, SA and WA. Registered NDIS provider.</p>
+        <ul><li><a href="tel:1300090931">1300 090 931</a></li><li><a href="#">Contact us</a></li></ul>
+      </div>
+      <div><h4>What we do</h4><ul><li><a href="#">Physiotherapy</a></li><li><a href="#">Exercise Physiology</a></li><li><a href="#">Hydrotherapy</a></li><li><a href="#">Remedial Massage</a></li><li><a href="#">Acupuncture</a></li></ul></div>
+      <div><h4>Getting started</h4><ul><li><a href="#">NDIS</a></li><li><a href="#">Support at Home</a></li><li><a href="#">DVA</a></li><li><a href="#">Workers Compensation</a></li><li><a href="#">Medicare &amp; GP Plans</a></li></ul></div>
+      <div><h4>Our clinics</h4><ul><li><a href="#">Hurstville</a></li><li><a href="#">Sans Souci</a></li><li><a href="#">Bexley</a></li><li><a href="#">Melton</a></li><li><a href="#">Keilor Downs</a></li><li><a href="#">Salisbury</a></li><li><a href="#">Elizabeth</a></li><li><a href="#">Belmont</a></li></ul></div>
+      <div><h4>Meet us</h4><ul><li><a href="#">Why Choose Us</a></li><li><a href="#">Our Team</a></li><li><a href="#">Careers</a></li><li><a href="#">Blog</a></li><li><a href="#">FAQs</a></li><li><a href="#">Refer a Patient</a></li></ul></div>
+    </div>
+    <p class="ack">Healthstin acknowledges the Traditional Custodians of the lands on which we work and pay our respects to Elders past and present.</p>
+    <div class="foot-base"><span>© 2026 Healthstin. All rights reserved.</span><span><a href="#">Privacy policy</a> · <a href="#">Terms and conditions</a></span></div>
+  </div>
+</footer>
+<div class="proto-note">Homepage concept by Local Health Marketing, October 2026. Video and photography are from the current site and would be replaced by a commissioned shoot. Compare hero: <button type="button" data-hero="video" aria-pressed="true">Video</button><button type="button" data-hero="photo" aria-pressed="false">Photo</button></div>
+
+<script>
+  // Mobile menu toggle
+  var btn=document.querySelector('.menu-btn'), mnav=document.getElementById('mnav');
+  btn.addEventListener('click',function(){var o=mnav.classList.toggle('open');btn.setAttribute('aria-expanded',o);btn.setAttribute('aria-label',o?'Close menu':'Open menu');});
+  // Background video: loop the 8 to 20 second stretch of the clip, with a pause control
+  var v=document.getElementById('heroVid'), vt=document.querySelector('.vid-toggle');
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(v){
+    v.addEventListener('loadedmetadata',function(){v.currentTime=8; if(!reduce){v.play().catch(function(){});}});
+    v.addEventListener('timeupdate',function(){if(v.currentTime>20){v.currentTime=8;}});
+    if(reduce){vt.style.display='none';}
+    vt.addEventListener('click',function(){
+      if(v.paused){v.play();vt.setAttribute('aria-label','Pause background video');vt.innerHTML='<svg class="icon"><use href="#i-pause"/></svg>';}
+      else{v.pause();vt.setAttribute('aria-label','Play background video');vt.innerHTML='<svg class="icon"><use href="#i-play"/></svg>';}
+    });
+  }
+  // Prototype only: compare video and photo hero (also via ?hero=photo)
+  function setHero(k){document.body.classList.toggle('hero-photo',k==='photo');document.querySelectorAll('[data-hero]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.hero===k)});if(v){if(k==='photo'){v.pause()}else if(!reduce){v.play().catch(function(){})}}}
+  document.querySelectorAll('[data-hero]').forEach(function(b){b.addEventListener('click',function(){setHero(b.dataset.hero)})});
+  if(new URLSearchParams(location.search).get('hero')==='photo'){setHero('photo')}
+  // Scroll reveal
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{rootMargin:'0px 0px -8% 0px'});
+    document.querySelectorAll('.reveal').forEach(function(el,i){el.style.transitionDelay=(i%4*60)+'ms';io.observe(el)});
+  } else {document.documentElement.classList.remove('js');}
+  // Condition tabs (arrow keys move between tabs)
+  var tabs=[].slice.call(document.querySelectorAll('.tablist [role=tab]'));
+  function selectTab(t){tabs.forEach(function(b){var on=b===t;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;document.getElementById(b.getAttribute('aria-controls')).hidden=!on;});}
+  tabs.forEach(function(t,i){t.addEventListener('click',function(){selectTab(t)});t.addEventListener('keydown',function(e){var n=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(n){var x=tabs[(i+n+tabs.length)%tabs.length];selectTab(x);x.focus();}});});
+  // Awards carousel: year chips and arrows scroll the track; the chip follows the slide in view
+  var track=document.querySelector('.aw-track');
+  if(track){
+    var slides=[].slice.call(track.querySelectorAll('.aw-slide')), chips=[].slice.call(document.querySelectorAll('.aw-years button')), cur=0, prog=false, t;
+    function setChips(i){chips.forEach(function(c,k){c.setAttribute('aria-pressed',k===i);});}
+    function maxScroll(){return track.scrollWidth-track.clientWidth;}
+    function goTo(i){cur=i;setChips(i);prog=true;track.scrollTo({left:Math.min(slides[i].offsetLeft-track.offsetLeft,maxScroll()),behavior:reduce?'auto':'smooth'});clearTimeout(t);t=setTimeout(function(){prog=false;},700);}
+    function nearest(){var x=track.scrollLeft;if(x>=maxScroll()-4){return slides.length-1;}var best=0;slides.forEach(function(s,i){if(Math.abs(s.offsetLeft-track.offsetLeft-x)<Math.abs(slides[best].offsetLeft-track.offsetLeft-x))best=i;});return best;}
+    chips.forEach(function(c,i){c.addEventListener('click',function(){goTo(i);});});
+    document.querySelectorAll('.awards .aw-arrow').forEach(function(b){b.addEventListener('click',function(){goTo(Math.min(slides.length-1,Math.max(0,cur+parseInt(b.dataset.dir,10))));});});
+    track.addEventListener('scroll',function(){if(prog)return;clearTimeout(t);t=setTimeout(function(){cur=nearest();setChips(cur);},100);});
+  }
+  // Team strip arrows scroll by most of the visible width
+  var tmTrack=document.querySelector('.tm-track');
+  document.querySelectorAll('.tm-arrow').forEach(function(b){b.addEventListener('click',function(){tmTrack.scrollBy({left:parseInt(b.dataset.dir,10)*tmTrack.clientWidth*0.8,behavior:reduce?'auto':'smooth'});});});
+  // Close desktop dropdowns with Escape
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.activeElement){document.activeElement.blur();}});
+</script>
+</body>
+</html>

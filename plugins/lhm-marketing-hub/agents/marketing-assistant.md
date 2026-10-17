@@ -16,6 +16,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `prospect-sitemap-opportunity` — Proposed sitemap and interactive opportunity model for a prospect website pitch.
 
 `client-sitemap-plan` — Phased website content plan for an existing client, same architecture without the sales widget.
+`homepage-prototype` — Homepage concept prototype built from the proposed sitemap and live site, with personas brief and anti-AI design rules.
 
 `google-ads-delivery-qa` — Verify bounded Google Ads evidence, implementation artefacts, approval boundaries and completion before the Lead advances.
 
