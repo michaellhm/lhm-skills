@@ -39,7 +39,7 @@ The `prospect-sitemap-opportunity` skill always includes it. The `client-sitemap
 }
 ```
 
-`logo_url` and `phone` are optional. Without a logo the name renders as text; without a phone the green call button is omitted. Pick brand colours from the client's own site so the mock feels like theirs.
+`logo_url` and `phone` are optional. `panel_top` is also optional: the top colour of the dark widget and progress panels, which fade down to `primary_dark`. It defaults to deep green (`#12351f`); set a dark shade of the client's own colour so the panel matches their brand. Without a logo the name renders as text; without a phone the green call button is omitted. Pick brand colours from the client's own site so the mock feels like theirs.
 
 ## nav
 

@@ -43,7 +43,7 @@ def esc(s):
 # ----------------------------------------------------------------------------- CSS
 CSS = """
   :root{
-    --green:__PRIMARY__; --green-d:__PRIMARY_DARK__; --lgreen:__PRIMARY_LIGHT__; --gold:__ACCENT__;
+    --green:__PRIMARY__; --green-d:__PRIMARY_DARK__; --lgreen:__PRIMARY_LIGHT__; --gold:__ACCENT__; --panel-top:__PANEL_TOP__;
     --dark:#1F2D23; --grey:#5B6B60; --line:#D8E0D8; --bg:#F6F8F5;
     --have:#2E7D32;  --have-bg:#E4EFE7;
     --enh:#E0A100;   --enh-bg:#FBF0D2;   --enh-txt:#9A6E00;
@@ -79,7 +79,7 @@ CSS = """
   .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;display:inline-block;vertical-align:middle}
   .dot.new{background:var(--new)} .dot.enh{background:var(--enh)} .dot.have{background:var(--have)}
   .wrap{max-width:1240px;margin:0 auto;padding:26px 22px 60px}
-  .opp{background:linear-gradient(180deg,#12351f 0%, var(--green-d) 100%);border-radius:16px;padding:22px 24px 20px;color:#fff;margin-bottom:24px;box-shadow:0 12px 34px rgba(18,53,31,.28)}
+  .opp{background:linear-gradient(180deg,var(--panel-top) 0%, var(--green-d) 100%);border-radius:16px;padding:22px 24px 20px;color:#fff;margin-bottom:24px;box-shadow:0 12px 34px rgba(18,53,31,.28)}
   .opp h2{font-size:19px;letter-spacing:-.01em;margin-bottom:3px}
   .opp .sub{color:#BFE0C8;font-size:13px;max-width:820px}
   .scen{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:10px;margin:18px 0 4px}
@@ -93,7 +93,7 @@ CSS = """
   .sc .chain{font-size:12px;color:#DDEbe0;border-top:1px dashed rgba(255,255,255,.22);padding-top:7px;margin-top:2px}
   .sc .chain b{color:#fff}
   .sc .real{font-size:11.5px;color:#CFE3D4;opacity:.9;line-height:1.4;border-top:1px dashed rgba(255,255,255,.22);padding-top:7px;margin-top:2px}
-  .arrow{display:flex;align-items:center;justify-content:center;color:#9FC7AC;font-size:22px;font-weight:800}
+  .arrow{display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.6);font-size:22px;font-weight:800}
   .controls{display:flex;flex-wrap:wrap;gap:16px 22px;align-items:flex-end;margin-top:16px;background:rgba(0,0,0,.16);border-radius:12px;padding:14px 16px}
   .ctrl{display:flex;flex-direction:column;gap:4px}
   .ctrl label{font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:#BFE0C8;font-weight:700}
@@ -106,7 +106,7 @@ CSS = """
   .seed{font-size:12.5px;color:#CFE3D4;margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.14)}
   .seed b{color:#F0DDB0}
   .fine{font-size:10.5px;color:#9FC0A8;margin-top:9px;line-height:1.45}
-  .delta{background:linear-gradient(180deg,#12351f 0%, var(--green-d) 100%);border-radius:16px;padding:20px 24px;color:#fff;margin-bottom:24px;box-shadow:0 12px 34px rgba(18,53,31,.28)}
+  .delta{background:linear-gradient(180deg,var(--panel-top) 0%, var(--green-d) 100%);border-radius:16px;padding:20px 24px;color:#fff;margin-bottom:24px;box-shadow:0 12px 34px rgba(18,53,31,.28)}
   .delta h2{font-size:19px;letter-spacing:-.01em;margin-bottom:3px}
   .delta .sub{color:#BFE0C8;font-size:13px;max-width:820px}
   .dstats{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
@@ -461,7 +461,8 @@ def build(spec, prev=None):
     css = (CSS.replace("__PRIMARY__", primary)
               .replace("__PRIMARY_DARK__", b.get("primary_dark", "#1F4D2C"))
               .replace("__PRIMARY_LIGHT__", b.get("primary_light", "#E4EFE7"))
-              .replace("__ACCENT__", b.get("accent", "#C8A44D")))
+              .replace("__ACCENT__", b.get("accent", "#C8A44D"))
+              .replace("__PANEL_TOP__", b.get("panel_top", "#12351f")))
     nav = "".join(nav_item(i) for i in spec["nav"])
     logo = (f'<img src="{esc(b["logo_url"])}" alt="{esc(b["name"])}" onerror="this.style.display=\'none\'">'
             if b.get("logo_url") else f'<span>{esc(b["name"])}</span>')
