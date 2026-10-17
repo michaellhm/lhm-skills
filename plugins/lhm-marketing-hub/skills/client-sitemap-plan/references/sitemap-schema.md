@@ -6,7 +6,7 @@ The single data file that drives both generators. Assemble it from your research
 
 | Key | Required | Purpose |
 |---|---|---|
-| `brand` | yes | Name, logo, phone, colours, credit line |
+| `brand` | yes | Name, logo, phone, optional header buttons, colours, credit line |
 | `nav` | yes | The proposed top navigation (drives the header and dropdowns) |
 | `opportunity` | prospect mode only | The impressions to clicks to leads model above the tree |
 | `intro` | yes | Title and paragraph above the page tree |
@@ -30,6 +30,12 @@ The `prospect-sitemap-opportunity` skill always includes it. The `client-sitemap
   "name": "My Garden Therapy",
   "logo_url": "https://…/logo.svg",
   "phone": "03 5215 9400",
+  "ctas": [
+    {"label": "Book an Appointment", "style": "solid"},
+    {"label": "Refer a Patient", "style": "outline"}
+  ],
+  "cta_position": "strip",
+  "careers_link": false,
   "primary": "#2E6B3E",
   "primary_dark": "#1F4D2C",
   "primary_light": "#E4EFE7",
@@ -39,7 +45,7 @@ The `prospect-sitemap-opportunity` skill always includes it. The `client-sitemap
 }
 ```
 
-`logo_url` and `phone` are optional. Without a logo the name renders as text; without a phone the green call button is omitted. Pick brand colours from the client's own site so the mock feels like theirs.
+`logo_url` and `phone` are optional. Without a logo the name renders as text; without a phone the green call button is omitted. `ctas` is optional too: a list of header buttons, each with a `label` and a `style` of `solid` (filled, the default) or `outline`. When `ctas` is present the phone shows as a ☎ text link before the buttons, all on one row; without it the header keeps the single green phone button. Set `cta_position` to `"strip"` to move the phone link and buttons into their own dark band above the logo and nav, which suits a long nav; leave it out to keep them inline at the right of the bar. Dropdowns that would run past the right edge of the window flip to right-aligned automatically. `careers_link` defaults to `true`, which shows a small "Careers ↗" link at the right of the bar; set it to `false` to leave it out. Pick brand colours from the client's own site so the mock feels like theirs.
 
 ## nav
 

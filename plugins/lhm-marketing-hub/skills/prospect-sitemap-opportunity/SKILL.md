@@ -97,7 +97,7 @@ Do not report this as complete until you have checked all four:
 
 ## What each generator does
 
-- `scripts/build_sitemap_html.py sitemap.json out.html` — the interactive page: branded header plus proposed nav (red "new" dots and a 3-column mega menu), colour-coded page tree, and the opportunity widget with editable CTR/conversion and the ongoing-SEO slider (each step = +N% impressions and conversion, CTR held flat).
+- `scripts/build_sitemap_html.py sitemap.json out.html` — the interactive page: branded header plus proposed nav (red "new" dots and a 3-column mega menu), colour-coded page tree, and the opportunity widget with editable CTR/conversion and the ongoing-SEO slider (each step = +N% impressions and conversion, CTR held flat). Match the header to the client's real site: if it shows booking or referral buttons beside the phone, add them as `brand.ctas`. With more than about five top-level nav items, also set `brand.cta_position: "strip"` so the buttons sit in a band above the nav; inline buttons beside a long nav need roughly 1550px and scroll sideways on a laptop. Set `brand.careers_link: false` when the client doesn't want the Careers link. Check the page at 1280px wide for one nav row and no horizontal scroll. See `references/sitemap-schema.md`.
 - `scripts/build_workbook.py sitemap.json out.xlsx` — a two-tab workbook (Proposed Sitemap, Keyword Demand) from the same JSON.
 
 Both are pure Python. Never hand-edit an output file. If something needs to change, change the JSON and re-run, so the deliverable stays consistent and regenerable.

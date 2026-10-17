@@ -63,6 +63,7 @@ CSS = """
   nav.top>ul>li .caret{font-size:10px;color:var(--grey);margin-left:4px}
   .dropdown{position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.12);min-width:250px;padding:6px;opacity:0;visibility:hidden;transform:translateY(6px);transition:.14s;z-index:60}
   nav.top>ul>li:hover .dropdown{opacity:1;visibility:visible;transform:translateY(3px)}
+  .dropdown.flip{left:auto;right:0}
   .dropdown a{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:7px;text-decoration:none;color:var(--dark);font-size:13.5px}
   .dropdown a:hover{background:var(--lgreen)}
   .dropdown .grp{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--grey);padding:9px 10px 4px}
@@ -70,6 +71,18 @@ CSS = """
   .mega .col{display:flex;flex-direction:column}
   .mega .grp{border-bottom:1px solid var(--line);margin-bottom:2px}
   .callbtn{background:var(--green);color:#fff;padding:9px 15px;border-radius:8px;font-weight:700;font-size:14px;white-space:nowrap;text-decoration:none}
+  .bar.wide{max-width:1560px}
+  .hdrcta{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+  .phonelink{color:var(--green-d);font-weight:800;font-size:14px;white-space:nowrap;text-decoration:none;margin-right:4px}
+  .ctabtn{padding:8px 13px;border-radius:8px;font-weight:700;font-size:13px;white-space:nowrap;text-decoration:none;border:2px solid var(--green)}
+  .ctabtn.solid{background:var(--green);color:#fff}
+  .ctabtn.outline{background:#fff;color:var(--green)}
+  .strip{background:var(--green-d)}
+  .strip .in{max-width:1240px;margin:0 auto;padding:7px 22px;display:flex;justify-content:flex-end;align-items:center;gap:8px}
+  .strip .phonelink{color:#fff}
+  .strip .ctabtn{padding:5px 12px;font-size:12.5px;border-color:#fff}
+  .strip .ctabtn.solid{background:#fff;color:var(--green-d)}
+  .strip .ctabtn.outline{background:transparent;color:#fff}
   .utility{display:flex;align-items:center;gap:14px;flex:0 0 auto}
   .careers-link{font-size:12.5px;font-weight:600;color:var(--grey);text-decoration:none;white-space:nowrap;padding:6px 2px;border-bottom:1px solid transparent}
   .careers-link:hover{color:var(--green-d);border-bottom-color:var(--green-d)}
@@ -455,6 +468,28 @@ def conversion_reality_html(cr):
   </section>
 """
 
+NAV_SCRIPT = """<script>
+  // Right-align any dropdown that would run past the window edge. Hidden
+  // dropdowns still widen the page, so check on load and resize as well as hover.
+  function fitDropdowns(){
+    document.querySelectorAll('nav.top .dropdown').forEach(function(dd){
+      var vw = document.documentElement.clientWidth;
+      dd.classList.remove('flip');
+      if(dd.getBoundingClientRect().right <= vw - 8){return;}
+      dd.classList.add('flip');
+      // Keep it left-aligned if flipping would push it off the left edge instead.
+      if(dd.getBoundingClientRect().left < 8){dd.classList.remove('flip');}
+    });
+  }
+  fitDropdowns();
+  // Re-check once images and fonts have loaded, since the logo can push the nav right.
+  window.addEventListener('load', fitDropdowns);
+  window.addEventListener('resize', fitDropdowns);
+  document.querySelectorAll('nav.top>ul>li').forEach(function(li){
+    li.addEventListener('mouseenter', fitDropdowns);
+  });
+</script>"""
+
 def build(spec, prev=None):
     b = spec["brand"]
     primary = b.get("primary", "#2E6B3E")
@@ -466,6 +501,20 @@ def build(spec, prev=None):
     logo = (f'<img src="{esc(b["logo_url"])}" alt="{esc(b["name"])}" onerror="this.style.display=\'none\'">'
             if b.get("logo_url") else f'<span>{esc(b["name"])}</span>')
     phone = f'<a class="callbtn" href="#">{esc(b["phone"])}</a>' if b.get("phone") else ""
+    bar_class = "bar"
+    strip = ""
+    # Optional header buttons. With ctas, the phone shows as a text link beside them.
+    if b.get("ctas"):
+        tel = f'<a class="phonelink" href="#">&#9742; {esc(b["phone"])}</a>' if b.get("phone") else ""
+        btns = "".join(f'<a class="ctabtn {"outline" if c.get("style") == "outline" else "solid"}" '
+                       f'href="#">{esc(c["label"])}</a>' for c in b["ctas"])
+        if b.get("cta_position") == "strip":
+            # Own band above the logo/nav bar, so the bar keeps its normal width.
+            strip = f'<div class="strip"><div class="in">{tel}{btns}</div></div>'
+            phone = ""
+        else:
+            phone = f'<div class="hdrcta">{tel}{btns}</div>'
+            bar_class = "bar wide"  # the extra buttons need more than the 1240px bar
 
     # Prospect mode when an opportunity block is present; client mode when it is not.
     o = spec.get("opportunity")
@@ -529,9 +578,10 @@ def build(spec, prev=None):
   }
 </script>"""
 
-    careers_link = ('<div class="utility"><a class="careers-link" href="#" '
-                     'title="Candidate-facing content stays off the primary buyer nav, '
-                     'linked here instead">Careers ↗</a>' + phone + '</div>')
+    careers = ('<a class="careers-link" href="#" '
+               'title="Candidate-facing content stays off the primary buyer nav, '
+               'linked here instead">Careers ↗</a>') if b.get("careers_link", True) else ""
+    careers_link = f'<div class="utility">{careers}{phone}</div>' if careers or phone else ""
 
     doc = f"""<!DOCTYPE html>
 <html lang="en">
@@ -543,7 +593,8 @@ def build(spec, prev=None):
 </head>
 <body>
 <header class="site">
-  <div class="bar">
+  {strip}
+  <div class="{bar_class}">
     <div class="logo">{logo}</div>
     <nav class="top"><ul>{nav}</ul></nav>
     {careers_link}
@@ -570,6 +621,7 @@ def build(spec, prev=None):
 <footer>{footer}</footer>
 {opp_script}
 {ver_script}
+{NAV_SCRIPT}
 </body>
 </html>
 """
