@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-201 skills across thirteen Claude Code plugins (5 inbox, 64 marketing, 42 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+202 skills across thirteen Claude Code plugins (5 inbox, 65 marketing, 42 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -34,7 +34,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/content.md                     # Direct content specialist entry
   agents/wordpress.md                   # Direct WordPress content specialist entry
   agents/marketing-assistant.md         # (legacy alias) — routes to start agent
-  skills/                              # All 64 skills
+  skills/                              # All 65 skills
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
     bid-budget-optimizer/              # Budget and bid strategy
@@ -54,6 +54,7 @@ plugins/lhm-marketing-hub/             # The plugin
     content-gap-analysis/              # Keyword, topic, and content gap identification
     prospect-sitemap-opportunity/      # Prospect pitch: proposed sitemap + interactive impressions-to-leads widget
     client-sitemap-plan/               # Existing client: same architecture as a phased content plan, no widget, --since progress view
+    homepage-prototype/                # Homepage concept from the sitemap and live site: personas brief, anti-AI design rules, QA, approved lhmstaging publish
     seo-content-writer/                # SEO-optimized blog posts and articles
     ai-recommendation-loop/            # Buyer-question AI visibility baseline, diagnosis, staging review and monthly measurement
     geo-content-optimizer/             # AI citation and GEO optimization
@@ -275,7 +276,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 **Strategy & Research** (3 skills): Competitive analysis with Porter's 5 Forces, keyword research with intent analysis and topic clustering, They Ask You Answer question discovery.
 
-**SEO & Content** (17 skills): Reusable staged SEO department entry and Lead, accepted-research page briefs, independent SEO delivery QA, proposed sitemap and opportunity model for prospect pitches (live site crawl, demand research, interactive HTML sitemap with an editable impressions-to-leads widget and ongoing-SEO slider, optional workbook), phased website content plan for existing clients (same architecture, build-order grouping, no sales widget, and a `--since` mode that renders a progress band and per-page change chips against a previous version so monthly reviews show what moved), content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, generic AI recommendation measurement and improvement with fixed buyer panels, captured answers/citations, staging verification, reviewer email and BasicOps handoff (`ai-recommendation-loop`), meta tags optimization, site-wide meta tag refresh (Ads conversion + GSC decline data, slug audit, Rank Math REST push with 301 redirects), CORE-EEAT content quality auditing, PR content rewriting for rejected distributions, content refresh planning. End-to-end website page batch rollout to staging (`lhm-page-rollout`): research, copy, FAQ and schema, internal links, build and review email. Client website content orchestration (`website-content-agent`) adds source comparison, user-selected reference templates, sitemap keyword/H1 mapping, independent editing and healthcare review, Astro integration, revision-bound client approvals, feedback learning and canonical project handback.
+**SEO & Content** (18 skills): Reusable staged SEO department entry and Lead, accepted-research page briefs, independent SEO delivery QA, proposed sitemap and opportunity model for prospect pitches (live site crawl, demand research, interactive HTML sitemap with an editable impressions-to-leads widget and ongoing-SEO slider, optional workbook), phased website content plan for existing clients (same architecture, build-order grouping, no sales widget, and a `--since` mode that renders a progress band and per-page change chips against a previous version so monthly reviews show what moved), content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, generic AI recommendation measurement and improvement with fixed buyer panels, captured answers/citations, staging verification, reviewer email and BasicOps handoff (`ai-recommendation-loop`), meta tags optimization, site-wide meta tag refresh (Ads conversion + GSC decline data, slug audit, Rank Math REST push with 301 redirects), CORE-EEAT content quality auditing, PR content rewriting for rejected distributions, content refresh planning. End-to-end website page batch rollout to staging (`lhm-page-rollout`): research, copy, FAQ and schema, internal links, build and review email. Client website content orchestration (`website-content-agent`) adds source comparison, user-selected reference templates, sitemap keyword/H1 mapping, independent editing and healthcare review, Astro integration, revision-bound client approvals, feedback learning and canonical project handback. Homepage concept prototypes for pitches and redesigns (`homepage-prototype`): reads the proposed sitemap and live site, writes three target-market personas and a homepage brief, builds a conservative single-file homepage in the client's own brand with anti-AI design rules, verifies desktop and phone, and publishes to lhmstaging only on approval.
 
 **Analytics & Reporting** (2 skills): GA4 event discovery and conversion classification, analytics dashboard artifact with period comparison and visual output.
 
