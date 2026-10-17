@@ -104,7 +104,7 @@ Do not report this as complete until you have checked all five:
 
 ## What each generator does
 
-- `scripts/build_sitemap_html.py sitemap.json out.html` — the interactive page: branded header plus proposed nav, and the colour-coded page tree. With no `opportunity` key in the JSON, the widget and its calculator JavaScript are not emitted at all.
+- `scripts/build_sitemap_html.py sitemap.json out.html` — the interactive page: branded header plus proposed nav, and the colour-coded page tree. With no `opportunity` key in the JSON, the widget and its calculator JavaScript are not emitted at all. Match the header to the client's real site: if it shows booking or referral buttons beside the phone, add them as `brand.ctas`. With more than about five top-level nav items, also set `brand.cta_position: "strip"` so the buttons sit in a band above the nav; inline buttons beside a long nav need roughly 1550px and scroll sideways on a laptop. Set `brand.careers_link: false` when the client doesn't want the Careers link. Check the page at 1280px wide for one nav row and no horizontal scroll. See `references/sitemap-schema.md`.
 - `scripts/build_workbook.py sitemap.json out.xlsx` — a two-tab workbook (Proposed Sitemap, Keyword Demand) from the same JSON. It reads only the page tree, so its output is identical in either mode.
 
 Both are pure Python. Never hand-edit an output file. Change the JSON and re-run, so the plan stays regenerable as pages get delivered.
