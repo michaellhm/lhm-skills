@@ -25,6 +25,20 @@ Read [client knowledge routing](../../references/obsidian-context-contract.md) b
 4. Reconcile user-reported completion, existing owners, waiting states, deferrals and rejected suggestions before choosing the next item. A later explicit user decision supersedes an earlier proposal; an assistant's claim alone does not prove a send or task mutation. Do not reopen settled work without a material new update or reached revisit date.
 5. If time/capacity is unknown and it affects the plan, ask one natural question. Otherwise use available calendar and stated constraints. Do not start every morning with a full weekly interview or force an arbitrary time budget.
 
+## Opening morning brief
+
+When Michael starts the day or asks for the daily list, provide one compact briefing before the one-item decision flow. Use this order:
+
+1. **What the team needs from Michael:** BasicOps decisions, mentions, approvals and blockers added or changed since the last verified review, normally around 24 hours. Read complete discussions and replies; exclude already answered or delegated requests. State any coverage gap rather than reporting an unverified all-clear.
+2. **Today's calendar:** verified local bookings and material clashes. Do not move bookings or turn flexible work targets into appointments.
+3. **Emails needing attention:** actionable incoming mail since the last review, including read or archived mail. Read current full threads and sent replies; show the required decision in one short line. Remove user-reported handled replies immediately, without treating the whole client project as complete.
+4. **Today's work:** BasicOps tasks due today plus Michael's explicitly chosen additions. Distinguish due today from pulled-forward work; deduplicate related email actions and meeting follow-ups. Do not dump the weekly backlog or treat every open task as a commitment for today. Michael chooses the order and realistic capacity.
+5. **Promises and unfinished meeting wraps:** inspect recent sent mail and user-reported commitments for promised deliverables and dates. Match existing BasicOps work, owner and due date; identify missing tasks or date mismatches. Preserve tentative language such as “aim for Friday” rather than inventing a hard client deadline. Surface current unfinished wrap reviews with their next action, but do not infer unfinished delivery from old wrap-card status alone or add the entire historical backlog to today.
+
+Give every actionable row its source link. Keep the attention list separate from today's execution commitments so Michael can see new information and decide what to move. Include near-term promises only where they affect planning, not as extra work automatically due today. A briefing sweep alone does not authorise task creation, date changes, calendar changes or email filing; perform those only within explicit existing authority and verify the result.
+
+Before describing the briefing as complete, record checked source windows, pagination, discussion/reply coverage and unresolved access gaps. An incomplete section must say so. Save the chosen order, additions, completed replies and commitment reconciliation in the private checkpoint. Once the list is reviewed, return to one item at a time and prepare portable execution prompts for selected work.
+
 ## Prepare the attention sweep
 
 Default order: clear BasicOps decisions blocking the team, review Michael's own BasicOps work and launch two or three chosen tasks with prepared prompts, then process emails while those tasks run. Follow Michael's requested order when different. Check calendar/deadlines early; genuinely urgent email may interrupt this order, but routine inbox work must not delay getting chosen tasks running.

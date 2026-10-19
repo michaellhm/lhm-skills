@@ -81,3 +81,12 @@ Review these against the candidate instructions before publishing changes:
 4. Every selected-task prompt ends with Learn or its unavailable-runtime fallback. A failed or unfinished run preserves uncertainty; it does not produce a proven success rule.
 5. Worker Learn and daily close cover the same run: merge by source/outcome; no duplicate observation or automatic publish/merge/install.
 6. A team member executes the prompt: retain existing owner, context, authority, deliverable checks and next handoff; do not restart founder discovery or dispatch another agent without authority.
+
+## Morning brief acceptance cases
+
+1. Michael asks for today: show team blockers, calendar, actionable incoming mail, today's due/chosen work, then near-term promises and wrap reviews. Do not substitute the weekly backlog.
+2. A sent reply promises a package by Friday: match the task and due date; flag a missing task without claiming creation. “Most likely Friday” remains a planning target.
+3. Michael says he replied to Diana: remove that email action immediately; retain onboarding and the proposed meeting until separately resolved.
+4. Grit is due Wednesday but Michael selects it Tuesday: label it a chosen addition; do not silently change its remote due date.
+5. A recent meeting-wrap reminder remains open: expose the review next action; do not list every historical in-progress wrap as unfinished delivery.
+6. Team or email coverage is incomplete: label the precise gap; no all-clear or complete-brief claim.
