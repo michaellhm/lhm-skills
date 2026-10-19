@@ -24,7 +24,7 @@ def validate(directory, require_review=True):
             p = root / p
         require(p.is_file() and digest(p) == item['sha256'], 'Evidence/baseline file missing or changed')
     access, research, comparison = [read(n) for n in ('access-receipt.json', 'research-receipt.json', 'comparison.json')]
-    require(access.get('worker') == 'codex-cli', 'Codex CLI worker required')
+    require(access.get('worker') in ('codex-cli', 'codex-desktop'), 'Verified Codex worker required')
     bound_file({'path': access['skill_path'], 'sha256': access['skill_sha256']})
     for source in ('gmail', 'obsidian', 'basicops'):
         a = access.get('sources', {}).get(source, {})

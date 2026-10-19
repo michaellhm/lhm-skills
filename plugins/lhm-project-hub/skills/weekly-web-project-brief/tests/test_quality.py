@@ -27,6 +27,14 @@ class QualityTest(unittest.TestCase):
     def review(self):
         self.write('quality-review.json',{'accepted':True,'reviewer':'controller','issues':[],**{k+'_sha256':q.digest(self.p/n) for k,n in [('brief','brief.json'),('email','email.json'),('research','research-receipt.json'),('comparison','comparison.json'),('access','access-receipt.json')]}})
     def test_complete_bound_report(self): self.assertEqual(q.validate(self.p)['state'],'quality_passed')
+    def test_desktop_worker_keeps_full_evidence_and_review_gates(self):
+        self.change('access-receipt.json',lambda d:d.update(worker='codex-desktop'))
+        self.assertEqual(q.validate(self.p)['state'],'quality_passed')
+        self.change('access-receipt.json',lambda d:d['sources'].pop('gmail'))
+        with self.assertRaisesRegex(ValueError,'Live worker read'):q.validate(self.p)
+    def test_unknown_worker_rejected(self):
+        self.change('access-receipt.json',lambda d:d.update(worker='unverified'))
+        with self.assertRaisesRegex(ValueError,'Verified Codex worker'):q.validate(self.p)
     def test_research_check_never_replaces_delivery_review(self):
         (self.p/'quality-review.json').unlink()
         self.assertEqual(q.validate(self.p, require_review=False)['state'], 'research_passed')
