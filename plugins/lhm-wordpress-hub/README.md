@@ -118,6 +118,7 @@ plugins/lhm-wordpress-hub/
 | `wp-start` | Workflow router — detects full-build vs LP, hands off to the right orchestrator |
 | `wp-project-setup` | Initialize client-root scaffolding and `wordpress/` subtree |
 | `lhm-project-hub:wp-project-manager` | Read, create, or update `project-management/website.md` |
+| `repo-org-migration` | Move an existing client repository into the lhmorg GitHub organisation and verify hosting still deploys |
 
 ### Phase 1: Client Onboarding & Strategy
 | Skill | Description |
