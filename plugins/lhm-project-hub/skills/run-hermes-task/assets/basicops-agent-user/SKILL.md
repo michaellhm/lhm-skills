@@ -129,11 +129,13 @@ If the available evidence cannot support a concrete recommendation, first use av
 
 For this pilot, publish the canonical versioned approval plan as a top-level task discussion message with `create_message_in_task`, even when the acknowledgement belongs in a reply. Pass that top-level plan ID to the submit tool; approvals may be replies to it. Check for an existing canonical plan before posting.
 
-For a task explicitly requesting the registered Codex session pilot, prepare the
+For the registered Wellness saved-context pilot only, prepare the
 normal versioned plan. State that the worker will produce a **saved-context,
 review-only** internal brief in a persistent Codex conversation. Name the concrete
 output and source records; do not propose live API reads, account changes, Drive
 publication or client sends as if this pilot supports them.
+
+For the registered RTB task (`2212824`), call `codex_session_status` before planning to read the route readiness. Its mode is `rtb_draft_edit`. Preserve the actual outcome: revised working files, prototype edits and checks, unsent reply and same-task review handback. Include the literal `draft-edit` in its plan. Do not substitute a saved-context summary, promise readiness before the tool reports it, or dispatch to Wellness. If readiness is false, post the real production plan with the capability dependency and wait. The host prepares new Drive review files and a Git source branch; prototype publication, production deployment and client email remain separate. A `needs_review` worker receipt without verified delivery is still `awaiting_delivery`, not completion.
 
 After the verified human approves the latest visible plan:
 

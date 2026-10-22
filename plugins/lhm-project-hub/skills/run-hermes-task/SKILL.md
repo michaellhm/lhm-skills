@@ -102,7 +102,7 @@ This bounded saved-context, review-only pilot uses a durable JSON run and native
 app-server conversation instead of an ephemeral CLI worker. Do not invoke both
 routes for the same plan. A verified notifier returns the result and session
 reference to the same BasicOps task and leaves it with the human in `Under Review`.
-Unregistered tasks retain the existing workforce route. This pilot does not add
+The separately registered RTB draft-edit route preserves actual document/prototype production, uses a fixed editable workspace and waits for verified Drive and source-branch delivery before handback. Read its readiness first; a false readiness flag or summary-only substitute must not be treated as accepted production. See [RTB runtime contract](../../../lhm-system-ops/assets/codex-session/RTB.md). Unregistered tasks retain the existing workforce route. This pilot does not add
 live-account access, Drive delivery, publishing or client-contact authority.
 
 1. For a human-delegated BasicOps task, invoke `hermes-production-plan` first. The Project Manager

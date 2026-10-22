@@ -16,6 +16,7 @@ PROFILE = Path('/opt/data/profiles/lhm_chief_of_staff')
 QUEUE = Path('/opt/data/profiles/lhm_brain/dispatch/codex-pilot')
 CONFIG = PROFILE / 'codex-session-pilot.json'
 STATE = PROFILE / 'codex-session-state'
+DELIVERIES = PROFILE / 'codex-session-deliveries'
 
 
 def plain(value):
@@ -73,8 +74,10 @@ class Bridge:
         registration = self.config['tasks'].get(str(task_id))
         if not registration or not registration.get('enabled'):
             raise ValueError('Task is not registered for the Codex session pilot; retain the current route')
-        if registration['client_id'] != 'wellness-chiropractic':
-            raise ValueError('Only the registered Wellness pilot client is enabled')
+        if registration['client_id'] not in {'wellness-chiropractic', 'raise-the-bar'}:
+            raise ValueError('Client is not enabled')
+        if registration['client_id'] == 'raise-the-bar' and task_id != 2212824:
+            raise ValueError('RTB editing is pinned to task 2212824')
         return registration
 
     def identity(self):
@@ -90,6 +93,8 @@ class Bridge:
 
     def approved_contract(self, task_id, plan_message_id, approval_message_id):
         registration = self.registration(task_id)
+        if not registration.get('ready', True):
+            raise ValueError('The registered editing route is not ready; retain the task and report its dependencies')
         self.identity()
         task = self.api('get_task', {'taskId': task_id})
         project = task.get('project', {})
@@ -124,8 +129,11 @@ class Bridge:
         if not task.get('url'):
             raise ValueError('BasicOps task URL is missing')
         plan = plain(latest['message']).strip()
-        if not re.search(r'saved.context', plan, re.I) or not re.search(r'review.only|read.only', plan, re.I):
-            raise ValueError('This pilot accepts only explicitly saved-context, review-only plans')
+        if registration['client_id'] == 'wellness-chiropractic':
+            if not re.search(r'saved.context', plan, re.I) or not re.search(r'review.only|read.only', plan, re.I):
+                raise ValueError('Wellness accepts only saved-context, review-only plans')
+        elif not re.search(r'draft.edit', plan, re.I) or not re.search(r'prototype', plan, re.I):
+            raise ValueError('RTB requires an explicit draft-edit plan with prototype work, not a summary-only substitute')
         if len(plan) > 8000:
             raise ValueError('Pilot plan exceeds the bounded context limit')
         return registration, task, latest, approval, version, plan
@@ -160,10 +168,11 @@ class Bridge:
         return self.status(task_id)
 
     def status(self, task_id):
-        self.registration(task_id)
+        registration = self.registration(task_id)
         path = self.state / f'{task_id}.json'
         if not path.exists():
-            return {'task_id': task_id, 'status': 'not_submitted'}
+            return {'task_id': task_id, 'status': 'not_submitted', 'client_id': registration['client_id'],
+                    'mode': registration.get('mode', 'saved_context_review'), 'ready': registration.get('ready', True)}
         mapping = json.loads(path.read_text())
         request = mapping['request']
         run = self.queue / 'runs' / request['request_id']
@@ -182,6 +191,18 @@ class Bridge:
         session = run / 'session.json'
         if not result['thread_id'] and session.exists():
             result['thread_id'] = json.loads(session.read_text())['thread_id']
+        if registration['client_id'] == 'raise-the-bar' and receipt['status'] == 'needs_review':
+            delivery_path = DELIVERIES / (request['request_id'] + '.json')
+            if not delivery_path.exists():
+                result['status'] = 'awaiting_delivery'
+            else:
+                delivery = json.loads(delivery_path.read_text())
+                if delivery.get('basicops') != request['basicops'] or delivery.get('artifacts') != receipt.get('artifacts'):
+                    raise ValueError('RTB delivery does not match the approved run and artifacts')
+                if delivery.get('verification') != 'passed':
+                    result.update(status='failed', error=delivery.get('error', 'RTB delivery verification failed'))
+                else:
+                    result['deliverables'] = delivery['deliverables']
         if receipt['status'] == 'needs_review':
             result['result'] = (run / 'result.md').read_text()
         return result
@@ -206,10 +227,15 @@ class Bridge:
             if existing is None:
                 summary = state.get('result', state.get('error') or 'Worker did not complete.')[:3000]
                 heading = 'Codex draft ready for review' if state['status'] == 'needs_review' else 'Codex worker needs attention'
+                boundary = ('This pilot used saved context only. No live account changes, client sends or Drive delivery were performed.'
+                            if registration['client_id'] == 'wellness-chiropractic' else
+                            'RTB draft files and prototype source were prepared for review. No shared-site publication or client email was performed.')
+                links = ''.join('<li><a href="' + html.escape(item['url'], quote=True) + '">'
+                                + html.escape(item['name']) + '</a></li>' for item in state.get('deliverables', []))
                 message = ('<p><strong>' + heading + '</strong></p><p>' + html.escape(summary) + '</p>'
                            '<p>Open the paired hermes-vps device in Codex. Chat: <strong>'
                            + html.escape(state['chat_title']) + '</strong>.</p>'
-                           '<p>This pilot used saved context only. No live account changes, client sends or Drive delivery were performed.</p>'
+                           '<p>' + boundary + '</p><ul>' + links + '</ul>'
                            '<p>Next handoff: review the draft and continue in the same Codex conversation.</p>'
                            '<p><small>' + marker + ' | Session: ' + html.escape(state.get('thread_id') or 'unavailable')
                            + ' | AI authorship: Ted via the governed Codex session bridge.</small></p>')
@@ -229,7 +255,7 @@ class Bridge:
                     atomic(path, checkpoint)
                     response = self.api('request_review', {'taskId': task_id,
                         'reviewers': [registration['reviewer_id']],
-                        'message': '<p>Please review the saved-context Codex draft in the task discussion.</p>'})
+                        'message': '<p>Please review the Codex draft and any linked files in the task discussion.</p>'})
                     if response.get('success') is False:
                         raise ValueError('BasicOps review request failed; inspect before retrying')
                     checkpoint['review_request'] = 'requested'

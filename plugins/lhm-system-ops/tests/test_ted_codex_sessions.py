@@ -68,6 +68,14 @@ class BridgeTests(unittest.TestCase):
             self.bridge.submit(123, 'plan', 'approve')
         self.assertFalse(list((self.queue / 'incoming').iterdir()))
 
+    def test_route_readiness_is_visible_and_blocks_dispatch(self):
+        self.bridge.config['tasks']['123']['ready'] = False
+        state = self.bridge.status(123)
+        self.assertFalse(state['ready'])
+        with self.assertRaises(ValueError):
+            self.bridge.submit(123, 'plan', 'approve')
+        self.assertFalse(list((self.queue / 'incoming').iterdir()))
+
     def test_stale_plan_is_rejected(self):
         self.api.messages.append({'id': 'newplan', 'user': 20, 'created': 3,
                                   'message': 'TED PLAN v2 — AWAITING APPROVAL. Saved-context review-only.'})

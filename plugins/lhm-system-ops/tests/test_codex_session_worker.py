@@ -3,6 +3,9 @@ import importlib.machinery
 import importlib.util
 from pathlib import Path
 import unittest
+import tempfile
+import json
+from unittest.mock import patch
 
 path = Path(__file__).parents[1] / 'assets/host/lhm-codex-session-worker'
 loader = importlib.machinery.SourceFileLoader('session_worker', str(path))
@@ -33,6 +36,24 @@ class WorkerTests(unittest.TestCase):
             worker.validate(task)
         task = self.task()
         task['request_id'] = 'ted-codex-124-v1'
+        with self.assertRaises(ValueError):
+            worker.validate(task)
+
+    def test_rtb_cannot_execute_until_the_root_manifest_is_ready(self):
+        task = self.task()
+        task['client_id'] = 'raise-the-bar'
+        task['basicops']['task_id'] = 2212824
+        task['request_id'] = 'ted-codex-2212824-v1'
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'task-context.json').write_text(json.dumps({'execution_ready': False}))
+            with patch.object(worker, 'RTB', root):
+                with self.assertRaises(ValueError):
+                    worker.validate(task)
+                (root / 'task-context.json').write_text(json.dumps({'execution_ready': True}))
+                worker.validate(task)
+        task['basicops']['task_id'] = 123
+        task['request_id'] = 'ted-codex-123-v1'
         with self.assertRaises(ValueError):
             worker.validate(task)
 

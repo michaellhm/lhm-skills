@@ -327,7 +327,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 ### Project Hub
 
-`run-hermes-task` supports an opt-in TED → persistent Codex VPS chat pilot, with exact-plan approval checks and a verified BasicOps review handback. The Wellness integration trial uses saved context only. Skill count is unchanged.
+`run-hermes-task` supports an opt-in TED → persistent Codex VPS chat pilot, with exact-plan approval checks and a verified BasicOps review handback. Wellness uses saved context only. The separately gated RTB draft-edit route prepares document revisions and a prototype review branch, with fixed-folder Drive readback; it stays inactive until its own Drive connection and personal plan approval are verified. Skill count is unchanged.
 
 **Personal Work Flow** (1 skill): Personal weekly planning and daily selection for Michael and the team, with overwhelmed mode, project/client priority ranking, optional mini stand-ups and a full BasicOps inbox review. The inbox flow presents client-risk rescue, stale/likely closure, delegate, keep and needs-decision groups, then applies only confirmed mutations through the shared BasicOps task manager with read-back verification.
 

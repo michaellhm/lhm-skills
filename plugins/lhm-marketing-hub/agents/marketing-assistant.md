@@ -31,7 +31,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `lhm-page-rollout` — Build a batch of LHM website pages end to end (research, brief, copy, FAQ and schema, internal links, images, staging build, verification and review email). Staging only.
 
-`run-hermes-task` — Dispatch approved Hermes work; registered TED pilot tasks open persistent Codex VPS chats and return drafts to BasicOps for human review.
+`run-hermes-task` — Dispatch approved Hermes work; registered TED tasks open persistent Codex VPS chats. Wellness is summary-only; the separately activated RTB draft-edit route prepares verified Drive review files and a prototype source branch before BasicOps handback.
 
 `hermes-production-plan` — Match an existing BasicOps outcome to its Obsidian AI Operations SOP, prepare the execution plan for Ted, and provide plain-English task status and CTO blocker reporting.
 
