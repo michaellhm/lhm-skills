@@ -1,20 +1,21 @@
 ---
 name: schedule-social-posts
-description: "Schedule approved Local Health Marketing feed carousels and Instagram Story sequences directly in GoHighLevel, with duplicate prevention, exact media-order checks and a durable private receipt. Use when Michael says a social post is approved, asks to schedule or publish approved LHM posts, says 'push the posts', or wants approved carousel or Story packages added to the LHM GoHighLevel Social Planner. Do not use for creating content or publishing unapproved drafts."
+description: "Schedule approved Local Health Marketing feed carousels and Instagram Story sequences through the protected LHM Social GoHighLevel API, with duplicate prevention, exact media-order checks and durable receipts. Use when Michael says a social post is approved, asks to schedule approved LHM posts, says 'push the posts', or wants approved carousel or Story packages added to the LHM GoHighLevel Social Planner. Do not use for creating content, unapproved drafts or browser-based scheduling."
 ---
 
 # Schedule Social Posts
 
-Schedule an already approved LHM Social package directly in the Local Health Marketing GoHighLevel Social Planner. Cloudflare and the protected review site are not required for this publishing step.
+Schedule an already approved LHM Social package through the protected API at `https://lhm-social.pages.dev`. That backend performs the GoHighLevel uploads, creates the post, preserves duplicate locks and reads the result back. Do not use the GoHighLevel browser composer for the normal workflow.
 
-Direct GoHighLevel scheduling is the canonical path after approval. The LHM Social review page is for reviewing artefacts and reporting delivery status; do not reintroduce feed scheduling controls there.
+The API is the canonical scheduling path after approval. The LHM Social review page is for reviewing artefacts and reporting delivery status; do not reintroduce feed scheduling controls there.
 
 ## Required context
 
 1. Read [GoHighLevel scheduling](references/ghl-scheduling.md).
-2. Read the package `manifest.json`, `caption.md`, optional `first-comment.md`, and `publish.json` from the verified `lhmorg/lhm-social` checkout.
-3. For a feed post, read every `slide-NN.png` in manifest order. For a Story, read `story-manifest.json` and every file in `export_files` order.
-4. Treat `source-receipt.private.json`, planning files and other private metadata as non-uploadable.
+2. Read this skill's `LEARNED.md`.
+3. Read the package `manifest.json`, `caption.md`, optional `first-comment.md`, and `publish.json` from the verified `lhmorg/lhm-social` checkout.
+4. For a feed post, read every `slide-NN.png` in manifest order. For a Story, read `story-manifest.json` and every file in `export_files` order.
+5. Treat `source-receipt.private.json`, planning files and other private metadata as non-uploadable.
 
 ## Approval boundary
 
@@ -29,7 +30,7 @@ Resolve before mutation:
 
 When Michael explicitly allows random days or times, choose future Melbourne times with meaningful separation and record them before scheduling. Do not silently randomise without that instruction.
 
-If the active computer-use environment requires an action-time confirmation for the final Schedule or Post control, obey it. Do not mistake the skill's approval model for permission to bypass tool safety controls.
+The API's approval nonce is a technical control, not user consent. Create it only after Michael has explicitly approved the exact immutable package, platforms and Melbourne time. Never reuse approval from a different revision or infer social publishing approval from content-production approval.
 
 ## Preflight
 
@@ -39,35 +40,47 @@ If the active computer-use environment requires an action-time confirmation for 
    - feed carousel: 2-10 PNG slides, normally 1080 x 1350;
    - Instagram Story: one 1080 x 1920 PNG per frame.
 4. Calculate or read stable hashes for the ordered media and public copy.
-5. Inspect the private scheduling receipt and the GHL Planner for an existing matching package, caption, account and time. A matching scheduled or published record is success, not a reason to recreate it.
-6. If an earlier creation result is ambiguous, stop and inspect GHL. Never retry a possibly accepted create request.
+5. Build and deploy the current approved package so it exists in the protected `/scheduling-catalogue.json`; the catalogue revision is the immutable API identity.
+6. Inspect the private scheduling receipt and call `/api/status` for the package. Any existing attempt is a durable duplicate lock. A matching verified record is success, not a reason to recreate it. A failed, creating, uploading, verification-pending or outcome-unknown attempt requires inspection, not a second create.
+7. Call `/api/setup` and require `enabled: true` plus the exact configured LHM platforms.
 
-## Schedule
+## Schedule through the API
 
-Prefer a connected GoHighLevel capability or authenticated direct GHL browser session. Do not route through Cloudflare merely because the package also appears on the review site.
+Use `node scripts/schedule_via_api.mjs <input.json>`. The script calls only the protected LHM Social API and never receives the GoHighLevel private-integration token. It reads the LHM Social shared login from `LHM_SOCIAL_API_USERNAME` and `LHM_SOCIAL_API_PASSWORD`; obtain those values from the approved secret store at runtime and never write, print, commit or pass them as command-line arguments.
+
+The input must bind the approved intent:
+
+```json
+{
+  "base_url": "https://lhm-social.pages.dev",
+  "package_id": "2026/10/2026-10-16-two-minute-ai-service-page-test",
+  "revision": "catalogue revision",
+  "platforms": ["facebook", "instagram"],
+  "local_time": "2026-10-25T10:43",
+  "approved": true
+}
+```
+
+Use a future Melbourne time at least five minutes away. Immediate feed publication is not supported by this API contract. Stop and report that limitation rather than opening the browser composer.
 
 ### Feed carousel
 
-1. Select only the verified Local Health Marketing Facebook Page and Instagram account requested by Michael.
-2. Set both channel types to Feed.
-3. Add `caption.md` without private notes or Markdown headings that are not intended for the public post.
-4. Upload slides in manifest order and confirm the composer shows the exact count and cover.
-5. Add `first-comment.md` only when it exists, has been approved and the selected platform supports the intended behaviour.
-6. Set the Melbourne publish time or choose Publish now as approved.
-7. Re-read the accounts, media count/order, caption, first comment and time immediately before the final action.
-8. Schedule once.
+1. Pass the exact package ID and current catalogue revision.
+2. Pass only the approved `facebook`, `instagram`, or both platform values.
+3. Pass the approved Melbourne wall-clock time without a timezone suffix. The server resolves daylight saving.
+4. Require `approved: true` only after the approval boundary above is satisfied.
+5. Run the script once. It checks setup, catalogue identity and existing attempts before requesting a single-use nonce, then schedules exactly once.
 
 ### Instagram Story sequence
 
-1. Use only `@localhealthmktg` unless Michael explicitly requests another verified account.
-2. Set the channel type to Story.
-3. Schedule each frame as a separate Story post in manifest order, one minute apart unless Michael specifies otherwise.
-4. Do not add a caption, first comment, music, poll or sticker artwork unless separately approved.
-5. Verify every frame independently. If one definite failure occurs, stop before creating later frames.
+1. Use the sequence package ID generated in the catalogue and the `instagram` platform unless the verified backend contract explicitly supports the approved Facebook sequence.
+2. The API schedules each frame as a separate Story in manifest order, one minute apart from the approved start time.
+3. Do not add a caption, first comment, music, poll or sticker artwork unless the backend and package contract are separately updated and approved.
+4. Verify every child attempt independently. If one attempt fails or becomes ambiguous, do not recreate the sequence.
 
 ## Verification and receipt
 
-Read the result back from GHL after scheduling. Verify:
+The script reads the result back through the API after scheduling and makes at most one verification call for a known pending post ID. Verify:
 
 - correct LHM account and platform;
 - `scheduled` or `published` state;
@@ -75,7 +88,7 @@ Read the result back from GHL after scheduling. Verify:
 - feed media count and visible order, or every Story child frame in order;
 - caption and approved first comment where applicable.
 
-Do not report a carousel as verified when GHL exposes only the cover and gives no second signal for the remaining media. The GHL Planner showing `Media +N` for the matching record is an acceptable second signal.
+Treat `scheduled_verified` and `published_verified` as complete. Treat `verification_pending`, `outcome_unknown`, `creating`, `uploading` or `failed` as incomplete. Never rerun scheduling to resolve an incomplete state.
 
 Write or update `scheduling-receipt.private.json` beside the package with the package hash, platforms, Melbourne and UTC times, GHL IDs, verification evidence, operator and status. Keep it out of `dist`, ZIP files and public GitHub Pages output. Commit the private receipt only when the current request or saved workflow authorises repository writes.
 
@@ -91,10 +104,33 @@ Stop without creating or retrying when:
 - a matching scheduled or published post already exists;
 - upload order cannot be confirmed;
 - a create result is ambiguous;
-- authentication, file-upload permission or another browser prerequisite requires Michael's action.
+- the secure API credentials are unavailable;
+- the production API reports scheduling disabled or the approved package is absent from the deployed catalogue;
+- the requested action is immediate feed publication, which the current API contract does not support.
 
-Report the exact blocker and preserve any prepared draft without clicking the final Post or Schedule control.
+Report the exact blocker without opening the browser composer or trying a direct GoHighLevel token.
 
 ## Output
 
-Return the post title, platforms, Melbourne schedule time, GHL IDs, media-count/order verification, caption/comment status, private receipt path, public status writeback and any remaining delivery check. Distinguish `scheduled`, `published`, `verification_pending` and `blocked` precisely.
+Return one JSON object:
+
+```json
+{
+  "run_result": "scheduled | published | already_exists | verification_pending | blocked",
+  "package_id": "...",
+  "revision": "...",
+  "platforms": ["facebook", "instagram"],
+  "scheduled_for_melbourne": "YYYY-MM-DDTHH:mm",
+  "attempts": [
+    {"platform": "facebook", "state": "scheduled_verified", "ghl_post_id": "..."}
+  ],
+  "media_order_verified": true,
+  "caption_verified": true,
+  "first_comment_verified": true,
+  "private_receipt_path": "...",
+  "public_status_path": "...",
+  "next_action": "none | inspect GoHighLevel | configure API credentials"
+}
+```
+
+Distinguish verified, pending and blocked states precisely. Do not report completion from the HTTP acceptance response alone.

@@ -119,7 +119,7 @@ When `github.mode` is `commit_push` and `github.repository` is `lhmorg/lhm-socia
 
 Approval for the protected review site is not approval to publish the post on Instagram, Facebook, LinkedIn or another social platform.
 
-When Michael later approves an exact package for social publication, route the separate scheduling step to `schedule-social-posts`. Do not make the review site's Cloudflare deployment a prerequisite for direct GoHighLevel scheduling.
+When Michael later approves an exact package, platforms and publication time for social scheduling, route the separate step to `schedule-social-posts`. Its protected API requires the approved package revision to be present in the deployed LHM Social scheduling catalogue. Production deployment is therefore a technical prerequisite for API scheduling, but it is not social-publishing approval and must never be treated as consent.
 
 ## Structured input
 

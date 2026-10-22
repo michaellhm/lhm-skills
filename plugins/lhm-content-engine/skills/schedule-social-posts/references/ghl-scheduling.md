@@ -12,28 +12,40 @@
 
 Account display names alone are not sufficient because other LHM-branded accounts are connected. Match the IDs when the interface or API exposes them.
 
-## Direct browser route
+## Protected API route
 
-Use an authenticated Chrome session for the LHM GoHighLevel/Kenkoo account:
+The production entrypoint is `https://lhm-social.pages.dev`. It is protected and forwards approved immutable packages to GoHighLevel with the production private-integration token held only by Cloudflare Pages Functions.
 
-1. Marketing → Social Planner → New Post → Create New Post.
-2. Select the verified accounts above.
-3. Enter the approved caption.
-4. Open the image control in the editor toolbar, then Media Storage → Upload → Upload file.
-5. Upload the ordered local PNG files together. Chrome automation requires the ChatGPT browser extension setting **Allow access to file URLs**. If it is disabled, preserve the draft and ask Michael to enable it; do not substitute stale media already in the library.
-6. Confirm the composer preview shows the correct cover and exact media count.
-7. Use the Post menu for Publish now or Schedule post.
+Authentication uses the authorised LHM Social shared login. The scheduling script reads it only from `LHM_SOCIAL_API_USERNAME` and `LHM_SOCIAL_API_PASSWORD`. Never store those values in this skill, the content repository, an automation prompt, a receipt or command history.
 
-Interface labels can change. Follow the visible current controls rather than relying on coordinates or guessed URLs.
+The API sequence is:
+
+1. `GET /api/setup` to require live scheduling and the verified configured accounts.
+2. `GET /scheduling-catalogue.json` to resolve the exact package and revision.
+3. `GET /api/status?packageId=...` to enforce the durable duplicate lock.
+4. `POST /api/approval` with the package ID, revision, approved platforms and Melbourne `localTime`. The returned nonce expires after five minutes and is bound to that exact intent.
+5. `POST /api/schedule` with the same fields, `approved: true` and the nonce.
+6. `GET /api/status` and, only for a known post ID in `verification_pending`, one `POST /api/verify` followed by one final status read.
+
+Every mutation includes `Origin: https://lhm-social.pages.dev`. Requests use `redirect: manual` so credentials are never forwarded to another origin. The script never accepts a base URL other than the production HTTPS origin unless its source is intentionally changed and reviewed.
+
+The catalogue is the approval boundary. It must contain the approved package and its current revision before scheduling. A package present only in the local checkout cannot be scheduled through production.
 
 ## Duplicate and ambiguous-result rules
 
-Search the GHL Planner and Statistics surfaces before creation. Match on a combination of caption lead, package title/cover, platform, media count and time.
+Call `/api/status` before creation. Any existing attempt for the package is a durable duplicate lock and must be handled by status inspection rather than a new create.
 
-- A matching record showing all carousel media, such as `Media +6` for a seven-slide package, is sufficient evidence that GHL retained the full carousel even if an API read-back exposes only the cover.
-- Never recreate a matching scheduled or published record.
-- A timeout after the final create action is ambiguous. Inspect the Planner before taking any further mutation.
+- `scheduled_verified` or `published_verified` is success.
+- `verification_pending` with a known post ID permits one `/api/verify` call, which performs read-back and never creates another post.
+- `outcome_unknown`, `creating`, `uploading`, `failed` or a pending state without a usable post ID requires inspection in GoHighLevel. Never submit another approval or schedule request for that package.
+- A timeout or malformed response after `/api/schedule` is ambiguous. Read `/api/status` before any further action.
 - Do not delete or reschedule an existing record without separate explicit authorisation.
+
+## Script result
+
+`scripts/schedule_via_api.mjs` returns a sanitised JSON object. It never prints the Basic credentials, approval nonce or GoHighLevel private-integration token. Its completion state is based on the final attempt states, not the create response.
+
+The current contract supports scheduled feed carousels and scheduled Story sequences. Feed times must be at least five minutes in the future. Immediate feed publication is intentionally unsupported.
 
 ## Receipt schema
 

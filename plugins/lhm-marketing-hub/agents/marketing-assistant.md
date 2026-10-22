@@ -50,7 +50,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `lhm-content-engine:weekly-social-carousel` — Build a privacy-safe editorial backlog from Fathom and current developments, rank ideas by audience frequency and value, then turn selected topics into reviewed LHM HTML and PNG carousel packages.
 
-`lhm-content-engine:schedule-social-posts` — Schedule Michael-approved LHM feed carousels and Instagram Story sequences directly in GoHighLevel with duplicate prevention, media-order verification and private receipts.
+`lhm-content-engine:schedule-social-posts` — Schedule Michael-approved LHM feed carousels and Instagram Story sequences through the protected LHM Social GoHighLevel API with duplicate prevention, media-order verification and private receipts.
 
 `google-ads-monthly-review` — Evidence-led account review, report highlights and Lily’s Monday review-card digest.
 
