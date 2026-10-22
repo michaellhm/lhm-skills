@@ -1,6 +1,6 @@
 ---
 name: lhm-daily-flow
-description: Run or resume Michael's daily operating review across BasicOps, email, calendar and chosen work, then close the day with learning and Obsidian context capture. Use when he says 'run through my day', 'plan today', 'daily flow', 'what should I focus on', 'what is next', 'wrap up today', or 'end of day learn' in an active daily session. Pre-sweep full task and email threads, prepare suggested replies or next actions, handle one decision at a time, remember dispositions across chats, and coordinate existing specialist skills without repeating the weekly review.
+description: Run or resume Michael's daily operating review across BasicOps, email, calendar and chosen work, then close the day with learning and Obsidian context capture. Use when he says 'run through my day', 'plan today', 'show me my day', 'show me day', 'daily flow', 'what should I focus on', 'what is next', 'wrap up today', or 'end of day learn' in an active daily session. Pre-sweep full task and email threads, prepare suggested replies or next actions, handle one decision at a time, remember dispositions across chats, and coordinate existing specialist skills without repeating the weekly review.
 ---
 
 # LHM Daily Flow
@@ -27,7 +27,7 @@ Read [client knowledge routing](../../references/obsidian-context-contract.md) b
 
 ## Opening morning brief
 
-When Michael starts the day or asks for the daily list, provide one compact briefing before the one-item decision flow. Use this order:
+When Michael starts the day, says “show me my day” or “show me day”, or asks for the daily list/agenda, provide one compact briefing before the one-item decision flow. Use lists in the five sections below. Show times only for verified calendar bookings; do not invent work time blocks, time budgets or a timed agenda unless Michael explicitly asks for scheduling. Use this order:
 
 1. **What the team needs from Michael:** BasicOps decisions, mentions, approvals and blockers added or changed since the last verified review, normally around 24 hours. Read complete discussions and replies; exclude already answered or delegated requests. State any coverage gap rather than reporting an unverified all-clear.
 2. **Today's calendar:** verified local bookings and material clashes. Do not move bookings or turn flexible work targets into appointments.
@@ -35,7 +35,9 @@ When Michael starts the day or asks for the daily list, provide one compact brie
 4. **Today's work:** BasicOps tasks due today plus Michael's explicitly chosen additions. Distinguish due today from pulled-forward work; deduplicate related email actions and meeting follow-ups. Do not dump the weekly backlog or treat every open task as a commitment for today. Michael chooses the order and realistic capacity.
 5. **Promises and unfinished meeting wraps:** inspect recent sent mail and user-reported commitments for promised deliverables and dates. Match existing BasicOps work, owner and due date; identify missing tasks or date mismatches. Preserve tentative language such as “aim for Friday” rather than inventing a hard client deadline. Surface current unfinished wrap reviews with their next action, but do not infer unfinished delivery from old wrap-card status alone or add the entire historical backlog to today.
 
-Give every actionable row its source link. Keep the attention list separate from today's execution commitments so Michael can see new information and decide what to move. Include near-term promises only where they affect planning, not as extra work automatically due today. A briefing sweep alone does not authorise task creation, date changes, calendar changes or email filing; perform those only within explicit existing authority and verify the result.
+Give every actionable list item its source link. Keep each item to a concrete next action and the minimum current state Michael needs. Preserve his chosen order, explicit carryovers, additions and deferrals; a later correction supersedes your proposed order. If he puts team decisions last, honour that without repeatedly recommending the default order. Keep tentative additions tentative (for example, a homepage plus possibly two sample page designs). An ambiguous named item stays unresolved while independent preparation continues; do not silently equate it with a different client or task.
+
+Keep the attention list separate from today's execution commitments so Michael can see new information and decide what to move. Include near-term promises only where they affect planning, not as extra work automatically due today. A briefing sweep alone does not authorise task creation, date changes, calendar changes or email filing; perform those only within explicit existing authority and verify the result.
 
 Before describing the briefing as complete, record checked source windows, pagination, discussion/reply coverage and unresolved access gaps. An incomplete section must say so. Save the chosen order, additions, completed replies and commitment reconciliation in the private checkpoint. Once the list is reviewed, return to one item at a time and prepare portable execution prompts for selected work.
 
