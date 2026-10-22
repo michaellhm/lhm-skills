@@ -1,6 +1,6 @@
 ---
 name: weekly-social-carousel
-description: "Turn useful practice-owner conversations, recurring operational questions, Google Search or Ads changes, and practical AI developments into a prioritised editorial backlog and concise Local Health Marketing carousel packages. Use this when the user mentions 'weekly social carousel', 'quick-win SOP', 'Fathom conversations into posts', 'content idea backlog', 'carousel from meeting notes', 'Friday social content', or asks for an LHM HTML carousel preview. Do not use it for client-facing clinical social posts or automatic social publishing."
+description: "Turn useful practice-owner conversations, recurring operational questions, Google Search or Ads changes, and practical AI developments into a prioritised editorial backlog and concise Local Health Marketing carousel packages. Use this when the user mentions 'weekly social carousel', 'quick-win SOP', 'Fathom conversations into posts', 'content idea backlog', 'carousel from meeting notes', 'Friday social content', or asks for an LHM HTML carousel preview. Use schedule-social-posts separately after Michael approves publication."
 ---
 
 # Weekly Social Carousel
@@ -118,6 +118,8 @@ When `github.mode` is `commit_push` and `github.repository` is `lhmorg/lhm-socia
 6. Push only through the branch and workflow explicitly authorised by the structured input.
 
 Approval for the protected review site is not approval to publish the post on Instagram, Facebook, LinkedIn or another social platform.
+
+When Michael later approves an exact package, platforms and publication time for social scheduling, route the separate step to `schedule-social-posts`. Its protected API requires the approved package revision to be present in the deployed LHM Social scheduling catalogue. Production deployment is therefore a technical prerequisite for API scheduling, but it is not social-publishing approval and must never be treated as consent.
 
 ## Structured input
 

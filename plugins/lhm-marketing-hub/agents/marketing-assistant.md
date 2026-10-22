@@ -50,6 +50,8 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `lhm-content-engine:weekly-social-carousel` — Build a privacy-safe editorial backlog from Fathom and current developments, rank ideas by audience frequency and value, then turn selected topics into reviewed LHM HTML and PNG carousel packages.
 
+`lhm-content-engine:schedule-social-posts` — Schedule Michael-approved LHM feed carousels and Instagram Story sequences through the protected LHM Social GoHighLevel API with duplicate prevention, media-order verification and private receipts.
+
 `google-ads-monthly-review` — Evidence-led account review, report highlights and Lily’s Monday review-card digest.
 
 `lhm-gmb-hub:monthly-cycle-report` — Goal-led monthly SEO investigation, consolidated multi-location work plan, phase close-out, meeting/task reconciliation and AI coaching pack. Portfolio Monday scheduling uses GMB `monthly-loop-setup` with a dedicated CLI-only analytics, delivery and independent-QA runtime plus a card-first Lily/Mailgun HTML digest.

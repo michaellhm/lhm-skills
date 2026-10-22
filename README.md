@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-202 skills across thirteen Claude Code plugins (5 inbox, 65 marketing, 42 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+203 skills across thirteen Claude Code plugins (5 inbox, 65 marketing, 42 WordPress, 19 GMB/local SEO, 9 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge, 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -169,11 +169,12 @@ plugins/lhm-gmb-hub/                   # GMB/Local SEO plugin
 plugins/lhm-content-engine/            # Content pipeline plugin
   .claude-plugin/plugin.json            # Plugin manifest
   agents/content-orchestrator.md        # Batch pipeline orchestrator
-  skills/                               # All 8 skills
+  skills/                               # All 9 skills
     generate-outline/                   # Structured article outline from CSV row
     write-blog/                         # Full blog article from outline
     generate-social-posts/              # GMB social posts from blog content
     weekly-social-carousel/             # Two-post SOP-led social workflow plus prioritised idea backlog
+    schedule-social-posts/              # Approved LHM packages scheduled through the protected GoHighLevel API
     quality-controller/                 # Anti-AI refinement and compliance gate
     publish-google-doc/                 # Create formatted Google Doc for review
     update-csv/                         # Update tracking CSV with results
@@ -312,7 +313,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 ### Content Engine
 
-**Content Pipeline** (8 skills): CSV-driven batch processing for allied health clinics plus a weekly LHM social-carousel workflow. Includes structured article outline generation, blog writing with anti-AI refinement, GMB social post generation, safe meeting and current-topic insight selection, branded HTML and PNG carousel packages, compliance quality gates, Google Doc publishing, tracking CSV updates, and full batch orchestration.
+**Content Pipeline** (9 skills): CSV-driven batch processing for allied health clinics plus a weekly LHM social-carousel workflow and direct GoHighLevel scheduling for explicitly approved LHM packages. Includes structured article outline generation, blog writing with anti-AI refinement, GMB social post generation, safe meeting and current-topic insight selection, branded HTML and PNG carousel packages, approval-bound feed and Story scheduling with duplicate protection, compliance quality gates, Google Doc publishing, tracking CSV updates, and full batch orchestration.
 
 ### Learn
 
