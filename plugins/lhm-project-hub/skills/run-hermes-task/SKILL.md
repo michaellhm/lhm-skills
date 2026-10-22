@@ -93,6 +93,18 @@ successful shell return or armed monitor is not acceptance.
 
 ## Dispatch and supervise
 
+For a task explicitly enrolled in the Codex session pilot, TED uses
+`codex_session_submit` through the registered `codex_sessions` MCP server after the
+latest visible plan is approved by the verified human. The tool checks the task,
+project, TED identity, plan and approval authorship/version before queue admission.
+Use the packaged [TED webhook entry](assets/basicops-agent-user/SKILL.md).
+This bounded saved-context, review-only pilot uses a durable JSON run and native
+app-server conversation instead of an ephemeral CLI worker. Do not invoke both
+routes for the same plan. A verified notifier returns the result and session
+reference to the same BasicOps task and leaves it with the human in `Under Review`.
+Unregistered tasks retain the existing workforce route. This pilot does not add
+live-account access, Drive delivery, publishing or client-contact authority.
+
 1. For a human-delegated BasicOps task, invoke `hermes-production-plan` first. The Project Manager
    posts the version-bound plan on the existing task and assigns it to the authenticated human in
    `Under Review` with `Review type: Plan approval`. Dispatch to `lhm-chief-of-staff` only after the

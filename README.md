@@ -217,6 +217,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
   skills/                               # All 30 skills
     basicops-task-manager/              # Shared BasicOps boundary — plain-English task briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
+    run-hermes-task/                    # Approved Hermes dispatch; registered TED tasks can open persistent VPS Codex chats
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
     staff-weekly-flow/                  # Verified Monday brief, role-informed commitments, weekly-board cleanup and immediate follow-ups
@@ -325,6 +326,8 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 **Client Communication** (3 skills, shims only): All three skills now live in `lhm-project-hub`; the entries here route straight there. See the Project Hub catalog below for current descriptions. Kept in place so existing muscle memory and any external references to `lhm-client-updates-hub:*` keep working.
 
 ### Project Hub
+
+`run-hermes-task` supports an opt-in TED → persistent Codex VPS chat pilot, with exact-plan approval checks and a verified BasicOps review handback. The Wellness integration trial uses saved context only. Skill count is unchanged.
 
 **Personal Work Flow** (1 skill): Personal weekly planning and daily selection for Michael and the team, with overwhelmed mode, project/client priority ranking, optional mini stand-ups and a full BasicOps inbox review. The inbox flow presents client-risk rescue, stale/likely closure, delegate, keep and needs-decision groups, then applies only confirmed mutations through the shared BasicOps task manager with read-back verification.
 
