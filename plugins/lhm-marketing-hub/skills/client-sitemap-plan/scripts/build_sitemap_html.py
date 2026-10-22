@@ -26,6 +26,12 @@ page that changes section is reported as moved rather than as a delete plus an
 add. Use it when regenerating a client plan, so the deliverable answers "what
 changed" and not only "what is planned".
 
+"tiers": [...] adds a cumulative package toggle (e.g. Foundation, then Growth).
+Pages, cards, sections, nav items and stats tagged with "tier" appear from that
+tier onwards; untagged elements always show. The bar under the header counts the
+pages in the selected package live, and in prospect mode the widget's "new
+searches" figure switches to that tier's imp_new.
+
 Status values on pages / nav items:
     "have"  -> green  (client already has this page)
     "enh"   -> yellow (exists, should be rebuilt/expanded)
@@ -170,11 +176,24 @@ CSS = """
   .note{font-size:12.5px;color:var(--grey);background:#fff;border:1px dashed var(--line);border-radius:10px;padding:12px 15px;margin-top:12px}
   footer{max-width:1240px;margin:0 auto;padding:0 22px 40px;color:var(--grey);font-size:12px}
   .pill{display:inline-block;background:var(--new);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;margin-left:8px;vertical-align:middle}
+  .tierbar .vertoggle{margin-top:0}
+  .tiersum{font-size:13px;color:var(--grey)}
+  .tiersum b{color:var(--green-d);font-size:15px}
+  .tchip{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:1px 6px;border-radius:5px;align-self:flex-start;margin-top:2px;white-space:nowrap;color:#fff;background:var(--gold)}
 """
 
 STATUS_TAG = {"have": ("have", "Existing"), "enh": ("enh", "Enhance"), "new": ("new", "New")}
 
 NEWDOT = ' <span class="dot new"></span>'
+
+# Set by build() from spec["tiers"]: {tier key: (index, label)}. Empty when the spec
+# has no tiers, in which case every tier helper below is a no-op.
+TIERS = {}
+
+def tier_attr(obj):
+    """data-tier="<index>" for an element tagged with a tier beyond the first."""
+    t = TIERS.get(obj.get("tier")) if obj else None
+    return f' data-tier="{t[0]}"' if t and t[0] > 0 else ""
 
 # (previous status, current status) -> (chip class, chip label)
 STATUS_CHANGE = {
@@ -193,9 +212,12 @@ def _link(i):
     dot = NEWDOT if i.get("new") else ""
     ver = i.get("ver")
     ver_attr = f' data-ver="{esc(ver)}"' if ver else ""
-    return f'<a href="#"{ver_attr}>' + esc(i["label"]) + dot + '</a>'
+    return f'<a href="#"{ver_attr}{tier_attr(i)}>' + esc(i["label"]) + dot + '</a>'
 
 def nav_item(item):
+    return nav_item_inner(item).replace("<li>", f"<li{tier_attr(item)}>", 1)
+
+def nav_item_inner(item):
     label = esc(item["label"])
     newdot = NEWDOT if item.get("new") else ""
     # mega dropdown (grouped columns)
@@ -330,9 +352,14 @@ def page_li(p, changes=None):
         hit = changes.get(page_key(p["name"]))
         if hit:
             chg = f'<span class="chg {hit[0]}">{esc(hit[1])}</span>'
-    return (f'<li><span class="dot {cls}"></span>'
+    t = TIERS.get(p.get("tier"))
+    tchip = f'<span class="tchip">{esc(t[1])}</span>' if t and t[0] > 0 else ""
+    # "count" lets one row stand for several pages (e.g. 21 team profiles) or for
+    # none (a clean-up row) in the live page total. Only emitted when tiers exist.
+    count_attr = f' data-count="{int(p.get("count", 1))}"' if TIERS else ""
+    return (f'<li{tier_attr(p)}{count_attr}><span class="dot {cls}"></span>'
             f'<span class="t">{name} {slug}</span>'
-            f'{volhtml}{chg}<span class="tag {cls}">{word}</span></li>')
+            f'{volhtml}{chg}{tchip}<span class="tag {cls}">{word}</span></li>')
 
 VER_RE = re.compile(r'^(V\d+|Phase\s*\d+)\b', re.I)
 
@@ -348,16 +375,18 @@ def card_html(c, changes=None):
     items = "".join(page_li(p, changes) for p in c["items"])
     ver = card_ver_tag(c.get("head", ""))
     ver_attr = f' data-ver="{esc(ver)}"' if ver else ""
-    return f'<div class="card"{ver_attr}><div class="head">{esc(c["head"])}{head_u}</div><ul>{items}</ul></div>'
+    return f'<div class="card"{ver_attr}{tier_attr(c)}><div class="head">{esc(c["head"])}{head_u}</div><ul>{items}</ul></div>'
 
 def section_html(s, changes=None):
     pill = f' <span class="pill">{esc(s["pill"])}</span>' if s.get("pill") else ""
     cards = "".join(card_html(c, changes) for c in s["cards"])
     note = f'<div class="note">{s["note"]}</div>' if s.get("note") else ""
-    return f'<h2 class="sec">{esc(s["title"])}{pill}</h2><div class="cols">{cards}</div>{note}'
+    body = f'<h2 class="sec">{esc(s["title"])}{pill}</h2><div class="cols">{cards}</div>{note}'
+    return f'<div class="secwrap"{tier_attr(s)}>{body}</div>' if TIERS else body
 
-def opportunity_html(o):
+def opportunity_html(o, tiers=()):
     """The impressions -> clicks -> leads widget. Prospect mode only."""
+    tier_notes = tier_notes_html(tiers)
     return f"""
   <section class="opp">
     <h2>{esc(o.get('title','The opportunity in Google Search'))}</h2>
@@ -372,7 +401,7 @@ def opportunity_html(o):
       </div>
       <div class="arrow">→</div>
       <div class="sc win">
-        <div class="lab">New website · same rates</div>
+        <div class="lab" id="newLab">New website · same rates</div>
         <div class="leads" id="leadsNew">0</div>
         <div class="leadu">leads / month · <span id="leadsNewYr">0/yr</span></div>
         <div class="chain"><b id="impNewT">0</b> searches → <b id="clkNew">0</b> clicks → <b id="leadsNew2">0</b> leads</div>
@@ -398,8 +427,14 @@ def opportunity_html(o):
     </div>
     <div class="seed">{o.get('seed','Drag the SEO slider to see how ongoing optimisation compounds the result. <b>The website gets you the structure; SEO keeps growing what it captures.</b>')}</div>
     <div class="fine">{o.get('composition_note','Illustrative model. "Searches" = average monthly search volume for the terms each structure is built to rank for.')}</div>
+    {tier_notes}
   </section>
 """
+
+def tier_notes_html(tiers):
+    """Per-tier fine print under the widget, shown only while that tier is selected."""
+    return "".join(f'<div class="fine" data-tier-only="{i}">{t["composition_note"]}</div>'
+                   for i, t in enumerate(tiers) if t.get("composition_note"))
 
 def opportunity_js(o):
     """Calculator for the widget. Only emitted when an opportunity block exists."""
@@ -455,7 +490,68 @@ def conversion_reality_html(cr):
   </section>
 """
 
+def tier_bar_and_js(tiers, has_opp):
+    """The package toggle under the header and the script that drives it."""
+    default = next((i for i, t in enumerate(tiers) if t.get("default")), 0)
+    btns = "".join(
+        f'<button type="button" class="verbtn{" active" if i == default else ""}" '
+        f'data-t="{i}" onclick="setTier({i})">{esc(t.get("label", t["key"]))}</button>'
+        for i, t in enumerate(tiers))
+    bar = (f'<div class="verbar tierbar"><div class="verbar-inner">'
+           f'<span class="verbar-lab">Package</span>'
+           f'<div class="vertoggle" role="tablist" aria-label="Package">{btns}</div>'
+           f'<span class="tiersum"><b id="tierPages">0</b> pages in this plan'
+           f'<span id="tierExtra"></span></span>'
+           f'</div></div>')
+    data = json.dumps([{"imp": t.get("imp_new"), "opp": t.get("opp_label", "")} for t in tiers])
+    js = f"""
+<script>
+  const TIERDATA = {data};
+  let TIERBASE = null;
+  function countPages(){{
+    let n = 0;
+    document.querySelectorAll('.card li[data-count]').forEach(function(li){{
+      if (li.style.display !== 'none' && li.closest('.card').style.display !== 'none'
+          && li.closest('.secwrap').style.display !== 'none') n += +li.dataset.count;
+    }});
+    return n;
+  }}
+  function setTier(i){{
+    document.querySelectorAll('.tierbar .verbtn').forEach(function(b){{ b.classList.toggle('active', +b.dataset.t === i); }});
+    document.querySelectorAll('[data-tier]').forEach(function(el){{ el.style.display = (+el.dataset.tier <= i) ? '' : 'none'; }});
+    document.querySelectorAll('[data-tier-only]').forEach(function(el){{ el.style.display = (+el.dataset.tierOnly === i) ? '' : 'none'; }});
+    document.querySelectorAll('.card').forEach(function(c){{
+      if (c.dataset.tier && +c.dataset.tier > i) return;
+      const any = Array.prototype.some.call(c.querySelectorAll('li'), function(li){{ return li.style.display !== 'none'; }});
+      c.style.display = any ? '' : 'none';
+    }});
+    document.querySelectorAll('.secwrap').forEach(function(s){{
+      if (s.dataset.tier && +s.dataset.tier > i) return;
+      const any = Array.prototype.some.call(s.querySelectorAll('.card'), function(c){{ return c.style.display !== 'none'; }});
+      s.style.display = any ? '' : 'none';
+    }});
+    document.querySelectorAll('.dropdown.mega').forEach(function(m){{
+      let cols = 0;
+      m.querySelectorAll('.col').forEach(function(col){{
+        const any = Array.prototype.some.call(col.querySelectorAll('a'), function(a){{ return a.style.display !== 'none'; }});
+        col.style.display = any ? '' : 'none'; if (any) cols++;
+      }});
+      m.style.setProperty('--cols', Math.max(cols, 1));
+    }});
+    const n = countPages();
+    if (TIERBASE === null) {{ TIERBASE = n; }}
+    document.getElementById('tierPages').textContent = n;
+    document.getElementById('tierExtra').innerHTML = i > 0 ? ' · <b>+' + (n - TIERBASE) + '</b> on top of ' + document.querySelector('.tierbar .verbtn[data-t="0"]').textContent : '';
+    {"const t = TIERDATA[i]; if (t.imp) { $('impNew').value = t.imp; } if (t.opp) { $('newLab').textContent = t.opp; } calc();" if has_opp else ""}
+  }}
+  setTier(0); setTier({default});
+</script>"""
+    return bar, js
+
 def build(spec, prev=None):
+    global TIERS
+    tiers = spec.get("tiers") or []
+    TIERS = {t["key"]: (i, t.get("short", t["key"])) for i, t in enumerate(tiers)}
     b = spec["brand"]
     primary = b.get("primary", "#2E6B3E")
     css = (CSS.replace("__PRIMARY__", primary)
@@ -470,7 +566,7 @@ def build(spec, prev=None):
 
     # Prospect mode when an opportunity block is present; client mode when it is not.
     o = spec.get("opportunity")
-    opp_section = opportunity_html(o) if o else ""
+    opp_section = opportunity_html(o, tiers) if o else ""
     opp_script = opportunity_js(o) if o else ""
     title_suffix = " &amp; Opportunity" if o else ""
     conv_section = conversion_reality_html(spec.get("conversion_reality"))
@@ -485,7 +581,12 @@ def build(spec, prev=None):
     legend_chg = ('<span>🔄 Change chips compare against the previous plan</span>'
                   if changes else "")
 
-    stats = "".join(f'<div><b>{esc(s["n"])}</b> {esc(s["label"])}</div>' for s in spec.get("stats", []))
+    # A stat tagged with a tier shows only while that exact tier is selected, since
+    # headline numbers ("~75 pages proposed") describe one package, not a running total.
+    def stat_html(s):
+        only = f' data-tier-only="{TIERS[s["tier"]][0]}"' if s.get("tier") in TIERS else ""
+        return f'<div{only}><b>{esc(s["n"])}</b> {esc(s["label"])}</div>'
+    stats = "".join(stat_html(s) for s in spec.get("stats", []))
     sections = "".join(section_html(s, changes) for s in spec["sections"])
     intro = spec.get("intro", {})
     footer = spec.get("footer", "")
@@ -530,6 +631,8 @@ def build(spec, prev=None):
   }
 </script>"""
 
+    tierbar, tier_script = tier_bar_and_js(tiers, bool(o)) if len(tiers) >= 2 else ("", "")
+
     careers_link = ('<div class="utility"><a class="careers-link" href="#" '
                      'title="Candidate-facing content stays off the primary buyer nav, '
                      'linked here instead">Careers ↗</a>' + phone + '</div>')
@@ -549,7 +652,7 @@ def build(spec, prev=None):
     <nav class="top"><ul>{nav}</ul></nav>
     {careers_link}
   </div>
-  {verbar}
+  {verbar}{tierbar}
 </header>
 <div class="wrap">
 {opp_section}{conv_section}{delta_section}
@@ -571,6 +674,7 @@ def build(spec, prev=None):
 <footer>{footer}</footer>
 {opp_script}
 {ver_script}
+{tier_script}
 </body>
 </html>
 """

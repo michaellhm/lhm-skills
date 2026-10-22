@@ -8,7 +8,8 @@ Usage:
     python build_workbook.py sitemap.json output.xlsx
 
 Produces two tabs:
-    "Proposed Sitemap" — every page with section, slug, status, searches/mo
+    "Proposed Sitemap" — every page with section, slug, status, searches/mo, plus a
+                         "Package" column when the spec defines "tiers"
     "Keyword Demand"   — the pages that carry a search volume, sorted high to low
 
 Reads only the page tree, so it works for both prospect and client specs. It never
@@ -40,16 +41,23 @@ def header(ws,row,n):
 
 def build(spec, out):
     brand=spec["brand"]; name=brand.get("name","Client")
+    tiers={t["key"]:t.get("short",t["key"]) for t in spec.get("tiers") or []}
+    first=next(iter(tiers.values()),"")
+    def package(sec,card,p):
+        for o in (p,card,sec):
+            if o.get("tier") in tiers: return tiers[o["tier"]]
+        return first
     wb=openpyxl.Workbook()
 
     # ---- Proposed Sitemap ----
     ws=wb.active; ws.title="Proposed Sitemap"; ws.sheet_view.showGridLines=False
-    ws.merge_cells("A1:E1")
+    ws.merge_cells(f"A1:{get_column_letter(6 if spec.get('tiers') else 5)}1")
     ws["A1"]=f"Proposed Sitemap - {name}"
     ws["A1"].font=Font(name="Arial",bold=True,size=14,color=WHITE)
     ws["A1"].fill=PatternFill("solid",fgColor=GREEN)
     ws["A1"].alignment=Alignment(vertical="center"); ws.row_dimensions[1].height=24
-    heads=["Section","Page","URL slug","Status","Searches/mo"]
+    heads=["Section","Page","URL slug","Status","Searches/mo"]+(["Package"] if tiers else [])
+    ncol=len(heads); last=get_column_letter(ncol)
     for j,h in enumerate(heads,1): ws.cell(row=2,column=j,value=h)
     header(ws,2,len(heads)); ws.row_dimensions[2].height=22
     r=3; kw=[]
@@ -59,6 +67,7 @@ def build(spec, out):
                 status=p.get("status","new"); vol=p.get("vol")
                 vals=[sec["title"], p["name"], p.get("slug",""), STATUS_WORD.get(status,"New"),
                       (int(vol) if isinstance(vol,(int,float)) and vol else "")]
+                if tiers: vals.append(package(sec,card,p))
                 for j,v in enumerate(vals,1):
                     cell=ws.cell(row=r,column=j,value=v); cell.border=border
                     cell.font=Font(name="Arial",size=9.5,color=DARK)
@@ -67,15 +76,15 @@ def build(spec, out):
                 ws.cell(row=r,column=4).font=Font(name="Arial",size=9.5,bold=True,color=STATUS_COLOUR.get(status,NEW))
                 ws.cell(row=r,column=5).alignment=Alignment(horizontal="center",vertical="center")
                 fill=LGREEN if r%2 else WHITE
-                for j in range(1,6):
+                for j in range(1,ncol+1):
                     if not ws.cell(row=r,column=j).fill.fgColor.rgb or ws.cell(row=r,column=j).fill.fgColor.rgb=="00000000":
                         ws.cell(row=r,column=j).fill=PatternFill("solid",fgColor=fill)
                 if isinstance(vol,(int,float)) and vol:
                     kw.append((p["name"], int(vol), STATUS_WORD.get(status,"New"), sec["title"]))
                 r+=1
-    for j,w in enumerate([26,34,40,12,13],1):
+    for j,w in enumerate([26,34,40,12,13,14][:ncol],1):
         ws.column_dimensions[get_column_letter(j)].width=w
-    ws.freeze_panes="A3"; ws.auto_filter.ref=f"A2:E{r-1}"
+    ws.freeze_panes="A3"; ws.auto_filter.ref=f"A2:{last}{r-1}"
 
     # ---- Keyword Demand ----
     ws2=wb.create_sheet("Keyword Demand"); ws2.sheet_view.showGridLines=False

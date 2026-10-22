@@ -130,6 +130,29 @@ Cards are just labelled groups, so they can carry sequencing as well as taxonomy
 
 `client-sitemap-plan` leans on this to express build order, since it has no widget to carry the narrative.
 
+## Packages: Foundation and Growth
+
+Add a top-level `tiers` list to show one sitemap as cumulative packages, for example a Foundation website and a 12-month Growth programme on top of it. A switch under the header moves between them, and the page count, nav, stats and widget all follow.
+
+```json
+"tiers": [
+  {"key": "Foundation", "label": "Foundation website", "short": "Foundation",
+   "imp_new": 16400, "opp_label": "Foundation website · same rates",
+   "composition_note": "…how this tier's searches were derived…"},
+  {"key": "Growth", "label": "Foundation + 12-month Growth", "short": "Growth",
+   "imp_new": 28100, "opp_label": "Foundation + Growth · same rates",
+   "composition_note": "…"}
+]
+```
+
+- Tag a page, card, section, nav item (top level or dropdown link) or stat with `"tier": "Growth"`. Tagged elements appear from that tier onwards. Untagged elements belong to the first tier and always show.
+- A page tagged beyond the first tier shows a small chip with the tier's `short` name.
+- `"count"` on a page sets how many pages the row stands for in the live total (default 1). Use it for a "21 clinician profiles" row, or `0` for a clean-up row that is not a page.
+- A stat tagged with a tier shows only while that exact tier is selected, since headline numbers describe one package.
+- In prospect mode, each tier's `imp_new` replaces the widget's "new searches" figure and `opp_label` relabels the middle column. Each tier's `composition_note` shows under the main one while that tier is selected.
+- The workbook gains a Package column.
+- Mark one tier `"default": true` to open on it; otherwise the page opens on the first tier.
+
 ## Comparing versions
 
 Keep each dated version of the spec. Passing an older one as `--since` renders a progress band and a change chip on every page that moved:
