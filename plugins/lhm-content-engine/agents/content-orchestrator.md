@@ -28,6 +28,7 @@ Route to **individual skills** when the user wants just one thing:
 - "Write a blog post" → `write-blog` skill directly
 - "Create social posts" → `generate-social-posts` skill directly
 - "Review this content" → `quality-controller` skill directly
+- "Schedule these approved social posts" → `schedule-social-posts` skill directly
 
 ## Workflow
 
@@ -73,6 +74,7 @@ After batch processing completes:
 | `publish-google-doc` | Create formatted Google Doc for client review | 5 |
 | `update-csv` | Update CSV with slug, meta, URL, status | 6 |
 | `run-batch` | Orchestrate full pipeline for all approved rows | All |
+| `schedule-social-posts` | Schedule approved LHM feed carousels and Stories directly in GoHighLevel | Separate publishing step |
 
 ## Context Carry-Forward (Within One Article)
 

@@ -45,6 +45,8 @@ Do not treat a single `page-sitemap.xml` as the whole site. Enumerate every chil
 
 Note which services are bundled onto shared pages, whether high-demand themes live only in the blog, and whether any location pages exist. Every existing page becomes a `have` (green) or `enh` (yellow) row. Everything you propose that is not there is `new` (red).
 
+When a page bundles conditions or services as H2 sections, read the full page before finalising the architecture. Granular subheads usually confirm the planned unbundling rather than represent separate existing pages.
+
 ## Step 3: Research demand
 
 Use the Keywords Everywhere MCP (`get_keyword_data`, `get_related_keywords`) for monthly search volumes. Pull, at minimum:
@@ -63,6 +65,8 @@ If the `gscServer` MCP tool returns a 403 on a domain property despite the clien
 
 Read `references/methodology.md` and apply it: un-bundle services into one page each, add audience and funding pillars, build location pages in tiers, and fold the blog into clusters that feed the money pages.
 
+For women's-health and other life-stage niches, an audience-led nav grouping such as `Stage of Life` can coexist with condition-literal page titles, URLs, H1s and metadata. Keep regulated credentials accurate: when search demand uses a title the prospect does not hold, use an honest comparison explainer where appropriate rather than implying that credential.
+
 ## Step 5: Assemble sitemap.json
 
 Read `references/sitemap-schema.md` and build the spec. `assets/example-sitemap.json` is a full worked example (the My Garden Therapy build) — copy its shape.
@@ -80,6 +84,8 @@ python scripts/build_workbook.py sitemap.json "‹Client›-Proposed-Sitemap.xls
 ```
 
 The HTML is the hero. The workbook is an optional sortable companion and needs `openpyxl`.
+
+Keep mega menus visually balanced. Merge several single-item groups into a shared column rather than creating a skinny column for each one.
 
 Save outputs to the canonical destination resolved in step 2 of *Before Starting*. Where a local working copy is also wanted, use `client/prospect-sitemap-opportunity/YYYY-MM/`.
 

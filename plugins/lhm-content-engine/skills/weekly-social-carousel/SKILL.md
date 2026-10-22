@@ -1,6 +1,6 @@
 ---
 name: weekly-social-carousel
-description: "Turn useful practice-owner conversations, recurring operational questions, Google Search or Ads changes, and practical AI developments into a prioritised editorial backlog and concise Local Health Marketing carousel packages. Use this when the user mentions 'weekly social carousel', 'quick-win SOP', 'Fathom conversations into posts', 'content idea backlog', 'carousel from meeting notes', 'Friday social content', or asks for an LHM HTML carousel preview. Do not use it for client-facing clinical social posts or automatic social publishing."
+description: "Turn useful practice-owner conversations, recurring operational questions, Google Search or Ads changes, and practical AI developments into a prioritised editorial backlog and concise Local Health Marketing carousel packages. Use this when the user mentions 'weekly social carousel', 'quick-win SOP', 'Fathom conversations into posts', 'content idea backlog', 'carousel from meeting notes', 'Friday social content', or asks for an LHM HTML carousel preview. Use schedule-social-posts separately after Michael approves publication."
 ---
 
 # Weekly Social Carousel
@@ -118,6 +118,8 @@ When `github.mode` is `commit_push` and `github.repository` is `lhmorg/lhm-socia
 6. Push only through the branch and workflow explicitly authorised by the structured input.
 
 Approval for the protected review site is not approval to publish the post on Instagram, Facebook, LinkedIn or another social platform.
+
+When Michael later approves an exact package for social publication, route the separate scheduling step to `schedule-social-posts`. Do not make the review site's Cloudflare deployment a prerequisite for direct GoHighLevel scheduling.
 
 ## Structured input
 
