@@ -90,3 +90,13 @@ Review these against the candidate instructions before publishing changes:
 4. Grit is due Wednesday but Michael selects it Tuesday: label it a chosen addition; do not silently change its remote due date.
 5. A recent meeting-wrap reminder remains open: expose the review next action; do not list every historical in-progress wrap as unfinished delivery.
 6. Team or email coverage is incomplete: label the precise gap; no all-clear or complete-brief claim.
+
+
+## Daily overview presentation acceptance cases
+
+1. “Show me my day” or “show me day” produces the five-part list: team needs, calendar, emails, today’s work, promises/unfinished wraps. Only actual calendar bookings have times; no invented work blocks.
+2. Today’s work contains due-today tasks and explicit carryovers/additions, with planning dates distinguished from firm deadlines. Older open work does not become today’s commitment merely because it exists.
+3. Michael chooses a different order and puts team work last: preserve that sequence, checkpoint it and proceed one item at a time without reverting to the default order.
+4. An item is already sent/done, delegated, parked or waiting: preserve that disposition in the overview and show no stale request for Michael to repeat the action.
+5. Coverage is partial: say which source review remains incomplete; do not fill the gap with unverified actionable items or an all-clear.
+6. Michael requests time blocking explicitly: provide a proposed schedule using verified commitments and his constraints, while keeping unapproved bookings distinct from calendar state.
