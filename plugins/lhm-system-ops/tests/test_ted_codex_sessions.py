@@ -35,9 +35,10 @@ class BasicOps:
             self.messages.append({'id': 'handback', 'user': 20, 'created': 3, 'message': args['message']})
             return {'id': 'handback'}
         if name == 'request_review':
+            self.task['status'] = 'Under Review'
             return {'success': True}
         if name == 'update_task':
-            self.task.update(status=args['status'], assignee={'id': args['assignee']})
+            self.task.update(status=args.get('status', self.task['status']), assignee={'id': args['assignee']})
             return self.task
         raise AssertionError(name)
 
@@ -55,6 +56,21 @@ class BridgeTests(unittest.TestCase):
         config.write_text(json.dumps({'agent_user_id': 20, 'tasks': {
             '123': {'enabled': True, 'client_id': 'wellness-chiropractic', 'project_id': 10, 'reviewer_id': 30}}}))
         self.bridge = module.Bridge(config, self.queue, self.root / 'state', self.api)
+
+    def test_direct_intake_uses_human_task_without_ted_plan(self):
+        self.bridge.config['tasks']['2212824'] = {'enabled': True, 'ready': True,
+            'direct_task_intake': True, 'client_id': 'raise-the-bar', 'project_id': 10, 'reviewer_id': 30}
+        self.api.task.update(id=2212824, title='RTB feedback', description='Update the handbook and prototype')
+        self.api.messages = [{'id': 'dm56789', 'user': 30, 'created': 9,
+                              'message': '@Ted run this task in Codex; prepare the revisions.'}]
+        result = self.bridge.submit_direct(2212824, 'dm56789')
+        self.assertIn('56789', result['request_id'])
+        request = json.loads(next((self.queue / 'incoming').iterdir()).read_text())
+        self.assertIn('Update the handbook and prototype', request['objective'])
+        self.assertEqual(request['basicops']['plan_message_id'], 'dm56789')
+        self.api.messages[0]['message'] += ' AI authorship: Codex'
+        with self.assertRaises(ValueError):
+            self.bridge.submit_direct(2212824, 'dm56789')
 
     def test_no_execution_without_current_human_approval(self):
         self.api.messages[1]['user'] = 20

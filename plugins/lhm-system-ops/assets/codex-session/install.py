@@ -43,7 +43,10 @@ c = yaml.safe_load(config.read_text())
 c.setdefault('mcp_servers', {})['codex_sessions'] = {
     'command': '/opt/hermes/.venv/bin/python',
     'args': ['/opt/data/profiles/lhm_chief_of_staff/codex_sessions_mcp.py'],
-    'tools': {'include': ['codex_session_submit', 'codex_session_status']}}
+    'tools': {'include': ['codex_session_submit', 'codex_session_status', 'codex_task_submit']}}
+route = c['platforms']['webhook']['extra']['routes']['basicops']
+if 'codex_sessions' not in route['toolsets']:
+    route['toolsets'].append('codex_sessions')
 config.write_text(yaml.safe_dump(c, sort_keys=False))
 
 units = {

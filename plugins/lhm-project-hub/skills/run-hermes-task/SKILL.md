@@ -93,7 +93,9 @@ successful shell return or armed monitor is not acceptance.
 
 ## Dispatch and supervise
 
-For a task explicitly enrolled in the Codex session pilot, TED uses
+For a registered route with `direct_task_intake=true`, TED first uses the verified human task instruction with `codex_task_submit`; Codex interprets the task without a mandatory TED plan. Read the packaged webhook entry for its authorship and scope checks. The versioned plan route remains available where an actual plan decision is required.
+
+For a task explicitly enrolled in the versioned Codex session pilot, TED uses
 `codex_session_submit` through the registered `codex_sessions` MCP server after the
 latest visible plan is approved by the verified human. The tool checks the task,
 project, TED identity, plan and approval authorship/version before queue admission.

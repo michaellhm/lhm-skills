@@ -16,3 +16,14 @@ The existing paired Wellness chat was previously verified by Michael. That confi
 All skill LEARNED files were scanned. Existing prospect-sitemap learnings concern unrelated marketing work and were preserved without changes in this scoped infrastructure update. An exploratory broad unittest pattern encountered an existing pytest-dependent test in a Python environment without pytest; the two new test suites were then selected explicitly and passed.
 
 Deployment is a scoped runtime pilot, not a main-branch merge or full marketplace plugin installation. Rollback copies are under `/var/lib/lhm-codex-pilot-build/ted-*`; the first installation attempt's backup precedes any worker/skill changes, while subsequent backups include prior pilot revisions. Keep both when rolling back.
+
+## Integration and direct-intake upgrade
+
+- Direct-intake human task and AI-relay rejection: bridge suite 12/12.
+- Existing worker suite 4/4 and delivery suite 4/4.
+- Version, duplicate-script parity and system-ops validation pass.
+- Canonical LEARNED scan reviewed the existing prospect sitemap entries; they are unrelated to this integration change and preserved rather than reset or absorbed into unrelated skills.
+- Live GitHub MCP 2.0.3: 35 tools discovered; authenticated RTB homepage source read passed. GitHub account repository push permission verified without publishing.
+- Live Codex skills/list: 371 total available skills across roots, zero loader errors; this deployment adds the 200 top-level LHM skills. Dependencies and authentication remain per-service.
+- Workspace MCP package installed at 2.1.2; Google Docs consent and live editing checks remain pending until Michael completes consent. Do not describe installed as authenticated.
+- This is a same-runtime QA/security pass, not independent review.

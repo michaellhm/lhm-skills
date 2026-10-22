@@ -327,7 +327,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 ### Project Hub
 
-`run-hermes-task` supports an opt-in TED → persistent Codex VPS chat pilot, with exact-plan approval checks and a verified BasicOps review handback. Wellness uses saved context only. The separately gated RTB draft-edit route prepares document revisions and a prototype review branch, with fixed-folder Drive readback; it stays inactive until its own Drive connection and personal plan approval are verified. Skill count is unchanged.
+`run-hermes-task` supports an opt-in TED → persistent Codex VPS chat pilot, with verified human task instructions or exact-plan approvals and a verified BasicOps review handback. Wellness uses saved context only. The separately gated RTB draft-edit route prepares document revisions and a prototype review branch, with fixed-folder Drive readback; it stays inactive until its own Drive connection and personal plan approval are verified. Skill count is unchanged.
 
 **Personal Work Flow** (1 skill): Personal weekly planning and daily selection for Michael and the team, with overwhelmed mode, project/client priority ranking, optional mini stand-ups and a full BasicOps inbox review. The inbox flow presents client-risk rescue, stale/likely closure, delegate, keep and needs-decision groups, then applies only confirmed mutations through the shared BasicOps task manager with read-back verification.
 
@@ -384,3 +384,5 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 | Skill | Purpose |
 | --- | --- |
 | `website-project-loop` | Read-only evidence snapshot, report dependency gate and one verified weekly summary per mapped project overview. |
+
+Registered RTB routes can use direct human task intake without a mandatory TED plan. The VPS can load the LHM skill library and separate GitHub/Workspace MCPs; provider authentication and explicit publishing/main/deployment permission remain distinct from draft preparation. Skill count is unchanged.

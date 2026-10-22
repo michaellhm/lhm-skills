@@ -40,6 +40,8 @@ def main():
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / 'prototype/rtb/homepage' / name, target)
     (ROOT / 'drafts').mkdir()
+    for anchor in ['.git', '.codex', '.agents']:
+        (ROOT / anchor).mkdir()
     baseline = {str(p.relative_to(ROOT)): digest(p) for p in ROOT.rglob('*') if p.is_file()}
     sources = [{'label': p.name, 'snapshot': str(p.relative_to(ROOT)), 'sha256': digest(p)}
                for p in sorted((ROOT / 'context').glob('*.md'))]
@@ -65,7 +67,7 @@ def main():
     registry = PROFILE / 'codex-session-pilot.json'
     data = json.loads(registry.read_text())
     data['tasks']['2212824'] = {'enabled': True, 'ready': False, 'mode': 'rtb_draft_edit',
-        'client_id': 'raise-the-bar', 'project_id': 49020, 'reviewer_id': 36398}
+        'client_id': 'raise-the-bar', 'project_id': 49020, 'reviewer_id': 36398, 'direct_task_intake': True}
     registry.write_text(json.dumps(data, indent=2) + '\n')
     print(json.dumps({'prepared': True, 'task_id': 2212824, 'base_commit': base,
                       'sources': len(sources), 'ready': False}))

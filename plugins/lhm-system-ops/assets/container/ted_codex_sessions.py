@@ -104,6 +104,29 @@ class Bridge:
         if actor(task) != self.config['agent_user_id'] or task.get('status') != 'In Progress':
             raise ValueError('TED must own the approved task in In Progress before dispatch')
         messages = self.messages(task_id)
+        # Explicit human task instructions can be the contract themselves. No TED-authored
+        # plan is required when this registered route has opted into direct intake.
+        if plan_message_id == approval_message_id and registration.get('direct_task_intake'):
+            instruction = next((m for m in messages if m.get('id') == approval_message_id), None)
+            text = plain(instruction.get('message', '')) if instruction else ''
+            if (not instruction or actor(instruction) != registration['reviewer_id']
+                    or re.search(r'AI authorship\s*:', text, re.I)
+                    or not re.search(r'\b(run|execute|update|revise|prepare|implement|work on|go ahead)\b', text, re.I)
+                    or re.search(r"\b(do not|don't|never)\s+(run|execute|update|proceed)\b", text, re.I)):
+                raise ValueError('Direct intake requires the registered human task instruction, not an agent relay')
+            if not re.fullmatch(r'dm[1-9][0-9]*', instruction['id']):
+                raise ValueError('Direct intake requires a durable BasicOps message ID')
+            if registration['client_id'] != 'raise-the-bar':
+                raise ValueError('Direct intake is not enabled for this client mode')
+            objective = ('Human-directed RTB draft-edit task; interpret the requested work yourself.\n'
+                         'Task: ' + task['title'] + '\nTask description: ' + plain(task.get('description', ''))
+                         + '\nHuman instruction: ' + text
+                         + '\nDeliver actual document/prototype review artifacts under the registered route. '
+                         'Publishing, main pushes, deployment and client sends require explicit scoped permission; '
+                         'this draft-edit route does not execute those actions.')
+            if len(objective) > 8000:
+                raise ValueError('Direct task exceeds the bounded context limit')
+            return registration, task, instruction, instruction, int(instruction['id'][2:]), objective
         plans = [m for m in messages if actor(m) == self.config['agent_user_id']
                  and re.search(r'TED PLAN v\d+\s*[—-]\s*AWAITING APPROVAL', plain(m.get('message', '')))]
         if not plans:
@@ -137,6 +160,9 @@ class Bridge:
         if len(plan) > 8000:
             raise ValueError('Pilot plan exceeds the bounded context limit')
         return registration, task, latest, approval, version, plan
+
+    def submit_direct(self, task_id, instruction_message_id):
+        return self.submit(task_id, instruction_message_id, instruction_message_id)
 
     def submit(self, task_id, plan_message_id, approval_message_id):
         registration, task, plan_message, approval, version, plan = self.approved_contract(
@@ -212,7 +238,7 @@ class Bridge:
         with (self.state / 'handback.lock').open('a') as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             state = self.status(task_id)
-            if state['status'] not in {'needs_review', 'failed'} or state.get('notification'):
+            if state['status'] not in {'needs_review', 'failed'} or (state.get('notification') or {}).get('work_state') == state['status']:
                 return state
             self.identity()
             task = self.api('get_task', {'taskId': task_id})
@@ -223,13 +249,15 @@ class Bridge:
             marker = 'Codex session handback: ' + state['request_id']
             existing = next((m for m in self.messages(task_id)
                              if marker in plain(m.get('message', ''))
-                             and actor(m) == self.config['agent_user_id']), None)
+                             and actor(m) == self.config['agent_user_id']
+                             and (state['status'] != 'needs_review' or 'Codex draft ready for review' in plain(m.get('message', '')))), None)
             if existing is None:
                 summary = state.get('result', state.get('error') or 'Worker did not complete.')[:3000]
                 heading = 'Codex draft ready for review' if state['status'] == 'needs_review' else 'Codex worker needs attention'
                 boundary = ('This pilot used saved context only. No live account changes, client sends or Drive delivery were performed.'
                             if registration['client_id'] == 'wellness-chiropractic' else
-                            'RTB draft files and prototype source were prepared for review. No shared-site publication or client email was performed.')
+                            ('RTB draft files and prototype source were prepared for review. No shared-site publication or client email was performed.'
+                             if state['status'] == 'needs_review' else 'The run stopped before verified delivery. Inspect its receipt; no completed draft or publication is claimed.'))
                 links = ''.join('<li><a href="' + html.escape(item['url'], quote=True) + '">'
                                 + html.escape(item['name']) + '</a></li>' for item in state.get('deliverables', []))
                 message = ('<p><strong>' + heading + '</strong></p><p>' + html.escape(summary) + '</p>'
@@ -251,6 +279,7 @@ class Bridge:
                 if checkpoint.get('review_request') == 'attempting':
                     raise ValueError('Review request outcome is uncertain; inspect BasicOps before retrying')
                 if not checkpoint.get('review_request'):
+                    self.api('update_task', {'taskId': task_id, 'assignee': registration['reviewer_id']})
                     checkpoint['review_request'] = 'attempting'
                     atomic(path, checkpoint)
                     response = self.api('request_review', {'taskId': task_id,
@@ -261,8 +290,9 @@ class Bridge:
                     checkpoint['review_request'] = 'requested'
                     atomic(path, checkpoint)
             next_status = 'Under Review' if state['status'] == 'needs_review' else 'Blocked'
-            self.api('update_task', {'taskId': task_id, 'status': next_status,
-                                     'assignee': registration['reviewer_id']})
+            if next_status == 'Blocked':
+                self.api('update_task', {'taskId': task_id, 'status': next_status,
+                                         'assignee': registration['reviewer_id']})
             checked = self.api('get_task', {'taskId': task_id})
             if checked.get('status') != next_status or actor(checked) != registration['reviewer_id']:
                 raise ValueError('BasicOps reviewer/status readback failed')
@@ -282,6 +312,9 @@ def run_mcp():
 
     async def list_tools(_context, _params):
         schemas = [
+            {'name': 'codex_task_submit', 'description': 'Send a registered human-directed task to Codex to interpret and execute within its configured scope, without a TED plan approval round trip.',
+             'inputSchema': {'type': 'object', 'additionalProperties': False, 'required': ['task_id', 'instruction_message_id'],
+                             'properties': {'task_id': {'type': 'integer'}, 'instruction_message_id': {'type': 'string'}}}},
             {'name': 'codex_session_submit', 'description': 'Send the latest human-approved, registered pilot plan to a persistent Codex chat. Never submits unapproved work.',
              'inputSchema': {'type': 'object', 'additionalProperties': False,
                              'required': ['task_id', 'plan_message_id', 'approval_message_id'],
@@ -296,7 +329,7 @@ def run_mcp():
     async def call_tool(_context, params):
         try:
             bridge = Bridge()
-            action = {'codex_session_submit': bridge.submit, 'codex_session_status': bridge.status}.get(params.name)
+            action = {'codex_task_submit': bridge.submit_direct, 'codex_session_submit': bridge.submit, 'codex_session_status': bridge.status}.get(params.name)
             if action is None:
                 raise ValueError('Unknown Codex session tool')
             result = await anyio.to_thread.run_sync(lambda: action(**(params.arguments or {})))
