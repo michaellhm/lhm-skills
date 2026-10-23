@@ -30,6 +30,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `website-content-agent` — Client website content orchestration: source comparison, user-selected reference templates, sitemap keyword/H1 mapping, briefs, copy, independent editing and healthcare review, Astro integration, client approvals, feedback learning and canonical project handback.
 
 `lhm-page-rollout` — Build a batch of LHM website pages end to end (research, brief, copy, FAQ and schema, internal links, images, staging build, verification and review email). Staging only.
+`site-rollout` — Config-driven phased page rollout for any client repo (`docs/rollout/config.md`). `build` writes the next cluster on a branch and opens a PR; `check` reads Search Console weekly and emails only on stalled pages, defects or decisions.
 
 `hermes-production-plan` — Match an existing BasicOps outcome to its Obsidian AI Operations SOP, prepare the execution plan for Ted, and provide plain-English task status and CTO blocker reporting.
 
