@@ -90,3 +90,5 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 - `client-review-release` — Install portable client review skills, scan new/changed/pending pages, propose release questions for operator approval, preserve explicit client approvals and prepare staged GitHub-access, local-setup and review emails with verified sharing routes.
 
 Approved Claude implementation handoff: exact human approval plus task/source context reaches a connected Remote Control conversation; TED forwards it without an extra plan gate. Native tool approval remains with Claude. Existing draft-only receipts are not silently upgraded.
+
+`lhm-cto` — Investigate capability incidents, then hand the findings and original outcome to one Intervention task with a linked paired Codex repair chat; retain Michael’s merge and deployment authority.

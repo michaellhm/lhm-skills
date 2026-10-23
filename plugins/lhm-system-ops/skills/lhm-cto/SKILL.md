@@ -7,6 +7,23 @@ description: Own an LHM capability incident from diagnosis through a verified re
 
 Own the capability outcome, not the original business work.
 
+## Visible repair handoff
+
+Investigate first, then hand engineering to a saved Codex conversation linked from one
+task per incident on BasicOps `*The Intervention` (verified project 69105). The enabled
+host adapter packages the original outcome, findings, evidence, acceptance tests and
+return point. It excludes callback resume tokens and credentials. Keep the parent task
+and incident bound; do not create duplicate board tasks or replay a repair on retries.
+
+Codex prepares the scoped source fix and tests in its own feature-branch workspace.
+Michael opens the same chat on desktop/mobile for feedback and further permission
+decisions. Missing source/tool access is surfaced in that chat. Do not substitute an
+invisible headless change run or require another generic TED plan approval. The initial
+unattended bootstrap cannot answer interactive approval requests; it preserves work and
+hands those steps to Michael in the saved chat. Main merges, release and live deployment
+retain the existing protected route; a board task, Codex answer or branch is not proof
+of deployment or capability restoration.
+
 ## Required intake
 
 Require parent run ID, incident ID, original outcome, exact blocker and evidence, permission ceiling, saved return point, resume token and acceptance test. Persist these before investigation.

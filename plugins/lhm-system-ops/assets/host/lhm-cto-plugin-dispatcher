@@ -4,6 +4,7 @@ import hashlib
 import os
 import re
 import shutil
+import importlib.util
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -151,12 +152,15 @@ def output_schema():
 def process(path):
     request = json.loads(path.read_text(encoding='utf-8'))
     validate(request, path)
-    if git('status', '--porcelain'):
-        raise ValueError('CTO source checkout is dirty')
-    git('fetch', '--prune', 'origin', 'main')
-    if git('rev-parse', 'main') != git('rev-parse', 'origin/main'):
-        git('checkout', 'main')
-        git('merge', '--ff-only', 'origin/main')
+    visible_config = Path('/etc/lhm-cto-codex-handoff.json')
+    visible_handoff = request['mode'] == 'change' and visible_config.exists() and json.loads(visible_config.read_text()).get('enabled') is True
+    if not visible_handoff:
+        if git('status', '--porcelain'):
+            raise ValueError('CTO source checkout is dirty')
+        git('fetch', '--prune', 'origin', 'main')
+        if git('rev-parse', 'main') != git('rev-parse', 'origin/main'):
+            git('checkout', 'main')
+            git('merge', '--ff-only', 'origin/main')
     audit_dir = RUNS / request['request_id']
     audit_dir.mkdir(mode=0o750, exist_ok=True)
     os.chown(audit_dir, 10003, HERMES_GROUP)
@@ -167,7 +171,7 @@ def process(path):
     schema.write_text(json.dumps(output_schema(), indent=2) + '\n', encoding='utf-8')
     os.chown(schema, 10003, 10003)
     os.chmod(schema, 0o600)
-    mode = request['mode']
+    mode = 'research' if visible_handoff else request['mode']
     workspace = REPO
     branch = None
     if mode == 'change':
@@ -181,10 +185,26 @@ def process(path):
     final = worker_run / 'final.json'
     events = worker_run / 'codex.jsonl'
     command = [CODEX, '--ask-for-approval', 'never', '--search', 'exec', '--sandbox', 'read-only' if mode == 'research' else 'workspace-write', '--cd', str(workspace), '--output-schema', str(schema), '--output-last-message', str(final), '--json', prompt]
-    completed = run_worker(['timeout', str(request['timeout_seconds']), *command])
+    try:
+        completed = run_worker(['timeout', str(request['timeout_seconds']), *command])
+    except subprocess.CalledProcessError:
+        if not visible_handoff:
+            raise
+        # Preserve the visible handoff even when the research runtime itself needs repair.
+        unavailable={'status':'failed','summary':'The CTO investigation runner failed. Continue source/tool troubleshooting in the saved Codex repair chat.',
+                     'sources':[],'questions_for_chief':[],'next_action':'Investigate the original blocker and the CTO runner; no source changes were made.'}
+        final.write_text(json.dumps(unavailable)+'\n')
+        completed=__import__('types').SimpleNamespace(stdout='')
     events.write_text(completed.stdout, encoding='utf-8')
     os.chown(events, 10003, 10003)
     result = json.loads(final.read_text(encoding='utf-8'))
+    if visible_handoff:
+        spec=importlib.util.spec_from_file_location('cto_codex_handoff','/usr/local/libexec/lhm-cto-codex-handoff.py')
+        courier=importlib.util.module_from_spec(spec);spec.loader.exec_module(courier)
+        handoff=courier.handoff(request,result)
+        result.update(status='needs_approval',approval_required=True,repair_handoff=handoff,
+                      decision='Investigation handed to the saved Codex repair conversation; no live deployment is implied.',
+                      next_action='Continue repair and approval decisions in '+handoff['chat_url']+'; Intervention task: '+handoff['task_url'])
     if mode == 'change' and result.get('status') == 'completed':
         actual_changes = workspace_changes(workspace)
         publication_request = {

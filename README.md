@@ -261,7 +261,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
   .claude-plugin/plugin.json            # Claude plugin manifest
   .codex-plugin/plugin.json             # Codex plugin manifest
   skills/                               # All 12 skills
-    lhm-cto/                            # Capability incident owner and team router
+    lhm-cto/                            # Investigation, Intervention task and linked Codex repair chat
     lhm-skill-maintainer/               # Canonical skill edits, tests, PR, approved deployment and hotfix reconciliation
     lhm-plugin-release-manager/         # Immutable GitHub and Hermes release handoff
     ... and 9 specialised engineering, QA, security and source-handoff skills
@@ -388,3 +388,5 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 Registered RTB routes can use direct human task intake without a mandatory TED plan. The VPS can load the LHM skill library and separate GitHub/Workspace MCPs; provider authentication and explicit publishing/main/deployment permission remain distinct from draft preparation. Skill count is unchanged.
 
 Approved Claude implementation handoff: exact human approval plus task/source context reaches a connected Remote Control conversation; TED forwards it without an extra plan gate. Native tool approval remains with Claude. Existing draft-only receipts are not silently upgraded.
+
+CTO visible repair handoff: investigation packages findings into one `*The Intervention` task and a persistent paired Codex chat. Michael continues feedback and approvals there; scoped source preparation, publishing, merge and deployment remain distinct. No new skill was added.
