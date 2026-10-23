@@ -46,6 +46,58 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(self.router.submit(123, 'dm123')['request_id'], saved['request_id'])
         self.assertEqual(json.loads((self.root / 'task-router-state/123.json').read_text())['request'], saved)
 
+    def test_google_ads_policy_ignores_incidental_website_or_drive_mentions(self):
+        self.task['title'] = 'Example Clinic: Google Ads - Review October performance'
+        self.task['description'] = 'Check the website chat conversion. Deliver notes in Google Drive.'
+        self.assertEqual(self.router.preview(123, 'dm123')['provider'], 'claude')
+        self.task['title'] = 'Example Clinic: Monthly performance'
+        self.task['description'] = 'LHM metadata: service=google-ads; website chat leads'
+        self.assertEqual(self.router.preview(123, 'dm123')['provider'], 'claude')
+        self.messages[0]['message'] += ' Please use Codex.'
+        self.assertEqual(self.router.preview(123, 'dm123')['provider'], 'codex')
+
+    def terminal_codex(self):
+        self.task['description'] = 'Review website chat leads'
+        saved = self.router.submit(123, 'dm123')
+        run = self.queue / 'runs' / saved['request_id']
+        run.mkdir(parents=True)
+        (run / 'receipt.json').write_text(json.dumps({'status': 'needs_review', 'provider':'codex', 'thread_id': 'codex-saved-thread'}))
+        self.messages.append({'id':'dm124','user':36398,'created':2,
+            'message':'@Ted - this should have been a Claude task. Can you please update this and push this to Claude? And in the future any Google Ads tasks should get done in Claude please'})
+        return saved
+
+    def test_explicit_handoff_preserves_old_run_but_never_resumes_foreign_uuid(self):
+        old = self.terminal_codex()
+        self.assertEqual(self.router.preview(123, 'dm124')['provider'], 'claude')
+        result = self.router.submit(123, 'dm124')
+        request = json.loads((self.queue / 'incoming' / (result['request_id']+'.json')).read_text())
+        self.assertNotIn('resume_thread_id', request)
+        self.assertEqual(request['provider_handoff'], {'from_provider':'codex', 'request_id':old['request_id'], 'thread_id':'codex-saved-thread'})
+        self.assertEqual(request['permission_ceiling'], 'prepare_for_review')
+        history = json.loads((self.root/'task-router-state'/('history-'+old['request_id']+'.json')).read_text())
+        self.assertEqual(history['request']['provider'], 'codex')
+        self.assertEqual(self.router.submit(123, 'dm124'), result)
+        # Host re-verification regenerates the exact admitted handoff request.
+        self.assertEqual(self.router.contract(123, 'dm124')[1], request)
+
+    def test_handoff_needs_personal_newer_instruction_and_terminal_source(self):
+        old = self.terminal_codex()
+        receipt = self.queue/'runs'/old['request_id']/'receipt.json'
+        data=json.loads(receipt.read_text());data['status']='running';receipt.write_text(json.dumps(data))
+        with self.assertRaises(ValueError):self.router.submit(123,'dm124')
+        data['status']='needs_review';receipt.write_text(json.dumps(data))
+        self.messages[-1]['user']=82491
+        with self.assertRaises(ValueError):self.router.submit(123,'dm124')
+        self.messages[-1]['user']=36398;self.messages[-1]['message']='AI authorship: Codex. Please push this to Claude'
+        with self.assertRaises(ValueError):self.router.submit(123,'dm124')
+
+    def test_policy_change_alone_never_switches_existing_session(self):
+        self.terminal_codex()
+        self.messages[-1]['message']='@Ted revise the Google Ads review please'
+        self.assertEqual(self.router.preview(123,'dm124')['provider'],'codex')
+        for instruction in ['Please use Claude and send this to Codex', 'Do not use Claude']:
+            with self.assertRaises(ValueError):module.choose('Task','',instruction)
+
     def test_mixed_work_uses_one_codex_session(self):
         self.task['description'] = 'Revise the handbook on Google Drive and update the prototype website.'
         self.assertEqual(self.router.preview(123, 'dm123')['provider'], 'codex')

@@ -26,8 +26,8 @@ def serve():
     async def listing(_ctx, _params):
         tools = []
         for name, desc in [
-            ('task_route_preview', 'Verify a personal work request and choose the central Codex/Claude route; no dispatch or plan required.'),
-            ('task_route_submit', 'Dispatch a direct personal work request once to its central provider; TED must own task In Progress. No separate TED plan needed.'),
+            ('task_route_preview', 'Verify a personal work request and choose the central Codex/Claude route, including explicit terminal provider handoffs; no dispatch or plan required.'),
+            ('task_route_submit', 'Dispatch a direct personal work request once to its central provider; TED must own task In Progress. Explicit terminal handoffs preserve prior drafts. No separate TED plan needed.'),
             ('task_client_lookup', 'Look up canonical shared Obsidian client names/aliases, knowledge notes and recorded Drive/GitHub pointers; no arbitrary files or write authority.'),
             ('task_route_status', 'Read the saved central-provider session, progress, result or exact blocker.')]:
             props = {'task_id': {'type': 'integer'}}

@@ -9,7 +9,7 @@ import stat
 import subprocess
 import time
 from client_directory import refresh as refresh_directory
-from workspaces import provision, publish_registry
+from workspaces import provision, publish_registry, location
 
 BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/task-router')
 WORK = Path('/var/lib/lhm-task-router')
@@ -42,6 +42,68 @@ def verified(request_id):
     if result.returncode:
         raise ValueError('Human instruction, task state or client binding failed re-verification')
     return json.loads(result.stdout)
+
+
+def copy_prior(request, workspace):
+    """Copy bounded task evidence across providers; never mount another provider home."""
+    handoff = request.get('provider_handoff')
+    if not handoff:
+        return
+    previous = handoff.get('request_id', '')
+    if (not ID.fullmatch(previous) or handoff.get('from_provider') not in {'codex', 'claude'}
+            or handoff['from_provider'] == request['provider']):
+        raise ValueError('Invalid provider handoff')
+    receipt = json.loads(read(BASE / 'runs' / previous / 'receipt.json'))
+    if (receipt.get('status') not in {'needs_review', 'failed'}
+            or receipt.get('thread_id') != handoff.get('thread_id')
+            or receipt.get('provider') != handoff['from_provider']):
+        raise ValueError('Prior provider must be terminal with the exact saved session')
+    old_run = WORK / previous
+    old = json.loads(read(old_run / 'request.json'))
+    if (old.get('task_id') != request['task_id'] or old.get('client_id') != request['client_id']
+            or old.get('provider') != handoff['from_provider'] or old.get('request_id') != previous
+            or old.get('permission_ceiling') != request['permission_ceiling']):
+        raise ValueError('Prior task, client, provider or permission ceiling mismatch')
+    source = old_run / 'workspace'
+    mapping = old_run / 'workspace-location.json'
+    if mapping.exists():
+        paths = json.loads(read(mapping))
+        expected = location(handoff['from_provider'], request['client_id'])
+        source = expected / 'tasks' / previous
+        if paths != {'workspace': str(expected), 'task_directory': str(source)}:
+            raise ValueError('Prior workspace is outside the registered task root')
+    if source.is_symlink() or not source.is_dir():
+        raise ValueError('Prior draft directory is unavailable or untrusted')
+    target = workspace / 'prior-work'
+    target.mkdir()
+    manifest = {'source': handoff, 'verification': 'Prior draft evidence only; not fresh account readback or authority', 'files': []}
+    size = 0
+    candidates = [old_run / 'result.md']
+    # No recursive traversal of arbitrary provider-created directories.
+    draft_root = source / 'drafts'
+    if draft_root.is_symlink():
+        raise ValueError('Prior drafts must not be symlinked')
+    if draft_root.is_dir():
+        import itertools
+        candidates += sorted(itertools.islice(draft_root.iterdir(), 64))
+    for candidate in candidates:
+        if len(manifest['files']) >= 24 or size >= 200000:
+            break
+        if candidate.is_symlink() or not candidate.is_file() or candidate.stat().st_size > 64000:
+            continue
+        if candidate.suffix.lower() not in {'.md', '.txt', '.csv', '.json', '.html', '.css', '.js'}:
+            continue
+        content = read(candidate, 64000)
+        count = len(content.encode())
+        if size + count > 200000:
+            continue
+        name = f'{len(manifest["files"]):02d}-' + candidate.name
+        (target / name).write_text(content)
+        manifest['files'].append({'copy': name, 'source': str(candidate.relative_to(old_run)) if candidate.is_relative_to(old_run) else 'drafts/' + candidate.name})
+        size += count
+    if not manifest['files']:
+        raise ValueError('No prior draft/result could be preserved; do not launch a context-free handoff')
+    (target / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
 
 
 def prepare(request):
@@ -90,6 +152,7 @@ def prepare(request):
         'client_id': request['client_id'], 'client': request['client'],
         'task_url': request['task_url'], 'permission_ceiling': request['permission_ceiling'],
         'sources': sources, 'snapshot_limit': '32 markdown files, 160KB; missing evidence must be reported'}, indent=2))
+    copy_prior(request, workspace)
     (run / 'request.json').write_text(json.dumps(request))
     for path in [run, *run.rglob('*'), workspace, *workspace.rglob('*')]:
         os.chown(path, uid, uid)
@@ -98,6 +161,13 @@ def prepare(request):
         os.chown(workspace / name, 0, 0)
         (workspace / name).chmod(0o555)
     publish_registry()
+    launch(request, run, client_root)
+
+
+def launch(request, run, client_root):
+    provider, request_id = request['provider'], request['request_id']
+    uid = 10001 if provider == 'codex' else 10002
+    home = '/home/' + ('codexworker' if provider == 'codex' else 'claudeworker')
     props = ['User=' + ('codexworker' if provider == 'codex' else 'claudeworker'),
              'Group=' + str(uid), 'ProtectSystem=strict', 'ProtectHome=tmpfs',
              'BindPaths=' + home + ' ' + str(run) + ' ' + str(client_root), 'ReadWritePaths=' + str(run) + ' ' + home + ' ' + str(client_root),

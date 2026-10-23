@@ -10,7 +10,7 @@ import uuid
 from urllib.parse import quote, urlparse
 from html.parser import HTMLParser
 
-POLICY_VERSION = 2
+POLICY_VERSION = 3
 TERMINAL = {'needs_review', 'failed'}
 
 
@@ -67,13 +67,26 @@ def contains_link(message, url):
     return url in links.urls
 
 
-def choose(title, description, instruction):
-    """Only the verified human instruction can override the provider."""
-    overrides = re.findall(r'\b(?:use|send (?:this |it )?to|run (?:this |it )?(?:in|with))\s+(codex|claude)\b', instruction, re.I)
-    if len(set(s.lower() for s in overrides)) > 1:
+def explicit_provider(instruction):
+    """Provider changes require a positive, personal routing instruction."""
+    pattern = (r'\b(?:use|(?:send|push|switch|move|reroute)\s+(?:(?:this|it|the task)\s+)?to|'
+               r'run\s+(?:(?:this|it)\s+)?(?:in|with))\s+(codex|claude)\b')
+    overrides = re.findall(pattern, instruction, re.I)
+    if overrides and re.search(r"\b(do not|don't|never|not)\s+(?:use|send|push|switch|move|reroute|run)\b", instruction, re.I):
+        raise ValueError('Negated provider instructions require clarification')
+    if len(set(value.lower() for value in overrides)) > 1:
         raise ValueError('Conflicting provider instructions; one provider is required')
-    if overrides:
-        return overrides[-1].lower(), 'Explicit human provider selection'
+    return overrides[-1].lower() if overrides else None
+
+
+def choose(title, description, instruction):
+    """Domain policy precedes incidental tools; personal override has highest priority."""
+    override = explicit_provider(instruction)
+    if override:
+        return override, 'Explicit human provider selection'
+    if (re.search(r'\bgoogle[ -]ads\b', title, re.I)
+            or re.search(r'\bservice\s*=\s*google-ads\b', description, re.I)):
+        return 'claude', 'Google Ads domain policy; incidental website/Workspace references do not change provider'
     text = ' '.join([title, description, instruction]).lower()
     if re.search(r'\b(website|prototype|github|repository|repo|code|html|css|javascript|astro|wordpress|deploy|staging|google docs|google drive|g drive|workspace|gmail|spreadsheet)\b', text):
         return 'codex', 'Website/code or connected Workspace work; keep mixed deliverables together'
@@ -158,7 +171,7 @@ class Router:
         instruction = plain(msg.get('message', '')) if msg else ''
         if (not msg or actor(msg) != self.config['reviewer_id']
                 or re.search(r'AI authorship\s*:', instruction, re.I)
-                or not re.search(r'\b(work on|run|execute|prepare|write|draft|research|investigate|update|revise|implement|go ahead|proceed|approve)\b', instruction, re.I)
+                or not (re.search(r'\b(work on|run|execute|prepare|write|draft|research|investigate|update|revise|implement|go ahead|proceed|approve)\b', instruction, re.I) or explicit_provider(instruction))
                 or re.search(r"\b(do not|don't|never|stop|cancel|hold|pause)\b", instruction, re.I)):
             raise ValueError('A direct personal work request is required; assignment, relay or a stop is not permission')
         if task.get('status') in {'Complete', 'Cancelled', 'Decline'}:
@@ -178,10 +191,12 @@ class Router:
         provider, reason = choose(plain(task['title']), plain(task.get('description', '')) + '\n' + discussion, instruction)
         existing = self.state / f'{task_id}.json'
         resume = None
+        handoff = None
         if existing.exists():
             old = json.loads(existing.read_text())['request']
             if old['instruction_message_id'] == instruction_message_id:
                 resume = old.get('resume_thread_id')
+                handoff = old.get('provider_handoff')
             else:
                 status = self.status(task_id)
                 if status['status'] not in TERMINAL or not status.get('thread_id'):
@@ -189,12 +204,15 @@ class Router:
                 if int(instruction_message_id[2:]) <= int(old['instruction_message_id'][2:]):
                     raise ValueError('Feedback must be a newer personal instruction')
                 resume = status['thread_id']
-            # Keep follow-ups with their provider unless a human explicitly asks otherwise.
-            explicit = re.search(r'\b(?:use|send (?:this |it )?to|run (?:this |it )?(?:in|with))\s+(codex|claude)\b', instruction, re.I)
-            if explicit and provider != old['provider']:
-                raise ValueError('Changing provider requires a new task; do not split an existing conversation')
-            provider = old['provider']
-            reason = old['reason'] if old['instruction_message_id'] == instruction_message_id else 'Continue the existing ' + provider + ' session'
+            explicit = explicit_provider(instruction)
+            if old['instruction_message_id'] != instruction_message_id and explicit and explicit != old['provider']:
+                handoff = {'from_provider': old['provider'], 'request_id': old['request_id'],
+                           'thread_id': status['thread_id']}
+                resume = None  # Provider IDs are never interchangeable.
+                provider, reason = explicit, 'Explicit human handoff from ' + old['provider'] + '; preserve prior draft and audit trail'
+            else:
+                provider = old['provider']
+                reason = old['reason'] if old['instruction_message_id'] == instruction_message_id else 'Continue the existing ' + provider + ' session'
         if not self.config['providers'].get(provider, False):
             raise ValueError(provider + ' is unavailable; no silent provider substitution')
         target = self.config['clients'][client]
@@ -213,11 +231,14 @@ class Router:
                 if prior['client_id'] != client:
                     raise ValueError('Canonical lookup conflicts with the admitted client')
                 request['client'] = prior['client']
+                request['policy_version'] = prior.get('policy_version', 1)
                 if prior.get('policy_version') == 1:
                     request['policy_version'] = 1
                     request.pop('context_messages', None)
         if resume:
             request['resume_thread_id'] = resume
+        if handoff:
+            request['provider_handoff'] = handoff
         if len(json.dumps(request).encode()) > 28000:
             raise ValueError('Task context too large; supply a bounded brief')
         return task, request
@@ -241,10 +262,13 @@ class Router:
                 old = json.loads(path.read_text())
                 if old['request'] == request:
                     return self.status(task_id)
-                if old['request']['instruction_message_id'] == instruction_message_id or not request.get('resume_thread_id'):
+                if old['request']['instruction_message_id'] == instruction_message_id or not (request.get('resume_thread_id') or request.get('provider_handoff')):
                     raise ValueError('Existing instruction changed; do not duplicate or replace work')
                 if old['request']['client_id'] != request['client_id']:
                     raise ValueError('Follow-up cannot change the client')
+                handoff = request.get('provider_handoff')
+                if handoff and (handoff['request_id'] != old['request']['request_id'] or handoff['from_provider'] != old['request']['provider']):
+                    raise ValueError('Handoff source changed; preview again')
                 atomic(self.state / ('history-' + old['request']['request_id'] + '.json'), old)
             previous = path.read_text() if path.exists() else None
             atomic(path, {'request': request, 'notification': None})

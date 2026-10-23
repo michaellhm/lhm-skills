@@ -66,6 +66,7 @@ def provision(request, uid):
         lock.touch(mode=0o444)
     if lock.is_symlink() or lock.stat().st_uid != 0:
         raise ValueError('Untrusted workspace lock')
+    lock.chmod(0o444)  # systemd UMask=0027 must not remove the provider’s read permission.
     (root / '.control').chmod(0o555)
     task = root / 'tasks' / request['request_id']
     task.mkdir(mode=0o750)  # Never overwrite an admitted intake or a previous draft.

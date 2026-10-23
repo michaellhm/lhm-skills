@@ -30,7 +30,12 @@ class WorkspaceTests(unittest.TestCase):
                 return SimpleNamespace(st_uid=0, st_mode=value.st_mode, st_size=value.st_size)
             with patch.object(Path, 'stat', stat):
                 request = {'provider':'codex','client_id':'alpha','client':{'name':'Alpha'},'request_id':'ted-route-1-dm1'}
-                root, task = module.provision(request, 10001)
+                mask = os.umask(0o027)
+                try:
+                    root, task = module.provision(request, 10001)
+                finally:
+                    os.umask(mask)
+                self.assertEqual((root / '.control/worker.lock').stat().st_mode & 0o777, 0o444)
                 (task / 'draft.md').write_text('keep this')
                 request['request_id'] = 'ted-route-2-dm2'
                 root2, task2 = module.provision(request, 10001)
