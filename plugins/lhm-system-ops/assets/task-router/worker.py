@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import stat
 import uuid
 
 
@@ -26,6 +27,17 @@ def execute(run, provider):
     task_directory = Path(location['task_directory']) if location else work
     if location and (not task_directory.is_relative_to(work / 'tasks') or task_directory.name != request['request_id']):
         raise ValueError('Invalid task workspace mapping')
+    recovery = run / 'interactive-recovery.json'
+    if recovery.exists():
+        info = recovery.lstat()
+        if info.st_uid != 0 or not stat.S_ISREG(info.st_mode):
+            raise ValueError('Interactive recovery must be authorised by the root supervisor')
+        authority = json.loads(recovery.read_text())
+        if (provider != 'claude' or authority['instruction_sha256'] != request['instruction_sha256']
+                or authority['request_id'] != request['request_id'] or authority['client_id'] != request['client_id']):
+            raise ValueError('Interactive recovery authority mismatch')
+        request = {**request, 'handoff_mode': 'provider_execution',
+                   'permission_ceiling': 'provider_tool_approval', 'resume_thread_id': authority['thread_id']}
     # One writer per client/provider; retain separate immutable intake and draft directories.
     lock = (work / '.control/worker.lock').open('r') if location else None
     if lock:
@@ -63,20 +75,24 @@ def execute(run, provider):
             receipt.update(thread_id=session, transport='claude-code',
                            resume_command=f'cd {work} && claude --resume {session}')
             atomic(run / 'receipt.json', receipt)
-            tools = 'Read,Write,Edit,Skill'
-            command = ['/home/claudeworker/.local/bin/claude', '-p', prompt,
-                       '--resume' if request.get('resume_thread_id') else '--session-id', session, '--name', request['title'],
-                       '--output-format', 'json', '--max-turns', '24', '--max-budget-usd', '4.00',
-                       '--permission-mode', 'acceptEdits', '--tools', tools, '--allowedTools', tools,
-                       '--strict-mcp-config', '--mcp-config', '/home/claudeworker/.config/lhm-bridge/no-mcp.json']
-            result = subprocess.run(command, cwd=work, env={**os.environ, 'HOME': '/home/claudeworker'},
-                                    capture_output=True, text=True, timeout=1200)
-            (run / 'events.jsonl').write_text(result.stdout)
-            (run / 'stderr.log').write_text(result.stderr)
-            parsed = json.loads(result.stdout)
-            if result.returncode or parsed.get('is_error') or not parsed.get('result', '').strip():
-                raise ValueError('Claude did not complete; inspect its saved transcript and error log')
-            (run / 'result.md').write_text(parsed['result'] + '\n')
+            if request.get('handoff_mode') in {'provider_execution', 'provider_conversation'}:
+                from interactive import run_session
+                run_session(request, run, work, task_directory, receipt)
+            else:
+                tools = 'Read,Write,Edit,Skill'
+                command = ['/home/claudeworker/.local/bin/claude', '-p', prompt,
+                           '--resume' if request.get('resume_thread_id') else '--session-id', session, '--name', request['title'],
+                           '--output-format', 'json', '--max-turns', '24', '--max-budget-usd', '4.00',
+                           '--permission-mode', 'acceptEdits', '--tools', tools, '--allowedTools', tools,
+                           '--strict-mcp-config', '--mcp-config', '/home/claudeworker/.config/lhm-bridge/no-mcp.json']
+                result = subprocess.run(command, cwd=work, env={**os.environ, 'HOME': '/home/claudeworker'},
+                                        capture_output=True, text=True, timeout=1200)
+                (run / 'events.jsonl').write_text(result.stdout)
+                (run / 'stderr.log').write_text(result.stderr)
+                parsed = json.loads(result.stdout)
+                if result.returncode or parsed.get('is_error') or not parsed.get('result', '').strip():
+                    raise ValueError('Claude did not complete; inspect its saved transcript and error log')
+                (run / 'result.md').write_text(parsed['result'] + '\n')
         artifacts = []
         for path in sorted((task_directory / 'drafts').rglob('*')):
             if path.is_symlink():

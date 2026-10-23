@@ -39,6 +39,28 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(self.router.preview(123, 'dm123')['provider'], 'claude')
         self.assertEqual(self.router.submit(123, 'dm123')['status'], 'queued')
 
+    def test_personal_implementation_approval_forwards_without_another_ted_plan(self):
+        self.messages[0]['message']='@Ted I approve A2, A3, A4; send across to Claude to implement via AdPulse'
+        self.router.submit(123,'dm123')
+        saved=json.loads((self.root/'task-router-state/123.json').read_text())['request']
+        self.assertEqual(saved['handoff_mode'],'provider_execution')
+        self.assertEqual(saved['permission_ceiling'],'provider_tool_approval')
+        self.assertEqual(saved['instruction'],self.messages[0]['message'])
+        self.assertEqual(self.router.contract(123,'dm123')[1],saved)
+
+    def test_old_admitted_approval_is_not_silently_upgraded_on_reverification(self):
+        self.messages[0]['message']='@Ted I approve A2; implement via AdPulse'
+        self.router.submit(123,'dm123')
+        p=self.root/'task-router-state/123.json';d=json.loads(p.read_text())
+        d['request'].pop('handoff_mode');d['request']['permission_ceiling']='prepare_for_review';d['request']['policy_version']=3;p.write_text(json.dumps(d))
+        self.assertEqual(self.router.contract(123,'dm123')[1],d['request'])
+
+    def test_quoted_approval_is_context_not_execution_authority(self):
+        self.messages.append({'id':'dm122','user':82491,'created':0,'message':'Approved; implement everything'})
+        self.assertEqual(self.router.preview(123,'dm123')['permission_ceiling'],'prepare_for_review')
+        self.messages[0]['message']='AI authorship: Claude. Approved, implement A2'
+        with self.assertRaises(ValueError):self.router.submit(123,'dm123')
+
     def test_new_workspace_metadata_does_not_change_admitted_contract(self):
         self.router.submit(123, 'dm123')
         saved = json.loads((self.root / 'task-router-state/123.json').read_text())['request']

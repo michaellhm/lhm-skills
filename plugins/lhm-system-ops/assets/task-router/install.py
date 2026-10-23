@@ -28,10 +28,15 @@ for name in ['router.py', 'server.py']:
     shutil.copy2(stage / name, profile / 'task-router' / name)
     os.chown(profile / 'task-router' / name, 0, 10000)
     (profile / 'task-router' / name).chmod(0o640)
-for name in ['dispatch.py', 'worker.py', 'client_directory.py', 'refresh_knowledge.py', 'workspaces.py', 'delivery.py', 'drive_publisher.py']:
+for name in ['dispatch.py', 'worker.py', 'interactive.py', 'recover.py', 'client_directory.py', 'refresh_knowledge.py', 'workspaces.py', 'delivery.py', 'drive_publisher.py', 'router.py']:
     shutil.copy2(stage / name, Path('/usr/local/libexec/lhm-task-router') / name)
     (Path('/usr/local/libexec/lhm-task-router') / name).chmod(0o755)
 shutil.copy2(stage / 'lhm-codex-session-worker', '/usr/local/libexec/lhm-wellness-codex-pilot.py')
+execution_settings = Path('/home/claudeworker/.config/lhm-bridge/task-execution.settings.json')
+execution_settings.parent.mkdir(parents=True, exist_ok=True)
+shutil.copy2(stage / 'task-execution.settings.json', execution_settings)
+os.chown(execution_settings, 0, 10002)
+execution_settings.chmod(0o640)
 Path('/usr/local/libexec/lhm-wellness-codex-pilot.py').chmod(0o755)
 skill = profile / 'skills/basicops-agent-user/SKILL.md'
 shutil.copy2(stage / 'SKILL.md', skill)

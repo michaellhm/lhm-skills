@@ -1,0 +1,11 @@
+{
+  "allowedMcpServers": [
+    {"serverName": "GoogleAds"},
+    {"serverUrl": "https://au.api.adpulse.app/mcp"},
+    {"serverUrl": "https://drivemcp.googleapis.com/mcp/v1"},
+    {"serverUrl": "https://gmailmcp.googleapis.com/mcp/v1"}
+  ],
+  "permissions": {
+    "ask": ["mcp__claude_ai_AdPulse_MCP__adpulse_graphql_mutation"]
+  }
+}

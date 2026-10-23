@@ -10,7 +10,7 @@ import uuid
 from urllib.parse import quote, urlparse
 from html.parser import HTMLParser
 
-POLICY_VERSION = 3
+POLICY_VERSION = 4
 TERMINAL = {'needs_review', 'failed'}
 
 
@@ -91,6 +91,11 @@ def choose(title, description, instruction):
     if re.search(r'\b(website|prototype|github|repository|repo|code|html|css|javascript|astro|wordpress|deploy|staging|google docs|google drive|g drive|workspace|gmail|spreadsheet)\b', text):
         return 'codex', 'Website/code or connected Workspace work; keep mixed deliverables together'
     return 'claude', 'Research, writing, analysis or planning; local draft for review'
+
+
+def execution_handoff(provider, instruction):
+    """Forward personal execution/approval intent, without TED interpreting action details."""
+    return provider == 'claude' and bool(re.search(r'\b(approve|approved|implement|execute|publish)\b', instruction, re.I))
 
 
 def resolve_client(task, clients, discussion=''):
@@ -240,6 +245,16 @@ class Router:
                    'client_id': client, 'client': target, 'provider': provider, 'reason': reason,
                    'reviewer_id': self.config['reviewer_id'],
                    'permission_ceiling': 'prepare_for_review', 'context_messages': context_messages}
+        if provider == 'claude':
+            request['handoff_mode'] = 'provider_conversation'
+        links = Links()
+        links.feed(task.get('description', ''))
+        for message in messages:
+            if message.get('created', 0) <= msg.get('created', 0):
+                links.feed(message.get('message', ''))
+        request['source_links'] = sorted(set(u for u in links.urls if u.startswith('https://')))[:40]
+        if execution_handoff(provider, instruction):
+            request.update(handoff_mode='provider_execution', permission_ceiling='provider_tool_approval')
         if existing.exists():
             prior = json.loads(existing.read_text())['request']
             if prior['instruction_message_id'] == instruction_message_id:
@@ -247,6 +262,16 @@ class Router:
                     raise ValueError('Canonical lookup conflicts with the admitted client')
                 request['client'] = prior['client']
                 request['policy_version'] = prior.get('policy_version', 1)
+                # Reverification never upgrades an immutable, already-admitted request.
+                request['permission_ceiling'] = prior['permission_ceiling']
+                if 'handoff_mode' in prior:
+                    request['handoff_mode'] = prior['handoff_mode']
+                else:
+                    request.pop('handoff_mode', None)
+                if 'source_links' in prior:
+                    request['source_links'] = prior['source_links']
+                else:
+                    request.pop('source_links', None)
                 if prior.get('policy_version') == 1:
                     request['policy_version'] = 1
                     request.pop('context_messages', None)

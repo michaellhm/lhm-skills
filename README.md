@@ -386,3 +386,5 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 | `website-project-loop` | Read-only evidence snapshot, report dependency gate and one verified weekly summary per mapped project overview. |
 
 Registered RTB routes can use direct human task intake without a mandatory TED plan. The VPS can load the LHM skill library and separate GitHub/Workspace MCPs; provider authentication and explicit publishing/main/deployment permission remain distinct from draft preparation. Skill count is unchanged.
+
+Approved Claude implementation handoff: exact human approval plus task/source context reaches a connected Remote Control conversation; TED forwards it without an extra plan gate. Native tool approval remains with Claude. Existing draft-only receipts are not silently upgraded.

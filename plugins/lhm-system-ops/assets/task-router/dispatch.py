@@ -62,7 +62,10 @@ def copy_prior(request, workspace):
     old = json.loads(read(old_run / 'request.json'))
     if (old.get('task_id') != request['task_id'] or old.get('client_id') != request['client_id']
             or old.get('provider') != handoff['from_provider'] or old.get('request_id') != previous
-            or old.get('permission_ceiling') != request['permission_ceiling']):
+            or (old.get('permission_ceiling') != request['permission_ceiling']
+                and not (request.get('handoff_mode') == 'provider_execution'
+                         and request['permission_ceiling'] == 'provider_tool_approval'
+                         and old.get('permission_ceiling') == 'prepare_for_review'))):
         raise ValueError('Prior task, client, provider or permission ceiling mismatch')
     source = old_run / 'workspace'
     mapping = old_run / 'workspace-location.json'
@@ -125,8 +128,9 @@ def prepare(request):
     if Path(prefix).is_absolute() or '..' in Path(prefix).parts:
         raise ValueError('Invalid registered vault prefix')
     source = (VAULT / prefix).resolve()
-    if not source.is_relative_to(VAULT) or not source.is_dir():
-        raise ValueError('Registered client context is missing')
+    if not source.is_relative_to(VAULT):
+        raise ValueError('Registered client context escapes the knowledge root')
+    missing = [] if source.is_dir() else ['Registered client context is unavailable; open source links in the provider conversation']
     sources, size = [], 0
     priority = {str(VAULT / p): i for i, p in enumerate(request['client'].get('context_notes', []))}
     candidates = sorted(source.rglob('*.md'), key=lambda p: (priority.get(str(p), 999), len(p.parts), str(p)))
@@ -136,9 +140,14 @@ def prepare(request):
         if path.is_symlink() or not path.resolve().is_relative_to(source):
             continue
         limit = 512000 if str(path) in priority else 32000
-        if path.stat().st_size > limit:
+        try:
+            if path.stat().st_size > limit:
+                missing.append('Oversized context source: ' + str(path.relative_to(VAULT)))
+                continue
+            full = read(path, limit).encode()
+        except OSError:
+            missing.append('Unreadable context source: ' + str(path.relative_to(VAULT)))
             continue
-        full = read(path, limit).encode()
         raw = full if len(full) <= 32000 else (full[:8000].decode(errors='ignore') + '\n[Bounded extract: middle omitted; consult canonical source for full evidence.]\n' + full[-23000:].decode(errors='ignore')).encode()
         if len(raw) > 32000 or size + len(raw) > 160000:
             continue
@@ -147,10 +156,15 @@ def prepare(request):
         sources.append({'snapshot': 'context/' + name, 'source': str(path.relative_to(VAULT)), 'truncated': len(raw) != len(full)})
         size += len(raw)
     if not sources:
-        raise ValueError('No bounded client context available; do not run without evidence')
+        missing.append('No readable bounded markdown snapshots; task, discussion and source links are still supplied')
     (workspace / 'task-context.json').write_text(json.dumps({
         'client_id': request['client_id'], 'client': request['client'],
-        'task_url': request['task_url'], 'permission_ceiling': request['permission_ceiling'],
+        'task_id': request['task_id'], 'task_url': request['task_url'], 'task_name': request['title'],
+        'task_description': request['description'], 'personal_instruction': request['instruction'],
+        'instruction_message_id': request['instruction_message_id'],
+        'instruction_sha256': request['instruction_sha256'],
+        'discussion': request.get('context_messages', []), 'permission_ceiling': request['permission_ceiling'],
+        'source_links': request.get('source_links', []), 'missing_context': missing,
         'sources': sources, 'snapshot_limit': '32 markdown files, 160KB; missing evidence must be reported'}, indent=2))
     copy_prior(request, workspace)
     (run / 'request.json').write_text(json.dumps(request))
@@ -175,7 +189,7 @@ def launch(request, run, client_root):
              'InaccessiblePaths=-' + home + '/.ssh',
              'NoNewPrivileges=true', 'PrivateTmp=true', 'PrivateDevices=true',
              'ProtectKernelTunables=true', 'ProtectControlGroups=true', 'RestrictSUIDSGID=true',
-             'UMask=0027', 'RuntimeMaxSec=1300', 'WorkingDirectory=' + str(client_root)]
+             'UMask=0027', 'RuntimeMaxSec=' + ('86500' if request.get('handoff_mode') in {'provider_execution', 'provider_conversation'} else '1300'), 'WorkingDirectory=' + str(client_root)]
     command = ['systemd-run', '--quiet', '--collect', '--unit=lhm-task-' + request_id]
     for prop in props:
         command += ['--property=' + prop]
@@ -271,7 +285,10 @@ def tick():
             if unit.stdout.strip() not in {'active', 'activating'} and (not provider_receipt.exists() or current.get('status') not in {'needs_review', 'failed'}):
                 atomic(run / 'receipt.json', {'status': 'failed', 'error': 'Provider service stopped before a terminal receipt; inspect saved logs/session before retrying'})
                 continue
-        if age > 1400:
+        interactive_alive = (provider_receipt.exists() and current.get('transport') == 'claude-code-remote-control'
+                             and current.get('status') == 'interactive'
+                             and 0 <= time.time() - current.get('heartbeat_at', 0) < 60)
+        if age > 1400 and not interactive_alive:
             atomic(run / 'receipt.json', {'status': 'failed', 'error': 'Worker timed out or stopped; inspect its saved session before retrying'})
     delivery_tick()
     subprocess.run(['docker', 'exec', '--user', 'hermes', 'hermes', '/opt/hermes/.venv/bin/python',
