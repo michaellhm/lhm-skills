@@ -13,6 +13,8 @@ Convert verified staging output into a durable client deliverable. Operate benea
 
 Read `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md` before delivery.
 
+The central TED runner invokes the same registered `google-drive-file-publish` capability through the shared deterministic backend in `assets/publisher.py` (installed as `drive_publisher.py`). Its Head of Production adapter validates the admitted task, producer manifest and registered staging boundary, takes a root-owned immutable snapshot, and verifies the exact Current Clients ancestry. Missing Drive capability registration goes through the bounded client-onboarding smoke using one actual required artefact; it records the exact create/readback evidence before normal delivery. Never bless a registration from a worker assertion or expose OAuth credentials to a worker.
+
 ## Required input contract
 
 Accept only a bounded delivery manifest containing:
@@ -45,7 +47,7 @@ If the client destination is absent or unverified, return `client_onboarding_req
 
 Invoke only the registered `google-drive-file-publish` route.
 
-Inside the exact registered folder:
+Inside the exact registered folder (or a bounded service/month/request subfolder created and read back beneath that root):
 
 1. Search for the exact intended file name.
 2. If an identical file already exists, reuse it after full verification; do not duplicate it.
@@ -54,7 +56,7 @@ Inside the exact registered folder:
 5. Read back file metadata and content.
 6. Verify file ID, file name, parent folder ID, byte count and content SHA-256 against the manifest.
 
-This skill may create or reuse the bounded file only. It may not share, move, rename, update, overwrite, trash, publish externally or change folder permissions.
+This skill may create or reuse the bounded file and its scoped task subfolders only. The folder-create operation must be recorded in the client capability; it does not grant arbitrary destination selection. It may not share, move, rename, update, overwrite, trash, publish externally or change folder permissions.
 
 ## Receipt
 

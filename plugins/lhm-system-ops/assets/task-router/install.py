@@ -28,7 +28,7 @@ for name in ['router.py', 'server.py']:
     shutil.copy2(stage / name, profile / 'task-router' / name)
     os.chown(profile / 'task-router' / name, 0, 10000)
     (profile / 'task-router' / name).chmod(0o640)
-for name in ['dispatch.py', 'worker.py', 'client_directory.py', 'refresh_knowledge.py', 'workspaces.py']:
+for name in ['dispatch.py', 'worker.py', 'client_directory.py', 'refresh_knowledge.py', 'workspaces.py', 'delivery.py', 'drive_publisher.py']:
     shutil.copy2(stage / name, Path('/usr/local/libexec/lhm-task-router') / name)
     (Path('/usr/local/libexec/lhm-task-router') / name).chmod(0o755)
 shutil.copy2(stage / 'lhm-codex-session-worker', '/usr/local/libexec/lhm-wellness-codex-pilot.py')

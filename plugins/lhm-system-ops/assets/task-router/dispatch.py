@@ -183,6 +183,33 @@ def launch(request, run, client_root):
     subprocess.run(command, check=True, timeout=20)
 
 
+def delivery_tick():
+    from delivery import deliver
+    admitted = 0
+    for queue_run in sorted((BASE / 'runs').iterdir()):
+        if not queue_run.is_dir() or not ID.fullmatch(queue_run.name):
+            continue
+        receipt = json.loads(read(queue_run / 'receipt.json'))
+        if receipt.get('status') != 'needs_review' or not (receipt.get('delivery_required') or (queue_run / 'delivery-request.json').exists()):
+            continue
+        target = queue_run / 'delivery.json'
+        old = json.loads(read(target)) if target.exists() else {}
+        if old.get('artefact_state') in {'delivered', 'no_files_produced'} or time.time() - old.get('attempted_at', 0) < 60:
+            continue
+        if admitted >= 2:
+            break
+        admitted += 1
+        try:
+            request = verified(queue_run.name)
+            run = WORK / queue_run.name
+            if json.loads(read(run / 'request.json')) != request:
+                raise ValueError('Producer request no longer matches the verified task')
+            deliver(request, run, queue_run)
+        except Exception as exc:
+            partial = json.loads(read(target)) if target.exists() else old
+            atomic(target, {**partial, 'artefact_state':'delivery_incomplete','error':str(exc)[:700], 'attempted_at':int(time.time())})
+
+
 def tick():
     # Follow existing governed handback registrations, without generating new client identities.
     config = json.loads((PROFILE / 'task-router.json').read_text())
@@ -246,6 +273,7 @@ def tick():
                 continue
         if age > 1400:
             atomic(run / 'receipt.json', {'status': 'failed', 'error': 'Worker timed out or stopped; inspect its saved session before retrying'})
+    delivery_tick()
     subprocess.run(['docker', 'exec', '--user', 'hermes', 'hermes', '/opt/hermes/.venv/bin/python',
         '/opt/data/profiles/lhm_chief_of_staff/task-router/server.py', '--reconcile'], timeout=90, check=True)
 

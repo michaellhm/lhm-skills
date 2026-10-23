@@ -200,6 +200,24 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(self.router.client_lookup('Alpha')['matches'][0]['client_id'], 'example')
         self.assertEqual(list((self.queue / 'incoming').glob('*')), [])
 
+    def test_drive_delivery_blocks_success_until_verified_and_returns_real_links(self):
+        submitted=self.router.submit(123,'dm123')
+        run=self.queue/'runs'/submitted['request_id'];run.mkdir(parents=True)
+        (run/'receipt.json').write_text(json.dumps({'status':'needs_review','provider':'claude','thread_id':'saved-session','delivery_required':True}))
+        (run/'result.md').write_text('Review: [report](/vps/workspace/drafts/report.md)')
+        self.router.reconcile(123)
+        self.assertEqual(len(self.messages),1)
+        (run/'delivery.json').write_text(json.dumps({'artefact_state':'delivery_incomplete','error':'Drive unavailable'}))
+        state=self.router.reconcile(123);self.assertIsNone(state['notification'])
+        self.router.reconcile(123);self.assertEqual(len(self.messages),2)
+        folder='https://drive.google.com/drive/folders/exact-parent'
+        url='https://drive.google.com/file/d/exact-file/view'
+        (run/'delivery.json').write_text(json.dumps({'artefact_state':'delivered','folder_url':folder,'files':[{'relative':'report.md','url':url}],'package_sha256':'abc'}))
+        state=self.router.reconcile(123);self.assertTrue(state['notification']['verified'])
+        self.assertTrue(any(module.contains_link(m['message'],url) for m in self.messages))
+        self.assertNotIn('/vps/workspace/drafts/report.md',self.messages[-1]['message'])
+        count=len(self.messages);self.router.reconcile(123);self.assertEqual(len(self.messages),count)
+
     def test_session_link_posted_while_running_once_then_retained_in_result(self):
         self.router.config['codex_host_id'] = 'remote-control:env_e_test'
         self.task['description'] = 'Update the website prototype'

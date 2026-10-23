@@ -14,7 +14,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 4. **Task routing** — Matches your request to a skill from the catalog
 5. **Skill execution** — Loads the skill, saves outputs to `client/skill_name/YYYY-MM/`
 
-Use `/start` to begin a session, or just describe what you need. TED routes Google Ads work to Claude, supports explicit provider handoffs with prior drafts, and reuses named client/provider VPS workspaces and records their locations in the shared Obsidian workspace registry; each task retains its own context, drafts and resumable chat.
+Use `/start` to begin a session, or just describe what you need. TED routes Google Ads work to Claude, supports explicit provider handoffs with prior drafts, and reuses named client/provider VPS workspaces and records their locations in the shared Obsidian workspace registry; each task retains its own context, drafts and resumable chat. Shared Drive delivery uploads generated files to the registered client working folder and returns verified Drive links; VPS output remains staging.
 
 ## Loops
 

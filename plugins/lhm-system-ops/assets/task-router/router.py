@@ -127,6 +127,21 @@ def resolve_client(task, clients, discussion=''):
     raise ValueError('Client not identified in task or brief. Check task_client_lookup and the canonical shared client index')
 
 
+def delivery_key(delivery):
+    return hashlib.sha256(json.dumps({k: delivery.get(k) for k in ['artefact_state','package_sha256','error']}, sort_keys=True).encode()).hexdigest()[:12]
+
+
+def result_with_drive_links(result, delivery):
+    if delivery.get('artefact_state') != 'delivered':
+        return result
+    files = delivery.get('files', [])
+    def replace(match):
+        path = match.group(2)
+        found = [f for f in files if path == 'drafts/' + f['relative'] or path.endswith('/drafts/' + f['relative'])]
+        return '[' + match.group(1) + '](' + found[0]['url'] + ')' if len(found) == 1 else match.group(0)
+    return re.sub(r'\[([^\]]+)\]\(([^)]+)\)', replace, result)
+
+
 class Router:
     def __init__(self, profile, queue, api):
         self.profile, self.queue, self.api = Path(profile), Path(queue), api
@@ -294,6 +309,10 @@ class Router:
         receipt = json.loads((run / 'receipt.json').read_text()) if (run / 'receipt.json').exists() else {'status': 'queued'}
         result = {k: request[k] for k in ['task_id', 'task_url', 'request_id', 'provider', 'reason', 'client_id', 'title']}
         result.update(receipt)
+        delivery_path = run / 'delivery.json'
+        result['delivery_required'] = bool(receipt.get('delivery_required') or (run / 'delivery-request.json').exists())
+        result['delivery'] = json.loads(delivery_path.read_text()) if delivery_path.exists() else {'artefact_state': 'pending' if result['delivery_required'] else 'not_configured'}
+        result['delivery_notification'] = saved.get('delivery_notification')
         result['notification'] = saved.get('notification')
         result['session_notification'] = saved.get('session_notification')
         result['chat_url'] = session_link(request['provider'], receipt.get('thread_id'), self.config, receipt)
@@ -306,8 +325,11 @@ class Router:
             fcntl.flock(lock, fcntl.LOCK_EX)
             state = self.status(task_id)
             needs_link = bool(state.get('chat_url')) and not state.get('session_notification')
-            needs_result = state['status'] in TERMINAL and not state['notification']
-            if not needs_link and not needs_result:
+            delivery = state.get('delivery', {})
+            delivery_state = delivery.get('artefact_state')
+            needs_delivery = delivery_state in {'delivered', 'delivery_incomplete', 'no_files_produced'} and state.get('delivery_notification') != delivery_key(delivery)
+            needs_result = state['status'] in TERMINAL and not state['notification'] and not (state.get('delivery_required') and delivery_state in {'pending', 'delivery_incomplete'})
+            if not needs_link and not needs_result and not needs_delivery:
                 return state
             path = self.state / f'{task_id}.json'
             saved = json.loads(path.read_text())
@@ -346,6 +368,25 @@ class Router:
                 atomic(path, saved)
                 if not saved['session_notification']['verified']:
                     raise ValueError('BasicOps did not preserve the chat-link anchor; do not claim a clickable link')
+            if needs_delivery:
+                marker = 'TED Drive delivery: ' + request['request_id'] + ':' + delivery_key(delivery)
+                messages = self.api('list_messages_in_task', {'taskId': task_id, 'limit': 50})
+                messages = messages if isinstance(messages, list) else messages.get('data', [])
+                if not any(marker in plain(m.get('message','')) and actor(m) == self.config['agent_user_id'] for m in messages):
+                    if delivery_state == 'delivered':
+                        body = '<p><strong>Files delivered to Google Drive</strong></p><p><a href="' + html.escape(delivery['folder_url'], quote=True) + '">Open the task files in Drive</a></p><ul>'
+                        body += ''.join('<li><a href="' + html.escape(f['url'], quote=True) + '">' + html.escape(f['relative']) + '</a></li>' for f in delivery['files'])
+                        body += '</ul><p>Every file was read back and its name, folder, byte count and SHA-256 verified. These are internal review drafts; no email send, live account change or website publication is implied.</p>'
+                    else:
+                        body = '<p><strong>' + ('Drive delivery incomplete' if delivery_state == 'delivery_incomplete' else 'No files produced') + '</strong></p><p>' + html.escape(delivery.get('error') or delivery.get('reason','')) + '</p><p>Local preparation is not a verified Drive delivery.</p>'
+                    body += '<p>' + html.escape(marker) + ' | AI authorship: TED central router.</p>'
+                    self.api('create_message_in_task', {'taskId':task_id,'message':body})
+                    checked = self.api('list_messages_in_task', {'taskId':task_id,'limit':50})
+                    checked = checked if isinstance(checked,list) else checked.get('data',[])
+                    if not any(marker in plain(m.get('message','')) and actor(m) == self.config['agent_user_id'] for m in checked):
+                        raise ValueError('Drive-link handback readback failed')
+                saved['delivery_notification'] = delivery_key(delivery)
+                atomic(path,saved)
             if not needs_result:
                 return self.status(task_id)
             marker = 'TED central route: ' + request['request_id']
@@ -360,7 +401,7 @@ class Router:
                 else:
                     location_html = html.escape(location)
                 body = ('<p><strong>' + request['provider'].title() + ' — ' + state['status'] + '</strong></p><p>'
-                        + html.escape(state.get('result') or state.get('error') or 'Inspect the saved run.')
+                        + html.escape(result_with_drive_links(state.get('result') or state.get('error') or 'Inspect the saved run.', delivery))
                         + '</p><p>' + location_html + '</p><p>Prepared for review. No publication, main push or client send is authorised by this route.</p><p>'
                         + html.escape(marker) + ' | AI authorship: TED central router.</p>')
                 self.api('create_message_in_task', {'taskId': task_id, 'message': body})
