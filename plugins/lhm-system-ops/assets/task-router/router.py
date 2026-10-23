@@ -209,12 +209,13 @@ class Router:
                    'permission_ceiling': 'prepare_for_review', 'context_messages': context_messages}
         if existing.exists():
             prior = json.loads(existing.read_text())['request']
-            if prior.get('policy_version') == 1 and prior['instruction_message_id'] == instruction_message_id:
+            if prior['instruction_message_id'] == instruction_message_id:
                 if prior['client_id'] != client:
                     raise ValueError('Canonical lookup conflicts with the admitted client')
-                request['policy_version'] = 1
                 request['client'] = prior['client']
-                request.pop('context_messages', None)
+                if prior.get('policy_version') == 1:
+                    request['policy_version'] = 1
+                    request.pop('context_messages', None)
         if resume:
             request['resume_thread_id'] = resume
         if len(json.dumps(request).encode()) > 28000:

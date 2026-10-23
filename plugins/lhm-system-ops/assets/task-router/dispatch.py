@@ -9,6 +9,7 @@ import stat
 import subprocess
 import time
 from client_directory import refresh as refresh_directory
+from workspaces import provision, publish_registry
 
 BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/task-router')
 WORK = Path('/var/lib/lhm-task-router')
@@ -51,8 +52,8 @@ def prepare(request):
     home = '/home/' + ('codexworker' if provider == 'codex' else 'claudeworker')
     run = WORK / request_id
     run.mkdir(mode=0o750)
-    workspace = run / 'workspace'
-    workspace.mkdir()
+    client_root, workspace = provision(request, uid)
+    (run / 'workspace-location.json').write_text(json.dumps({'workspace': str(client_root), 'task_directory': str(workspace)}))
     (workspace / 'drafts').mkdir()
     for name in ['.git', '.codex', '.agents']:
         (workspace / name).mkdir()
@@ -90,19 +91,21 @@ def prepare(request):
         'task_url': request['task_url'], 'permission_ceiling': request['permission_ceiling'],
         'sources': sources, 'snapshot_limit': '32 markdown files, 160KB; missing evidence must be reported'}, indent=2))
     (run / 'request.json').write_text(json.dumps(request))
-    for path in [run, *run.rglob('*')]:
+    for path in [run, *run.rglob('*'), workspace, *workspace.rglob('*')]:
         os.chown(path, uid, uid)
         path.chmod(0o750 if path.is_dir() else 0o640)
     for name in ['.git', '.codex', '.agents']:
         os.chown(workspace / name, 0, 0)
         (workspace / name).chmod(0o555)
+    publish_registry()
     props = ['User=' + ('codexworker' if provider == 'codex' else 'claudeworker'),
              'Group=' + str(uid), 'ProtectSystem=strict', 'ProtectHome=tmpfs',
-             'BindPaths=' + home, 'ReadWritePaths=' + str(run) + ' ' + home,
-             'InaccessiblePaths=' + home + '/clients -' + home + '/.ssh' if provider == 'codex' else 'InaccessiblePaths=-' + home + '/.ssh',
+             'BindPaths=' + home + ' ' + str(run) + ' ' + str(client_root), 'ReadWritePaths=' + str(run) + ' ' + home + ' ' + str(client_root),
+             'TemporaryFileSystem=/var/lib/lhm-client-workspaces:ro /var/lib/lhm-task-router:ro' + (' /home/codexworker/clients:ro' if provider == 'codex' else ''),
+             'InaccessiblePaths=-' + home + '/.ssh',
              'NoNewPrivileges=true', 'PrivateTmp=true', 'PrivateDevices=true',
              'ProtectKernelTunables=true', 'ProtectControlGroups=true', 'RestrictSUIDSGID=true',
-             'UMask=0027', 'RuntimeMaxSec=1300', 'WorkingDirectory=' + str(workspace)]
+             'UMask=0027', 'RuntimeMaxSec=1300', 'WorkingDirectory=' + str(client_root)]
     command = ['systemd-run', '--quiet', '--collect', '--unit=lhm-task-' + request_id]
     for prop in props:
         command += ['--property=' + prop]

@@ -66,6 +66,10 @@ def build(vault, registered):
             overview, folder / 'client_profile.md', folder / 'Goals.md', folder / 'Current Projects.md']
             if p.is_file() and not p.is_symlink()]
         entry['project_notes'] = prefix + 'project-management/'
+        entry['agent_workspaces'] = {provider: '/var/lib/lhm-client-workspaces/' + provider + '/' + slug for provider in ['codex', 'claude']}
+        if slug in {'wellness-chiropractic', 'raise-the-bar'}:
+            entry['agent_workspaces']['codex'] = '/home/codexworker/clients/' + slug
+        entry['workspace_registry'] = '30 Projects/TED Client Workspaces.md'
         # These are sourced links, NOT a declaration of live access or write authority.
         section = re.search(r'^## Systems and files\s*\n(.*?)(?=^## |\Z)', text, re.M | re.S)
         links = []

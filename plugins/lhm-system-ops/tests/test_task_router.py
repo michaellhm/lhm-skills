@@ -39,6 +39,13 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(self.router.preview(123, 'dm123')['provider'], 'claude')
         self.assertEqual(self.router.submit(123, 'dm123')['status'], 'queued')
 
+    def test_new_workspace_metadata_does_not_change_admitted_contract(self):
+        self.router.submit(123, 'dm123')
+        saved = json.loads((self.root / 'task-router-state/123.json').read_text())['request']
+        self.router.config['clients']['example']['agent_workspaces'] = {'codex': '/var/lib/lhm-client-workspaces/codex/example'}
+        self.assertEqual(self.router.submit(123, 'dm123')['request_id'], saved['request_id'])
+        self.assertEqual(json.loads((self.root / 'task-router-state/123.json').read_text())['request'], saved)
+
     def test_mixed_work_uses_one_codex_session(self):
         self.task['description'] = 'Revise the handbook on Google Drive and update the prototype website.'
         self.assertEqual(self.router.preview(123, 'dm123')['provider'], 'codex')
