@@ -119,8 +119,6 @@ def _handoff(request, findings):
                 if not any(url in m.get('message','') or html.escape(url,quote=True) in m.get('message','') for m in items(api('list_messages_in_task',{'taskId':task['id'],'limit':50}))):
                     raise ValueError('Codex link readback failed')
                 saved.update(chat_url=url,thread_id=uid,status='in_codex',link_verified=True);atomic(state_path,saved)
-                data['chat_url']=url
-                p.write_text(json.dumps(data,indent=2)+'\n')
             if child.poll() is not None:break
             time.sleep(1)
         if not saved.get('chat_url'):raise ValueError('Codex did not return a saved conversation; task retained for troubleshooting')
