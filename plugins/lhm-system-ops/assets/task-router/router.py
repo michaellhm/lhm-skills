@@ -6,6 +6,9 @@ import json
 from pathlib import Path
 import re
 import time
+import uuid
+from urllib.parse import quote, urlparse
+from html.parser import HTMLParser
 
 POLICY_VERSION = 2
 TERMINAL = {'needs_review', 'failed'}
@@ -24,6 +27,44 @@ def atomic(path, value):
     tmp = path.with_name('.' + path.name + '.tmp')
     tmp.write_text(json.dumps(value, indent=2) + '\n')
     tmp.replace(path)
+
+
+def session_link(provider, thread_id, config, receipt):
+    if provider == 'codex':
+        try:
+            thread_id = str(uuid.UUID(thread_id or ''))
+        except (ValueError, AttributeError):
+            return None
+        host = config.get('codex_host_id')
+        if not isinstance(host, str) or not re.fullmatch(r'[A-Za-z0-9:_-]{1,160}', host):
+            return None
+        return 'codex://threads/' + thread_id + '?hostId=' + quote(host, safe='')
+    # A Claude Code local UUID is NOT a Remote Control session URL. Never fabricate that mapping.
+    remote = receipt.get('remote_session_url', '')
+    if not isinstance(remote, str):
+        return None
+    parsed = urlparse(remote)
+    if (parsed.scheme == 'https' and parsed.netloc == 'claude.ai'
+            and re.fullmatch(r'/code/session_[A-Za-z0-9]+', parsed.path)
+            and not parsed.query and not parsed.fragment):
+        return remote
+    return None
+
+
+class Links(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.urls = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'a':
+            self.urls.extend(v for k, v in attrs if k == 'href')
+
+
+def contains_link(message, url):
+    links = Links()
+    links.feed(message)
+    return url in links.urls
 
 
 def choose(title, description, instruction):
@@ -229,6 +270,8 @@ class Router:
         result = {k: request[k] for k in ['task_id', 'task_url', 'request_id', 'provider', 'reason', 'client_id', 'title']}
         result.update(receipt)
         result['notification'] = saved.get('notification')
+        result['session_notification'] = saved.get('session_notification')
+        result['chat_url'] = session_link(request['provider'], receipt.get('thread_id'), self.config, receipt)
         if (run / 'result.md').exists():
             result['result'] = (run / 'result.md').read_text()[:12000]
         return result
@@ -237,7 +280,9 @@ class Router:
         with (self.state / 'handback.lock').open('a') as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             state = self.status(task_id)
-            if state['status'] not in TERMINAL or state['notification']:
+            needs_link = bool(state.get('chat_url')) and not state.get('session_notification')
+            needs_result = state['status'] in TERMINAL and not state['notification']
+            if not needs_link and not needs_result:
                 return state
             path = self.state / f'{task_id}.json'
             saved = json.loads(path.read_text())
@@ -246,6 +291,38 @@ class Router:
             task, current = self.contract(task_id, request['instruction_message_id'])
             if current != request or actor(task) not in {self.config['agent_user_id'], self.config['reviewer_id']}:
                 raise ValueError('Task changed or ownership moved; retain result without overwriting a human handoff')
+            if needs_link:
+                marker = 'TED session link: ' + request['request_id']
+                messages = self.api('list_messages_in_task', {'taskId': task_id, 'limit': 50})
+                messages = messages if isinstance(messages, list) else messages.get('data', [])
+                existing = next((m for m in messages if marker in plain(m.get('message', ''))
+                                 and actor(m) == self.config['agent_user_id']), None)
+                url = state['chat_url']
+                if existing is None:
+                    label = 'Open existing ' + request['provider'].title() + ' chat'
+                    message = ('<p><strong>' + html.escape(request['provider'].title() + ' session available')
+                               + '</strong></p><p><a href="' + html.escape(url, quote=True) + '">'
+                               + html.escape(label) + '</a></p><p>Chat: ' + html.escape(request['title'])
+                               + '. Worker status: ' + html.escape(state['status']) + '.</p>'
+                               + '<p>This opens the existing conversation, preserving its context. '
+                               + ('Use the desktop app paired with hermes-vps. ' if request['provider'] == 'codex' else '')
+                               + 'A running worker is not a completed delivery; check its status before taking over.</p>'
+                               + '<p><small>' + html.escape(marker) + ' | AI authorship: TED central router.</small></p>')
+                    self.api('create_message_in_task', {'taskId': task_id, 'message': message})
+                    check = self.api('list_messages_in_task', {'taskId': task_id, 'limit': 50})
+                    check = check if isinstance(check, list) else check.get('data', [])
+                    existing = next((m for m in check if marker in plain(m.get('message', ''))
+                                     and actor(m) == self.config['agent_user_id']), None)
+                if existing is None:
+                    raise ValueError('Session-link message readback failed')
+                saved['session_notification'] = {'message_id': existing['id'],
+                    'url': url, 'verified': contains_link(existing.get('message', ''), url),
+                    'verification_scope': 'BasicOps anchor readback; desktop opening requires the paired client'}
+                atomic(path, saved)
+                if not saved['session_notification']['verified']:
+                    raise ValueError('BasicOps did not preserve the chat-link anchor; do not claim a clickable link')
+            if not needs_result:
+                return self.status(task_id)
             marker = 'TED central route: ' + request['request_id']
             messages = self.api('list_messages_in_task', {'taskId': task_id, 'limit': 50})
             messages = messages if isinstance(messages, list) else messages.get('data', [])
@@ -253,9 +330,13 @@ class Router:
                 location = ('Open hermes-vps in Codex and find “' + request['title'] + '”.'
                             if request['provider'] == 'codex' else
                             'Claude session saved on the VPS. It does not appear automatically in the Claude app. Resume command: ' + str(state.get('resume_command', 'unavailable')))
+                if state.get('chat_url'):
+                    location_html = '<a href="' + html.escape(state['chat_url'], quote=True) + '">Open existing ' + html.escape(request['provider'].title()) + ' chat</a>'
+                else:
+                    location_html = html.escape(location)
                 body = ('<p><strong>' + request['provider'].title() + ' — ' + state['status'] + '</strong></p><p>'
                         + html.escape(state.get('result') or state.get('error') or 'Inspect the saved run.')
-                        + '</p><p>' + html.escape(location) + '</p><p>Prepared for review. No publication, main push or client send is authorised by this route.</p><p>'
+                        + '</p><p>' + location_html + '</p><p>Prepared for review. No publication, main push or client send is authorised by this route.</p><p>'
                         + html.escape(marker) + ' | AI authorship: TED central router.</p>')
                 self.api('create_message_in_task', {'taskId': task_id, 'message': body})
                 check = self.api('list_messages_in_task', {'taskId': task_id, 'limit': 50})

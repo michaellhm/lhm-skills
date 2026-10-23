@@ -31,7 +31,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `lhm-page-rollout` — Build a batch of LHM website pages end to end (research, brief, copy, FAQ and schema, internal links, images, staging build, verification and review email). Staging only.
 
-`run-hermes-task` — Route a direct personal TED work request centrally to Codex for website/code/Workspace or Claude for research/writing/planning; retain the session, resume feedback and return results to BasicOps without a separate TED plan. Resolve client aliases and source pointers from refreshed shared Obsidian context, including task Discussion briefs. Preserve existing pilot chats and scoped delivery/publishing permissions.
+`run-hermes-task` — Route a direct personal TED work request centrally to Codex for website/code/Workspace or Claude for research/writing/planning; retain the session, resume feedback and return results to BasicOps without a separate TED plan. Resolve client aliases and source pointers from refreshed shared Obsidian context, including task Discussion briefs. Post existing-chat links early when the provider mapping is known; preserve existing pilot chats and scoped delivery/publishing permissions.
 
 `hermes-production-plan` — Match an existing BasicOps outcome to its Obsidian AI Operations SOP, prepare the execution plan for Ted, and provide plain-English task status and CTO blocker reporting.
 

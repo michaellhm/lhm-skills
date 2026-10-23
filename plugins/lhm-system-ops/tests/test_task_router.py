@@ -30,7 +30,7 @@ class RoutingTests(unittest.TestCase):
             if name == 'get_task': return self.task
             if name == 'list_messages_in_task': return self.messages
             if name == 'create_message_in_task':
-                self.messages.append({'id': 'dm999', 'user': 82491, 'message': args['message']})
+                self.messages.append({'id': 'dm999', 'user': 82491, 'message': args['message'], 'created': 99})
                 return {'id': 'dm999'}
             raise AssertionError(name)
         self.router = module.Router(self.root, self.queue, api)
@@ -140,6 +140,46 @@ class RoutingTests(unittest.TestCase):
         self.router.config['clients']['example']['aliases'] = ['Alpha']
         self.assertEqual(self.router.client_lookup('Alpha')['matches'][0]['client_id'], 'example')
         self.assertEqual(list((self.queue / 'incoming').glob('*')), [])
+
+    def test_session_link_posted_while_running_once_then_retained_in_result(self):
+        self.router.config['codex_host_id'] = 'remote-control:env_e_test'
+        self.task['description'] = 'Update the website prototype'
+        submitted = self.router.submit(123, 'dm123')
+        run = self.queue / 'runs' / submitted['request_id']
+        run.mkdir(parents=True)
+        receipt = {'status': 'running', 'thread_id': '01a1665c-d9f3-7460-8bc8-a257fc417517'}
+        (run / 'receipt.json').write_text(json.dumps(receipt))
+        state = self.router.reconcile(123)
+        self.assertTrue(state['session_notification']['verified'])
+        self.assertIn('hostId=remote-control%3Aenv_e_test', state['chat_url'])
+        self.router.reconcile(123)
+        self.assertEqual(len(self.messages), 2)
+        self.assertTrue(module.contains_link(self.messages[-1]['message'], state['chat_url']))
+        receipt['status'] = 'needs_review'
+        (run / 'receipt.json').write_text(json.dumps(receipt))
+        (run / 'result.md').write_text('Actual review result')
+        final = self.router.reconcile(123)
+        self.assertEqual(len(self.messages), 3)
+        self.assertTrue(module.contains_link(self.messages[-1]['message'], final['chat_url']))
+        self.router.reconcile(123)
+        self.assertEqual(len(self.messages), 3)
+
+    def test_no_fabricated_claude_link_from_local_uuid(self):
+        self.assertIsNone(module.session_link('claude', '17a6695b-465c-4b62-9455-7d19226bbc26', {}, {}))
+        real = 'https://claude.ai/code/session_Existing123'
+        self.assertEqual(module.session_link('claude', None, {}, {'remote_session_url': real}), real)
+        self.assertIsNone(module.session_link('claude', None, {}, {'remote_session_url': 'https://attacker.example/code/session_Existing123'}))
+
+    def test_codex_requires_valid_session_and_observed_host(self):
+        session = '01a1665c-d9f3-7460-8bc8-a257fc417517'
+        self.assertIsNone(module.session_link('codex', session, {}, {}))
+        self.assertIsNone(module.session_link('codex', 'new', {'codex_host_id': 'local'}, {}))
+        self.assertIsNone(module.session_link('codex', session, {'codex_host_id': 'bad?host=other'}, {}))
+
+    def test_readback_requires_actual_anchor_not_plain_link_text(self):
+        url = 'codex://threads/existing?hostId=remote'
+        self.assertFalse(module.contains_link('<p>' + url + '</p>', url))
+        self.assertTrue(module.contains_link('<a href="' + url + '">Open</a>', url))
 
     def test_assignment_alone_not_permission(self):
         self.messages[0]['message'] = 'Thanks Ted'

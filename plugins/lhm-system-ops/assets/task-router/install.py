@@ -45,8 +45,11 @@ for key, value in ads.items():
         clients[key] = {'name': value['name'], 'vault_prefix': value['evidence_prefix'],
                         'drive_folder_query': 'exact registered folder ' + value['drive_folder_url'],
                         'basicops_task_ids': value.get('basicops_task_ids', [])}
+prior_config = json.loads((profile / 'task-router.json').read_text()) if (profile / 'task-router.json').exists() else {}
 config = {'schema_version': 1, 'require_client_directory': True, 'agent_user_id': 82491, 'reviewer_id': 36398,
           'providers': {'codex': True, 'claude': True}, 'clients': clients}
+if prior_config.get('codex_host_id'):
+    config['codex_host_id'] = prior_config['codex_host_id']
 target = profile / 'task-router.json'
 target.write_text(json.dumps(config, indent=2) + '\n')
 os.chown(target, 0, 10000)
