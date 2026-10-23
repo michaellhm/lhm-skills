@@ -92,17 +92,18 @@ def _handoff(request, findings):
     source=work/'source';run=work/'handoff';run.mkdir(exist_ok=True,mode=0o750);os.chown(run,10001,10001)
     base=cfg.get('base_ref','main')
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._/-]{0,120}',base) or '..' in base:raise ValueError('Invalid configured source ref')
-    user=['runuser','-u','codexworker','--','env','HOME=/home/codexworker']
+    user=['/usr/sbin/runuser','-u','codexworker','--','env','HOME=/home/codexworker']
     clone_error=None
     if not source.exists():
         try:
             subprocess.run([*user,'git','clone','--quiet','--single-branch','--branch',base,REPO,str(source)],capture_output=True,text=True,check=True,timeout=90)
             subprocess.run([*user,'git','-C',str(source),'checkout','-b','cto/'+slug],capture_output=True,text=True,check=True,timeout=15)
-        except subprocess.SubprocessError:
+        except (subprocess.SubprocessError,OSError):
             clone_error='Source checkout failed; troubleshoot the exact repository connection in this Codex chat. Do not invent source contents.'
     if not (source/'.git').is_dir():
         clone_error='The source checkout is unavailable; troubleshoot repository access in this existing Codex chat.'
-    data=packet(request,findings);data.update(task_id=task['id'],task_url=task['url'],source_ref=base,source_error=clone_error)
+    data=packet(request,findings);data.update(task_id=task['id'],task_url=task['url'],source_ref=base,source_error=clone_error,
+                                            workspace=str(work),source_workspace=str(source),branch='cto/'+slug)
     p=run/'task-context.json';p.write_text(json.dumps(data,indent=2)+'\n');os.chown(p,10001,10001);p.chmod(0o640)
     saved.update(worker_started=True,request_id=request['request_id'],workspace=str(work),status='starting');atomic(state_path,saved)
     log=open(run/'launcher.stderr','w')
@@ -118,6 +119,8 @@ def _handoff(request, findings):
                 if not any(url in m.get('message','') or html.escape(url,quote=True) in m.get('message','') for m in items(api('list_messages_in_task',{'taskId':task['id'],'limit':50}))):
                     raise ValueError('Codex link readback failed')
                 saved.update(chat_url=url,thread_id=uid,status='in_codex',link_verified=True);atomic(state_path,saved)
+                data['chat_url']=url
+                p.write_text(json.dumps(data,indent=2)+'\n')
             if child.poll() is not None:break
             time.sleep(1)
         if not saved.get('chat_url'):raise ValueError('Codex did not return a saved conversation; task retained for troubleshooting')

@@ -66,6 +66,7 @@ class VisibleHandoffTests(unittest.TestCase):
                 if name=='list_messages_in_task':return messages
                 self.fail(name)
             def child(*args,**kwargs):
+                self.assertEqual(args[0][0],'/usr/sbin/runuser')
                 run=work/'incident1/handoff'
                 (run/'session.json').write_text(json.dumps({'thread_id':'12345678-1234-4234-8234-123456789abc'}))
                 return SimpleNamespace(poll=lambda:0,returncode=0)
