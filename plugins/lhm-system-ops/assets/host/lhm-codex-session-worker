@@ -135,16 +135,19 @@ def build_prompt(task):
     return '\n\n'.join(parts)
 
 
-def conversation(task, prompt, run):
+def conversation(task, prompt, run, *, cwd=None, write=None, timeout=None, read_only_integrations=False):
     """Create a native app-server chat, retaining its identity across feedback."""
     command = [CODEX, '-c', 'mcp_servers.basicops.enabled=false',
                '-c', 'mcp_servers.fathom.enabled=false', '-c', 'web_search="disabled"',
                'app-server', '--stdio']
+    if read_only_integrations:
+        command[1:1] = ['-c', 'mcp_servers.workspace.enabled_tools=["search_drive_files","get_drive_file_content","get_drive_file_download_url","get_doc_content","search_gmail_messages","get_gmail_thread_content"]',
+                        '-c', 'mcp_servers.github.enabled_tools=["get_file_contents","list_branches","search_code","get_commit"]']
     env = {**os.environ, 'HOME': '/home/codexworker', 'CODEX_HOME': '/home/codexworker/.codex'}
-    deadline = time.monotonic() + (1200 if task['client_id'] == 'raise-the-bar' else 300)
+    deadline = time.monotonic() + (timeout or (1200 if task['client_id'] == 'raise-the-bar' else 300))
     with (run / 'events.jsonl').open('w') as events, (run / 'stderr.log').open('w') as err:
         process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                   stderr=err, cwd=workspace(task), env=env)
+                                   stderr=err, cwd=cwd or workspace(task), env=env)
         pending = []
         buffer = b''
 
@@ -190,8 +193,8 @@ def conversation(task, prompt, run):
         try:
             rpc(1, 'initialize', {'clientInfo': {'name': 'lhm_wellness_pilot', 'version': '0.1.0'}})
             send({'method': 'initialized'})
-            params = {'cwd': str(workspace(task)), 'approvalPolicy': 'never',
-                      'sandbox': 'workspace-write' if task['client_id'] == 'raise-the-bar' else 'read-only'}
+            params = {'cwd': str(cwd or workspace(task)), 'approvalPolicy': 'never',
+                      'sandbox': 'workspace-write' if (write if write is not None else task['client_id'] == 'raise-the-bar') else 'read-only'}
             if task['task_type'] == 'feedback':
                 params['threadId'] = task['resume_thread_id']
                 result = rpc(2, 'thread/resume', params)

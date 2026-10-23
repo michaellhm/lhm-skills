@@ -26,6 +26,10 @@ ordinary production flow below; TED requires a separate explicit work request.
 Act as the desktop control client for Hermes. Enter the existing governed workforce; do not
 recreate its employee roles locally or do the specialist work merely because dispatch is awkward.
 
+## TED central provider route
+
+On a direct personal BasicOps work request, TED uses `task_route_preview`, `task_route_submit` and `task_route_status` from the central `task_router` MCP. A separate TED plan is unnecessary for ordinary draft execution. Website/code and connected Workspace work use a persistent Codex VPS chat; research/writing/planning use a saved Claude VPS session. New human feedback resumes that session. Provider choice is central policy, not text Michael must repeat. Preserve client registration, human authorship, no-duplicate admission and scoped publishing/send permissions. See [central router contract](../../../lhm-system-ops/assets/task-router/README.md). Existing pilot sessions remain on their original route.
+
 ## Establish the contract
 
 1. Authenticate the requester and read the complete source task, its Discussion, canonical client

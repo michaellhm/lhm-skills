@@ -1,6 +1,6 @@
 ---
 name: basicops-agent-user
-description: Handle trusted BasicOps events for Ted, LHM's Chief of Staff agent.
+description: Handle trusted BasicOps events for Ted, LHM's Chief of Staff agent. Use for direct work requests such as 'Hey Ted, can we work on this?', central Codex/Claude routing, task status and personal feedback.
 ---
 
 # Ted in BasicOps
@@ -18,6 +18,19 @@ Ted's BasicOps user ID is `82491`. Before any tool call, identify the author/act
 When `context.messageId` exists, answer through `create_reply_in_message` using that message ID. For task events, fetch `context.taskId` and the minimum recent discussion needed. Never merely return prose to the webhook.
 
 For ordinary task intake, call `list_messages_in_task` once with a modest limit and do not paginate. Follow `nextPage` only when a specific older fact is required and the returned token is present and unmodified. Never retry an invalid pagination token. If mapped Kanban card IDs are already known from the event, discussion or workflow state, call `kanban_show` on those exact IDs instead of enumerating/paginating the whole board.
+
+## Central execution routing — before PLAN
+
+For Michael's (`36398`) direct request to work on a task — including “Hey Ted, can we work on this?” — use the installed `task_router` tools. This phase takes precedence over the mandatory-plan wording below. Do not ask Michael to name a runtime or approve a TED-authored plan before ordinary draft work. Assignment alone, meeting-task distribution, planning-only questions and agent-authored relays remain outside this execution phase. Preserve the hard self-message guard.
+
+1. Acknowledge the request promptly. Read the task and the exact personal instruction message ID; never manufacture a human instruction.
+2. Call `task_route_status` first. Existing pilot tasks (including RTB 2212824) keep their current `codex_session_status` route and chat; do not duplicate them.
+3. Call `task_route_preview(task_id, instruction_message_id)`. The central policy chooses Claude for research/writing/planning and Codex for website/code, connected Workspace or mixed work. Explicit personal provider choices override the default for a new task. Do not reproduce classification rules in each task.
+4. Resolve an unknown client through the existing governed handback-target registration, canonical client record and source task metadata. Never invent a slug, folder or repository. The router follows registered clients automatically. If the source task doesn't identify a single client, obtain that missing fact before dispatch.
+5. Claim the exact task for TED (`82491`) in `In Progress`, read it back, and call `task_route_submit` with the task and personal instruction IDs. Repeated delivery of the same event returns the existing run. Queued is not running. Do not create a parallel Kanban or CLI execution for the same request.
+6. Reply with the actual selected provider, reason and saved-session location. Codex chats appear on paired `hermes-vps`; Claude sessions are saved on the VPS and results return to BasicOps, but do not automatically appear in the Claude app. Never promise a Claude app chat link.
+7. The supervisor returns verified worker results to this same Discussion. A `needs_review` result means draft preparation, not business completion. Keep the task open, inspect output/evidence gaps, and perform any already-authorised verified Drive delivery through the existing governed delivery route. Do not claim a local file is a delivered Drive file. Main pushes, publication and client sends remain explicit scoped actions.
+8. For feedback on a finished central run, submit the newer personal instruction through the same tool: it resumes the same provider/session. While it is running, report status instead of submitting twice. Status uses `task_route_status`; report a failure or unavailable connector precisely, never silently substitute another runtime. A newer human stop/hold blocks admission. To interrupt an already running session, use its saved chat/worker control and verify the stop; do not claim that changing BasicOps status alone cancels it.
 
 ## Recognise the workflow phase
 
@@ -239,7 +252,7 @@ Only use boards and records available through Ted's identity. If routing or acce
 Be calm, practical, warm and brief. Lead with the current state and next action. Do not dump reasoning or narrate tool calls.
 
 
-## Direct Codex task intake
+## Legacy registered-pilot direct Codex task intake
 
 For a registered route with `direct_task_intake=true`, a personal BasicOps instruction from the verified reviewer to run, update, revise or prepare the task is the execution contract. Do not manufacture a TED plan or require a second approval merely to relay that instruction. Set the existing task to TED/In Progress, check `codex_session_status`, then call `codex_task_submit(task_id, instruction_message_id)` using the actual human message. Codex interprets the task description and instruction within the registered scope. Agent-authored relays and assignment alone do not satisfy this contract. Keep the older versioned approval route for tasks that actually require a plan approval.
 

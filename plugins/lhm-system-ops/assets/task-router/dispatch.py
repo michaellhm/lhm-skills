@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+"""Root queue supervisor: verified intake, bounded snapshots, non-root providers."""
+import fcntl
+import json
+import os
+from pathlib import Path
+import re
+import stat
+import subprocess
+import time
+
+BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/task-router')
+WORK = Path('/var/lib/lhm-task-router')
+VAULT = Path('/home/hermes/.hermes/profiles/lhm_brain/vault').resolve()
+PROFILE = Path('/home/hermes/.hermes/profiles/lhm_chief_of_staff')
+ID = re.compile(r'ted-route-[1-9][0-9]*-dm[1-9][0-9]*')
+
+
+def read(path, limit=1048576):
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    with os.fdopen(fd) as f:
+        info = os.fstat(f.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_size > limit:
+            raise ValueError('Invalid or oversized file')
+        return f.read()
+
+
+def atomic(path, data):
+    tmp = path.with_suffix('.tmp')
+    tmp.write_text(json.dumps(data, indent=2) + '\n')
+    os.chown(tmp, 0, 10000)
+    tmp.chmod(0o640)
+    tmp.replace(path)
+
+
+def verified(request_id):
+    result = subprocess.run(['docker', 'exec', '--user', 'hermes', 'hermes', '/opt/hermes/.venv/bin/python',
+        '/opt/data/profiles/lhm_chief_of_staff/task-router/server.py', '--verify', request_id],
+        capture_output=True, text=True, timeout=50)
+    if result.returncode:
+        raise ValueError('Human instruction, task state or client binding failed re-verification')
+    return json.loads(result.stdout)
+
+
+def prepare(request):
+    request_id, provider = request['request_id'], request['provider']
+    if provider not in {'codex', 'claude'}:
+        raise ValueError('Invalid provider')
+    uid = 10001 if provider == 'codex' else 10002
+    home = '/home/' + ('codexworker' if provider == 'codex' else 'claudeworker')
+    run = WORK / request_id
+    run.mkdir(mode=0o750)
+    workspace = run / 'workspace'
+    workspace.mkdir()
+    (workspace / 'drafts').mkdir()
+    for name in ['.git', '.codex', '.agents']:
+        (workspace / name).mkdir()
+    context = workspace / 'context'
+    context.mkdir()
+    prefix = request['client']['vault_prefix']
+    if Path(prefix).is_absolute() or '..' in Path(prefix).parts:
+        raise ValueError('Invalid registered vault prefix')
+    source = (VAULT / prefix).resolve()
+    if not source.is_relative_to(VAULT) or not source.is_dir():
+        raise ValueError('Registered client context is missing')
+    sources, size = [], 0
+    candidates = sorted(source.rglob('*.md'), key=lambda p: (len(p.parts), str(p)))
+    for path in candidates:
+        if len(sources) >= 32 or size >= 160000:
+            break
+        if path.is_symlink() or not path.resolve().is_relative_to(source):
+            continue
+        if path.stat().st_size > 32000:
+            continue
+        raw = read(path, 32000).encode()
+        if len(raw) > 32000 or size + len(raw) > 160000:
+            continue
+        name = f'{len(sources):02d}-{path.name}'
+        (context / name).write_bytes(raw)
+        sources.append({'snapshot': 'context/' + name, 'source': str(path.relative_to(VAULT))})
+        size += len(raw)
+    if not sources:
+        raise ValueError('No bounded client context available; do not run without evidence')
+    (workspace / 'task-context.json').write_text(json.dumps({
+        'client_id': request['client_id'], 'client': request['client'],
+        'task_url': request['task_url'], 'permission_ceiling': request['permission_ceiling'],
+        'sources': sources, 'snapshot_limit': '32 markdown files, 160KB; missing evidence must be reported'}, indent=2))
+    (run / 'request.json').write_text(json.dumps(request))
+    for path in [run, *run.rglob('*')]:
+        os.chown(path, uid, uid)
+        path.chmod(0o750 if path.is_dir() else 0o640)
+    for name in ['.git', '.codex', '.agents']:
+        os.chown(workspace / name, 0, 0)
+        (workspace / name).chmod(0o555)
+    props = ['User=' + ('codexworker' if provider == 'codex' else 'claudeworker'),
+             'Group=' + str(uid), 'ProtectSystem=strict', 'ProtectHome=tmpfs',
+             'BindPaths=' + home, 'ReadWritePaths=' + str(run) + ' ' + home,
+             'InaccessiblePaths=' + home + '/clients -' + home + '/.ssh' if provider == 'codex' else 'InaccessiblePaths=-' + home + '/.ssh',
+             'NoNewPrivileges=true', 'PrivateTmp=true', 'PrivateDevices=true',
+             'ProtectKernelTunables=true', 'ProtectControlGroups=true', 'RestrictSUIDSGID=true',
+             'UMask=0027', 'RuntimeMaxSec=1300', 'WorkingDirectory=' + str(workspace)]
+    command = ['systemd-run', '--quiet', '--collect', '--unit=lhm-task-' + request_id]
+    for prop in props:
+        command += ['--property=' + prop]
+    command += ['/usr/bin/python3', '/usr/local/libexec/lhm-task-router/worker.py', str(run), provider]
+    subprocess.run(command, check=True, timeout=20)
+
+
+def tick():
+    # Follow existing governed handback registrations, without generating new client identities.
+    config = json.loads((PROFILE / 'task-router.json').read_text())
+    registered = json.loads(Path('/home/hermes/.hermes/profiles/lhm_brain/config/client-handback-targets.json').read_text())['clients']
+    for key, value in registered.items():
+        if re.fullmatch(r'[a-z0-9][a-z0-9-]{0,79}', key) and all(k in value for k in ['name', 'vault_prefix', 'drive_folder_query']):
+            config['clients'][key] = value
+    atomic(PROFILE / 'task-router.json', config)
+    for path in sorted((BASE / 'incoming').glob('*.json'))[:8]:
+        request_id = path.stem
+        if not ID.fullmatch(request_id):
+            continue
+        run = BASE / 'runs' / request_id
+        run.mkdir(exist_ok=True, mode=0o750)
+        os.chown(run, 0, 10000)
+        if (run / 'receipt.json').exists():
+            path.rename(BASE / 'processed' / path.name)
+            continue
+        try:
+            request = json.loads(read(path, 32768))
+            if request != verified(request_id):
+                raise ValueError('Queued request differs from verified human contract')
+            # Save a durable admission receipt BEFORE starting a provider. A restart never duplicates it.
+            atomic(run / 'receipt.json', {'status': 'starting', 'provider': request['provider'], 'request_id': request_id,
+                                         'started_at': int(time.time())})
+            prepare(request)
+        except Exception as exc:
+            atomic(run / 'receipt.json', {'status': 'failed', 'error': str(exc)[:1200]})
+        path.rename(BASE / 'processed' / path.name)
+    for run in (BASE / 'runs').iterdir():
+        if not run.is_dir() or not ID.fullmatch(run.name):
+            continue
+        receipt = json.loads(read(run / 'receipt.json'))
+        if receipt['status'] in {'needs_review', 'failed'}:
+            continue
+        work = WORK / run.name
+        provider_receipt = work / 'receipt.json'
+        if provider_receipt.exists():
+            current = json.loads(read(provider_receipt))
+            if current.get('request_id') != run.name:
+                current = {'status': 'failed', 'error': 'Provider receipt mismatch'}
+            if (work / 'session.json').exists():
+                current.update(json.loads(read(work / 'session.json')))
+            if (work / 'result.md').exists():
+                result = read(work / 'result.md', 200000)
+                target = run / 'result.md'
+                target.write_text(result)
+                os.chown(target, 0, 10000)
+                target.chmod(0o640)
+            current['started_at'] = receipt.get('started_at', int(time.time()))
+            atomic(run / 'receipt.json', current)
+        age = time.time() - receipt.get('started_at', time.time())
+        if age > 60:
+            unit = subprocess.run(['systemctl', 'show', '--property=ActiveState', '--value', 'lhm-task-' + run.name], capture_output=True, text=True, timeout=10)
+            if unit.stdout.strip() not in {'active', 'activating'} and (not provider_receipt.exists() or current.get('status') not in {'needs_review', 'failed'}):
+                atomic(run / 'receipt.json', {'status': 'failed', 'error': 'Provider service stopped before a terminal receipt; inspect saved logs/session before retrying'})
+                continue
+        if age > 1400:
+            atomic(run / 'receipt.json', {'status': 'failed', 'error': 'Worker timed out or stopped; inspect its saved session before retrying'})
+    subprocess.run(['docker', 'exec', '--user', 'hermes', 'hermes', '/opt/hermes/.venv/bin/python',
+        '/opt/data/profiles/lhm_chief_of_staff/task-router/server.py', '--reconcile'], timeout=90, check=True)
+
+
+if __name__ == '__main__':
+    WORK.mkdir(exist_ok=True, mode=0o755)
+    WORK.chmod(0o755)
+    with (WORK / 'dispatch.lock').open('a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        tick()
