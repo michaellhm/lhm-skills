@@ -5,8 +5,9 @@ import html
 import json
 from pathlib import Path
 import re
+import time
 
-POLICY_VERSION = 1
+POLICY_VERSION = 2
 TERMINAL = {'needs_review', 'failed'}
 
 
@@ -38,24 +39,38 @@ def choose(title, description, instruction):
     return 'claude', 'Research, writing, analysis or planning; local draft for review'
 
 
-def resolve_client(task, clients):
-    # Prefer exact pre-existing task bindings. Never trust a model-supplied path/slug.
+def resolve_client(task, clients, discussion=''):
     exact = [key for key, value in clients.items() if str(task['id']) in [str(i) for i in value.get('basicops_task_ids', [])]]
-    if len(exact) == 1:
-        return exact[0]
-    title = plain(task['title']).casefold()
-    named = [key for key, value in clients.items()
-             if re.search(r'(?<!\w)' + re.escape(value['name'].casefold()) + r'(?!\w)', title)]
-    if re.search(r'(?<!\w)rtb(?!\w)', title) and 'raise-the-bar' in clients:
-        named = list(set(named + ['raise-the-bar']))
     if len(exact) > 1:
         raise ValueError('Conflicting registered task bindings')
-    if not named:
-        description = plain(task.get('description', '')).casefold()
-        named = [key for key, value in clients.items() if re.search(r'(?<!\w)' + re.escape(value['name'].casefold()) + r'(?!\w)', description)]
-    if len(named) != 1:
-        raise ValueError('Client is missing or ambiguous. Resolve the existing handback target before dispatch; do not guess a folder')
-    return named[0]
+    if len(exact) == 1:
+        return exact[0]
+
+    def names(text, prefix_only=False):
+        text = plain(text).casefold()
+        found = set()
+        for key, value in clients.items():
+            aliases = [value['name'], *value.get('aliases', [])]
+            if key == 'raise-the-bar':
+                aliases.append('RTB')  # Preserve the original pilot abbreviation.
+            for alias in aliases:
+                pattern = re.escape(alias.casefold())
+                if prefix_only or len(alias) <= 5:
+                    matched = re.match(r'^\s*' + pattern + r'\s*:', text)
+                else:
+                    matched = re.search(r'(?<!\w)' + pattern + r'(?!\w)', text)
+                if matched:
+                    found.add(key)
+        return found
+
+    for text, prefix_only in [(task['title'], True), (task['title'], False),
+                              (task.get('description', ''), False), (discussion, False)]:
+        found = names(text, prefix_only)
+        if len(found) == 1:
+            return next(iter(found))
+        if len(found) > 1:
+            raise ValueError('Several canonical clients match this task; do not guess a folder')
+    raise ValueError('Client not identified in task or brief. Check task_client_lookup and the canonical shared client index')
 
 
 class Router:
@@ -64,6 +79,29 @@ class Router:
         self.config = json.loads((self.profile / 'task-router.json').read_text())
         self.state = self.profile / 'task-router-state'
         self.state.mkdir(exist_ok=True)
+        self.directory = None
+        catalog = self.profile / 'task-router-client-directory.json'
+        if catalog.exists():
+            self.directory = json.loads(catalog.read_text())
+            self.config['clients'] = self.directory['clients']
+
+    def client_lookup(self, query):
+        if not isinstance(query, str) or not 2 <= len(query.strip()) <= 120:
+            raise ValueError('Supply a client name or known alias, 2–120 characters')
+        if self.api('get_current_user', {}).get('id') != self.config['agent_user_id']:
+            raise ValueError('TED connector identity mismatch')
+        self.check_freshness()
+        matches = [{'client_id': key, **value} for key, value in self.config['clients'].items()
+                   if any(query.strip().casefold() in name.casefold() for name in [value['name'], *value.get('aliases', [])])]
+        return {'source': 'shared Obsidian client index and canonical overviews',
+                'matches': matches[:20], 'count': len(matches),
+                'write_authority': 'none; recorded Drive/GitHub links require normal access and destination verification'}
+
+    def check_freshness(self):
+        if self.config.get('require_client_directory') and self.directory is None:
+            raise ValueError('Canonical shared client directory is not ready; refresh shared knowledge before intake')
+        if self.directory and not 0 <= time.time() - self.directory.get('knowledge_refreshed_at', 0) <= 900:
+            raise ValueError('Canonical shared client knowledge cache is stale; refresh or use live evidence, not a guessed client')
 
     def contract(self, task_id, instruction_message_id):
         if type(task_id) is not int or task_id <= 0 or not re.fullmatch(r'dm[1-9][0-9]*', instruction_message_id):
@@ -87,8 +125,16 @@ class Router:
         if any(actor(m) == self.config['reviewer_id'] and m.get('created', 0) > msg.get('created', 0)
                and re.search(r'\b(stop|cancel|hold|pause)\b', plain(m.get('message', '')), re.I) for m in messages):
             raise ValueError('A later human stop/hold supersedes this instruction')
-        client = resolve_client(task, self.config['clients'])
-        provider, reason = choose(plain(task['title']), plain(task.get('description', '')), instruction)
+        self.check_freshness()
+        context_messages = [{'id': m['id'], 'author': actor(m), 'text': plain(m.get('message', ''))}
+                            for m in messages if m.get('id') != instruction_message_id
+                            and m.get('created', 0) <= msg.get('created', 0) and m.get('message')]
+        context_messages.sort(key=lambda m: m['id'])
+        if sum(len(m['text']) for m in context_messages) > 16000:
+            raise ValueError('Task discussion brief exceeds bounded context; identify a smaller authoritative brief')
+        discussion = '\n'.join(m['text'] for m in context_messages)
+        client = resolve_client(task, self.config['clients'], discussion)
+        provider, reason = choose(plain(task['title']), plain(task.get('description', '')) + '\n' + discussion, instruction)
         existing = self.state / f'{task_id}.json'
         resume = None
         if existing.exists():
@@ -119,7 +165,15 @@ class Router:
                    'instruction_sha256': hashlib.sha256(msg['message'].encode()).hexdigest(),
                    'client_id': client, 'client': target, 'provider': provider, 'reason': reason,
                    'reviewer_id': self.config['reviewer_id'],
-                   'permission_ceiling': 'prepare_for_review'}
+                   'permission_ceiling': 'prepare_for_review', 'context_messages': context_messages}
+        if existing.exists():
+            prior = json.loads(existing.read_text())['request']
+            if prior.get('policy_version') == 1 and prior['instruction_message_id'] == instruction_message_id:
+                if prior['client_id'] != client:
+                    raise ValueError('Canonical lookup conflicts with the admitted client')
+                request['policy_version'] = 1
+                request['client'] = prior['client']
+                request.pop('context_messages', None)
         if resume:
             request['resume_thread_id'] = resume
         if len(json.dumps(request).encode()) > 28000:

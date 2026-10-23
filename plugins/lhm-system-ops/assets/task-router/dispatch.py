@@ -8,10 +8,11 @@ import re
 import stat
 import subprocess
 import time
+from client_directory import refresh as refresh_directory
 
 BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/task-router')
 WORK = Path('/var/lib/lhm-task-router')
-VAULT = Path('/home/hermes/.hermes/profiles/lhm_brain/vault').resolve()
+VAULT = Path('/home/hermes/.hermes/profiles/lhm_brain/vault-task-router').resolve()
 PROFILE = Path('/home/hermes/.hermes/profiles/lhm_chief_of_staff')
 ID = re.compile(r'ted-route-[1-9][0-9]*-dm[1-9][0-9]*')
 
@@ -64,20 +65,23 @@ def prepare(request):
     if not source.is_relative_to(VAULT) or not source.is_dir():
         raise ValueError('Registered client context is missing')
     sources, size = [], 0
-    candidates = sorted(source.rglob('*.md'), key=lambda p: (len(p.parts), str(p)))
+    priority = {str(VAULT / p): i for i, p in enumerate(request['client'].get('context_notes', []))}
+    candidates = sorted(source.rglob('*.md'), key=lambda p: (priority.get(str(p), 999), len(p.parts), str(p)))
     for path in candidates:
         if len(sources) >= 32 or size >= 160000:
             break
         if path.is_symlink() or not path.resolve().is_relative_to(source):
             continue
-        if path.stat().st_size > 32000:
+        limit = 512000 if str(path) in priority else 32000
+        if path.stat().st_size > limit:
             continue
-        raw = read(path, 32000).encode()
+        full = read(path, limit).encode()
+        raw = full if len(full) <= 32000 else (full[:8000].decode(errors='ignore') + '\n[Bounded extract: middle omitted; consult canonical source for full evidence.]\n' + full[-23000:].decode(errors='ignore')).encode()
         if len(raw) > 32000 or size + len(raw) > 160000:
             continue
         name = f'{len(sources):02d}-{path.name}'
         (context / name).write_bytes(raw)
-        sources.append({'snapshot': 'context/' + name, 'source': str(path.relative_to(VAULT))})
+        sources.append({'snapshot': 'context/' + name, 'source': str(path.relative_to(VAULT)), 'truncated': len(raw) != len(full)})
         size += len(raw)
     if not sources:
         raise ValueError('No bounded client context available; do not run without evidence')
@@ -114,6 +118,10 @@ def tick():
         if re.fullmatch(r'[a-z0-9][a-z0-9-]{0,79}', key) and all(k in value for k in ['name', 'vault_prefix', 'drive_folder_query']):
             config['clients'][key] = value
     atomic(PROFILE / 'task-router.json', config)
+    try:
+        refresh_directory(VAULT, PROFILE, config['clients'])
+    except Exception as exc:
+        print(json.dumps({'client_directory': 'unavailable', 'reason': str(exc)}))
     for path in sorted((BASE / 'incoming').glob('*.json'))[:8]:
         request_id = path.stem
         if not ID.fullmatch(request_id):

@@ -327,7 +327,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 ### Project Hub
 
-`run-hermes-task` supports central TED routing: a simple personal work request selects Codex for website/code and Workspace tasks or Claude for research/writing/planning. Sessions persist, feedback resumes the same session, and results return to BasicOps. Existing pilot chats remain intact; Claude sessions stay on the VPS. Publication and sends keep their own permission boundaries. Skill count is unchanged.
+`run-hermes-task` supports central TED routing: a simple personal work request selects Codex for website/code and Workspace tasks or Claude for research/writing/planning. Client names and aliases resolve through a refreshed read-only directory from the shared Obsidian index/overviews; Discussion briefs reach the worker. Sessions persist, feedback resumes the same session, and results return to BasicOps. Existing pilot chats remain intact; Claude sessions stay on the VPS. Publication and sends keep their own permission boundaries. Skill count is unchanged.
 
 **Personal Work Flow** (1 skill): Personal weekly planning and daily selection for Michael and the team, with overwhelmed mode, project/client priority ranking, optional mini stand-ups and a full BasicOps inbox review. The inbox flow presents client-risk rescue, stale/likely closure, delegate, keep and needs-decision groups, then applies only confirmed mutations through the shared BasicOps task manager with read-back verification.
 

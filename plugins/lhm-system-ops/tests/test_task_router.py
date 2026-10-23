@@ -2,6 +2,7 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+import time
 import unittest
 
 SOURCE = Path(__file__).resolve().parents[1] / 'assets/task-router/router.py'
@@ -99,6 +100,46 @@ class RoutingTests(unittest.TestCase):
         self.router.submit(123, 'dm123')
         self.messages.append({'id': 'dm124', 'user': 36398, 'created': 2, 'message': '@Ted revise the wording please'})
         with self.assertRaises(ValueError): self.router.submit(123, 'dm124')
+
+    def test_alpha_brief_in_discussion_resolves_and_reaches_worker(self):
+        self.task['title'] = 'Alpha: Client Comms - Prepare October meeting-wrap review'
+        self.task['description'] = 'Metadata and source tracker link only'
+        self.router.config['clients'] = {'alpha-sports-med': {'name': 'Alpha Sports Med', 'vault_prefix': '20 Clients/Alpha Sports Med/'}}
+        self.messages.insert(0, {'id': 'dm122', 'user': 36398, 'created': 0,
+                                'message': 'Prepare the Alpha Sports Med meeting wrap. No email sends. AI authorship: Codex.'})
+        result = self.router.submit(123, 'dm123')
+        request = json.loads((self.queue / 'incoming' / (result['request_id'] + '.json')).read_text())
+        self.assertEqual(request['client_id'], 'alpha-sports-med')
+        self.assertIn('No email sends', request['context_messages'][0]['text'])
+        # TED's later handback/status must not change the original intake contract.
+        self.messages.append({'id': 'dm125', 'user': 82491, 'created': 3, 'message': 'Queued for the worker'})
+        self.assertEqual(self.router.submit(123, 'dm123')['request_id'], result['request_id'])
+
+    def test_documented_short_alias_is_not_a_generic_word_match(self):
+        self.router.config['clients']['example']['aliases'] = ['Example']
+        self.task['title'] = 'Example: prepare review'
+        self.assertEqual(self.router.preview(123, 'dm123')['client_id'], 'example')
+        self.task['title'] = 'A generic example of an update'
+        # Long aliases still need explicit canonical evidence; short aliases only match prefix.
+        self.router.config['clients']['example']['aliases'] = ['Ex']
+        self.task['title'] = 'Ex plan'
+        with self.assertRaises(ValueError): self.router.preview(123, 'dm123')
+
+    def test_colliding_aliases_are_a_real_ambiguity(self):
+        self.router.config['clients']['example']['aliases'] = ['Alpha']
+        self.router.config['clients']['other'] = {'name': 'Other Clinic', 'aliases': ['Alpha']}
+        self.task['title'] = 'Alpha: prepare update'
+        with self.assertRaises(ValueError): self.router.preview(123, 'dm123')
+
+    def test_stale_directory_blocks_admission_but_not_status(self):
+        self.router.directory = {'knowledge_refreshed_at': time.time() - 1800}
+        with self.assertRaises(ValueError): self.router.preview(123, 'dm123')
+        self.assertEqual(self.router.status(123)['status'], 'not_submitted')
+
+    def test_lookup_returns_existing_context_without_task_creation(self):
+        self.router.config['clients']['example']['aliases'] = ['Alpha']
+        self.assertEqual(self.router.client_lookup('Alpha')['matches'][0]['client_id'], 'example')
+        self.assertEqual(list((self.queue / 'incoming').glob('*')), [])
 
     def test_assignment_alone_not_permission(self):
         self.messages[0]['message'] = 'Thanks Ted'

@@ -28,7 +28,7 @@ for name in ['router.py', 'server.py']:
     shutil.copy2(stage / name, profile / 'task-router' / name)
     os.chown(profile / 'task-router' / name, 0, 10000)
     (profile / 'task-router' / name).chmod(0o640)
-for name in ['dispatch.py', 'worker.py']:
+for name in ['dispatch.py', 'worker.py', 'client_directory.py', 'refresh_knowledge.py']:
     shutil.copy2(stage / name, Path('/usr/local/libexec/lhm-task-router') / name)
     (Path('/usr/local/libexec/lhm-task-router') / name).chmod(0o755)
 shutil.copy2(stage / 'lhm-codex-session-worker', '/usr/local/libexec/lhm-wellness-codex-pilot.py')
@@ -45,7 +45,7 @@ for key, value in ads.items():
         clients[key] = {'name': value['name'], 'vault_prefix': value['evidence_prefix'],
                         'drive_folder_query': 'exact registered folder ' + value['drive_folder_url'],
                         'basicops_task_ids': value.get('basicops_task_ids', [])}
-config = {'schema_version': 1, 'agent_user_id': 82491, 'reviewer_id': 36398,
+config = {'schema_version': 1, 'require_client_directory': True, 'agent_user_id': 82491, 'reviewer_id': 36398,
           'providers': {'codex': True, 'claude': True}, 'clients': clients}
 target = profile / 'task-router.json'
 target.write_text(json.dumps(config, indent=2) + '\n')
@@ -56,7 +56,7 @@ c = yaml.safe_load(settings.read_text())
 c.setdefault('mcp_servers', {})['task_router'] = {
     'command': '/opt/hermes/.venv/bin/python',
     'args': ['/opt/data/profiles/lhm_chief_of_staff/task-router/server.py'],
-    'tools': {'include': ['task_route_preview', 'task_route_submit', 'task_route_status']}}
+    'tools': {'include': ['task_route_preview', 'task_route_submit', 'task_route_status', 'task_client_lookup']}}
 route = c['platforms']['webhook']['extra']['routes']['basicops']
 if 'task_router' not in route['toolsets']:
     route['toolsets'].append('task_router')
@@ -85,6 +85,30 @@ for name, body in [('lhm-task-router.service', unit), ('lhm-task-router.timer', 
     if path.exists():
         shutil.copy2(path, backup / name)
     path.write_text(body)
+refresh_unit = '''[Unit]
+Description=Read shared client knowledge into TED's isolated routing cache
+After=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/local/libexec/lhm-task-router/refresh_knowledge.py
+TimeoutStartSec=510
+UMask=0027
+'''
+refresh_timer = '''[Unit]
+Description=Refresh TED shared client knowledge without bidirectional writes
+[Timer]
+OnBootSec=20
+OnUnitActiveSec=300
+Unit=lhm-task-router-knowledge.service
+[Install]
+WantedBy=timers.target
+'''
+for name, body in [('lhm-task-router-knowledge.service', refresh_unit), ('lhm-task-router-knowledge.timer', refresh_timer)]:
+    path = Path('/etc/systemd/system') / name
+    if path.exists():
+        shutil.copy2(path, backup / name)
+    path.write_text(body)
 subprocess.run(['systemctl', 'daemon-reload'], check=True)
+subprocess.run(['systemctl', 'enable', '--now', 'lhm-task-router-knowledge.timer'], check=True)
 subprocess.run(['systemctl', 'enable', '--now', 'lhm-task-router.timer'], check=True)
 print(json.dumps({'installed': True, 'backup': str(backup), 'registered_clients': len(clients), 'ted_reload_required': True}))
