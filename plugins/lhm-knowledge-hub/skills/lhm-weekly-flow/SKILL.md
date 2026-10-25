@@ -1,6 +1,6 @@
 ---
 name: lhm-weekly-flow
-description: Run Michael’s separate founder/business weekly review and planning interview using its Obsidian vault, WeekFlow context and operating systems. Use when Michael says “run my business weekly flow”, “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, improve or complete an LHM weekly planning session. Begin with a personal check-in, use evidence to help recall the week, review time and unfinished work, then update Obsidian with decisions, three weekly outcomes and capacity-checked commitments. Keep planning separate from optional action work and verify any authorised WeekFlow scheduling.
+description: "Run Michael’s separate founder/business weekly review and planning interview using its Obsidian vault, WeekFlow context and operating systems. Use when Michael says “run my business weekly flow”, “start the weekly flow”, “run the weekly review”, “plan the week”, “review last week”, “what needs my attention?”, or asks to prepare, continue, improve or complete an LHM weekly planning session. Default to a brisk business conversation: personal check-in, current-quarter Obsidian goal progress and sales, material decisions, then up to three goal-aligned weekly commitments. Save confirmed changes in Obsidian; leave client/task selection to the separate staff review. Keep planning separate from optional action work and verify any authorised WeekFlow scheduling."
 ---
 ## Client file routing
 
@@ -33,13 +33,23 @@ For morning attention sweeps, ongoing “what’s next?” sessions and end-of-d
 
 ## Session shape: plan first, act second
 
-Aim for a 30–40 minute core planning conversation, not a compulsory time limit. Keep the personal check-in and useful reflection. Compress unchanged sections; do not make Michael answer questions already resolved by evidence. If he wants to explore a material decision, allow it and make the trade-off visible.
+Default to a brisk business review, as Michael confirmed on 26 October 2026. Do not turn the nine reference sections below into a compulsory questionnaire or target a minimum duration. Use this conversational order:
+
+1. **Check in:** energy, wins and what is on Michael’s mind. His opening answer may already cover sales and friction; capture it once.
+2. **Review the current quarter before selecting commitments:** read the canonical quarterly plan and linked goal notes; show targets, dated evidence, progress and the gap. Discuss sales momentum and commercial value together.
+3. **Resolve only material business choices:** continue, change or park a goal/project; distinguish a decision needed now from a later idea. Discuss a delivery bottleneck at company level, without selecting individual websites or asking what each person will do.
+4. **Agree up to three weekly outcomes:** connect each to a quarterly goal, define an observable finish line, distinguish firm work from stretch, and check capacity alongside normal sales and fulfilment.
+5. **Confirm and close:** save the plan and agreed goal/project changes. Create BasicOps tasks only when requested, then verify them. Offer optional action work once.
+
+Ask one useful question at a time, reflect briefly and keep moving. Skip questions already answered in the conversation or evidence. When Michael asks to “pump through” or avoid a massive review, this compact path takes precedence over exhaustive intake, backlog, scorecard and interview sections. Expand only for a material uncertainty or at his request. Do not finish the plan and then ask whether he wants a goals review: goal alignment is part of the default flow.
 
 The core session ends with three or fewer outcomes, dependable capacity, chosen commitments and explicit waiting/overflow work. A full board cleanup, client production, email session or opportunity workshop is optional action work, not a prerequisite for completing the weekly review. Ask once at the end whether to continue into an action session; do not invent or invoke a not-yet-installed action-session skill. Use the existing `lhm-project-hub:staff-weekly-flow` for separate personal delivery planning and daily selection and `lhm-project-hub:basicops-task-manager` for authorised task writes.
 
 An explicit request to act during planning can be handled immediately. Keep the current section and next question recorded so the interview resumes without restarting. Do not force a new conversation. When the user chooses a new conversation, provide a bounded handoff with confirmed decisions, source links, pending actions and approval limits; do not assume cross-chat memory.
 
 ## Prepare decisions before presenting tasks
+
+These detailed checks apply when a material business decision requires operational evidence or Michael explicitly requests action planning. They are not a requirement to inspect the whole board, calendar or WeekFlow backlog during the compact founder review.
 
 - Reuse the existing Monday project briefing and available structured output; verify its generated time, source links and material task changes. Do not create another briefing, JSON store or automation from this skill. If it has not arrived, prepare from accessible live evidence and reconcile later arrivals into the same plan.
 - Reconcile BasicOps, relevant meetings/project digests and WeekFlow before presenting the actionable shortlist. Fetch independent reads together where supported; paginate relevant queries and keep raw payloads out of the conversation. Reading the full backlog does not commit it to the week.
@@ -56,8 +66,8 @@ An explicit request to act during planning can be handled immediately. Keep the 
    - If no authoritative active layout can be established, ask which copy is active before writes. If the private root is unavailable, do not save private notes in the shared vault as a workaround.
 2. Read `_System/Vault Conventions.md` and `_System/Multi-Agent Memory Contract.md` in each root when present. Respect the narrower privacy boundary. Absence of a shared copy of the memory contract does not permit private-to-shared disclosure.
 3. Detect the official Obsidian CLI. When available, target each resolved vault explicitly for searches and links. Otherwise use direct Markdown reads scoped to each root. Obsidian links between vaults do not provide cross-vault search or automatic access.
-4. Read private context completely: `01 Inbox/Inbox.md`, unprocessed Inbox captures, `05 Weekly/Weekly Flow.md`, `05 Weekly/Attention Queue.md`, `10 Goals/Goals.md`, active goals, `30 Projects/Projects.md`, active personal projects and relevant `40 Ideas` notes.
-5. Read relevant shared context: Clients and Client Flow, People, internal Meetings, `25 Marketing/Marketing.md`, current strategy, Sales Pipeline, and applicable `60 Knowledge` and `70 SOPs` notes. Read the actual previous Monday–Sunday client-meeting commitments and current Ads review evidence before allocating delivery time; distinguish scheduled work from carryover.
+4. Read the current quarterly plan and linked active goals completely first. Then read relevant private context: `01 Inbox/Inbox.md`, unprocessed Inbox captures, `05 Weekly/Weekly Flow.md`, `05 Weekly/Attention Queue.md`, `10 Goals/Goals.md`, `30 Projects/Projects.md`, and relevant active projects/ideas. Screen intake and captures for material changes; open relevant source notes fully rather than exhaustively reading unrelated backlog.
+5. Read relevant shared context: Clients and Client Flow, People, internal Meetings, `25 Marketing/Marketing.md`, current strategy, Sales Pipeline, and applicable `60 Knowledge` and `70 SOPs` notes. Use shared evidence only for material company outcomes or blockers in this review. Allocating delivery time and reconciling individual meeting/Ads tasks belongs in staff-weekly-flow unless Michael explicitly expands scope.
 6. From the private root, read the most recent completed weekly review and every AI conversation capture since that review. Collect unresolved lessons, recurrences and contradictions. Read `05 Weekly/Weekly Flow.md` for the current sales-review cadence, reporting period and delivery preferences rather than resetting them from memory.
 7. Search the authorised roots separately for relevant unresolved tasks, blockers, open decisions and material changes. Do not automatically copy ordinary delivery tasks into the private Attention Queue. Verify shared files are locally readable and current; a cloud placeholder or inaccessible root is not evidence of no client work.
 8. If shared context is unavailable or freshness is uncertain, continue the personal interview with that limitation explicit. Do not invent client state, create a substitute shared vault or duplicate team notes privately. Reconcile the missing shared evidence before confirming a delivery-dependent plan.
@@ -91,7 +101,7 @@ Start as a human conversation before presenting the operating briefing. Ask one 
 
 Let the answer influence the tone, depth and ambition of the review. Record relevant capacity context without turning private reflection into an operational fact Michael did not approve.
 
-Then give a compact briefing:
+Then give a compact briefing, led by current-quarter goals and sales. The following are possible inputs, not a list to recite:
 
 - The current week and date range
 - The most relevant unfinished outcomes from the previous week
@@ -100,7 +110,7 @@ Then give a compact briefing:
 - New AI-captured lessons, knowledge candidates and operational blockers since the previous review
 - Missing scorecard data that may need to be supplied
 
-Before the wins review, route the Monday intake in this order:
+Prepare material Monday intake in the background in this order; do not delay the goals/sales conversation for a full intake interview:
 
 1. Prepare dispositions for unprocessed `01 Inbox` captures. Discuss only items that materially affect this week; retain the rest in an explicit optional action-session queue. Do not require a full Inbox cleanup before planning.
 2. Review structured `seed` ideas that are relevant now; do not force parked or unrelated ideas into the week.
@@ -109,7 +119,19 @@ Before the wins review, route the Monday intake in this order:
 
 When an Inbox thought is worth developing, ask focused questions one at a time. Move it to `40 Ideas` only after it states the problem or opportunity, potential value, evidence or rationale and smallest next test. Aim to leave no unclassified Inbox item older than seven days.
 
-Then run the interview one section at a time. Ask one main question per message; use up to three tightly related prompts only when they are naturally answered together. Do not dump the entire questionnaire on Michael.
+Use the compact session order above. The sections below are reference prompts to draw on when relevant, not nine compulsory interview stages. Ask one main question per message; use up to three tightly related prompts only when they are naturally answered together. Do not dump the entire questionnaire on Michael.
+
+## Current-quarter goals and sales check
+
+Resolve the actual quarter from Australia/Melbourne dates and the canonical plan. If Michael casually says “Q3” in late October while referring to the current quarter, briefly explain that you are using Q4; ask only if he genuinely wants a historical Q3 review. Never hard-code this session’s goals or targets into future reviews.
+
+Use one compact table: **quarterly goal and target | evidence/progress as of date | status and remaining gap | weekly contribution**. Use `on target`, `at risk`, `off target`, `achieved`, `parked` or `unverified`, with a short reason. A numerical status needs an actual count/value and a relevant milestone or pace; do not invent linear monthly quotas for an uneven quarter. Positive momentum alone is not proof of being on target. With missing actuals, state exactly what is unverified and continue planning unless the missing fact changes the decision.
+
+For sales, separate booked calls, agreed sales, first payments, collected cash and open pitches. Label week/month/quarter and approximate one-to-two-week recall. Deduplicate overlapping reports. Compare both number of deals and sale values with the goal: five lower-priced sales do not establish four sales at the target price, and an outstanding large pitch cannot close a revenue gap until won. Do not force a mailbox/accounting audit or full scorecard merely to finish a quick review; use attributed reports and keep reconciliation explicit.
+
+Clarify the one ambiguity that changes a goal, such as “three total including one secured, so two more?” Apply an explicit revised target to the canonical goal and quarterly summary, preserving dated history and identifying the superseded target. Distinguish new-client acquisition from repricing existing clients. When a project is parked, update its canonical status and retire its active milestone in the quarterly summary; do not silently revive it next week. Preserve ideas such as a weekly client-call model as proposals until agreed.
+
+Link weekly outcomes to the existing goals; do not invent a new goal to justify an experiment. Keep a small test bounded and separate its result from a possible later rollout. Record a weak link honestly and protect the more direct priorities if capacity competes. Training content supports delivery capability but does not itself prove live website launches or a complete process map.
 
 ## Interview sequence
 
@@ -210,7 +232,7 @@ When Michael resolves an item:
 
 Do not treat every queue item as a priority for the current week.
 
-When Michael asks an agent to create a personal BasicOps task, use the `Michael Tasks` board, `INBOX` section and Michael as assignee unless he explicitly requests different routing. Always return the task link.
+When Michael requests tasks for the agreed outcomes, use `lhm-project-hub:basicops-task-manager` and verify the `Michael Tasks` / `INBOX` route and Michael as assignee. Internal LHM titles start `LHM: <workstream> - <plain action>`. Create or reuse one task per agreed outcome, keeping stretch work inside its brief rather than multiplying tasks. Deduplicate by equivalent outcome, not only title. Include goal context, finish line, inputs and next review/handoff in Discussion; preserve private reflection outside BasicOps. Do not infer dates or time blocks from “add to my inbox”; use confirmed timing in the brief and explicit due dates only when authorised. Read back routing, owner, title and Discussion, return all task links and save a publication receipt in the private weekly note. Task creation is optional and does not execute or publish the work.
 
 ### 7. Active projects and opportunities
 
@@ -241,6 +263,8 @@ Turn each outcome into the minimum necessary commitments with owner and agreed t
 Confirm the final plan with Michael before marking the review complete.
 
 ## Capacity and priority decisions
+
+For the default founder review, check whether the business outcomes fit alongside sales and fulfilment without building a daily schedule. Detailed daily ordering and calendar/task allocation below apply only to an explicitly requested action or combined planning session; otherwise hand them to staff-weekly-flow.
 
 Rank work using evidence: first actions that unblock another person or protect a client promise/live service, then due client delivery, then agreed opportunities and internal improvements. A genuine immediate client risk can outrank an ordinary handoff. Explain the top choices; do not mark every item high priority.
 
@@ -280,7 +304,7 @@ If the session stops early, leave `status: draft` and tell Michael which section
 
 When Michael confirms the plan:
 
-1. Ensure the weekly note contains wins, losses, lesson dispositions, available scorecard data, reviewed attention items, active project changes, three or fewer outcomes, commitments, decisions and parking-lot items.
+1. Ensure the weekly note contains the relevant wins/friction, current-quarter goal assessment and sales evidence, material decisions, up to three goal-aligned outcomes, commitments and parked work. Record skipped reference sections as not reviewed/not material and missing figures as unavailable; do not leave empty template placeholders implying a completed audit or fabricate answers to complete every section.
 2. Move completed attention items to `Resolved`; keep deferred items in `Waiting` with a reason and review date.
 3. Add newly discovered Michael-level decisions using the next unused stable `ATT-nnn` identifier.
 4. Update canonical goal, marketing and project notes without duplicating detailed task lists.
