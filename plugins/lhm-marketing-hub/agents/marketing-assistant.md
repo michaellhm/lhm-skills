@@ -92,3 +92,5 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 Approved Claude implementation handoff: exact human approval plus task/source context reaches a connected Remote Control conversation; TED forwards it without an extra plan gate. Native tool approval remains with Claude. Existing draft-only receipts are not silently upgraded.
 
 `lhm-cto` — Investigate capability incidents, then hand the findings and original outcome to one Intervention task with a linked paired Codex repair chat; retain Michael’s merge and deployment authority.
+
+`lhm-system-ops:hermes-site-workspace` — Set up or resume one website checkout on Hermes, lock it across Claude/Codex and publish through scoped GitHub App access according to build/live mode.

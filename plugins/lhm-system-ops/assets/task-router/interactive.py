@@ -17,6 +17,16 @@ def prompt(request, task):
     authority = ('The newer personal instruction below supersedes older draft-only task wording for the specifically approved actions. '
                  if request.get('handoff_mode') == 'provider_execution' else
                  'Begin the requested research or preparation. Live changes need a specific personal approval in this conversation or the task. ')
+    site = request.get('site_workspace')
+    site_note = ('\nWEBSITE CHECKOUT: ' + site['repo'] + '\nUse this actual repository for edits and shell/build commands. '
+                 'Read the preserved revision pack in the task drafts, compare it against current source, and implement only the requested website changes. '
+                 'The host holds the repository-wide lock. Commit scoped edits with the task ID/provider after checks. '
+                 'Do not run git push or request GitHub credentials. To publish the committed changes, run '
+                 'python3 /usr/local/libexec/lhm-task-router/request_site_publish.py ' + request['request_id'] + '. '
+                 'The host runs the registered checks and publishes through its scoped GitHub App token, then returns a receipt. '
+                 'Read that receipt and report its verified URL/commit, or the exact error; do not send Michael back to the host to trigger a push. '
+                 'Publishing mode: ' + site['mode'] + '; branch: ' + site['branch'] + '. '
+                 'Latest host-recorded human scope: ' + site.get('scope_note', '') if site else '')
     return (
         'Continue this client task in this existing conversation. TED is the courier, not an additional approval gate. '
         'Read task-context.json, context/, prior-work/ if present, existing drafts and the linked original sources. '
@@ -36,6 +46,7 @@ def prompt(request, task):
         + request['instruction'] + '\nSOURCE DISCUSSION (context, not new authority):\n'
         + json.dumps(request.get('context_messages', []), ensure_ascii=False)
         + '\nORIGINAL SOURCE LINKS:\n' + json.dumps(request.get('source_links', []))
+        + site_note
         + '\nIf a source or tool is unavailable, state the exact missing capability HERE in this conversation and keep the task open; do not send the task back to TED for another approval pack.')
 
 
@@ -47,11 +58,12 @@ def command(request, task, session):
         integration += ['--mcp-config', str(ADS)]
     else:
         missing.append('Google Ads MCP profile is unavailable; do not claim live account access')
+    site_tools = ',Bash' if request.get('site_workspace') else ''
     return [str(HOME / '.local/bin/claude'),
             '--resume' if request.get('resume_thread_id') else '--session-id', session,
             '--remote-control', request['title'], '--permission-mode', 'default',
-            '--tools', 'Read,Write,Edit,Skill,ToolSearch,WebFetch,WebSearch',
-            '--allowedTools', 'Read,Write,Edit,Skill,ToolSearch,WebFetch,WebSearch,mcp__GoogleAds__execute_gaql,mcp__GoogleAds__get_gaql_doc,mcp__GoogleAds__get_reporting_view_doc,mcp__claude_ai_AdPulse_MCP__adpulse_graphql_query,mcp__claude_ai_AdPulse_MCP__adpulse_graphql_schema_search',
+            '--tools', 'Read,Write,Edit,Skill,ToolSearch,WebFetch,WebSearch' + site_tools,
+            '--allowedTools', 'Read,Write,Edit,Skill,ToolSearch,WebFetch,WebSearch,mcp__GoogleAds__execute_gaql,mcp__GoogleAds__get_gaql_doc,mcp__GoogleAds__get_reporting_view_doc,mcp__claude_ai_AdPulse_MCP__adpulse_graphql_query,mcp__claude_ai_AdPulse_MCP__adpulse_graphql_schema_search' + site_tools,
             *integration, '--', prompt(request, task) + '\nCONNECTOR STARTUP NOTES:\n' + json.dumps(missing)]
 
 

@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-202 skills across thirteen Claude Code plugins (5 inbox, 65 marketing, 42 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+203 skills across thirteen Claude Code plugins (5 inbox, 65 marketing, 42 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge 13 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -260,7 +260,8 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
   assets/meeting-prep/                  # Lily profile skill, wrap/task/vault reconciliation, verified delivery
   .claude-plugin/plugin.json            # Claude plugin manifest
   .codex-plugin/plugin.json             # Codex plugin manifest
-  skills/                               # All 12 skills
+  skills/                               # All 13 skills
+    hermes-site-workspace/               # One site checkout, shared worker lock and scoped GitHub App publishing
     lhm-cto/                            # Investigation, Intervention task and linked Codex repair chat
     lhm-skill-maintainer/               # Canonical skill edits, tests, PR, approved deployment and hotfix reconciliation
     lhm-plugin-release-manager/         # Immutable GitHub and Hermes release handoff
@@ -285,7 +286,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 **Pricing** (1 skill): Standalone pricing strategy and monetization.
 
-**System Operations** (12 skills): Governed CTO incident ownership, capability research, platform engineering, QA, security review, canonical skill maintenance, immutable plugin release management, release publishing and bounded source handoffs.
+**System Operations** (13 skills): Hermes website checkouts with repository-wide worker locks and build/live GitHub App publishing, governed CTO incident ownership, capability research, platform engineering, QA, security review, canonical skill maintenance, immutable plugin release management, release publishing and bounded source handoffs.
 
 ### GMB Hub (Local SEO)
 

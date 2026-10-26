@@ -201,3 +201,6 @@ Return one concise receipt containing:
 Call the outcome complete only when the source acceptance condition, every required Drive delivery receipt and review
 request are all verified. Describe work awaiting human inspection as `ready for review`, not
 completed.
+
+## Managed website source
+For website work on Hermes, use `lhm-system-ops:hermes-site-workspace` before treating a task-context folder as a website checkout. Registered sites reuse one source folder across Claude and Codex, with a host-enforced repository-wide lock and GitHub App credentials. Build-mode sites may publish tested commits to main under recorded human authority; live sites use task branches/review. Preserve existing sessions/drafts on migration; resolve exact repo and deployment mapping before changing mode. Normal task intake automatically invokes the site supervisor for registered clients. Missing App/repo/build access remains an exact capability gap, not another hypothetical operator pack or permission to copy human credentials.
