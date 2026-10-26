@@ -28,9 +28,22 @@ for name in ['router.py', 'server.py']:
     shutil.copy2(stage / name, profile / 'task-router' / name)
     os.chown(profile / 'task-router' / name, 0, 10000)
     (profile / 'task-router' / name).chmod(0o640)
-for name in ['dispatch.py', 'worker.py', 'interactive.py', 'recover.py', 'recover_admission.py', 'client_directory.py', 'refresh_knowledge.py', 'workspaces.py', 'delivery.py', 'drive_publisher.py', 'router.py']:
+for name in ['dispatch.py', 'worker.py', 'interactive.py', 'recover.py', 'recover_admission.py', 'site_workspace.py', 'site_source_check.py', 'client_directory.py', 'refresh_knowledge.py', 'workspaces.py', 'delivery.py', 'drive_publisher.py', 'router.py']:
     shutil.copy2(stage / name, Path('/usr/local/libexec/lhm-task-router') / name)
     (Path('/usr/local/libexec/lhm-task-router') / name).chmod(0o755)
+# Install the discoverable site workflow into the Hermes coordination profiles.
+site_skill = stage.parents[1] / 'skills/hermes-site-workspace/SKILL.md'
+site_contract = stage / 'SITE-WORKSPACES.md'
+for name in ['lhm_brain', 'lhm_chief_of_staff']:
+    destination = Path('/home/hermes/.hermes/profiles') / name / 'skills/hermes-site-workspace'
+    destination.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(site_skill, destination / 'SKILL.md')
+    shutil.copy2(site_contract, destination / 'HOST-CONTRACT.md')
+    text = (destination / 'SKILL.md').read_text().replace('../../assets/task-router/SITE-WORKSPACES.md', 'HOST-CONTRACT.md')
+    (destination / 'SKILL.md').write_text(text)
+    for item in [destination, destination / 'SKILL.md', destination / 'HOST-CONTRACT.md']:
+        os.chown(item, 0, 10000)
+        item.chmod(0o755 if item.is_dir() else 0o644)
 shutil.copy2(stage / 'lhm-codex-session-worker', '/usr/local/libexec/lhm-wellness-codex-pilot.py')
 execution_settings = Path('/home/claudeworker/.config/lhm-bridge/task-execution.settings.json')
 execution_settings.parent.mkdir(parents=True, exist_ok=True)

@@ -175,6 +175,15 @@ def prepare(request):
         os.chown(workspace / name, 0, 0)
         (workspace / name).chmod(0o555)
     publish_registry()
+    from site_workspace import CONFIG as site_config, config as read_site_config, site_for
+    if site_config.exists():
+        settings = read_site_config()
+        if any(row['client_id'] == request['client_id'] for row in settings['sites'].values()):
+            site_for(request, settings)
+            subprocess.run(['systemd-run', '--quiet', '--collect', '--unit=lhm-site-' + request_id,
+                            '/usr/bin/python3', '/usr/local/libexec/lhm-task-router/site_workspace.py', 'run', request_id],
+                           check=True, timeout=20)
+            return
     launch(request, run, client_root)
 
 
@@ -190,6 +199,15 @@ def launch(request, run, client_root):
              'NoNewPrivileges=true', 'PrivateTmp=true', 'PrivateDevices=true',
              'ProtectKernelTunables=true', 'ProtectControlGroups=true', 'RestrictSUIDSGID=true',
              'UMask=0027', 'RuntimeMaxSec=' + ('86500' if request.get('handoff_mode') in {'provider_execution', 'provider_conversation'} else '1300'), 'WorkingDirectory=' + str(client_root)]
+    if (run / 'site-location.json').exists():
+        from site_workspace import validate_mapping
+        site = validate_mapping(run, request)
+        task_path = site['task_directory']
+        props += ['BindPaths=' + task_path, 'ReadWritePaths=' + task_path,
+                  'InaccessiblePaths=-/etc/lhm-sites -/var/lib/lhm-sites/.locks']
+        # Read-only old workspace lock remains available for the original provider/client lease.
+        original = json.loads(read(run / 'workspace-location.json'))['workspace']
+        props += ['BindReadOnlyPaths=' + original + '/.control']
     command = ['systemd-run', '--quiet', '--collect', '--unit=lhm-task-' + request_id]
     for prop in props:
         command += ['--property=' + prop]
