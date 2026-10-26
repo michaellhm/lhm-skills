@@ -21,7 +21,10 @@ def prompt(request, task):
     site_note = ('\nWEBSITE CHECKOUT: ' + site['repo'] + '\nUse this actual repository for edits and shell/build commands. '
                  'Read the preserved revision pack in the task drafts, compare it against current source, and implement only the requested website changes. '
                  'The host holds the repository-wide lock. Commit scoped edits with the task ID/provider after checks. '
-                 'Do not push or request GitHub credentials; the host publishes with a scoped GitHub App token after checks. '
+                 'Do not run git push or request GitHub credentials. To publish the committed changes, run '
+                 'python3 /usr/local/libexec/lhm-task-router/request_site_publish.py ' + request['request_id'] + '. '
+                 'The host runs the registered checks and publishes through its scoped GitHub App token, then returns a receipt. '
+                 'Read that receipt and report its verified URL/commit, or the exact error; do not send Michael back to the host to trigger a push. '
                  'Publishing mode: ' + site['mode'] + '; branch: ' + site['branch'] + '. '
                  'Latest host-recorded human scope: ' + site.get('scope_note', '') if site else '')
     return (

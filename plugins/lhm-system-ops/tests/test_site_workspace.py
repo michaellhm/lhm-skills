@@ -127,3 +127,56 @@ class PublicationTests(unittest.TestCase):
                         with self.assertRaises(ValueError):m.publish('ysp',request['request_id'],'reviewed')
                         self.assertFalse(any(c[0]=='push' for c in calls))
                 self.assertFalse(any('--force' in c for c in calls))
+
+class WorkerPublicationBridgeTests(unittest.TestCase):
+    def fixture(self, root):
+        request={'client_id':'ysp','request_id':'ted-route-1-dm1','provider':'claude'}
+        run=root/'run';run.mkdir();task=root/'task';task.mkdir()
+        (run/'request.json').write_text(json.dumps(request));(task/'publish-request.json').write_text('{}')
+        mapping={'repo':str(root/'repo'),'site_id':'ysp','task_directory':str(task)}
+        packet={'request_id':request['request_id'],'commit':'a'*40,'nonce':'test-nonce-123'}
+        return request,run,mapping,packet
+
+    def test_worker_packet_rejects_other_task_arbitrary_target_and_symlink(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p=Path(tmp)/'request.json';request={'request_id':'ted-route-1-dm1','provider':'claude'}
+            packet={'request_id':'ted-route-1-dm1','commit':'a'*40,'nonce':'test-nonce-123'}
+            with patch.dict(m.PROVIDERS,{'claude':(os.getuid(),'current')}):
+                p.write_text(json.dumps(packet));self.assertEqual(m.read_publication_packet(p,request),packet)
+                for bad in [{**packet,'request_id':'ted-route-2-dm2'},{**packet,'branch':'main'},{**packet,'commit':'HEAD'}]:
+                    p.write_text(json.dumps(bad))
+                    with self.assertRaises(ValueError):m.read_publication_packet(p,request)
+                link=Path(tmp)/'link';link.symlink_to(p)
+                with self.assertRaises(OSError):m.read_publication_packet(link,request)
+
+    def test_success_freezes_checks_publishes_thaws_and_is_idempotent(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            request,run,mapping,packet=self.fixture(Path(tmp));order=[]
+            def command(args,**_kw):order.append(args[1]);return SimpleNamespace(returncode=0)
+            def check(*a,**kw):self.assertTrue(kw['_lease_held']);order.append('checks');return {'passed':True,'commit':'a'*40}
+            def publish(*a,**kw):self.assertTrue(kw['_lease_held']);order.append('publish');return {'commit':'a'*40,'url':'https://github.com/example/repo/commit/'+'a'*40}
+            with patch.object(m,'validate_mapping',return_value=mapping),patch.object(m,'read_publication_packet',return_value=packet),patch.object(m.subprocess,'run',side_effect=command),patch.object(m,'git',return_value=SimpleNamespace(stdout='a'*40+'\n')),patch.object(m,'check_site',side_effect=check),patch.object(m,'publish',side_effect=publish):
+                m.process_publication_request(run,'unit')
+                result=json.loads((run/'site-publication.json').read_text());self.assertEqual(result['status'],'published')
+                self.assertEqual(order,['freeze','checks','publish','thaw'])
+                with patch.object(m,'read_owned',return_value=result):m.process_publication_request(run,'unit')
+                self.assertEqual(order,['freeze','checks','publish','thaw'])
+
+    def test_changed_commit_or_failed_checks_never_push_and_always_thaw(self):
+        for failure in ['changed','checks']:
+            with tempfile.TemporaryDirectory() as tmp:
+                request,run,mapping,packet=self.fixture(Path(tmp));calls=[]
+                def command(args,**_kw):calls.append(args[1]);return SimpleNamespace(returncode=0)
+                with patch.object(m,'validate_mapping',return_value=mapping),patch.object(m,'read_publication_packet',return_value=packet),patch.object(m.subprocess,'run',side_effect=command),patch.object(m,'git',return_value=SimpleNamespace(stdout=('b' if failure=='changed' else 'a')*40+'\n')),patch.object(m,'check_site',return_value={'passed':False}),patch.object(m,'publish') as publish:
+                    m.process_publication_request(run,'unit')
+                    publish.assert_not_called();self.assertEqual(calls,['freeze','thaw'])
+                    self.assertEqual(json.loads((run/'site-publication.json').read_text())['status'],'failed')
+
+class RootReceiptSafetyTests(unittest.TestCase):
+    def test_worker_temporary_symlink_cannot_redirect_host_receipt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp); victim=folder/'host-secret';victim.write_text('preserve')
+            target=folder/'site-publication.json';target.with_suffix('.tmp').symlink_to(victim)
+            m.atomic(target,{'status':'published'})
+            self.assertEqual(victim.read_text(),'preserve')
+            self.assertEqual(json.loads(target.read_text()),{'status':'published'})

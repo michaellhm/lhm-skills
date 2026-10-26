@@ -2,7 +2,7 @@
 """Host-managed website checkouts, GitHub App credentials and repository-wide leases."""
 import argparse
 import base64
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 import fcntl
 import hashlib
 import json
@@ -12,6 +12,7 @@ import re
 import stat
 import subprocess
 import time
+import tempfile
 import urllib.error
 import urllib.request
 
@@ -52,10 +53,20 @@ def site_for(request, settings=None):
 
 
 def atomic(path, value, mode=0o644):
-    temp = path.with_suffix('.tmp')
-    temp.write_text(json.dumps(value, indent=2) + '\n')
-    temp.chmod(mode)
-    temp.replace(path)
+    # Task directories are worker-writable: never follow a predictable temporary symlink as root.
+    with tempfile.NamedTemporaryFile(mode='w', dir=path.parent, prefix='.' + path.name + '.', delete=False) as stream:
+        temp = Path(stream.name)
+        try:
+            stream.write(json.dumps(value, indent=2) + '\n')
+            stream.flush()
+            os.fchmod(stream.fileno(), mode)
+        except BaseException:
+            temp.unlink(missing_ok=True)
+            raise
+    try:
+        temp.replace(path)
+    finally:
+        temp.unlink(missing_ok=True)
 
 
 @contextmanager
@@ -230,10 +241,11 @@ def supervise(request_id):
                                     capture_output=True, text=True, timeout=10)
             if result.stdout.strip() not in {'active', 'activating', 'deactivating', 'reloading'}:
                 break
+            process_publication_request(run, unit)
             time.sleep(5)
 
 
-def check_site(site_id, request_id):
+def check_site(site_id, request_id, *, _lease_held=False):
     from dispatch import WORK, verified
     if os.geteuid() != 0 or not REQUEST.fullmatch(request_id):
         raise ValueError('Host administrator and exact request required')
@@ -246,7 +258,7 @@ def check_site(site_id, request_id):
     if key != site_id:
         raise ValueError('Wrong website')
     provider, repo = request['provider'], Path(mapping['repo'])
-    with lease(row['repository'], {'request_id': request_id, 'action': 'checks'}):
+    with (nullcontext() if _lease_held else lease(row['repository'], {'request_id': request_id, 'action': 'checks'})):
         if git(repo, ['status', '--porcelain'], provider).stdout:
             raise ValueError('Commit source changes before binding checks to a revision')
         sha = git(repo, ['rev-parse', 'HEAD'], provider).stdout.strip()
@@ -272,8 +284,8 @@ def check_site(site_id, request_id):
         return receipt
 
 
-def publish(site_id, request_id, message):
-    """Called by the host after worker exit. Build mode authorises main, live mode only its task branch."""
+def publish(site_id, request_id, message, *, _lease_held=False):
+    """Host publishes with an exclusive lease and a stopped/frozen writer; mode controls the branch."""
     from dispatch import WORK, verified
     if os.geteuid() != 0 or not REQUEST.fullmatch(request_id):
         raise ValueError('Host administrator and exact request required')
@@ -285,7 +297,7 @@ def publish(site_id, request_id, message):
     key, row = site_for(request, settings)
     if key != site_id or mapping['mode'] != row['mode']:
         raise ValueError('Publishing mode or website changed; review required')
-    with lease(row['repository'], {'request_id': request_id, 'provider': request['provider'], 'action': 'publish'}):
+    with (nullcontext() if _lease_held else lease(row['repository'], {'request_id': request_id, 'provider': request['provider'], 'action': 'publish'})):
         repo, provider = Path(mapping['repo']), request['provider']
         expected = 'https://github.com/' + row['repository'] + '.git'
         if any(git(repo, args, provider).stdout.strip() != expected for args in [['remote','get-url','origin'], ['remote','get-url','--push','origin']]):
@@ -314,6 +326,60 @@ def publish(site_id, request_id, message):
                   'message': message, 'mode': row['mode']}
         atomic(ROOT / key / 'publication.json', result)
         return result
+
+
+def read_publication_packet(path, request):
+    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+    with os.fdopen(fd) as stream:
+        info = os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_uid not in {0, PROVIDERS[request['provider']][0]} or info.st_size > 4096:
+            raise ValueError('Invalid publication request file')
+        packet = json.load(stream)
+    if (set(packet) != {'request_id', 'commit', 'nonce'} or packet['request_id'] != request['request_id']
+            or not re.fullmatch(r'[0-9a-f]{40}', str(packet['commit']))
+            or not re.fullmatch(r'[A-Za-z0-9-]{8,80}', str(packet['nonce']))):
+        raise ValueError('Publication request must name only this task, exact commit and unique nonce')
+    return packet
+
+
+def process_publication_request(run, unit):
+    """The owning site supervisor borrows its own lease while freezing its writer."""
+    request = json.loads((run / 'request.json').read_text())
+    mapping = validate_mapping(run, request)
+    path = Path(mapping['task_directory']) / 'publish-request.json'
+    if not path.exists():
+        return
+    target = run / 'site-publication.json'
+    frozen = False
+    result = {'status': 'failed', 'request_id': request['request_id']}
+    try:
+        packet = read_publication_packet(path, request)
+        fingerprint = hashlib.sha256(json.dumps(packet, sort_keys=True).encode()).hexdigest()
+        prior = read_owned(target) if target.exists() else {}
+        if prior.get('fingerprint') == fingerprint or (prior.get('status') == 'published' and prior.get('commit') == packet['commit']):
+            return
+        result.update(commit=packet['commit'], fingerprint=fingerprint)
+        subprocess.run(['systemctl', 'freeze', unit], check=True, capture_output=True, timeout=15)
+        frozen = True
+        if git(Path(mapping['repo']), ['rev-parse', 'HEAD'], request['provider']).stdout.strip() != packet['commit']:
+            raise ValueError('Requested commit differs from current HEAD')
+        checks = check_site(mapping['site_id'], request['request_id'], _lease_held=True)
+        if checks.get('passed') is not True:
+            raise ValueError('Registered website checks failed; inspect host check evidence')
+        published = publish(mapping['site_id'], request['request_id'], 'Provider requested host publication after scoped website changes', _lease_held=True)
+        result.update(published, status='published', checks=checks, published_at=int(time.time()))
+    except Exception as exc:
+        result['error'] = str(exc)[:700]
+    finally:
+        if frozen:
+            try:
+                thaw = subprocess.run(['systemctl', 'thaw', unit], capture_output=True, timeout=15)
+                if thaw.returncode:
+                    raise ValueError('Thaw failed')
+            except (subprocess.SubprocessError, ValueError):
+                result['worker_thaw_error'] = 'Host must thaw the paused worker; do not replay publication'
+    atomic(target, result)
+
 
 
 if __name__ == '__main__':
