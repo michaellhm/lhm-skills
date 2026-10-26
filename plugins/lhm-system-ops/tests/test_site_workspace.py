@@ -81,7 +81,7 @@ class WebsiteTests(unittest.TestCase):
                 m.git(Path('/site'), ['fetch','origin'], 'claude', token='ephemeral')
             self.assertNotIn('ephemeral', str(exc.exception))
             args, kw = run.call_args
-            self.assertEqual(args[0][:4], ['runuser','-u','claudeworker','--'])
+            self.assertEqual(args[0][:4], ['/usr/sbin/runuser','-u','claudeworker','--'])
             self.assertNotIn('ephemeral', ' '.join(args[0]))
             self.assertEqual(kw['env']['GIT_CONFIG_KEY_0'], 'http.https://github.com/.extraheader')
 

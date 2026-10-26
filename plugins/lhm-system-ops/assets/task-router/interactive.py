@@ -22,7 +22,8 @@ def prompt(request, task):
                  'Read the preserved revision pack in the task drafts, compare it against current source, and implement only the requested website changes. '
                  'The host holds the repository-wide lock. Commit scoped edits with the task ID/provider after checks. '
                  'Do not push or request GitHub credentials; the host publishes with a scoped GitHub App token after checks. '
-                 'Publishing mode: ' + site['mode'] + '; branch: ' + site['branch'] + '.' if site else '')
+                 'Publishing mode: ' + site['mode'] + '; branch: ' + site['branch'] + '. '
+                 'Latest host-recorded human scope: ' + site.get('scope_note', '') if site else '')
     return (
         'Continue this client task in this existing conversation. TED is the courier, not an additional approval gate. '
         'Read task-context.json, context/, prior-work/ if present, existing drafts and the linked original sources. '

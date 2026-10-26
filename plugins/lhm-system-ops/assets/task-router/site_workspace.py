@@ -125,7 +125,7 @@ def git(repo, args, provider, token=None, check=True):
         auth = base64.b64encode(('x-access-token:' + token).encode()).decode()
         env.update(GIT_CONFIG_COUNT='1', GIT_CONFIG_KEY_0='http.https://github.com/.extraheader',
                    GIT_CONFIG_VALUE_0='AUTHORIZATION: basic ' + auth)
-    command = ['runuser', '-u', user, '--', 'git', *options]
+    command = ['/usr/sbin/runuser', '-u', user, '--', 'git', *options]
     if repo is not None:
         command += ['-C', str(repo)]
     result = subprocess.run(command + args, env=env, text=True, capture_output=True, timeout=180)
@@ -141,7 +141,7 @@ def ensure_checkout(settings, key, row, provider):
     uid = PROVIDERS[provider][0]
     if repo.is_symlink():
         raise ValueError('Website checkout cannot be a symlink')
-    if repo.exists():
+    if repo.exists() and any(repo.iterdir()):
         # A previous stopped worker keeps its files. Only ownership changes, never reset/clean/stash.
         for base, dirs, files in os.walk(repo, followlinks=False):
             os.chown(base, uid, uid)
@@ -160,7 +160,7 @@ def ensure_checkout(settings, key, row, provider):
         git(repo, ['checkout', 'main'], provider)
         git(repo, ['merge', '--ff-only', 'origin/main'], provider)
     else:
-        repo.mkdir(mode=0o750); os.chown(repo, uid, uid)
+        repo.mkdir(mode=0o750, exist_ok=True); os.chown(repo, uid, uid)
         git(None, ['clone', '--branch', 'main', '--single-branch', 'https://github.com/' + row['repository'] + '.git', str(repo)],
             provider, installation_token(settings, row))
     return repo
@@ -210,7 +210,8 @@ def supervise(request_id):
         mapping = {'request_id': request_id, 'client_id': request['client_id'],
                    'instruction_sha256': request['instruction_sha256'], 'site_id': key,
                    'repo': str(repo), 'branch': branch, 'mode': row['mode'],
-                   'authority_source': row['authority_source'], 'task_directory': old['task_directory'],
+                   'authority_source': row['authority_source'], 'scope_note': row.get('scope_note', ''),
+                   'task_directory': old['task_directory'],
                    'resume_thread_id': resume.get('thread_id'), 'lease_pid': os.getpid()}
         atomic(run / 'site-location.json', mapping)
         starting = {'status': 'starting', 'provider': request['provider'], 'request_id': request_id,
@@ -258,7 +259,7 @@ def check_site(site_id, request_id):
         user = PROVIDERS[provider][1]
         for index, command in enumerate(commands):
             with (evidence / (request_id + '-check-' + str(index) + '.log')).open('w') as log:
-                result = subprocess.run(['runuser', '-u', user, '--', *command], cwd=repo,
+                result = subprocess.run(['/usr/sbin/runuser', '-u', user, '--', *command], cwd=repo,
                     env={'PATH': '/usr/local/bin:/usr/bin:/bin', 'HOME': '/home/' + user, 'CI': 'true'},
                     stdout=log, stderr=subprocess.STDOUT, timeout=600)
             results.append({'command': command, 'exit_code': result.returncode})
