@@ -180,3 +180,12 @@ class RootReceiptSafetyTests(unittest.TestCase):
             m.atomic(target,{'status':'published'})
             self.assertEqual(victim.read_text(),'preserve')
             self.assertEqual(json.loads(target.read_text()),{'status':'published'})
+
+class PublicationHeartbeatTests(unittest.TestCase):
+    def test_only_fresh_host_publication_extends_the_worker_heartbeat(self):
+        with patch.object(m.time,'time',return_value=5000):
+            for receipt,expected in [({'status':'publishing','started_at':4990},True),({'status':'publishing','started_at':100},False),({'status':'published','started_at':4990},False)]:
+                with patch.object(m,'read_owned',return_value=receipt):
+                    self.assertEqual(m.publication_active(Path('/run')),expected)
+            with patch.object(m,'read_owned',side_effect=ValueError('Worker-owned receipt')):
+                self.assertFalse(m.publication_active(Path('/run')))

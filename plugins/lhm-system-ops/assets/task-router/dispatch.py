@@ -306,7 +306,8 @@ def tick():
         interactive_alive = (provider_receipt.exists() and current.get('transport') == 'claude-code-remote-control'
                              and current.get('status') == 'interactive'
                              and 0 <= time.time() - current.get('heartbeat_at', 0) < 60)
-        if age > 1400 and not interactive_alive:
+        from site_workspace import publication_active
+        if age > 1400 and not interactive_alive and not publication_active(work):
             atomic(run / 'receipt.json', {'status': 'failed', 'error': 'Worker timed out or stopped; inspect its saved session before retrying'})
     delivery_tick()
     subprocess.run(['docker', 'exec', '--user', 'hermes', 'hermes', '/opt/hermes/.venv/bin/python',

@@ -263,7 +263,7 @@ def check_site(site_id, request_id, *, _lease_held=False):
             raise ValueError('Commit source changes before binding checks to a revision')
         sha = git(repo, ['rev-parse', 'HEAD'], provider).stdout.strip()
         commands = row.get('checks', [])
-        if not commands or any(not isinstance(c, list) or not c or not all(isinstance(a, str) for a in c) for c in commands):
+        if not commands or len(commands) > 6 or any(not isinstance(c, list) or not c or not all(isinstance(a, str) for a in c) for c in commands):
             raise ValueError('Registered check commands are required')
         evidence = ROOT / key / 'evidence'
         evidence.mkdir(exist_ok=True, mode=0o700)
@@ -328,6 +328,16 @@ def publish(site_id, request_id, message, *, _lease_held=False):
         return result
 
 
+def publication_active(run):
+    """Only a fresh host-owned publication receipt can extend an interactive heartbeat."""
+    try:
+        receipt = read_owned(run / 'site-publication.json')
+        return (receipt.get('status') == 'publishing'
+                and 0 <= time.time() - receipt.get('started_at', 0) < 4000)
+    except (OSError, ValueError, TypeError):
+        return False
+
+
 def read_publication_packet(path, request):
     fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
     with os.fdopen(fd) as stream:
@@ -358,7 +368,8 @@ def process_publication_request(run, unit):
         prior = read_owned(target) if target.exists() else {}
         if prior.get('fingerprint') == fingerprint or (prior.get('status') == 'published' and prior.get('commit') == packet['commit']):
             return
-        result.update(commit=packet['commit'], fingerprint=fingerprint)
+        result.update(commit=packet['commit'], fingerprint=fingerprint, status='publishing', started_at=int(time.time()))
+        atomic(target, result)
         subprocess.run(['systemctl', 'freeze', unit], check=True, capture_output=True, timeout=15)
         frozen = True
         if git(Path(mapping['repo']), ['rev-parse', 'HEAD'], request['provider']).stdout.strip() != packet['commit']:
@@ -369,7 +380,7 @@ def process_publication_request(run, unit):
         published = publish(mapping['site_id'], request['request_id'], 'Provider requested host publication after scoped website changes', _lease_held=True)
         result.update(published, status='published', checks=checks, published_at=int(time.time()))
     except Exception as exc:
-        result['error'] = str(exc)[:700]
+        result.update(status='failed', error=str(exc)[:700])
     finally:
         if frozen:
             try:
