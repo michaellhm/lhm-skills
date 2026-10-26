@@ -57,4 +57,21 @@ class WorkspaceTests(unittest.TestCase):
                 with self.assertRaises(ValueError): module.publish_registry()
                 self.assertEqual(run.call_count, 1)
 
+class RegistryMergeTests(unittest.TestCase):
+    def test_legacy_registry_preserves_guidance_and_prior_entries(self):
+        prior = '# TED Client Workspaces\n\n' + module.LEGACY_MARKER + '\n\nOperating guidance: [[Workflow]].\n\n## Existing — claude\n- Workspace: `/existing`\n- Human note: retain this.\n'
+        generated = '# TED Client Workspaces\n' + module.MARKER + '\n\n## Existing — claude\n- Workspace: `/existing`\n\n## Your Story — claude\n- Workspace: `/your-story`\n'
+        body = module.merge_registry(prior, generated)
+        self.assertIn('Operating guidance: [[Workflow]].', body)
+        self.assertIn('- Human note: retain this.', body)
+        self.assertEqual(body.count('## Your Story — claude'), 1)
+        self.assertIn(module.MARKER, body)
+        self.assertEqual(module.merge_registry(body, generated), body)
+
+    def test_unknown_marker_and_conflicting_workspace_are_rejected(self):
+        generated = module.MARKER + '\n## Client — claude\n- Workspace: `/correct`\n'
+        for prior in ['# Human note', module.MARKER + '\n## Client — claude\n- Workspace: `/wrong`\n']:
+            with self.assertRaises(ValueError):
+                module.merge_registry(prior, generated)
+
 if __name__ == '__main__': unittest.main()

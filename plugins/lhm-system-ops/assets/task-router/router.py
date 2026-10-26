@@ -420,7 +420,8 @@ class Router:
             if not any(marker in plain(m.get('message', '')) and actor(m) == self.config['agent_user_id'] for m in messages):
                 location = ('Open hermes-vps in Codex and find “' + request['title'] + '”.'
                             if request['provider'] == 'codex' else
-                            'Claude session saved on the VPS. It does not appear automatically in the Claude app. Resume command: ' + str(state.get('resume_command', 'unavailable')))
+                            ('Claude session saved on the VPS. It does not appear automatically in the Claude app. Resume command: ' + str(state.get('resume_command', 'unavailable'))
+                             if state.get('thread_id') else 'Claude did not return a saved session. Inspect the admission failure before retrying.'))
                 if state.get('chat_url'):
                     location_html = '<a href="' + html.escape(state['chat_url'], quote=True) + '">Open existing ' + html.escape(request['provider'].title()) + ' chat</a>'
                 else:
