@@ -14,6 +14,8 @@ spec.loader.exec_module(module)
 
 class InteractiveTests(unittest.TestCase):
     def setUp(self):
+        agent = patch('capabilities.agent_definition', return_value={'description':'test', 'prompt':'Lead'})
+        agent.start(); self.addCleanup(agent.stop)
         self.request = {'title':'Morr: Google Ads', 'description':'Linked original report',
                         'instruction':'I approve A2, A3, A4; implement via AdPulse',
                         'instruction_message_id':'dm123', 'context_messages':[{'text':'A1 remains proposed'}]}

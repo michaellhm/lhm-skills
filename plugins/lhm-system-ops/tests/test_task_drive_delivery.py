@@ -93,12 +93,12 @@ class DeliveryTests(unittest.TestCase):
         spec=importlib.util.spec_from_file_location('drive_worker_test',SOURCE/'worker.py')
         worker=importlib.util.module_from_spec(spec);spec.loader.exec_module(worker)
         run=self.root/'worker-run';work=run/'workspace';(work/'drafts').mkdir(parents=True)
-        request={'provider':'claude','request_id':'ted-route-1-dm1','title':'Prepare a client draft','description':'Internal review','instruction':'Please draft this'}
+        request={'provider':'claude','request_id':'ted-route-1-dm1','title':'Prepare a client draft','description':'Internal review','instruction':'Please draft this','handoff_mode':'provider_conversation'}
         (run/'request.json').write_text(json.dumps(request))
         def complete(*a,**kw):
             (work/'drafts/review.md').write_text('draft')
             return SimpleNamespace(stdout=json.dumps({'result':'Prepared draft','is_error':False}),stderr='',returncode=0)
-        with patch.object(worker.subprocess,'run',side_effect=complete):worker.execute(run,'claude')
+        with patch('interactive.run_session',side_effect=complete), patch('capabilities.preflight',return_value={'status':'ready'}):worker.execute(run,'claude')
         receipt=json.loads((run/'receipt.json').read_text())
         self.assertTrue(receipt['delivery_required']);self.assertEqual(receipt['status'],'needs_review')
         self.assertEqual(receipt['artifact_manifest'],[{'relative':'review.md','size_bytes':5,'sha256':pub.digest(b'draft')}])

@@ -217,7 +217,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
   skills/                               # All 30 skills
     basicops-task-manager/              # Shared BasicOps boundary — plain-English task briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
-    run-hermes-task/                    # Human-directed Hermes dispatch; central TED routing to saved Codex/Claude VPS sessions
+    run-hermes-task/                    # Saved provider sessions; explicit Claude Lead, skills and startup connector preflight
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
     staff-weekly-flow/                  # Verified Monday brief, role-informed commitments, weekly-board cleanup and immediate follow-ups
@@ -328,7 +328,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 ### Project Hub
 
-`run-hermes-task` supports central TED routing: a simple personal work request selects Codex for website/code and Workspace tasks or Claude for research/writing/planning. Client names and aliases resolve through a refreshed read-only directory from the shared Obsidian index/overviews; Discussion briefs reach the worker. Sessions persist, feedback resumes the same session, and results return to BasicOps. An existing-chat link is posted as soon as a valid session and paired destination are available. Existing pilot chats remain intact; Claude sessions stay on the VPS. Publication and sends keep their own permission boundaries. Skill count is unchanged.
+`run-hermes-task` supports central TED routing: a simple personal work request selects Codex for website/code and Workspace tasks or Claude for research/writing/planning. Client names and aliases resolve through a refreshed read-only directory from the shared Obsidian index/overviews; Discussion briefs reach the worker. Sessions persist, feedback resumes the same session, and results return to BasicOps. An existing-chat link is posted as soon as a valid session and paired destination are available. Existing pilot chats remain intact; Claude sessions stay on the VPS. Publication and sends keep their own permission boundaries. Claude handoffs name a specialist Lead, required skills and connectors; non-model startup checks block missing requirements before task execution. Skill count is unchanged.
 
 **Personal Work Flow** (1 skill): Personal weekly planning and daily selection for Michael and the team, with overwhelmed mode, project/client priority ranking, optional mini stand-ups and a full BasicOps inbox review. The inbox flow presents client-risk rescue, stale/likely closure, delegate, keep and needs-decision groups, then applies only confirmed mutations through the shared BasicOps task manager with read-back verification.
 

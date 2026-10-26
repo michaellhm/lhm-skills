@@ -24,11 +24,11 @@ for directory in [profile / 'task-router', profile / 'task-router-state', queue,
     directory.chmod(0o755 if 'libexec' in str(directory) else (0o750 if directory in [queue, queue / 'processed', queue / 'runs'] else 0o770))
 Path('/var/lib/lhm-task-router').mkdir(exist_ok=True, mode=0o755)
 Path('/var/lib/lhm-task-router').chmod(0o755)
-for name in ['router.py', 'server.py']:
+for name in ['router.py', 'server.py', 'capabilities.py']:
     shutil.copy2(stage / name, profile / 'task-router' / name)
     os.chown(profile / 'task-router' / name, 0, 10000)
     (profile / 'task-router' / name).chmod(0o640)
-for name in ['dispatch.py', 'worker.py', 'interactive.py', 'recover.py', 'recover_admission.py', 'site_workspace.py', 'request_site_publish.py', 'site_source_check.py', 'client_directory.py', 'refresh_knowledge.py', 'workspaces.py', 'delivery.py', 'drive_publisher.py', 'router.py']:
+for name in ['capabilities.py', 'dispatch.py', 'worker.py', 'interactive.py', 'recover.py', 'recover_admission.py', 'site_workspace.py', 'request_site_publish.py', 'site_source_check.py', 'client_directory.py', 'refresh_knowledge.py', 'workspaces.py', 'delivery.py', 'drive_publisher.py', 'router.py']:
     shutil.copy2(stage / name, Path('/usr/local/libexec/lhm-task-router') / name)
     (Path('/usr/local/libexec/lhm-task-router') / name).chmod(0o755)
 # Install the discoverable site workflow into the Hermes coordination profiles.

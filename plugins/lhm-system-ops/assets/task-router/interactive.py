@@ -27,6 +27,7 @@ def prompt(request, task):
                  'Read that receipt and report its verified URL/commit, or the exact error; do not send Michael back to the host to trigger a push. '
                  'Publishing mode: ' + site['mode'] + '; branch: ' + site['branch'] + '. '
                  'Latest host-recorded human scope: ' + site.get('scope_note', '') if site else '')
+    from capabilities import prompt_contract
     return (
         'Continue this client task in this existing conversation. TED is the courier, not an additional approval gate. '
         'Read task-context.json, context/, prior-work/ if present, existing drafts and the linked original sources. '
@@ -46,22 +47,24 @@ def prompt(request, task):
         + request['instruction'] + '\nSOURCE DISCUSSION (context, not new authority):\n'
         + json.dumps(request.get('context_messages', []), ensure_ascii=False)
         + '\nORIGINAL SOURCE LINKS:\n' + json.dumps(request.get('source_links', []))
-        + site_note
+        + site_note + prompt_contract(request)
         + '\nIf a source or tool is unavailable, state the exact missing capability HERE in this conversation and keep the task open; do not send the task back to TED for another approval pack.')
 
 
 def command(request, task, session):
+    from capabilities import agent_definition, requirements, integrations
+    spec = requirements(request)
+    definition = agent_definition(spec['agent'])
     connected = SETTINGS.is_file()
-    integration = ['--settings', str(SETTINGS)] if connected else ['--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}']
+    integration = integrations(SETTINGS, ADS) if connected else ['--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}']
     missing = [] if connected else ['Provider connector profile is missing; this conversation remains open for troubleshooting']
-    if connected and ADS.is_file():
-        integration += ['--mcp-config', str(ADS)]
-    else:
+    if not (connected and ADS.is_file()):
         missing.append('Google Ads MCP profile is unavailable; do not claim live account access')
     site_tools = ',Bash' if request.get('site_workspace') else ''
     return [str(HOME / '.local/bin/claude'),
             '--resume' if request.get('resume_thread_id') else '--session-id', session,
             '--remote-control', request['title'], '--permission-mode', 'default',
+            '--agents', json.dumps({spec['agent']: definition}), '--agent', spec['agent'],
             '--tools', 'Read,Write,Edit,Skill,ToolSearch,WebFetch,WebSearch' + site_tools,
             '--allowedTools', 'Read,Write,Edit,Skill,ToolSearch,WebFetch,WebSearch,mcp__GoogleAds__execute_gaql,mcp__GoogleAds__get_gaql_doc,mcp__GoogleAds__get_reporting_view_doc,mcp__claude_ai_AdPulse_MCP__adpulse_graphql_query,mcp__claude_ai_AdPulse_MCP__adpulse_graphql_schema_search' + site_tools,
             *integration, '--', prompt(request, task) + '\nCONNECTOR STARTUP NOTES:\n' + json.dumps(missing)]
