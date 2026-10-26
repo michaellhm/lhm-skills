@@ -1,6 +1,6 @@
 # Daily checkpoint
 
-Use the private vault's existing daily convention, otherwise `05 Weekly/Daily/YYYY-MM-DD — Daily Flow.md`. Read before updating; preserve unrelated sections. One record per local day, shared by any authorised surface. Never put the file in Git or the shared client vault.
+Use the verified participant's private vault's existing daily convention, otherwise `05 Weekly/Daily/YYYY-MM-DD — Daily Flow.md`. Read before updating; preserve unrelated sections. One record per participant per local day, shared by their authorised surfaces. Verify owner and account scope before resuming; a same-date record belonging to someone else must never be read or reused. Never put the file in Git or the shared client vault.
 
 Suggested structure:
 
@@ -8,7 +8,10 @@ Suggested structure:
 ---
 type: daily-flow
 date: YYYY-MM-DD
-timezone: Australia/Melbourne
+participant_id: verified stable ID
+participant_name: verified display name
+source_accounts: verified account IDs and delegated scope if any
+timezone: verified participant timezone
 status: active
 updated: ISO timestamp
 ---
@@ -81,3 +84,16 @@ Review these against the candidate instructions before publishing changes:
 4. Every selected-task prompt ends with Learn or its unavailable-runtime fallback. A failed or unfinished run preserves uncertainty; it does not produce a proven success rule.
 5. Worker Learn and daily close cover the same run: merge by source/outcome; no duplicate observation or automatic publish/merge/install.
 6. A team member executes the prompt: retain existing owner, context, authority, deliverable checks and next handoff; do not restart founder discovery or dispatch another agent without authority.
+
+## Participant isolation acceptance cases
+
+1. Kristalyn runs “plan today” in Claude with her verified BasicOps and mail accounts: select her assignments, mentions, reviews, commitments and dependencies; use her calendar and private checkpoint. Do not load Michael's queue, founder review or voice profile.
+2. Aya self-identifies and the directory verifies Aiya's profile: use the verified ID, not a guessed name filter. Aiya's existing owner assignments remain intact; founder decisions stay with their owner.
+3. Michael runs the flow: preserve his established labels, authorised founder context and private checkpoint; existing send/filing gates still apply.
+4. No identity metadata or two matching profiles: ask who is running the flow before personal reads. Never default to Michael from the plugin author or local path.
+5. Kristalyn is the participant but Gmail/calendar is authenticated as Michael: report those source gaps, continue her verified BasicOps work and do not sweep Michael's accounts without explicit delegated scope.
+6. Staff have no accessible private vault: continue verified work with an explicitly unsaved conversational delta; do not read/write Michael's vault or create a shared daily checkpoint.
+7. Two staff share a runtime and today's date: rebind identity and sources; never reuse the earlier user's queue, cursors, approvals or checkpoint. A legacy record without verified ownership cannot establish identity.
+8. A Michael-only email helper is installed: prepare neutral suggested text for the participant and report unsupported voice/logging; do not invoke the helper against Michael's mailbox or copy his private preferences.
+9. A team member asks for another person's daily flow: distinguish actor and subject, verify delegated scope per source and retain it in the checkpoint; the request alone does not grant account access.
+10. Participant timezone differs from Melbourne: daily note date, deadlines and reminder ages use the established participant timezone; event conversions use the actual event date.

@@ -67,7 +67,7 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 
 `lhm-knowledge-hub:lhm-weekly-flow` — Brisk founder check-in, current-quarter Obsidian goal status and sales, then up to three goal-aligned commitments; confirmed goal updates and requested LHM-prefixed BasicOps tasks. Leave client/task selection to staff-weekly-flow.
 
-`lhm-knowledge-hub:lhm-daily-flow` — Daily full task/reply and email-thread pre-sweep, prepared responses, team blockers first, portable prompts with verified agent/skill routing and per-task Learn for two or three chosen tasks before email work, email filing, reviewed 5/10-day Waiting On follow-ups and end-of-day Learn for client context and interaction preferences. Reports unsaved checkpoint deltas and bounds app access without bypassing denials.
+`lhm-knowledge-hub:lhm-daily-flow` — Participant-aware daily review with verified per-user tasks/accounts, role, labels, private checkpoints and learning; full task/reply and email-thread pre-sweep, prepared responses, team blockers first, portable prompts with verified agent/skill routing and per-task Learn for two or three chosen tasks before email work, email filing, reviewed 5/10-day Waiting On follow-ups and end-of-day Learn for client context and interaction preferences. Reports unsaved checkpoint deltas and bounds app access without bypassing denials.
 
 ## AI recommendation visibility
 

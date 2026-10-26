@@ -188,7 +188,7 @@ plugins/lhm-knowledge-hub/             # Knowledge and operating-rhythm hub
   .claude-plugin/plugin.json            # Plugin manifest
   agents/knowledge-orchestrator.md      # Weekly Flow, vault thinking, capture and review entry point
   skills/                               # All 6 knowledge-system skills
-    lhm-daily-flow/                     # Verified task/reply pre-sweep, prepared responses and daily learning
+    lhm-daily-flow/                     # Participant-specific daily sweep, private continuity and learning
     lhm-weekly-flow/                    # Brisk business check-in, quarterly goals/sales and three weekly outcomes
 plugins/lhm-learn/                    # Session learning capture plugin
   .claude-plugin/plugin.json            # Plugin manifest
@@ -368,7 +368,7 @@ Client-facing skills read and update shared LHM Knowledge client records; delive
 
 Meeting wraps apply an LHM scope check before proposing tasks: explicit LHM commitments and client inputs required for agreed delivery qualify; client internal projects and other discussion remain context. Existing project requirements are reused rather than duplicated.
 
-**Daily Flow** (`lhm-knowledge-hub:lhm-daily-flow`): MCP-first full task/reply and email-thread pre-sweep, prepared suggested replies or next actions, team blockers first, two or three chosen BasicOps tasks with portable execution prompts with verified agent/skill routing and per-task Learn before emails, durable private resume checkpoint, specialist action handoffs, outcome-based email filing, reviewed 5/10-day Waiting On follow-ups and end-of-day Learn for confirmed client decisions and reusable interaction preferences. Reuses weekly commitments and saves verified client context to shared Obsidian. Portable to Your Dot after access and continuity checks.
+**Daily Flow** (`lhm-knowledge-hub:lhm-daily-flow`): Resolves the person running it and scopes tasks, accounts, role, labels, private checkpoints and learning to that participant. MCP-first full task/reply and email-thread pre-sweep, prepared suggested replies or next actions, team blockers first, two or three chosen BasicOps tasks with portable execution prompts with verified agent/skill routing and per-task Learn before emails, durable private resume checkpoint, specialist action handoffs, outcome-based email filing, reviewed 5/10-day Waiting On follow-ups and end-of-day Learn for confirmed client decisions and reusable interaction preferences. Reuses weekly commitments and saves verified client context to shared Obsidian. Portable to Your Dot after access and continuity checks.
 
 
 Daily Flow returns an unsaved delta and restart point on checkpoint failure, and bounds native-app access with authorised capability fallbacks that cannot bypass permission denials.
