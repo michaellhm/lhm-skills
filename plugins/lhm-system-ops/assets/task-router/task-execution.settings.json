@@ -1,11 +1,27 @@
 {
   "allowedMcpServers": [
-    {"serverName": "GoogleAds"},
-    {"serverUrl": "https://au.api.adpulse.app/mcp"},
-    {"serverUrl": "https://drivemcp.googleapis.com/mcp/v1"},
-    {"serverUrl": "https://gmailmcp.googleapis.com/mcp/v1"}
+    {
+      "serverName": "GoogleAds"
+    },
+    {
+      "serverUrl": "https://au.api.adpulse.app/mcp"
+    },
+    {
+      "serverUrl": "https://drivemcp.googleapis.com/mcp/v1"
+    },
+    {
+      "serverUrl": "https://gmailmcp.googleapis.com/mcp/v1"
+    },
+    {
+      "serverUrl": "https://app.basicops.com/mcp"
+    },
+    {
+      "serverUrl": "https://api.fathom.ai/mcp"
+    }
   ],
   "permissions": {
-    "ask": ["mcp__claude_ai_AdPulse_MCP__adpulse_graphql_mutation"]
+    "ask": [
+      "mcp__claude_ai_AdPulse_MCP__adpulse_graphql_mutation"
+    ]
   }
 }

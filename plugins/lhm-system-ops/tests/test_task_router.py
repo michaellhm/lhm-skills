@@ -39,6 +39,22 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual(self.router.preview(123, 'dm123')['provider'], 'claude')
         self.assertEqual(self.router.submit(123, 'dm123')['status'], 'queued')
 
+    def test_explicit_capability_contract_is_in_preview_and_immutable_intake(self):
+        self.task['title'] = 'Example Clinic: Google Ads - Review October performance'
+        preview = self.router.preview(123, 'dm123')
+        self.assertEqual(preview['agent'], 'lhm-marketing-hub:google-ads')
+        self.assertIn('BasicOps', preview['required_connectors'])
+        self.router.submit(123, 'dm123')
+        p = self.root/'task-router-state/123.json'
+        saved = json.loads(p.read_text())
+        self.assertEqual(saved['request']['required_skills'], preview['required_skills'])
+        from capabilities import contract
+        for key in contract(saved['request']):
+            saved['request'].pop(key, None)
+        saved['request']['policy_version'] = 4
+        p.write_text(json.dumps(saved))
+        self.assertEqual(self.router.contract(123, 'dm123')[1], saved['request'])
+
     def test_personal_implementation_approval_forwards_without_another_ted_plan(self):
         self.messages[0]['message']='@Ted I approve A2, A3, A4; send across to Claude to implement via AdPulse'
         self.router.submit(123,'dm123')

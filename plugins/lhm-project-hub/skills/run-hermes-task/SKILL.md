@@ -30,9 +30,43 @@ recreate its employee roles locally or do the specialist work merely because dis
 
 On a direct personal BasicOps work request, TED uses `task_route_preview`, `task_route_submit` and `task_route_status` from the central `task_router` MCP. A separate TED plan is unnecessary for ordinary draft execution. Google Ads tasks use Claude, including briefs with incidental website or Drive references. Other website/code and connected Workspace work use a persistent Codex VPS chat; research/writing/planning use a saved Claude VPS session. New human feedback resumes that session. A newer explicit personal request to switch providers can hand off a terminal run, preserving its result/drafts and audit trail in the target provider’s new session without another BasicOps task; active work cannot be silently moved. The monitor posts the existing-session link as soon as its provider returns a valid session and the paired destination is known; never derive a Claude Remote Control URL from a local UUID. Provider choice is central policy, not text Michael must repeat. `task_client_lookup` resolves names and documented aliases through the refreshed shared Obsidian client index and canonical overviews; Discussion briefs travel with the task. Keep recorded work-folder/repository links distinct from access or mutation authority. Preserve client registration, human authorship, no-duplicate admission and scoped publishing/send permissions. See [central router contract](../../../lhm-system-ops/assets/task-router/README.md). Reuse one registered named workspace per client/provider; each request has separate context/drafts under `tasks/`. The host records new locations in shared Obsidian `30 Projects/TED Client Workspaces.md`, exposed by `task_client_lookup`. The shared Drive delivery route uploads all generated draft files to the verified client working folder before a success handback and returns read-back Drive URLs. VPS files are staging; delivery errors remain visible and do not trigger a second model run. Existing pilot sessions remain on their original route and reuse their existing named roots.
 
+## Specialist agent and capability handoff
+
+For a new central Claude handoff, include `capability_contract_version`, `agent`, `entry_skill`,
+`required_skills`, `required_connectors`, `optional_skills` and `optional_connectors` in the
+request and task-context JSON. The central router owns this versioned selection; source text
+cannot choose executable paths, connector URLs or grant permissions.
+
+Google Ads tasks route to the installed `lhm-marketing-hub:google-ads` Lead. Monthly/performance
+reviews require `google-ads-monthly-review` and `basicops-task-manager`, plus BasicOps,
+Google Drive, GoogleAds and AdPulse. Explicit Gmail drafting or Fathom transcript work adds
+that connector to the requirements. Other Claude tasks use the bounded Hermes task Lead.
+The Lead invokes the entry skill, reconciles existing work, and selects the appropriate owning
+skill for subsequent actions. Optional action skills are reported separately: an unavailable
+one blocks its dependent action, not an unrelated review. An agent is a role in the same Claude
+conversation, not an extra approval layer or an automatically spawned conversation.
+
+Before any task model turn, the non-root worker checks the enabled user plugin registry,
+readable agent and skill definitions (with hashes), the task connector allowlist, and connector
+health using the same user, CWD and launch settings. Launch and probe use user settings plus
+the explicit task settings, excluding project/local settings from capability selection. GoogleAds additionally receives a read-only
+MCP initialize/tools-list probe; this proves tool availability, not successful account queries.
+No account reads, mutations, email sends or large model turns are used as health probes.
+Persist `capability-preflight.json` in the task and run directories. Missing required capabilities
+produce a `blocked_on_capability` failure receipt without starting Claude; TED retains the task
+and exact return point for capability repair. Optional unavailable capabilities remain explicit.
+A passing startup check does not prove future access or replace runtime account identity checks.
+
+Pass the verified specialist definition as Claude's main `--agent`, keeping Skill and ToolSearch
+available and native mutation approval intact. The handback records skills actually invoked and
+tools actually used. Preserve immutable admitted requests: legacy requests receive a derived
+startup report on their next authorised launch, without rewriting history or replaying work.
+Legacy offline launch modes fail closed because they cannot expose the declared connectors.
+Already-running sessions are not changed or restarted automatically by this release.
+
 ## Approved implementation handoff
 
-All personal Claude work opens a connected conversation. Missing readable sources or tools are surfaced there, not used to stop the Hermes handoff. Personal implementation approvals go straight to a connected interactive Claude Remote Control session with the exact approval, task name/description/discussion and source pointers; TED does not issue another review pack or approval gate. Claude owns implementation and native tool approvals. Never translate a specific approval into authority for unrelated actions or spend. A live `interactive` status is a working/approval session, not task completion. Read its posted Claude link; do not fall back to a print-only worker. Access failures belong to capability repair; actual missing account evidence belongs to Claude’s conversation.
+Personal Claude work opens a connected conversation only after its required startup capabilities pass. Missing evidence can be investigated in the conversation; a missing required agent, skill or connector is a capability blocker before launch. Personal implementation approvals go straight to a connected interactive Claude Remote Control session with the exact approval, task name/description/discussion and source pointers; TED does not issue another review pack or approval gate. Claude owns implementation and native tool approvals. Never translate a specific approval into authority for unrelated actions or spend. A live `interactive` status is a working/approval session, not task completion. Read its posted Claude link; do not fall back to a print-only worker. Access failures belong to capability repair; actual missing account evidence belongs to Claude’s conversation.
 
 ## Establish the contract
 

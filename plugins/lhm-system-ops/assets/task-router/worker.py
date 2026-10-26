@@ -87,6 +87,20 @@ def execute(run, provider):
             thread = native.conversation(task, prompt, run, cwd=work, write=True, timeout=1200, read_only_integrations=True)
             receipt.update(thread_id=thread, host='hermes-vps', transport='app-server')
         else:
+            from capabilities import preflight
+            readiness = preflight(request, work)
+            if request.get('handoff_mode') not in {'provider_execution', 'provider_conversation'}:
+                readiness['status'] = 'blocked_on_capability'
+                readiness.setdefault('errors', []).append('Legacy offline runner cannot expose required connectors; use an authorised connected resume')
+            atomic(run / 'capability-preflight.json', readiness)
+            atomic(task_directory / 'capability-preflight.json', readiness)
+            receipt['capability_preflight'] = readiness
+            if readiness['status'] != 'ready':
+                receipt.update(status='failed', failure_kind='blocked_on_capability',
+                               delivery_required=False, error='; '.join(readiness['errors']),
+                               resume_thread_id=request.get('resume_thread_id'))
+                atomic(run / 'receipt.json', receipt)
+                return
             session = request.get('resume_thread_id') or str(uuid.uuid4())
             receipt.update(thread_id=session, transport='claude-code',
                            resume_command=f'cd {work} && claude --resume {session}')

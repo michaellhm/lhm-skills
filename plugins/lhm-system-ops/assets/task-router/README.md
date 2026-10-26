@@ -89,3 +89,48 @@ Live acceptance: both original local Claude UUIDs resumed, without creating a fr
 The workspace registry accepts the original generated marker and the known curated marker. Merge preserves existing guidance and entries, appends missing workspaces, and rejects unknown ownership or conflicting workspace paths. Failed admissions must not claim a saved provider session without a thread ID.
 
 For the exact pre-launch registry failure, an authorised host administrator can run `python3 /usr/local/libexec/lhm-task-router/recover_admission.py ted-route-2216403-dm2679721` after installing the reviewed source changes. Recovery re-verifies the personal instruction and context, excludes existing sessions/results/drafts, locks the dispatcher, publishes and reads back the merged registry, then launches the original prepared request once. It never deletes or re-provisions the task directory. A partial recovery remains visible and requires inspection before any further retry.
+
+
+## Specialist agent capability contract (2026-10-27)
+
+New Claude requests carry the registered `agent`, `entry_skill`, required and optional skill and
+connector lists, and capability contract version 1. These are derived centrally and included in
+preview, immutable intake and task-context JSON. No source message can name an executable or a
+connector URL. Historical intake remains byte-compatible on re-verification; the worker derives
+and records its startup contract without changing the saved authority.
+
+`capabilities.py` verifies enabled user plugins and readable agent/skill files, fingerprints their
+contents, then probes MCP health as the worker UID with the task CWD, launch settings and MCP
+configuration. Both use `--setting-sources user` plus explicit task settings so project/local
+settings cannot silently change plugin selection. The connector allowlist is part of readiness: account-level login alone is not
+sufficient. The GoogleAds launch-only stdio server is checked with initialize/tools-list, never
+GAQL or a mutation. Health checks create no task model turn and export no credentials. The task
+still verifies live account identity and evidence when work starts.
+
+`worker.py` saves `capability-preflight.json` to both task and run. Missing requirements return
+`status=failed`, `failure_kind=blocked_on_capability`, the exact missing capabilities, no new
+session ID and no delivery claim. Legacy offline launch modes also fail closed because their
+strict empty MCP configuration cannot expose the declared dependencies. Existing TED failure reconciliation preserves the original
+task; capability repair and an authorised resume are separate from production replay. Optional
+capabilities do not block independent work. The main agent is loaded with `--agents`/`--agent`;
+Skill and ToolSearch remain available and mutation tools keep native approvals.
+
+Google Ads monthly review requires the Google Ads Lead, monthly-review and BasicOps skills,
+and BasicOps/Drive/GoogleAds/AdPulse connectors. Gmail and Fathom are checked as optional unless
+explicitly required by the task intent. The settings allowlist adds the already-connected
+BasicOps and Fathom endpoints; no OAuth scopes, credentials or mutation auto-approval are added.
+
+Dry Eye regression, read-only staged candidate: existing launch settings blocked BasicOps and
+Fathom. Candidate settings made all six checked connectors available; required skills/Lead passed.
+The installed older marketing plugin lacks the optional google-ads-implementation skill; that
+remains visible as unavailable and a dependent implementation task must not proceed without it.
+No Claude task, campaign action or email was launched by these probes. Startup checks outside the
+systemd sandbox are diagnostic evidence; post-install acceptance must repeat under the real worker.
+
+Rollout requires explicit deployment approval. Install the new capabilities module alongside both
+copies of router.py (host and TED profile), worker.py, dispatch.py, interactive.py and the additive
+launch settings, with backups and exact hashes. Reload TED only after both module copies exist.
+Do not restart or replay active tasks. Smoke-test the real worker with an isolated no-model
+preflight, then a separately authorised new/resumed task; verify the named agent and entry skill
+from its startup/transcript before claiming live task acceptance. Roll back the same files and
+reload TED, retaining all task drafts, requests, reports and sessions.

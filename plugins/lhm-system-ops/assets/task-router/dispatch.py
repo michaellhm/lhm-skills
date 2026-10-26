@@ -165,6 +165,8 @@ def prepare(request):
         'instruction_sha256': request['instruction_sha256'],
         'discussion': request.get('context_messages', []), 'permission_ceiling': request['permission_ceiling'],
         'source_links': request.get('source_links', []), 'missing_context': missing,
+        **{k: request[k] for k in ['capability_contract_version', 'agent', 'entry_skill', 'required_skills',
+                                  'required_connectors', 'optional_skills', 'optional_connectors'] if k in request},
         'sources': sources, 'snapshot_limit': '32 markdown files, 160KB; missing evidence must be reported'}, indent=2))
     copy_prior(request, workspace)
     (run / 'request.json').write_text(json.dumps(request))

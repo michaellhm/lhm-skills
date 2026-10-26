@@ -10,7 +10,7 @@ import uuid
 from urllib.parse import quote, urlparse
 from html.parser import HTMLParser
 
-POLICY_VERSION = 4
+POLICY_VERSION = 5
 TERMINAL = {'needs_review', 'failed'}
 
 
@@ -255,6 +255,9 @@ class Router:
         request['source_links'] = sorted(set(u for u in links.urls if u.startswith('https://')))[:40]
         if execution_handoff(provider, instruction):
             request.update(handoff_mode='provider_execution', permission_ceiling='provider_tool_approval')
+        if provider == 'claude':
+            from capabilities import contract
+            request.update(contract(request))
         if existing.exists():
             prior = json.loads(existing.read_text())['request']
             if prior['instruction_message_id'] == instruction_message_id:
@@ -262,6 +265,12 @@ class Router:
                     raise ValueError('Canonical lookup conflicts with the admitted client')
                 request['client'] = prior['client']
                 request['policy_version'] = prior.get('policy_version', 1)
+                from capabilities import contract as capability_contract
+                for key in capability_contract(request):
+                    if key in prior:
+                        request[key] = prior[key]
+                    else:
+                        request.pop(key, None)
                 # Reverification never upgrades an immutable, already-admitted request.
                 request['permission_ceiling'] = prior['permission_ceiling']
                 if 'handoff_mode' in prior:
@@ -285,7 +294,8 @@ class Router:
 
     def preview(self, task_id, instruction_message_id):
         _, request = self.contract(task_id, instruction_message_id)
-        return {k: request[k] for k in ['task_id', 'task_url', 'client_id', 'provider', 'reason', 'permission_ceiling']}
+        return {k: request[k] for k in ['task_id', 'task_url', 'client_id', 'provider', 'reason', 'permission_ceiling',
+                'agent', 'entry_skill', 'required_skills', 'required_connectors', 'optional_skills', 'optional_connectors'] if k in request}
 
     def submit(self, task_id, instruction_message_id):
         task, request = self.contract(task_id, instruction_message_id)
