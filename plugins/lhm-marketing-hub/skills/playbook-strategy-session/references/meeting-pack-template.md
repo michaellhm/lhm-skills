@@ -27,6 +27,14 @@ updated: YYYY-MM-DD
 
 - [Provisional or conflicting fact that matters strategically]
 
+## Sales-call continuations
+
+- [Client statement + source/timestamp → useful follow-up; distinguish seller examples]
+
+## Internal delivery expectations
+
+- [Promise or expectation to reconcile with accepted scope; separate from interview questions]
+
 ## Opening frame
 
 > [Short explanation Michael can give the client.]
@@ -55,7 +63,27 @@ updated: YYYY-MM-DD
 
 **Listen for:** [playbook material and exact language]
 
+**Website use:** [Pages/sections this theme informs]
+
 [Repeat for each theme.]
+
+## Voice exercise — ten mixed sentences
+
+[Capture the client's own voice first, then tailor ten probes using sales-call-to-interview.md.]
+
+| # | Sentence | Yes / No / Unsure | What would you change? |
+|---|---|---|---|
+| [1–10, one row each] | [Tailored contrasting sentence, without predicted answer] | | |
+
+Tone preferences do not establish factual accuracy or final copy approval. Record reasons and exact replacement wording.
+
+## Website-content coverage
+
+[Map homepage angle, About/team, approach, services/conditions, FAQs and booking to known evidence and gaps.]
+
+## Context and workflow status
+
+[Knowledge root, verified work root and links; context setup authority/status; interview pending/completed; handover deferred/requested. No implied gate completion.]
 
 ## If time is running short
 

@@ -13,12 +13,17 @@ For each theme: briefly explain it; give one broad invitation; give two or three
 
 Do not impose a fixed question count. Depth and natural flow matter more than completing a checklist.
 
+Use the pack's tailored sequence: story/purpose/future; philosophy and common misconceptions; people helped best; practical approach, difference and stories; becoming a patient/customer; voice and ten-sentence exercise; and provisional positioning/success/read-back. Preserve the distinction between beliefs about a problem and the practical approach to it. Explore why someone would choose this provider and how they explain alternatives without assuming superiority. Derive the angle from answers and ask the client to correct it.
+
+For voice, capture the client's own explanation before showing the ten mixed sentence probes. Present the pack's Yes / No / Unsure table without predicted ratings, record reasons and exact replacements, and ask one follow-up at a time. Tone approval does not establish factual/clinical accuracy or final copy approval.
+
 Commands:
 
 - `Start the meeting` — give the opening frame and Theme 1.
 - `Next theme` — introduce the next theme.
 - `Go deeper` — give the best single follow-up.
 - `Give me examples` — give two or three neutral examples.
+- `Test the voice` — show the ten-sentence table and capture ratings and wording changes.
 - `What did we miss?` — identify the most important missing part.
 - `Come back to this` — record the gap and move on.
 - `Time check` — recommend what to prioritise or defer.
@@ -31,7 +36,7 @@ Keep strategy separate from routine administration. Capture access, credentials,
 
 Maintain a private coverage map across founder story; mission, vision, values and North Star; brand voice; audiences; customer psychology; services and capacity; differentiators and proof; enquiry and sales approach; pricing, funding and booking; marketing and website direction; compliance; and gaps.
 
-On `End the session`, produce findings by theme; exact quotes with speaker attribution; strategic decisions; contradictions and confirmations; administrative follow-ups separated from strategic gaps; complete, partial and missing coverage; and a clean source brief for the campaign-playbook generator.
+On `End the session`, produce findings by theme; exact quotes with speaker attribution; problem-to-approach examples; differentiators with evidence/limits; sentence ratings, reasons and replacements; provisional positioning for confirmation; strategic decisions; contradictions and confirmations; administrative follow-ups separated from strategic gaps; complete, partial and missing coverage for both playbook and website sections; and a clean source brief for the campaign-playbook generator. Do not run the sales handover or change client records unless separately authorised. Respect any explicit handover deferral.
 
 Begin only when I say `Start the meeting`.
 ```

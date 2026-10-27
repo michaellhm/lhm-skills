@@ -11,7 +11,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 ## Skill Catalog
 
-`playbook-strategy-session` — Prepare and coach theme-led client strategy calls for campaign playbooks.
+`playbook-strategy-session` — Turn sales transcripts into themed website/playbook interviews, ten-sentence voice exercises and live coaching; prepare Obsidian context when requested, keeping deferred handover separate.
 
 `prospect-sitemap-opportunity` — Proposed sitemap and interactive opportunity model for a prospect website pitch.
 

@@ -67,7 +67,7 @@ plugins/lhm-marketing-hub/             # The plugin
     ga-event-config/                   # GA4 event discovery and conversion classification
     ga-dashboard-artifact/             # Analytics dashboard artifact with period comparison
     campaign-playbook-generator/       # Campaign & sales playbooks from transcripts
-    playbook-strategy-session/         # Theme-led strategy meeting preparation and live coaching
+    playbook-strategy-session/         # Sales-transcript-led interview themes, sentence calibration and live coaching
     pmax-banner-generator/             # Performance Max creative assets (CSV)
     pmax-campaign-setup/               # Performance Max campaign build spec for local businesses
     pmax-optimizer/                    # Performance Max monthly + 90-day optimisation passes
@@ -272,7 +272,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 **Hermes profile assets:** System Ops also governs Lily meeting preparation with bounded research, retry checkpoints and verified email delivery. This deployed profile asset does not add a desktop skill.
 
-**Client Management** (3 skills): Client onboarding and profile setup, theme-led campaign-playbook strategy session preparation and coaching, and campaign playbook generation from transcripts.
+**Client Management** (3 skills): Client onboarding and profile setup, sales-transcript-led website/playbook interviews with tailored themes, ten-sentence voice calibration, authorised Obsidian context setup and live coaching, and campaign playbook generation from transcripts.
 
 **Google Ads & PPC** (11 skills): BasicOps-driven implementation of approved changes through AdPulse with a guided Chrome fallback plus an AdPulse Insights/Optimize triage sweep, Ad copy, bid/budget optimization, keyword analysis, landing page audits, monthly review (+ agent for full execution), independent action-level delivery QA, quarterly adversarial 90-day review, PMax banner creative, PMax campaign setup for local businesses, PMax monthly + 90-day optimisation.
 
