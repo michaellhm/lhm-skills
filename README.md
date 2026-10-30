@@ -211,7 +211,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
     staff-weekly-flow/                  # Chosen commitments, item-by-item BasicOps reconciliation and Tuesday web meeting document
     sales-handover/                     # Hand a newly-closed client from sales to delivery
-    client-onboarding/                  # Scope-aware Obsidian-first onboarding — 5 top-level BasicOps gates
+    client-onboarding/                  # Scope-aware onboarding, reviewed handovers and campaign master → UI UX Pro Max → website prototype
     website-kickoff/                    # New website build kickoff (WordPress or Astro) → handoff to WordPress hub
     existing-client-website-handover/   # Michael → Kristalyn website brief for an existing client
     landing-page-kickoff/               # New PPC landing page campaign kickoff → handoff to WordPress hub

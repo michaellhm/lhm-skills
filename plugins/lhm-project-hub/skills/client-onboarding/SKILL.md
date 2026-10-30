@@ -1,6 +1,6 @@
 ---
 name: client-onboarding
-description: "Run LHM's resumable new-client onboarding workflow. Use when the user says 'client onboarding', 'onboard [client]', 'continue onboarding', 'where is onboarding up to', 'billing setup', 'strategy call', 'client access', 'tracking setup', or 'service kickoff'. Reads and updates the detailed, scope-aware Obsidian onboarding checklist first, then mirrors only five top-level phases and seven top-level checks to the BasicOps *Client Onboarding board: Payment & Billing, Client Contact & Strategy, Access Assets & Config, Service Kickoff, and Onboarding Complete."
+description: "Run LHM's resumable new-client onboarding workflow. Use when the user says 'client onboarding', 'onboard [client]', 'continue onboarding', 'where is onboarding up to', 'billing setup', 'strategy call', 'client access', 'tracking setup', 'campaign master', 'design system', 'website prototype', or 'service kickoff'. Reads and updates the detailed, scope-aware Obsidian onboarding checklist first, then mirrors only five top-level phases and seven top-level checks to the BasicOps *Client Onboarding board: Payment & Billing, Client Contact & Strategy, Access Assets & Config, Service Kickoff, and Onboarding Complete."
 ---
 ## Client file routing
 
@@ -25,6 +25,10 @@ Follow `references/folder-convention.md`. Read, in order:
 If `Onboarding.md` does not exist, instantiate it from `references/checklists/client-onboarding.md`, the handover and purchased scope. Preserve the instantiated checklist as the client's detailed execution state; future reference changes must not silently rewrite it.
 
 Obsidian is authoritative when detailed state disagrees with BasicOps. Report the mismatch and reconcile BasicOps only after confirming the Obsidian evidence.
+
+## Website intake and production handoff
+
+For a newly sold website, follow [website intake and production](references/website-production-handoff.md). Capture sales and strategy calls separately, resolve the salesperson/payment route, prepare the internal handover and client next-steps email, then coordinate campaign master → required UI UX Pro Max design system → representative prototype. Reuse the existing website/task records. This is a delivery lane inside onboarding, not an eighth onboarding gate or automatic full-site launch.
 
 ## 2. Confirm the BasicOps parent card
 
@@ -57,6 +61,8 @@ Use the first incomplete canonical phase:
 
 Immediate owner: Josephine.
 
+Resolve whether this is a direct LHM or partner/Marlon sale from supplied sales evidence; ask one question if unclear. For a Marlon client, check whether he collected upfront. Explicit human confirmation of receipt can satisfy the payment check; record who confirmed and when without claiming bank verification. Do not send a duplicate invoice or collection request, force GoCardless, or leave Josephine blocking a paid deal.
+
 Work the applicable billing checks in Obsidian. GoCardless is conditional, not universal. Michael's handover/introduction check runs in parallel but is also required to leave Phase 1. Advance only when both top-level checks are verified, or an explicit Michael-approved exception is recorded.
 
 Kristalyn may work on her welcome and scheduling actions in parallel, but the parent card remains assigned to Josephine while billing is the immediate blocking gate.
@@ -80,6 +86,8 @@ Before the call, create or reuse one nested BasicOps preparation task beneath `K
 - On completion, hand off to the person leading the strategy call through the confirmed team channel.
 
 Route the task through `lhm-project-hub:basicops-task-manager`. Use stable key `basicops:<client-slug>:onboarding:prepare-playbook-strategy-session`, deduplicate before creating, add its verified native BasicOps link to a clearly labelled linked-subtasks list in the strategy subtask's Discussion, verify the complete record, and ask whether the user wants it moved to the assignee's individual board. Never move it automatically.
+
+If the strategy call already happened, read its supplied transcript and record the questionnaire answers rather than repeating discovery or creating retrospective preparation work. Keep sales promises separate from strategy decisions, preserve unresolved contradictions, and distinguish phrase preferences from approval of final copy.
 
 Complete the call, record decisions in Obsidian, and create or link the client campaign/project record—the canonical project brief or service record that converts those decisions into delivery scope. Mark the BasicOps top-level check complete only after the preparation task, strategy call, recorded decisions and campaign/project record are verified.
 
@@ -121,7 +129,7 @@ For each detailed Obsidian item:
 - Log the date, result and verification method.
 - If a tool fails, leave the item open, record the failed write or verification and name who must retry.
 
-Client-facing emails remain drafts until a human sends them.
+Prepare editable internal handover and client introduction/next-steps emails for review using `lhm-inbox-hub:email-drafts` where available. Use a writing block when supported, otherwise show the full draft. Keep edits exact; verify recipients, especially the actual partner and coordinator. An explicit send instruction authorises the approved latest text through a supported sending tool; verify SENT and recipients before completing the introduction check. Draft approval does not authorise unrelated emails or task changes. A review-first instruction freezes those mutations until separately approved.
 
 ## 5. Mirror only top-level operational state
 
