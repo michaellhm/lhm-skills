@@ -8,6 +8,8 @@ Turn an authorised website task into work in its real Git checkout. Use the exis
 
 ## Resolve and register the site
 
+Apply `lhm-system-ops:development-workspaces` first. Verify the configured development volume and stable bind aliases before admitting a checkout. Repository source, task worktrees, dependencies and builds belong on that volume. Keep the current one-checkout repository lease until the host supports isolated task worktrees; do not invent parallel-writer support or restart an active conversation to move files.
+
 Read the shared client overview, current website project and task discussion. Verify the exact GitHub repository, default branch and where it deploys. Keep the existing client knowledge, Drive deliverables, task context and website source distinct. If the repository is missing locally, the host clones the verified repository into `/var/lib/lhm-sites/<site-id>/repo`.
 
 Use the host-owned `/etc/lhm-sites/config.json` registration. It records client ID, repository, explicit `build` or `live` mode, verified deployment mapping, human authority, check commands and commit identity. Never infer build mode from a task name, staging hostname alone or an old note. Register new repositories only under the user's existing authority and GitHub App installation scope; missing App access is a concrete blocker, not permission to use another identity. The host owns registration and App credentials; the provider cannot edit them.

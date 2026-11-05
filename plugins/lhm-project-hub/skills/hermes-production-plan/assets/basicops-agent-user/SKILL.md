@@ -87,6 +87,8 @@ For an authenticated team member reporting completed website work and asking to 
 
 ## Production planning from a task discussion
 
+For website/repository work, include `lhm-system-ops:development-workspaces` in readiness checks. Verify volume-backed registered paths, actual worktree support and the existing repository/task lease. Preserve active pins and the current task/session during storage maintenance.
+
 When Michael asks to plan, prepare, resume, hand off or proceed with a task whose outcome requires production work, apply the `lhm-project-manager-dispatch` rules already injected into this webhook route. Do not try to open a skill path with `web_extract`, a browser or a `file://` URL. This branch overrides the generic fast-response limit because a production plan requires the task discussion, dependencies and canonical links.
 
 Before work expected to take longer than about 20 seconds, post one short reply in the same thread: `Got it — I’m checking the task context and building the production handoff now.` Then perform the bounded reads and post the final plan as a second reply. Do not use this acknowledgement for simple questions.

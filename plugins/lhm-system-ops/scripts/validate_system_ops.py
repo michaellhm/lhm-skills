@@ -12,7 +12,7 @@ REQUIRED_SKILLS = {
     'lhm-qa-tester', 'lhm-security-reviewer', 'lhm-plugin-release-manager',
     'lhm-chief-of-staff-source-handoff', 'lhm-context-research-source-handoff',
     'lhm-cto-source-handoff', 'lhm-head-of-production-source-handoff',
-    'release-publishing-engineer', 'lhm-skill-maintainer',
+    'release-publishing-engineer', 'lhm-skill-maintainer', 'hermes-site-workspace', 'development-workspaces',
 }
 
 
@@ -82,8 +82,8 @@ def main():
     for relative in generated_bytecode_paths(PLUGIN):
         errors.append(f'generated Python bytecode in plugin release contents: {relative}')
     expected_manifest_versions = {
-        '.codex-plugin/plugin.json': '0.9.63',
-        '.claude-plugin/plugin.json': '0.9.114',
+        '.codex-plugin/plugin.json': '0.9.125',
+        '.claude-plugin/plugin.json': '0.9.125',
     }
     for relative, expected_version in expected_manifest_versions.items():
         path = PLUGIN / relative

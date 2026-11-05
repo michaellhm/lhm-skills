@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Marketing skills and tools for agency workflows - Google Ads, SEO, CRO, content, and more.",
-    "version": "2.2.73"
+    "version": "2.2.74"
   },
   "plugins": [
     {
@@ -97,7 +97,7 @@
       "name": "lhm-marketing-hub",
       "source": "./plugins/lhm-marketing-hub",
       "description": "General marketing orchestration plus direct Google Ads, SEO, Content, and WordPress specialists with governed delegation and shared client context.",
-      "version": "2.2.73",
+      "version": "2.2.74",
       "category": "utilities",
       "tags": [
         "marketing",
@@ -154,7 +154,7 @@
       "name": "lhm-project-hub",
       "source": "./plugins/lhm-project-hub",
       "description": "LHM project management hub \u2014 sales handover, client onboarding, delivery kickoffs, reviews, and client success.",
-      "version": "0.1.136",
+      "version": "0.1.137",
       "category": "utilities",
       "tags": [
         "project-management",
@@ -171,7 +171,7 @@
       "name": "lhm-system-ops",
       "source": "./plugins/lhm-system-ops",
       "description": "Governed CTO operations and exact-ID evidence-to-production bridge.",
-      "version": "0.9.124",
+      "version": "0.9.125",
       "category": "utilities",
       "tags": [
         "cto",

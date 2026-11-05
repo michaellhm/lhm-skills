@@ -91,6 +91,8 @@ date from server UTC or a fixed offset.
 
 ## Preflight Hermes
 
+For website/repository work, apply `lhm-system-ops:development-workspaces` before admission. Verify the registered development volume, stable aliases, repository, actual branch/worktree support and existing lease. Preserve active workspace pins, the original task/session and instruction identity during storage moves.
+
 Before dispatch, verify the configured Hermes host/profile, container or service health, registered
 role routes, writable checkpoint storage, provider admission and required repository/tool access.
 Use bounded read-only checks. Never use a large model turn as a health probe.

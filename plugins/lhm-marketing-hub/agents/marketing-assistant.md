@@ -11,6 +11,8 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 ## Skill Catalog
 
+`lhm-system-ops:development-workspaces` — Govern volume-backed repositories, Codex/Claude workspaces, isolated task branches, active pins and session-preserving handoffs.
+
 `playbook-strategy-session` — Prepare and coach theme-led client strategy calls for campaign playbooks.
 
 `prospect-sitemap-opportunity` — Proposed sitemap and interactive opportunity model for a prospect website pitch.
