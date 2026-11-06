@@ -89,22 +89,53 @@ class InstallTests(unittest.TestCase):
         queue.chmod(0o600);before_queue = queue.read_bytes()
         helper = self.root/'libexec/github_deployment.py';helper.parent.mkdir();helper.parent.chmod(0o755);helper.write_bytes(b'old independent helper');helper.chmod(0o755)
         profile = self.root/'profile/SKILL.md';profile.parent.mkdir();profile.parent.chmod(0o755);profile.write_bytes(b'old scope doc')
+        router = self.root/'hermes-profile/task-router/router.py'
+        router.parent.mkdir(parents=True);router.parent.chmod(0o770)
+        router.write_bytes(b'old root router');router.chmod(0o755)
+        router_inode = router.parent.stat().st_ino
+        router_owner = [10000]
+        router_source = mod.SYSTEM+'assets/task-router/router.py'
         ext_source = mod.SYSTEM+'assets/task-router/github_deployment.py'
         payload = {source: ('new reviewed '+source).encode() for source in mod.ASSETS}
         payload[mod.PREFIX+'scripts/install_runtime.py'] = Path(mod.__file__).read_bytes()
         real_fstat = os.fstat
         def root_stat(fd):
             info = real_fstat(fd)
-            return SimpleNamespace(st_uid=0, st_gid=10001, st_mode=info.st_mode, st_nlink=info.st_nlink, st_size=info.st_size, st_mtime_ns=info.st_mtime_ns)
+            return SimpleNamespace(st_uid=router_owner[0] if info.st_ino == router_inode else 0, st_gid=10000 if info.st_ino == router_inode else 10001, st_mode=info.st_mode, st_nlink=info.st_nlink, st_size=info.st_size, st_mtime_ns=info.st_mtime_ns)
         patches = [patch.object(mod, 'QA_ROOT', state/'qa-runs'), patch.object(mod, 'DISPATCH_LOCK', self.root/'libexec/dispatch.lock'),
                    patch.object(mod, 'INSTALL', install), patch.object(mod, 'CURRENT', install/'current'),
                    patch.object(mod, 'COMPAT', self.root/'libexec/runtime'), patch.object(mod, 'CODEX_SKILL', self.root/'codex/skills/loop'),
                    patch.object(mod, 'CONFIG', self.root/'etc/sites.json'), patch.object(mod, 'STATE', state),
-                   patch.object(mod, 'EXTERNAL', {ext_source: str(helper)}),
+                   patch.object(mod, 'EXTERNAL', {ext_source: str(helper), router_source: str(router)}),
+                   patch.object(mod, 'PROFILE_ROUTER', str(router)),
                    patch.object(mod, 'PROFILE_FILES', {str(profile): mod.PREFIX+'SKILL.md'}),
                    patch.object(mod.os, 'geteuid', return_value=0), patch.object(mod.os, 'fstat', side_effect=root_stat), patch.object(mod.os, 'fchown')]
         for item in patches: item.start();self.addCleanup(item.stop)
         baseline = mod.current_state()
+        # Even when a root helper comes first, an unknown late profile owner aborts
+        # the whole preflight without replacing any existing target.
+        router_owner[0] = 12345
+        with self.assertRaisesRegex(ValueError, 'untrusted scoped Hermes'):
+            mod.apply(self.commit, payload, mod.registration_payload(self.config), baseline)
+        self.assertEqual(helper.read_bytes(), b'old independent helper')
+        self.assertEqual(router.read_bytes(), b'old root router')
+        self.assertFalse((install/'releases'/self.commit).exists())
+        router_owner[0] = 10000
+        pinned = mod.target_parent(router)
+        try:
+            router.write_bytes(b'independent repair after baseline')
+            with self.assertRaisesRegex(ValueError, 'changed after preflight'):
+                mod.verify_destination(router, pinned, baseline['targets'][str(router)])
+            router.write_bytes(b'old root router')
+        finally:
+            os.close(pinned)
+        original_parent = router.parent.with_name('original-task-router')
+        router.parent.rename(original_parent)
+        router.parent.symlink_to(original_parent, target_is_directory=True)
+        with self.assertRaises(OSError):
+            mod.apply(self.commit, payload, mod.registration_payload(self.config), baseline)
+        self.assertEqual(helper.read_bytes(), b'old independent helper')
+        router.parent.unlink();original_parent.rename(router.parent)
         previous = os.umask(0o077)
         try:
             result = mod.apply(self.commit, payload, mod.registration_payload(self.config), baseline)
@@ -122,6 +153,22 @@ class InstallTests(unittest.TestCase):
         index = json.loads((Path(result['backup'])/'target-index.json').read_text())
         self.assertEqual((Path(result['backup'])/index[str(helper)]['file']).read_bytes(), b'old independent helper')
         self.assertEqual(helper.read_bytes(), payload[ext_source])
+        self.assertEqual(router.read_bytes(), payload[router_source])
+        self.assertEqual(router.parent.stat().st_mode & 0o777, 0o770)
+        self.assertEqual(index[str(router)]['uid'], router.stat().st_uid)
+        self.assertEqual(index[str(router)]['gid'], router.stat().st_gid)
+        # A later path swap cannot redirect writes through the retained descriptor.
+        fd = mod.target_parent(router)
+        outside = self.root/'outside';outside.mkdir();(outside/'router.py').write_bytes(b'untouched')
+        router.parent.rename(original_parent);router.parent.symlink_to(outside, target_is_directory=True)
+        try:
+            mod.atomic(router, b'anchored', mode=0o755, parent_fd=fd)
+        finally:
+            os.close(fd)
+        self.assertEqual((outside/'router.py').read_bytes(), b'untouched')
+        self.assertEqual((original_parent/'router.py').read_bytes(), b'anchored')
+        router.parent.unlink();original_parent.rename(router.parent)
+        router.write_bytes(payload[router_source])
         self.assertEqual(os.readlink(install/'current'), 'releases/'+self.commit)
         self.assertEqual(os.readlink(self.root/'codex/skills/loop'), str(install/'current'))
         self.assertFalse((self.root/'etc/systemd').exists())

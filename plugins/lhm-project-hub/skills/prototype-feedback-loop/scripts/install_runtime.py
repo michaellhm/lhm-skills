@@ -54,6 +54,23 @@ SITE_FIELDS = {'enabled', 'account', 'senders', 'threads', 'review_start', 'cock
                'client_id', 'client_label', 'canonical_note', 'work_folder_url', 'repository',
                'subtree', 'preview_url', 'reviewer_id', 'worker_root'}
 MAX_ARCHIVE = 100 * 1024 * 1024
+PROFILE_ROUTER = '/home/hermes/.hermes/profiles/lhm_chief_of_staff/task-router/router.py'
+# Independently read back from the existing authenticated Hermes installation.
+PROFILE_ROUTER_PARENT = (10000, 10000, 0o770)
+
+
+def target_parent(path):
+    path = Path(path)
+    if str(path) == PROFILE_ROUTER:
+        fd = directory_fd(path.parent)
+        info = os.fstat(fd)
+        if (info.st_uid, info.st_gid, stat.S_IMODE(info.st_mode)) != PROFILE_ROUTER_PARENT:
+            os.close(fd)
+            raise ValueError('untrusted scoped Hermes router parent')
+        return fd
+    protected(path.parent)
+    return directory_fd(path.parent)
+
 
 
 def canonical(value):
@@ -117,12 +134,38 @@ def protected(path, *, mode=0o755):
     finally: os.close(fd)
 
 
-def atomic(path, data, *, mode=0o644):
-    path = Path(path);directory = directory_fd(path.parent)
+def verify_destination(path, directory, expected):
+    """Recheck the pinned baseline through the exact directory used for replacement."""
+    path = Path(path)
+    try:
+        info = os.stat(path.name, dir_fd=directory, follow_symlinks=False)
+    except FileNotFoundError:
+        if expected is not None:
+            raise ValueError('destination disappeared after preflight')
+        return
+    if expected is None:
+        raise ValueError('new destination appeared after preflight')
+    if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
+        raise ValueError('destination changed type after preflight')
+    fd = os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory)
+    with os.fdopen(fd, 'rb') as stream:
+        protected_info = os.fstat(stream.fileno())
+        if protected_info.st_uid != 0 or protected_info.st_mode & 0o022:
+            raise ValueError('destination file lost root protection')
+        data = stream.read(2 * 1024 * 1024 + 1)
+    actual = {'sha256': digest(data), 'mode': stat.S_IMODE(info.st_mode), 'uid': info.st_uid, 'gid': info.st_gid}
+    if actual != expected:
+        raise ValueError('destination changed after preflight')
+
+
+def atomic(path, data, *, mode=0o644, parent_fd=None):
+    path = Path(path);directory = directory_fd(path.parent) if parent_fd is None else os.dup(parent_fd)
     temporary = '.' + path.name + '.' + uuid.uuid4().hex + '.next'
     try:
         info = os.fstat(directory)
-        if info.st_uid != 0 or info.st_mode & 0o022:
+        special = (parent_fd is not None and str(path) == PROFILE_ROUTER
+                   and (info.st_uid, info.st_gid, stat.S_IMODE(info.st_mode)) == PROFILE_ROUTER_PARENT)
+        if not special and (info.st_uid != 0 or info.st_mode & 0o022):
             raise ValueError('unsafe install destination parent')
         fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, mode, dir_fd=directory)
         with os.fdopen(fd, 'wb') as stream:
@@ -136,8 +179,8 @@ def atomic(path, data, *, mode=0o644):
         os.close(directory)
 
 
-def link(path, target):
-    path = Path(path);directory = directory_fd(path.parent)
+def link(path, target, *, parent_fd=None):
+    path = Path(path);directory = directory_fd(path.parent) if parent_fd is None else os.dup(parent_fd)
     temporary = '.' + path.name + '.' + uuid.uuid4().hex + '.next'
     try:
         os.symlink(target, temporary, dir_fd=directory)
@@ -212,7 +255,7 @@ def current_state():
         if path.exists() or path.is_symlink():
             data = read_file(path, root=True)
             info = path.lstat()
-            targets[target] = {'sha256': digest(data), 'mode': stat.S_IMODE(info.st_mode)}
+            targets[target] = {'sha256': digest(data), 'mode': stat.S_IMODE(info.st_mode), 'uid': info.st_uid, 'gid': info.st_gid}
         else: targets[target] = None
     links = {}
     for path in (CURRENT, COMPAT, CODEX_SKILL):
@@ -250,6 +293,7 @@ def apply(commit, payload, config, baseline):
         finally: os.close(fd)
     qa_root_info()
     handles = []
+    destinations = {}
     try:
         for path in (INSTALL/'.install.lock', STATE/'poll.lock', STATE/'runner.lock', STATE/'scan.lock', QA_ROOT/'.coordinator.lock', DISPATCH_LOCK):
             fd = os.open(path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600);handles.append(fd)
@@ -259,6 +303,12 @@ def apply(commit, payload, config, baseline):
             fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         if baseline != current_state():
             raise ValueError('live source changed while acquiring install locks')
+        # Preflight all destinations before any existing helper/doc/config/link write.
+        # Pin no-follow directory descriptors across the transaction.
+        for target in [*EXTERNAL.values(), *PROFILE_FILES, str(CONFIG), str(CURRENT), str(COMPAT), str(CODEX_SKILL)]:
+            destinations[str(target)] = target_parent(target)
+        if baseline != current_state():
+            raise ValueError('live source changed during destination preflight')
         release = INSTALL/'releases'/commit
         protected(release)
         manifest = {}
@@ -298,23 +348,21 @@ def apply(commit, payload, config, baseline):
             (backup/'queue.snapshot.sqlite').chmod(0o600)
         # Only the explicit helper files change; the router/profile installer is never invoked.
         for source, target in EXTERNAL.items():
-            protected(Path(target).parent)
-            atomic(target, payload[source], mode=0o755)
+            verify_destination(target, destinations[str(target)], baseline['targets'][str(target)])
+            atomic(target, payload[source], mode=0o755, parent_fd=destinations[str(target)])
         for target, source in PROFILE_FILES.items():
-            protected(Path(target).parent)
-            atomic(target, payload[source])
-        protected(CONFIG.parent)
-        atomic(CONFIG, config, mode=0o600)
+            verify_destination(target, destinations[str(target)], baseline['targets'][str(target)])
+            atomic(target, payload[source], parent_fd=destinations[str(target)])
+        verify_destination(CONFIG, destinations[str(CONFIG)], baseline['targets'][str(CONFIG)])
+        atomic(CONFIG, config, mode=0o600, parent_fd=destinations[str(CONFIG)])
         for source, target in EXTERNAL.items():
             if read_file(target, root=True) != payload[source]: raise RuntimeError('scoped helper readback failed; use recorded backup')
         for target, source in PROFILE_FILES.items():
             if read_file(target, root=True) != payload[source]: raise RuntimeError('scoped skill-document readback failed')
         if read_file(CONFIG, private=True, root=True) != config: raise RuntimeError('registration readback failed')
-        link(CURRENT, 'releases/' + commit)
-        protected(COMPAT.parent)
-        link(COMPAT, str(CURRENT/'scripts'))
-        protected(CODEX_SKILL.parent)
-        link(CODEX_SKILL, str(CURRENT))
+        link(CURRENT, 'releases/' + commit, parent_fd=destinations[str(CURRENT)])
+        link(COMPAT, str(CURRENT/'scripts'), parent_fd=destinations[str(COMPAT)])
+        link(CODEX_SKILL, str(CURRENT), parent_fd=destinations[str(CODEX_SKILL)])
         if (os.readlink(CURRENT) != 'releases/' + commit or os.readlink(COMPAT) != str(CURRENT/'scripts')
                 or os.readlink(CODEX_SKILL) != str(CURRENT)):
             raise RuntimeError('release projection readback failed')
@@ -323,6 +371,7 @@ def apply(commit, payload, config, baseline):
         return {'state': 'installed-not-activated', 'commit': commit, 'backup': str(backup),
                 'release': str(release), 'timer_installed': False, 'timer_enabled': False}
     finally:
+        for fd in destinations.values(): os.close(fd)
         for fd in reversed(handles): os.close(fd)
 
 
