@@ -210,7 +210,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
     staff-weekly-flow/                  # Chosen commitments, item-by-item BasicOps reconciliation and Tuesday web meeting document
-    sales-handover/                     # Hand a newly-closed client from sales to delivery
+    sales-handover/                     # Fathom/email evidence → Obsidian → reviewed emails → dated owner tasks
     client-onboarding/                  # Scope-aware onboarding, reviewed handovers and campaign master → UI UX Pro Max → website prototype
     website-kickoff/                    # New website build kickoff (WordPress or Astro) → handoff to WordPress hub
     existing-client-website-handover/   # Michael → Kristalyn website brief for an existing client
@@ -319,7 +319,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 **Team Handoffs** (4 skills): A universal team-work briefing flow reads requester, client, assignee and project context; checks access, dependencies, authority, completion and review; asks one material question at a time; and learns carefully from assignee feedback. The Hermes production-plan flow lets Monica preflight an existing BasicOps outcome, prepare a concise version-bound execution chain for Waylon, answer “where are we at?” from authoritative checkpoints, explain CTO blockers in plain English, verify durable artefact delivery and reconcile the returned work. The shared Drive artefact delivery capability moves approved files from bounded staging into the registered client folder and proves exact metadata and content through readback. The shared BasicOps task manager then applies LHM naming, short plain-English task briefs for the team, discussion-first actionable next steps, existing-client website routing, parent-discussion subtask links, personal-board confirmation, approval, deduplication and read-back verification to every task mutation.
 
-**Client Lifecycle** (3 skills): Sales-to-delivery handover; Tier 1 client onboarding; and an existing-client website handover that transfers a newly scoped website project from Michael to Kristalyn without restarting general onboarding.
+**Client Lifecycle** (3 skills): Evidence-first sales handover (Fathom/email → Obsidian → reviewed communications → dated owner tasks → verified Obsidian handback); Tier 1 client onboarding; and an existing-client website handover that transfers a newly scoped website project from Michael to Kristalyn without restarting general onboarding.
 
 **Delivery Kickoffs** (6 skills): Website build kickoff (WordPress or Astro), PPC landing page campaign kickoff, SEO engagement kickoff, GMB/local SEO cycle kickoff, blog/article content pipeline kickoff, and Google Ads campaign build kickoff (gated on conversion tracking being live). Each follows the same shared pattern: intake, a project-management state file, a BasicOps scaffold with backwards-scheduled milestones, a client kickoff email, and handoff to the delivery specialist hub.
 
