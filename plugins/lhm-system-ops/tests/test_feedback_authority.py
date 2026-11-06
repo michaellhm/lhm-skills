@@ -38,7 +38,7 @@ class AuthorityTests(unittest.TestCase):
         real_fstat = os.fstat
         def root_stat(fd):
             s = real_fstat(fd)
-            return SimpleNamespace(st_uid=0, st_mode=s.st_mode, st_size=s.st_size)
+            return SimpleNamespace(st_uid=0, st_mode=s.st_mode, st_size=s.st_size, st_nlink=s.st_nlink)
         self.mock_owner = patch.object(mod.os, 'fstat', side_effect=root_stat)
         self.mock_owner.start()
         self.addCleanup(self.mock_owner.stop)
@@ -120,10 +120,39 @@ class AuthorityTests(unittest.TestCase):
         run, receipt = self.admission(router, 'needs_review')
         self.cockpit['section']['id'] = 110341
         (run/'result.md').write_text('Existing worker result; requires human review.')
-        self.assertTrue(router.reconcile(12)['notification']['verified'])
+        self.assertIsNone(router.reconcile(12)['notification'])
+        self.assertNotIn('completion',router.status(12))
+        self.assertFalse(any('TED central route:' in value['message'] for value in self.messages))
         before = len(self.messages)
         router.reconcile(12)
         self.assertEqual(len(self.messages), before)
+
+    def test_exit_after_verified_completion_keeps_readonly_proof_and_blocks_new_dispatch(self):
+        router=self.router();run,receipt=self.admission(router,'needs_review')
+        self.cockpit['section']['id']=110341
+        self.task.update(assignee=36398,status='Under Review')
+        saved_path=self.root/'task-router-state/12.json';saved=json.loads(saved_path.read_text())
+        saved['session_notification']={'verified':True};saved_path.write_text(json.dumps(saved));request=saved['request']
+        commit='b'*40
+        proof={'schema_version':1,'status':'verified_for_review','request_id':request['request_id'],'task_id':12,
+            'client_id':'blue-dragonfly','batch_id':self.grant['batch_id'],'producer_thread_id':receipt['thread_id'],
+            'source_package_sha256':'a'*64,'qa_receipt_sha256':'a'*64,'delivery_package_sha256':'a'*64,
+            'publication_package_sha256':'a'*64,'commit':commit,'workflow':{'id':289562388,'name':'Deploy to lhmstaging',
+            'path':'.github/workflows/deploy.yml','head_sha':commit,'head_branch':'main','status':'completed','conclusion':'success',
+            'run_id':123,'html_url':'https://github.com/michaellhm/lhm-prototype/actions/runs/123'},
+            'public_files':[{'url':'https://lhmstaging.net/prototypes/luminary-counselling/homepage/index.html','status':200,'bytes':1,'sha256':'a'*64}],
+            'changed_files':['luminary-counselling/homepage/index.html'],
+            'preview_url':'https://lhmstaging.net/prototypes/luminary-counselling/homepage/?rev='+commit[:7],
+            'reviewer_id':36398,'basicops_status':'Under Review','discussion_sha256':'a'*64,
+            'drive_folder_url':'https://drive.google.com/drive/folders/evidence123','handback_receipt_sha256':'a'*64,'verified_at':1}
+        (run/'completion.json').write_text(json.dumps(proof))
+        before=len(self.messages)
+        state=router.reconcile(12)
+        self.assertEqual(state['completion'],proof)
+        self.assertIsNone(state['notification'])
+        self.assertEqual(len(self.messages),before)
+        self.assertEqual(len(list((self.root/'queue/incoming').glob('*.json'))),1)
+        with self.assertRaises(ValueError):router.submit(12,'dm34')
 
     def test_exit_before_admission_does_not_hand_back_as_running(self):
         router = self.router()

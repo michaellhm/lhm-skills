@@ -395,4 +395,4 @@ Approved Claude implementation handoff: exact human approval plus task/source co
 
 CTO visible repair handoff: investigation packages findings into one `*The Intervention` task and a persistent paired Codex chat. Michael continues feedback and approvals there; scoped source preparation, publishing, merge and deployment remain distinct. No new skill was added.
 
-**Prototype feedback:** `prototype-feedback-loop` prepares deduplicated batches from eligible website projects; `prototype-revisions` implements and verifies them through the existing site worker. Host adapters and live activation require verified integration.
+**Prototype feedback:** `prototype-feedback-loop` prepares deduplicated batches from eligible website projects; `prototype-revisions` implements and verifies them through the existing site worker. Bounded Gmail, BasicOps and Ted host adapters include crash reconciliation and independent completion QA. Installed status and recurring activation require separate live acceptance.

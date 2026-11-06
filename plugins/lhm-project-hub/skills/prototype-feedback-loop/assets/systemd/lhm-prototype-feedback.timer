@@ -1,0 +1,11 @@
+[Unit]
+Description=LHM prototype feedback check every two hours
+
+[Timer]
+OnCalendar=*-*-* 00/2:00:00 Australia/Melbourne
+Persistent=true
+AccuracySec=1min
+Unit=lhm-prototype-feedback.service
+
+[Install]
+WantedBy=timers.target

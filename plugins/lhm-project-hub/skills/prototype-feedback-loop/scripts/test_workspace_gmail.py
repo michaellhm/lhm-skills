@@ -73,6 +73,7 @@ class MimeTests(unittest.TestCase):
 
     def test_output_directory_must_be_private(self):
         self.images.mkdir(mode=0o755)
+        self.images.chmod(0o755)  # Exercise the unsafe mode independently of process umask.
         with self.assertRaisesRegex(ValueError, 'private'):
             self.parse()
 

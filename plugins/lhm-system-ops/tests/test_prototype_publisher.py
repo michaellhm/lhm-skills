@@ -1,4 +1,4 @@
-import hashlib, importlib.util, json, os, tempfile, unittest
+import hashlib, importlib.util, json, os, subprocess, sys, tempfile, time, unittest
 from importlib.machinery import SourceFileLoader
 from pathlib import Path
 from unittest import mock
@@ -7,7 +7,19 @@ ROOT=Path(__file__).resolve().parents[1]; HELPER=ROOT/'assets/host/lhm-prototype
 spec=importlib.util.spec_from_loader('prototype_publisher',SourceFileLoader('prototype_publisher',str(HELPER)))
 publisher=importlib.util.module_from_spec(spec); spec.loader.exec_module(publisher)
 
+def deployment_action(commit):
+    return {'id':123,'workflow_id':publisher.WORKFLOW['id'],'name':publisher.WORKFLOW['name'],
+            'path':publisher.WORKFLOW['path'],'head_sha':commit,'head_branch':'main',
+            'status':'completed','conclusion':'success',
+            'html_url':'https://github.com/michaellhm/lhm-prototype/actions/runs/123'}
+
 class PrototypePublisherTests(unittest.TestCase):
+    def setUp(self):
+        self.real_verify_deployment = publisher.verify_deployment
+        patcher = mock.patch.object(publisher, 'verify_deployment', side_effect=deployment_action)
+        self.deployment = patcher.start()
+        self.addCleanup(patcher.stop)
+
     def request(self,root,client='alpha-health',kind='sitemap',files=None,**updates):
         publisher.SOURCE_ROOT=root.parent
         files=files or {'index.html':b'<title>Prototype</title>','styles/site.css':b'body{}','scripts/site.js':b'console.log("static")','data/site.json':b'{"ok":true}','images/logo.webp':b'RIFFimage','fonts/site.woff2':b'wOF2font'}
@@ -116,7 +128,7 @@ class PrototypePublisherTests(unittest.TestCase):
             push=next(call for call in git.call_args_list if call.args and call.args[0]=='push')
             self.assertIn(f"--force-with-lease=refs/heads/main:{request['expected_base_commit']}",push.args)
 
-    def exercise_real_checkout(self, files, *, extra_path=None):
+    def exercise_real_checkout(self, files, *, extra_path=None, base_files=None):
         """Use real local Git status/commit; replace only network/deployment calls."""
         with tempfile.TemporaryDirectory() as temporary:
             base = Path(temporary); checkout = base/'checkout';checkout.mkdir()
@@ -128,7 +140,9 @@ class PrototypePublisherTests(unittest.TestCase):
                 native_git('init', '--quiet')
                 initial = checkout/'alpha-health/homepage/index.html';initial.parent.mkdir(parents=True)
                 initial.write_bytes(b'original index')
-                native_git('add', '--', 'alpha-health/homepage/index.html')
+                for relative,data in (base_files or {}).items():
+                    path=initial.parent/relative;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(data)
+                native_git('add', '--', 'alpha-health/homepage')
                 native_git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '--quiet', '-m', 'fixture base')
                 commit = native_git('rev-parse', 'HEAD')
                 request['expected_base_commit'] = commit
@@ -164,6 +178,16 @@ class PrototypePublisherTests(unittest.TestCase):
         result = self.exercise_real_checkout({'index.html': b'changed index', 'styles/site.css': b'body { color: #222; }'})
         self.assertEqual(result['changed_files'], ['alpha-health/homepage/index.html', 'alpha-health/homepage/styles/site.css'])
 
+    def test_css_only_manifest_accepts_unchanged_index_anchor(self):
+        result=self.exercise_real_checkout({'index.html':b'original index','style.css':b'body{color:blue}'},
+                                          base_files={'style.css':b'body{color:red}'})
+        self.assertEqual(result['changed_files'],['alpha-health/homepage/style.css'])
+
+    def test_unchanged_non_index_anchor_is_rejected(self):
+        with self.assertRaisesRegex(ValueError,'checkout changes do not match'):
+            self.exercise_real_checkout({'index.html':b'changed index','style.css':b'body{color:red}'},
+                                        base_files={'style.css':b'body{color:red}'})
+
     def test_unchanged_manifest_still_rejected_before_commit_or_push(self):
         with self.assertRaisesRegex(ValueError, 'checkout changes do not match'):
             self.exercise_real_checkout({'index.html': b'original index'})
@@ -175,7 +199,7 @@ class PrototypePublisherTests(unittest.TestCase):
     def test_duplicate_idempotency_key_returns_receipt_without_git(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary)/'source'; root.mkdir(); request=self.request(root); publisher.STATE_ROOT=Path(temporary)/'receipts'
-            expected={'status':'published_and_verified','commit':'b'*40}
+            expected={'status':'published_and_verified','commit':'b'*40,'workflow':publisher.workflow_evidence(deployment_action('b'*40))}
             publisher.store_receipt(request,expected)
             with mock.patch.object(publisher,'git') as git:
                 self.assertEqual(publisher.publish(request),expected); git.assert_not_called()
@@ -186,7 +210,7 @@ class PrototypePublisherTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary)/'source'; root.mkdir(); request=self.request(root); publisher.STATE_ROOT=Path(temporary)/'receipts'
             publisher.STATE_ROOT.mkdir(); (publisher.STATE_ROOT/f"{request['idempotency_key']}.tmp").write_text('interrupted')
-            expected={'status':'published_and_verified','commit':'b'*40}
+            expected={'status':'published_and_verified','commit':'b'*40,'workflow':publisher.workflow_evidence(deployment_action('b'*40))}
             publisher.store_receipt(request,expected)
             self.assertEqual(publisher.prior_receipt(request),expected)
 
@@ -195,7 +219,51 @@ class PrototypePublisherTests(unittest.TestCase):
             root=Path(temporary)/'source'; root.mkdir(); request=self.request(root); publisher.STATE_ROOT=Path(temporary)/'receipts'
             with mock.patch.object(publisher.fcntl,'flock') as flock, mock.patch.object(publisher,'_publish_locked',return_value={'status':'ok'}):
                 self.assertEqual(publisher.publish(request),{'status':'ok'})
-                flock.assert_called_once_with(mock.ANY,publisher.fcntl.LOCK_EX)
+                self.assertEqual(flock.call_args_list,[mock.call(mock.ANY,publisher.fcntl.LOCK_EX),mock.call(mock.ANY,publisher.fcntl.LOCK_EX)])
+
+    def test_different_requests_serialize_the_complete_shared_checkout_transaction(self):
+        script = r'''import importlib.util,sys,time
+from importlib.machinery import SourceFileLoader
+from pathlib import Path
+spec=importlib.util.spec_from_loader('publisher',SourceFileLoader('publisher',sys.argv[1]))
+p=importlib.util.module_from_spec(spec);spec.loader.exec_module(p)
+p.STATE_ROOT=Path(sys.argv[2]);name=sys.argv[3]
+def critical(request):
+    with (p.STATE_ROOT/'events').open('a') as out:out.write(name+'-enter\n')
+    (p.STATE_ROOT/(name+'.entered')).touch()
+    if name=='first':
+        deadline=time.monotonic()+8
+        while not (p.STATE_ROOT/'release').exists():
+            if time.monotonic()>deadline:raise RuntimeError('test release timed out')
+            time.sleep(.01)
+    with (p.STATE_ROOT/'events').open('a') as out:out.write(name+'-exit\n')
+    return {'status':'fixture'}
+p._publish_locked=critical
+(p.STATE_ROOT/(name+'.started')).touch()
+p.publish({'idempotency_key':name})
+'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            def wait_for(name):
+                deadline=time.monotonic()+5
+                while not (root/name).exists():
+                    if time.monotonic()>deadline:self.fail('child marker not observed: '+name)
+                    time.sleep(.01)
+            first=subprocess.Popen([sys.executable,'-c',script,str(HELPER),str(root),'first'],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+            second=None
+            try:
+                wait_for('first.entered')
+                second=subprocess.Popen([sys.executable,'-c',script,str(HELPER),str(root),'second'],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+                wait_for('second.started');time.sleep(.15)
+                self.assertFalse((root/'second.entered').exists(),'different request entered the shared checkout concurrently')
+            finally:
+                (root/'release').touch()
+                out,err=first.communicate(timeout=6)
+                self.assertEqual(first.returncode,0,err.decode())
+                if second is not None:
+                    out,err=second.communicate(timeout=6)
+                    self.assertEqual(second.returncode,0,err.decode())
+            self.assertEqual((root/'events').read_text().splitlines(),['first-enter','first-exit','second-enter','second-exit'])
 
     def test_missing_root_credential_fails_closed(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -253,5 +321,115 @@ class PrototypePublisherTests(unittest.TestCase):
             self.assertFalse(first['review_handoff']['complete'])
             self.assertTrue(first['review_handoff']['human_task_open'])
             self.assertFalse(first['review_handoff']['client_contact'])
+
+    def test_legacy_zero_workflow_is_verified_and_backed_up_without_git(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)/'source';root.mkdir();request=self.request(root)
+            with mock.patch.object(publisher,'STATE_ROOT',Path(temporary)/'receipts'):
+                old={'status':'published_and_verified','commit':'b'*40,'workflow':{**publisher.WORKFLOW,'run_id':0,'conclusion':'success'}}
+                publisher.store_receipt(request,old)
+                original=publisher.receipt_path(request['idempotency_key']).read_bytes()
+                with mock.patch.object(publisher,'git') as git:
+                    result=publisher.publish(request)
+                    again=publisher.publish(request)
+                    git.assert_not_called()
+                self.assertEqual(result,again)
+                self.assertEqual(result['workflow']['run_id'],123)
+                self.assertEqual(result['workflow']['head_sha'],'b'*40)
+                envelope=json.loads(publisher.receipt_path(request['idempotency_key']).read_text())
+                self.assertEqual(Path(envelope['legacy_workflow_receipt_backup']).read_bytes(),original)
+                self.assertNotIn('legacy_workflow_receipt_backup',result)
+                self.deployment.assert_called_once_with('b'*40)
+
+    def test_legacy_failed_workflow_preserves_original_and_does_not_push(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)/'source';root.mkdir();request=self.request(root)
+            with mock.patch.object(publisher,'STATE_ROOT',Path(temporary)/'receipts'):
+                publisher.store_receipt(request,{'status':'published_and_verified','commit':'b'*40,'workflow':{'run_id':0}})
+                original=publisher.receipt_path(request['idempotency_key']).read_bytes()
+                self.deployment.side_effect=ValueError('not verified')
+                with mock.patch.object(publisher,'git') as git, self.assertRaisesRegex(ValueError,'not verified'):
+                    publisher.publish(request)
+                git.assert_not_called()
+                self.assertEqual(publisher.receipt_path(request['idempotency_key']).read_bytes(),original)
+
+    def test_post_push_workflow_failure_keeps_pending_and_no_success_receipt(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            base=Path(temporary);root=base/'incoming/source';root.mkdir(parents=True);request=self.request(root)
+            with mock.patch.object(publisher,'STATE_ROOT',base/'receipts'), mock.patch.object(publisher,'CHECKOUT',base/'checkout'):
+                publisher.CHECKOUT.mkdir();publisher.STATE_ROOT.mkdir();commit='b'*40
+                publisher.pending_path(request['idempotency_key']).write_text(json.dumps({'request_digest':publisher.request_digest(request),'commit':commit}))
+                self.deployment.side_effect=ValueError('not verified')
+                with mock.patch.object(publisher,'ssh_env',return_value={}), mock.patch.object(publisher,'preflight_post_publish_dependencies'), \
+                     mock.patch.object(publisher,'git',side_effect=['',commit]) as git, \
+                     mock.patch.object(publisher,'wait_for_public_deploy',return_value={'status':200}):
+                    with self.assertRaisesRegex(ValueError,'not verified'):publisher.publish(request)
+                self.assertTrue(publisher.pending_path(request['idempotency_key']).exists())
+                self.assertFalse(publisher.receipt_path(request['idempotency_key']).exists())
+                self.assertFalse(any(c.args[0] in {'push','commit'} for c in git.call_args_list))
+
+    def test_real_deployment_reader_uses_fixed_nonroot_authenticated_route(self):
+        import types
+        done=types.SimpleNamespace(returncode=0,stdout=json.dumps(deployment_action('b'*40)))
+        with mock.patch.object(publisher,'preflight_deployment_reader') as preflight, mock.patch.object(publisher.subprocess,'run',return_value=done) as call:
+            result=self.real_verify_deployment('b'*40)
+        self.assertEqual(result['id'],123);preflight.assert_called_once()
+        self.assertEqual(call.call_args.args[0],[publisher.RUNUSER,'-u','codexworker','--',str(publisher.DEPLOYMENT_PYTHON),str(publisher.DEPLOYMENT_HELPER),'--commit','b'*40])
+        self.assertEqual(call.call_args.kwargs['timeout'],400)
+
+    def test_reader_failure_or_mismatched_evidence_never_becomes_success(self):
+        import types
+        cases=[types.SimpleNamespace(returncode=1,stdout=''),types.SimpleNamespace(returncode=0,stdout=json.dumps(deployment_action('a'*40)))]
+        for done in cases:
+            with self.subTest(done=done),mock.patch.object(publisher,'preflight_deployment_reader'),mock.patch.object(publisher.subprocess,'run',return_value=done),self.assertRaises(ValueError):
+                self.real_verify_deployment('b'*40)
+
+    def test_zero_or_wrong_workflow_action_rejected_by_release_result(self):
+        for updates in [{'id':0},{'workflow_id':1},{'status':'in_progress'},{'conclusion':'failure'},{'path':'.github/workflows/other.yml'},{'html_url':'https://example.test/123'}]:
+            with self.subTest(updates=updates),self.assertRaises(ValueError):
+                publisher.validate_deployment_action({**deployment_action('b'*40),**updates},'b'*40)
+
+    def test_real_preflight_checks_authenticated_read_capability_before_mutation(self):
+        import types
+        expected={'status':'ready','repository':publisher.REPOSITORY,'workflow_id':publisher.WORKFLOW['id']}
+        done=types.SimpleNamespace(returncode=0,stdout=json.dumps(expected))
+        with mock.patch.object(publisher,'preflight_deployment_reader'),mock.patch.object(publisher.subprocess,'run',return_value=done) as call:
+            publisher.preflight_deployment_access()
+        self.assertEqual(call.call_args.args[0][-1],'--preflight')
+        done.stdout=json.dumps({**expected,'repository':'other/repo'})
+        with mock.patch.object(publisher,'preflight_deployment_reader'),mock.patch.object(publisher.subprocess,'run',return_value=done),self.assertRaises(ValueError):
+            publisher.preflight_deployment_access()
+        done.returncode=1
+        with mock.patch.object(publisher,'preflight_deployment_reader'),mock.patch.object(publisher.subprocess,'run',return_value=done),self.assertRaises(ValueError):
+            publisher.preflight_deployment_access()
+
+    def test_closed_result_schema_requires_real_exact_workflow_evidence(self):
+        try:
+            import jsonschema
+        except ImportError:
+            self.skipTest('run the publication schema check with the jsonschema test dependency')
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)/'source';root.mkdir();request=self.request(root)
+            paths=[x['path'] for x in request['file_manifest']]
+            index=next(x for x in request['file_manifest'] if x['path'].endswith('/index.html'))
+            public={'url':'https://lhmstaging.net/prototypes/alpha-health/sitemap/','status':200,'bytes':index['bytes'],'sha256':index['sha256'],'commit':'b'*40}
+            result=publisher.release_result(request,paths,'b'*40,deployment_action('b'*40),public)
+            schema=json.loads((ROOT/'references/prototype-publication.result.schema.json').read_text())
+            jsonschema.Draft202012Validator(schema).validate(result)
+            for updates in ({'run_id':0},{'html_url':'https://example.test/123'},{'head_branch':'feature'},{'status':'queued'}):
+                bad={**result,'workflow':{**result['workflow'],**updates}}
+                with self.subTest(updates=updates),self.assertRaises(jsonschema.ValidationError):
+                    jsonschema.Draft202012Validator(schema).validate(bad)
+            bad={**result,'legacy_workflow_receipt_backup':'internal-only'}
+            with self.assertRaises(jsonschema.ValidationError):jsonschema.Draft202012Validator(schema).validate(bad)
+
+    def test_missing_or_linked_helper_fails_preflight(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            missing=Path(temporary)/'missing'
+            with mock.patch.object(publisher,'DEPLOYMENT_HELPER',missing),self.assertRaisesRegex(ValueError,'not installed'):
+                publisher.preflight_deployment_reader()
+            target=Path(temporary)/'target';target.write_text('source');missing.symlink_to(target)
+            with mock.patch.object(publisher,'DEPLOYMENT_HELPER',missing),self.assertRaisesRegex(ValueError,'protected root-owned'):
+                publisher.preflight_deployment_reader()
 
 if __name__=='__main__': unittest.main()

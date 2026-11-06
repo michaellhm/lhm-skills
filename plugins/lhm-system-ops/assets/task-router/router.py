@@ -24,6 +24,55 @@ def feedback_authority_module():
     return module
 
 
+def completion_proof(path,request):
+    """Read the root supervisor's bounded verified completion projection only."""
+    fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW)
+    with os.fdopen(fd,'rb') as stream:
+        info=os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_uid!=0 or info.st_mode&0o022 or info.st_nlink!=1 or info.st_size>262144:
+            raise ValueError('completion proof must be root protected')
+        proof=json.loads(stream.read(262145))
+    fields={'schema_version','status','request_id','task_id','client_id','batch_id','producer_thread_id',
+            'source_package_sha256','qa_receipt_sha256','delivery_package_sha256','publication_package_sha256',
+            'commit','workflow','public_files','changed_files','preview_url','reviewer_id','basicops_status',
+            'discussion_sha256','drive_folder_url','handback_receipt_sha256','verified_at'}
+    binding=request.get('feedback_authority',{})
+    if (not isinstance(proof,dict) or set(proof)!=fields or proof['schema_version']!=1
+            or proof['status']!='verified_for_review' or proof['request_id']!=request['request_id']
+            or proof['task_id']!=request['task_id'] or proof['client_id']!=request['client_id']
+            or proof['batch_id']!=binding.get('batch_id') or proof['reviewer_id']!=request['reviewer_id']
+            or proof['basicops_status']!='Under Review' or not re.fullmatch(r'[a-f0-9]{40}',str(proof['commit']))
+            or type(proof['verified_at']) is not int or proof['verified_at']<=0
+            or str(uuid.UUID(proof['producer_thread_id']))!=proof['producer_thread_id']):
+        raise ValueError('completion proof differs from the admitted native request')
+    for field in ('source_package_sha256','qa_receipt_sha256','delivery_package_sha256','publication_package_sha256',
+                  'discussion_sha256','handback_receipt_sha256'):
+        if not re.fullmatch(r'[a-f0-9]{64}',str(proof[field])):raise ValueError('completion proof hash is invalid')
+    workflow=proof['workflow'];commit=proof['commit']
+    if (workflow.get('id')!=289562388 or workflow.get('name')!='Deploy to lhmstaging'
+            or workflow.get('path')!='.github/workflows/deploy.yml' or workflow.get('head_sha')!=commit
+            or workflow.get('head_branch')!='main' or workflow.get('status')!='completed'
+            or workflow.get('conclusion')!='success' or type(workflow.get('run_id')) is not int
+            or workflow['run_id']<=0 or workflow.get('html_url')!='https://github.com/michaellhm/lhm-prototype/actions/runs/'+str(workflow['run_id'])):
+        raise ValueError('completion proof workflow is not exact and successful')
+    prefix='https://lhmstaging.net/prototypes/'+binding.get('subtree','')+'homepage/'
+    if proof['preview_url']!=prefix+'?rev='+commit[:7] or not re.fullmatch(r'https://drive\.google\.com/drive/folders/[A-Za-z0-9_-]{8,160}',proof['drive_folder_url']):
+        raise ValueError('completion proof review destinations differ')
+    files=proof['public_files']
+    if (not isinstance(files,list) or not 1<=len(files)<=1000 or any(set(row)!={'url','sha256','bytes','status'}
+            or not row['url'].startswith(prefix) or row['status']!=200 or not re.fullmatch(r'[a-f0-9]{64}',str(row['sha256']))
+            or type(row['bytes']) is not int or not 0<=row['bytes']<=10000000 for row in files)
+            or len({row['url'] for row in files})!=len(files)):
+        raise ValueError('completion proof lacks exact public file readbacks')
+    changed=proof['changed_files']
+    if (not isinstance(changed,list) or not changed or changed!=sorted(set(changed))
+            or any(not isinstance(name,str) or not name.startswith(binding.get('subtree','')+'homepage/') or '..' in Path(name).parts for name in changed)
+            or not set('https://lhmstaging.net/prototypes/'+quote(name,safe='/') for name in changed).issubset({row['url'] for row in files})
+            or not any(row['url']==prefix+'index.html' and row['bytes']>0 for row in files)):
+        raise ValueError('completion proof changed/public file scope differs')
+    return proof
+
+
 def plain(value):
     return html.unescape(re.sub(r'<[^>]*>', ' ', str(value)))
 
@@ -413,6 +462,11 @@ class Router:
         result['delivery_notification'] = saved.get('delivery_notification')
         result['notification'] = saved.get('notification')
         result['session_notification'] = saved.get('session_notification')
+        proof_path=run/'completion.json'
+        if request.get('feedback_authority') and proof_path.exists():
+            result['completion']=completion_proof(proof_path,request)
+            if result['completion']['producer_thread_id']!=receipt.get('thread_id'):
+                raise ValueError('root completion conversation differs from native receipt')
         result['chat_url'] = session_link(request['provider'], receipt.get('thread_id'), self.config, receipt)
         if (run / 'result.md').exists():
             result['result'] = (run / 'result.md').read_text()[:12000]
@@ -422,11 +476,14 @@ class Router:
         with (self.state / 'handback.lock').open('a') as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             state = self.status(task_id)
+            if state.get('status')=='not_submitted':return state
+            saved=json.loads((self.state/f'{task_id}.json').read_text())
+            feedback=bool(saved['request'].get('feedback_authority'))
             needs_link = bool(state.get('chat_url')) and not state.get('session_notification')
             delivery = state.get('delivery', {})
             delivery_state = delivery.get('artefact_state')
-            needs_delivery = delivery_state in {'delivered', 'delivery_incomplete', 'no_files_produced'} and state.get('delivery_notification') != delivery_key(delivery)
-            needs_result = state['status'] in TERMINAL and not state['notification'] and not (state.get('delivery_required') and delivery_state in {'pending', 'delivery_incomplete'})
+            needs_delivery = not feedback and delivery_state in {'delivered', 'delivery_incomplete', 'no_files_produced'} and state.get('delivery_notification') != delivery_key(delivery)
+            needs_result = not feedback and state['status'] in TERMINAL and not state['notification'] and not (state.get('delivery_required') and delivery_state in {'pending', 'delivery_incomplete'})
             if not needs_link and not needs_result and not needs_delivery:
                 return state
             path = self.state / f'{task_id}.json'

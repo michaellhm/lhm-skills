@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import re
 import stat
+import sqlite3
 import subprocess
 import time
 from client_directory import refresh as refresh_directory
@@ -15,6 +16,7 @@ BASE = Path('/home/hermes/.hermes/profiles/lhm_brain/dispatch/task-router')
 WORK = Path('/var/lib/lhm-task-router')
 VAULT = Path('/home/hermes/.hermes/profiles/lhm_brain/vault-task-router').resolve()
 PROFILE = Path('/home/hermes/.hermes/profiles/lhm_chief_of_staff')
+FEEDBACK_QUEUE = Path('/var/lib/lhm-prototype-feedback/state/queue.sqlite')
 ID = re.compile(r'ted-route-[1-9][0-9]*-dm[1-9][0-9]*')
 
 
@@ -224,6 +226,12 @@ def delivery_tick():
         receipt = json.loads(read(queue_run / 'receipt.json'))
         if receipt.get('status') != 'needs_review' or not (receipt.get('delivery_required') or (queue_run / 'delivery-request.json').exists()):
             continue
+        local_request = WORK / queue_run.name / 'request.json'
+        if local_request.exists():
+            try: contract = json.loads(read(local_request))
+            except (ValueError,OSError): continue
+            if contract.get('feedback_authority') or contract.get('permission_ceiling') == 'registered_prototype_revision':
+                continue  # Completion owns QA and native handback, including after review changes task ownership.
         target = queue_run / 'delivery.json'
         old = json.loads(read(target)) if target.exists() else {}
         if old.get('artefact_state') in {'delivered', 'no_files_produced'} or time.time() - old.get('attempted_at', 0) < 60:
@@ -236,10 +244,59 @@ def delivery_tick():
             run = WORK / queue_run.name
             if json.loads(read(run / 'request.json')) != request:
                 raise ValueError('Producer request no longer matches the verified task')
+            # Registered feedback is exclusively delivered by the root completion transaction
+            # after independent exact-package QA. Ordinary producer completion is insufficient.
+            if request.get('feedback_authority') or request.get('permission_ceiling') == 'registered_prototype_revision':
+                admitted -= 1
+                continue
             deliver(request, run, queue_run)
         except Exception as exc:
             partial = json.loads(read(target)) if target.exists() else old
             atomic(target, {**partial, 'artefact_state':'delivery_incomplete','error':str(exc)[:700], 'attempted_at':int(time.time())})
+
+
+def feedback_completion_tick():
+    """One protected sidecar observed by this existing tick; no new poller."""
+    queue_path=FEEDBACK_QUEUE
+    if not queue_path.exists(): return
+    info=queue_path.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid!=0 or info.st_mode & 0o077 or info.st_nlink!=1:
+        raise ValueError('Feedback completion queue must remain root private')
+    database=sqlite3.connect('file:'+str(queue_path)+'?mode=ro',uri=True,timeout=2)
+    try:
+        active={row[0] for row in database.execute("SELECT run_id FROM batches WHERE state='active' AND site='luminary-counselling'")}
+    finally: database.close()
+    if not active: return
+    pending = False
+    for queue_run in sorted((BASE / 'runs').iterdir()):
+        if not queue_run.is_dir() or not ID.fullmatch(queue_run.name):
+            continue
+        if queue_run.name not in active: continue
+        receipt = json.loads(read(queue_run / 'receipt.json'))
+        request_path = WORK / queue_run.name / 'request.json'
+        if receipt.get('status') != 'needs_review' or not request_path.exists():
+            continue
+        request = json.loads(read(request_path))
+        if request.get('feedback_authority') or request.get('permission_ceiling') == 'registered_prototype_revision':
+            pending = True
+    if not pending:
+        return
+    script = Path('/usr/local/libexec/lhm-prototype-feedback/completion_runtime.py')
+    if not script.exists():
+        return  # Feedback remains gated; never use ordinary delivery as fallback.
+    info = script.lstat()
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_mode & 0o022 or info.st_nlink != 1:
+        raise ValueError('Feedback completion runtime must be root protected')
+    unit = 'lhm-feedback-completion-luminary-counselling'
+    status = subprocess.run(['systemctl', 'show', '--property=ActiveState', '--value', unit],
+                            capture_output=True, text=True, timeout=10)
+    if status.stdout.strip() in {'active', 'activating'}:
+        return
+    subprocess.run(['systemd-run', '--quiet', '--collect', '--unit=' + unit,
+                    '--property=User=root', '--property=NoNewPrivileges=true',
+                    '--property=PrivateTmp=true', '--property=UMask=0077',
+                    '--property=RuntimeMaxSec=3600', '/usr/bin/python3', str(script),
+                    '--site', 'luminary-counselling'], check=True, timeout=20)
 
 
 def tick():
@@ -309,6 +366,10 @@ def tick():
         from site_workspace import publication_active
         if age > 1400 and not interactive_alive and not publication_active(work):
             atomic(run / 'receipt.json', {'status': 'failed', 'error': 'Worker timed out or stopped; inspect its saved session before retrying'})
+    try:
+        feedback_completion_tick()
+    except Exception as exc:
+        print(json.dumps({'feedback_completion':'blocked','reason':str(exc)[:700]}))
     delivery_tick()
     subprocess.run(['docker', 'exec', '--user', 'hermes', 'hermes', '/opt/hermes/.venv/bin/python',
         '/opt/data/profiles/lhm_chief_of_staff/task-router/server.py', '--reconcile'], timeout=90, check=True)
