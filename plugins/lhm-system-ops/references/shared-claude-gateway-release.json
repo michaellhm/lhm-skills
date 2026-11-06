@@ -18,12 +18,12 @@
     "worker": {
       "source": "assets/gateways/lhm-shared-claude-worker",
       "destination": "/usr/local/libexec/lhm-claude-worker",
-      "sha256": "10c681dccdfdcb78df154c35816c11e45a7a51e8b381dadeb5e3bbb83c665401",
+      "sha256": "8cfbd266a1e7efa3df3e9b4de90a63eb9fcbdc56bba402ef4127f957cbbbe8c7",
       "previous_sha256": "10c681dccdfdcb78df154c35816c11e45a7a51e8b381dadeb5e3bbb83c665401",
       "owner": "root",
       "group": "root",
       "mode": "0755",
-      "size_bytes": 28274
+      "size_bytes": 29771
     },
     "dispatch_unit": {
       "source": "assets/systemd/lhm-claude-dispatch.service",

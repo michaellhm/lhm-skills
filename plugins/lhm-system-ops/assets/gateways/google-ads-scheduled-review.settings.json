@@ -1,0 +1,13 @@
+{
+  "allowedMcpServers": [
+    {
+      "serverName": "GoogleAds"
+    },
+    {
+      "serverName": "analytics-mcp"
+    },
+    {
+      "serverUrl": "https://api.fathom.ai/mcp"
+    }
+  ]
+}
