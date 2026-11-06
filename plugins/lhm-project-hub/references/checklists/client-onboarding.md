@@ -11,6 +11,10 @@ Instantiate this structure into `20 Clients/<Client>/project-management/Onboardi
 - Current phase
 - Started, created and updated dates
 
+## Partner-managed finance applicability
+
+For Marlon-sold clients, record Marlon as finance owner and LHM billing as `N/A — partner-managed`. Do not create Josephine billing work or infer that payment is complete. Start with Kristalyn at Client Contact & Strategy unless later progress is verified. The seven gates below are the reference model, not a requirement to create inapplicable cards. If Michael removes the separate service-kickoff card, preserve readiness checks in Obsidian and link actual delivery work.
+
 ## Top-level gates
 
 - [ ] Michael handover and client introduction completed.

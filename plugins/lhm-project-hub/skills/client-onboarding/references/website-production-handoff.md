@@ -70,3 +70,7 @@ End the execution prompt with:
 - Campaign document unfinished: production remains open; no fabricated whole-onboarding completion.
 - Personal-board moves approved: preserve original IDs/parent links, verify destination and owner.
 - Prototype approved: full build still requires its own scope and publishing/launch boundaries.
+
+## Marlon finance route
+
+Marlon manages finances for his clients. Follow the partner exception in client-onboarding: no Josephine billing task, duplicate invoice or LHM payment gate. Record the route without inferring payment receipt.

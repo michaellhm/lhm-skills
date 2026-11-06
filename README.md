@@ -222,8 +222,8 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
     staff-weekly-flow/                  # Verified Monday brief, role-informed commitments, weekly-board cleanup and immediate follow-ups
-    sales-handover/                     # Hand a newly-closed client from sales to delivery
-    client-onboarding/                  # Scope-aware onboarding, reviewed handovers and campaign master → UI UX Pro Max → website prototype
+    sales-handover/                     # Sales handover with Marlon-managed finance routing
+    client-onboarding/                  # Scope-aware onboarding, Marlon finance routing and reviewed website production
     website-kickoff/                    # New website build kickoff (WordPress or Astro) → handoff to WordPress hub
     existing-client-website-handover/   # Michael → Kristalyn website brief for an existing client
     landing-page-kickoff/               # New PPC landing page campaign kickoff → handoff to WordPress hub
