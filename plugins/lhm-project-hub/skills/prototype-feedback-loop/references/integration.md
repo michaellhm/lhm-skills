@@ -36,3 +36,9 @@ Run pilot manually with scheduling disabled. Verify duplicate checks after a pro
 No live connector adapters, schedule, board changes, notification delivery or installation are proved by local queue tests.
 
 Queue checkpoints distinguish `handback_receipt` (verified BasicOps result, required before ready_for_review) from `notification_receipt` (delivery to the reviewer, recorded after readiness). A notification retry must never reopen or re-execute a revision.
+
+## Adapter implementation
+
+`scripts/adapters.py` supplies injectable Gmail MIME/byte intake, BasicOps stage/readback, durable uncertain-effect reconciliation, Ted dispatch receipt checks, a reviewed-message ledger and independent completion/notification checks. Bind each callable to the existing authenticated runtime; these classes alone do not install those bindings. Unknown remote outcomes require reconciliation and are never blindly retried. BasicOps Description is compared as canonical saved HTML; persist the actual readback form.
+
+The optional `feedback_authority.py` router hook accepts only an operator-owned exact-message-bound grant. It never treats AI text posted as Michael as personal approval. New admission rechecks the live cockpit; verified host-admitted runs may return after stage exit. The pilot scope is the actual repository subtree `luminary-counselling/`; `/prototypes/` is a public URL prefix, not a repository directory. Keep authority registries and private feedback out of Git.

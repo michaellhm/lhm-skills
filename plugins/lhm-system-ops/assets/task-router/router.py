@@ -2,7 +2,10 @@
 import fcntl
 import hashlib
 import html
+import importlib.util
 import json
+import os
+import stat
 from pathlib import Path
 import re
 import time
@@ -177,7 +180,53 @@ class Router:
         if self.directory and not 0 <= time.time() - self.directory.get('knowledge_refreshed_at', 0) <= 900:
             raise ValueError('Canonical shared client knowledge cache is stale; refresh or use live evidence, not a guessed client')
 
-    def contract(self, task_id, instruction_message_id):
+    def feedback_admitted_request(self, task_id, instruction_message_id, observation):
+        """Only observation may retain an exact root-admitted feedback request.
+
+        A queued state, starting receipt or provider-owned result is insufficient.
+        Submit and host pre-launch verification never invoke this exception.
+        """
+        saved = self.state / f'{task_id}.json'
+        if not saved.exists():
+            return None
+        request = json.loads(saved.read_text())['request']
+        expected = f'ted-route-{task_id}-{instruction_message_id}'
+        if (request.get('request_id') != expected or request.get('task_id') != task_id
+                or request.get('instruction_message_id') != instruction_message_id
+                or request.get('provider') != 'codex' or not request.get('feedback_authority')):
+            return None
+        run = self.queue / 'runs' / expected
+        try:
+            directory = os.open(run, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        except FileNotFoundError:
+            return None
+        try:
+            info = os.fstat(directory)
+            if info.st_uid != 0 or info.st_mode & 0o022:
+                raise ValueError('Feedback admission directory is not host-owned')
+            try:
+                fd = os.open('receipt.json', os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory)
+            except FileNotFoundError:
+                return None
+            with os.fdopen(fd, 'rb') as stream:
+                info = os.fstat(stream.fileno())
+                if info.st_uid != 0 or not stat.S_ISREG(info.st_mode) or info.st_mode & 0o022 or info.st_size > 32768:
+                    raise ValueError('Feedback admission receipt is not protected host evidence')
+                receipt = json.loads(stream.read(32769))
+        finally:
+            os.close(directory)
+        if (receipt.get('request_id') != expected or receipt.get('provider') != 'codex'
+                or receipt.get('status') not in {'running', 'needs_review', 'failed'}
+                or any(receipt.get(k) != observation.get(k) for k in ('request_id', 'provider', 'thread_id'))):
+            return None
+        try:
+            if str(uuid.UUID(receipt.get('thread_id', ''))) != receipt.get('thread_id'):
+                return None
+        except (ValueError, TypeError, AttributeError):
+            return None
+        return request
+
+    def contract(self, task_id, instruction_message_id, *, _reconcile=False):
         if type(task_id) is not int or task_id <= 0 or not re.fullmatch(r'dm[1-9][0-9]*', instruction_message_id):
             raise ValueError('Exact task and durable human instruction IDs are required')
         if self.api('get_current_user', {}).get('id') != self.config['agent_user_id']:
@@ -189,9 +238,18 @@ class Router:
         messages = response if isinstance(response, list) else response.get('data', [])
         msg = next((m for m in messages if m.get('id') == instruction_message_id), None)
         instruction = plain(msg.get('message', '')) if msg else ''
-        if (not msg or actor(msg) != self.config['reviewer_id']
+        feedback = None
+        authority = self.profile / 'config/prototype-feedback-authority.json'
+        if authority.exists() or authority.is_symlink():
+            spec = importlib.util.spec_from_file_location('feedback_authority', Path(__file__).with_name('feedback_authority.py'))
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            admitted = self.feedback_admitted_request(task_id, instruction_message_id, self.status(task_id)) if _reconcile else None
+            feedback = module.verify(self.profile, self.api, task, msg, admitted_request=admitted)
+        if feedback is None and (not msg or actor(msg) != self.config['reviewer_id']
                 or re.search(r'AI authorship\s*:', instruction, re.I)
-                or not (re.search(r'\b(work on|run|execute|prepare|write|draft|research|investigate|update|revise|implement|go ahead|proceed|approve)\b', instruction, re.I) or explicit_provider(instruction))
+                or re.search(r"\b(?:not|never|isn['’]t|wasn['’]t|aren['’]t)\s+(?:(?:yet|fully|currently)\s+)?approved\b", instruction, re.I)
+                or not (re.search(r'\b(work on|run|execute|prepare|write|draft|research|investigate|update|revise|implement|go ahead|proceed|approve|approved)\b', instruction, re.I) or explicit_provider(instruction))
                 or re.search(r"\b(do not|don't|never|stop|cancel|hold|pause)\b", instruction, re.I)):
             raise ValueError('A direct personal work request is required; assignment, relay or a stop is not permission')
         if task.get('status') in {'Complete', 'Cancelled', 'Decline'}:
@@ -208,6 +266,8 @@ class Router:
             raise ValueError('Task discussion brief exceeds bounded context; identify a smaller authoritative brief')
         discussion = '\n'.join(m['text'] for m in context_messages)
         client = resolve_client(task, self.config['clients'], discussion)
+        if feedback is not None and feedback['client_id'] != client:
+            raise ValueError('Feedback authority conflicts with canonical client lookup')
         provider, reason = choose(plain(task['title']), plain(task.get('description', '')) + '\n' + discussion, instruction)
         existing = self.state / f'{task_id}.json'
         resume = None
@@ -233,6 +293,10 @@ class Router:
             else:
                 provider = old['provider']
                 reason = old['reason'] if old['instruction_message_id'] == instruction_message_id else 'Continue the existing ' + provider + ' session'
+        if feedback is not None:
+            if existing.exists() and json.loads(existing.read_text())['request'].get('feedback_authority') != feedback:
+                raise ValueError('Feedback authority cannot replace an existing request')
+            provider, reason = 'codex', 'Registered prototype feedback; root-bound AI authority'
         if not self.config['providers'].get(provider, False):
             raise ValueError(provider + ' is unavailable; no silent provider substitution')
         target = self.config['clients'][client]
@@ -255,6 +319,9 @@ class Router:
         request['source_links'] = sorted(set(u for u in links.urls if u.startswith('https://')))[:40]
         if execution_handoff(provider, instruction):
             request.update(handoff_mode='provider_execution', permission_ceiling='provider_tool_approval')
+        if feedback is not None:
+            request.update(feedback_authority=feedback, handoff_mode='provider_execution',
+                           permission_ceiling='registered_prototype_revision')
         if existing.exists():
             prior = json.loads(existing.read_text())['request']
             if prior['instruction_message_id'] == instruction_message_id:
@@ -360,7 +427,7 @@ class Router:
             saved = json.loads(path.read_text())
             request = saved['request']
             # Re-read authority and task, including stop messages since admission.
-            task, current = self.contract(task_id, request['instruction_message_id'])
+            task, current = self.contract(task_id, request['instruction_message_id'], _reconcile=True)
             if current != request or actor(task) not in {self.config['agent_user_id'], self.config['reviewer_id']}:
                 raise ValueError('Task changed or ownership moved; retain result without overwriting a human handoff')
             if needs_link:

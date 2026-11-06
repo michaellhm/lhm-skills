@@ -7,7 +7,7 @@ description: Monitor websites in the verified BasicOps Prototype Feedback sectio
 
 Use BasicOps as the eligibility source. Apply `basicops-task-manager` to all writes and `run-hermes-task` to worker handoffs. Michael authorised automatic task creation, Ted assignment and implementation for eligible registered prototypes, with results returned to him for review. Do not insert a per-batch approval gate. Retain site-specific publication limits and native tool permissions.
 
-Read [integration contract](references/integration.md) before installing or operating the loop. The included queue is a local intake component, not a Gmail/BasicOps adapter or an installed scheduler.
+Read [integration contract](references/integration.md) before installing or operating the loop. The queue and supporting adapters require authenticated host bindings and are not an installed scheduler.
 
 ## Intake
 
