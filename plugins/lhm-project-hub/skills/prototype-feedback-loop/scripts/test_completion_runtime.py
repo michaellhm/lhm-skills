@@ -318,6 +318,31 @@ class PublicationTests(unittest.TestCase):
             self.assertEqual(httpcalls,[entry['path'] for entry in frozen['source']['files']])
             self.assertEqual(calls[0]['expected_base_commit'],'a'*40)
 
+    def test_native_http_uses_existing_publisher_identity_and_checks_all_bytes(self):
+        import urllib.request
+        from urllib.parse import urlsplit
+        with tempfile.TemporaryDirectory() as temp, mock.patch.object(runtime,'atomic',atomic), \
+             mock.patch.object(runtime,'protected_directory',directory), \
+             mock.patch.object(runtime,'root_json',lambda path,**kwargs:json.loads(path.read_text())), \
+             mock.patch.object(runtime,'root_bytes',lambda path,**kwargs:path.read_bytes()):
+            tx,stage,batch,frozen,delivery,calls,httpcalls=self.fixture(Path(temp))
+            tx.http=None;observed=[]
+            def response(request,timeout):
+                self.assertEqual(request.get_header('User-agent'),'LHM-Prototype-Publisher/2')
+                self.assertEqual(request.get_header('Cache-control'),'no-cache')
+                self.assertEqual(timeout,40)
+                path=urlsplit(request.full_url).path.removeprefix('/prototypes/')
+                self.assertIn('lhm_verify=',request.full_url);observed.append(path)
+                data=(stage/'source'/path).read_bytes()
+                stream=mock.MagicMock();stream.status=200
+                stream.read.side_effect=lambda maximum:data[:maximum]
+                stream.__enter__.return_value=stream
+                return stream
+            with mock.patch.object(urllib.request,'urlopen',side_effect=response):
+                result=tx.publication(stage,batch,frozen,delivery,{'cockpit_id':999})
+            self.assertEqual(observed,[entry['path'] for entry in frozen['source']['files']])
+            self.assertEqual(len(result['public_files']),2)
+
     def test_css_only_index_anchor_passes_real_publisher_contract(self):
         with tempfile.TemporaryDirectory() as temp, mock.patch.object(runtime,'atomic',atomic), \
              mock.patch.object(runtime,'protected_directory',directory), \

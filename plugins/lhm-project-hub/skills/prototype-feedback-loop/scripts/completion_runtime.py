@@ -517,7 +517,7 @@ class Transaction:
                 code, data = self.http(url)
             else:
                 with urllib.request.urlopen(urllib.request.Request(url + '?lhm_verify=' + commit,
-                        headers={'Cache-Control': 'no-cache'}), timeout=40) as response:
+                        headers={'Cache-Control': 'no-cache', 'User-Agent': 'LHM-Prototype-Publisher/2'}), timeout=40) as response:
                     code, data = response.status, response.read(entry['bytes'] + 1)
             if code != 200 or len(data) != entry['bytes'] or sha(data) != entry['sha256']:
                 raise ValueError('published public file differs from approved QA bytes: ' + entry['path'])
