@@ -231,5 +231,47 @@ class BookingChoiceTests(unittest.TestCase):
         self.assertNotIn('private=hidden', json.dumps(result))
 
 
+
+class EntryPointTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.script = Path(__file__).with_name('visual_qa.mjs').resolve()
+
+    def test_symlink_cli_with_missing_arguments_exits_usage(self):
+        link = self.root / 'visual_qa.mjs'
+        link.symlink_to(self.script)
+        result = subprocess.run(['node', str(link)], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn('Usage: visual_qa.mjs', result.stderr)
+        self.assertEqual(result.stdout, '')
+
+    def test_current_release_directory_symlink_runs_cli_guard(self):
+        current = self.root / 'current'
+        current.symlink_to(self.script.parent, target_is_directory=True)
+        result = subprocess.run(['node', str(current / 'visual_qa.mjs'), 'only-one-argument'], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn('Usage: visual_qa.mjs', result.stderr)
+
+    def test_import_through_symlink_remains_inert(self):
+        link = self.root / 'visual_qa.mjs'
+        link.symlink_to(self.script)
+        wrapper = self.root / 'importer.mjs'
+        wrapper.write_text('import * as qa from ' + json.dumps(link.as_uri()) + '; console.log(JSON.stringify({imported:typeof qa.run}));')
+        result = subprocess.run(['node', str(wrapper)], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), {'imported': 'function'})
+        self.assertNotIn('Usage:', result.stderr)
+
+    def test_symlink_cli_valid_arg_count_cannot_silently_skip_invalid_scope(self):
+        link = self.root / 'visual_qa.mjs'
+        link.symlink_to(self.script)
+        result = subprocess.run(['node', str(link), '/unregistered/source', '/unregistered/output'], capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(json.loads(result.stderr)['status'], 'mechanical_failed')
+        self.assertEqual(result.stdout, '')
+
+
 if __name__ == '__main__':
     unittest.main()

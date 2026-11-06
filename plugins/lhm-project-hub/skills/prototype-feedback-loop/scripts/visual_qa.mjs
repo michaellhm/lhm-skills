@@ -301,7 +301,11 @@ export async function run(source, output, { playwright, root = QA_ROOT, requireR
     await new Promise(resolve => server.close(resolve));
   }
 }
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// Production invokes this through a root-owned current-release symlink. Compare
+// filesystem identities so symlink execution runs, while ordinary ESM imports stay inert.
+const invokedEntry = process.argv[1] ? await fs.realpath(process.argv[1]).catch(() => null) : null;
+const moduleEntry = await fs.realpath(fileURLToPath(import.meta.url));
+if (invokedEntry === moduleEntry) {
   if (process.argv.length !== 4) { console.error('Usage: visual_qa.mjs <registered-source> <registered-output>'); process.exitCode = 2; }
   else try {
     const receipt = await run(process.argv[2], process.argv[3]);

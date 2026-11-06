@@ -142,9 +142,20 @@ class QA:
             # A complete exact-package receipt can be adopted after a root-driver crash;
             # incomplete output is retained and never erased/replayed in place.
             if (output/'mechanical-qa.json').exists():
-                return json.loads(worker_bytes(output/'mechanical-qa.json',2000000))
+                receipt=json.loads(worker_bytes(output/'mechanical-qa.json',2000000))
+                manifest_raw=root_bytes(stage/'source-manifest.json',maximum=2000000)
+                validate_mechanical(receipt,json.loads(manifest_raw),sha(manifest_raw))
+                diagnostic=stage/'native-browser-run.json'
+                if diagnostic.exists():
+                    native=root_json(diagnostic)
+                    if (native.get('source_manifest_sha256')!=sha(manifest_raw)
+                            or ((native.get('status')!='exited' or native.get('returncode')!=0)
+                                and receipt['status']!='mechanical_failed')):
+                        raise ValueError('independent browser native execution failed; private diagnostics: '+str(diagnostic))
+                return receipt
             self.recover_directory(stage,'output','lhm-feedback-browser-'+stage.name)
         output.mkdir(mode=0o700);os.chown(output, 10001, 10001)
+        checker=Path(VISUAL).resolve()
         command = ['/usr/bin/systemd-run', '--quiet', '--wait', '--pipe', '--collect',
             '--unit=lhm-feedback-browser-' + stage.name, '--property=User=codexworker',
             '--property=Group=codexworker', '--property=ProtectSystem=strict',
@@ -153,12 +164,43 @@ class QA:
             '--property=ReadWritePaths=' + str(output),
             '--property=NoNewPrivileges=true', '--property=PrivateTmp=true',
             '--property=PrivateDevices=true', '--property=UMask=0077',
-            '--property=RuntimeMaxSec=600', '--setenv=PLAYWRIGHT_BROWSERS_PATH=/opt/lhm-prototype-feedback-qa/browsers', '/usr/bin/node', VISUAL,
+            '--property=RuntimeMaxSec=600', '--setenv=PLAYWRIGHT_BROWSERS_PATH=/opt/lhm-prototype-feedback-qa/browsers', '/usr/bin/node', str(checker),
             str(stage / 'source'), str(output)]
-        result = self.runner(command, capture_output=True, text=True, timeout=640, check=False)
-        receipt = json.loads(worker_bytes(output / 'mechanical-qa.json', 2000000))
-        if receipt.get('status') not in ('mechanical_passed','mechanical_failed'):
-            raise ValueError('independent browser QA returned no bounded result')
+        manifest_raw=root_bytes(stage/'source-manifest.json',maximum=2000000)
+        native={'schema_version':1,'unit':'lhm-feedback-browser-'+stage.name,
+                'source_manifest_sha256':sha(manifest_raw),
+                'source_package_sha256':json.loads(manifest_raw).get('package_sha256'),
+                'checker_path':str(checker),'checker_sha256':sha(root_bytes(checker,maximum=2000000)),
+                'command_sha256':sha(canonical(command)),'started_at':int(time.time())}
+        try:
+            result = self.runner(command, capture_output=True, text=True, timeout=640, check=False)
+            native.update(status='exited',returncode=result.returncode,
+                          stdout=result.stdout[:8192],stderr=result.stderr[:8192])
+        except (subprocess.TimeoutExpired,OSError) as exc:
+            def bounded(value):
+                return (value.decode(errors='replace') if isinstance(value,bytes) else value or '')[:8192]
+            native.update(status='timed_out' if isinstance(exc,subprocess.TimeoutExpired) else 'launch_failed',
+                          returncode=None,stdout=bounded(getattr(exc,'stdout',None)),
+                          stderr=bounded(getattr(exc,'stderr',None)),error=str(exc)[:1000])
+        native['finished_at']=int(time.time())
+        diagnostic=stage/'native-browser-run.json'
+        if diagnostic.exists():
+            previous=root_bytes(diagnostic,maximum=100000)
+            archive=stage/('native-browser-run-'+sha(previous)+'.json')
+            if not archive.exists():atomic(archive,previous)
+        atomic(diagnostic,canonical(native))
+        try:
+            receipt = json.loads(worker_bytes(output / 'mechanical-qa.json', 2000000))
+        except (OSError,ValueError) as exc:
+            raise ValueError('independent browser QA produced no valid receipt; private diagnostics: '+str(diagnostic)) from exc
+        if not isinstance(receipt,dict) or receipt.get('status') not in ('mechanical_passed','mechanical_failed'):
+            raise ValueError('independent browser QA returned no bounded result; private diagnostics: '+str(diagnostic))
+        try:
+            validate_mechanical(receipt,json.loads(manifest_raw),sha(manifest_raw))
+        except (ValueError,TypeError,AttributeError,KeyError) as exc:
+            raise ValueError('independent browser QA receipt is not exact; private diagnostics: '+str(diagnostic)) from exc
+        if (native['status']!='exited' or native['returncode']!=0) and receipt['status']!='mechanical_failed':
+            raise ValueError('independent browser native execution failed; private diagnostics: '+str(diagnostic))
         return receipt
 
     def semantic(self, stage, evidence, producer):

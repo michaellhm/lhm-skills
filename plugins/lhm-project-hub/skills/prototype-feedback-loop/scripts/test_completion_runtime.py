@@ -633,4 +633,77 @@ class DiagnosticTests(unittest.TestCase):
                 self.assertTrue((stage/'semantic-diagnostic.json').is_file())
 
 
+class BrowserNativeDiagnosticsTests(unittest.TestCase):
+    def root_stats(self,fd):
+        info=self.real_fstat(fd)
+        return types.SimpleNamespace(st_mode=info.st_mode,st_uid=0,st_gid=10001,st_nlink=info.st_nlink,st_size=info.st_size)
+
+    def test_no_receipt_records_native_success_failure_and_timeout_before_blocking(self):
+        import host_runtime
+        for scenario in ('success_without_output','native_failure','timeout'):
+            with self.subTest(scenario=scenario),tempfile.TemporaryDirectory() as temp:
+                stage=Path(temp).resolve();checker=stage/'checker.mjs';checker.write_text('// actual checker')
+                manifest=runtime.canonical({'package_sha256':'a'*64});(stage/'source-manifest.json').write_bytes(manifest)
+                writes=[];commands=[];original_atomic=host_runtime.atomic
+                def tracked_atomic(path,data,**kwargs):
+                    writes.append(path);return original_atomic(path,data,**kwargs)
+                def runner(command,**kwargs):
+                    commands.append(command)
+                    if scenario=='timeout':
+                        raise runtime.subprocess.TimeoutExpired(command,640,output=b'partial native stdout',stderr=b'private timeout detail')
+                    return types.SimpleNamespace(returncode=0 if scenario=='success_without_output' else 7,
+                        stdout='native stdout',stderr='private native failure' if scenario=='native_failure' else '')
+                self.real_fstat=os.fstat
+                with mock.patch.object(runtime,'VISUAL',str(checker)),mock.patch.object(runtime,'atomic',side_effect=tracked_atomic), \
+                     mock.patch.object(runtime,'root_bytes',lambda path,**kwargs:Path(path).read_bytes()), \
+                     mock.patch.object(runtime.os,'fstat',side_effect=self.root_stats),mock.patch.object(runtime.os,'fchown') as owner, \
+                     mock.patch.object(runtime.os,'chown'):
+                    with self.assertRaisesRegex(ValueError,'private diagnostics: .*native-browser-run.json'):
+                        runtime.QA(runner=runner).mechanical(stage)
+                path=stage/'native-browser-run.json';record=json.loads(path.read_text())
+                self.assertEqual(path.stat().st_mode&0o777,0o600)
+                self.assertTrue(any(call.args[1:]==(0,0) for call in owner.call_args_list))
+                self.assertTrue(all(path.parent==stage for path in writes))
+                self.assertEqual(record['source_manifest_sha256'],runtime.sha(manifest))
+                self.assertEqual(record['source_package_sha256'],'a'*64)
+                self.assertEqual(record['checker_sha256'],runtime.sha(checker.read_bytes()))
+                self.assertEqual(record['checker_path'],str(checker))
+                self.assertEqual(record['unit'],'lhm-feedback-browser-'+stage.name)
+                self.assertEqual(commands[0][-3],str(checker))
+                self.assertFalse((stage/'output/mechanical-qa.json').exists())
+                if scenario=='timeout':
+                    self.assertEqual(record['status'],'timed_out');self.assertIsNone(record['returncode'])
+                    self.assertEqual(record['stderr'],'private timeout detail')
+                else:
+                    self.assertEqual(record['status'],'exited')
+                    self.assertEqual(record['returncode'],0 if scenario=='success_without_output' else 7)
+                    self.assertEqual(record['stdout'],'native stdout')
+                    if scenario=='native_failure':self.assertEqual(record['stderr'],'private native failure')
+
+    def test_nonzero_requires_a_genuine_exact_failed_receipt_and_cannot_reuse_passed(self):
+        for disposition in ('mechanical_failed','mechanical_passed','wrong_source'):
+            with self.subTest(disposition=disposition),tempfile.TemporaryDirectory() as temp:
+                stage=Path(temp).resolve();checker=stage/'checker.mjs';checker.write_text('// checker')
+                source={'package_sha256':'a'*64};raw=runtime.canonical(source);(stage/'source-manifest.json').write_bytes(raw)
+                receipt={'status':'mechanical_passed' if disposition=='mechanical_passed' else 'mechanical_failed',
+                    'source_package_sha256':'b'*64 if disposition=='wrong_source' else 'a'*64,
+                    'source_manifest_sha256':runtime.sha(raw),'semantic_qa_approved':False,
+                    'pages':[{'page':page,'viewport':{'width':w,'height':h},'status':'passed' if disposition=='mechanical_passed' else 'failed',
+                              'errors':[] if disposition=='mechanical_passed' else ['Actual check failed']}
+                             for page in runtime.PAGES for w,h in ((1440,1000),(390,844))]}
+                def runner(*args,**kwargs):
+                    (stage/'output/mechanical-qa.json').write_text(json.dumps(receipt))
+                    return types.SimpleNamespace(returncode=7,stdout='',stderr='native exit detail')
+                with mock.patch.object(runtime,'VISUAL',str(checker)),mock.patch.object(runtime,'atomic',atomic), \
+                     mock.patch.object(runtime,'root_bytes',lambda path,**kwargs:Path(path).read_bytes()), \
+                     mock.patch.object(runtime,'root_json',lambda path:json.loads(path.read_text())),mock.patch.object(runtime.os,'chown'):
+                    qa=runtime.QA(runner=runner)
+                    if disposition=='mechanical_failed':self.assertEqual(qa.mechanical(stage),receipt)
+                    else:
+                        with self.assertRaisesRegex(ValueError,'private diagnostics:'):qa.mechanical(stage)
+                        if disposition=='mechanical_passed':
+                            with self.assertRaisesRegex(ValueError,'private diagnostics:'):qa.mechanical(stage)
+                self.assertEqual(json.loads((stage/'native-browser-run.json').read_text())['stderr'],'native exit detail')
+
+
 if __name__ == '__main__': unittest.main()
