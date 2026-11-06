@@ -1,6 +1,6 @@
 ---
 name: sales-handover
-description: "Hand a newly closed client from Michael or Marlon into LHM delivery. Use after a sale closes or when the user says 'sales handover', 'handover to KP', 'we signed a client', 'closed a deal', 'new client handover', or 'hand this client over'. Captures sales context in canonical Obsidian records, drafts Michael's client introduction, creates one client-level card on the BasicOps *Client Onboarding board assigned first to Josephine, adds seven top-level checks, and hands the detailed workflow to client-onboarding."
+description: "Hand a newly closed client from Michael or Marlon into LHM delivery. Use after a sale closes or when the user says 'sales handover', 'handover to KP', 'we signed a client', 'closed a deal', 'new client handover', or 'hand this client over'. Captures sales context in canonical Obsidian records, drafts Michael's client introduction, creates one client-level card on the BasicOps *Client Onboarding board assigned to the applicable immediate owner, adds scope-applicable top-level checks, and hands the detailed workflow to client-onboarding."
 ---
 ## Client file routing
 
@@ -12,6 +12,16 @@ For client-specific work, first read [Client knowledge and working-file routing]
 Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the handover-specific payload; the shared skill owns wording, approval, deduplication, mutation and verification.
 
 Capture what sales knows and start the approved Obsidian-first client-onboarding flow. Ask interview questions one at a time.
+
+## Partner/Marlon clients — finance ownership and applicable tasks
+
+For a client sold by Marlon, Marlon manages the finances. Record `Finance owner: Marlon` and `LHM billing: N/A — partner-managed` in the handover and onboarding note. Do not create or assign Josephine an invoice/payment task, introduce her as billing contact, request payment, or put the parent in Josephine's billing queue. This routing decision does not prove payment was received; keep receipt status unknown unless supported by evidence. Refer commercial questions to Marlon without making them an LHM billing gate.
+
+For this route, start the parent in `2 — Client Contact & Strategy`, assigned to Kristalyn, unless verified progress places it in a later phase. Michael's introduction remains a separate applicable check. Apply this exception wherever the default below says Josephine, Payment & Billing or exactly seven subtasks. Preserve the five board phases and seven reference gates as the general model, but create only applicable tasks. Keep omitted gates in Obsidian with their reason; never mark unperformed work complete.
+
+When Michael explicitly removes the separate `Purchased services kicked off` task, retain service-start readiness in the Obsidian completion checklist and link the actual delivery task instead. Do not recreate the removed card. A website sitemap/prototype task is a distinct delivery outcome owned by the confirmed strategist; it does not reinstate a generic kickoff card.
+
+When reconciling an existing Marlon client, inspect the parent, billing task and discussions. Propose cancellation (not completion or deletion) of unnecessary open LHM billing work and reassignment of a billing-owned parent through basicops-task-manager. Preserve legitimate billing history and unrelated admin work. Do not bulk-change clients whose sales route is unverified.
 
 ## 1. Confirm the sale
 
@@ -107,7 +117,7 @@ Do not mark `Michael handover and client introduction completed` until the intro
 
 ## 8. Hand off
 
-Finish with: `Handover complete. Next: run lhm-project-hub:client-onboarding — it will resume at Payment & Billing.`
+Finish with `Handover complete. Next: run lhm-project-hub:client-onboarding` and name the verified resume phase. For Marlon clients, use Client Contact & Strategy or the evidenced later phase, not the LHM billing queue.
 
 ## Rules
 

@@ -1,6 +1,6 @@
 ---
 name: client-onboarding
-description: "Run LHM's resumable new-client onboarding workflow. Use when the user says 'client onboarding', 'onboard [client]', 'continue onboarding', 'where is onboarding up to', 'billing setup', 'strategy call', 'client access', 'tracking setup', 'campaign master', 'design system', 'website prototype', or 'service kickoff'. Reads and updates the detailed, scope-aware Obsidian onboarding checklist first, then mirrors only five top-level phases and seven top-level checks to the BasicOps *Client Onboarding board: Payment & Billing, Client Contact & Strategy, Access Assets & Config, Service Kickoff, and Onboarding Complete."
+description: "Run LHM's resumable new-client onboarding workflow. Use when the user says 'client onboarding', 'onboard [client]', 'continue onboarding', 'where is onboarding up to', 'billing setup', 'strategy call', 'client access', 'tracking setup', 'campaign master', 'design system', 'website prototype', or 'service kickoff'. Reads and updates the detailed, scope-aware Obsidian onboarding checklist first, then mirrors five top-level phases and applicable checks from the seven-gate model to the BasicOps *Client Onboarding board: Payment & Billing, Client Contact & Strategy, Access Assets & Config, Service Kickoff, and Onboarding Complete."
 ---
 ## Client file routing
 
@@ -12,6 +12,16 @@ For client-specific work, first read [Client knowledge and working-file routing]
 Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the onboarding-specific payload; the shared skill owns wording, approval, deduplication, mutation and verification.
 
 Resume a newly sold client's onboarding from canonical Obsidian state. This workflow is service-neutral: generate detailed checks from what the client purchased rather than assuming Google Ads, Maps, GoCardless or any other service applies.
+
+## Partner/Marlon clients — finance ownership and applicable tasks
+
+For a client sold by Marlon, Marlon manages the finances. Record `Finance owner: Marlon` and `LHM billing: N/A — partner-managed` in the handover and onboarding note. Do not create or assign Josephine an invoice/payment task, introduce her as billing contact, request payment, or put the parent in Josephine's billing queue. This routing decision does not prove payment was received; keep receipt status unknown unless supported by evidence. Refer commercial questions to Marlon without making them an LHM billing gate.
+
+For this route, start the parent in `2 — Client Contact & Strategy`, assigned to Kristalyn, unless verified progress places it in a later phase. Michael's introduction remains a separate applicable check. Apply this exception wherever the default below says Josephine, Payment & Billing or exactly seven subtasks. Preserve the five board phases and seven reference gates as the general model, but create only applicable tasks. Keep omitted gates in Obsidian with their reason; never mark unperformed work complete.
+
+When Michael explicitly removes the separate `Purchased services kicked off` task, retain service-start readiness in the Obsidian completion checklist and link the actual delivery task instead. Do not recreate the removed card. A website sitemap/prototype task is a distinct delivery outcome owned by the confirmed strategist; it does not reinstate a generic kickoff card.
+
+When reconciling an existing Marlon client, inspect the parent, billing task and discussions. Propose cancellation (not completion or deletion) of unnecessary open LHM billing work and reassignment of a billing-owned parent through basicops-task-manager. Preserve legitimate billing history and unrelated admin work. Do not bulk-change clients whose sales route is unverified.
 
 ## 1. Load canonical state
 
