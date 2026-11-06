@@ -354,6 +354,21 @@ class PublicationTests(unittest.TestCase):
 
 
 class GateTests(unittest.TestCase):
+    def test_screenshot_pixels_do_not_become_text_credentials_but_metadata_is_rejected(self):
+        import struct,zlib
+        def chunk(kind,body):
+            return struct.pack('>I',len(body))+kind+body+struct.pack('>I',zlib.crc32(kind+body)&0xffffffff)
+        header=b'\x89PNG\r\n\x1a\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',4,1,8,2,0,0,0))
+        # Real uncompressed-deflate pixel bytes can coincidentally spell a token.
+        pixels=chunk(b'IDAT',zlib.compress(b'\x00sk-example12',level=0))
+        image=header+pixels+chunk(b'IEND',b'')
+        self.assertIn(b'sk-example',image)
+        runtime.safe_output(image)
+        for extra in (chunk(b'tEXt',b'comment\x00ghp_example'),chunk(b'zTXt',b'comment\x00\x00'+zlib.compress(b'ghp_example')),chunk(b'eXIf',b'private metadata')):
+            with self.assertRaisesRegex(ValueError,'metadata'):runtime.safe_output(header+extra+pixels+chunk(b'IEND',b''))
+        with self.assertRaisesRegex(ValueError,'checksum'):runtime.safe_output(image[:-1]+bytes([image[-1]^1]))
+        with self.assertRaises(ValueError):runtime.safe_output(image[:-7])
+
     def setUp(self):
         patcher=mock.patch.object(runtime,'root_bytes',lambda path,**kwargs:Path(path).read_bytes())
         patcher.start();self.addCleanup(patcher.stop)

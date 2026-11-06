@@ -43,6 +43,28 @@ SENSITIVE=re.compile(rb'(BEGIN [A-Z ]*PRIVATE KEY|github_pat_|ghp_|(?<![A-Za-z0-
 
 
 def safe_output(data):
+    if data.startswith(b'\x89PNG\r\n\x1a\n'):
+        # Browser screenshots contain compressed pixels, not credential text.
+        # Admit only bounded, CRC-valid structural PNG chunks. Text/EXIF and
+        # unknown ancillary metadata stay excluded rather than bypassing checks.
+        import struct,zlib
+        position=8;types=[];scan=[]
+        while position<len(data):
+            if position+12>len(data):raise ValueError('truncated PNG output')
+            size=struct.unpack('>I',data[position:position+4])[0]
+            kind=data[position+4:position+8];end=position+12+size
+            if end>len(data) or size>10000000:raise ValueError('unbounded PNG output')
+            body=data[position+8:position+8+size]
+            if zlib.crc32(kind+body)&0xffffffff!=struct.unpack('>I',data[end-4:end])[0]:
+                raise ValueError('PNG checksum differs')
+            if kind not in (b'IHDR',b'IDAT',b'IEND',b'sRGB',b'gAMA',b'cHRM',b'pHYs',b'PLTE',b'tRNS'):
+                raise ValueError('PNG metadata is outside the screenshot delivery scope')
+            if kind!=b'IDAT':scan.append(body)
+            types.append(kind);position=end
+        if (not types or types[0]!=b'IHDR' or types[-1]!=b'IEND'
+                or types.count(b'IHDR')!=1 or types.count(b'IEND')!=1 or b'IDAT' not in types):
+            raise ValueError('incomplete PNG output')
+        data=b'\n'.join(scan)
     if SENSITIVE.search(data) or re.search(rb'"(?:access_token|refresh_token|client_secret|private_key)"\s*:',data):
         raise ValueError('credential-like material cannot enter the registered delivery package')
 
