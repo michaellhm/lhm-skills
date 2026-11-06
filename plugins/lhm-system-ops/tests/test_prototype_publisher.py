@@ -116,6 +116,62 @@ class PrototypePublisherTests(unittest.TestCase):
             push=next(call for call in git.call_args_list if call.args and call.args[0]=='push')
             self.assertIn(f"--force-with-lease=refs/heads/main:{request['expected_base_commit']}",push.args)
 
+    def exercise_real_checkout(self, files, *, extra_path=None):
+        """Use real local Git status/commit; replace only network/deployment calls."""
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary); checkout = base/'checkout';checkout.mkdir()
+            root = base/'incoming/source';root.mkdir(parents=True)
+            request = self.request(root, client='alpha-health', kind='homepage', files=files)
+            pushes = []
+            native_git, native_run = publisher.git, publisher.run
+            with mock.patch.object(publisher, 'CHECKOUT', checkout), mock.patch.object(publisher, 'STATE_ROOT', base/'receipts'):
+                native_git('init', '--quiet')
+                initial = checkout/'alpha-health/homepage/index.html';initial.parent.mkdir(parents=True)
+                initial.write_bytes(b'original index')
+                native_git('add', '--', 'alpha-health/homepage/index.html')
+                native_git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '--quiet', '-m', 'fixture base')
+                commit = native_git('rev-parse', 'HEAD')
+                request['expected_base_commit'] = commit
+                def git(*args, env=None):
+                    if args[0] == 'fetch': return ''
+                    if args == ('rev-parse', 'FETCH_HEAD'): return commit
+                    if args[0] == 'push':
+                        pushes.append(args);return ''
+                    if args[0] == 'status' and extra_path:
+                        extra = checkout/extra_path;extra.parent.mkdir(parents=True, exist_ok=True);extra.write_text('not approved')
+                    return native_git(*args, env=env)
+                def run(args, *, env=None, raw=False):
+                    if args[:2] == ['git', 'ls-remote']:
+                        return native_git('rev-parse', 'HEAD')+'\trefs/heads/main'
+                    return native_run(args, env=env, raw=raw)
+                with mock.patch.object(publisher, 'git', side_effect=git), mock.patch.object(publisher, 'run', side_effect=run), \
+                     mock.patch.object(publisher, 'ssh_env', return_value={}), mock.patch.object(publisher, 'preflight_post_publish_dependencies'), \
+                     mock.patch.object(publisher, 'wait_for_public_deploy', return_value={'url':'https://example.test', 'status':200, 'bytes':1, 'sha256':'0'*64}):
+                    try:
+                        result = publisher.publish(request)
+                    except ValueError:
+                        self.assertFalse(pushes)
+                        self.assertEqual(native_git('rev-parse', 'HEAD'), commit)
+                        raise
+                self.assertEqual(len(pushes), 1)
+                return result
+
+    def test_real_porcelain_preserves_modified_first_path(self):
+        result = self.exercise_real_checkout({'index.html': b'changed index'})
+        self.assertEqual(result['changed_files'], ['alpha-health/homepage/index.html'])
+
+    def test_real_porcelain_matches_mixed_modified_and_new_manifest(self):
+        result = self.exercise_real_checkout({'index.html': b'changed index', 'styles/site.css': b'body { color: #222; }'})
+        self.assertEqual(result['changed_files'], ['alpha-health/homepage/index.html', 'alpha-health/homepage/styles/site.css'])
+
+    def test_unchanged_manifest_still_rejected_before_commit_or_push(self):
+        with self.assertRaisesRegex(ValueError, 'checkout changes do not match'):
+            self.exercise_real_checkout({'index.html': b'original index'})
+
+    def test_unapproved_extra_checkout_path_still_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'checkout changes do not match'):
+            self.exercise_real_checkout({'index.html': b'changed index'}, extra_path='other-client/homepage/extra.html')
+
     def test_duplicate_idempotency_key_returns_receipt_without_git(self):
         with tempfile.TemporaryDirectory() as temporary:
             root=Path(temporary)/'source'; root.mkdir(); request=self.request(root); publisher.STATE_ROOT=Path(temporary)/'receipts'

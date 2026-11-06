@@ -27,11 +27,15 @@ MAX_FILE = 10_000_000
 MAX_HTTP = 2_000_000
 FIELDS = {'schema_version','request_id','source_basicops_task','governed_parent','destination_profile_id','operation','credential_reference','client_slug','project_slug','prototype_kind','repository','branch','expected_base_commit','source_directory','source_package_sha256','source_drive_file_id','source_drive_file_sha256','source_drive_file_bytes','file_manifest','qa_evidence_reference','idempotency_key','standing_authority_reference','commit_message'}
 
-def run(args, *, env=None):
-    return subprocess.run(args, check=True, capture_output=True, text=True, env=env).stdout.strip()
+def run(args, *, env=None, raw=False):
+    output = subprocess.run(args, check=True, capture_output=True, text=True, env=env).stdout
+    return output if raw else output.strip()
 
 def git(*args, env=None):
-    return run(['git','-c',f'safe.directory={CHECKOUT}','-C',str(CHECKOUT),*args], env=env)
+    # Porcelain status begins with two meaningful status columns (e.g. ' M').
+    # Preserve the complete NUL-delimited machine output before slicing paths.
+    raw = '--porcelain=v1' in args and '-z' in args
+    return run(['git','-c',f'safe.directory={CHECKOUT}','-C',str(CHECKOUT),*args], env=env, raw=raw)
 
 def digest_file(path):
     h=hashlib.sha256()
