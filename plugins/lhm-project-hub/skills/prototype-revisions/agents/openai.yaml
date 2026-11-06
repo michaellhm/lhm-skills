@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prototype Revisions"
+  short_description: "Apply feedback and return a verified preview"
+  default_prompt: "Apply this prototype feedback using the registered website source, inspect the images, verify each change and return a preview for review."

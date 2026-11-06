@@ -67,6 +67,8 @@ All Project Hub skills, and when to route to each:
 
 | Skill | Route here when |
 |---|---|
+| `lhm-project-hub:prototype-feedback-loop` | Monitor eligible Prototype Feedback projects and queue deduplicated Gmail feedback/image batches for Ted. |
+| `lhm-project-hub:prototype-revisions` | Implement and verify a prototype revision task, then return a checked preview for human review. |
 | `lhm-project-hub:basicops-task-manager` | Any workflow or user asks to create, edit, assign, discuss, move, complete or otherwise mutate a BasicOps task. This is the mandatory final write path even when another skill prepared the task context. |
 | `lhm-project-hub:staff-weekly-flow` | Michael or a team member asks what to focus on this week/today, feels overloaded, wants a mini stand-up, or wants to review and clean up their full personal BasicOps inbox. The skill reads the current shared weekly web brief, coaches Michael/Kristalyn/Aiya through decisions, communications, last-week closure and commitments, saves chosen commitments and attributed progress in shared person/week notes, reviews last week supportively, and routes confirmed inbox mutations through `basicops-task-manager`. |
 | `lhm-project-hub:team-work-brief` | Any team member needs to turn a rough request, client email or idea into a context-checked brief; or an assignee gives feedback about what a future brief should include. It resolves requester, client, assignee, access, dependencies, completion and next handoff before routing the approved task to BasicOps. |

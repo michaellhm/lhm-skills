@@ -17,3 +17,7 @@ Route every BasicOps mutation through `lhm-project-hub:basicops-task-manager`. K
 ## Client knowledge and work destinations
 
 For client work, read `references/obsidian-context-contract.md`: shared LHM Knowledge is canonical for client facts, goals and project state; verified Claude Workspace/Current Clients folders hold deliverables. Apply this before legacy single-folder instructions. Preserve personal-vault boundaries and workflow-specific approval gates.
+
+## Prototype feedback
+
+Route automated feedback intake through `prototype-feedback-loop` and worker implementation through `prototype-revisions`. These reuse BasicOps task management, TED routing and registered website workspaces. Desktop installation does not prove VPS installation or live connector readiness.
