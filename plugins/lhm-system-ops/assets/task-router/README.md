@@ -134,3 +134,7 @@ Do not restart or replay active tasks. Smoke-test the real worker with an isolat
 preflight, then a separately authorised new/resumed task; verify the named agent and entry skill
 from its startup/transcript before claiming live task acceptance. Roll back the same files and
 reload TED, retaining all task drafts, requests, reports and sessions.
+
+## Claude handover defaults
+
+TED starts Claude conversations and draft workers with the pinned model `claude-opus-5-5`, low reasoning effort, and `acceptEdits` permission mode. These startup flags also apply when TED resumes a saved conversation. File edits are accepted automatically; existing connector approval rules still apply. Claude Code must support Opus 5.5 (v2.1.280 or later) before rollout.

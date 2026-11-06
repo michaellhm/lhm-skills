@@ -113,6 +113,7 @@ def execute(run, provider):
                 command = ['/home/claudeworker/.local/bin/claude', '-p', prompt,
                            '--resume' if request.get('resume_thread_id') else '--session-id', session, '--name', request['title'],
                            '--output-format', 'json', '--max-turns', '24', '--max-budget-usd', '4.00',
+                           '--model', 'claude-opus-5-5', '--effort', 'low',
                            '--permission-mode', 'acceptEdits', '--tools', tools, '--allowedTools', tools,
                            '--strict-mcp-config', '--mcp-config', '/home/claudeworker/.config/lhm-bridge/no-mcp.json']
                 result = subprocess.run(command, cwd=work, env={**os.environ, 'HOME': '/home/claudeworker'},

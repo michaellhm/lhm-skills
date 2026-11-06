@@ -63,7 +63,9 @@ def command(request, task, session):
     site_tools = ',Bash' if request.get('site_workspace') else ''
     return [str(HOME / '.local/bin/claude'),
             '--resume' if request.get('resume_thread_id') else '--session-id', session,
-            '--remote-control', request['title'], '--permission-mode', 'default',
+            '--remote-control', request['title'],
+            '--model', 'claude-opus-5-5', '--effort', 'low',
+            '--permission-mode', 'acceptEdits',
             '--agents', json.dumps({spec['agent']: definition}), '--agent', spec['agent'],
             '--tools', 'Read,Write,Edit,Skill,ToolSearch,WebFetch,WebSearch' + site_tools,
             '--allowedTools', 'Read,Write,Edit,Skill,ToolSearch,WebFetch,WebSearch,mcp__GoogleAds__execute_gaql,mcp__GoogleAds__get_gaql_doc,mcp__GoogleAds__get_reporting_view_doc,mcp__claude_ai_AdPulse_MCP__adpulse_graphql_query,mcp__claude_ai_AdPulse_MCP__adpulse_graphql_schema_search' + site_tools,
