@@ -18,13 +18,15 @@ Use the existing BasicOps revision task and saved worker conversation. Do not cr
 
 Apply clear, in-scope changes without another generic approval. Preserve the established design unless the feedback requests a change. Use the existing project stack; do not convert to Astro during a prototype revision unless separately authorised.
 
-Use reference artwork/sites for direction, not permission to copy third-party assets or wording. Do not invent clinical services, qualifications, rebate eligibility, Medicare arrangements, prices or working booking integrations. Route uncertain claims or contradictory instructions to the recorded decision owner. Continue independent clear items where safe; keep unresolved items visible.
+Use reference artwork/sites for direction, not permission to copy third-party assets or wording. Keep public-page copy useful for prospective clients: move implementation notes, scope/page-count explanations, source routing, approval mechanics and clinical/platform verification holds into the private handoff. Do not expose internal work instructions on the website. Do not invent clinical services, qualifications, rebate eligibility, Medicare arrangements, prices or working booking integrations. Route uncertain claims or contradictory instructions to the recorded decision owner. Continue independent clear items where safe; keep unresolved items visible.
 
 Serialize revisions through the existing repository lease. Newly received feedback is a subsequent batch; never silently change an active worker's brief. Reuse an existing run/chat after a retry rather than replaying edits.
 
 ## Verify and hand back
 
 For every checklist ID, report `implemented`, `already_satisfied`, `blocked` or `needs_decision`, with evidence. Run the registered project checks and inspect affected pages at desktop and mobile sizes. Check navigation, requested copy, layout, image loading and relevant interactions. Do not submit real client forms or bookings as a test.
+
+Before sealing a shared-repository publication, compare every file against the exact approved base and include only actual changes in the publisher manifest. Preserve unchanged baseline assets; a complete review snapshot is not the changed-file publication manifest. If the publisher rejects a request, inspect commit/push/pending-receipt state before correcting it; never assume an uncertain push failed.
 
 Publish only through the verified registered route. Dedicated sites use the existing task-bound site publisher. Shared-repository prototypes require the standing prototype authority, bounded client subtree, sealed exact-base package and independent QA before the root-owned prototype publisher; do not invent a dedicated site registration or use the dedicated-site publish helper for this route. Verify the deployed preview corresponds to the returned commit, rather than accepting HTTP 200 or a successful push as proof. Shared prototypes also require the exact-commit Deploy to lhmstaging workflow result and the published page content readback. If deployment is pending/failed, report it; do not mark ready for review.
 
