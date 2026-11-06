@@ -112,7 +112,7 @@ class BasicOps:
 
     def discussion(self, batch, task_id, message):
         def lookup():
-            found = [m for m in pages(self.call, 'list_messages_in_task', {'taskId': task_id, 'limit': 100})
+            found = [m for m in pages(self.call, 'list_messages_in_task', {'taskId': task_id, 'limit': 50})
                      if m.get('message') == message]
             if len(found) > 1:
                 raise ReconcileRequired('ambiguous discussion receipt')
@@ -122,7 +122,7 @@ class BasicOps:
             return {'message_id': result['id']}
         def verify(receipt):
             return any(m['id'] == receipt['message_id'] and m.get('message') == message
-                       for m in pages(self.call, 'list_messages_in_task', {'taskId': task_id, 'limit': 100}))
+                       for m in pages(self.call, 'list_messages_in_task', {'taskId': task_id, 'limit': 50}))
         return self.effects.perform(batch + ':brief', {'task': task_id, 'message': message}, lookup, write, verify)
 
 

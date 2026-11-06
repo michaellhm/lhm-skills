@@ -21,7 +21,10 @@ class AuthorityTests(unittest.TestCase):
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
         (self.root/'config').mkdir()
-        self.path = self.root/'config/prototype-feedback-authority.json'
+        self.path = self.root/'host-authority.json'
+        registry_patch = patch.object(mod, 'REGISTRY', self.path)
+        registry_patch.start()
+        self.addCleanup(registry_patch.stop)
         self.task = {'id': 12, 'url': 'https://app.basicops.com/task/12', 'assignee': 82491, 'status': 'In Progress'}
         self.message = {'id': 'dm34', 'user': {'id': 82491}, 'message': '<p>Implement revisions. AI authorship: Ted.</p>'}
         self.cockpit = {'id': 99, 'project': {'id': 68635}, 'section': {'id': 110340}, 'status': 'Accepted'}
@@ -59,6 +62,9 @@ class AuthorityTests(unittest.TestCase):
         spec = importlib.util.spec_from_file_location('feedback_test_router', source)
         router_mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(router_mod)
+        loader_patch = patch.object(router_mod, 'feedback_authority_module', return_value=mod)
+        loader_patch.start()
+        self.addCleanup(loader_patch.stop)
         (self.root/'task-router.json').write_text(json.dumps({
             'codex_host_id': 'remote-control:test-host', 'agent_user_id': 82491, 'reviewer_id': 36398, 'providers': {'codex': True, 'claude': True},
             'clients': {'blue-dragonfly': {'name': 'Blue Dragonfly', 'vault_prefix': '20 Clients/Blue Dragonfly/', 'basicops_task_ids': ['12']}}}))
@@ -184,6 +190,27 @@ class AuthorityTests(unittest.TestCase):
         self.cockpit['section']['id'] = 110341
         with self.assertRaises(ValueError): router.contract(12, 'dm34')
         self.assertEqual(router.status(12)['status'], 'queued')
+
+    def test_router_human_instruction_ignores_registered_ai_grant(self):
+        router = self.router()
+        self.message.update(user=36398, message='@Ted work on this prototype')
+        request = router.contract(12, 'dm34')[1]
+        self.assertNotIn('feedback_authority', request)
+        self.assertEqual(request['permission_ceiling'], 'prepare_for_review')
+
+    def test_router_human_instruction_survives_malformed_optional_registry(self):
+        router = self.router()
+        self.path.write_text('malformed registry')
+        self.message.update(user=36398, message='@Ted work on this prototype')
+        self.assertNotIn('feedback_authority', router.contract(12, 'dm34')[1])
+
+    def test_writable_profile_registry_is_never_a_fallback(self):
+        self.path.unlink()
+        legacy = self.root/'config/prototype-feedback-authority.json'
+        legacy.write_text(json.dumps({'schema_version': 1, 'grants': {'12': self.grant}}))
+        legacy.chmod(0o644)
+        self.assertIsNone(self.check())
+        with self.assertRaises(ValueError): self.router().contract(12, 'dm34')
 
     def test_router_rejects_ai_instruction_without_grant(self):
         router = self.router()

@@ -123,6 +123,24 @@ class BasicOpsTests(unittest.TestCase):
             return task
         raise AssertionError(name)
 
+    def test_discussion_obeys_connector_fifty_message_limit(self):
+        messages, limits = [], []
+        def call(name, args):
+            if name == 'list_messages_in_task':
+                limits.append(args['limit'])
+                if args['limit'] > 50:
+                    raise ValueError('BasicOps list_messages_in_task limit exceeds 50')
+                return {'data': messages}
+            if name == 'create_message_in_task':
+                messages.append({'id': 'dm1', 'message': args['message']})
+                return {'id': 'dm1'}
+            self.fail(name)
+        self.api.call = call
+        self.assertEqual(self.api.discussion('batch', 2, '<p>Brief</p>'), {'message_id': 'dm1'})
+        self.api.discussion('batch', 2, '<p>Brief</p>')
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(set(limits), {50})
+
     def test_create_readback_then_repeat_has_one_task(self):
         self.assertEqual(self.api.task('batch', 1, self.payload), {'task_id': 2})
         self.api.task('batch', 1, self.payload)

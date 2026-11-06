@@ -17,6 +17,13 @@ POLICY_VERSION = 4
 TERMINAL = {'needs_review', 'failed'}
 
 
+def feedback_authority_module():
+    spec = importlib.util.spec_from_file_location('feedback_authority', Path(__file__).with_name('feedback_authority.py'))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def plain(value):
     return html.unescape(re.sub(r'<[^>]*>', ' ', str(value)))
 
@@ -239,11 +246,10 @@ class Router:
         msg = next((m for m in messages if m.get('id') == instruction_message_id), None)
         instruction = plain(msg.get('message', '')) if msg else ''
         feedback = None
-        authority = self.profile / 'config/prototype-feedback-authority.json'
-        if authority.exists() or authority.is_symlink():
-            spec = importlib.util.spec_from_file_location('feedback_authority', Path(__file__).with_name('feedback_authority.py'))
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
+        # Ordinary reviewer instructions never read the optional system registry.
+        # A malformed/missing automation grant cannot disrupt the human route.
+        if msg and actor(msg) == self.config['agent_user_id']:
+            module = feedback_authority_module()
             admitted = self.feedback_admitted_request(task_id, instruction_message_id, self.status(task_id)) if _reconcile else None
             feedback = module.verify(self.profile, self.api, task, msg, admitted_request=admitted)
         if feedback is None and (not msg or actor(msg) != self.config['reviewer_id']

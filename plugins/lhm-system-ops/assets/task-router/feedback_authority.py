@@ -16,6 +16,9 @@ FIELDS = {'authority_id', 'task_id', 'instruction_message_id', 'instruction_sha2
           'cockpit_id', 'stage_id', 'client_id', 'batch_id', 'author_id', 'reviewer_id',
           'repository', 'subtree', 'enabled'}
 MAX_BYTES = 262144
+# This directory is supplied by the existing immutable release read-only mount.
+# Never fall back to a Hermes-writable profile or accept an email/config override.
+REGISTRY = Path('/opt/data/immutable-plugin-releases/prototype-feedback-authority/authority.json')
 
 
 def actor(value):
@@ -27,8 +30,8 @@ def fingerprint(grant):
     return hashlib.sha256(json.dumps(grant, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 
-def read_registry(profile):
-    path = Path(profile) / 'config/prototype-feedback-authority.json'
+def read_registry(profile=None):
+    path = REGISTRY
     try:
         fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
     except FileNotFoundError:
