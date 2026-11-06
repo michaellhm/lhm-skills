@@ -17,6 +17,9 @@
     },
     {
       "serverUrl": "https://api.fathom.ai/mcp"
+    },
+    {
+      "serverName": "analytics-mcp"
     }
   ],
   "permissions": {

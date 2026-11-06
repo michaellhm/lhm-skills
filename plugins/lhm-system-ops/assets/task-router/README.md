@@ -138,3 +138,11 @@ reload TED, retaining all task drafts, requests, reports and sessions.
 ## Claude handover defaults
 
 TED starts Claude conversations and draft workers with the pinned model `claude-opus-5-5`, low reasoning effort, and `acceptEdits` permission mode. These startup flags also apply when TED resumes a saved conversation. File edits are accepted automatically; existing connector approval rules still apply. Claude Code must support Opus 5.5 (v2.1.280 or later) before rollout.
+
+## GA4 and Fathom handover connections
+
+The handover allowlist includes the official Fathom connector (`https://api.fathom.ai/mcp`) and the existing local `analytics-mcp` GA4 server. Fathom uses the Claude account connection. GA4 uses the `analytics-mcp` entry in the installed `voyager-review.mcp.json` launch profile; reuse the existing entry from `google-ads-review-readonly.mcp.json`, including its existing worker-owned authentication environment. Do not put credentials into source or copy another runtime's authentication. Preserve the GoogleAds entry and other live settings when updating this profile. The installer leaves the local MCP launch profile intact.
+
+Verification must use the handover settings and worker identity. Check Fathom with `claude mcp list`. For the local GA4 server, test MCP initialize, tools/list and the read-only `get_account_summaries` call; the Claude connector-status list may omit local servers supplied through the launch flag. Report authentication failures separately from allowlist omissions. Existing sessions need a fresh handover or reconnection before newly available tools can be assumed.
+
+Live verification on 2026-11-07 (Australia/Melbourne): Fathom reported Connected; GA4 initialization, tool discovery and account-summary read passed under claudeworker. No client reports or transcripts were retrieved for this check.
