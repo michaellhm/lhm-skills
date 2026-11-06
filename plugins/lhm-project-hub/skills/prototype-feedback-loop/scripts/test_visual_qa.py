@@ -114,7 +114,7 @@ const browser={{async newContext(options){{seen.contexts.push(options);return {{
 async route(pattern,fn){{await fn({{request:()=>({{url:()=> 'https://booking.example.com/submit'}}),abort:reason=>seen.routes.push(reason),continue:()=>seen.routes.push('continued')}});}},
 async routeWebSocket(pattern,fn){{fn({{close:()=>seen.routes.push('websocket-closed')}});}},
 async newPage(){{let open=false;return {{on(){{}},async goto(){{return {{status:()=>200}};}},async evaluate(){{return dom;}},
-locator(selector){{return selector.startsWith('button')?{{count:async()=>1,isVisible:async()=>true,click:async()=>{{open=true;seen.clicks++;}},getAttribute:async()=>String(open)}}:{{isVisible:async()=>open}};}},
+locator(selector){{if(selector==='[data-booking-choice]') return {{count:async()=>0}};return selector.startsWith('button')?{{count:async()=>1,isVisible:async()=>true,click:async()=>{{open=true;seen.clicks++;}},getAttribute:async()=>String(open)}}:{{isVisible:async()=>open}};}},
 keyboard:{{press:async key=>{{if(key==='Escape'){{open=false;seen.escapes++;}}}}}},
 screenshot:async options=>fs.writeFile(options.path,Buffer.from('fake PNG bytes')),close:async()=>{{seen.closed++;}} }};}},
 async close(){{}} }};}},async close(){{}} }};
@@ -132,6 +132,103 @@ hashes:receipt.pages.every(page=>/^[a-f0-9]{{64}}$/.test(page.screenshot.sha256)
         self.assertTrue(result['hashes'])
         self.assertTrue((self.output / 'mechanical-qa.json').exists())
         self.assertEqual(result['manifest'], self.manifest['package_sha256'])
+
+
+
+BOOKING_FAKE = r"""
+function bookingPage(options={}) {
+  const initial='http://127.0.0.1:1234/prototypes/luminary-counselling/homepage/fees-and-getting-started.html';
+  const original='Choose either option above.';
+  const state={url:initial,message:original,focused:false,clicks:[],reloads:0};
+  const handlers=new Map();
+  const panel={count:async()=>options.missingPanel?0:1,isVisible:async()=>true,
+    getAttribute:async name=>name==='aria-live'?(options.badLive?'off':'polite'):'-1'};
+  const message={count:async()=>options.missingMessage?0:1,isVisible:async()=>true,textContent:async()=>state.message};
+  return {state,url:()=>state.url,on:(event,fn)=>handlers.set(event,fn),off:event=>handlers.delete(event),
+    locator(selector){
+      if(selector==='[data-booking-choice]')return {count:async()=>options.absent?0:2};
+      if(selector==='#booking-placeholder')return panel;
+      if(selector==='#booking-placeholder [data-choice-message]')return message;
+      const choice=selector.includes('"session"')?'session':'conversation';
+      return {count:async()=>1,isVisible:async()=>true,getAttribute:async()=>options.unsafeHref?'https://booking.example/submit':'#booking-placeholder',
+        click:async()=>{
+          state.clicks.push(choice);
+          if(!(options.brokenBranch&&choice==='conversation'))state.message=options.sameMessage?'Same choice':choice==='session'?'You chose a full session.':'You chose an introductory conversation.';
+          state.focused=!options.noFocus;
+          state.url=options.navigate?'http://127.0.0.1:1234/other':initial+(options.noHash?'':'#booking-placeholder');
+          if(options.backend&&handlers.has('request'))handlers.get('request')({method:()=> 'POST',url:()=> 'https://booking.example/submit?private=hidden'});
+        }};
+    },
+    waitForFunction:async(fn,before)=>{if(!state.focused||state.message===before)throw new Error('timed out');},
+    evaluate:async()=>state.focused,
+    goto:async url=>{state.reloads++;state.url=url;state.message=original;state.focused=false;return {status:()=>200};}
+  };
+}
+"""
+
+
+class BookingChoiceTests(unittest.TestCase):
+    def result(self, options=None):
+        return node(BOOKING_FAKE + 'const page=bookingPage(' + json.dumps(options or {}) + ');'
+                    + 'const result=await qa.bookingChoices(page);console.log(JSON.stringify({result,state:page.state}));')
+
+    def test_both_distinct_branches_have_focus_and_fragment_on_both_viewports(self):
+        for viewport in (1440, 390):
+            with self.subTest(viewport=viewport):
+                outcome = self.result({'viewport': viewport})
+                result = outcome['result']
+                self.assertEqual(result['status'], 'passed')
+                self.assertEqual([branch['choice'] for branch in result['branches']], ['session', 'conversation'])
+                self.assertNotEqual(result['branches'][0]['message'], result['branches'][1]['message'])
+                self.assertTrue(all(branch['focused'] and branch['fragmentMatched'] and branch['stayedOnPage'] for branch in result['branches']))
+                self.assertEqual(outcome['state']['clicks'], ['session', 'conversation'])
+                self.assertEqual(outcome['state']['message'], 'Choose either option above.')
+                self.assertNotIn('#', outcome['state']['url'])
+                self.assertEqual(outcome['state']['reloads'], 1)
+
+    def test_old_prototype_without_widget_is_skipped(self):
+        outcome = self.result({'absent': True})
+        self.assertEqual(outcome['result']['status'], 'not_present')
+        self.assertFalse(outcome['result']['present'])
+        self.assertEqual(outcome['state']['clicks'], [])
+        self.assertEqual(outcome['state']['reloads'], 0)
+
+    def test_inert_conversation_branch_fails(self):
+        outcome = self.result({'brokenBranch': True})
+        self.assertEqual(outcome['result']['status'], 'failed')
+        self.assertEqual(outcome['result']['branches'][0]['status'], 'passed')
+        self.assertEqual(outcome['result']['branches'][1]['status'], 'failed')
+        self.assertEqual(outcome['state']['reloads'], 1)
+
+    def test_identical_messages_fail(self):
+        result = self.result({'sameMessage': True})['result']
+        self.assertEqual(result['status'], 'failed')
+        self.assertTrue(any('not distinct' in error for error in result['errors']))
+
+    def test_missing_panel_or_message_blocks_clicks(self):
+        for options in ({'missingPanel': True}, {'missingMessage': True}, {'badLive': True}):
+            with self.subTest(options=options):
+                outcome = self.result(options)
+                self.assertEqual(outcome['result']['status'], 'failed')
+                self.assertEqual(outcome['state']['clicks'], [])
+
+    def test_focus_or_fragment_failure_is_reported(self):
+        for options in ({'noFocus': True}, {'noHash': True}, {'navigate': True}):
+            with self.subTest(options=options):
+                result = self.result(options)['result']
+                self.assertEqual(result['status'], 'failed')
+                self.assertEqual(len(result['branches']), 2)
+
+    def test_unsafe_backend_anchor_never_clicked(self):
+        outcome = self.result({'unsafeHref': True})
+        self.assertEqual(outcome['result']['status'], 'failed')
+        self.assertEqual(outcome['state']['clicks'], [])
+
+    def test_backend_attempt_fails_and_receipt_omits_query(self):
+        result = self.result({'backend': True})['result']
+        self.assertEqual(result['status'], 'failed')
+        self.assertEqual(result['backendRequests'], ['POST https://booking.example/submit'] * 2)
+        self.assertNotIn('private=hidden', json.dumps(result))
 
 
 if __name__ == '__main__':

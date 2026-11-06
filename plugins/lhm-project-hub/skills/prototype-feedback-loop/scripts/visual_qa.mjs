@@ -110,6 +110,86 @@ export function checkDom(dom) {
   if (dom.motion.length) errors.push('active motion exceeds reduced-motion limit');
   return errors;
 }
+export async function bookingChoices(page) {
+  const controls = page.locator('[data-booking-choice]');
+  if (await controls.count() === 0) return { present: false, status: 'not_present', errors: [], branches: [] };
+  const errors = [], branches = [], initialUrl = page.url();
+  const initial = new URL(initialUrl);
+  const panel = page.locator('#booking-placeholder');
+  if (await controls.count() !== 2) errors.push('booking widget must expose exactly session and conversation choices');
+  if (await panel.count() !== 1 || !await panel.isVisible()) errors.push('booking choice panel missing or hidden');
+  else if (await panel.getAttribute('aria-live') !== 'polite' || await panel.getAttribute('tabindex') !== '-1')
+    errors.push('booking choice panel must be a focusable polite live region');
+  const message = page.locator('#booking-placeholder [data-choice-message]');
+  if (await message.count() !== 1 || !await message.isVisible()) errors.push('booking choice message missing or hidden');
+  if (errors.length) return { present: true, status: 'failed', errors, branches };
+  const originalMessage = (await message.textContent() ?? '').trim();
+  const network = [], popupClosures = [];
+  let tracking = false, touched = false, restoredOrdinaryState = false;
+  const onRequest = request => {
+    if (!tracking) return;
+    let parsed;
+    try { parsed = new URL(request.url()); } catch { network.push('invalid request URL'); return; }
+    if (!['GET', 'HEAD'].includes(request.method()) || ![initial.origin, 'null'].includes(parsed.origin)
+        || parsed.protocol !== 'data:' && parsed.origin !== initial.origin)
+      network.push(request.method() + ' ' + parsed.origin + parsed.pathname);
+  };
+  const onPopup = popup => {
+    if (!tracking) return;
+    errors.push('booking choice opened an unexpected window');
+    popupClosures.push(popup.close().catch(() => {}));
+  };
+  page.on('request', onRequest); page.on('popup', onPopup);
+  try {
+    let previousMessage = originalMessage;
+    for (const choice of ['session', 'conversation']) {
+      const branchErrors = [];
+      const link = page.locator('a[data-booking-choice="' + choice + '"]');
+      if (await link.count() !== 1 || !await link.isVisible() || await link.getAttribute('href') !== '#booking-placeholder') {
+        branches.push({ choice, status: 'failed', errors: ['local booking choice anchor missing or unsafe'] });
+        errors.push(choice + ': local booking choice anchor missing or unsafe');
+        continue;
+      }
+      tracking = true; touched = true;
+      await link.click();
+      try {
+        await page.waitForFunction(before => {
+          const panel = document.getElementById('booking-placeholder');
+          const message = panel?.querySelector('[data-choice-message]');
+          return document.activeElement === panel && message?.textContent.trim() && message.textContent.trim() !== before;
+        }, previousMessage, { timeout: 2500 });
+      } catch { branchErrors.push('choice did not update its message and focus the panel'); }
+      const text = (await message.textContent() ?? '').trim();
+      const focused = await page.evaluate(() => document.activeElement?.id === 'booking-placeholder');
+      const current = new URL(page.url());
+      const samePage = current.origin === initial.origin && current.pathname === initial.pathname && current.search === initial.search;
+      const fragmentMatched = current.hash === '#booking-placeholder';
+      if (!text || text === originalMessage || text === previousMessage) branchErrors.push('choice message is empty, unchanged or not distinct');
+      if (!await panel.isVisible() || !await message.isVisible()) branchErrors.push('choice result is not visible');
+      if (!focused) branchErrors.push('choice result did not receive focus');
+      if (!samePage || !fragmentMatched) branchErrors.push('choice did not stay on the matching local panel fragment');
+      branches.push({ choice, status: branchErrors.length ? 'failed' : 'passed', message: text,
+        focused, fragmentMatched, stayedOnPage: samePage, errors: branchErrors });
+      errors.push(...branchErrors.map(error => choice + ': ' + error));
+      previousMessage = text;
+      tracking = false;
+    }
+  } finally {
+    tracking = false;
+    page.off('request', onRequest); page.off('popup', onPopup);
+    await Promise.all(popupClosures);
+    // Reload the ordinary prototype state before the normal desktop/mobile screenshot.
+    if (touched) {
+      const restored = await page.goto(initialUrl, { waitUntil: 'networkidle', timeout: 25000 });
+      restoredOrdinaryState = Boolean(restored && restored.status() === 200);
+      if (!restoredOrdinaryState) errors.push('ordinary booking UI could not be restored');
+    }
+  }
+  errors.push(...network.map(request => 'booking choice attempted a backend/network request: ' + request));
+  return { present: true, status: errors.length ? 'failed' : 'passed', errors, branches,
+    prototypeOnly: true, backendRequests: network, restoredOrdinaryState };
+}
+
 export async function inspectPage(page, { origin, pagePath, viewport, output, files }) {
   const url = origin + '/prototypes/' + pagePath;
   const resourceErrors = [];
@@ -147,6 +227,8 @@ export async function inspectPage(page, { origin, pagePath, viewport, output, fi
       if (!menu.opened || !menu.escapeClosed) errors.push('mobile menu open/Escape-close failed');
     }
   }
+  const booking = await bookingChoices(page);
+  errors.push(...booking.errors);
   // Inspect links without navigating away, booking, clicking external links or submitting forms.
   const links = dom.links.map(href => {
     try {
@@ -161,7 +243,7 @@ export async function inspectPage(page, { origin, pagePath, viewport, output, fi
   const screenshot = path.join(output, pagePath.replaceAll('/', '--').replace(/\.html$/, '') + '-' + viewport.width + '.png');
   await page.screenshot({ path: screenshot, fullPage: true, animations: 'disabled' });
   const screenshotBytes = await fs.readFile(screenshot);
-  return { page: pagePath, viewport, url, status: errors.length ? 'failed' : 'passed', errors, menu,
+  return { page: pagePath, viewport, url, status: errors.length ? 'failed' : 'passed', errors, menu, booking,
     checks: { h1: dom.h1, noindex: dom.noindex, horizontalOverflow: dom.scrollWidth > dom.viewportWidth + 1,
       missingImages: dom.missingImages, reducedMotion: dom.reducedMotion, motion: dom.motion },
     screenshot: { path: screenshot, sha256: sha(screenshotBytes), size_bytes: screenshotBytes.length }, ids: dom.ids, links };
