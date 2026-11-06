@@ -1,3 +1,4 @@
+import copy
 import importlib.util
 import json
 from pathlib import Path
@@ -78,6 +79,85 @@ class DeliveryTests(unittest.TestCase):
         (run/'receipt.json').write_text(json.dumps({'status':'needs_review','request_id':request['request_id'],'provider':'codex','artifact_manifest':[artifact]}))
         q=self.root/'queue';q.mkdir();(q/'receipt.json').write_text(json.dumps({'started_at':1792719000}))
         return request,run,q,draft
+
+    def feedback_request(self, request):
+        grant = {'authority_id': 'MICHAEL-PROTOTYPE-FEEDBACK-20261107', 'task_id': 123,
+                 'instruction_message_id': 'dm123', 'instruction_sha256': 'a'*64,
+                 'cockpit_id': 99, 'stage_id': 110340, 'client_id': 'alpha',
+                 'batch_id': 'prototype-'+'b'*32, 'author_id': 82491, 'reviewer_id': 36398,
+                 'repository': 'michaellhm/lhm-prototype', 'subtree': 'luminary-counselling/', 'enabled': True}
+        request.update(permission_ceiling='registered_prototype_revision', task_id=123,
+                       instruction_message_id='dm123', instruction_sha256='a'*64)
+        request['feedback_authority'] = {'authority_id': grant['authority_id'],
+            'grant_sha256': pub.digest(json.dumps(grant, sort_keys=True, separators=(',', ':')).encode()),
+            **{k: grant[k] for k in ('batch_id', 'client_id', 'repository', 'subtree')}}
+        registry = self.root/'authority/authority.json'
+        registry.parent.mkdir()
+        registry.write_text(json.dumps({'schema_version': 1, 'grants': {'123': grant}}))
+        registry.chmod(0o644)
+        return registry, grant
+
+    def root_stats(self, uid=0):
+        from types import SimpleNamespace
+        real = module.os.fstat
+        def result(fd):
+            value = real(fd)
+            return SimpleNamespace(st_uid=uid, st_mode=value.st_mode, st_nlink=value.st_nlink, st_size=value.st_size)
+        return patch.object(module.os, 'fstat', side_effect=result)
+
+    def test_registered_feedback_delivers_only_internal_review_files(self):
+        request, run, q, draft = self.prepare()
+        registry, grant = self.feedback_request(request)
+        with patch.object(module, 'ROOT', self.root/'delivery'), patch.object(module, 'FEEDBACK_REGISTRY', registry), self.root_stats():
+            package = module.manifest(request, run, q)
+        self.assertEqual(package['permission_ceiling'], 'internal_review_file_create_only')
+        self.assertEqual(package['files'][0]['sha256'], pub.digest(b'prepared report'))
+        self.assertNotIn('publish', package)
+
+    def test_feedback_delivery_rejects_forged_or_incomplete_request_binding(self):
+        request, run, q, draft = self.prepare()
+        registry, grant = self.feedback_request(request)
+        changes = [
+            {'feedback_authority': None},
+            {'feedback_authority': dict(request['feedback_authority'], grant_sha256='c'*64)},
+            {'feedback_authority': dict(request['feedback_authority'], subtree='other/')},
+            {'feedback_authority': dict(request['feedback_authority'], batch_id='prototype-'+'c'*32)},
+            {'client_id': 'another-client'}, {'provider': 'claude'}, {'task_id': 124},
+            {'reviewer_id': 99}, {'instruction_sha256': 'd'*64}, {'instruction_message_id': 'dm124'}]
+        with patch.object(module, 'ROOT', self.root/'delivery'), patch.object(module, 'FEEDBACK_REGISTRY', registry), self.root_stats():
+            for change in changes:
+                with self.subTest(change=change), self.assertRaises(ValueError):
+                    module.manifest({**copy.deepcopy(request), **change}, run, q)
+        self.assertFalse((self.root/'delivery').exists())
+
+    def test_feedback_delivery_requires_actual_protected_root_source(self):
+        request, run, q, draft = self.prepare()
+        registry, grant = self.feedback_request(request)
+        with patch.object(module, 'ROOT', self.root/'delivery'), patch.object(module, 'FEEDBACK_REGISTRY', registry):
+            with self.root_stats(uid=1000), self.assertRaises(ValueError):
+                module.manifest(request, run, q)
+            with self.root_stats():
+                registry.chmod(0o666)
+                with self.assertRaises(ValueError): module.manifest(request, run, q)
+                registry.chmod(0o644)
+                original = registry.with_suffix('.saved')
+                registry.rename(original);registry.symlink_to(original)
+                with self.assertRaises(OSError): module.manifest(request, run, q)
+                registry.unlink()
+                with self.assertRaises(OSError): module.manifest(request, run, q)
+
+    def test_feedback_scope_cannot_bypass_immutable_producer_manifest(self):
+        request, run, q, draft = self.prepare()
+        registry, grant = self.feedback_request(request)
+        draft.write_text('correction is still being produced')
+        with patch.object(module, 'ROOT', self.root/'delivery'), patch.object(module, 'FEEDBACK_REGISTRY', registry), self.root_stats(), self.assertRaises(ValueError):
+            module.manifest(request, run, q)
+
+    def test_other_execution_ceilings_remain_denied_for_delivery(self):
+        request, run, q, draft = self.prepare()
+        request['permission_ceiling'] = 'provider_tool_approval'
+        with patch.object(module, 'ROOT', self.root/'delivery'), self.assertRaises(ValueError):
+            module.manifest(request, run, q)
 
     def test_manifest_snapshots_only_verified_drafts_and_detects_changed_package(self):
         request,run,q,draft=self.prepare()
