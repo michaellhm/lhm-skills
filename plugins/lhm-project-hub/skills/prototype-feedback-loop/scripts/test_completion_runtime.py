@@ -174,6 +174,23 @@ class CompletionTests(unittest.TestCase):
 
 
 class HandbackTests(unittest.TestCase):
+    def test_native_review_wrapper_and_preview_reconcile_without_repeating_review(self):
+        with tempfile.TemporaryDirectory() as temp, mock.patch.object(runtime,'atomic',atomic), \
+             mock.patch.object(runtime,'root_json',lambda path:json.loads(path.read_text())):
+            tx,batch,reg,delivery,pub,backend,queue=self.fixture(Path(temp),crash_review=True)
+            backend.task['title']='Blue Dragonfly: Website - Revise the Luminary prototype'
+            with self.assertRaises(TimeoutError):tx.handback(Path(temp),batch,{},reg,delivery,pub)
+            expected=backend.messages[-1]['message']
+            wrapper='Ted needs review from <span class="conversation-user-name" _id="36398">Michael Colman</span> for '+backend.task['title']+'<br><br>'
+            suffix='<br><!-- --snippets--'+json.dumps([{'url':reg['preview_url']+'?rev='+'a'*7,'title':'Luminary Counselling'}])+' -->'
+            actual=wrapper+expected+suffix;backend.messages[-1]['message']=actual
+            self.assertTrue(runtime.review_message_matches(actual,expected,reviewer=36398,title=backend.task['title']))
+            for changed in (actual.replace('_id="36398"','_id="999"'),actual.replace('Verified preview','Changed preview'),actual.replace('"url": "https://lhmstaging.net','"url": "https://evil.example')):
+                self.assertFalse(runtime.review_message_matches(changed,expected,reviewer=36398,title=backend.task['title']))
+            receipt=tx.handback(Path(temp),batch,{},reg,delivery,pub)
+            self.assertEqual(receipt['discussion_sha256'],runtime.sha(actual.encode()))
+            self.assertEqual(backend.writes,['bulk_create_or_update_task','request_review'])
+
     def test_link_decoration_reconciles_after_metadata_write_without_reassignment(self):
         import re
         with tempfile.TemporaryDirectory() as temp, mock.patch.object(runtime,'atomic',atomic), \

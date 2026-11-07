@@ -84,6 +84,24 @@ def basicops_html(value):
     parser=Tokens();parser.feed(value);parser.close();return parser.tokens
 
 
+def review_message_matches(actual,expected,*,reviewer,title):
+    """Allow the native review announcement and bounded URL-preview suffix only."""
+    import html
+    prefix=re.match(r'^Ted needs review from <span class="conversation-user-name" _id="'+str(reviewer)
+        +r'">[^<]+</span> for '+re.escape(html.escape(title))+r'<br><br>',actual)
+    if prefix:actual=actual[prefix.end():]
+    suffix=re.search(r'<br><!-- --snippets--(\[.*\]) -->$',actual,flags=re.DOTALL)
+    if suffix:
+        try:snippets=json.loads(suffix[1])
+        except ValueError:return False
+        allowed={html.unescape(url) for url in re.findall(r'href="([^"]+)"',expected)}
+        if (not isinstance(snippets,list) or len(snippets)>20
+                or any(not isinstance(row,dict) or row.get('url') not in allowed for row in snippets)):
+            return False
+        actual=actual[:suffix.start()]
+    return basicops_html(actual)==basicops_html(expected)
+
+
 def worker_bytes(path, maximum=10000000):
     """Read each component without following worker-controlled links."""
     from delivery import read
@@ -562,15 +580,19 @@ class Transaction:
                    '<p>Deployment: ' + str(publication['release']['workflow']['run_id']) + '. Next handoff: Michael to review the verified preview.</p><p>AI authorship: This update was written by Ted.</p>')
         def messages():
             return list(pages(backend.basicops, 'list_messages_in_task', {'taskId': task_id, 'limit': 50}))
+        matched=[]
         def reviewed():
             task = backend.basicops('get_task', {'taskId': task_id})
             from host_runtime import actor
             reviewers = task.get('reviewers', [])
+            matches=[row for row in messages() if actor(row)==82491 and review_message_matches(
+                row.get('message',''),message,reviewer=reg['reviewer_id'],title=task.get('title',''))]
+            if matches:matched[:]=[matches[0]['message']]
             return (task.get('status') == 'Under Review' and actor(task) == reg['reviewer_id']
                     and any((row.get('id') if isinstance(row, dict) else row) == reg['reviewer_id'] for row in reviewers)
                     and all(url in task.get('description','') for url in (commit_url,preview,delivery['folder_url']))
                     and len(re.findall(r'<p>LHM metadata:.*?workflow_state=ready-for-review.*?approval_status=pending-human.*?</p>',task.get('description',''),flags=re.DOTALL))==1
-                    and any(basicops_html(row.get('message','')) == basicops_html(message) and actor(row)==82491 for row in messages()))
+                    and bool(matches))
         final_path = stage / 'handback.json'
         if final_path.exists():
             if not reviewed(): raise ValueError('completed native review handback changed')
@@ -607,8 +629,7 @@ class Transaction:
             if not reviewed(): raise ValueError('native review outcome uncertain; preserve request and reconcile, do not replay')
         receipt = {'task_id': task_id, 'run_id': batch['run_id'], 'status': 'Under Review',
                    'reviewer_id': reg['reviewer_id'], 'commit': commit, 'preview_url': preview,
-                   'receipt_id': marker, 'discussion_sha256': sha(next(row['message'] for row in messages()
-                       if basicops_html(row.get('message',''))==basicops_html(message) and actor(row)==82491).encode())}
+                   'receipt_id': marker, 'discussion_sha256': sha(matched[0].encode())}
         atomic(final_path, canonical(receipt))
         return receipt
 
