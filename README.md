@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-202 skills across thirteen Claude Code plugins (5 inbox, 65 marketing, 42 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge, 14 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+204 skills across thirteen Claude Code plugins (5 inbox, 65 marketing, 42 WordPress, 19 GMB/local SEO, 8 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 32 project hub, 6 knowledge, 14 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -214,9 +214,11 @@ plugins/lhm-inbox-hub/                # Michael's inbox system — triage, voice
 plugins/lhm-project-hub/              # Agency process hub — sales handover through monthly/quarterly reviews
   .claude-plugin/plugin.json            # Plugin manifest
   agents/pm-orchestrator.md             # Main entry point — status, SOP discovery and governed multi-skill coordination
-  skills/                               # All 30 skills
+  skills/                               # All 32 skills
     basicops-task-manager/              # Shared BasicOps boundary — plain-English task briefs, routing, website cockpit handoffs, approvals and verification
     team-work-brief/                    # Context-check rough team requests, resolve gaps and learn from handoff feedback
+    prototype-feedback-loop/            # Board-driven feedback intake, private image context and persistent deduplicated queue
+    prototype-revisions/                # Worker revision checklist, visual verification and preview handback
     run-hermes-task/                    # Human-directed Hermes dispatch; central TED routing to saved Codex/Claude VPS sessions
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
@@ -392,3 +394,5 @@ Registered RTB routes can use direct human task intake without a mandatory TED p
 Approved Claude implementation handoff: exact human approval plus task/source context reaches a connected Remote Control conversation; TED forwards it without an extra plan gate. Native tool approval remains with Claude. Existing draft-only receipts are not silently upgraded.
 
 CTO visible repair handoff: investigation packages findings into one `*The Intervention` task and a persistent paired Codex chat. Michael continues feedback and approvals there; scoped source preparation, publishing, merge and deployment remain distinct. No new skill was added.
+
+**Prototype feedback:** `prototype-feedback-loop` prepares deduplicated batches from eligible website projects; `prototype-revisions` implements and verifies them through the existing site worker. Bounded Gmail, BasicOps and Ted host adapters include crash reconciliation and independent completion QA. Installed status and recurring activation require separate live acceptance.

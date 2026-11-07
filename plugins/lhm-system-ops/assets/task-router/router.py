@@ -2,7 +2,10 @@
 import fcntl
 import hashlib
 import html
+import importlib.util
 import json
+import os
+import stat
 from pathlib import Path
 import re
 import time
@@ -12,6 +15,62 @@ from html.parser import HTMLParser
 
 POLICY_VERSION = 4
 TERMINAL = {'needs_review', 'failed'}
+
+
+def feedback_authority_module():
+    spec = importlib.util.spec_from_file_location('feedback_authority', Path(__file__).with_name('feedback_authority.py'))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def completion_proof(path,request):
+    """Read the root supervisor's bounded verified completion projection only."""
+    fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW)
+    with os.fdopen(fd,'rb') as stream:
+        info=os.fstat(stream.fileno())
+        if not stat.S_ISREG(info.st_mode) or info.st_uid!=0 or info.st_mode&0o022 or info.st_nlink!=1 or info.st_size>262144:
+            raise ValueError('completion proof must be root protected')
+        proof=json.loads(stream.read(262145))
+    fields={'schema_version','status','request_id','task_id','client_id','batch_id','producer_thread_id',
+            'source_package_sha256','qa_receipt_sha256','delivery_package_sha256','publication_package_sha256',
+            'commit','workflow','public_files','changed_files','preview_url','reviewer_id','basicops_status',
+            'discussion_sha256','drive_folder_url','handback_receipt_sha256','verified_at'}
+    binding=request.get('feedback_authority',{})
+    if (not isinstance(proof,dict) or set(proof)!=fields or proof['schema_version']!=1
+            or proof['status']!='verified_for_review' or proof['request_id']!=request['request_id']
+            or proof['task_id']!=request['task_id'] or proof['client_id']!=request['client_id']
+            or proof['batch_id']!=binding.get('batch_id') or proof['reviewer_id']!=request['reviewer_id']
+            or proof['basicops_status']!='Under Review' or not re.fullmatch(r'[a-f0-9]{40}',str(proof['commit']))
+            or type(proof['verified_at']) is not int or proof['verified_at']<=0
+            or str(uuid.UUID(proof['producer_thread_id']))!=proof['producer_thread_id']):
+        raise ValueError('completion proof differs from the admitted native request')
+    for field in ('source_package_sha256','qa_receipt_sha256','delivery_package_sha256','publication_package_sha256',
+                  'discussion_sha256','handback_receipt_sha256'):
+        if not re.fullmatch(r'[a-f0-9]{64}',str(proof[field])):raise ValueError('completion proof hash is invalid')
+    workflow=proof['workflow'];commit=proof['commit']
+    if (workflow.get('id')!=289562388 or workflow.get('name')!='Deploy to lhmstaging'
+            or workflow.get('path')!='.github/workflows/deploy.yml' or workflow.get('head_sha')!=commit
+            or workflow.get('head_branch')!='main' or workflow.get('status')!='completed'
+            or workflow.get('conclusion')!='success' or type(workflow.get('run_id')) is not int
+            or workflow['run_id']<=0 or workflow.get('html_url')!='https://github.com/michaellhm/lhm-prototype/actions/runs/'+str(workflow['run_id'])):
+        raise ValueError('completion proof workflow is not exact and successful')
+    prefix='https://lhmstaging.net/prototypes/'+binding.get('subtree','')+'homepage/'
+    if proof['preview_url']!=prefix+'?rev='+commit[:7] or not re.fullmatch(r'https://drive\.google\.com/drive/folders/[A-Za-z0-9_-]{8,160}',proof['drive_folder_url']):
+        raise ValueError('completion proof review destinations differ')
+    files=proof['public_files']
+    if (not isinstance(files,list) or not 1<=len(files)<=1000 or any(set(row)!={'url','sha256','bytes','status'}
+            or not row['url'].startswith(prefix) or row['status']!=200 or not re.fullmatch(r'[a-f0-9]{64}',str(row['sha256']))
+            or type(row['bytes']) is not int or not 0<=row['bytes']<=10000000 for row in files)
+            or len({row['url'] for row in files})!=len(files)):
+        raise ValueError('completion proof lacks exact public file readbacks')
+    changed=proof['changed_files']
+    if (not isinstance(changed,list) or not changed or changed!=sorted(set(changed))
+            or any(not isinstance(name,str) or not name.startswith(binding.get('subtree','')+'homepage/') or '..' in Path(name).parts for name in changed)
+            or not set('https://lhmstaging.net/prototypes/'+quote(name,safe='/') for name in changed).issubset({row['url'] for row in files})
+            or not any(row['url']==prefix+'index.html' and row['bytes']>0 for row in files)):
+        raise ValueError('completion proof changed/public file scope differs')
+    return proof
 
 
 def plain(value):
@@ -177,7 +236,53 @@ class Router:
         if self.directory and not 0 <= time.time() - self.directory.get('knowledge_refreshed_at', 0) <= 900:
             raise ValueError('Canonical shared client knowledge cache is stale; refresh or use live evidence, not a guessed client')
 
-    def contract(self, task_id, instruction_message_id):
+    def feedback_admitted_request(self, task_id, instruction_message_id, observation):
+        """Only observation may retain an exact root-admitted feedback request.
+
+        A queued state, starting receipt or provider-owned result is insufficient.
+        Submit and host pre-launch verification never invoke this exception.
+        """
+        saved = self.state / f'{task_id}.json'
+        if not saved.exists():
+            return None
+        request = json.loads(saved.read_text())['request']
+        expected = f'ted-route-{task_id}-{instruction_message_id}'
+        if (request.get('request_id') != expected or request.get('task_id') != task_id
+                or request.get('instruction_message_id') != instruction_message_id
+                or request.get('provider') != 'codex' or not request.get('feedback_authority')):
+            return None
+        run = self.queue / 'runs' / expected
+        try:
+            directory = os.open(run, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+        except FileNotFoundError:
+            return None
+        try:
+            info = os.fstat(directory)
+            if info.st_uid != 0 or info.st_mode & 0o022:
+                raise ValueError('Feedback admission directory is not host-owned')
+            try:
+                fd = os.open('receipt.json', os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory)
+            except FileNotFoundError:
+                return None
+            with os.fdopen(fd, 'rb') as stream:
+                info = os.fstat(stream.fileno())
+                if info.st_uid != 0 or not stat.S_ISREG(info.st_mode) or info.st_mode & 0o022 or info.st_size > 32768:
+                    raise ValueError('Feedback admission receipt is not protected host evidence')
+                receipt = json.loads(stream.read(32769))
+        finally:
+            os.close(directory)
+        if (receipt.get('request_id') != expected or receipt.get('provider') != 'codex'
+                or receipt.get('status') not in {'running', 'needs_review', 'failed'}
+                or any(receipt.get(k) != observation.get(k) for k in ('request_id', 'provider', 'thread_id'))):
+            return None
+        try:
+            if str(uuid.UUID(receipt.get('thread_id', ''))) != receipt.get('thread_id'):
+                return None
+        except (ValueError, TypeError, AttributeError):
+            return None
+        return request
+
+    def contract(self, task_id, instruction_message_id, *, _reconcile=False):
         if type(task_id) is not int or task_id <= 0 or not re.fullmatch(r'dm[1-9][0-9]*', instruction_message_id):
             raise ValueError('Exact task and durable human instruction IDs are required')
         if self.api('get_current_user', {}).get('id') != self.config['agent_user_id']:
@@ -189,9 +294,17 @@ class Router:
         messages = response if isinstance(response, list) else response.get('data', [])
         msg = next((m for m in messages if m.get('id') == instruction_message_id), None)
         instruction = plain(msg.get('message', '')) if msg else ''
-        if (not msg or actor(msg) != self.config['reviewer_id']
+        feedback = None
+        # Ordinary reviewer instructions never read the optional system registry.
+        # A malformed/missing automation grant cannot disrupt the human route.
+        if msg and actor(msg) == self.config['agent_user_id']:
+            module = feedback_authority_module()
+            admitted = self.feedback_admitted_request(task_id, instruction_message_id, self.status(task_id)) if _reconcile else None
+            feedback = module.verify(self.profile, self.api, task, msg, admitted_request=admitted)
+        if feedback is None and (not msg or actor(msg) != self.config['reviewer_id']
                 or re.search(r'AI authorship\s*:', instruction, re.I)
-                or not (re.search(r'\b(work on|run|execute|prepare|write|draft|research|investigate|update|revise|implement|go ahead|proceed|approve)\b', instruction, re.I) or explicit_provider(instruction))
+                or re.search(r"\b(?:not|never|isn['’]t|wasn['’]t|aren['’]t)\s+(?:(?:yet|fully|currently)\s+)?approved\b", instruction, re.I)
+                or not (re.search(r'\b(work on|run|execute|prepare|write|draft|research|investigate|update|revise|implement|go ahead|proceed|approve|approved)\b', instruction, re.I) or explicit_provider(instruction))
                 or re.search(r"\b(do not|don't|never|stop|cancel|hold|pause)\b", instruction, re.I)):
             raise ValueError('A direct personal work request is required; assignment, relay or a stop is not permission')
         if task.get('status') in {'Complete', 'Cancelled', 'Decline'}:
@@ -208,6 +321,8 @@ class Router:
             raise ValueError('Task discussion brief exceeds bounded context; identify a smaller authoritative brief')
         discussion = '\n'.join(m['text'] for m in context_messages)
         client = resolve_client(task, self.config['clients'], discussion)
+        if feedback is not None and feedback['client_id'] != client:
+            raise ValueError('Feedback authority conflicts with canonical client lookup')
         provider, reason = choose(plain(task['title']), plain(task.get('description', '')) + '\n' + discussion, instruction)
         existing = self.state / f'{task_id}.json'
         resume = None
@@ -233,6 +348,10 @@ class Router:
             else:
                 provider = old['provider']
                 reason = old['reason'] if old['instruction_message_id'] == instruction_message_id else 'Continue the existing ' + provider + ' session'
+        if feedback is not None:
+            if existing.exists() and json.loads(existing.read_text())['request'].get('feedback_authority') != feedback:
+                raise ValueError('Feedback authority cannot replace an existing request')
+            provider, reason = 'codex', 'Registered prototype feedback; root-bound AI authority'
         if not self.config['providers'].get(provider, False):
             raise ValueError(provider + ' is unavailable; no silent provider substitution')
         target = self.config['clients'][client]
@@ -255,6 +374,9 @@ class Router:
         request['source_links'] = sorted(set(u for u in links.urls if u.startswith('https://')))[:40]
         if execution_handoff(provider, instruction):
             request.update(handoff_mode='provider_execution', permission_ceiling='provider_tool_approval')
+        if feedback is not None:
+            request.update(feedback_authority=feedback, handoff_mode='provider_execution',
+                           permission_ceiling='registered_prototype_revision')
         if existing.exists():
             prior = json.loads(existing.read_text())['request']
             if prior['instruction_message_id'] == instruction_message_id:
@@ -340,6 +462,11 @@ class Router:
         result['delivery_notification'] = saved.get('delivery_notification')
         result['notification'] = saved.get('notification')
         result['session_notification'] = saved.get('session_notification')
+        proof_path=run/'completion.json'
+        if request.get('feedback_authority') and proof_path.exists():
+            result['completion']=completion_proof(proof_path,request)
+            if result['completion']['producer_thread_id']!=receipt.get('thread_id'):
+                raise ValueError('root completion conversation differs from native receipt')
         result['chat_url'] = session_link(request['provider'], receipt.get('thread_id'), self.config, receipt)
         if (run / 'result.md').exists():
             result['result'] = (run / 'result.md').read_text()[:12000]
@@ -349,18 +476,21 @@ class Router:
         with (self.state / 'handback.lock').open('a') as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             state = self.status(task_id)
+            if state.get('status')=='not_submitted':return state
+            saved=json.loads((self.state/f'{task_id}.json').read_text())
+            feedback=bool(saved['request'].get('feedback_authority'))
             needs_link = bool(state.get('chat_url')) and not state.get('session_notification')
             delivery = state.get('delivery', {})
             delivery_state = delivery.get('artefact_state')
-            needs_delivery = delivery_state in {'delivered', 'delivery_incomplete', 'no_files_produced'} and state.get('delivery_notification') != delivery_key(delivery)
-            needs_result = state['status'] in TERMINAL and not state['notification'] and not (state.get('delivery_required') and delivery_state in {'pending', 'delivery_incomplete'})
+            needs_delivery = not feedback and delivery_state in {'delivered', 'delivery_incomplete', 'no_files_produced'} and state.get('delivery_notification') != delivery_key(delivery)
+            needs_result = not feedback and state['status'] in TERMINAL and not state['notification'] and not (state.get('delivery_required') and delivery_state in {'pending', 'delivery_incomplete'})
             if not needs_link and not needs_result and not needs_delivery:
                 return state
             path = self.state / f'{task_id}.json'
             saved = json.loads(path.read_text())
             request = saved['request']
             # Re-read authority and task, including stop messages since admission.
-            task, current = self.contract(task_id, request['instruction_message_id'])
+            task, current = self.contract(task_id, request['instruction_message_id'], _reconcile=True)
             if current != request or actor(task) not in {self.config['agent_user_id'], self.config['reviewer_id']}:
                 raise ValueError('Task changed or ownership moved; retain result without overwriting a human handoff')
             if needs_link:

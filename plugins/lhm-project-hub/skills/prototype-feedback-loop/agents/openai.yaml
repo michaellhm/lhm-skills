@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prototype Feedback Loop"
+  short_description: "Queue client feedback and route revisions to Ted"
+  default_prompt: "Check eligible Prototype Feedback projects, capture new email feedback and images, deduplicate batches and route authorised revisions through Ted."

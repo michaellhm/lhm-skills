@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Root-owned, repository-scoped LHM static prototype publisher."""
-import argparse, fcntl, hashlib, json, os, re, shutil, subprocess, time, urllib.request
+import argparse, fcntl, hashlib, json, os, re, shutil, stat, subprocess, time, urllib.request
 from pathlib import Path, PurePosixPath
 
 REPOSITORY = 'michaellhm/lhm-prototype'
@@ -13,6 +13,9 @@ CHECKOUT = Path('/srv/lhm-prototype-publisher/lhm-prototype')
 SOURCE_ROOT = Path('/var/lib/lhm-prototype-publication/incoming')
 STATE_ROOT = Path('/var/lib/lhm-prototype-publication/receipts')
 WORKFLOW = {'name':'Deploy to lhmstaging','id':289562388,'path':'.github/workflows/deploy.yml'}
+DEPLOYMENT_HELPER = Path('/usr/local/libexec/lhm-task-router/github_deployment.py')
+DEPLOYMENT_PYTHON = Path('/opt/lhm-workspace-mcp/bin/python')
+RUNUSER = '/usr/sbin/runuser'
 PROFILE_ID = 'prototype-main-v1'
 CREDENTIAL_REFERENCE = 'LHM_PROTOTYPE_MAIN_DEPLOY_KEY'
 STANDING_AUTHORITY = 'MICHAEL-PROTOTYPE-PUBLISH-STANDING-20260820'
@@ -27,11 +30,15 @@ MAX_FILE = 10_000_000
 MAX_HTTP = 2_000_000
 FIELDS = {'schema_version','request_id','source_basicops_task','governed_parent','destination_profile_id','operation','credential_reference','client_slug','project_slug','prototype_kind','repository','branch','expected_base_commit','source_directory','source_package_sha256','source_drive_file_id','source_drive_file_sha256','source_drive_file_bytes','file_manifest','qa_evidence_reference','idempotency_key','standing_authority_reference','commit_message'}
 
-def run(args, *, env=None):
-    return subprocess.run(args, check=True, capture_output=True, text=True, env=env).stdout.strip()
+def run(args, *, env=None, raw=False):
+    output = subprocess.run(args, check=True, capture_output=True, text=True, env=env).stdout
+    return output if raw else output.strip()
 
 def git(*args, env=None):
-    return run(['git','-c',f'safe.directory={CHECKOUT}','-C',str(CHECKOUT),*args], env=env)
+    # Porcelain status begins with two meaningful status columns (e.g. ' M').
+    # Preserve the complete NUL-delimited machine output before slicing paths.
+    raw = '--porcelain=v1' in args and '-z' in args
+    return run(['git','-c',f'safe.directory={CHECKOUT}','-C',str(CHECKOUT),*args], env=env, raw=raw)
 
 def digest_file(path):
     h=hashlib.sha256()
@@ -122,17 +129,92 @@ def prior_receipt(r):
     if value.get('request_digest') != request_digest(r): raise ValueError('idempotency key was already used for a different request')
     return value['result']
 
-def store_receipt(r,result):
+def store_receipt(r,result,legacy_backup=None):
     STATE_ROOT.mkdir(parents=True,exist_ok=True,mode=0o700)
     payload={'request_digest':request_digest(r),'result':result}
+    if legacy_backup is not None: payload['legacy_workflow_receipt_backup']=str(legacy_backup)
     temporary=receipt_path(r['idempotency_key']).with_suffix(f'.{os.getpid()}.tmp')
     flags=os.O_WRONLY|os.O_CREAT|os.O_EXCL
     fd=os.open(temporary,flags,0o600)
     with os.fdopen(fd,'w') as stream: json.dump(payload,stream,sort_keys=True); stream.write('\n')
     os.replace(temporary,receipt_path(r['idempotency_key']))
 
+def preflight_deployment_reader():
+    try:
+        info = DEPLOYMENT_HELPER.lstat()
+    except FileNotFoundError:
+        raise ValueError('exact deployment reader is not installed')
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_mode & 0o022 or info.st_nlink != 1:
+        raise ValueError('exact deployment reader must be protected root-owned source')
+    if not DEPLOYMENT_PYTHON.is_file() or not os.access(DEPLOYMENT_PYTHON, os.X_OK) or not os.path.isfile(RUNUSER):
+        raise ValueError('existing authenticated deployment runtime is unavailable')
+
+
+def validate_deployment_action(action, commit):
+    if (not isinstance(action, dict) or type(action.get('id')) is not int or action['id'] <= 0
+            or action.get('workflow_id') != WORKFLOW['id'] or action.get('name') != WORKFLOW['name']
+            or action.get('path') != WORKFLOW['path'] or action.get('head_sha') != commit
+            or action.get('head_branch') != BRANCH or action.get('status') != 'completed'
+            or action.get('conclusion') != 'success'
+            or action.get('html_url') != f'https://github.com/{REPOSITORY}/actions/runs/{action["id"]}'):
+        raise ValueError('exact successful deployment workflow has not been verified')
+    return action
+
+
+def verify_deployment(commit):
+    if not isinstance(commit, str) or not SHA.fullmatch(commit):
+        raise ValueError('exact deployment commit required')
+    preflight_deployment_reader()
+    result = subprocess.run([RUNUSER, '-u', 'codexworker', '--', str(DEPLOYMENT_PYTHON),
+                             str(DEPLOYMENT_HELPER), '--commit', commit],
+                            capture_output=True, text=True, timeout=400, check=False)
+    if result.returncode:
+        raise ValueError('existing GitHub MCP did not verify the exact deployment workflow')
+    if len(result.stdout) > 32768:
+        raise ValueError('deployment reader returned oversized evidence')
+    return validate_deployment_action(json.loads(result.stdout), commit)
+
+
+def refresh_legacy_workflow_receipt(r, previous):
+    commit = previous.get('commit')
+    action = verify_deployment(commit)
+    path = receipt_path(r['idempotency_key'])
+    original = path.read_bytes()
+    backup = path.with_name(path.stem + '.legacy-workflow-v1.json')
+    if backup.exists():
+        if backup.is_symlink() or backup.read_bytes() != original:
+            raise ValueError('legacy deployment receipt backup conflicts')
+    else:
+        fd = os.open(backup, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+        with os.fdopen(fd, 'wb') as stream:
+            stream.write(original)
+    updated = dict(previous)
+    updated['workflow'] = workflow_evidence(action)
+    store_receipt(r, updated, legacy_backup=backup)
+    return updated
+
+
+def workflow_evidence(action):
+    return {**WORKFLOW, 'run_id': action['id'], 'head_sha': action['head_sha'],
+            'head_branch': action['head_branch'], 'status': action['status'],
+            'conclusion': action['conclusion'], 'html_url': action.get('html_url')}
+
+
+def preflight_deployment_access():
+    preflight_deployment_reader()
+    result = subprocess.run([RUNUSER, '-u', 'codexworker', '--', str(DEPLOYMENT_PYTHON),
+                             str(DEPLOYMENT_HELPER), '--preflight'],
+                            capture_output=True, text=True, timeout=90, check=False)
+    if result.returncode or len(result.stdout) > 32768:
+        raise ValueError('existing GitHub deployment read route is unavailable before publication')
+    expected = {'status':'ready','repository':REPOSITORY,'workflow_id':WORKFLOW['id']}
+    if json.loads(result.stdout) != expected:
+        raise ValueError('GitHub deployment preflight does not match the registered route')
+
+
 def preflight_post_publish_dependencies():
     if not shutil.which('git') or not shutil.which('ssh'): raise ValueError('required repository transport dependency is unavailable')
+    preflight_deployment_access()
     STATE_ROOT.mkdir(parents=True,exist_ok=True,mode=0o700)
     probe=STATE_ROOT/f'.preflight-{os.getpid()}'
     fd=os.open(probe,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600); os.close(fd); probe.unlink()
@@ -156,9 +238,25 @@ def wait_for_public_deploy(r,commit):
             time.sleep(10)
     raise ValueError('exact public prototype content was not observed after deployment')
 
+def approved_changes(paths,observed,index,anchor_unchanged):
+    """Only the unchanged homepage index may accompany a changed-file package."""
+    expected=[value for value in paths if value!=index] if anchor_unchanged else paths
+    if not observed or observed!=expected:
+        raise ValueError('checkout changes do not match the approved manifest')
+    return observed
+
 def _publish_locked(r):
     paths=validate(r); previous=prior_receipt(r)
-    if previous: return previous
+    if previous:
+        workflow = previous.get('workflow', {})
+        if (type(workflow.get('run_id')) is not int or workflow['run_id'] <= 0
+                or workflow.get('id') != WORKFLOW['id'] or workflow.get('name') != WORKFLOW['name']
+                or workflow.get('path') != WORKFLOW['path'] or workflow.get('head_branch') != BRANCH
+                or workflow.get('head_sha') != previous.get('commit')
+                or workflow.get('status') != 'completed' or workflow.get('conclusion') != 'success'
+                or workflow.get('html_url') != f'https://github.com/{REPOSITORY}/actions/runs/{workflow.get("run_id")}'):
+            return refresh_legacy_workflow_receipt(r, previous)
+        return previous
     env=ssh_env(); preflight_post_publish_dependencies(); git('fetch','--no-tags',REMOTE,BRANCH,env=env)
     fetched=git('rev-parse','FETCH_HEAD')
     pending=pending_path(r['idempotency_key'])
@@ -167,20 +265,26 @@ def _publish_locked(r):
         if journal.get('request_digest')!=request_digest(r) or not SHA.fullmatch(journal.get('commit','')): raise ValueError('invalid pending release receipt')
         commit=journal['commit']
         if fetched!=commit: raise ValueError('remote no longer equals the interrupted exact release commit')
-        public=wait_for_public_deploy(r,commit); action={'id':0}
-        result=release_result(r,paths,commit,action,public)
+        public=wait_for_public_deploy(r,commit); action=verify_deployment(commit)
+        actual=journal.get('changed_files',paths)
+        if not isinstance(actual,list) or actual!=sorted(set(actual)): raise ValueError('invalid pending changed files')
+        approved_changes(paths,actual,prototype_prefix(r)+'index.html',prototype_prefix(r)+'index.html' not in actual)
+        result=release_result(r,actual,commit,action,public)
         store_receipt(r,result); pending.unlink(); return result
     if fetched!=r['expected_base_commit']: raise ValueError('main moved since evidence-bound approval; redispatch with a fresh base')
     git('reset','--hard',r['expected_base_commit']); git('clean','-ffd')
     source=Path(r['source_directory'])
+    anchor=prototype_prefix(r)+'index.html'
+    base_index=CHECKOUT/anchor
+    anchor_unchanged=base_index.is_file() and digest_file(base_index)==digest_file(source/anchor)
     for value in paths:
         destination=CHECKOUT.joinpath(*PurePosixPath(value).parts); destination.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(source/value,destination)
     changed=git('status','--porcelain=v1','-z','--untracked-files=all').split('\0')
     observed=sorted(line[3:] for line in changed if line)
-    if observed!=paths: raise ValueError('checkout changes do not match the approved manifest')
-    git('add','--',*paths); git('-c','user.name=LHM Prototype Publisher','-c','user.email=prototype-publisher@localhealthmarketing.com.au','commit','-m',r['commit_message'])
+    approved_changes(paths,observed,anchor,anchor_unchanged)
+    git('add','--',*observed); git('-c','user.name=LHM Prototype Publisher','-c','user.email=prototype-publisher@localhealthmarketing.com.au','commit','-m',r['commit_message'])
     commit=git('rev-parse','HEAD')
-    atomic_pending={'request_digest':request_digest(r),'commit':commit,'base_commit':r['expected_base_commit']}
+    atomic_pending={'request_digest':request_digest(r),'commit':commit,'base_commit':r['expected_base_commit'],'changed_files':observed}
     temporary=pending.with_suffix(f'.{os.getpid()}.tmp')
     fd=os.open(temporary,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
     with os.fdopen(fd,'w') as stream: json.dump(atomic_pending,stream,sort_keys=True); stream.write('\n')
@@ -189,26 +293,33 @@ def _publish_locked(r):
     git('push',f'--force-with-lease=refs/heads/{BRANCH}:{r["expected_base_commit"]}',REMOTE,f'{commit}:refs/heads/{BRANCH}',env=env)
     remote=run(['git','ls-remote',REMOTE,f'refs/heads/{BRANCH}'],env=env).split()
     if len(remote)!=2 or remote[0]!=commit: raise ValueError('exact remote main SHA verification failed')
-    public=wait_for_public_deploy(r,commit); action={'id':0}
-    result=release_result(r,paths,commit,action,public)
+    public=wait_for_public_deploy(r,commit); action=verify_deployment(commit)
+    result=release_result(r,observed,commit,action,public)
     store_receipt(r,result); pending.unlink(); return result
 
 def release_result(r,paths,commit,action,public):
     evidence={'client_slug':r['client_slug'],'project_slug':r['project_slug'],'release_receipt_id':r['idempotency_key'],'repository':REPOSITORY,'commit':commit,'public_url':public['url'],'verification_sha256':public['sha256'],'mutation_performed':False}
     qa={'recipient':'independent_qa','receipt_id':r['idempotency_key'],'status':'awaiting_independent_receipt_review'}
     handoff={'contract_version':1,'skill':'lhm-project-hub:basicops-task-manager','source_task':r['source_basicops_task'],'state':'Under Review','complete':False,'human_task_open':True,'native_review_required':True,'reviewer':'Michael','client_contact':False,'mutation_performed':False}
-    return {'schema_version':3,'status':'published_and_verified','request_id':r['request_id'],'destination_profile_id':PROFILE_ID,'operation':r['operation'],'repository':REPOSITORY,'branch':BRANCH,'base_commit':r['expected_base_commit'],'commit':commit,'source_package_sha256':r['source_package_sha256'],'workflow':{**WORKFLOW,'run_id':action['id'],'conclusion':'success'},'public_verifications':[public],'changed_files':paths,'source_basicops_task':r['source_basicops_task'],'governed_parent':r['governed_parent'],'qa_evidence_reference':r['qa_evidence_reference'],'idempotency_key':r['idempotency_key'],'standing_authority_reference':r['standing_authority_reference'],'independent_qa_handoff':qa,'canonical_client_state_evidence':evidence,'review_handoff':handoff}
+    return {'schema_version':3,'status':'published_and_verified','request_id':r['request_id'],'destination_profile_id':PROFILE_ID,'operation':r['operation'],'repository':REPOSITORY,'branch':BRANCH,'base_commit':r['expected_base_commit'],'commit':commit,'source_package_sha256':r['source_package_sha256'],'workflow':workflow_evidence(validate_deployment_action(action,commit)),'public_verifications':[public],'changed_files':paths,'source_basicops_task':r['source_basicops_task'],'governed_parent':r['governed_parent'],'qa_evidence_reference':r['qa_evidence_reference'],'idempotency_key':r['idempotency_key'],'standing_authority_reference':r['standing_authority_reference'],'independent_qa_handoff':qa,'canonical_client_state_evidence':evidence,'review_handoff':handoff}
 
 def publish(r):
     # Serialize the complete check/write/receipt transaction for this idempotency key.
     if not isinstance(r,dict) or not isinstance(r.get('idempotency_key'),str) or not SAFE_ID.fullmatch(r['idempotency_key']):
         raise ValueError('invalid idempotency_key')
     STATE_ROOT.mkdir(parents=True,exist_ok=True,mode=0o700)
-    lock_path=STATE_ROOT/f"{r['idempotency_key']}.lock"
-    fd=os.open(lock_path,os.O_RDWR|os.O_CREAT,0o600)
-    with os.fdopen(fd,'r+') as lock:
-        fcntl.flock(lock,fcntl.LOCK_EX)
-        return _publish_locked(r)
+    # All requests share one checkout. Hold its lock across the complete
+    # fetch/check/write/push/receipt transaction, then take the per-key lock.
+    # Every caller uses this order, including pending and legacy verification.
+    flags=os.O_RDWR|os.O_CREAT|os.O_NOFOLLOW
+    repository_fd=os.open(STATE_ROOT/'repository.lock',flags,0o600)
+    with os.fdopen(repository_fd,'r+') as repository_lock:
+        fcntl.flock(repository_lock,fcntl.LOCK_EX)
+        lock_path=STATE_ROOT/f"{r['idempotency_key']}.lock"
+        fd=os.open(lock_path,flags,0o600)
+        with os.fdopen(fd,'r+') as lock:
+            fcntl.flock(lock,fcntl.LOCK_EX)
+            return _publish_locked(r)
 
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--request',required=True); args=parser.parse_args(); path=Path(args.request)

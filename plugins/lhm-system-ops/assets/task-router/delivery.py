@@ -18,6 +18,7 @@ ROOT = Path('/var/lib/lhm-drive-delivery')
 CONFIG = Path('/etc/lhm-task-router/drive-delivery.json')
 CAPS = Path('/home/hermes/.hermes/profiles/lhm_brain/vault-task-router/_System/Hermes/clients')
 ID = re.compile(r'ted-route-[1-9][0-9]*-dm[1-9][0-9]*')
+FEEDBACK_REGISTRY = Path('/opt/lhm-plugin-releases/prototype-feedback-authority/authority.json')
 
 
 def read(path, limit=25000000):
@@ -50,9 +51,70 @@ def save(path, value, mode=0o600):
     temp.chmod(mode);temp.replace(path)
 
 
+def feedback_delivery_authority(request):
+    """Prove the scoped ceiling against the host's protected immutable registry.
+
+    Request JSON and worker output cannot grant Drive authority. This permits
+    only the existing internal file-create/readback route; it grants no publish,
+    client-send, overwrite or credential capability.
+    """
+    if request.get('permission_ceiling') != 'registered_prototype_revision':
+        return False
+    directory = os.open(FEEDBACK_REGISTRY.parent.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        info = os.fstat(directory)
+        if info.st_uid != 0 or info.st_mode & 0o022:
+            raise ValueError('Feedback authority anchor is not root protected')
+        child = os.open(FEEDBACK_REGISTRY.parent.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
+        os.close(directory);directory = child
+        info = os.fstat(directory)
+        if info.st_uid != 0 or info.st_mode & 0o022:
+            raise ValueError('Feedback authority directory is not root protected')
+        fd = os.open(FEEDBACK_REGISTRY.name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory)
+        with os.fdopen(fd, 'rb') as stream:
+            info = os.fstat(stream.fileno())
+            if info.st_uid != 0 or not stat.S_ISREG(info.st_mode) or info.st_mode & 0o022 or info.st_nlink != 1 or info.st_size > 262144:
+                raise ValueError('Feedback authority registry is not a protected regular source')
+            registry = json.loads(stream.read(262145))
+    finally:
+        os.close(directory)
+    if not isinstance(registry, dict) or set(registry) != {'schema_version', 'grants'} or registry['schema_version'] != 1 or not isinstance(registry['grants'], dict):
+        raise ValueError('Malformed feedback delivery authority registry')
+    task_id = request.get('task_id')
+    if type(task_id) is not int or task_id <= 0:
+        raise ValueError('Exact feedback task identity required')
+    grant = registry['grants'].get(str(task_id))
+    fields = {'authority_id', 'task_id', 'instruction_message_id', 'instruction_sha256',
+              'cockpit_id', 'stage_id', 'client_id', 'batch_id', 'author_id', 'reviewer_id',
+              'repository', 'subtree', 'enabled'}
+    if not isinstance(grant, dict) or set(grant) != fields:
+        raise ValueError('Exact root feedback delivery grant required')
+    if (grant['authority_id'] != 'MICHAEL-PROTOTYPE-FEEDBACK-20261107'
+            or grant['enabled'] is not True or grant['task_id'] != task_id
+            or grant['author_id'] != 82491 or grant['reviewer_id'] != 36398 or grant['stage_id'] != 110340
+            or type(grant['cockpit_id']) is not int or grant['cockpit_id'] <= 0 or grant['cockpit_id'] == task_id
+            or grant['repository'] != 'michaellhm/lhm-prototype' or grant['subtree'] != 'luminary-counselling/'
+            or not isinstance(grant['batch_id'], str) or not re.fullmatch(r'prototype-[a-f0-9]{32}', grant['batch_id'])
+            or not isinstance(grant['client_id'], str) or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*', grant['client_id'])
+            or not isinstance(grant['instruction_sha256'], str) or not re.fullmatch(r'[a-f0-9]{64}', grant['instruction_sha256'])
+            or not isinstance(grant['instruction_message_id'], str) or not re.fullmatch(r'dm[1-9][0-9]*', grant['instruction_message_id'])):
+        raise ValueError('Feedback delivery grant exceeds registered prototype scope')
+    binding = {'authority_id': grant['authority_id'],
+               'grant_sha256': digest(json.dumps(grant, sort_keys=True, separators=(',', ':')).encode()),
+               'batch_id': grant['batch_id'], 'client_id': grant['client_id'],
+               'repository': grant['repository'], 'subtree': grant['subtree']}
+    if (request.get('feedback_authority') != binding or request.get('client_id') != grant['client_id']
+            or request.get('reviewer_id') != grant['reviewer_id'] or request.get('provider') != 'codex'
+            or request.get('instruction_message_id') != grant['instruction_message_id']
+            or request.get('instruction_sha256') != grant['instruction_sha256']
+            or request.get('request_id') != f"ted-route-{task_id}-{grant['instruction_message_id']}"):
+        raise ValueError('Feedback delivery request differs from root-bound authority')
+    return True
+
+
 def manifest(request, run, queue_run):
     ident = request['request_id']
-    if not ID.fullmatch(ident) or request['permission_ceiling'] != 'prepare_for_review':
+    if not ID.fullmatch(ident) or (request['permission_ceiling'] != 'prepare_for_review' and not feedback_delivery_authority(request)):
         raise ValueError('Unsupported delivery contract')
     result = json.loads(read(run / 'receipt.json'))
     if result.get('status') != 'needs_review' or result.get('request_id') != ident or result.get('provider') != request['provider']:
