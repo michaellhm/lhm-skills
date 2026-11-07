@@ -236,6 +236,34 @@ class SearchTests(unittest.TestCase):
             Worker(runner=lambda *args, **kwargs: seen.append(args)).query('send_gmail_message', {})
         self.assertEqual(seen, [])
 
+    def test_gmail_reads_start_as_worker_with_child_restrictions_and_unique_units(self):
+        import types
+        seen=[]
+        def run(command,**kwargs):
+            seen.append((command,kwargs))
+            return types.SimpleNamespace(returncode=0,stdout=json.dumps({'result':'mapped context'}))
+        worker=Worker(runner=run)
+        self.assertEqual(worker.query('get_gmail_thread_content',{'thread_id':'abc'}),'mapped context')
+        worker.raw('abc','account@example.com',Path('/fixed/private/work'))
+        units=[]
+        for command,kwargs in seen:
+            self.assertEqual(command[0],'/usr/bin/systemd-run')
+            self.assertIn('--property=User=codexworker',command)
+            self.assertIn('--property=Group=codexworker',command)
+            self.assertIn('--property=NoNewPrivileges=true',command)
+            self.assertIn('--property=ProtectSystem=full',command)
+            self.assertNotIn('/usr/sbin/runuser',command)
+            units.append(next(value for value in command if value.startswith('--unit=')))
+            self.assertEqual(kwargs['timeout'],180)
+        self.assertNotEqual(*units)
+        self.assertEqual(seen[0][0][-5:],['worker-query','--tool','get_gmail_thread_content','--arguments','{"thread_id": "abc"}'])
+
+    def test_failed_account_read_holds_without_exposing_connector_output(self):
+        import types
+        worker=Worker(runner=lambda *args,**kwargs:types.SimpleNamespace(returncode=1,stdout='private connector output'))
+        with self.assertRaisesRegex(RuntimeError,'^private Gmail read failed or response exceeded bound$'):
+            worker.query('get_gmail_thread_content',{})
+
 
 
 class ReceivingAuthenticationTests(unittest.TestCase):

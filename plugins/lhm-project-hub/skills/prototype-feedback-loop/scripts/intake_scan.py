@@ -345,10 +345,20 @@ class Worker:
         self.runner = runner
         self.script = str(Path(script or __file__).resolve())
 
+    def command(self, *arguments):
+        # PID1 changes identity before applying child restrictions. A nested
+        # runuser cannot switch UID inside the hardened root coordinator.
+        return ['/usr/bin/systemd-run','--quiet','--wait','--pipe','--collect',
+            '--unit=lhm-feedback-gmail-'+uuid.uuid4().hex,
+            '--property=User='+WORKER,'--property=Group='+WORKER,
+            '--property=NoNewPrivileges=true','--property=PrivateTmp=true',
+            '--property=PrivateDevices=true','--property=ProtectSystem=full',
+            '--property=UMask=0077','--property=RuntimeMaxSec=170',
+            '--setenv=HOME=/home/codexworker',PYTHON,self.script,*arguments]
+
     def query(self, tool, arguments, *, work=None):
         WorkspaceGmail.validate_tool(tool)
-        command = ['/usr/sbin/runuser', '-u', WORKER, '--', PYTHON, self.script,
-                   'worker-query', '--tool', tool, '--arguments', json.dumps(arguments)]
+        command = self.command('worker-query', '--tool', tool, '--arguments', json.dumps(arguments))
         result = self.runner(command, capture_output=True, text=True, timeout=180, check=False)
         if result.returncode or len(result.stdout.encode()) > 8 * 1024 * 1024:
             raise RuntimeError('private Gmail read failed or response exceeded bound')
@@ -356,8 +366,7 @@ class Worker:
         return value['result']
 
     def raw(self, message_id, account, work):
-        command = ['/usr/sbin/runuser', '-u', WORKER, '--', PYTHON, self.script,
-            'worker-read', '--message-id', message_id, '--account', account, '--work', str(work)]
+        command = self.command('worker-read', '--message-id', message_id, '--account', account, '--work', str(work))
         result = self.runner(command, capture_output=True, text=True, timeout=180, check=False)
         if result.returncode or len(result.stdout.encode()) > MAX_JSON:
             raise RuntimeError('full private Gmail materialisation failed')
