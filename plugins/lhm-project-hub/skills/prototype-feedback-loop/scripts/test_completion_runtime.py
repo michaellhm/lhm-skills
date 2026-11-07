@@ -174,6 +174,35 @@ class CompletionTests(unittest.TestCase):
 
 
 class HandbackTests(unittest.TestCase):
+    def test_link_decoration_reconciles_after_metadata_write_without_reassignment(self):
+        import re
+        with tempfile.TemporaryDirectory() as temp, mock.patch.object(runtime,'atomic',atomic), \
+             mock.patch.object(runtime,'root_json',lambda path:json.loads(path.read_text())):
+            tx,batch,reg,delivery,pub,backend,queue=self.fixture(Path(temp))
+            original=backend.basicops;crashed=[]
+            def decorate(value):return re.sub(r'(<a href="[^"]+")>',r'\1 class="linkStyle external-link" target="_blank">',value)
+            def native(action,args):
+                value=original(action,args)
+                if action=='bulk_create_or_update_task':
+                    backend.task['description']=decorate(backend.task['description'])
+                    if not crashed:crashed.append(True);raise TimeoutError('after metadata persisted')
+                if action=='request_review':backend.messages[-1]['message']=decorate(backend.messages[-1]['message'])
+                return value
+            backend.basicops=native
+            with self.assertRaises(TimeoutError):tx.handback(Path(temp),batch,{},reg,delivery,pub)
+            receipt=tx.handback(Path(temp),batch,{},reg,delivery,pub)
+            self.assertEqual(receipt['status'],'Under Review')
+            self.assertEqual(receipt['discussion_sha256'],runtime.sha(backend.messages[-1]['message'].encode()))
+            self.assertEqual(tx.handback(Path(temp),batch,{},reg,delivery,pub),receipt)
+            self.assertEqual(backend.writes,['bulk_create_or_update_task','request_review'])
+
+    def test_link_normalization_preserves_destinations_and_content(self):
+        plain='<p><a href="https://example.com/a">Review</a></p>'
+        decorated='<p><a href="https://example.com/a" class="linkStyle external-link" target="_blank">Review</a></p>'
+        self.assertEqual(runtime.basicops_html(plain),runtime.basicops_html(decorated))
+        for changed in (decorated.replace('/a"','/b"'),decorated.replace('Review','Changed'),decorated.replace('_blank','_self'),decorated.replace('external-link','other-class')):
+            self.assertNotEqual(runtime.basicops_html(plain),runtime.basicops_html(changed))
+
     def fixture(self, root, crash_review=False, crash_ready=False):
         class Backend:
             def __init__(self):

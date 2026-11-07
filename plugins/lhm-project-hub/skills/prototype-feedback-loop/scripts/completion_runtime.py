@@ -69,6 +69,21 @@ def safe_output(data):
         raise ValueError('credential-like material cannot enter the registered delivery package')
 
 
+def basicops_html(value):
+    """Compare content/destinations, allowing only BasicOps' known link decoration."""
+    from html.parser import HTMLParser
+    class Tokens(HTMLParser):
+        def __init__(self):super().__init__(convert_charrefs=True);self.tokens=[]
+        def handle_starttag(self,tag,attrs):
+            attrs=[(key,value) for key,value in attrs if not (tag=='a' and
+                (key=='class' and value=='linkStyle external-link' or key=='target' and value=='_blank'))]
+            self.tokens.append(('start',tag,sorted(attrs)))
+        def handle_endtag(self,tag):self.tokens.append(('end',tag))
+        def handle_data(self,data):self.tokens.append(('data',data))
+        def handle_comment(self,data):self.tokens.append(('comment',data))
+    parser=Tokens();parser.feed(value);parser.close();return parser.tokens
+
+
 def worker_bytes(path, maximum=10000000):
     """Read each component without following worker-controlled links."""
     from delivery import read
@@ -316,7 +331,11 @@ class Transaction:
     def phase(self, stage, operation, payload):
         path = stage / (operation + '-intent.json')
         if path.exists():
-            if root_json(path) != payload:
+            saved=root_json(path)
+            if operation=='handback-metadata' and isinstance(saved,dict) and isinstance(payload,dict):
+                saved={**saved,'description':basicops_html(saved['description'])}
+                payload={**payload,'description':basicops_html(payload['description'])}
+            if saved != payload:
                 raise ValueError('completion intent changed; preserve prior remote effects')
         else: atomic(path, canonical(payload))
 
@@ -529,6 +548,7 @@ class Transaction:
     def handback(self, stage, batch, frozen, reg, delivery, publication):
         import html
         from adapters import pages
+        from host_runtime import actor
         backend = self.coordinator.backend
         task_id = int(batch['task_id'])
         commit = publication['release']['commit']
@@ -550,7 +570,7 @@ class Transaction:
                     and any((row.get('id') if isinstance(row, dict) else row) == reg['reviewer_id'] for row in reviewers)
                     and all(url in task.get('description','') for url in (commit_url,preview,delivery['folder_url']))
                     and len(re.findall(r'<p>LHM metadata:.*?workflow_state=ready-for-review.*?approval_status=pending-human.*?</p>',task.get('description',''),flags=re.DOTALL))==1
-                    and any(row.get('message') == message and actor(row)==82491 for row in messages()))
+                    and any(basicops_html(row.get('message','')) == basicops_html(message) and actor(row)==82491 for row in messages()))
         final_path = stage / 'handback.json'
         if final_path.exists():
             if not reviewed(): raise ValueError('completed native review handback changed')
@@ -572,11 +592,11 @@ class Transaction:
             self.phase(stage, 'handback-metadata', {'task_id': task_id, 'description': description, 'assignee': reg['reviewer_id']})
             # A prior uncertain metadata operation is reconciled via exact current state.
             from host_runtime import actor
-            if actor(task) != reg['reviewer_id'] or task.get('description') != description:
+            if actor(task) != reg['reviewer_id'] or basicops_html(task.get('description','')) != basicops_html(description):
                 backend.basicops('bulk_create_or_update_task', {'items': [{'taskId': task_id,
                     'assignee': reg['reviewer_id'], 'description': description}]})
             current = backend.basicops('get_task', {'taskId': task_id})
-            if actor(current) != reg['reviewer_id'] or current.get('description') != description:
+            if actor(current) != reg['reviewer_id'] or basicops_html(current.get('description','')) != basicops_html(description):
                 raise ValueError('native assignee/metadata readback failed before review')
             self.phase(stage, 'request-review', {'task_id': task_id, 'reviewers': [reg['reviewer_id']], 'message': message})
             # Never replay an uncertain review write: discussion/status readback must prove it.
@@ -587,7 +607,8 @@ class Transaction:
             if not reviewed(): raise ValueError('native review outcome uncertain; preserve request and reconcile, do not replay')
         receipt = {'task_id': task_id, 'run_id': batch['run_id'], 'status': 'Under Review',
                    'reviewer_id': reg['reviewer_id'], 'commit': commit, 'preview_url': preview,
-                   'receipt_id': marker, 'discussion_sha256': sha(message.encode())}
+                   'receipt_id': marker, 'discussion_sha256': sha(next(row['message'] for row in messages()
+                       if basicops_html(row.get('message',''))==basicops_html(message) and actor(row)==82491).encode())}
         atomic(final_path, canonical(receipt))
         return receipt
 
