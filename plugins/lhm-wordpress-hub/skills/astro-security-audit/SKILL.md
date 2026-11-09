@@ -1,13 +1,13 @@
 ---
 name: astro-security-audit
-description: "Evidence-based security review of an Astro site's source, production build and deployed preview before go-live, with API/Klaviyo checks and a launch readiness report. Use when the user says 'Astro security check', 'pre-launch security audit', 'harden our Astro site', 'check script injection or redirects', or 'check Klaviyo API security'. Also run as the Astro security specialist within site-launch-qa."
+description: "Evidence-based security review of an Astro site's source, production build and deployed preview before go-live, with provider-neutral API and integration checks and a launch readiness report. Use when the user says 'Astro security check', 'pre-launch security audit', 'harden our Astro site', 'check script injection or redirects', or 'check API integration security'. Also run as the Astro security specialist within site-launch-qa."
 ---
 
 # Astro Security Audit
 
 Review the release candidate before launch; retest relevant controls after fixes and domain cutover. This is a practical application-security review, not a penetration-test certification or a guarantee that a site cannot be compromised.
 
-For client work, read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Save deliverables under verified `work_root/astro-security-audit/YYYY-MM/`; link the report from the combined site-launch-qa report and canonical project note. Do not audit the old Binsmart website merely because it motivated this skill.
+For client work, read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Save deliverables under verified `work_root/astro-security-audit/YYYY-MM/`; link the report from the combined site-launch-qa report and canonical project note. Audit only the website specified for the current project.
 
 ## Establish scope and evidence
 
@@ -40,7 +40,7 @@ Useful initial searches (from the verified site root; exclude vendor/build trees
 rg -n --glob '!node_modules/**' --glob '!dist/**' --glob '!.git/**' \
   'set:html|innerHTML|outerHTML|insertAdjacentHTML|document.write|eval\(|new Function|postMessage|location\.(href|assign|replace)|Astro.redirect|Response.redirect' src public functions
 rg -l --hidden --glob '!node_modules/**' --glob '!.git/**' \
-  'pk_[A-Za-z0-9]{20,}|PRIVATE.KEY|API.SECRET|PUBLIC_.*(SECRET|PRIVATE)' src public dist functions
+  'PRIVATE.KEY|API.SECRET|ACCESS.TOKEN|PUBLIC_.*(SECRET|PRIVATE|TOKEN)' src public dist functions
 ```
 
 Only include directories that exist; adapt redirect searches for framework islands and other functions. The second search returns filenames, not secrets; it is a heuristic, not a complete secret scanner. Use an available maintained secret scanner with redaction for broader coverage. Do not attach raw `.env` files or entire responses containing personal information.

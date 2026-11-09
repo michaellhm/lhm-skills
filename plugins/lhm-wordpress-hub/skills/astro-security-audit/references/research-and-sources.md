@@ -1,6 +1,6 @@
 # Research basis and maintenance
 
-Researched 2026-11-09. This is an LHM pre-launch review baseline combining official Astro behaviour, browser policy documentation, OWASP application-security guidance and integration-provider documentation. It is not an assertion that any existing client site passed these checks.
+Researched 2026-11-09. This is an LHM pre-launch review baseline combining official Astro behaviour, browser policy documentation, OWASP application-security guidance and integration-provider documentation used as examples. It is not an assertion that any existing client site passed these checks.
 
 Read the installed version and current primary documentation during each audit. Documentation may describe newer Astro features than the project supports. Adapt controls to static hosting, SSR, adapter and separate functions rather than copying configuration across them.
 
@@ -20,9 +20,11 @@ Read the installed version and current primary documentation during each audit. 
 | [OWASP REST security](https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html) | Review API permissions, input limits, errors and abuse boundaries. |
 | [OWASP CSRF prevention](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html) | Match cross-site protections to authentication and browser request behaviour. |
 | [OWASP SSRF prevention](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html) | Review server-side URL fetching without probing real internal services. |
-| [Klaviyo API key management](https://help.klaviyo.com/hc/en-us/articles/115005062267) | Public site IDs and private scoped credentials have different security roles; check current account/key guidance. |
-| [Klaviyo credential guide (versioned)](https://developers.klaviyo.com/en/v2024-02-15/docs/retrieve_api_credentials) | Historical primary reference for public/private key distinction; use current provider docs for endpoint revisions and key-management operations. Do not copy this old API revision into an integration. |
 | [Cloudflare Pages headers](https://developers.cloudflare.com/pages/configuration/headers/) | Static `_headers` rules do not establish equivalent protection on Pages Functions. Use current provider documentation for whichever host is actually deployed. |
+
+## Optional provider example
+
+[Klaviyo API key management](https://help.klaviyo.com/hc/en-us/articles/115005062267) informed the distinction between public identifiers and scoped private credentials. It is an example only: no Klaviyo integration is required or assumed. For each actual provider, consult its current documentation for credential exposure rules, scopes, endpoint versions, webhook verification and test environments. Do not transfer one provider’s key prefixes or authentication conventions to another.
 
 ## Operational conclusions
 

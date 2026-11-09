@@ -19,7 +19,7 @@ Use this as the single completion-QA entry point: gather project requirements, r
 
 ## Astro security gate
 
-For Astro projects, run [Astro Security Audit](../astro-security-audit/SKILL.md) against the release candidate before declaring pre-launch QA complete. It reviews source, built assets, deployed headers and API boundaries, including Klaviyo where present. Link its `security-report.md` in the combined QA report; preserve BLOCKED/CONDITIONAL status and unverified checks. A homepage header check or passing visual review cannot substitute for this evidence. Preserve the existing project launch authority; this specialist audit creates no extra client approval gate.
+For Astro projects, run [Astro Security Audit](../astro-security-audit/SKILL.md) against the release candidate before declaring pre-launch QA complete. It reviews source, built assets, deployed headers and API boundaries, for the providers actually used. Link its `security-report.md` in the combined QA report; preserve BLOCKED/CONDITIONAL status and unverified checks. A homepage header check or passing visual review cannot substitute for this evidence. Preserve the existing project launch authority; this specialist audit creates no extra client approval gate.
 
 ## Before Starting
 
