@@ -17,6 +17,10 @@ Read and follow [Website completion QA](../../references/website-completion-qa.m
 
 Use this as the single completion-QA entry point: gather project requirements, run the automated checks below and `visual-qa` for browser/design evidence, guide Jaimee through the phone and client-request tests, then use `website-delivery-qa` to verify the combined handback. Keep a single report with linked specialist evidence. Do not automatically message Jaimee or assign a task merely because a report was prepared.
 
+## Astro security gate
+
+For Astro projects, run [Astro Security Audit](../astro-security-audit/SKILL.md) against the release candidate before declaring pre-launch QA complete. It reviews source, built assets, deployed headers and API boundaries, for the providers actually used. Link its `security-report.md` in the combined QA report; preserve BLOCKED/CONDITIONAL status and unverified checks. A homepage header check or passing visual review cannot substitute for this evidence. Preserve the existing project launch authority; this specialist audit creates no extra client approval gate.
+
 ## Before Starting
 
 1. Read `LEARNED.md` from this skill's directory

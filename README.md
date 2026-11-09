@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-204 skills across thirteen Claude Code plugins (5 inbox, 66 marketing, 42 WordPress, 19 GMB/local SEO, 9 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge, 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+205 skills across thirteen Claude Code plugins (5 inbox, 66 marketing, 43 WordPress, 19 GMB/local SEO, 9 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge, 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -92,7 +92,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     wordpress-builder.md                # Phase E — theme scaffold and page build
     qa-and-launch.md                    # Phase F — QA, performance, security and launch
     site-extension.md                   # Post-launch page management
-  skills/                               # All 42 skills
+  skills/                               # All 43 skills
     wp-start/                           # Entry point — /wp-start command
     wp-project-setup/                   # Initialize project folder structure (platform choice)
     wp-project-manager/                 # PM doc — create, read, mark complete, gate-check
@@ -114,6 +114,7 @@ plugins/lhm-wordpress-hub/             # WordPress build plugin
     visual-qa/                          # Browser design checks + Jaimee’s real-device review
     wp-performance/                     # Performance audit and optimization
     wp-security/                        # Security hardening checklist
+    astro-security-audit/               # Astro source/build/preview security gate, API and integration review
     site-launch-qa/                     # Coached completion QA: full-site SEO, sitemap/GSC, phone and tracking
     repo-init/                          # Create GitHub repos and scaffold docs/ for a new client
     repo-install/                       # Clone client repos onto a new machine
@@ -302,7 +303,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 ### WordPress Hub
 
-**Website Build Pipeline** (24 skills): Project setup (with WordPress/Astro platform choice), Phase 0 client data collection (Drive folder, BasicOps access checklist, data-gathering email, weekly automated follow-up), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, registered WordPress REST operation, blog publishing, visual QA, performance optimization, security hardening, the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), Decap CMS setup for Astro on Cloudflare Pages (Git-backed editing, drafts, scheduled publishing, deploy previews), the combined site-launch-qa workflow (automated checks, Jaimee’s manual phone review, source-linked client requirements, adaptive coaching, full-site SEO, sitemap/robots repair and GSC evidence, tracking/search evidence and website-delivery-qa handback, for WordPress and Astro), Rank Math 301 redirect management, and the Phase 4 digital audit (automated GA4 checks — data, key events, Ads link — plus a manual GTM/Search Console checklist).
+**Website Build Pipeline** (25 skills): Project setup (with WordPress/Astro platform choice), Phase 0 client data collection (Drive folder, BasicOps access checklist, data-gathering email, weekly automated follow-up), client context intake, sitemap architecture, page briefs, page copywriting, brand discovery, design system generation, HTML prototyping, block architecture, theme scaffolding, CSS sync checking, page building, registered WordPress REST operation, blog publishing, visual QA, performance optimization, security hardening, evidence-based Astro pre-launch security review (`astro-security-audit`: injection, redirects, CSP, secrets, APIs and integrations, access controls and deployed retests), the /wp-start entry point, the Astro build skill (scaffold, prototype conversion, SEO, deployment), Decap CMS setup for Astro on Cloudflare Pages (Git-backed editing, drafts, scheduled publishing, deploy previews), the combined site-launch-qa workflow (automated checks, Jaimee’s manual phone review, source-linked client requirements, adaptive coaching, full-site SEO, sitemap/robots repair and GSC evidence, tracking/search evidence and website-delivery-qa handback, for WordPress and Astro), Rank Math 301 redirect management, and the Phase 4 digital audit (automated GA4 checks — data, key events, Ads link — plus a manual GTM/Search Console checklist).
 
 **Git Repo Workflow** (3 skills): First-time client repo setup — creates GitHub repos, scaffolds docs/ context folder, commits the initial scaffold, and invites confirmed default LHM collaborators with write access (`repo-init`). Clones an existing client project onto a new machine or pulls the latest (`repo-install`). Prepares approved client review releases and installs portable local review skills, a persistent approval register, README guidance, staged access/setup/review emails and explicitly configured pre-launch sharing (`client-review-release`).
 

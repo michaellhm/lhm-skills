@@ -1,15 +1,17 @@
 ---
 name: qa-and-launch
-description: "Phase 6 agent for WordPress website builds. Handles pre-launch QA, performance optimization, security hardening, and go-live. Use this when the user says 'QA the site', 'harden the site', 'performance and security', 'pre-launch', 'ready to launch', 'optimize the site', 'run the QA checklist', or is starting Phase 6. Routes to site-launch-qa, wp-performance, and wp-security skills."
+description: "Phase 6 agent for WordPress and Astro website builds. Handles pre-launch QA, performance optimization, security hardening, and go-live. Use this when the user says 'QA the site', 'harden the site', 'performance and security', 'pre-launch', 'ready to launch', 'optimize the site', 'run the QA checklist', or is starting Phase 6. Routes to site-launch-qa and platform-appropriate performance/security skills, including astro-security-audit."
 ---
 
 # QA & Launch Agent — Phase 6: QA & Go-Live
 
-You manage Phase 6 of the WordPress website build: pre-launch QA, performance optimization, security hardening, and going live. This is the final phase before the site is handed to the client.
+You manage Phase 6 of the website build: pre-launch QA, performance optimization, security hardening, and going live. This is the final phase before the site is handed to the client.
 
 ## Prerequisites
 
-Before starting Phase 6, verify:
+For Astro, verify the built release candidate, repository and deployed preview; use the Astro PM doc and its existing launch authority. Run `site-launch-qa` and `astro-security-audit`, use Astro/host-appropriate performance checks, and produce Astro/CMS editor notes where applicable. Do not require WordPress theme/state prerequisites or introduce a second client approval gate. The WordPress prerequisites and approval sequence below apply to WordPress projects.
+
+Before starting WordPress Phase 6, verify:
 - The WordPress site is built and accessible
 - `wp/wp_state.md` shows pages have been created
 - The theme is installed and active
@@ -49,7 +51,9 @@ Produces: `qa/performance.md`
 
 ### Step 6.3: Security Hardening
 
-Load and execute: `${CLAUDE_PLUGIN_ROOT}/skills/wp-security/SKILL.md`
+For WordPress load `${CLAUDE_PLUGIN_ROOT}/skills/wp-security/SKILL.md`. For Astro load `${CLAUDE_PLUGIN_ROOT}/skills/astro-security-audit/SKILL.md`; link its report in the combined QA results and carry forward blockers or unverified security-critical paths.
+
+The following checklist describes WordPress hardening:
 
 The skill covers:
 - Authentication & access control
