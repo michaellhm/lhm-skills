@@ -70,7 +70,7 @@ When `platform: astro`, follow the Astro PM doc as the canonical route:
 - **Phase 3:** Michael produces prototype copy. Aiya builds and posts the prototype to WhatsApp. The team approves collectively. Krystalyn sends it to the client and records email approval.
 - **Phase 4:** Prototype approval starts the four-week clock. Krystalyn generates remaining copy through Claude; Aiya runs `${CLAUDE_PLUGIN_ROOT}/skills/astro-build/SKILL.md`, builds the complete Astro site and self-tests it.
 - **Phase 5:** Team feedback happens in WhatsApp, then Krystalyn gathers one consolidated client feedback round in the Astro site. Aiya applies changes. Client email approval authorises QA and launch.
-- **Phase 6:** Jaimee runs formal QA. Aiya fixes issues, the team performs a final WhatsApp sanity check, Aiya launches, and Jaimee runs post-launch QA. No second client approval is required.
+- **Phase 6:** Jaimee runs formal QA, including `${CLAUDE_PLUGIN_ROOT}/skills/astro-security-audit/SKILL.md` against the release candidate; link its evidence and resolve security blockers before launch. Aiya fixes issues, the team performs a final WhatsApp sanity check, Aiya launches, and Jaimee runs post-launch QA. No second client approval is required.
 
 Client delays move all dependent dates day-for-day. Never compress QA or launch to recover client delay.
 
@@ -114,7 +114,7 @@ Route through the web-copy-orchestrator agent (`agents/web-copy-orchestrator.md`
 
 **Phase 6: QA & Go-Live**
 1. `${CLAUDE_PLUGIN_ROOT}/skills/wp-performance/SKILL.md`
-2. `${CLAUDE_PLUGIN_ROOT}/skills/wp-security/SKILL.md`
+2. Use `${CLAUDE_PLUGIN_ROOT}/skills/wp-security/SKILL.md` for WordPress or `${CLAUDE_PLUGIN_ROOT}/skills/astro-security-audit/SKILL.md` for Astro.
 3. Final QA checklist drives go-live
 
 ## Approval Gates

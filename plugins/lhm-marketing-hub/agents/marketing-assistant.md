@@ -82,6 +82,7 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 
 ### Website completion QA (`lhm-wordpress-hub`)
 
+- `astro-security-audit` — Astro pre-launch source, build and deployed-preview security review; injection, redirects, CSP, API/Klaviyo and evidence-based launch readiness.
 - `site-launch-qa` — Combined coached completion QA: client requests, full-site SEO, sitemap/robots repair and GSC verification, Jaimee’s phone review, tracking evidence, fixes and retests.
 - `visual-qa` — Browser screenshots and design/responsive checks plus guided phone checks feeding the combined report.
 - `website-delivery-qa` — Verify the delivery workflow and evidence; require completed human, client-request and tracking checks for final-site handback.
