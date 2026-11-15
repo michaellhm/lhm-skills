@@ -23,6 +23,12 @@ When Michael explicitly removes the separate `Purchased services kicked off` tas
 
 When reconciling an existing Marlon client, inspect the parent, billing task and discussions. Propose cancellation (not completion or deletion) of unnecessary open LHM billing work and reassignment of a billing-owned parent through basicops-task-manager. Preserve legitimate billing history and unrelated admin work. Do not bulk-change clients whose sales route is unverified.
 
+## Resume a reviewed sales handover
+
+When `sales-handover` supplies an explicitly approved lean task map, preserve it. Keep the five board phases and seven reference gates in the detailed Obsidian checklist, but do not regenerate seven subtasks, duplicate completed discovery/preparation or restore a kickoff/billing card the user omitted. Reuse the onboarding overview, coordinator/specialist work and website overview/personal execution records; route later changes through `basicops-task-manager`. The approved task map takes precedence over the default “exactly seven” structure below for this handoff. New service branches still require scope and owner evidence.
+
+Keep the reviewed order: internal handover, client introduction, then process/task proposals. Each send and task batch has its own authority; completed sends do not prove access or technical readiness. For review-only work, prepare the next requested package without forcing an actual send. Preserve the user's operational-email edits, including omitted pricing/payment requests, while retaining sourced commercial facts in canonical records.
+
 ## 1. Load canonical state
 
 Follow `references/folder-convention.md`. Read, in order:
