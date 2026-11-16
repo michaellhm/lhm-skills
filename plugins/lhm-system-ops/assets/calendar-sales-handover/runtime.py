@@ -62,13 +62,42 @@ def fathom_read(payload):
     return json.loads(result.stdout)
 
 
+def daemon_owned_by_host_unit():
+    active = subprocess.run(['/usr/bin/systemctl', 'is-active', '--quiet',
+        'lhm-calendar-codex-host.service'], capture_output=True, timeout=10)
+    if active.returncode:
+        return False
+    try:
+        pid = read(Path('/home/codexworker/.codex/app-server-daemon/app-server.pid'))['pid']
+        if type(pid) is not int or pid < 1:
+            return False
+        proc = Path('/proc') / str(pid)
+        return (proc.stat().st_uid == 10001 and any(
+            line.endswith('/lhm-calendar-codex-host.service')
+            for line in (proc / 'cgroup').read_text().splitlines()))
+    except (OSError, ValueError, KeyError, TypeError):
+        return False
+
+
 def visible_host_ready():
     # Native non-model health check. Never create a chat Michael cannot open.
-    result = subprocess.run(['/usr/sbin/runuser', '-u', 'codexworker', '--',
+    if not daemon_owned_by_host_unit():
+        return False
+    command = ['/usr/sbin/runuser', '-u', 'codexworker', '--',
         '/usr/bin/env', 'HOME=/home/codexworker',
-        '/home/codexworker/.local/bin/codex', 'remote-control', 'start', '--json'],
+        '/home/codexworker/.local/bin/codex']
+    version = subprocess.run([*command, 'app-server', 'daemon', 'version'],
+        capture_output=True, text=True, timeout=15)
+    try:
+        state = json.loads(version.stdout)
+    except (ValueError, TypeError):
+        return False
+    if version.returncode or state.get('status') != 'running':
+        # Starting a PID fallback here would put it in this short-lived service cgroup.
+        return False
+    result = subprocess.run([*command, 'remote-control', 'start', '--json'],
         capture_output=True, text=True, timeout=30)
-    return result.returncode == 0
+    return result.returncode == 0 and daemon_owned_by_host_unit()
 
 
 class Calendar:

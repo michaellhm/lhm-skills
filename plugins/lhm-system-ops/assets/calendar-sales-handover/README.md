@@ -50,6 +50,15 @@ restore that existing login/connection, then explicitly resume the saved run usi
 `runtime.py resume --run-key EXACT_RUN_KEY` from `status`. This continues the same
 thread, preserves the prior failure receipt and never creates a replacement chat.
 
+The native daemon must run in the dedicated `lhm-calendar-codex-host.service`,
+separate from the short-lived calendar checks. Readiness verifies its actual PID's
+systemd cgroup before and after the connection check. Codex 0.147 uses a PID backend;
+bootstrapping it inside a calendar oneshot would let that service kill it on exit.
+The installer supplies the host unit without stopping/migrating an existing daemon.
+After login is valid and active work is checked, use native daemon stop, then enable
+the dedicated host unit. Preserve the same provider home/enrollment and verify the
+existing remote environment identity; do not pair again or delete saved state.
+
 ## Configuration and installation
 
 Supply an operator-only JSON config outside Git containing `calendar_id` (normally

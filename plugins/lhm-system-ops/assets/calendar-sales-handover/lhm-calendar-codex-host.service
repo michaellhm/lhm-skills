@@ -1,0 +1,22 @@
+[Unit]
+Description=Persistent native Codex host for Hermes calendar handovers
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=codexworker
+Group=codexworker
+Environment=HOME=/home/codexworker
+Environment=CODEX_HOME=/home/codexworker/.codex
+ExecStart=/home/codexworker/.local/bin/codex app-server daemon bootstrap --remote-control
+ExecStop=/home/codexworker/.local/bin/codex app-server daemon stop
+TimeoutStartSec=120
+TimeoutStopSec=45
+KillMode=control-group
+UMask=0077
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

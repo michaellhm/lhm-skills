@@ -122,6 +122,20 @@ class DispatchAcceptance(unittest.TestCase):
         fetch.assert_not_called(); launch.assert_not_called()
         self.assertFalse((self.state / 'launches' / (self.key + '.json')).exists())
 
+    def test_connection_check_never_spawns_an_unmanaged_daemon(self):
+        with patch.object(R, 'daemon_owned_by_host_unit', return_value=False), \
+                patch.object(R.subprocess, 'run') as command:
+            self.assertFalse(R.visible_host_ready())
+        command.assert_not_called()
+
+    def test_connection_check_requires_daemon_to_remain_in_its_service(self):
+        from types import SimpleNamespace
+        responses = [SimpleNamespace(returncode=0, stdout='{"status":"running","backend":"pid"}'),
+                     SimpleNamespace(returncode=0, stdout='{}')]
+        with patch.object(R, 'daemon_owned_by_host_unit', side_effect=[True, False]), \
+                patch.object(R.subprocess, 'run', side_effect=responses):
+            self.assertFalse(R.visible_host_ready())
+
     def test_untrusted_session_symlink_is_not_followed_by_root(self):
         target = self.state / 'elsewhere.json'
         target.write_text(json.dumps({'thread_id': THREAD}))

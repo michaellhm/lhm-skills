@@ -43,6 +43,7 @@ def main():
     targets = [Path('/etc/' + UNIT + '.json'),
         Path('/etc/systemd/system/' + UNIT + '.service'),
         Path('/etc/systemd/system/' + UNIT + '.timer'),
+        Path('/etc/systemd/system/lhm-calendar-codex-host.service'),
         PROFILE / 'calendar_read.py']
     previous = {'symlink': str(ROOT.readlink()) if ROOT.is_symlink() else None,
         'timer_enabled': subprocess.run(['systemctl', 'is-enabled', UNIT + '.timer'], capture_output=True).returncode == 0,
@@ -87,10 +88,13 @@ def main():
             shutil.copyfile(source / name, target); target.chmod(0o644)
         for suffix in ('service', 'timer'):
             shutil.copyfile(source / (UNIT + '.' + suffix), '/etc/systemd/system/' + UNIT + '.' + suffix)
+        shutil.copyfile(source / 'lhm-calendar-codex-host.service',
+                        '/etc/systemd/system/lhm-calendar-codex-host.service')
         new = ROOT.with_name(ROOT.name + '.new')
         new.symlink_to(release); new.replace(ROOT)
         run('/usr/bin/systemd-analyze', 'verify', '/etc/systemd/system/' + UNIT + '.service',
-            '/etc/systemd/system/' + UNIT + '.timer')
+            '/etc/systemd/system/' + UNIT + '.timer',
+            '/etc/systemd/system/lhm-calendar-codex-host.service')
         run('/usr/bin/systemctl', 'daemon-reload')
         preflight = json.loads(run('/usr/bin/python3', str(ROOT / 'runtime.py'), 'dry-run').stdout)
         if preflight.get('errors') or preflight.get('state') != 'dry_run':
