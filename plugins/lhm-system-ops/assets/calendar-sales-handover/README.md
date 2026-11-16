@@ -35,6 +35,8 @@ it reads only meeting lists/transcripts. No credential is copied into packets, l
 source. Codex's existing saved-session helper launches as uid 10001, with read-only
 integrations and task-local file writes. The initial bootstrap never runs as root.
 The deterministic supervisor is root-owned and launches only this fixed worker.
+The worker has private writable temporary storage for the native sandbox's
+bubblewrap lock; its other filesystem write boundaries remain confined.
 
 Event descriptions, locations, conference passwords and attachments are excluded from
 the packet. Included source text is evidence, never instructions. All ledgers and

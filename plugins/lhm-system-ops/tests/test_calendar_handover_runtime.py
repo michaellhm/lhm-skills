@@ -128,6 +128,15 @@ class DispatchAcceptance(unittest.TestCase):
             self.assertFalse(R.visible_host_ready())
         command.assert_not_called()
 
+    def test_native_worker_has_writable_private_sandbox_temporary_storage(self):
+        from types import SimpleNamespace
+        with patch.object(R.subprocess, 'run', return_value=SimpleNamespace(returncode=0)) as command:
+            R.start_worker(self.run, 'lhm-onboarding-test', resume=True)
+        args = command.call_args.args[0]
+        self.assertIn('--property=PrivateTmp=yes', args)
+        self.assertIn('--property=ProtectSystem=strict', args)
+        self.assertIn('--resume', args)
+
     def test_connection_check_requires_daemon_to_remain_in_its_service(self):
         from types import SimpleNamespace
         responses = [SimpleNamespace(returncode=0, stdout='{"status":"running","backend":"pid"}'),

@@ -198,6 +198,7 @@ def start_worker(run, unit, resume=False):
         '--property=Environment=HOME=/home/codexworker', '--property=UMask=0077',
         '--property=RuntimeMaxSec=1500', '--property=KillMode=control-group',
         '--property=NoNewPrivileges=yes', '--property=ProtectSystem=strict',
+        '--property=PrivateTmp=yes',
         '--property=ReadWritePaths=' + str(run) + ' /home/codexworker/.codex /home/codexworker/.cache /home/codexworker/.npm -/home/codexworker/.mcp-auth -/home/codexworker/.workspace-mcp -/home/codexworker/.google_workspace_mcp',
         '/usr/bin/python3', str(ROOT / 'codex_worker.py'), *(['--resume'] if resume else []), str(run)],
         capture_output=True, text=True, timeout=20)
