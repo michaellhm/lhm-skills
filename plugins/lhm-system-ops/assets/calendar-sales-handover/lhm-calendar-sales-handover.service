@@ -1,0 +1,17 @@
+[Unit]
+Description=Hermes onboarding calendar to saved Codex handover chats
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /usr/local/libexec/lhm-calendar-sales-handover/runtime.py scan
+TimeoutStartSec=900
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/var/lib/lhm-calendar-sales-handover
+ReadWritePaths=-/home/codexworker/.mcp-auth -/home/codexworker/.npm
+
