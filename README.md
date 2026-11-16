@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-205 skills across thirteen Claude Code plugins (5 inbox, 66 marketing, 43 WordPress, 19 GMB/local SEO, 9 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge, 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+203 skills across thirteen Claude Code plugins (5 inbox, 66 marketing, 43 WordPress, 19 GMB/local SEO, 9 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge, 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -223,7 +223,7 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     hermes-production-plan/             # Match an Obsidian SOP, plan and verify a BasicOps outcome; includes the Hermes PM dispatch source asset
     drive-artifact-delivery/             # Deliver approved production files to client Drive with exact create/readback evidence
     staff-weekly-flow/                  # Verified Monday brief, role-informed commitments, weekly-board cleanup and immediate follow-ups
-    sales-handover/                     # Sales handover with Marlon-managed finance routing
+    sales-handover/                     # Evidence first, internal then client email review, lean approved task handoff
     client-onboarding/                  # Scope-aware onboarding, Marlon finance routing and reviewed website production
     website-kickoff/                    # New website build kickoff (WordPress or Astro) → handoff to WordPress hub
     existing-client-website-handover/   # Michael → Kristalyn website brief for an existing client
@@ -260,6 +260,7 @@ plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
     weekly-skill-review/                # Cross-team review — applies learnings on a branch, opens a PR
 plugins/lhm-system-ops/               # Governed CTO engineering and release operations
   assets/meeting-prep/                  # Lily profile skill, wrap/task/vault reconciliation, verified delivery
+  assets/calendar-sales-handover/       # Hermes calendar gate → saved Codex handover chat, reviewed skill, dedup and test route
   .claude-plugin/plugin.json            # Claude plugin manifest
   .codex-plugin/plugin.json             # Codex plugin manifest
   skills/                               # All 12 skills
@@ -271,7 +272,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 ## Skills Catalog
 
-**Hermes profile assets:** System Ops also governs Lily meeting preparation with bounded research, retry checkpoints and verified email delivery. This deployed profile asset does not add a desktop skill.
+**Hermes profile assets:** System Ops governs Lily meeting preparation with bounded research, retry checkpoints and verified email delivery, plus onboarding-calendar handoffs that open a saved Codex sales-handover chat after the meeting, with source gathering, duplicate protection and a controlled test route. These deployed assets do not add desktop skills.
 
 **Client Management** (3 skills): Client onboarding and profile setup, theme-led campaign-playbook strategy session preparation and coaching, and campaign playbook generation from transcripts.
 
@@ -333,7 +334,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 **Team Handoffs** (4 skills): A universal team-work briefing flow reads requester, client, assignee and project context; checks access, dependencies, authority, completion and review; asks one material question at a time; and learns carefully from assignee feedback. The Hermes production-plan flow lets Monica preflight an existing BasicOps outcome, prepare a concise version-bound execution chain for Waylon, answer “where are we at?” from authoritative checkpoints, explain CTO blockers in plain English, verify durable artefact delivery and reconcile the returned work. The shared Drive artefact delivery capability moves approved files from bounded staging into the registered client folder and proves exact metadata and content through readback. The shared BasicOps task manager then applies LHM naming, short plain-English task briefs for the team, discussion-first actionable next steps, existing-client website routing, parent-discussion subtask links, personal-board confirmation, approval, deduplication and read-back verification to every task mutation.
 
-**Client Lifecycle** (3 skills): Sales-to-delivery handover; Tier 1 client onboarding; and an existing-client website handover that transfers a newly scoped website project from Michael to Kristalyn without restarting general onboarding.
+**Client Lifecycle** (3 skills): Evidence-first sales handover with internal email → client introduction → reviewed onboarding/task proposals, existing-account checks and Marlon-managed finance; scope-aware client onboarding that preserves the approved lean task map; and an existing-client website handover that transfers a newly scoped website project from Michael to Kristalyn without restarting general onboarding.
 
 **Delivery Kickoffs** (6 skills): Website build kickoff (WordPress or Astro), PPC landing page campaign kickoff, SEO engagement kickoff, GMB/local SEO cycle kickoff, blog/article content pipeline kickoff, and Google Ads campaign build kickoff (gated on conversion tracking being live). Each follows the same shared pattern: intake, a project-management state file, a BasicOps scaffold with backwards-scheduled milestones, a client kickoff email, and handoff to the delivery specialist hub.
 

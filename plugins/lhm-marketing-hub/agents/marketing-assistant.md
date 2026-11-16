@@ -92,3 +92,5 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 - `client-review-release` — Install portable client review skills, scan new/changed/pending pages, propose release questions for operator approval, preserve explicit client approvals and prepare staged GitHub-access, local-setup and review emails with verified sharing routes.
 
 `lhm-project-hub:client-onboarding` — Reviewed website handover, Marlon-managed finance routing, campaign master, required UI UX Pro Max design system and prototype execution prompt.
+
+`lhm-project-hub:sales-handover` — Investigate sales/strategy and existing systems; review internal handover before client introduction, then approve lean onboarding tasks. Preserve existing accounts, Marlon-managed finance and separate send/task authority.

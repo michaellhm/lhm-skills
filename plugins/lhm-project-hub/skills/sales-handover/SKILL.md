@@ -1,129 +1,106 @@
 ---
 name: sales-handover
-description: "Hand a newly closed client from Michael or Marlon into LHM delivery. Use after a sale closes or when the user says 'sales handover', 'handover to KP', 'we signed a client', 'closed a deal', 'new client handover', or 'hand this client over'. Captures sales context in canonical Obsidian records, drafts Michael's client introduction, creates one client-level card on the BasicOps *Client Onboarding board assigned to the applicable immediate owner, adds scope-applicable top-level checks, and hands the detailed workflow to client-onboarding."
+description: "Hand a newly closed client from Michael or Marlon into LHM delivery. Use when the user says 'sales handover', 'handover to KP', 'we signed a client', 'closed a deal', 'new client handover', or 'hand this client over'. Investigates sales, strategy and existing systems first; prepares the internal handover before the client introduction; then prepares the detailed onboarding process and lean BasicOps tasks for review. Preserves partner-managed finance, existing accounts, separate send/task approvals and verified handoffs."
 ---
-## Client file routing
-
-For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
-
 
 # Sales Handover
 
-Route every BasicOps creation or mutation through `lhm-project-hub:basicops-task-manager`. This skill prepares the handover-specific payload; the shared skill owns wording, approval, deduplication, mutation and verification.
+Read [client knowledge and working-file routing](../../references/obsidian-context-contract.md) first. Knowledge belongs in the verified shared LHM Knowledge client records; deliverables belong in the separate verified Claude Workspace / Current Clients work folder. Never copy credentials into either. Route every BasicOps mutation through `lhm-project-hub:basicops-task-manager` and email preparation through the matched `lhm-inbox-hub:email-drafts` helper.
 
-Capture what sales knows and start the approved Obsidian-first client-onboarding flow. Ask interview questions one at a time.
+## Default order and authority
 
-## Partner/Marlon clients — finance ownership and applicable tasks
+Use this order unless the user explicitly changes it:
 
-For a client sold by Marlon, Marlon manages the finances. Record `Finance owner: Marlon` and `LHM billing: N/A — partner-managed` in the handover and onboarding note. Do not create or assign Josephine an invoice/payment task, introduce her as billing contact, request payment, or put the parent in Josephine's billing queue. This routing decision does not prove payment was received; keep receipt status unknown unless supported by evidence. Refer commercial questions to Marlon without making them an LHM billing gate.
+1. Investigate the sale, completed interviews, client records and existing systems.
+2. Prepare the internal handover email; open it in the editor and review the wording with Michael.
+3. Send the latest approved internal text only on explicit instruction; verify SENT and recipients.
+4. Build the client introduction from that approved handover; open it in the editor for separate review and send only on explicit instruction.
+5. Prepare the detailed onboarding process and exact BasicOps task proposals for review.
+6. Create or update only the approved tasks, then verify them. Agree due dates and board/owner changes separately when not already supplied.
 
-For this route, start the parent in `2 — Client Contact & Strategy`, assigned to Kristalyn, unless verified progress places it in a later phase. Michael's introduction remains a separate applicable check. Apply this exception wherever the default below says Josephine, Payment & Billing or exactly seven subtasks. Preserve the five board phases and seven reference gates as the general model, but create only applicable tasks. Keep omitted gates in Obsidian with their reason; never mark unperformed work complete.
+If the user wants preparation only, draft the sequence without sending or writing tasks. Do not require a send just to continue authorised preparation. Approval of one email does not approve the other or the task batch. An explicit send instruction authorises the latest approved text through a supported send tool; do not substitute another unsent draft. Refresh sent history before retrying an uncertain send. Preserve manual edits exactly. Never send a WhatsApp/team notification merely because handover is mentioned.
 
-When Michael explicitly removes the separate `Purchased services kicked off` task, retain service-start readiness in the Obsidian completion checklist and link the actual delivery task instead. Do not recreate the removed card. A website sitemap/prototype task is a distinct delivery outcome owned by the confirmed strategist; it does not reinstate a generic kickoff card.
+## 1. Investigate before interviewing
 
-When reconciling an existing Marlon client, inspect the parent, billing task and discussions. Propose cancellation (not completion or deletion) of unnecessary open LHM billing work and reassignment of a billing-owned parent through basicops-task-manager. Preserve legitimate billing history and unrelated admin work. Do not bulk-change clients whose sales route is unverified.
+Confirm the client identity, genuinely new versus existing client, salesperson, purchased services, add-ons and relevant promises. An existing client's new project routes to an internal project handover and the applicable kickoff, not duplicate new-client onboarding.
 
-## 1. Confirm the sale
+Read the existing overview/profile, Goals, Current Projects, handover, Onboarding and purchased-service records. Follow `references/folder-convention.md` and locate existing records before creating them. Resolve the work folder by verified mapping/ancestry, not client-name guesswork. If unavailable, continue permitted evidence review and show an editor draft, but report temporary staging and the unresolved durable destination; never invent a production folder in Knowledge.
 
-Confirm the client name, purchased services, fee, add-ons, payment arrangement and whether the client is genuinely new to LHM. Validate standard recurring pricing against `references/team-roster.md`; preserve explicitly agreed exceptions and flag contradictions rather than silently correcting them.
+Read sales and strategy/onboarding evidence separately: Fathom, supplied transcripts, proposal and email threads including later client replies. Use the connected call/link resolver and relevant transcript passages, not just an automated recap. If a source is inaccessible, state the gap and use available supplied evidence without claiming playback. Review user-referenced Codex chats with `read_thread` before relying on them, including later edits and send decisions. A later explicit decision supersedes an earlier draft.
 
-If an existing client has bought a new project, do not run new-client onboarding. Create an internal project handover and route to the applicable service kickoff.
+If the strategy interview already happened, capture its answers and remaining gaps. Do not repeat discovery or create retrospective meeting-preparation tasks. Ask only genuinely missing questions, one at a time: commitments; communication preferences; risks; previous work and why it failed. Do not ask Michael to repeat an answer available in the sources.
 
-## 2. Create or locate canonical Obsidian records
+### Existing systems check
 
-Follow `references/folder-convention.md`. Use the LHM Obsidian vault, not Google Drive Markdown, for durable context and state:
+Inspect the current public website and booking journey within access authority. Identify installed Google tags/GTM containers, booking provider, and the internal practice system separately. Record snippet IDs and observations without treating them as verified account ownership, GA4 data collection or working conversion tracking. Check available account inventories/access; no matching accessible account means an access gap, not proof no account exists.
 
-- `20 Clients/<Client>/<Client>.md`
-- `20 Clients/<Client>/Current Projects.md`
-- `20 Clients/<Client>/Goals.md`
-- `20 Clients/<Client>/project-management/Handover YYYY-MM-DD.md`
-- `20 Clients/<Client>/project-management/Onboarding.md`
+Check the existing setup before proposing new Analytics/GTM accounts. Have Jaimee or the applicable specialist reconcile overlapping tags, destinations and booking events; preserve current accounts where possible. Distinguish booking clicks, enquiries, completed bookings and attendance. Platform support must be inspected/tested before promising completed-booking attribution.
 
-Google Drive remains the asset, working-file and deliverable store. Never copy credentials; reference the approved password-manager entry.
+A separate booking front end is not automatically a practice-system migration. Capture practitioner/time selection, slot management, notes and notifications only when evidenced. Keep a discussed future build as FYI until its owner, brief and action authority are confirmed; do not create a speculative build task or change the live booking route.
 
-## 3. Gather sales evidence
+### Commercial record and finance route
 
-Pull the recent sales call from Fathom when available and obtain the proposal or GHL deal notes. If the call cannot be retrieved, ask the salesperson for the notes and state the gap.
+Record agreed scope, fee and payment terms in the appropriate canonical commercial handover, preserving contradictions and later written evidence. Keep client-reported signing, planned payment and verified receipt distinct. Validate standard recurring pricing against `references/team-roster.md` only when applicable; never substitute recurring tiers for an explicit project offer.
 
-Interview the salesperson, one question at a time:
+For Marlon-sold clients: `Finance owner: Marlon`; `LHM billing: N/A — partner-managed`. Do not introduce Josephine as billing owner, create an LHM invoice/payment task, request payment or make receipt an LHM onboarding gate. Unknown receipt stays unknown. For a direct LHM sale, resolve the applicable billing owner and checks from evidence; do not assume this partner exception applies.
 
-1. What exact promises or commitments were made?
-2. What client communication preferences or quirks matter?
-3. What risks or sensitivities should delivery know?
-4. What has the client tried before, and why did it fail?
+## 2. Prepare the internal handover first
 
-Keep important wording close to verbatim. Ask follow-ups when an answer is thin.
+Use the relevant parts of `references/templates/handover-doc.md` for the canonical record, but apply these reviewed communication rules instead of obsolete billing-first/template defaults. Record service outcomes, client contacts, decisions, promises, risks, access references, owners and next steps. Dates require evidence or explicit authority; otherwise leave unset.
 
-## 4. Write the handover
+Default website handover recipients: verified salesperson/partner, Kristalyn and Jaimee, with Michael copied. Adjust to actual service owners and confirmed scope; do not add Josephine or the whole team automatically. Write in Michael's voice, with short practical sections:
 
-Use `references/templates/handover-doc.md`. Record:
+- Website URL near the top, practice location and main contact/email. State the practice's actual time zone and relation to Michael's only after checking it; Sydney/Melbourne is an example, not a global default.
+- Selected services in plain language. State the actual GMB/posting scope and duration only if purchased; never copy another client's two-posts/six-month package as universal.
+- Omit pricing, payment schedules and payment-confirmation requests from the operational email unless Michael explicitly asks for a commercial discussion. Canonical commercial records retain the facts; omission is not proof of receipt.
+- Bold **Kristalyn**: onboarding/access/assets, GBP access, domain manager/current hosting, client-owned Cloudflare where applicable, and later approved nameserver/DNS coordination preserving website and email. Gather logos, practitioner/clinic photos and usage permission.
+- Bold **Jaimee**: existing Analytics/GTM access and setup before creating new accounts; duplicate/overlapping tag checks; supported booking-platform tracking and limitations. Say what was observed versus what remains unverified.
+- Michael's strategy, sitemap and initial homepage/design role when confirmed; client feedback before expansion and further service interviews as needed. Preserve the confirmed build handoff owner instead of assigning one from habit.
+- A short FYI for separately discussed booking work, without converting it into a build assignment. Include useful meeting/handover links.
 
-- Package, fee, add-ons and payment arrangement.
-- One block per purchased service with an explicit success outcome.
-- Client contacts and approval path.
-- Promises, risks, preferences and failed prior approaches.
-- Access references without secrets.
-- The first three dated actions.
-- Kristalyn as overall onboarding owner, Josephine as the first operational owner, and Michael's retained decisions.
+Show and open the complete editable email. Save an unsent Gmail draft where supported, preserve its ID/latest version, and clearly report unsent versus provider-verified sent.
 
-Merge confirmed facts into the client overview and Goals without overwriting conflicting existing content. Record unresolved contradictions explicitly.
+## 3. Prepare the client introduction second
 
-## 5. Initialise the detailed Obsidian onboarding checklist
+Use the latest reviewed internal handover and actual client facts. Default to the verified client contact, copying the coordinator, technical specialist and salesperson when relevant. Do not guess another practitioner's email.
 
-Create or update `project-management/Onboarding.md` from `references/checklists/client-onboarding.md`.
+- Warm opening tied to the actual meeting; verify the date rather than guessing Thursday/Friday.
+- Introduce Kristalyn and Jaimee in plain language and explain who handles coordination/access/assets versus measurement.
+- Explain Cloudflare as “website hosting”, under client ownership where applicable. Preserve existing website/email during preparation; no premature hosting cancellation.
+- Ask whether they can access Analytics/GTM or whether their existing provider manages them. Use existing accounts where possible. Do not ask whether an account exists when access ownership is the actual gap.
+- Explain measurement as understanding discovery, enquiries and bookings; avoid unsupported integration claims and raw container IDs.
+- Explain the agreed initial homepage/design and wording review, then further pages and deeper interviews. Michael stays involved in strategy/sitemap/design; describe Marlon's actual continuing role without inventing video or delivery scope.
+- Keep immediate asks small, such as domain manager and current host. Kristalyn coordinates the detailed access/assets follow-up.
+- Omit prices, billing requests and unnecessary Astro/AI/backend detail unless specifically relevant/requested.
 
-- Include all universal checks.
-- Include only service-specific access, configuration and kickoff checks that apply to the purchased scope.
-- Mark confirmed non-applicable branches with the reason; never silently omit uncertainty.
-- Record the five top-level phases and the seven top-level gates separately from the detailed checklist. Treat Michael's handover/introduction and Josephine's payment setup as the two parallel checks required to leave Phase 1.
-- Set the current phase to `1 — Payment & Billing`, overall owner to Kristalyn and immediate owner to Josephine.
+Open the draft in the editor and preserve later edits. Only mark the introduction sent after provider confirmation of SENT and recipients, or explicitly label a user-reported send. Do not mark access, configuration or onboarding complete because the email was sent.
 
-Update `Current Projects.md` with separate `Overall owner: Kristalyn` and `Immediate owner: Josephine` fields, plus the current phase, next action and onboarding-note link.
+## 4. Prepare the onboarding process and lean task batch
 
-## 6. Create or migrate the BasicOps onboarding card
+Instantiate or update `project-management/Onboarding.md` from `references/checklists/client-onboarding.md` after the communications review, preserving earlier evidence and version-stable checklists. Read `client-onboarding` for applicable gates and [reviewed-flow acceptance cases](references/reviewed-flow-cases.md) before handback.
 
-Use the BasicOps project `*Client Onboarding` (project ID `68921`), not `*Client Flow`.
+Keep detailed, conditional gates in Obsidian: contact/strategy evidence; verified access/assets; measurement/configuration; approved production and purchased-service kickoff; completion/handoff. Marlon billing is N/A, not falsely completed. Completed interviews and sends are evidence in the checklist, not new retrospective tasks.
 
-1. Find a matching onboarding card on `*Client Onboarding` and search older client-flow tasks before creating anything.
-2. Reuse or migrate the existing client-level task when one exists; never create a duplicate.
-3. Title the parent card `[Client] — Client Onboarding`.
-4. Place it in `1 — Payment & Billing`, assign it to Josephine and record Kristalyn as overall owner in the description.
-5. Link the canonical Obsidian onboarding path and Google Drive client folder.
-6. State one immediate next action and exact blocker or `none`.
+For a website-led handover with the roles confirmed above, propose this lean five-record pattern instead of automatically making seven gate subtasks:
 
-Create or reuse exactly these top-level subtasks:
+| Record | Default evidenced owner | Destination |
+| --- | --- | --- |
+| `[Client] — Client Onboarding` | Kristalyn | `*Client Onboarding` (`68921`), current applicable phase |
+| `<CLIENT>: Onboarding - Coordinate access and assets` | Kristalyn | Verified Kristalyn Inbox |
+| `<CLIENT>: Website - Check Analytics, GTM and booking tracking` | Jaimee/applicable specialist | Verified specialist Inbox |
+| `<CLIENT>: Website - Website rebuild` | Immediate website-stage owner | Enduring `*Web Projects` (`68635`) card |
+| `<CLIENT>: Website - Prepare sitemap and homepage design` | Confirmed strategist, normally Michael | Verified owner's personal Inbox |
 
-- Michael handover and client introduction completed — Michael.
-- Invoice and payment setup completed — Josephine.
-- Kristalyn welcome email and strategy call completed — Kristalyn.
-- Required access and assets confirmed — Kristalyn.
-- Tracking and configuration confirmed — Jaimee or the applicable specialist.
-- Purchased services kicked off — Kristalyn.
-- Client onboarding completed — Kristalyn.
+Use established client labels and actual board/assignee IDs through the task manager. This is a scope-aware proposal, not a universal five-task requirement: omit unsupported branches, preserve needed direct-LHM finance work and reuse existing records. Start a Marlon onboarding card at `2 — Client Contact & Strategy` with Kristalyn unless later progress is verified; direct LHM billing may remain Phase 1. Website overview starts at the evidenced stage, not “in progress” merely because a task was created.
 
-BasicOps carries only these top-level checks, current phase, immediate owner and next action. Detailed, conditional checklists and evidence remain in Obsidian.
+Keep the shared website overview distinct from the personal execution task and cross-link related records in Discussion. Do not create a subtask per page/checklist item, redundant discovery or generic kickoff cards when actual delivery tasks/checklist already carry that outcome. No separate custom-booking build without a confirmed brief/owner. Do not recreate a gate card Michael removed.
 
-If BasicOps is unavailable, print the exact parent card and seven subtasks as manual instructions and leave the intended BasicOps write pending in the Obsidian onboarding log.
+Prepare exact titles, owners, boards/sections, status, due date or unset, metadata/working URLs, plain-English Discussion, completion checks, next handoff and stable deduplication keys through `basicops-task-manager`. Put action briefs in Discussion, not Description. Show the complete batch for review before any creation, assignment or move. Due dates stay unset until authorised; calculate relative weekdays in the participant's actual time zone and name the dates. Board movement and reassignment are separate: resolve spoken “AI/Aiya/my board” ambiguity before moving, while applying independent authorised dates. Preserve the same task ID.
 
-## 7. Draft communications
+After approval, repeat deduplication across onboarding, older client-flow, website and personal-board routes. Create/update only approved records; verify owners, destinations, statuses, dates, metadata, Discussion and links. No requested task is considered posted from a prepared payload or a model claim alone. If writes fail, report partial success and leave exact reconciliation pending; never recreate successful rows.
 
-Prepare but do not send:
+## 5. Save and hand off
 
-- Michael's client introduction email introducing Kristalyn and Josephine.
-- Internal handover email to Kristalyn and Josephine, copied to Michael.
-- Human-sent WhatsApp team notification.
+Update/read back overview/profile, Goals where changed, Current Projects, handover and Onboarding with evidenced outcomes, live IDs/links, pending review and exact next owner/action. Keep commercial data out of operational emails, private capacity out of shared records and secrets out of all artefacts. Report unchanged/missing records without inventing facts.
 
-Do not mark `Michael handover and client introduction completed` until the introduction email is explicitly confirmed sent.
-
-## 8. Hand off
-
-Finish with `Handover complete. Next: run lhm-project-hub:client-onboarding` and name the verified resume phase. For Marlon clients, use Client Contact & Strategy or the evidenced later phase, not the LHM billing queue.
-
-## Rules
-
-- Obsidian is canonical for detailed state and evidence; BasicOps is canonical for visible assignment, stage and next action; Google Drive holds assets and deliverables.
-- Client-facing emails are drafts only.
-- Tick items only after explicit human confirmation or successful system verification.
-- Never fabricate dates, data, access or completion.
-- Never create the same live onboarding or delivery task twice.
-- Ask the sales interview questions one at a time.
+Hand `lhm-project-hub:client-onboarding` the approved lean task map, scope applicability, current phase, verified sends, unresolved account/work-folder gaps and exact resume point. The five/seven reference gates stay in the detailed checklist; resuming must not regenerate a duplicate task tree or undo explicit omissions. “Handover complete” requires the authorised handover outputs actually sent/posted/verified; otherwise report prepared, sent, task-review-ready or partially complete accurately.
