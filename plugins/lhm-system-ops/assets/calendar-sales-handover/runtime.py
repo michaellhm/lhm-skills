@@ -62,6 +62,15 @@ def fathom_read(payload):
     return json.loads(result.stdout)
 
 
+def visible_host_ready():
+    # Native non-model health check. Never create a chat Michael cannot open.
+    result = subprocess.run(['/usr/sbin/runuser', '-u', 'codexworker', '--',
+        '/usr/bin/env', 'HOME=/home/codexworker',
+        '/home/codexworker/.local/bin/codex', 'remote-control', 'start', '--json'],
+        capture_output=True, text=True, timeout=30)
+    return result.returncode == 0
+
+
 class Calendar:
     def __init__(self, calendar_id):
         self.calendar_id = calendar_id
@@ -112,6 +121,8 @@ class Dispatcher:
             raise RuntimeError('Launch outcome pending; reconcile original session, never replay')
         if run.stat().st_uid != os.geteuid() or run.stat().st_mode & 0o022:
             raise RuntimeError('Prelaunch directory is not exclusively operator controlled')
+        if not visible_host_ready():
+            raise DispatchNotStarted('Existing Codex host needs authentication or reconnection')
         evidence_path = run / 'meeting-evidence.json'
         prior = read(evidence_path) if evidence_path.exists() else {'attempt': 0}
         try:
@@ -142,17 +153,7 @@ class Dispatcher:
                 p = Path(parent) / name
                 os.chown(p, 0, 10001); p.chmod(0o640)
             os.chown(parent, 10001, 10001); os.chmod(parent, 0o750)
-        result = subprocess.run(['/usr/bin/systemd-run', '--quiet', '--collect',
-            '--unit=' + unit, '--uid=codexworker', '--property=WorkingDirectory=' + str(run),
-            '--property=Environment=HOME=/home/codexworker', '--property=UMask=0077',
-            '--property=RuntimeMaxSec=1500', '--property=KillMode=control-group',
-            '--property=NoNewPrivileges=yes', '--property=ProtectSystem=strict',
-            '--property=ReadWritePaths=' + str(run) + ' /home/codexworker/.codex /home/codexworker/.cache /home/codexworker/.npm -/home/codexworker/.mcp-auth -/home/codexworker/.workspace-mcp -/home/codexworker/.google_workspace_mcp',
-            '--property=ReadOnlyPaths=/home/codexworker/.codex/auth.json',
-            '/usr/bin/python3', str(ROOT / 'codex_worker.py'), str(run)],
-            capture_output=True, text=True, timeout=20)
-        if result.returncode:
-            raise RuntimeError('Native worker launch failed; inspect saved launch before retry')
+        start_worker(run, unit)
         for _ in range(20):
             existing = self.receipt(run)
             if existing:
@@ -160,6 +161,19 @@ class Dispatcher:
                 return existing
             time.sleep(1)
         raise RuntimeError('Native chat creation pending; reconcile on next check')
+
+
+def start_worker(run, unit, resume=False):
+    result = subprocess.run(['/usr/bin/systemd-run', '--quiet', '--collect',
+        '--unit=' + unit, '--uid=codexworker', '--property=WorkingDirectory=' + str(run),
+        '--property=Environment=HOME=/home/codexworker', '--property=UMask=0077',
+        '--property=RuntimeMaxSec=1500', '--property=KillMode=control-group',
+        '--property=NoNewPrivileges=yes', '--property=ProtectSystem=strict',
+        '--property=ReadWritePaths=' + str(run) + ' /home/codexworker/.codex /home/codexworker/.cache /home/codexworker/.npm -/home/codexworker/.mcp-auth -/home/codexworker/.workspace-mcp -/home/codexworker/.google_workspace_mcp',
+        '/usr/bin/python3', str(ROOT / 'codex_worker.py'), *(['--resume'] if resume else []), str(run)],
+        capture_output=True, text=True, timeout=20)
+    if result.returncode:
+        raise RuntimeError('Native worker launch failed; inspect saved launch before retry')
 
 
 def load_config():
@@ -175,14 +189,26 @@ def load_config():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['scan', 'dry-run', 'status', 'test'])
+    parser.add_argument('action', choices=['scan', 'dry-run', 'status', 'test', 'resume'])
     parser.add_argument('--event-id', help='Explicit existing event for isolated test; does not alter calendar')
+    parser.add_argument('--run-key', help='Exact saved run key for explicit same-chat recovery')
     args = parser.parse_args()
     if os.geteuid() != 0:
         parser.error('Use the operator service')
     STATE.mkdir(exist_ok=True, mode=0o700)
     (STATE / 'launches').mkdir(exist_ok=True, mode=0o700)
     cfg = load_config()
+    if args.action == 'resume':
+        if not args.run_key or not re.fullmatch(r'[a-f0-9]{64}', args.run_key):
+            parser.error('resume requires the exact saved --run-key')
+        run = STATE / 'worker-runs' / args.run_key
+        if run.is_symlink() or not run.is_dir():
+            raise ValueError('Invalid saved run')
+        saved = read(run / 'worker-receipt.json')
+        if saved.get('status') != 'needs_attention' or not Dispatcher(cfg).receipt(run):
+            raise ValueError('Only a failed saved conversation may be explicitly resumed')
+        start_worker(run, 'lhm-onboarding-resume-' + args.run_key[:24], resume=True)
+        print(json.dumps({'state': 'resuming_same_chat', **Dispatcher(cfg).receipt(run)})); return
     calendar = Calendar(cfg['calendar_id'])
     watcher = Watcher(STATE / 'events.sqlite', Config.from_dict(cfg), calendar, Dispatcher(cfg))
     if args.action == 'status':
@@ -195,6 +221,7 @@ def main():
             key = row['dispatch_key']
             if row.get('test_mode'):
                 key = hashlib.sha256(('test:' + key).encode()).hexdigest()
+            row['run_key'] = key
             run = STATE / 'worker-runs' / key
             p = run / 'worker-receipt.json'
             row['worker'] = read(p) if p.exists() else None

@@ -116,7 +116,41 @@ def session_receipt(run, host):
             'chat_url': 'codex://threads/' + thread + '?hostId=' + quote(host, safe='')}
 
 
-def execute(run):
+def failure_kind(run):
+    """Classify only a native enum; never retain error text or connector streams."""
+    try:
+        descriptor = os.open(run / 'events.jsonl', os.O_RDONLY | os.O_NOFOLLOW)
+        with os.fdopen(descriptor, 'rb') as handle:
+            info = os.fstat(handle.fileno())
+            if not stat.S_ISREG(info.st_mode):
+                return 'bootstrap_failed'
+            handle.seek(max(0, info.st_size - 65536))
+            tail = handle.read(65536)
+        for line in tail.splitlines():
+            try:
+                message = json.loads(line)
+            except (ValueError, UnicodeDecodeError):
+                continue
+            if not isinstance(message, dict):
+                continue
+            params = message.get('params', {})
+            if not isinstance(params, dict):
+                continue
+            if message.get('method') == 'error':
+                error = params.get('error', {})
+            elif message.get('method') == 'turn/completed':
+                turn = params.get('turn', {})
+                error = turn.get('error', {}) if isinstance(turn, dict) else {}
+            else:
+                continue
+            if isinstance(error, dict) and error.get('codexErrorInfo') == 'unauthorized':
+                return 'authentication_required'
+    except OSError:
+        pass
+    return 'bootstrap_failed'
+
+
+def execute(run, resume=False):
     if run.is_symlink():
         raise ValueError('Run directory cannot be symlinked')
     run = run.resolve(strict=True)
@@ -129,12 +163,22 @@ def execute(run):
         if not isinstance(host, str) or not HOST_ID.fullmatch(host):
             raise ValueError('Verified remote-control Codex host is required')
         receipt_path = run / 'worker-receipt.json'
+        saved = None
         if receipt_path.exists():
             saved = read_json(receipt_path)
-            if saved.get('status') in {'ready_for_review', 'needs_attention', 'starting'}:
+            if not resume and saved.get('status') in {'ready_for_review', 'completed', 'needs_attention', 'starting'}:
                 # A prior launch with an uncertain outcome is never replayed automatically.
                 return {**saved, **session_receipt(run, host)}
-        if (run / 'session.json').exists():
+        resume_link = None
+        if resume:
+            if not saved or saved.get('status') != 'needs_attention':
+                raise ValueError('Explicit resume requires a needs_attention receipt')
+            resume_link = session_receipt(run, host)
+            if not resume_link.get('thread_id'):
+                raise ValueError('Explicit resume requires a verified saved conversation')
+            if saved.get('thread_id') and saved['thread_id'] != resume_link['thread_id']:
+                raise ValueError('Recovery receipt and saved session identity mismatch')
+        elif (run / 'session.json').exists():
             saved = {'status': 'needs_attention', 'initial_turn_status': 'unknown',
                      'error': 'Saved conversation already exists; continue it without replaying.',
                      **session_receipt(run, host)}
@@ -153,15 +197,29 @@ def execute(run):
         receipt = {'status': 'starting', 'initial_turn_status': 'starting',
                    'started_at_unix': int(time.time()), 'title': title_for(packet),
                    'permission_ceiling': 'research_and_local_drafts', 'live_mutations': False}
+        if resume:
+            history = run / 'worker-history'
+            history.mkdir(mode=0o700, exist_ok=True)
+            if history.is_symlink() or not history.is_dir():
+                raise ValueError('Worker history must be a private regular directory')
+            history.chmod(0o700)
+            atomic(history / (str(time.time_ns()) + '-receipt.json'), saved)
+            receipt.update(resume_thread_id=resume_link['thread_id'],
+                           attempt=int(saved.get('attempt', 1)) + 1,
+                           **resume_link)
         atomic(receipt_path, receipt)
         task = {'client_id': 'calendar-sales-handover', 'task_type': 'sales_handover',
                 'title': receipt['title']}
+        if resume:
+            task.update(task_type='feedback', resume_thread_id=resume_link['thread_id'])
         try:
             thread = native.conversation(task, prompt, run, cwd=run, write=True,
                                          timeout=1200, read_only_integrations=True)
             link = session_receipt(run, host)
             if link.get('thread_id') != str(uuid.UUID(thread)):
                 raise ValueError('Saved session identity mismatch')
+            if resume and link['thread_id'] != resume_link['thread_id']:
+                raise ValueError('Recovery changed saved session identity')
             draft = run / 'drafts' / 'internal-handover-email.md'
             result = run / 'result.md'
             if (draft.is_symlink() or not draft.is_file() or not draft.read_text().strip()
@@ -171,10 +229,14 @@ def execute(run):
         except Exception as exc:
             # Exceptions from the helper may contain RPC details; never persist raw streams.
             receipt.update(status='needs_attention', initial_turn_status='failed',
+                           error_kind=failure_kind(run),
                            error='Codex bootstrap did not verify the required draft (' +
                            type(exc).__name__ + '). Inspect the saved conversation; do not replay.')
             try:
-                receipt.update(session_receipt(run, host))
+                failed_link = session_receipt(run, host)
+                if resume and failed_link.get('thread_id') != resume_link['thread_id']:
+                    raise ValueError('Recovery saved session identity mismatch')
+                receipt.update(failed_link)
             except (ValueError, OSError, TypeError):
                 receipt['session_error'] = 'Saved session could not be verified'
         receipt['finished_at_unix'] = int(time.time())
@@ -185,7 +247,9 @@ def execute(run):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('run', type=Path)
+    parser.add_argument('--resume', action='store_true',
+                        help='Explicitly retry a needs_attention bootstrap in its existing saved chat')
     args = parser.parse_args()
     if os.geteuid() != 10001:
         parser.error('Run through the registered non-root codexworker service')
-    print(json.dumps(execute(args.run), ensure_ascii=False))
+    print(json.dumps(execute(args.run, resume=args.resume), ensure_ascii=False))

@@ -42,6 +42,14 @@ launch markers are durable. A timeout after launch requires reconciliation again
 the original session; it never authorises a second chat. Starting a chat and finishing
 the first draft are separately recorded.
 
+Before creation, the supervisor verifies the existing native remote-control host is
+connected. A failed login/connection remains pending for the next scan without making
+an inaccessible chat. Normal provider token refresh uses its existing owner-only
+credential store; no token is copied or shared. If the first turn fails after creation,
+restore that existing login/connection, then explicitly resume the saved run using
+`runtime.py resume --run-key EXACT_RUN_KEY` from `status`. This continues the same
+thread, preserves the prior failure receipt and never creates a replacement chat.
+
 ## Configuration and installation
 
 Supply an operator-only JSON config outside Git containing `calendar_id` (normally

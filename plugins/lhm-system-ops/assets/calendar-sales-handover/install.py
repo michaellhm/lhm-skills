@@ -24,6 +24,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--commit', required=True)
     parser.add_argument('--config-file', required=True, type=Path)
+    parser.add_argument('--hold', action='store_true', help='Install without enabling until live acceptance passes')
     args = parser.parse_args()
     if os.geteuid() != 0 or not re.fullmatch('[a-f0-9]{40}', args.commit):
         parser.error('Root and an immutable full source SHA are required')
@@ -97,9 +98,13 @@ def main():
         hashes = {name: hashlib.sha256((release / name).read_bytes()).hexdigest() for name in FILES}
         for name in ('calendar_read.py',):
             assert hashlib.sha256((PROFILE / name).read_bytes()).hexdigest() == hashes[name]
-        run('/usr/bin/systemctl', 'enable', '--now', UNIT + '.timer')
-        run('/usr/bin/systemctl', 'is-active', UNIT + '.timer')
-        receipt = {'status': 'installed_verified', 'commit': args.commit, 'hashes': hashes,
+        if args.hold:
+            run('/usr/bin/systemctl', 'disable', '--now', UNIT + '.timer')
+        else:
+            run('/usr/bin/systemctl', 'enable', '--now', UNIT + '.timer')
+            run('/usr/bin/systemctl', 'is-active', UNIT + '.timer')
+        receipt = {'status': 'installed_held_for_validation' if args.hold else 'installed_verified',
+            'commit': args.commit, 'hashes': hashes,
             'release': str(release), 'backup': str(backup), 'preflight': preflight}
         (backup / 'installation.json').write_text(json.dumps(receipt, indent=2))
         print(json.dumps(receipt))

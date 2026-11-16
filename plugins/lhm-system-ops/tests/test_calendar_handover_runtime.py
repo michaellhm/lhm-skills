@@ -104,7 +104,8 @@ class DispatchAcceptance(unittest.TestCase):
         launch.assert_not_called()
 
     def test_transcript_not_ready_is_a_retryable_prelaunch_state(self):
-        with patch.object(R, 'fathom_read', return_value={'status': 'not_ready'}), \
+        with patch.object(R, 'visible_host_ready', return_value=True), \
+                patch.object(R, 'fathom_read', return_value={'status': 'not_ready'}), \
                 patch.object(R.subprocess, 'run') as launch:
             for expected in (1, 2):
                 with self.assertRaises(W.DispatchNotStarted):
@@ -112,6 +113,14 @@ class DispatchAcceptance(unittest.TestCase):
                 self.assertEqual(json.loads((self.run / 'meeting-evidence.json').read_text())['attempt'], expected)
         self.assertFalse((self.state / 'launches' / (self.key + '.json')).exists())
         launch.assert_not_called()
+
+    def test_disconnected_host_waits_without_creating_a_chat(self):
+        with patch.object(R, 'visible_host_ready', return_value=False), \
+                patch.object(R, 'fathom_read') as fetch, patch.object(R, 'start_worker') as launch:
+            with self.assertRaises(W.DispatchNotStarted):
+                self.dispatch({'dispatch_key': self.key})
+        fetch.assert_not_called(); launch.assert_not_called()
+        self.assertFalse((self.state / 'launches' / (self.key + '.json')).exists())
 
     def test_untrusted_session_symlink_is_not_followed_by_root(self):
         target = self.state / 'elsewhere.json'

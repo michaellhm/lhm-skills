@@ -14,3 +14,4 @@ PrivateTmp=yes
 ProtectSystem=strict
 ReadWritePaths=/var/lib/lhm-calendar-sales-handover
 ReadWritePaths=-/home/codexworker/.mcp-auth -/home/codexworker/.npm
+ReadWritePaths=/home/codexworker/.codex -/home/codexworker/.cache
