@@ -9,6 +9,13 @@ This skill turns a client's proposed sitemap and current website into one polish
 
 Every client is different. The section library and rules here are a starting kit, not a template to fill in. Decide what this business's homepage needs from the research, then pick, reorder, drop or invent sections to suit.
 
+**Proven layouts.** Two worked examples are bundled:
+
+- `references/clinic-layout-v2.md` with `assets/better-backs-homepage-example.html`: a single-location clinic layout Michael approved. Start from this when he asks for "the Better Backs layout" or "the Rediscover layout", and by default for one-clinic allied health or chiro practices.
+- `references/section-library.md` with `assets/healthstin-homepage-example.html`: multi-location providers with funding schemes and referrers.
+
+Keep the chosen layout's structure and replace every word, colour and photo with the client's own.
+
 ## The process
 
 Work through these stages in order. Show Michael (or whoever asked) the brief before building if anything about the audience or structure is uncertain; otherwise keep moving and let them react to a real page.
@@ -17,7 +24,8 @@ Work through these stages in order. Show Michael (or whoever asked) the brief be
 
 - **Proposed sitemap.** Look for the sitemap deliverable in the client's working folder (usually `prospect-sitemap-opportunity/YYYY-MM/sitemap.json` and its HTML). The homepage nav, service names, funding/getting-started labels and location structure must match it, because the homepage is the front door to that architecture. If there is no sitemap yet, say so and suggest running `prospect-sitemap-opportunity` (prospects) or `client-sitemap-plan` (clients) first.
 - **Current website.** Fetch the homepage and two or three inner pages (a service page, a location or clinic page, the team page). Extract: their hero line and any messaging worth keeping, services, funding schemes, locations and addresses, phone number, reviews and testimonials (verbatim), partner and accreditation logos, awards, team members, and every reasonably sized photo and video. Photos on service and location pages are often far better than the homepage ones, so check them. Use the browser tools or `curl`; `scripts/scan_site_assets.py` lists images with their pixel sizes.
-- **Brand.** Take colours from the live site itself, especially the footer, buttons and clinic or location pages, not just the logo. Note the site's current fonts. Run `scripts/contrast.py` on every text/background pair you plan to use.
+- **Brand.** Take colours from the live site itself, especially the footer, buttons and clinic or location pages, not just the logo. Note the site's current fonts. Run `scripts/contrast.py` on every text/background pair you plan to use. If the only logo is a small PNG, run `scripts/trace_logo.py` to make crisp `logo.svg` and `logo-white.svg` files, check them zoomed in, and ask the client for their vector originals.
+- **Discovery call.** If there's a Fathom recording of the onboarding or strategy call, read the transcript. Take the headline the client approved, their own words about what makes them different, their real new-patient process and the technology they use. Those make the outcome and services sections specific instead of generic.
 - **Reference sites.** If the person names reference sites or earlier LHM prototypes (for example on lhmstaging.net/prototypes/), look at them for structure and tone, not for copy.
 
 ### 2. Write the personas and homepage brief
@@ -34,7 +42,7 @@ Save it as `personas-and-homepage-brief.md` next to the prototype, using `assets
 
 ### 4. Build the page
 
-Read `references/anti-ai-design.md` before writing any markup, then `references/section-library.md` for the proven sections and how each one should be built.
+Read `references/anti-ai-design.md` before writing any markup, then the layout reference you chose (`references/clinic-layout-v2.md` or `references/section-library.md`) for the proven sections and how each one should be built.
 
 - One self-contained `index.html`: inline CSS and JS, Google Fonts link, inline SVG icons. Images may be hotlinked from the client's site for a prototype (check they load with a staging referrer) or saved into an `assets/` folder beside it.
 - Container around 1400px wide. Mobile-first CSS with breakpoints at roughly 640, 960 and 1200px.

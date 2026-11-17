@@ -1,6 +1,6 @@
 # Feedback patterns
 
-Comments that came up while building the Healthstin homepage, and what fixed them. Expect similar feedback from other clients and from Michael.
+Comments that came up while building the Healthstin and Better Backs homepages, and what fixed them. Expect similar feedback from other clients and from Michael.
 
 | Feedback | What fixed it |
 |---|---|
@@ -16,3 +16,13 @@ Comments that came up while building the Healthstin homepage, and what fixed the
 | "Make the bottom call to action like their careers band, all green" | Full-width brand gradient band with the team cut-out breaking out of the top. |
 | "Show the team, but in one row" | One horizontally scrolling row of clinicians from the team page. |
 | "Drop the FAQs" | FAQs belong on their own page, not the homepage. |
+| "That's terrible, way too AIey" (Better Backs v1) | Rebuilt on the clinic layout v2 structure with plainer copy. See `clinic-layout-v2.md`. |
+| "The logo doesn't look crisp, it looks squashed" | The client only had a 200px PNG. Traced it to SVG with `scripts/trace_logo.py` and asked for vector files. |
+| "Use Marlon's navigation, just the top level" | Copied the top-level items from the proposed sitemap page. |
+| "Find the killer headline they liked in the call" | Searched the Fathom transcript for the headlines read out and used the one the client called "perfect". |
+| "Most people wait a while before they call us is the wrong play" | Replaced the pain band with an outcome band built from the founders' own words. |
+| "Can we see his face in the hero?" | Flipped the photo horizontally. |
+| "Add all their services, the health fund logos, the map and the new patient offer" | Eight condition tiles from the live site, greyscale fund logos above the footer, a Google Maps iframe and an offer band with the site's terms. Flagged the conflicting offer prices. |
+| "The offer looks a tiny bit off" | Put price, inclusions and button in one row with a divider and moved the terms to a full-width row underneath. |
+| "Make the final call to action pop" | A wide gradient card half over the footer, with founder portraits and a light border so its edge stays visible. |
+| "Remove the conditions chips from the hero, get SEO in the eyebrow" | Eyebrow became "Chiropractor in Parramatta"; chips removed. |
