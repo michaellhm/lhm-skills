@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Better Backs Better Living Homepage v2</title>
+<meta name="description" content="Chiropractors in Parramatta. Pierre Faddoul and Stelios Matsis help with back pain, neck pain, headaches and sciatica.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@500;600;700;800&family=Noto+Sans:wght@400;600&display=swap">
+<style>
+/* Same rhythm as the Rediscover v2 prototype: photo hero, overlapping trust bar, reversed navy bands, photo cards, numbered steps */
+:root{
+  --ink:#1B2233; --text-2:#4A5468; --navy-900:#1A2360; --navy-700:#2B3A8C; --cyan:#5BC0EB; --cyan-deep:#0F6F9E; --cyan-soft:#D8ECF8;
+  --mist:#EEF4FA; --sand:#F7F4EC; --line:#DDE3EC; --white:#FFFFFF; --bg:#FFFFFF;
+  --display:"Figtree",system-ui,sans-serif; --body:"Noto Sans",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.6 var(--body);margin:0}
+h1,h2,h3{font-family:var(--display);line-height:1.12;text-wrap:balance;margin:0}
+h2{font-size:clamp(1.9rem,3.4vw,2.7rem);font-weight:800;letter-spacing:-.01em}
+h3{font-size:1.2rem;font-weight:700}
+p{margin:0}
+a{color:inherit}
+img{max-width:100%;display:block}
+.wrap{max-width:1220px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.sec{padding-block:88px}
+.kicker{display:inline-flex;align-items:center;gap:8px;font:700 .82rem/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--cyan-deep)}
+.kicker::before{content:"";width:22px;height:3px;background:var(--cyan);border-radius:2px}
+.on-dark .kicker{color:var(--cyan)}
+.hero .kicker{color:var(--white)}
+.head{display:grid;gap:14px;max-width:680px;margin-bottom:44px}
+.head p{color:var(--text-2);font-size:1.08rem}
+.on-dark .head p{color:var(--cyan-soft)}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 24px;border-radius:999px;font:700 1rem var(--display);text-decoration:none;transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
+.btn-cyan{background:var(--cyan);color:var(--navy-900)}
+.btn-navy{background:var(--navy-700);color:var(--white)}
+.btn-ghost{border:2px solid currentColor;color:var(--white)}
+.btn-line{border:2px solid var(--navy-700);color:var(--navy-700)}
+.i{width:24px;height:24px;flex:none}
+.skip{position:absolute;left:-999px;top:8px;background:var(--white);padding:10px 16px;z-index:50;border-radius:8px}
+.skip:focus{left:12px}
+
+/* header */
+.strip{background:var(--navy-900);color:var(--cyan-soft);font-size:.9rem}
+.strip .wrap{display:flex;justify-content:space-between;gap:16px;padding-block:8px;flex-wrap:wrap}
+.strip a{text-decoration:none;color:var(--white);font-weight:600}
+header.site{position:sticky;top:0;z-index:20;background:var(--white);border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-block:10px}
+.logo img{height:60px;width:auto;display:block}
+nav ul{display:flex;gap:24px;white-space:nowrap;list-style:none;margin:0;padding:0;font:600 .98rem var(--display)}
+nav a{text-decoration:none}
+nav a:hover{color:var(--cyan-deep)}
+@media(max-width:1120px){nav{display:none}}
+@media(max-width:420px){.logo img{height:48px}header.site .btn{padding:0 18px}}
+
+/* hero */
+.hero{position:relative;color:var(--white);overflow:hidden;background:var(--navy-900)}
+.hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:25% 25%;opacity:.6;transform:scaleX(-1)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(26,35,96,.96) 0%,rgba(26,35,96,.78) 46%,rgba(26,35,96,.15) 100%)}
+.hero .wrap{position:relative;z-index:1;padding-block:96px 120px;display:grid;gap:26px}
+.hero h1{font-size:clamp(2.6rem,6vw,4.6rem);font-weight:800;max-width:14ch;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--cyan)}
+.hero .lede{font-size:1.2rem;max-width:34rem;color:var(--cyan-soft)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;list-style:none;padding:0;margin:0}
+.chips li{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 16px;font:600 .95rem var(--display)}
+.chips .i{width:18px;height:18px;color:var(--cyan)}
+@media(max-width:700px){.hero::after{background:linear-gradient(180deg,rgba(26,35,96,.82) 0%,rgba(26,35,96,.95) 100%)}.hero .wrap{padding-block:64px 100px}}
+
+/* trust bar overlapping hero */
+.trust{position:relative;z-index:2;margin-top:-56px}
+.trust ul{list-style:none;margin:0;padding:22px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;background:var(--white);border-radius:18px;box-shadow:0 18px 40px rgba(26,35,96,.14)}
+.trust li{display:flex;gap:14px;align-items:center;font:600 .98rem/1.3 var(--display)}
+.trust .ico{width:48px;height:48px;border-radius:12px;background:var(--mist);color:var(--navy-700);display:grid;place-items:center;flex:none}
+.trust small{display:block;font:400 .85rem var(--body);color:var(--text-2)}
+@media(max-width:900px){.trust ul{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.trust ul{grid-template-columns:1fr}}
+
+/* team */
+.team .split{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;list-style:none;padding:0;margin:0}
+.member{position:relative;border-radius:18px;overflow:hidden}
+.member img{aspect-ratio:4/5;object-fit:cover;width:100%}
+.member .cap{position:absolute;inset:auto 0 0 0;padding:70px 18px 18px;background:linear-gradient(transparent,rgba(26,35,96,.96));color:var(--white)}
+.member .cap p{font-size:.88rem;color:var(--cyan-soft);line-height:1.4;margin-top:4px}
+.team .lead p{color:var(--text-2);font-size:1.08rem;margin-top:16px}
+.team .lead .btns{margin-top:26px}
+@media(max-width:900px){.team .split{grid-template-columns:1fr;gap:36px}}
+
+/* problem band */
+.problem{background:var(--navy-900);color:var(--white)}
+.prob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.prob{background:var(--navy-700);border-radius:18px;padding:30px;display:grid;gap:14px;align-content:start}
+.prob .ico{width:56px;height:56px;border-radius:50%;background:var(--cyan);color:var(--navy-900);display:grid;place-items:center}
+.prob p{color:var(--cyan-soft)}
+.prob h3{font-size:1.35rem}
+@media(max-width:860px){.prob-grid{grid-template-columns:1fr}}
+
+/* first visits split */
+.outcome .split{display:grid;grid-template-columns:1fr 1.05fr;gap:56px;align-items:center}
+.outcome figure{margin:0;position:relative}
+.outcome figure img{border-radius:22px;aspect-ratio:4/5;object-fit:cover;object-position:40% 50%;width:100%}
+.outcome figcaption{position:absolute;left:-18px;bottom:28px;background:var(--cyan);color:var(--navy-900);padding:14px 18px;border-radius:14px;font:700 .98rem/1.3 var(--display);max-width:240px;box-shadow:0 10px 24px rgba(0,0,0,.15)}
+.ticks{list-style:none;margin:28px 0 32px;padding:0;display:grid;gap:18px;counter-reset:t}
+.ticks li{display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start}
+.ticks li::before{counter-increment:t;content:counter(t);width:44px;height:44px;border-radius:12px;background:var(--navy-700);color:var(--white);font:800 1.15rem var(--display);display:grid;place-items:center}
+.ticks strong{font:700 1.1rem var(--display);display:block}
+.ticks span{color:var(--text-2)}
+@media(max-width:900px){.outcome .split{grid-template-columns:1fr}.outcome figure img{aspect-ratio:4/3}.outcome figcaption{left:12px}}
+
+/* concerns: photo cards */
+.who{background:var(--sand)}
+.who-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.person{background:var(--white);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;transition:transform .2s,box-shadow .2s}
+.person:hover{transform:translateY(-4px);box-shadow:0 16px 30px rgba(26,35,96,.12)}
+.person img{aspect-ratio:4/3;object-fit:cover;width:100%}
+.person .tag{background:var(--navy-900);color:var(--cyan);font:700 .78rem var(--display);letter-spacing:.06em;text-transform:uppercase;padding:8px 18px}
+.person .body{padding:20px 20px 24px;display:grid;gap:8px}
+.person p{color:var(--text-2);font-size:.97rem}
+.go{display:inline-flex;align-items:center;gap:6px}
+.go .a{width:18px;height:18px}
+.person .go{margin-top:6px;font:700 .95rem var(--display);color:var(--cyan-deep)}
+.scope{margin-top:28px;color:var(--text-2);font-size:.97rem;max-width:62ch}
+@media(max-width:1000px){.who-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.who-grid{grid-template-columns:1fr}}
+
+/* how we help: bento */
+.bento{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.svc{border-radius:18px;padding:28px;display:grid;gap:12px;grid-template-rows:auto auto 1fr auto;text-decoration:none;background:var(--navy-700);color:var(--white);transition:transform .2s}
+.svc:hover{transform:translateY(-3px)}
+.svc .ico{width:52px;height:52px;border-radius:14px;background:var(--cyan);color:var(--navy-900);display:grid;place-items:center}
+.svc p{color:var(--cyan-soft)}
+.svc .go{font:700 .95rem var(--display);color:var(--cyan)}
+.svc.feature{grid-column:span 2;padding:0;overflow:hidden;grid-template-rows:auto 1fr}
+.svc.feature img{width:100%;aspect-ratio:16/8;object-fit:cover}
+.svc.feature .in{padding:28px;display:grid;gap:12px;align-content:start}
+@media(max-width:900px){.bento{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.bento{grid-template-columns:1fr}.svc.feature{grid-column:auto}}
+
+/* questions */
+.worry{background:var(--navy-700);color:var(--white)}
+.worry .split{display:grid;grid-template-columns:.85fr 1.15fr;gap:48px;align-items:start}
+.worry .head{margin-bottom:28px}
+details{background:var(--white);color:var(--ink);border-radius:14px;margin-bottom:12px}
+summary{cursor:pointer;list-style:none;padding:20px 22px;font:700 1.08rem var(--display);display:flex;justify-content:space-between;gap:16px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:700 1.5rem/1 var(--display);color:var(--navy-700);transition:transform .2s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{padding:0 22px 22px;color:var(--text-2)}
+details a{color:var(--cyan-deep);font-weight:600}
+@media(max-width:900px){.worry .split{grid-template-columns:1fr;gap:12px}}
+
+/* visit */
+.visit .split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.facts{list-style:none;margin:28px 0 30px;padding:0;display:grid;gap:18px}
+.facts li{display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start}
+.facts .ico{width:44px;height:44px;border-radius:12px;background:var(--mist);color:var(--navy-700);display:grid;place-items:center}
+.facts strong{font:700 1.05rem var(--display);display:block}
+.facts span{color:var(--text-2)}
+.map{border-radius:22px;background:var(--mist);border:0;width:100%;min-height:400px;display:block}
+@media(max-width:900px){.visit .split{grid-template-columns:1fr}.map{min-height:260px}}
+
+/* offer */
+.offer{padding-bottom:88px}
+.offer-card{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"price list cta" "terms terms terms";gap:20px 48px;align-items:center;background:var(--cyan-soft);border-radius:22px;padding:36px 44px 24px}
+.o-price{grid-area:price;padding-right:48px;border-right:2px solid rgba(43,58,140,.15)}
+.o-list{grid-area:list}
+.o-cta{grid-area:cta}
+.o-terms{grid-area:terms;border-top:1px solid rgba(43,58,140,.15);padding-top:16px;text-align:center;font-size:.78rem;color:var(--text-2);line-height:1.4}
+.o-price h2 b{color:var(--navy-700)}
+.o-price p{color:var(--text-2);margin-top:6px}
+.o-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:14px 28px;align-content:center}
+.o-list li{display:flex;gap:10px;align-items:center;font-weight:600;font-size:.97rem}
+.o-list .i{color:var(--navy-700);width:22px;height:22px;margin-top:1px}
+@media(max-width:1000px){.offer-card{grid-template-columns:1fr;grid-template-areas:"price" "list" "cta" "terms";gap:22px;padding:28px}.o-price{padding-right:0;border-right:0}.o-terms{text-align:left}}
+@media(max-width:560px){.o-list{grid-template-columns:1fr}}
+.outcome{padding-bottom:56px}
+/* conditions */
+.cond-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.cond{background:var(--white);border-radius:18px;padding:24px;display:grid;gap:10px;grid-template-rows:auto auto 1fr auto;text-decoration:none;transition:transform .2s,box-shadow .2s}
+.cond:hover{transform:translateY(-4px);box-shadow:0 16px 30px rgba(26,35,96,.12)}
+.cond .ico{width:48px;height:48px;border-radius:12px;background:var(--navy-700);color:var(--white);display:grid;place-items:center}
+.cond p{color:var(--text-2);font-size:.95rem}
+.cond .go{font:700 .95rem var(--display);color:var(--cyan-deep)}
+@media(max-width:1000px){.cond-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.cond-grid{grid-template-columns:1fr}}
+/* funds */
+.funds{border-top:1px solid var(--line);text-align:center}
+.funds .wrap{padding-block:56px;display:grid;gap:10px;justify-items:center}
+.funds h2{font-size:clamp(1.3rem,2.2vw,1.7rem)}
+.funds p{color:var(--text-2)}
+.funds ul{list-style:none;margin:24px 0 0;padding:0;display:grid;grid-template-columns:repeat(6,1fr);gap:22px 32px;align-items:center;justify-items:center;width:100%;max-width:940px}
+.funds img{height:48px;width:auto;max-width:120px;object-fit:contain;filter:grayscale(1) contrast(1.1);opacity:.6;mix-blend-mode:multiply;transition:opacity .2s,filter .2s}
+.funds img:hover{opacity:1;filter:none}
+@media(max-width:800px){.funds ul{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:480px){.funds ul{grid-template-columns:repeat(3,1fr);gap:18px}.funds img{height:34px;max-width:88px}}
+
+/* cta + footer */
+.cta{background:linear-gradient(var(--white) 50%,var(--navy-900) 50%)}
+.cta-card{position:relative;overflow:hidden;display:grid;grid-template-columns:1.25fr .75fr;gap:40px;align-items:center;background:linear-gradient(120deg,#3A4BA8 0%,var(--navy-700) 60%);color:var(--white);border-radius:28px;padding:64px;border:1px solid rgba(255,255,255,.14);box-shadow:0 30px 60px rgba(10,14,40,.35)}
+.cta-card::before{content:"";position:absolute;width:520px;height:520px;right:-140px;top:-180px;border-radius:50%;background:radial-gradient(circle,rgba(91,192,235,.35),transparent 65%)}
+.cta-copy{position:relative;display:grid;gap:18px;justify-items:start}
+.cta-copy .kicker{color:var(--cyan)}
+.cta h2{font-size:clamp(2.2rem,4.4vw,3.4rem);max-width:16ch}
+.cta h2 em{font-style:normal;color:var(--cyan)}
+.cta-copy p{color:var(--cyan-soft);font-size:1.12rem;max-width:42ch}
+.cta-copy .btns{margin-top:8px}
+.cta-team{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0;justify-items:center;align-items:center;max-width:320px;justify-self:center}
+.cta-team img{width:150px;height:150px;border-radius:50%;object-fit:cover;border:5px solid var(--navy-900);box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.cta-team img:first-child{transform:translateX(18px)}
+.cta-team img:nth-child(2){transform:translateX(-18px) translateY(24px)}
+.cta-team p{grid-column:1/-1;margin-top:34px;text-align:center;color:var(--cyan-soft);font-size:.92rem}
+.cta-team b{display:block;color:var(--white);font:700 1.05rem var(--display)}
+@media(max-width:900px){.cta-card{grid-template-columns:1fr;padding:44px 28px}.cta-team{justify-self:start}}
+@media(max-width:480px){.cta-team img{width:116px;height:116px}}
+footer{background:var(--navy-900);color:var(--cyan-soft);font-size:.95rem}
+footer .wrap{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:32px;padding-block:56px}
+footer h3{color:var(--white);font-size:1rem;margin-bottom:10px}
+footer ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+footer a{text-decoration:none}
+footer a:hover{color:var(--white)}
+footer .legal{border-top:1px solid rgba(255,255,255,.15);padding-block:20px;font-size:.85rem;display:block}
+@media(max-width:800px){footer .wrap{grid-template-columns:1fr 1fr}}
+.proto{background:#FFF3C4;color:#4A3B00;font-size:.85rem;text-align:center;padding:8px 16px}
+.proto a{font-weight:600}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-spine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1.5"/><rect x="8" y="10" width="8" height="4" rx="1.5"/><rect x="8" y="18" width="8" height="4" rx="1.5"/><path d="M12 6v4M12 14v4"/></symbol>
+    <symbol id="i-neck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6" r="4"/><path d="M10 10v3M14 10v3M5 22c0-5 3-9 7-9s7 4 7 9"/></symbol>
+    <symbol id="i-head" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 9h.01M16 9h.01M9 16c1.5-1 4.5-1 6 0"/><path d="M4 4l2 2M20 4l-2 2"/></symbol>
+    <symbol id="i-leg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v8l-2 6 1 6M14 2v7l1 6-2 7"/><path d="M17 8l2 2-2 2M19 14l2 2-2 2"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-question" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-6-2.4l-3.6-3.6a2 2 0 0 1 2.8-2.8L7 15"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+    <symbol id="i-paper" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></symbol>
+    <symbol id="i-dollar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-train" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M9 21l1.5-4M15 21l-1.5-4M9 14h.01M15 14h.01"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-walk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="4" r="2"/><path d="M7 22l3-7 3 2v5M8 12l2-4 4 1 2 4 3 1M10 15l-1-4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21.2l8.8-8.8a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+    <symbol id="i-disc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="5" rx="2"/><rect x="6" y="17" width="12" height="5" rx="2"/><path d="M5 12h14"/><path d="M19 12c1.5 0 2 1 2 1M5 12c-1.5 0-2 1-2 1"/></symbol>
+    <symbol id="i-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><path d="M3 12h18"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/></symbol>
+    <symbol id="i-posture" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><path d="M12 6v8M8 9h8M12 14l-3 8M12 14l3 8"/><path d="M4 2v20M20 2v20" stroke-dasharray="2 3"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14l4-4"/><path d="M3.3 19a10 10 0 1 1 17.4 0"/></symbol>
+  </defs>
+</svg>
+
+<a class="skip" href="#top">Skip to main content</a>
+<div class="proto">Design prototype for review. Links to inner pages are placeholders. <a href="https://lhmstaging.net/prototypes/better-backs/homepage/sitemap.html">View the sitemap</a></div>
+<div class="strip"><div class="wrap"><span>Level 1, 410 Church Street, Parramatta · Monday to Thursday</span><a href="tel:+61298907111">(02) 9890 7111</a></div></div>
+<header class="site"><div class="wrap">
+  <a class="logo" href="#top" aria-label="Better Backs Better Living home"><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/logo.svg" alt="Better Backs Better Living" width="129" height="60"></a>
+  <nav aria-label="Main"><ul>
+    <li><a href="/about/">About</a></li>
+    <li><a href="/services/">Services</a></li>
+    <li><a href="/conditions/">Conditions</a></li>
+    <li><a href="/fees/">Fees</a></li>
+    <li><a href="/areas-we-serve/">Areas we serve</a></li>
+    <li><a href="/learn/">Learn</a></li>
+    <li><a href="#visit">Contact</a></li>
+  </ul></nav>
+  <a class="btn btn-cyan js-book" href="#">Book now</a>
+</div></header>
+
+<main id="top">
+<section class="hero" aria-labelledby="h1">
+  <img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/bb-5.jpg" alt="">
+  <div class="wrap">
+    <span class="kicker">Chiropractor in Parramatta</span>
+    <h1 id="h1">Chiropractic care that <em>finally makes sense</em></h1>
+    <p class="lede">Back pain, neck pain or headaches? Pierre and Stelios have been a familiar face in Parramatta for over 20 years. They'll listen, check your whole spine and explain what they find in plain language.</p>
+    <div class="btns"><a class="btn btn-cyan js-book" href="#">Book an appointment <svg class="i"><use href="#i-arrow"/></svg></a><a class="btn btn-ghost" href="tel:+61298907111"><svg class="i"><use href="#i-phone"/></svg>(02) 9890 7111</a></div>
+  </div>
+</section>
+
+<div class="trust"><div class="wrap"><ul>
+  <li><span class="ico"><svg class="i"><use href="#i-clock"/></svg></span><span>Over 20 years<small>in the same Parramatta practice</small></span></li>
+  <li><span class="ico"><svg class="i"><use href="#i-users"/></svg></span><span>Two chiropractors<small>you see the same face each visit</small></span></li>
+  <li><span class="ico"><svg class="i"><use href="#i-hand"/></svg></span><span>Gentle options<small>no cracking unless you're comfortable</small></span></li>
+  <li><span class="ico"><svg class="i"><use href="#i-train"/></svg></span><span>Near Parramatta Station<small>Level 1, 410 Church Street</small></span></li>
+</ul></div></div>
+
+<section class="sec team" id="team" aria-labelledby="t-h">
+  <div class="wrap split">
+    <div class="lead">
+      <span class="kicker">The people</span>
+      <h2 id="t-h" style="margin-top:14px">Two chiropractors who get to know you, and your family</h2>
+      <p>Better Backs is a small practice. You'll see Pierre or Stelios every time, and many of the families who come to us have been coming for years.</p>
+      <div class="btns"><a class="btn btn-line" href="/about/">About the practice <svg class="i"><use href="#i-arrow"/></svg></a></div>
+    </div>
+    <ul class="team-grid">
+      <li class="member"><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/pierre-1-768x768.jpg" alt="Pierre Faddoul, chiropractor"><div class="cap"><h3>Pierre Faddoul</h3><p>Chiropractor. Master of Chiropractic, Macquarie University</p></div></li>
+      <li class="member"><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/stelios-768x768.jpg" alt="Stelios Matsis, chiropractor"><div class="cap"><h3>Stelios Matsis</h3><p>Chiropractor</p></div></li>
+    </ul>
+  </div>
+</section>
+
+<section class="sec problem on-dark" aria-labelledby="prob-h">
+  <div class="wrap">
+    <div class="head"><span class="kicker">What we're here for</span><h2 id="prob-h">More time doing what you love</h2><p>Pierre and Stelios are known for one thing above all: explaining what's going on with your spine in a way that actually makes sense.</p></div>
+    <div class="prob-grid">
+      <article class="prob"><span class="ico"><svg class="i"><use href="#i-question"/></svg></span><h3>Finally understand what's going on</h3><p>X-rays and nerve scans, then a plain-language walk-through of what they show and what we recommend. No jargon and no guesswork.</p></article>
+      <article class="prob"><span class="ico"><svg class="i"><use href="#i-hand"/></svg></span><h3>Gentle care, done precisely</h3><p>More isn't better. We focus on what your spine needs that visit, often with a very light touch. Plenty of people are surprised how gentle it is.</p></article>
+      <article class="prob"><span class="ico"><svg class="i"><use href="#i-walk"/></svg></span><h3>Back to better living</h3><p>Walking further, a round of golf, the gardening or getting down on the floor with the kids. We check how you're going every visit and re-examine every 12.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="sec outcome" aria-labelledby="out-h">
+  <div class="wrap split">
+    <figure><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/bb-4.jpg" alt="A Better Backs chiropractor explaining a neck X-ray to a patient on screen"></figure>
+    <div>
+      <span class="kicker">Your first visits</span>
+      <h2 id="out-h" style="margin-top:14px">From first call to a clear plan, with no pressure</h2>
+      <ol class="ticks">
+        <li><div><strong>A quick chat first</strong><span>Book online or call. We may ring you beforehand to make sure we're the right fit.</span></div></li>
+        <li><div><strong>We listen and assess</strong><span>We take your history and check your whole spine, not just the sore spot. If imaging would help, we'll explain why.</span></div></li>
+        <li><div><strong>We explain what we found</strong><span>At your second visit we go through the results in plain language and recommend a plan, including how often and what it costs.</span></div></li>
+        <li><div><strong>You decide</strong><span>Ask anything, take it home and think about it. It's your call whether to go ahead.</span></div></li>
+      </ol>
+      <div class="btns"><a class="btn btn-cyan js-book" href="#">Book your first visit <svg class="i"><use href="#i-arrow"/></svg></a><a class="btn btn-line" href="/new-patients/fees/">Fees and health funds</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="offer" aria-labelledby="o-h"><div class="wrap">
+  <div class="offer-card">
+    <div class="o-price"><span class="kicker">New patient offer</span><h2 id="o-h">First visit <b>$75</b></h2><p>Children's first visit $147</p></div>
+    <ul class="o-list">
+      <li><svg class="i"><use href="#i-check"/></svg>Initial consultation with Pierre or Stelios</li>
+      <li><svg class="i"><use href="#i-check"/></svg>Thorough full-body examination</li>
+      <li><svg class="i"><use href="#i-check"/></svg>Nerve system scan</li>
+      <li><svg class="i"><use href="#i-check"/></svg>Spinal X-rays if needed (Medicare bulk billed)</li>
+    </ul>
+    <div class="o-cta"><a class="btn btn-navy js-book" href="#">Claim your first visit <svg class="i"><use href="#i-arrow"/></svg></a></div>
+    <p class="o-terms">For new patients on their first consult only. Does not include treatment. Any health treatment carries risk and individual results vary.</p>
+  </div>
+</div></section>
+
+<section class="sec who" id="concerns" aria-labelledby="who-h">
+  <div class="wrap">
+    <div class="head"><span class="kicker">Conditions</span><h2 id="who-h">What we help with</h2><p>If it's coming from your spine, there's a good chance we can help. Not sure? Call and ask.</p></div>
+    <div class="cond-grid">
+      <a class="cond" href="/lower-back-pain/"><span class="ico"><svg class="i"><use href="#i-spine"/></svg></span><h3>Low back pain</h3><p>Stiffness, pain when bending, or a back that keeps flaring up.</p><span class="go">Read more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+      <a class="cond" href="/neck-pain/"><span class="ico"><svg class="i"><use href="#i-neck"/></svg></span><h3>Neck pain</h3><p>A tight, sore neck or pain turning your head.</p><span class="go">Read more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+      <a class="cond" href="/disc-bulge/"><span class="ico"><svg class="i"><use href="#i-disc"/></svg></span><h3>Disc bulge</h3><p>You've been told you have a disc bulge or disc injury.</p><span class="go">Read more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+      <a class="cond" href="/sciatica/"><span class="ico"><svg class="i"><use href="#i-leg"/></svg></span><h3>Sciatica and nerve pain</h3><p>Pain, tingling or numbness travelling into the leg or arm.</p><span class="go">Read more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+      <a class="cond" href="/headaches-migraines/"><span class="ico"><svg class="i"><use href="#i-head"/></svg></span><h3>Headaches and migraines</h3><p>Headaches that may be linked to your neck or posture.</p><span class="go">Read more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+      <a class="cond" href="/pregnancy/"><span class="ico"><svg class="i"><use href="#i-heart"/></svg></span><h3>Pregnancy-related pain</h3><p>Gentle care for back, hip and pelvic discomfort during pregnancy.</p><span class="go">Read more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+      <a class="cond" href="/whiplash/"><span class="ico"><svg class="i"><use href="#i-car"/></svg></span><h3>Whiplash</h3><p>Neck pain, stiffness or headaches after a car accident or fall.</p><span class="go">Read more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+      <a class="cond" href="/children/"><span class="ico"><svg class="i"><use href="#i-users"/></svg></span><h3>Children</h3><p>Gentle check-ups for posture, sport and school-bag aches.</p><span class="go">Read more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+    </div>
+    <p class="scope">We focus on the spine. If it's a knee, wrist or elbow on its own, we'll tell you honestly on the phone and point you to someone better placed to help.</p>
+  </div>
+</section>
+
+<section class="sec" id="help" aria-labelledby="svc-h">
+  <div class="wrap">
+    <div class="head"><span class="kicker">How we help</span><h2 id="svc-h">Hands-on care, backed by proper testing</h2><p>Not sure where to start? Call us and we'll talk it through.</p></div>
+    <div class="bento">
+      <a class="svc feature" href="/chiropractic-care/"><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/bb.jpg" alt="A chiropractor assessing a patient's spine" style="object-position:50% 20%"><div class="in"><h3>Chiropractic care</h3><p>We assess where it hurts and how the rest of your spine is moving, then adapt our technique to your age and comfort. Hands-on or gentle instrument-assisted adjustments.</p><span class="go">How we work <svg class="i a"><use href="#i-arrow"/></svg></span></div></a>
+      <a class="svc feature" href="/advanced-diagnostics/"><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/bb-2.jpg" alt="A chiropractor pointing to a lower back X-ray while a patient watches"><div class="in"><h3>X-rays and nerve scans</h3><p>Spinal X-rays show us the structure. Nerve scans show how your nervous system is coping. Together they guide your care, and we go through both with you.</p><span class="go">Our diagnostics <svg class="i a"><use href="#i-arrow"/></svg></span></div></a>
+      <a class="svc" href="/spinal-decompression/"><span class="ico"><svg class="i"><use href="#i-spine"/></svg></span><h3>Spinal decompression</h3><p>Dedicated tables for some disc-related back and neck pain, after a full assessment.</p><span class="go">Learn more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+      <a class="svc" href="/gentle-instrument-adjustments/"><span class="ico"><svg class="i"><use href="#i-hand"/></svg></span><h3>Gentle instrument adjustments</h3><p>Precise, light-touch instruments that work as an extension of our hands.</p><span class="go">Learn more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+      <a class="svc" href="/posture-correction/"><span class="ico"><svg class="i"><use href="#i-posture"/></svg></span><h3>Posture checks</h3><p>We measure posture and weight balance, then track how it changes as your spine improves.</p><span class="go">Learn more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+      <a class="svc" href="/your-care/"><span class="ico"><svg class="i"><use href="#i-gauge"/></svg></span><h3>Progress check-ups</h3><p>A quick check every visit and a full re-examination every 12, so you can see where you're up to.</p><span class="go">Learn more <svg class="i a"><use href="#i-arrow"/></svg></span></a>
+    </div>
+  </div>
+</section>
+
+<section class="sec worry on-dark" aria-labelledby="q-h">
+  <div class="wrap split">
+    <div>
+      <div class="head"><span class="kicker">Before you book</span><h2 id="q-h">Questions people often ask us</h2><p>Still unsure? Give us a call. Pierre or Stelios is usually happy to talk it through.</p></div>
+      <a class="btn btn-cyan" href="tel:+61298907111"><svg class="i"><use href="#i-phone"/></svg>(02) 9890 7111</a>
+    </div>
+    <div>
+      <details><summary>Will an adjustment hurt?</summary><p>Adjustments don't need to be forceful. We choose a technique to suit you, and many people are surprised by how light it feels. Some people notice mild soreness afterwards. Tell us how you're going at any point and we'll change our approach.</p></details>
+      <details><summary>Do you crack backs?</summary><p>Not necessarily. We often use gentle instrument-assisted adjustments, and only use manual techniques when they're appropriate and you're comfortable with them.</p></details>
+      <details><summary>Do I need to get changed?</summary><p>No. You stay fully clothed. You might just be asked to take off a heavy jumper or jacket.</p></details>
+      <details><summary>Will I need X-rays?</summary><p>Not always. After your first assessment we'll tell you whether imaging may be useful, explain why, and let you know about any cost before you decide.</p></details>
+      <details><summary>What does it cost?</summary><p>Our new patient fees are on the <a href="/new-patients/fees/">fees page</a>. If care is recommended, we go through the cost of the plan at your second visit before anything begins.</p></details>
+      <details><summary>Do I need a referral?</summary><p>No referral needed. If you already have scans or reports, bring them along.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="sec visit" id="visit" aria-labelledby="v-h">
+  <div class="wrap split">
+    <div>
+      <span class="kicker">Visit us</span>
+      <h2 id="v-h" style="margin-top:14px">In the heart of Parramatta</h2>
+      <ul class="facts">
+        <li><span class="ico"><svg class="i"><use href="#i-pin"/></svg></span><div><strong>Level 1, 410 Church Street</strong><span>Parramatta NSW 2150. Entrance on Church Street.</span></div></li>
+        <li><span class="ico"><svg class="i"><use href="#i-train"/></svg></span><div><strong>Easy to get to</strong><span>A short walk from Parramatta Station and Westfield.</span></div></li>
+        <li><span class="ico"><svg class="i"><use href="#i-cal"/></svg></span><div><strong>Monday to Thursday</strong><span>Call us for appointment times.</span></div></li>
+      </ul>
+      <div class="btns"><a class="btn btn-navy" href="/contact/">Directions and parking <svg class="i"><use href="#i-arrow"/></svg></a></div>
+    </div>
+    <iframe class="map" title="Map showing Better Backs Better Living, 410 Church Street, Parramatta" src="https://maps.google.com/maps?q=Better%20Backs%20Better%20Living%2C%20410%20Church%20St%2C%20Parramatta%20NSW&t=m&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+</section>
+
+<section class="funds" aria-labelledby="f-h"><div class="wrap">
+  <h2 id="f-h">We accept all major private health funds</h2>
+  <p>We also accept Medicare-subsidised visits through a GP Chronic Disease Management plan.</p>
+  <ul><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/ahm-logo.webp" alt="ahm" loading="lazy"></li><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/bupa-logo.png" alt="Bupa" loading="lazy"></li><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/cbhs-healthfund-logo.png" alt="CBHS" loading="lazy"></li><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/defencehealth-logo.webp" alt="Defence Health" loading="lazy"></li><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/gmhba-healthinsurance-logo-1.png" alt="GMHBA" loading="lazy"></li><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/hbf-logo1.png" alt="HBF" loading="lazy"></li><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/hcf-logo1.png" alt="HCF" loading="lazy"></li><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/mbf-logo1.png" alt="MBF" loading="lazy"></li><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/medibank-logo.jpg" alt="Medibank" loading="lazy"></li><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/nib-logo1.webp" alt="nib" loading="lazy"></li><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/teachers-health-logo-1024x551.png" alt="Teachers Health" loading="lazy"></li><li><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/funds/australian-govt-logo1.png" alt="Medicare (Australian Government)" loading="lazy"></li></ul>
+</div></section>
+
+<section class="cta" aria-labelledby="c-h"><div class="wrap">
+  <div class="cta-card">
+    <div class="cta-copy">
+      <span class="kicker">Book your first visit</span>
+      <h2 id="c-h">Ready to talk about your <em>back or neck?</em></h2>
+      <p>Book online, or call and Pierre or Stelios will have a chat with you about what's going on. No referral needed.</p>
+      <div class="btns"><a class="btn btn-cyan js-book" href="#">Book online <svg class="i"><use href="#i-cal"/></svg></a><a class="btn btn-ghost" href="tel:+61298907111"><svg class="i"><use href="#i-phone"/></svg>(02) 9890 7111</a></div>
+    </div>
+    <div class="cta-team" aria-hidden="true">
+      <img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/pierre-1-768x768.jpg" alt="">
+      <img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/stelios-768x768.jpg" alt="">
+      <p><b>Pierre and Stelios</b>Level 1, 410 Church Street, Parramatta</p>
+    </div>
+  </div>
+</div></section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><img src="https://lhmstaging.net/prototypes/better-backs/homepage/assets/logo-white.svg" alt="Better Backs Better Living" style="height:64px;width:auto;margin-bottom:14px"><p>Chiropractic care in Parramatta.</p></div>
+    <div><h3>Visit</h3><p>Level 1, 410 Church Street<br>Parramatta NSW 2150</p></div>
+    <div><h3>Contact</h3><ul><li><a href="tel:+61298907111">(02) 9890 7111</a></li><li><a class="js-book" href="#">Book online</a></li><li><a href="/contact/">Contact us</a></li></ul></div>
+    <div><h3>Hours</h3><ul><li>Monday to Thursday</li><li>Call for appointment times</li></ul></div>
+  </div>
+  <div class="wrap legal">Chiropractic care is not suitable for everyone and results vary between people. Information on this site is general and is not a substitute for an individual assessment. Pierre Faddoul and Stelios Matsis are registered chiropractors with the Chiropractic Board of Australia. © Better Backs Better Living · Privacy · Terms</div>
+</footer>
+
+<script>
+/* Booking destination is configurable. The final booking system is not decided yet. */
+const BOOKING_URL = "https://betterbacks.com.au/book-now/";
+document.querySelectorAll('.js-book').forEach(a=>{a.href=BOOKING_URL;a.target="_blank";a.rel="noopener"});
+/* Prototype: inner pages are not built yet */
+document.querySelectorAll('a[href^="/"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();alert('Prototype link. Planned page: '+a.getAttribute('href'))}));
+</script>
+</body>
+</html>

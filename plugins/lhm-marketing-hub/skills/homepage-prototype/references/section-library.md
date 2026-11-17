@@ -1,6 +1,6 @@
 # Section library
 
-Proven homepage sections, in the order that worked for a multi-location allied health provider. Pick what the personas brief calls for and reorder freely. `assets/healthstin-homepage-example.html` contains working code for every section; search it for the class names given here.
+Proven homepage sections, in the order that worked for a multi-location allied health provider. For a single-location clinic, start from `clinic-layout-v2.md` instead. Pick what the personas brief calls for and reorder freely. `assets/healthstin-homepage-example.html` contains working code for every section; search it for the class names given here.
 
 ## Contents
 
