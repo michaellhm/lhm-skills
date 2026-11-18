@@ -92,3 +92,5 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 - `client-review-release` — Install portable client review skills, scan new/changed/pending pages, propose release questions for operator approval, preserve explicit client approvals and prepare staged GitHub-access, local-setup and review emails with verified sharing routes.
 
 `lhm-project-hub:client-onboarding` — Reviewed website handover, Marlon-managed finance routing, campaign master, required UI UX Pro Max design system and prototype execution prompt.
+
+`lhm-wordpress-hub:post-launch-redirect-review` — Analyse post-launch GSC/GA4 and HTTP evidence, auto-fix uniquely evidenced exact redirects under site-bound release authority, ask Jaimee about uncertain matches, verify live and start daily monitoring after a24-hour pilot.
