@@ -93,4 +93,4 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 
 `lhm-project-hub:client-onboarding` — Reviewed website handover, Marlon-managed finance routing, campaign master, required UI UX Pro Max design system and prototype execution prompt.
 
-`lhm-wordpress-hub:post-launch-redirect-review` — Analyse post-launch GSC/GA4 and HTTP evidence, prepare relevant exact redirect maps, route approved platform changes and pilot review-only recurring monitoring.
+`lhm-wordpress-hub:post-launch-redirect-review` — Analyse post-launch GSC/GA4 and HTTP evidence, auto-fix uniquely evidenced exact redirects under site-bound release authority, ask Jaimee about uncertain matches, verify live and start daily monitoring after a24-hour pilot.
