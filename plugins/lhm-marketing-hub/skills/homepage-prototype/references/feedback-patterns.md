@@ -1,6 +1,6 @@
 # Feedback patterns
 
-Comments that came up while building the Healthstin and Better Backs homepages, and what fixed them. Expect similar feedback from other clients and from Michael.
+Comments that came up while building the Healthstin, Better Backs and Eyecentric homepages, and what fixed them. Expect similar feedback from other clients and from Michael.
 
 | Feedback | What fixed it |
 |---|---|
@@ -26,3 +26,14 @@ Comments that came up while building the Healthstin and Better Backs homepages, 
 | "The offer looks a tiny bit off" | Put price, inclusions and button in one row with a divider and moved the terms to a full-width row underneath. |
 | "Make the final call to action pop" | A wide gradient card half over the footer, with founder portraits and a light border so its edge stays visible. |
 | "Remove the conditions chips from the hero, get SEO in the eyebrow" | Eyebrow became "Chiropractor in Parramatta"; chips removed. |
+| "Get rid of the homepage concept for review bar and move it all up" (Eyecentric) | Removed the yellow review banner; noindex is enough. Also removed the "Homepage concept by Local Health Marketing" footer line. |
+| "The black navigation's too dark" | Header in the brand's main colour (aubergine), address strip one shade deeper. |
+| "That black band is a bit too dark, lighten it up" | Mid-tone brand shade for the band, translucent white cards. |
+| "Get rid of the red dash, keep the hero label all white" | Hero label white with no rule. Other label rules in the brand colour, or white on dark. |
+| "The Book button text should be white, and say Book an appointment" | White text on a darkened brand teal that passes 4.5:1; the same label on every booking button. |
+| "It's more about 30 years' experience each, more than what you need for the price" | Team copy rewritten around combined experience and value, with no competitor named. |
+| "Just Google a stock photo of the equipment" | Free Unsplash photo saved locally, with the credit recorded in the brief. |
+| "Line up the two boxes" | The image `height` attribute was overriding the CSS aspect ratio. Added `height:auto` so paired feature cards match. |
+| "Add the brands they work with, and grey health fund logos" | Brands section (lens partner card plus a frame-brand logo grid) and a greyscale fund logo row, logos pulled from the client's site. |
+| "How important are footer links for SEO? It looks cleaner without" | Kept the footer clean. Header nav and body links carry internal linking; footer links add little. Privacy and Terms become real links in the build. |
+| "Do they need Conditions in the nav?" | Logged it as a client question: keep it only if they manage those conditions themselves. |

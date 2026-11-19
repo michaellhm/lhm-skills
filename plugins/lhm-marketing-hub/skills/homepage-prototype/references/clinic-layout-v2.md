@@ -14,7 +14,7 @@ Keep the structure and rhythm and swap everything else: brand colours, logo, pho
 
 | # | Section (class) | Job | Where the content comes from |
 |---|---|---|---|
-| 1 | Prototype note, top strip, sticky header (`.proto`, `.strip`, `header.site`) | Address, hours and phone at a glance; nav; one Book button | Live site. **Nav = the top level of the proposed sitemap** (for Better Backs, Marlon's: About, Services, Conditions, Fees, Areas we serve, Learn, Contact). Hide the nav under about 1120px and keep the logo and Book button |
+| 1 | Prototype note, top strip, sticky header (`.proto`, `.strip`, `header.site`) | Address, hours and phone at a glance; nav; one Book button | Live site. **Nav = the top level of the proposed sitemap** (for Better Backs, Marlon's: About, Services, Conditions, Fees, Areas we serve, Learn, Contact). Hide the nav under about 1120px and keep the logo, the Book button and an accessible Menu button that opens the same links (see "Refinements from Eyecentric") |
 | 2 | Photo hero (`.hero`) | Eyebrow, H1, one lede, two buttons | Eyebrow carries the SEO term ("Chiropractor in Parramatta"). H1 is a short promise about the experience, not a pain list ("Chiropractic care that finally makes sense"). Put the client's favourite line from the call in the lede. **No condition chips in the hero**: the conditions grid covers them |
 | 3 | Trust bar overlapping the hero (`.trust`) | Four quick reasons to trust them | Verified facts only: years in practice, who you'll see, gentle options, location |
 | 4 | Team (`.team`) | Faces early | Real portraits; heading in the client's voice ("Two chiropractors who get to know you, and your family") |
@@ -25,6 +25,7 @@ Keep the structure and rhythm and swap everything else: brand colours, logo, pho
 | 9 | How we help, bento (`.bento`, two `.svc.feature` + four `.svc`) | Treatments and technology | Two photo features (core treatment, diagnostics). Four small tiles for differentiators from the call (decompression, instruments, posture checks, progress re-examinations). Don't repeat sections already on the page (first visit, fees) |
 | 10 | FAQ band (`.worry`) | Objections before booking | What the client said people worry about |
 | 11 | Visit (`.visit`) with a live Google Maps iframe | Getting there | Address, transport, hours; embed `maps.google.com/maps?q=<name, address>&output=embed` |
+| 11b | Brands and suppliers (optional, retail-led practices) | Show what they stock and trust | Supplier logos pulled from their products or partners page (Eyecentric: Rodenstock lenses plus eight frame brands), greyscale on a white panel, colour on hover. Confirm the brands are still current |
 | 12 | Health fund logos (`.funds`) | "We accept all major private health funds" | Logos pulled from their site, shown greyscale at reduced opacity in a 6/4/3-column grid, colour on hover |
 | 13 | Call-to-action card (`.cta-card`) half over the footer | Last push to book | Section background split white/navy at 50%. Brighter gradient card with a thin light border so its bottom edge stays visible; founder portraits and the address on the right |
 | 14 | Footer | Visit, contact, hours, Ahpra-style disclaimer | Live site |
@@ -51,3 +52,18 @@ Small PNG logos look soft and squashed. Run `scripts/trace_logo.py logo.png asse
 
 - Ahpra: no outcome claims (immunity, fertility, digestion, anxiety and so on), even when the client tells those stories on the call. Keep "results vary" style terms on offers and a general disclaimer in the footer.
 - Don't invent testimonials, credentials, statistics or prices. Record unconfirmed facts in the working notes for the client to check.
+
+## Refinements from Eyecentric (optometry, November 2026)
+
+Michael called the revised Eyecentric homepage "perfect". These rules came from his two review rounds and apply to every build on this layout.
+
+- **Header colour:** use the brand's main colour for the sticky header and a slightly deeper shade for the address strip. A near-black header was "too dark".
+- **Dark bands:** use a mid-tone shade of the brand colour, not the darkest shade. Cards on a dark band can be translucent white panels (`rgba(255,255,255,.08)` with a light border) instead of a second solid colour.
+- **Section labels:** the hero label is plain white text, with no dash and no underline. Elsewhere the short rule before a label uses the brand colour on light sections and white on dark ones. An accent-colour rule (Eyecentric's coral) read as a stray "red line".
+- **Booking buttons:** every button says "Book an appointment", never "Book on <platform>". Use white text. If white fails contrast on the brand colour, darken that colour for the button (Eyecentric teal `#2FA5A2` became `#1F7A77`, 5.11:1) rather than switching to dark text.
+- **Team section copy:** lead with the founders' combined experience and what patients get for the price ("more than the minimum"). Don't frame it as "unlike a busy chain", and never name competitors.
+- **Brand motifs:** if the client has a distinctive pattern, use it in a few deliberate places (over the hero photo, one band, the final call to action). Don't add an extra decorative strip above the address bar.
+- **Footer:** keep it clean, with no navigation link columns. Visit, contact and hours only, plus a disclaimer line. Privacy and Terms become real links in the build. No "concept by" credit.
+- **Mobile menu:** below 1120px show a Menu button (`aria-expanded`, `aria-controls`) that drops the nav as a full-width panel. Focus moves to the first link, and Escape closes it and returns focus. At 400px and below, show the icon only with a visually hidden label. The example file includes it.
+- **Navigation scope:** an item like "Conditions" goes in the top nav only if the client diagnoses and manages those conditions. If they mostly monitor and refer, list it as a question for the client and fold the pages under the relevant service.
+- **Missing photos:** use a free-licence stock photo, not a placeholder panel (see SKILL.md step 4).

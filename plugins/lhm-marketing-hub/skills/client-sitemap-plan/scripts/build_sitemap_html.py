@@ -588,7 +588,8 @@ def build(spec, prev=None):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{esc(b['name'])} — Proposed Sitemap{title_suffix}</title>
+<meta name="robots" content="noindex, nofollow">
+<title>{esc(b['name'])}: Proposed Sitemap{title_suffix}</title>
 <style>{css}</style>
 </head>
 <body>
@@ -608,9 +609,9 @@ def build(spec, prev=None):
     <p>{intro.get('paragraph','')}</p>
     <div class="meta">{stats}</div>
     <div class="legend">
-      <span><span class="dot have"></span> <b style="color:var(--have)">Existing</b>&nbsp;— you already have this page</span>
-      <span><span class="dot enh"></span> <b style="color:var(--enh-txt)">Enhance</b>&nbsp;— exists, rebuild to rank &amp; convert</span>
-      <span><span class="dot new"></span> <b style="color:var(--new)">New</b>&nbsp;— doesn't exist yet</span>
+      <span><span class="dot have"></span> <b style="color:var(--have)">Existing</b>&nbsp;· you already have this page</span>
+      <span><span class="dot enh"></span> <b style="color:var(--enh-txt)">Enhance</b>&nbsp;· exists, rebuild to rank &amp; convert</span>
+      <span><span class="dot new"></span> <b style="color:var(--new)">New</b>&nbsp;· doesn't exist yet</span>
       <span>🔎 Green number = monthly searches · "n/a" = no volume recorded</span>
       {legend_chg}
     </div>
