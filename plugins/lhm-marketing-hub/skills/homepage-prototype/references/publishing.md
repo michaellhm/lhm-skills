@@ -5,7 +5,7 @@ Publishing shows the page to the client. Only publish when the person asks for i
 ## Where it goes
 
 - Repository: `michaellhm/lhm-prototype`, branch `main`. Every push to `main` triggers the "Deploy to lhmstaging" action, which copies the repository to `https://lhmstaging.net/prototypes/`.
-- Paths: `<client-slug>/homepage/index.html` for the homepage and `<client-slug>/sitemap/index.html` for the matching proposed sitemap. Only touch those paths, `<client-slug>/README.md` and the root `README.md`.
+- Paths: `<client-slug>/homepage/index.html` for the homepage, with its `assets/` folder beside it, and `<client-slug>/homepage/sitemap.html` for the matching proposed sitemap (the Better Backs and Eyecentric convention). Older prototypes use `<client-slug>/sitemap/index.html`, which is also fine. Any asset path in the sitemap, such as the brand logo, must resolve from where the file is published. Only touch those paths, `<client-slug>/README.md` and the root `README.md`.
 - Add `<meta name="robots" content="noindex, nofollow">` to each page before publishing.
 - Add one row per page to the "Current contents" table in the root `README.md`.
 
@@ -15,7 +15,7 @@ Publishing shows the page to the client. Only publish when the person asks for i
 2. Clone the repository fresh (or pull), copy the approved files into place, and confirm the copied hashes match the Drive files.
 3. Commit with a clear message and push to `main`.
 4. Watch the deploy: `gh run list -R michaellhm/lhm-prototype --commit <sha>` then `gh run watch <id> --exit-status`.
-5. Read back each live URL with `curl` and confirm its SHA-256 matches the Drive file exactly.
+5. Read back each live URL with `curl` and confirm its SHA-256 matches the Drive file exactly. lhmstaging sits behind Cloudflare, whose email obfuscation rewrites `mailto:` links (`/cdn-cgi/l/email-protection`) and injects `email-decode.min.js`, so a page with an email address will not hash-match. When that happens, diff the live file against the published file and accept the publish only if those Cloudflare rewrites are the sole differences. Record that in the report.
 6. Report the live URLs, the commit and anything QA flagged.
 
 The deploy mirrors the whole repository to the server, so never delete or rewrite other clients' folders.

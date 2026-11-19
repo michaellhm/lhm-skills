@@ -6,6 +6,7 @@ Check the page the way a client will see it, then check the details a client wil
 
 - **Look at real screenshots.** DOM measurements miss ugly things. For full-resolution desktop screenshots use headless Chrome; `scripts/screenshot.sh` captures the full page and crops any section by vertical offset.
 - **Headless Chrome won't render narrower than about 500px.** For phone checks use the browser pane's mobile preset (375px wide), not headless Chrome; headless captures below 500px look cut off when they aren't.
+- **Serve the folder over localhost for the browser pane.** A `file://` page outside the project opens as a static snapshot with no relative images. Run `python3 -m http.server 8765 --bind 127.0.0.1` from the client folder in the background and open `http://127.0.0.1:8765/...`; stop the server when you finish.
 - **The browser pane caches local files.** After editing a local HTML file, navigate to it again (or open a fresh tab). Reloading the same tab can show the old version.
 - **Resize, then reload.** Some layout logic (for example dropdown flipping) runs on load, so measure after a reload at the new size.
 
@@ -16,6 +17,8 @@ Check the page the way a client will see it, then check the details a client wil
 - Every image has loaded (`naturalWidth > 0`) and the video plays, loops and pauses.
 - Menus, tabs, carousels and toggles work by click and by keyboard, and each control only moves its own section (shared class names have broken this before).
 - Exactly one `h1`, headings in order, visible focus outlines, buttons at least 44px tall.
+- Paired cards line up: compare the image heights and heading positions of side-by-side feature cards. Any `<img>` with `width`/`height` attributes and a CSS `aspect-ratio` also needs `height:auto`, or the attribute height wins.
+- On a phone, the Menu button opens the nav by keyboard (Enter), moves focus to the first link, and Escape closes it.
 - Every text/background pair passes contrast: `python3 scripts/contrast.py "#FFFFFF" "#3B7D23"`.
 
 ## Content checks

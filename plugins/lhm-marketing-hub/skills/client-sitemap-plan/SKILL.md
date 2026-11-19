@@ -86,7 +86,7 @@ python scripts/build_workbook.py sitemap.json "‹Client›-Website-Content-Plan
 
 The script prints which mode it rendered. Confirm it says **client (no widget)**.
 
-The workbook is genuinely useful here, more so than in a pitch, because the client can sort and annotate it as pages get written. It needs `openpyxl`.
+The workbook is genuinely useful here, more so than in a pitch, because the client can sort and annotate it as pages get written. It needs `openpyxl`. On a Mac with an externally managed system Python, `pip install` is refused: create a virtual environment (`python3 -m venv <scratch>/venv && <scratch>/venv/bin/pip install openpyxl`) and run both scripts with that interpreter. Both generated pages carry `noindex` and no em dashes, so they can be published to lhmstaging as they are.
 
 Save outputs to the canonical destination resolved in *Before Starting*. Where a local working copy is also wanted, use `client/client-sitemap-plan/YYYY-MM/`.
 
