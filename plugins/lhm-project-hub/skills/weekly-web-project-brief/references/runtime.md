@@ -64,3 +64,8 @@ Installation remains explicit: update the runtime and both scoped skill links fr
 
 
 Explicit recovery: `weekly_runtime.py recover --week YYYY-MM-DD --continue-from YYYY-MM-DD` resumes the original failed research on the current Monday after 08:00 under the current immutable release. It preserves the original failed run, source times and evidence, uses a separate commit-keyed recovery directory, refreshes relevant reads, runs independent review and sends through the same weekly production receipt. It refuses any existing production receipt, which must be reconciled instead of resent. Run recovery in a supervised one-shot service, with no concurrent scheduled worker; never delete status or receipts to force a rerun.
+
+
+## Explicit catch-up outside Monday
+
+Only on Michael’s explicit request, run `weekly_runtime.py catch-up --week <missed-Monday> --authorised-catch-up` in a supervised one-shot service. It starts fresh, labels the report Catch-up, records the actual cutoff, runs ordinary independent QA, uses the same weekly production receipt, and publishes the matching shared archive. It rejects future/non-Monday weeks and any existing receipt. This operator-only mode does not change the scheduled queue’s Monday guard. Activate the watcher, alert timer and existing no-agent cron only after source preflight and a reviewed live run pass.

@@ -170,8 +170,22 @@ def wait_for_delivery(week, clock=None, sleep=None):
         sleep(min(60,remaining))
 
 
-def run(cfg,week,mode,continue_from=None):
+def validate_catch_up(week, authorised=False, at=None):
+    at = (at or datetime.now(TZ)).astimezone(TZ)
+    day = date.fromisoformat(week)
+    if not authorised or day.weekday() != 0 or day > at.date():
+        raise ValueError('Explicit catch-up authority and a past/current Monday are required')
+    return week
+
+
+def run(cfg,week,mode,continue_from=None,authorised_catch_up=False):
     state=Path(cfg['state']);state.mkdir(parents=True,exist_ok=True)
+    if mode == 'catch-up':
+        validate_catch_up(week, authorised_catch_up)
+        if continue_from:
+            raise ValueError('Catch-up starts fresh; do not import old research')
+        if (state/'receipts'/(week+'-brief.json')).exists():
+            raise ValueError('Existing production receipt requires reconciliation; catch-up will not resend')
     if mode == 'recover':
         at = datetime.now(TZ)
         if at.weekday() != 0 or at.date().isoformat() != week or at.hour < 8 or continue_from != week:
@@ -220,11 +234,16 @@ def run(cfg,week,mode,continue_from=None):
             prompt+=f'\nRead the prior shared weekly note {prior_note} through vault-read, including dated team corrections, if it exists. Treat attributed feedback as evidence to reconcile with current task state; a suggestion is not a confirmed decision. Preserve actual source dates. Missing first-week archive is optional, not a core source failure. Do not read other 60 Knowledge content.'
             repair_contract=repair_prompt(skill,out)
             prompt+='\n'+repair_contract
+            if mode == 'catch-up':
+                prompt += f'\nExplicitly authorised catch-up for the missed week {week}, researched now on {datetime.now(TZ).isoformat()}. Set brief.catch_up=true and identify the missed week and actual fresh evidence cutoff in the intro. Do not backdate reads or present current facts as known on the missed Monday. Reconcile dated commitments against current evidence, preserving original dates and completed outcomes. This remains one normal weekly receipt, not a test or duplicate report.'
             if continue_from:
                 prompt=common+repair_contract+f"\nThis is continuation of {continue_from}, copied into the current research directory, using the same successful live source evidence and original read times. The original CLI session is resumed. Refresh newly relevant records, finish all missing reads and use the CURRENT installed skill path/hash; preserve prior access provenance. Prior independent review failure to resolve: "+str(prior_status.get('error','See prior review result'))
             invoke(cfg,work/'research',prompt,sock,resume=bool(continue_from))
             def core_check():
                 if not (out/'email.json').is_file():raise RuntimeError('No researched payload')
+                if mode == 'catch-up':
+                    if json.loads((out/'brief.json').read_text()).get('catch_up') is not True or not json.loads((out/'email.json').read_text())['subject'].startswith('Catch-up | '):
+                        raise ValueError('Catch-up report must retain its explicit label')
                 retain_raw_reads(work/'research',out)
                 list(safe_files(out))
                 access=json.loads((out/'access-receipt.json').read_text())
@@ -270,17 +289,18 @@ def run(cfg,week,mode,continue_from=None):
             hermes=pwd.getpwnam('hermesagent')
             for p in [dest,*dest.rglob('*')]:os.chown(p,hermes.pw_uid,hermes.pw_gid)
             result={'state':'reviewed_dry_run','week':week,'output':str(dest),'commit':cfg['commit']}
-            if mode in ('scheduled','recover'):
+            if mode in ('scheduled','recover','catch-up'):
                 save(state/'archive'/(week+'.json'), {'state':'awaiting_delivery','week':week,'run':key})
-                wait_for_delivery(week)
+                if mode != 'catch-up':
+                    wait_for_delivery(week)
                 container='/opt/data/profiles/lhm_brain/workspace/weekly-web-project-brief/runs/'+key+'/email.json'
                 cmd=['docker','exec','-u','hermes','hermes','/opt/data/.venv/bin/python','/opt/data/profiles/lhm_brain/skills/weekly-web-project-brief/scripts/brief.py']
-                send=subprocess.run(cmd+['send','--week',week,'--file',container],capture_output=True,text=True,check=True);result=json.loads(send.stdout)
+                send=subprocess.run(cmd+['send','--week',week,'--file',container]+(['--authorised-catch-up'] if mode=='catch-up' else []),capture_output=True,text=True,check=True);result=json.loads(send.stdout)
                 for i in range(4):
                     verify=subprocess.run(cmd+['verify','--week',week],capture_output=True,text=True,check=True);result=json.loads(verify.stdout)
                     if result.get('state') in ('delivered','failed'):break
                     if i<3:time.sleep(15)
-            if mode in ('scheduled','recover') and result.get('state') == 'delivered':
+            if mode in ('scheduled','recover','catch-up') and result.get('state') == 'delivered':
                 from weekly_archive import reconcile
                 result['archive'] = reconcile(cfg, week)
             save(status,result);return result
@@ -289,7 +309,8 @@ def run(cfg,week,mode,continue_from=None):
         finally:server.shutdown();server.server_close();sock.unlink(missing_ok=True)
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('action',choices=['queue','preflight','dry-run','recover']);p.add_argument('--week');p.add_argument('--continue-from');a=p.parse_args();cfg=json.loads(CONFIG.read_text())
+    p=argparse.ArgumentParser();p.add_argument('action',choices=['queue','preflight','dry-run','recover','catch-up']);p.add_argument('--week');p.add_argument('--continue-from');p.add_argument('--authorised-catch-up',action='store_true');a=p.parse_args();cfg=json.loads(CONFIG.read_text())
+    if a.authorised_catch_up and a.action!='catch-up':p.error('--authorised-catch-up requires catch-up')
     if a.action=='queue':
         queue=Path(cfg['state'])/'incoming'
         failed=False
@@ -318,5 +339,5 @@ def main():
             raise SystemExit(1)
     else:
         if not a.week or date.fromisoformat(a.week).weekday()!=0:raise ValueError('Monday week required')
-        print(json.dumps(run(cfg,a.week,a.action,a.continue_from)))
+        print(json.dumps(run(cfg,a.week,a.action,a.continue_from,a.authorised_catch_up)))
 if __name__=='__main__':main()

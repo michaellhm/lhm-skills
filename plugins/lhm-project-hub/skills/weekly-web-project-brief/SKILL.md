@@ -80,6 +80,10 @@ The controller allows two bounded corrections after independent review, each fol
 
 When correction is exhausted or the worker fails, record failure and exit unsuccessfully. The separate watchdog checks every five minutes, detects missed starts after 07:15 Monday, interruptions, the three-hour processing limit and unconfirmed delivery after 20 minutes. It sends one clearly labelled failure notice per week to the existing support inbox through the fixed sender. This is distinct from the weekly project report and does not consume its delivery receipt. Raw exception text, client records and credentials never enter the alert. Preserve every attempt and receipt. No automatic resend after an uncertain send; reconcile provider evidence. The watchdog never invokes a model or changes client records. A true missing record or business decision requires a specific human handoff rather than endless retries.
 
+## Explicit missed-week recovery
+
+When Michael explicitly asks to recover a missed weekly report, the operator may use `weekly_runtime.py catch-up --week YYYY-MM-DD --authorised-catch-up`. It researches fresh evidence, labels the missed week and actual cutoff, requires independent review, and uses the original weekly delivery and archive receipts. It never fabricates a Monday run or skips existing/uncertain receipts. The recurring queue cannot request this mode. Run the dependent website loop only after verified delivery and archive.
+
 ## Shared weekly archive and Monday coaching
 
 After verified normal email delivery, the controller saves the exact report as

@@ -3,6 +3,17 @@ from datetime import datetime
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('runtime',Path(__file__).parents[1]/'scripts/weekly_runtime.py');r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
 class RuntimeTests(unittest.TestCase):
+ def test_catch_up_authority_and_week_validation(self):
+  at=datetime.fromisoformat('2026-11-21T10:00:00+11:00')
+  self.assertEqual(r.validate_catch_up('2026-11-16',True,at),'2026-11-16')
+  for week,authority in [('2026-11-16',False),('2026-11-17',True),('2026-11-23',True)]:
+   with self.assertRaises(ValueError):r.validate_catch_up(week,authority,at)
+  with self.assertRaises(ValueError):r.validate_request({'week':'2026-11-16','mode':'catch-up'},at)
+ def test_existing_send_intent_blocks_catch_up_before_research(self):
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d);(root/'receipts').mkdir();(root/'receipts/2026-09-21-brief.json').write_text('{"state":"delivery_uncertain"}')
+   with self.assertRaisesRegex(ValueError,'Existing production receipt'):
+    r.run({'state':d},'2026-09-21','catch-up',authorised_catch_up=True)
  def test_completion_prompt_can_be_constructed(self):
   prompt=r.repair_prompt(Path('/skill'),Path('/output'))
   self.assertIn('{project: exact displayed name',prompt)
