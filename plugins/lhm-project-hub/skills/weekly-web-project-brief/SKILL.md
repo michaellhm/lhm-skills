@@ -2,7 +2,7 @@
 name: weekly-web-project-brief
 description: "Prepare Lily's Monday website portfolio email or apply Michael's consolidated project corrections. Use for 'weekly web projects', 'website weekly brief', 'Monday website email', 'update the web brief' or 'website brief feedback'. Reconciles Obsidian, BasicOps discussions, email and meeting evidence; produces an HTML table with due dates and red-first traffic lights."
 metadata:
-  version: 1.3.2
+  version: 1.3.3
 ---
 ## Client file routing
 
@@ -26,7 +26,7 @@ Read references/weekly-coaching.md and references/editorial.md, references/feedb
 
 Hermes schedules and delivers; Codex CLI researches and drafts using this exact skill release. Do not let Hermes's default model substitute for the worker. Prove live read access from the actual worker to Gmail message bodies, the canonical Obsidian vault and BasicOps tasks/discussions before research. Verify Fathom access when a recent meeting changes a website decision. Save successful read IDs/paths and failures in access-receipt.json. A configured connector name, search snippet or cached export is not proof of working access. Read-only authenticated helpers are acceptable; never copy credentials or grant write authority. If the registered VPS lane is absent, report that limitation; a desktop CLI test does not prove unattended Hermes deployment.
 
-Give the worker the last human-approved brief, explicit subsequent corrections, and primary evidence used for that brief, or functioning read routes to retrieve it. Never pass an incomplete failed draft as the only context or prohibit fresh reads while claiming a fresh report. Follow references/freshness.md for evidence, comparison and send checks.
+Give the worker the last human-approved brief, explicit subsequent corrections, and primary evidence used for that brief, or functioning read routes to retrieve it. A correction pass must repair stale report assertions, not merely add source receipts. Reconcile the newest canonical note, actual message body and task replies; convert source dates to Melbourne time. Explicit same-release catch-up continuations retain each failed attempt under a separate run key, with the full source commit recorded and the single normal send receipt unchanged. Never pass an incomplete failed draft as the only context or prohibit fresh reads while claiming a fresh report. Follow references/freshness.md for evidence, comparison and send checks.
 
 ## Discover and reconcile the full portfolio
 
