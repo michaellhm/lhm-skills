@@ -20,6 +20,7 @@ DELIVERY
 - Read the registered client's `report_directory` from `/opt/data/profiles/lhm_brain/config/google-ads-clients.json`.
 - When Claude returns a complete QA-passed report, write that returned report body to `REPORT_DIRECTORY/google-ads-monthly-review-YYYY-MM.md` beneath the LHM vault.
 - Validate with `python3 /opt/data/profiles/lhm_brain/scripts/ads-weekly-digest/validate-report.py REPORT_PATH`. A formatting failure requires correction against the saved worker evidence, not a duplicate live research run. Never bypass validation.
+- Before submitting delivery, append every returned CSV/TXT body under `## Supporting file bodies` in the staged report, with `### EXACT_FILENAME` and one csv/text fence per file. Include every promised manifest file; a missing body is an explicit delivery blocker, never permission to omit the file. These are prepared files, not Ads imports.
 - Submit it once with `/opt/data/profiles/lhm_brain/bin/monthly-review-delivery submit CLIENT_SLUG YYYY-MM RELATIVE_REPORT_PATH`, where `RELATIVE_REPORT_PATH` is the vault-relative path beginning `20 Clients/`. Do not pass an absolute path or a workspace path.
 - Preserve the delivery run ID; poll `monthly-review-delivery status RUN_ID` and retrieve `monthly-review-delivery result RUN_ID`.
 - Delivery is complete only when the Codex worker returns verified Google Drive and BasicOps URLs.
