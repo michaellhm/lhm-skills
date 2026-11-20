@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Scoped root controller: read-only source broker, Codex research/review, fixed sender."""
-import argparse,fcntl,hashlib,json,os,pwd,re,shutil,socketserver,subprocess,threading,time
+import argparse,fcntl,hashlib,json,os,pwd,re,shutil,socketserver,subprocess,threading,time,uuid
 from datetime import datetime,date,timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -137,6 +137,7 @@ def retain_raw_reads(work,out):
 
 def repair_prompt(skill,out):
     return f"""Continue the authorised research; do not stop merely because more reads remain. Finish missing Gmail bodies, current task discussions/replies and all selected owner actions. A real access failure must be evidenced, with bounded retry for temporary rate limits. Preserve earlier successful source evidence and actual read times; never label unread sources complete. Read the current skill {skill}/SKILL.md and quality.py. All final files must be in {out}, replacing prior partial files there. Do not author quality-review.json or send anything.
+Repair the report assertions as well as the receipts: compare EVERY displayed state, date and next action with the newest actual canonical record, Gmail body and task/reply evidence. Correct already-sent previews, completed work and superseded handoffs in brief.json and the rendered email; adding provenance to a stale assertion does not repair it. Convert offset-bearing message dates to Australia/Melbourne before displaying a calendar date.
 Evidence and ownership: retain complete source text/results, including current task discussions and replies. Actual CLI responses are available in the research directory's events*.jsonl; the controller also retains them under output/evidence/raw-events*.json before review. Use those responses to substantiate every current_evidence_ids mapping, never empty IDs or unsupported summaries. Preserve the real BasicOps assignee. A recommended coordination action for Michael/Kristalyn on Aiya's task must record the real task_assignee separately from action_owner, with explicit ownership_basis='recommended coordination' and source; never relabel another person's task as a personal Inbox assignment. Keep actionable coordination in the brief when justified, and explain it accurately in evidence.
 Per-project source accounting is mandatory before review. For complete sources use the following shape; for genuinely absent project records use status limited with gap_id as documented below. For EVERY row in brief.projects, populate research.project_source_coverage with {{project: exact displayed name, gmail:{{status:'complete',evidence:[retained source references]}}, obsidian:{{status:'complete',evidence:[retained source references]}}, basicops:{{status:'complete',evidence:[retained source references]}}}}. Read each client's available identity/profile, Current Projects, goals and canonical website/landing-page notes, not just a directory listing. Read targeted Gmail bodies or retain the exact no-result search. Include actual task/discussion/reply sources. Search the canonical index for aliases and alternate client/project folder names before concluding a record is missing. Missing records must be explicitly documented with the search evidence and affected uncertainty, never invented. If a genuine client/project record remains absent after successful searches, use the disclosed project-gap contract in references/freshness.md: limited coverage with gap_id, retained search evidence, research.project_gaps and a matching brief.blockers entry. Send verified updates with the explicit uncertainty; never mark missing records complete. Global source access, core board pagination or worker failures remain material_gaps and stop delivery. Keep one-off live-site actions in owner lists only, with evidence-based exclusion from the project snapshot. For each dated baseline action, retain it or explicitly record current evidence proving completion, cancellation or a superseding commitment; newer activity alone does not remove a deadline. A source failure is not complete coverage. Do not reuse an old footer timestamp. Keep your evidence indexes bound to your own immutable source files; controller-* files are separate append-only receipts, never overwrite or rehash worker-indexed files.
 Every snapshot project also needs one research.projects entry with project exactly matching the displayed name and all fields from quality.PROJECT_FIELDS. Use actual retained evidence paths, record unknown targets/activity honestly, and provide substantive current-state, ownership, target and light reasoning. The validator checks these before review.
@@ -187,6 +188,19 @@ def validate_continuation(mode, week, key, prior):
         raise ValueError('Only same-week stopped/failed research may be continued')
 
 
+def run_key(cfg, week, mode, continue_from=None):
+    base = week if mode == 'scheduled' else week+'-'+mode+'-'+cfg['commit'][:8]
+    prior = Path(cfg['state'])/'runtime'/base/'status.json'
+    # Explicit same-week continuation retains every failed attempt, even when
+    # its reviewed source release has not changed. Normal scheduled keys stay fixed.
+    if mode == 'catch-up' and continue_from and prior.exists() and json.loads(prior.read_text()).get('state') == 'failed':
+        while True:
+            candidate = week+'-catch-up-'+uuid.uuid4().hex[:8]
+            if not (Path(cfg['state'])/'runtime'/candidate).exists():
+                return candidate
+    return base
+
+
 def run(cfg,week,mode,continue_from=None,authorised_catch_up=False):
     state=Path(cfg['state']);state.mkdir(parents=True,exist_ok=True)
     if mode == 'catch-up':
@@ -200,7 +214,7 @@ def run(cfg,week,mode,continue_from=None,authorised_catch_up=False):
         if (state/'receipts'/(week+'-brief.json')).exists():
             raise ValueError('Existing production receipt requires reconciliation; recovery will not resend')
 
-    key=week if mode=='scheduled' else week+'-'+mode+'-'+cfg['commit'][:8]
+    key=run_key(cfg,week,mode,continue_from)
     status=state/'runtime'/key/'status.json';status.parent.mkdir(parents=True,exist_ok=True)
     with (status.parent/'.lock').open('a') as lock:
         try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)

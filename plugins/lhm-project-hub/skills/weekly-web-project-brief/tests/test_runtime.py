@@ -3,6 +3,17 @@ from datetime import datetime
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('runtime',Path(__file__).parents[1]/'scripts/weekly_runtime.py');r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
 class RuntimeTests(unittest.TestCase):
+ def test_same_release_continuation_preserves_failed_run_and_stable_schedule(self):
+  with tempfile.TemporaryDirectory() as d:
+   cfg={'state':d,'commit':'a'*40};week='2026-11-16';base=week+'-catch-up-aaaaaaaa'
+   p=Path(d)/'runtime'/base/'status.json';p.parent.mkdir(parents=True);p.write_text('{"state":"failed","error":"retain"}')
+   key=r.run_key(cfg,week,'catch-up',base)
+   self.assertNotEqual(key,base);self.assertRegex(key,r'^2026-11-16-catch-up-[0-9a-f]{8}$')
+   self.assertEqual(json.loads(p.read_text())['error'],'retain')
+   self.assertEqual(r.run_key(cfg,week,'scheduled',base),week)
+   self.assertEqual(r.run_key(cfg,week,'catch-up'),base)
+   p.write_text('{"state":"running"}')
+   self.assertEqual(r.run_key(cfg,week,'catch-up',base),base)
  def test_only_failed_same_week_catch_up_can_continue(self):
   r.validate_continuation('catch-up','2026-11-16','2026-11-16-catch-up-1234abcd',{'state':'failed'})
   for mode,key,state in [('catch-up','2026-11-09-catch-up-1234abcd','failed'),('catch-up','2026-11-16-catch-up-1234abcd','delivered'),('scheduled','2026-11-16-catch-up-1234abcd','failed')]:
