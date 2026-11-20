@@ -10,6 +10,8 @@ The research worker includes one to four concise, evidence-backed Highlights and
 {"light":"orange","status_reason":"CPA exceeds the approved target","stage":"Last 30 complete days versus preceding 30 days; measurement confidence: medium","highlights":["Replace this example with a sourced finding and its actual period."],"next_action":"Replace with the first supported action or exact decision."}
 ```
 
+Use headings `## Highlights` and `## Start here`. The object has exactly the five keys shown above; one to four highlight strings must appear verbatim in Highlights, and next_action must appear verbatim in Start here. Rich account metrics and action registers belong elsewhere in the report or handback, never in this object. Run `scripts/validate-report.py` before returning the report.
+
 Allowed `light`: red, orange, yellow, blue, green, unknown. Preserve the mechanical AdPulse zone; operational cautions and measurement confidence stay separate. Yellow must remain Yellow, not be relabelled Orange to match SEO. Unclassified or unavailable evidence uses unknown. Conversion events are not verified patients. Do not invent a metric or a link. No new analysis belongs in the email.
 
 The delivery worker preserves this block in the saved report, puts the human highlights and Start here in the BasicOps Discussion, and verifies report contents, parent folder, card ownership/routing and Discussion. Append exactly one JSON receipt to its final result:

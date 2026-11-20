@@ -149,6 +149,8 @@ If the destination is missing, dispatch is unavailable, either connector is unav
 
 ### Weekly highlights and Monday email
 
+For scheduled reviews, the report must contain exactly one literal `ads_digest` fenced JSON object with exactly these five keys: `light`, `status_reason`, `stage`, `highlights`, `next_action`. `light` is red/orange/yellow/blue/green/unknown; `highlights` contains one to four strings copied verbatim from `## Highlights`; `next_action` is copied verbatim from `## Start here`. Keep analytics, actions and handback metadata outside this object. Do not wrap it in an `ads_digest` envelope or label the fence `json ads_digest`. Read `references/monday-digest.md` in this skill even when it is not supplied in the evidence pack. Run `scripts/validate-report.py REPORT_PATH` before returning the report; correct formatting against the existing evidence rather than rerunning research. A consequential action awaiting approval does not prevent delivery of its review.
+
 For the scheduled weekly flow, follow `references/monday-digest.md`. Include a short Highlights section and Start here action in the report and return the matching `ads_digest` JSON block. The registered deterministic email script sends one Lily HTML/text digest only after terminal child results and verified delivery receipts. Report-only requests never send email.
 
 ### Step 8: Hermes overview, BasicOps record and approval gate
@@ -243,7 +245,9 @@ Measurement confidence: [High/Medium/Low] — [one-line reason]
 ### Highlights
 - [Evidence-backed result or change, with the comparison period]
 - [Main issue or opportunity, preserving measurement uncertainty]
-Start here: [First concrete action or exact approval needed]
+
+### Start here
+[First concrete action or exact approval needed]
 
 ### Key Metrics
 - Monthly Budget: $X,XXX | Actual Spend: $X,XXX (XX% of month elapsed)
