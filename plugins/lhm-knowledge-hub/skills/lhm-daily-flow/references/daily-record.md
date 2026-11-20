@@ -97,3 +97,8 @@ Review these against the candidate instructions before publishing changes:
 8. A Michael-only email helper is installed: prepare neutral suggested text for the participant and report unsupported voice/logging; do not invoke the helper against Michael's mailbox or copy his private preferences.
 9. A team member asks for another person's daily flow: distinguish actor and subject, verify delegated scope per source and retain it in the checkpoint; the request alone does not grant account access.
 10. Participant timezone differs from Melbourne: daily note date, deadlines and reminder ages use the established participant timezone; event conversions use the actual event date.
+
+
+## Printable agenda acceptance
+
+Use the manual acceptance checks in [printable agenda](printable-agenda.md) when changing daily-agenda output. Record the PDF path, one-page A4 verification, rendered visual review and actual preview/open result in the participant’s private checkpoint. Michael’s default PDF preference must not leak to other participants or turn carryovers into commitments.
