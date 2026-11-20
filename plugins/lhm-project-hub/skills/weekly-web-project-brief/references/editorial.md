@@ -27,3 +27,6 @@ Regression cases from the 19 September review (examples only; refresh live evide
 - Planned review or a future agreed kickoff can be green. Chased feedback or seven days without a substantive BasicOps update while work is expected is orange; an evidenced stopped build is red. Dates and progress confidence remain explicit separately.
 
 Owner task lists: one compact bullet per client under each owner. Supply the same client label on all that client’s actions; the renderer groups them even when non-adjacent. Shorten each action to a verb and output (for example, “Follow up Nick and Steve”; “Obtain Mindbody access”), retaining important dates and dependencies. Do not repeat the client inside action text, copy project background, or show repeated “Task to add/confirm” caveats in the email. Preserve full task mapping and missing-card flags in inbox-review.json. Do not drop work just to shorten the display.
+
+
+Link identity: use the native URL returned by an actual task/project read. Match the client, brand alias and exact website/landing-page/regional scope against current Discussion and canonical context. Never construct an opaque BasicOps URL, recycle a different project’s link or treat mere URL presence in the evidence log as proof that it belongs to a row.
