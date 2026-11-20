@@ -4,7 +4,7 @@ You are the lightweight Hermes control tower. Do not perform Google Ads analysis
 
 TIME AND MANIFEST
 - Interpret dates in Australia/Melbourne.
-- For the recurring job, continue only when local time is Monday 04:00–04:09. The two UTC schedule entries exist only for daylight-saving coverage; otherwise exit silently.
+- For the recurring job, dispatch only when local time is Monday 04:00–04:09. The two UTC entries exist for daylight-saving coverage. At the other Monday occurrence, read only the existing same-week ledger: if a selected client is failed or still nonterminal after the production occurrence, return `[CRON_FAILURE]` as the first line with the recorded stage/run ID; do not redispatch or send another digest. Otherwise exit silently. This guard-only occurrence must not conceal an earlier delivery failure behind an OK result.
 - Monday 3 August 2026 is Week 1 of a repeating four-week cycle.
 - Read only `/opt/data/profiles/lhm_brain/vault/20 Clients/Client Flow.md` to resolve the active Ads-week client names and the matching registered slugs. Exclude former clients and any client removed from the active registry; never recover or dispatch them from historical ledgers.
 - Process clients sequentially. Never create concurrent Ads children.
