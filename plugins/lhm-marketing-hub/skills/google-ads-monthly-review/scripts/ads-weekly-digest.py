@@ -66,7 +66,12 @@ def assemble(manifest, registry, runs=RUNS):
             if receipt.get('client') != slug or receipt.get('delivery_status') != 'complete' or receipt.get('readback_verified') is not True:
                 raise ValueError('Verified delivery receipt missing')
             drive = urlsplit(receipt['verified_drive_url'])
-            if drive.scheme != 'https' or drive.netloc != 'drive.google.com' or not drive.path.startswith('/file/d/'):
+            valid_drive_path = (drive.netloc == 'drive.google.com' and
+                                re.fullmatch(r'/file/d/[A-Za-z0-9_-]+(?:/view)?', drive.path))
+            valid_docs_path = (drive.netloc == 'docs.google.com' and
+                               re.fullmatch(r'/document/d/[A-Za-z0-9_-]+(?:/edit)?', drive.path))
+            if (drive.scheme != 'https' or drive.username or drive.password or
+                    not (valid_drive_path or valid_docs_path)):
                 raise ValueError('Invalid verified Drive URL')
             # The frozen prompt contains the exact report delivered, not mutable vault state.
             prompt = (run / 'prompt.txt').read_text()

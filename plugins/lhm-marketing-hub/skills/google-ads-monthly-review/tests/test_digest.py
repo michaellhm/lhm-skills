@@ -41,6 +41,15 @@ class DigestTests(unittest.TestCase):
     def test_unsafe_link_rejected(self):
         self.receipt['verified_basicops_url']='https://app.basicops.com.evil.test/123?l=example';self.write()
         self.assertNotIn('href=',self.render()['html'])
+    def test_observed_google_docs_report_link_accepted(self):
+        self.receipt['verified_drive_url']='https://docs.google.com/document/d/observed_file_id/edit?usp=drivesdk&rtpof=true'
+        self.write()
+        self.assertIn('Open review card:',self.render()['text'])
+        self.assertNotIn('Report or delivery incomplete',self.render()['text'])
+    def test_unsafe_drive_links_remain_incomplete(self):
+        for url in ['https://docs.google.com.evil.test/document/d/file/edit', 'https://user@docs.google.com/document/d/file/edit', 'http://drive.google.com/file/d/file/view', 'https://docs.google.com/document/d/', 'https://docs.google.com/spreadsheets/d/file/edit']:
+            self.receipt['verified_drive_url']=url;self.write()
+            self.assertIn('Invalid verified Drive URL',self.render()['text'])
     def test_readback_required(self):
         self.receipt['readback_verified']=False;self.write()
         self.assertIn('Verified delivery receipt missing',self.render()['text'])

@@ -135,7 +135,7 @@ can resolve it now. Each recommendation must include:
 Saving the read-only monthly report and creating its review record are part of delivery, not consequential Google Ads actions. Do this **before** asking for approval.
 
 1. Read the client's canonical service file and use its exact Google Drive destination for Google Ads deliverables. Do not infer a folder from the client name when a destination is recorded.
-2. Return the completed consolidated review and any evidence-supported implementation files to Hermes. Hermes submits one bounded monthly-review delivery job to the configured ChatGPT/Codex bridge; it must not require a direct Drive or BasicOps connector in the Hermes session.
+2. Return the completed consolidated review and any evidence-supported implementation files to Hermes. Include every promised CSV/TXT body under `## Supporting file bodies`, with `### EXACT_FILENAME` and one csv/text fence per file, so the bounded delivery worker can save and verify all manifest items. Hermes submits one bounded monthly-review delivery job to the configured ChatGPT/Codex bridge; it must not require a direct Drive or BasicOps connector in the Hermes session.
 3. The delivery worker validates the required manifest, saves and reads back every manifest item, then captures the observed Drive file IDs/URLs, byte counts and parent folder. Missing specialist completion, a missing required file or failed readback is a delivery failure, not an optional omission.
 4. In the same job, the worker invokes `lhm-project-hub:basicops-task-manager`, deduplicates and creates or updates the review parent, writes the discussion and reads it back.
 5. Hermes polls the recorded delivery run ID and resumes it rather than submitting duplicates. It may proceed to the approval gate only after receiving verified Drive and BasicOps URLs.
@@ -148,6 +148,8 @@ If the destination is missing, dispatch is unavailable, either connector is unav
 - say `analysis complete; delivery incomplete`, preserve the delivery run ID and do not silently save somewhere else.
 
 ### Weekly highlights and Monday email
+
+For scheduled reviews, the report must contain exactly one literal `ads_digest` fenced JSON object with exactly these five keys: `light`, `status_reason`, `stage`, `highlights`, `next_action`. `light` is red/orange/yellow/blue/green/unknown; `highlights` contains one to four strings copied verbatim from `## Highlights`; `next_action` is copied verbatim from `## Start here`. Keep analytics, actions and handback metadata outside this object. Do not wrap it in an `ads_digest` envelope or label the fence `json ads_digest`. Read `references/monday-digest.md` in this skill even when it is not supplied in the evidence pack. Run `scripts/validate-report.py REPORT_PATH` before returning the report; correct formatting against the existing evidence rather than rerunning research. A consequential action awaiting approval does not prevent delivery of its review.
 
 For the scheduled weekly flow, follow `references/monday-digest.md`. Include a short Highlights section and Start here action in the report and return the matching `ads_digest` JSON block. The registered deterministic email script sends one Lily HTML/text digest only after terminal child results and verified delivery receipts. Report-only requests never send email.
 
@@ -243,7 +245,9 @@ Measurement confidence: [High/Medium/Low] — [one-line reason]
 ### Highlights
 - [Evidence-backed result or change, with the comparison period]
 - [Main issue or opportunity, preserving measurement uncertainty]
-Start here: [First concrete action or exact approval needed]
+
+### Start here
+[First concrete action or exact approval needed]
 
 ### Key Metrics
 - Monthly Budget: $X,XXX | Actual Spend: $X,XXX (XX% of month elapsed)
