@@ -69,3 +69,5 @@ Explicit recovery: `weekly_runtime.py recover --week YYYY-MM-DD --continue-from 
 ## Explicit catch-up outside Monday
 
 Only on Michael’s explicit request, run `weekly_runtime.py catch-up --week <missed-Monday> --authorised-catch-up` in a supervised one-shot service. It starts fresh, labels the report Catch-up, records the actual cutoff, runs ordinary independent QA, uses the same weekly production receipt, and publishes the matching shared archive. It rejects future/non-Monday weeks and any existing receipt. This operator-only mode does not change the scheduled queue’s Monday guard. Activate the watcher, alert timer and existing no-agent cron only after source preflight and a reviewed live run pass.
+
+An explicitly authorised catch-up may add `--continue-from <same-week-catch-up-key>` only when that prior run is stopped and failed and no production receipt exists. A new immutable release/run key preserves the failed attempt. Retain actual read times, refresh newly relevant evidence, resolve all prior reviewer/operator findings and obtain a fresh independent review. This is an operator recovery, not another automatic retry.

@@ -2,7 +2,7 @@
 name: weekly-web-project-brief
 description: "Prepare Lily's Monday website portfolio email or apply Michael's consolidated project corrections. Use for 'weekly web projects', 'website weekly brief', 'Monday website email', 'update the web brief' or 'website brief feedback'. Reconciles Obsidian, BasicOps discussions, email and meeting evidence; produces an HTML table with due dates and red-first traffic lights."
 metadata:
-  version: 1.3.1
+  version: 1.3.2
 ---
 ## Client file routing
 
@@ -69,6 +69,8 @@ Use direct names and verbs: “Kristalyn: send David the prototype and ask for f
 
 Before send verify source completeness, all project scopes represented/deduplicated, next actors, approval anchors, due-date types, red-first sorting, new-project dates, completed-child suppression, no AI Support, no secrets/patient details, working evidence links, HTML and text outputs, approved recipients, and feedback instructions. If a core board cannot be read, save failure and do not send a seemingly complete portfolio. For a partial optional source, label affected rows orange and include the precise limitation.
 
+Every project row and owner action must use a native task URL observed in an actual BasicOps get/list response. Verify that the linked task belongs to the intended client and scope against its current title, Discussion and canonical note. A valid URL for another client is a factual regression. Resolve brand aliases and separate website/landing-page, regional and execution/cockpit scopes explicitly; do not invent links or copy a different row’s URL. The independent reviewer checks this identity/scope mapping for every displayed link.
+
 Before delivery, run scripts/quality.py against the run directory after independent controller review. A changed payload invalidates that review. A warning footer cannot excuse known factual regressions.
 
 Scheduled delivery: save brief.json, email.json, research-receipt.json, comparison.json, access-receipt.json, quality-review.json and preview.html before invoking send. The sender persists a weekly receipt before the network call; never remove it or retry an uncertain send via another route. Verify recipient delivery events; queued is not delivered. Save run outcome with message ID and verification state. Do not send extra team pings.
@@ -82,7 +84,7 @@ When correction is exhausted or the worker fails, record failure and exit unsucc
 
 ## Explicit missed-week recovery
 
-When Michael explicitly asks to recover a missed weekly report, the operator may use `weekly_runtime.py catch-up --week YYYY-MM-DD --authorised-catch-up`. It researches fresh evidence, labels the missed week and actual cutoff, requires independent review, and uses the original weekly delivery and archive receipts. It never fabricates a Monday run or skips existing/uncertain receipts. The recurring queue cannot request this mode. Run the dependent website loop only after verified delivery and archive.
+When Michael explicitly asks to recover a missed weekly report, the operator may use `weekly_runtime.py catch-up --week YYYY-MM-DD --authorised-catch-up`. It researches fresh evidence, labels the missed week and actual cutoff, requires independent review, and uses the original weekly delivery and archive receipts. It never fabricates a Monday run or skips existing/uncertain receipts. An operator may continue a failed same-week catch-up from retained evidence under a new immutable release, preserving actual read times, refreshing relevant changes and obtaining fresh independent review. The recurring queue cannot request this mode. Run the dependent website loop only after verified delivery and archive.
 
 ## Shared weekly archive and Monday coaching
 
