@@ -97,6 +97,8 @@ def render(d):
     if any(o['name'] not in OWNERS for o in d['owners']):
         raise ValueError('Unrecognised owner or AI Support section')
     subject = f'Web projects | Week of {week} | What needs moving this week'
+    if d.get('catch_up') is True:
+        subject = 'Catch-up | ' + subject
     text = ['Hi team,', d['intro']]
     parts = [f'<p>Hi team,</p><p>{html.escape(d["intro"])}</p>']
 
@@ -187,7 +189,7 @@ def mailgun(path, data=None, query=None):
         return json.load(response)
 
 
-def send(week, email, kind='brief'):
+def send(week, email, kind='brief', authorised_catch_up=False):
     if kind not in ('brief', 'test'):
         raise ValueError('Use the fixed alert action for failure notices')
     p = receipt(week, kind)
@@ -199,7 +201,10 @@ def send(week, email, kind='brief'):
         raise ValueError('Required table or feedback footer missing')
     if kind == 'brief':
         at = now()
-        if at.weekday() != 0 or at.date().isoformat() != week or at.hour < 8:
+        if authorised_catch_up:
+            if monday(week) > at.date() or not email['subject'].startswith('Catch-up | '):
+                raise ValueError('Authorised catch-up requires a past/current Monday and a labelled payload')
+        elif at.weekday() != 0 or at.date().isoformat() != week or at.hour < 8:
             raise ValueError('Production send allowed only on its Monday at or after 08:00 Melbourne')
     return submit_message(week, email, kind)
 
@@ -292,8 +297,11 @@ def main():
     parser.add_argument('--kind', choices=['brief', 'test', 'alert'], default='brief')
     parser.add_argument('--file')
     parser.add_argument('--out')
+    parser.add_argument('--authorised-catch-up', action='store_true', help='Explicit operator authority for one labelled late weekly report; preserves QA and the normal receipt')
     parser.add_argument('--to-self', action='store_true', help='Michael-only explicitly authorised test')
     args = parser.parse_args()
+    if args.authorised_catch_up and (args.action != 'send' or args.kind != 'brief'):
+        parser.error('--authorised-catch-up requires normal send')
     if args.to_self:
         if args.kind != 'test':
             parser.error('--to-self requires --kind test')
@@ -315,7 +323,7 @@ def main():
     elif args.action == 'send':
         from quality import validate
         validate(Path(args.file).parent)
-        result = send(args.week, json.loads(Path(args.file).read_text()), args.kind)
+        result = send(args.week, json.loads(Path(args.file).read_text()), args.kind, args.authorised_catch_up)
     else:
         result = verify(args.week, args.kind)
     print(json.dumps(result))

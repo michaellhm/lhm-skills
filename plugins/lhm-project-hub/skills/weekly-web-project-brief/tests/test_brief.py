@@ -23,6 +23,25 @@ class BriefTests(unittest.TestCase):
     def fixture(self):
         return {'week': '2026-09-21', 'cutoff': '19 September', 'intro': 'Fixture only', 'priorities': [], 'new_projects': [], 'owners': [{'name': 'Jaimee', 'actions': ['No immediate action.']}], 'projects': [{'name': name, 'url': 'https://example.org/project', 'light': light, 'state': '<script>alert(1)</script>', 'target': 'To confirm', 'next': 'Michael: check date'} for name, light in [('Green project', 'green'), ('Red project', 'red'), ('Orange project', 'orange')]]}
 
+    def test_explicit_catch_up_keeps_normal_receipt_and_fixed_recipient(self):
+        d=self.fixture();d['catch_up']=True;email=b.render(d)
+        self.assertTrue(email['subject'].startswith('Catch-up | '))
+        at=datetime.fromisoformat('2026-09-26T10:00:00+10:00')
+        with patch.object(b,'now',return_value=at),patch.object(b,'mailgun',return_value={'id':'<late>'}) as mail:
+            with self.assertRaises(ValueError):b.send(d['week'],email)
+            b.send(d['week'],email,authorised_catch_up=True)
+            b.send(d['week'],email,authorised_catch_up=True)
+            self.assertEqual(mail.call_count,1)
+            self.assertEqual(mail.call_args.args[1]['to'],'support@localhealthmarketing.com.au')
+            self.assertTrue(b.receipt(d['week'],'brief').exists())
+    def test_catch_up_rejects_future_week_or_missing_label(self):
+        at=datetime.fromisoformat('2026-09-26T10:00:00+10:00')
+        with patch.object(b,'now',return_value=at),patch.object(b,'mailgun') as mail:
+            with self.assertRaises(ValueError):b.send('2026-09-21',b.render(self.fixture()),authorised_catch_up=True)
+            d=self.fixture();d.update(week='2026-09-28',catch_up=True)
+            with self.assertRaises(ValueError):b.send(d['week'],b.render(d),authorised_catch_up=True)
+            mail.assert_not_called()
+
     def test_dst_gate(self):
         for stamp in ['2026-09-20T21:00:00+00:00', '2026-10-04T20:00:00+00:00']:
             self.assertTrue(b.gate(datetime.fromisoformat(stamp))['wakeAgent'])

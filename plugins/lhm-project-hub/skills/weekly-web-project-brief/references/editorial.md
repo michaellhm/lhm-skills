@@ -7,7 +7,7 @@ Use concise Australian English. Aim for a two-minute priority scan, with the ful
 
 brief.json schema (all content plain text, no embedded HTML):
 - week: ISO Monday YYYY-MM-DD; cutoff: human-readable evidence date/time.
-- intro: string.
+- intro: string. For an explicitly authorised catch-up, state the missed week and actual evidence cutoff; set optional catch_up=true so the renderer prefixes the subject with Catch-up.
 - priorities: list of strings.
 - new_projects: list of strings, identifying kickoff/handover dates; empty produces “No new website projects this week.”
 - projects: list of {name, url, light: red|orange|green, state, target, next}. Use verified https source links. Include owner in next. Order among equal lights is supplied by the researcher.

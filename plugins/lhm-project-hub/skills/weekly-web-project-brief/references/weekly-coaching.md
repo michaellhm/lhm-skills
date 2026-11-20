@@ -5,7 +5,7 @@ email release at **08:00 Australia/Melbourne**, then use the current shared week
 early review and the team's Monday planning. The existing hourly native no-agent cron remains;
 the DST-aware gate selects 07:00–07:59. The controller waits until 08:00 before submitting a ready
 report. If preparation finishes later it sends then, with the actual cutoff/delivery time. This is
-a target, not a guarantee of arrival at exactly 08:00. No duplicate/catch-up send on another day.
+a target, not a guarantee of arrival at exactly 08:00. No duplicate send on another day. A missed-week catch-up requires Michael’s explicit authority and the operator-only mode in runtime.md.
 
 Verified useful updates should be sent with project-specific questions visibly disclosed. Preserve
 uncertain commitments as confirmation actions with owner, impact and next step. Do not require the
