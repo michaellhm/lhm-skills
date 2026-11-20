@@ -41,7 +41,7 @@ class BlockerTest(QualityTest):
     def test_brief_changed_after_review_fails(self):
         self.disclose();d=json.loads((self.p/'brief.json').read_text());d['projects'][0]['name']='Changed';self.write('brief.json',d)
         # A consistent source change still needs a new independent review.
-        r=json.loads((self.p/'research-receipt.json').read_text());r['project_source_coverage'][0]['project']='Changed';r['project_source_coverage'][0]['obsidian']['status']='complete';self.write('research-receipt.json',r)
+        r=json.loads((self.p/'research-receipt.json').read_text());r['projects'][0]['project']='Changed';r['project_source_coverage'][0]['project']='Changed';r['project_source_coverage'][0]['obsidian']['status']='complete';self.write('research-receipt.json',r)
         with self.assertRaisesRegex(ValueError,'Review invalidated'):__import__('quality').validate(self.p)
     def test_render_blockers_near_bottom_escaped(self):
         b=self.disclose()

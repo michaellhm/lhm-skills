@@ -2,7 +2,7 @@
 name: weekly-web-project-brief
 description: "Prepare Lily's Monday website portfolio email or apply Michael's consolidated project corrections. Use for 'weekly web projects', 'website weekly brief', 'Monday website email', 'update the web brief' or 'website brief feedback'. Reconciles Obsidian, BasicOps discussions, email and meeting evidence; produces an HTML table with due dates and red-first traffic lights."
 metadata:
-  version: 1.3.1
+  version: 1.3.2
 ---
 ## Client file routing
 
@@ -84,7 +84,7 @@ When correction is exhausted or the worker fails, record failure and exit unsucc
 
 ## Explicit missed-week recovery
 
-When Michael explicitly asks to recover a missed weekly report, the operator may use `weekly_runtime.py catch-up --week YYYY-MM-DD --authorised-catch-up`. It researches fresh evidence, labels the missed week and actual cutoff, requires independent review, and uses the original weekly delivery and archive receipts. It never fabricates a Monday run or skips existing/uncertain receipts. The recurring queue cannot request this mode. Run the dependent website loop only after verified delivery and archive.
+When Michael explicitly asks to recover a missed weekly report, the operator may use `weekly_runtime.py catch-up --week YYYY-MM-DD --authorised-catch-up`. It researches fresh evidence, labels the missed week and actual cutoff, requires independent review, and uses the original weekly delivery and archive receipts. It never fabricates a Monday run or skips existing/uncertain receipts. An operator may continue a failed same-week catch-up from retained evidence under a new immutable release, preserving actual read times, refreshing relevant changes and obtaining fresh independent review. The recurring queue cannot request this mode. Run the dependent website loop only after verified delivery and archive.
 
 ## Shared weekly archive and Monday coaching
 

@@ -20,12 +20,22 @@ class QualityTest(unittest.TestCase):
         research=json.loads((self.p/'research-receipt.json').read_text());research['evidence_files'].append({'path':'inbox-review.json','sha256':q.digest(self.p/'inbox-review.json')});self.write('research-receipt.json',research)
         self.write('brief.json',{'projects':[{'name':'Example'}]})
         research=json.loads((self.p/'research-receipt.json').read_text());research['project_source_coverage']=[{'project':'Example',**{k:{'status':'complete','evidence':['source.txt']} for k in ('gmail','obsidian','basicops')}}];self.write('research-receipt.json',research)
+        research=json.loads((self.p/'research-receipt.json').read_text());record={key:None for key in q.PROJECT_FIELDS};record.update(project='Example',project_key='example',recorded_task_state='Accepted',reconciled_state='Ready',next_actor='Michael',next_action='Read the supplied result',ownership_basis='Assigned reviewer',target_basis='No agreed target',light_reason='Ready for review',unresolved_conflicts=[],evidence=['source.txt']);research['projects']=[record];self.write('research-receipt.json',research)
         self.review()
     def write(self,n,d): (self.p/n).write_text(json.dumps(d))
     def change(self,n,fn):
         d=json.loads((self.p/n).read_text());fn(d);self.write(n,d);self.review()
     def review(self):
         self.write('quality-review.json',{'accepted':True,'reviewer':'controller','issues':[],**{k+'_sha256':q.digest(self.p/n) for k,n in [('brief','brief.json'),('email','email.json'),('research','research-receipt.json'),('comparison','comparison.json'),('access','access-receipt.json')]}})
+    def test_missing_reconciled_project_records_fail_before_review(self):
+        self.change('research-receipt.json',lambda d:d.pop('projects'))
+        with self.assertRaisesRegex(ValueError,'Per-project reconciled'):q.validate(self.p,require_review=False)
+    def test_project_reasoning_and_real_evidence_required(self):
+        self.change('research-receipt.json',lambda d:d['projects'][0].pop('ownership_basis'))
+        with self.assertRaisesRegex(ValueError,'Incomplete reconciled'):q.validate(self.p,require_review=False)
+    def test_fictitious_project_evidence_reference_rejected(self):
+        self.change('research-receipt.json',lambda d:d['projects'][0].update(evidence=['missing-record.json']))
+        with self.assertRaisesRegex(ValueError,'retained evidence'):q.validate(self.p,require_review=False)
     def test_complete_bound_report(self): self.assertEqual(q.validate(self.p)['state'],'quality_passed')
     def test_research_check_never_replaces_delivery_review(self):
         (self.p/'quality-review.json').unlink()

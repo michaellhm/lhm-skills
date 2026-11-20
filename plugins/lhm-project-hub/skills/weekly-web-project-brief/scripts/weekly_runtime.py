@@ -139,6 +139,7 @@ def repair_prompt(skill,out):
     return f"""Continue the authorised research; do not stop merely because more reads remain. Finish missing Gmail bodies, current task discussions/replies and all selected owner actions. A real access failure must be evidenced, with bounded retry for temporary rate limits. Preserve earlier successful source evidence and actual read times; never label unread sources complete. Read the current skill {skill}/SKILL.md and quality.py. All final files must be in {out}, replacing prior partial files there. Do not author quality-review.json or send anything.
 Evidence and ownership: retain complete source text/results, including current task discussions and replies. Actual CLI responses are available in the research directory's events*.jsonl; the controller also retains them under output/evidence/raw-events*.json before review. Use those responses to substantiate every current_evidence_ids mapping, never empty IDs or unsupported summaries. Preserve the real BasicOps assignee. A recommended coordination action for Michael/Kristalyn on Aiya's task must record the real task_assignee separately from action_owner, with explicit ownership_basis='recommended coordination' and source; never relabel another person's task as a personal Inbox assignment. Keep actionable coordination in the brief when justified, and explain it accurately in evidence.
 Per-project source accounting is mandatory before review. For complete sources use the following shape; for genuinely absent project records use status limited with gap_id as documented below. For EVERY row in brief.projects, populate research.project_source_coverage with {{project: exact displayed name, gmail:{{status:'complete',evidence:[retained source references]}}, obsidian:{{status:'complete',evidence:[retained source references]}}, basicops:{{status:'complete',evidence:[retained source references]}}}}. Read each client's available identity/profile, Current Projects, goals and canonical website/landing-page notes, not just a directory listing. Read targeted Gmail bodies or retain the exact no-result search. Include actual task/discussion/reply sources. Search the canonical index for aliases and alternate client/project folder names before concluding a record is missing. Missing records must be explicitly documented with the search evidence and affected uncertainty, never invented. If a genuine client/project record remains absent after successful searches, use the disclosed project-gap contract in references/freshness.md: limited coverage with gap_id, retained search evidence, research.project_gaps and a matching brief.blockers entry. Send verified updates with the explicit uncertainty; never mark missing records complete. Global source access, core board pagination or worker failures remain material_gaps and stop delivery. Keep one-off live-site actions in owner lists only, with evidence-based exclusion from the project snapshot. For each dated baseline action, retain it or explicitly record current evidence proving completion, cancellation or a superseding commitment; newer activity alone does not remove a deadline. A source failure is not complete coverage. Do not reuse an old footer timestamp. Keep your evidence indexes bound to your own immutable source files; controller-* files are separate append-only receipts, never overwrite or rehash worker-indexed files.
+Every snapshot project also needs one research.projects entry with project exactly matching the displayed name and all fields from quality.PROJECT_FIELDS. Use actual retained evidence paths, record unknown targets/activity honestly, and provide substantive current-state, ownership, target and light reasoning. The validator checks these before review.
 Schema reminders: access.sources.gmail/obsidian/basicops/meetings use status='passed' and evidence; research.coverage source status='complete' and reason; material_gaps=[] only when global/core gaps are resolved; disclosed project-specific gaps belong in project_gaps, never hide them. evidence_files is a nonempty list of relative {{path,sha256}} entries including inbox-review.json and primary evidence. Inbox boards must each have owner, board_id, section_id, status='complete', terminal=true, selected_actions list, candidates and excluded reasons. Preserve every selected weekly action in concise client groups; explain every removal from the approved action baseline using current evidence. comparison.baseline must be a relative {{path,sha256}} file, projects nonempty, unresolved_regressions=[] only when resolved. Validate structural research with quality.validate(output, require_review=False); that does not authorise sending."""
 
 
@@ -178,12 +179,18 @@ def validate_catch_up(week, authorised=False, at=None):
     return week
 
 
+def validate_continuation(mode, week, key, prior):
+    allowed = ((mode == 'dry-run' and re.fullmatch(re.escape(week)+r'-dry-run-[0-9a-f]{8}', key)) or
+               (mode == 'recover' and key == week) or
+               (mode == 'catch-up' and re.fullmatch(re.escape(week)+r'-catch-up-[0-9a-f]{8}', key)))
+    if not allowed or prior.get('state') != 'failed':
+        raise ValueError('Only same-week stopped/failed research may be continued')
+
+
 def run(cfg,week,mode,continue_from=None,authorised_catch_up=False):
     state=Path(cfg['state']);state.mkdir(parents=True,exist_ok=True)
     if mode == 'catch-up':
         validate_catch_up(week, authorised_catch_up)
-        if continue_from:
-            raise ValueError('Catch-up starts fresh; do not import old research')
         if (state/'receipts'/(week+'-brief.json')).exists():
             raise ValueError('Existing production receipt requires reconciliation; catch-up will not resend')
     if mode == 'recover':
@@ -203,10 +210,10 @@ def run(cfg,week,mode,continue_from=None,authorised_catch_up=False):
         user=pwd.getpwnam('codexworker');work=Path(user.pw_dir)/'weekly-web-runs'/key
         work.mkdir(parents=True,exist_ok=True);os.chown(work.parent,user.pw_uid,user.pw_gid);os.chown(work,user.pw_uid,user.pw_gid)
         if continue_from:
-            if not ((mode=='dry-run' and re.fullmatch(re.escape(week)+r'-dry-run-[0-9a-f]{8}',continue_from)) or (mode=='recover' and continue_from==week)):raise ValueError('Only same-week failed-run continuation allowed')
+            if '/' in continue_from or '..' in continue_from:raise ValueError('Confined continuation key required')
             previous=state/'runtime'/continue_from/'status.json'
             prior_status=json.loads(previous.read_text())
-            if prior_status.get('state')!='failed':raise ValueError('Prior dry-run must be stopped/failed')
+            validate_continuation(mode,week,continue_from,prior_status)
             source=work.parent/continue_from/'research';list(safe_files(source))
             shutil.copytree(source,work/'research')
             for p in [work/'research',*(work/'research').rglob('*')]:os.chown(p,user.pw_uid,user.pw_gid)
@@ -234,10 +241,10 @@ def run(cfg,week,mode,continue_from=None,authorised_catch_up=False):
             prompt+=f'\nRead the prior shared weekly note {prior_note} through vault-read, including dated team corrections, if it exists. Treat attributed feedback as evidence to reconcile with current task state; a suggestion is not a confirmed decision. Preserve actual source dates. Missing first-week archive is optional, not a core source failure. Do not read other 60 Knowledge content.'
             repair_contract=repair_prompt(skill,out)
             prompt+='\n'+repair_contract
+            if continue_from:
+                prompt=common+repair_contract+f"\nThis is continuation of {continue_from}, copied into the current research directory, using the same successful live source evidence and original read times. The original CLI session is resumed. Refresh newly relevant records, finish all missing reads and use the CURRENT installed skill path/hash; preserve prior access provenance. Prior independent review failure to resolve: "+str(prior_status.get('error','See prior review result'))+'\nAdditional operator verification findings to resolve against primary evidence: '+json.dumps(prior_status.get('operator_issues',[]))
             if mode == 'catch-up':
                 prompt += f'\nExplicitly authorised catch-up for the missed week {week}, researched now on {datetime.now(TZ).isoformat()}. Set brief.catch_up=true and identify the missed week and actual fresh evidence cutoff in the intro. Do not backdate reads or present current facts as known on the missed Monday. Reconcile dated commitments against current evidence, preserving original dates and completed outcomes. This remains one normal weekly receipt, not a test or duplicate report.'
-            if continue_from:
-                prompt=common+repair_contract+f"\nThis is continuation of {continue_from}, copied into the current research directory, using the same successful live source evidence and original read times. The original CLI session is resumed. Refresh newly relevant records, finish all missing reads and use the CURRENT installed skill path/hash; preserve prior access provenance. Prior independent review failure to resolve: "+str(prior_status.get('error','See prior review result'))
             invoke(cfg,work/'research',prompt,sock,resume=bool(continue_from))
             def core_check():
                 if not (out/'email.json').is_file():raise RuntimeError('No researched payload')

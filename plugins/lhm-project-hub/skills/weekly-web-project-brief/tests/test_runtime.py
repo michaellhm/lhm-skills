@@ -3,6 +3,10 @@ from datetime import datetime
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('runtime',Path(__file__).parents[1]/'scripts/weekly_runtime.py');r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
 class RuntimeTests(unittest.TestCase):
+ def test_only_failed_same_week_catch_up_can_continue(self):
+  r.validate_continuation('catch-up','2026-11-16','2026-11-16-catch-up-1234abcd',{'state':'failed'})
+  for mode,key,state in [('catch-up','2026-11-09-catch-up-1234abcd','failed'),('catch-up','2026-11-16-catch-up-1234abcd','delivered'),('scheduled','2026-11-16-catch-up-1234abcd','failed')]:
+   with self.assertRaises(ValueError):r.validate_continuation(mode,'2026-11-16',key,{'state':state})
  def test_catch_up_authority_and_week_validation(self):
   at=datetime.fromisoformat('2026-11-21T10:00:00+11:00')
   self.assertEqual(r.validate_catch_up('2026-11-16',True,at),'2026-11-16')

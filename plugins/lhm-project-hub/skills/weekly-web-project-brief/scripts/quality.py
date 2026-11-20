@@ -11,6 +11,9 @@ def digest(p):
     return hashlib.sha256(Path(p).read_bytes()).hexdigest()
 
 
+PROJECT_FIELDS = ('project_key', 'recorded_task_state', 'reconciled_state', 'next_actor', 'next_action', 'ownership_basis', 'approval_evidence', 'original_target', 'estimated_target', 'effective_target', 'target_basis', 'risk_reason', 'unresolved_conflicts', 'last_substantive_basicops_at', 'inactivity_days', 'expected_activity', 'light_reason', 'evidence')
+
+
 def validate(directory, require_review=True):
     root = Path(directory).resolve()
     def read(name):
@@ -69,6 +72,18 @@ def validate(directory, require_review=True):
             disclosed = item.get('status') == 'limited' and any(g.get('id') == item.get('gap_id') and g.get('project') == project['project'] and g.get('source') == source for g in gaps)
             require(evidence and (item.get('status') == 'complete' or disclosed), 'Incomplete project source: '+project['project']+' / '+source)
         require(any(project.get(source, {}).get('status') == 'complete' for source in ('gmail','obsidian','basicops')), 'Project needs verified source evidence')
+    records = research.get('projects', [])
+    require(isinstance(records, list) and len(records) == len(names) and
+            {p.get('project') for p in records} == names, 'Per-project reconciled records required')
+    for project in records:
+        require(set(PROJECT_FIELDS) <= set(project), 'Incomplete reconciled project record: ' + project['project'])
+        for key in ('project_key','recorded_task_state','reconciled_state','next_actor','next_action','ownership_basis','target_basis','light_reason'):
+            require(isinstance(project[key], str) and bool(project[key].strip()), 'Missing project reasoning: ' + key)
+        require(isinstance(project['unresolved_conflicts'], list), 'Project conflicts must be explicit')
+        days = project['inactivity_days']
+        require(days is None or (type(days) is int and days >= 0), 'Invalid project inactivity')
+        require(isinstance(project['evidence'], list) and bool(project['evidence']) and
+                all(e in file_names for e in project['evidence']), 'Project reasoning must reference retained evidence')
     for gap in gaps:
         if gap['project'] in names:
             entry = next(p for p in coverage if p['project'] == gap['project'])[gap['source']]
