@@ -4,7 +4,9 @@ import hashlib
 import html
 import json
 import sys
-from read_audit import precise_time, read_entry
+from read_audit import precise_time, read_entry, task_index
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 
@@ -85,8 +87,15 @@ def validate(directory, require_review=True):
         for key in ('project_key','recorded_task_state','reconciled_state','next_actor','next_action','ownership_basis','target_basis','light_reason'):
             require(isinstance(project[key], str) and bool(project[key].strip()), 'Missing project reasoning: ' + key)
         require(isinstance(project['unresolved_conflicts'], list), 'Project conflicts must be explicit')
+        last = project['last_substantive_basicops_at']
+        require(last is None or precise_time(last), 'Activity date must be an observed ISO timestamp or null')
         days = project['inactivity_days']
         require(days is None or (type(days) is int and days >= 0), 'Invalid project inactivity')
+        if days is not None:
+            require(last is not None and precise_time(brief.get('evidence_cutoff')), 'Dated inactivity requires an actual activity date and cutoff')
+            tz=ZoneInfo('Australia/Melbourne')
+            elapsed=(datetime.fromisoformat(brief['evidence_cutoff'].replace('Z','+00:00')).astimezone(tz).date()-datetime.fromisoformat(last.replace('Z','+00:00')).astimezone(tz).date()).days
+            require(days == elapsed, 'Inactivity days differ from actual activity/cutoff dates')
         require(isinstance(project['evidence'], list) and bool(project['evidence']) and
                 all(e in file_names for e in project['evidence']), 'Project reasoning must reference retained evidence')
     for gap in gaps:
@@ -118,6 +127,14 @@ def validate(directory, require_review=True):
             expected = [x for x in reads if x['source'] == source]
             require(bool(expected) and details.get('reads') == expected,
                     'Source-specific read times missing: ' + source)
+    task_ref=access.get('controller_task_evidence', {})
+    require(task_ref.get('path') in file_names, 'Controller task evidence index missing')
+    bound_file(task_ref)
+    indexed=read(task_ref['path'])
+    require(indexed == task_index(reads, read), 'Task index differs from actual native results')
+    tasks=indexed['tasks']
+    for row in brief['projects']:
+        require(any(identity['url'] == row.get('url') for task in tasks.values() for identity in task['identities']), 'Project URL lacks native task identity: '+row['name'])
     inbox_path = root / 'inbox-review.json'
     require(any((root / f['path']).resolve() == inbox_path for f in files), 'Inbox review must be retained and hash-bound')
     inbox = read('inbox-review.json')
@@ -126,6 +143,9 @@ def validate(directory, require_review=True):
     for board in boards:
         require(board.get('status') == 'complete' and board.get('terminal') is True and board.get('board_id') and board.get('section_id'), 'Incomplete owner inbox sweep: ' + str(board.get('owner')))
         require(isinstance(board.get('selected_actions'), list), 'Selected weekly actions missing')
+        for action in board['selected_actions']:
+            task=tasks.get(str(action.get('task_id')), {})
+            require(task.get('identities') and task.get('task_reads') and task.get('discussion_reads'), 'Selected Inbox action lacks actual task/discussion reads: '+str(action.get('task_id')))
     bound_file(comparison['baseline'])
     require(bool(comparison.get('projects')), 'No baseline comparison')
     require(comparison.get('unresolved_regressions') == [], 'Unresolved factual regression')

@@ -98,6 +98,47 @@ class NewProjectTests(unittest.TestCase):
             d=self.sample();d['new_projects'][0][field]=value
             with self.assertRaises(ValueError):brief.new_project_items(d)
 
+class TaskEvidenceTests(unittest.TestCase):
+    def test_resumed_native_reads_keep_identity_and_discussion_together(self):
+        native={'records':[
+            {'id':'task','result':{'content':[{'type':'text','text':json.dumps(
+                {'id':42,'title':'Client website review','url':'https://app.basicops.com/task/42','assignee':{'id':7}})}]}},
+            {'id':'discussion','result':{'content':[{'type':'text','text':'[]'}]}}]}
+        reads=[{'source':'basicops','tool':tool,'target':{'taskId':42},
+                'read_id':'events-3.jsonl:'+record,'record_id':record,'evidence':'native.json'}
+               for tool,record in [('get_task','task'),('list_messages_in_task','discussion')]]
+        indexed=a.task_index(reads,lambda _:native)['tasks']['42']
+        self.assertEqual(indexed['identities'][0]['url'],'https://app.basicops.com/task/42')
+        self.assertEqual(indexed['task_reads'],['events-3.jsonl:task'])
+        self.assertEqual(indexed['discussion_reads'],['events-3.jsonl:discussion'])
+
+    def test_description_url_is_not_a_native_task_identity(self):
+        item={'records':[{'id':'list','result':{'content':[{'type':'text','text':json.dumps(
+            {'id':42,'description':'https://app.basicops.com/task/99'})}]}}]}
+        reads=[{'source':'basicops','tool':'list_tasks','target':{},'read_id':'events.jsonl:list',
+                'record_id':'list','evidence':'native.json'}]
+        self.assertEqual(a.task_index(reads,lambda _:item)['tasks'],{})
+
+
+class TaskQualityTests(QualityTest):
+    def test_placeholder_activity_fails_before_review(self):
+        self.change('research-receipt.json',lambda d:d['projects'][0].update(
+            last_substantive_basicops_at='Recorded in retained BasicOps discussion evidence'))
+        with self.assertRaisesRegex(ValueError,'Activity date'):__import__('quality').validate(self.p,require_review=False)
+
+    def test_selected_metadata_without_discussion_fails_before_review(self):
+        inbox=json.loads((self.p/'inbox-review.json').read_text())
+        inbox['boards'][0]['selected_actions']=[{'task_id':1}]
+        self.write('inbox-review.json',inbox)
+        q=__import__('quality')
+        self.change('research-receipt.json',lambda d:next(f for f in d['evidence_files']
+                    if f['path']=='inbox-review.json').update(sha256=q.digest(self.p/'inbox-review.json')))
+        with self.assertRaisesRegex(ValueError,'actual task/discussion'):q.validate(self.p,require_review=False)
+
+    def test_project_url_from_vault_prose_alone_fails(self):
+        self.change('brief.json',lambda d:d['projects'][0].update(url='https://app.basicops.com/task/99'))
+        with self.assertRaisesRegex(ValueError,'native task identity'):__import__('quality').validate(self.p,require_review=False)
+
 
 if __name__ == '__main__':
     unittest.main()

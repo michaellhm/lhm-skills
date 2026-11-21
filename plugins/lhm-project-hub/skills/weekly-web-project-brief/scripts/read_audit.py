@@ -72,3 +72,49 @@ def read_entry(item, log_name, evidence):
             'tool': tool, 'target': target, 'read_at': observed,
             'time_basis': 'controller_received_result', 'evidence': evidence,
             'record_id': item['id']}
+
+
+def native_payload(item):
+    """Decode native MCP JSON; never search prose/descriptions for task identities."""
+    result = item.get('result') or {}
+    structured = result.get('structured_content') or result.get('structuredContent')
+    if structured is not None:
+        return structured
+    values = []
+    for block in result.get('content', []):
+        if block.get('type') == 'text':
+            try: values.append(json.loads(block['text']))
+            except (ValueError, KeyError): pass
+    return values
+
+
+def task_index(reads, load):
+    """Controller-derived task identity/discussion index across every continuation."""
+    tasks = {}
+    def entry(task_id):
+        return tasks.setdefault(str(task_id), {'identities': [], 'task_reads': [], 'discussion_reads': []})
+    def walk(value):
+        if isinstance(value, list):
+            for child in value: yield from walk(child)
+        elif isinstance(value, dict):
+            if all(k in value for k in ('id', 'title', 'url')) and any(
+                    k in value for k in ('assignee', 'section', 'dueDate', 'description')):
+                yield value
+            for child in value.values():
+                if isinstance(child, (dict, list)): yield from walk(child)
+    for read in reads:
+        if read['source'] != 'basicops': continue
+        raw = load(read['evidence'])
+        item = next(r for r in raw['records'] if r['id'] == read['record_id'])
+        tool, target = read['tool'], read['target']
+        if tool in ('get_task', 'list_tasks', 'list_tasks_in_project', 'list_subtasks_in_task'):
+            for task in walk(native_payload(item)):
+                record = entry(task['id'])
+                identity = {'id': task['id'], 'title': task['title'], 'url': task['url'],
+                            'read_id': read['read_id']}
+                record['identities'].append(identity)
+            if tool == 'get_task' and isinstance(target, dict) and target.get('taskId'):
+                entry(target['taskId'])['task_reads'].append(read['read_id'])
+        if tool == 'list_messages_in_task' and isinstance(target, dict) and target.get('taskId'):
+            entry(target['taskId'])['discussion_reads'].append(read['read_id'])
+    return {'schema_version': 1, 'tasks': tasks}

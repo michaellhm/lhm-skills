@@ -2,7 +2,7 @@
 name: weekly-web-project-brief
 description: "Prepare Lily's Monday website portfolio email or apply Michael's consolidated project corrections. Use for 'weekly web projects', 'website weekly brief', 'Monday website email', 'update the web brief' or 'website brief feedback'. Reconciles Obsidian, BasicOps discussions, email and meeting evidence; produces an HTML table with due dates and red-first traffic lights."
 metadata:
-  version: 1.3.2
+  version: 1.3.3
 ---
 ## Client file routing
 
@@ -102,3 +102,5 @@ never triggers another email. The research worker has no archive-write or send a
 ## Separate Monday board reconciliation
 
 Read [board reconciliation](references/board-reconciliation.md) when asked to post weekly project summaries or reconcile boards after the report. This is a separate explicitly invoked execution job, never part of Scheduled report generation. Require the verified report dependency, live rereads, identity, owning-skill authority, deduplication and per-task readback in that contract.
+
+Controller task evidence: `access.controller_task_evidence` binds native task IDs, current titles/URLs and task/discussion read IDs across every retained continuation. Use it as the authoritative index rather than model-written aggregate mappings. Every portfolio URL must have native identity and every selected Inbox action must have actual task and discussion reads. Activity dates must be timezone-aware ISO values or null; inactivity counts must match the actual cutoff. Placeholder prose is rejected before independent review.
