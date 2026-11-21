@@ -9,7 +9,8 @@ brief.json schema (all content plain text, no embedded HTML):
 - week: ISO Monday YYYY-MM-DD; cutoff: human-readable evidence date/time.
 - intro: string. For an explicitly authorised catch-up, state the missed week and actual evidence cutoff; set optional catch_up=true so the renderer prefixes the subject with Catch-up.
 - priorities: list of strings.
-- new_projects: list of strings, identifying kickoff/handover dates; empty produces “No new website projects this week.”
+- evidence_cutoff: actual timezone-aware ISO evidence cutoff; required when new_projects is nonempty.
+- new_projects: list of {project, event_type: kickoff|handover, event_date: YYYY-MM-DD, text, url, evidence: retained-relative-file}. Only evidenced kickoff/handover dates from the previous Monday through the actual cutoff qualify. The renderer displays that date and rejects ordinary stage events, strings, missing evidence and dates outside the window. Empty produces “No new website projects this week.” Prototype sends, revisions and interview bookings belong in progress/owner actions.
 - projects: list of {name, url, light: red|orange|green, state, target, next}. Use verified https source links. Include owner in next. Order among equal lights is supplied by the researcher.
 - owners: list of {name, actions: list of strings or {client, text, url} objects}; allowed names Michael, Kristalyn, Aiya, Jaimee, Josephine. Use {client, text, url} objects for task-linked actions so the HTML shows readable linked text rather than long raw URLs. Omit Josephine when no current dependency requires her.
 - older_cards: list of strings, optional; identify actual remaining uncertainty, not allegations of inactivity.

@@ -13,6 +13,14 @@ import brief as b
 
 
 class WeeklyArchiveTests(unittest.TestCase):
+    def test_structured_new_project_date_survives_archive(self):
+        brief, receipt = self.fixture()
+        brief.update(evidence_cutoff='2026-09-28T08:00:00+10:00', new_projects=[
+            {'project':'Example','event_type':'handover','event_date':'2026-09-25',
+             'text':'Scope handed over','url':'https://example.org/project','evidence':'source.json'}])
+        _, body, _ = a.snapshot(brief, receipt)
+        self.assertIn('Example — handover 2026-09-25', body)
+
     def fixture(self):
         brief = {'week': '2026-09-28', 'cutoff': '28 September, 07:45 Melbourne', 'priorities': ['Review'],
                  'new_projects': [], 'projects': [], 'owners': [{'name': 'Aiya', 'actions': ['Confirm remaining work']}],

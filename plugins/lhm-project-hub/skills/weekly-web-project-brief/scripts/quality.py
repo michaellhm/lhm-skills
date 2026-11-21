@@ -4,6 +4,7 @@ import hashlib
 import html
 import json
 import sys
+from read_audit import precise_time, read_entry
 from pathlib import Path
 
 
@@ -51,6 +52,10 @@ def validate(directory, require_review=True):
     gap_ids = [g.get('id') for g in gaps]
     require(len(gap_ids) == len(set(gap_ids)) and set(gap_ids) <= set(ids), 'Every project gap needs a visible blocker')
     file_names = {f['path'] for f in research.get('evidence_files', [])}
+    from brief import new_project_items
+    new_project_items(brief)
+    for item in brief.get('new_projects', []):
+        require(item['evidence'] in file_names, 'New project date evidence must be retained')
     for gap in gaps:
         require(gap.get('scope') == 'project' and gap.get('source') in ('gmail', 'obsidian', 'basicops'), 'Only scoped project gaps may be disclosed')
         require(gap.get('evidence') and isinstance(gap['evidence'], list) and all(e in file_names for e in gap['evidence']), 'Project gap search evidence must be retained')
@@ -92,6 +97,27 @@ def validate(directory, require_review=True):
     require(bool(files), 'No retained primary evidence')
     for f in files:
         bound_file(f)
+    audit_ref = access.get('controller_read_receipts', {})
+    require(audit_ref.get('path') in file_names, 'Controller source read timestamps missing')
+    bound_file(audit_ref)
+    audit = read(audit_ref['path'])
+    require(audit.get('time_basis') == 'controller_received_result', 'Invalid source read time basis')
+    reads = audit.get('reads', [])
+    require(bool(reads) and len({x.get('read_id') for x in reads}) == len(reads), 'Unique source read IDs required')
+    for item in reads:
+        require(precise_time(item.get('read_at')) and item.get('evidence') in file_names,
+                'Source-specific actual read timestamp and evidence required')
+        raw = read(item['evidence'])
+        matches = [r for r in raw.get('records', []) if r.get('id') == item.get('record_id')]
+        require(len(matches) == 1, 'Source timestamp must identify one retained result')
+        log_name = item['read_id'].rsplit(':', 1)[0]
+        require(read_entry(matches[0], log_name, item['evidence']) == item,
+                'Source timestamp differs from controller-observed result')
+    for source, details in access['sources'].items():
+        if details.get('status') == 'passed':
+            expected = [x for x in reads if x['source'] == source]
+            require(bool(expected) and details.get('reads') == expected,
+                    'Source-specific read times missing: ' + source)
     inbox_path = root / 'inbox-review.json'
     require(any((root / f['path']).resolve() == inbox_path for f in files), 'Inbox review must be retained and hash-bound')
     inbox = read('inbox-review.json')

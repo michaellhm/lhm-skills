@@ -41,7 +41,8 @@ def snapshot(brief, receipt):
              '## Priorities', '']
     lines += ['- ' + x for x in brief['priorities']]
     lines += ['', '## New projects', '']
-    lines += ['- ' + x for x in brief.get('new_projects', [])] or ['No new website projects this week.']
+    from brief import new_project_items
+    lines += [f'- [{x["text"]}]({x["url"]})' for x in new_project_items(brief)] or ['No new website projects this week.']
     lines += ['', '## Project snapshot', '', '| Project | Position | Target | Next action |', '| --- | --- | --- | --- |']
     for p in brief['projects']:
         lines.append(f'| [{cell(p["name"])}]({p["url"]}) | **{p["light"].title()}** — {cell(p["state"])} | {cell(p["target"])} | {cell(p["next"])} |')

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Scoped root controller: read-only source broker, Codex research/review, fixed sender."""
 import argparse,fcntl,hashlib,json,os,pwd,re,shutil,socketserver,subprocess,threading,time
+from read_audit import capture_events, read_entry
 from datetime import datetime,date,timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -88,8 +89,18 @@ def invoke(cfg,work,prompt,socket,resume=False):
         cmd+=['resume',thread,'-']
     else:cmd+=['-']
     def drop():os.setgroups([]);os.setgid(user.pw_gid);os.setuid(user.pw_uid)
-    with prompt_path.open('rb') as inp,event_path.open('wb') as out,(work/('stderr'+suffix+'.log')).open('wb') as err:
-        p=subprocess.run(cmd,stdin=inp,stdout=out,stderr=err,env=env,preexec_fn=drop,timeout=cfg.get('timeout',3600))
+    with prompt_path.open('rb') as inp,event_path.open('w') as out,(work/('stderr'+suffix+'.log')).open('wb') as err:
+        with subprocess.Popen(cmd,stdin=inp,stdout=subprocess.PIPE,stderr=err,env=env,preexec_fn=drop,text=True) as p:
+            failures = []
+            def record():
+                try: capture_events(p.stdout, out)
+                except Exception as exc: failures.append(exc)
+            reader = threading.Thread(target=record, daemon=True); reader.start()
+            try: p.wait(timeout=cfg.get('timeout',3600))
+            except subprocess.TimeoutExpired:
+                p.kill(); p.wait(); reader.join(timeout=5); raise
+            reader.join(timeout=5)
+            if reader.is_alive() or failures: raise RuntimeError('Source event recording failed')
     if p.returncode:raise RuntimeError('Codex failed; inspect '+str(work))
     return result_path.read_text()
 
@@ -108,7 +119,7 @@ def safe_files(root):
 def retain_raw_reads(work,out):
     """Keep actual CLI source responses, not only the worker's prose summaries."""
     evidence=out/'evidence';evidence.mkdir(exist_ok=True)
-    paths=[]
+    paths=[]; observed_reads=[]
     for log in sorted(work.glob('events*.jsonl')):
         records=[]
         for line in log.read_text().splitlines():
@@ -117,6 +128,8 @@ def retain_raw_reads(work,out):
             item=event.get('item',{})
             if event.get('type')!='item.completed':continue
             if item.get('type')=='mcp_tool_call' or (item.get('type')=='command_execution' and 'source_read.py' in item.get('command','')):
+                if event.get('controller_read_at'):
+                    item = dict(item, controller_read_at=event['controller_read_at'])
                 records.append(item)
         if records:
             value={'provenance':'Actual Codex CLI completed source calls; may include failed attempts. Read result before treating as evidence.','records':records}
@@ -124,6 +137,22 @@ def retain_raw_reads(work,out):
             p=evidence/('controller-'+log.stem+'-'+fingerprint[:16]+'.json')
             if not p.exists():save(p,value)
             paths.append(p)
+            for item in records:
+                entry = read_entry(item, log.name, str(p.relative_to(out)))
+                if entry: observed_reads.append(entry)
+    if observed_reads:
+        value={'schema_version':1,'time_basis':'controller_received_result','reads':observed_reads}
+        fingerprint=hashlib.sha256(json.dumps(value,sort_keys=True).encode()).hexdigest()
+        audit=evidence/('controller-read-times-'+fingerprint[:16]+'.json')
+        if not audit.exists(): save(audit,value)
+        paths.append(audit)
+        access_path=out/'access-receipt.json'
+        if access_path.is_file():
+            access=json.loads(access_path.read_text());owner=access_path.stat()
+            access['controller_read_receipts']={'path':str(audit.relative_to(out)),'sha256':digest(audit)}
+            for source, details in access.get('sources',{}).items():
+                if isinstance(details,dict): details['reads']=[x for x in observed_reads if x['source']==source]
+            save(access_path,access);os.chown(access_path,owner.st_uid,owner.st_gid)
     receipt=out/'research-receipt.json'
     if receipt.is_file():
         value=json.loads(receipt.read_text());files=value.setdefault('evidence_files',[])
@@ -140,6 +169,9 @@ def repair_prompt(skill,out):
 Evidence and ownership: retain complete source text/results, including current task discussions and replies. Actual CLI responses are available in the research directory's events*.jsonl; the controller also retains them under output/evidence/raw-events*.json before review. Use those responses to substantiate every current_evidence_ids mapping, never empty IDs or unsupported summaries. Preserve the real BasicOps assignee. A recommended coordination action for Michael/Kristalyn on Aiya's task must record the real task_assignee separately from action_owner, with explicit ownership_basis='recommended coordination' and source; never relabel another person's task as a personal Inbox assignment. Keep actionable coordination in the brief when justified, and explain it accurately in evidence.
 Per-project source accounting is mandatory before review. For complete sources use the following shape; for genuinely absent project records use status limited with gap_id as documented below. For EVERY row in brief.projects, populate research.project_source_coverage with {{project: exact displayed name, gmail:{{status:'complete',evidence:[retained source references]}}, obsidian:{{status:'complete',evidence:[retained source references]}}, basicops:{{status:'complete',evidence:[retained source references]}}}}. Read each client's available identity/profile, Current Projects, goals and canonical website/landing-page notes, not just a directory listing. Read targeted Gmail bodies or retain the exact no-result search. Include actual task/discussion/reply sources. Search the canonical index for aliases and alternate client/project folder names before concluding a record is missing. Missing records must be explicitly documented with the search evidence and affected uncertainty, never invented. If a genuine client/project record remains absent after successful searches, use the disclosed project-gap contract in references/freshness.md: limited coverage with gap_id, retained search evidence, research.project_gaps and a matching brief.blockers entry. Send verified updates with the explicit uncertainty; never mark missing records complete. Global source access, core board pagination or worker failures remain material_gaps and stop delivery. Keep one-off live-site actions in owner lists only, with evidence-based exclusion from the project snapshot. For each dated baseline action, retain it or explicitly record current evidence proving completion, cancellation or a superseding commitment; newer activity alone does not remove a deadline. A source failure is not complete coverage. Do not reuse an old footer timestamp. Keep your evidence indexes bound to your own immutable source files; controller-* files are separate append-only receipts, never overwrite or rehash worker-indexed files.
 Every snapshot project also needs one research.projects entry with project exactly matching the displayed name and all fields from quality.PROJECT_FIELDS. Use actual retained evidence paths, record unknown targets/activity honestly, and provide substantive current-state, ownership, target and light reasoning. The validator checks these before review.
+Run source_read.py directly, one broker request per command; do not hide source calls in Python subprocess batches or pipelines, which cannot be matched to an exact controller receipt.
+Controller read times: events*.jsonl now contains controller_read_at on each live completed result. The controller builds hash-bound controller-read-times evidence and populates access.sources.<source>.reads before validation. Use these exact read IDs/times; never estimate from the cutoff or filesystem mtime. Historical copied logs without observed timestamps are not fresh read receipts. Refresh the source when a current supporting read lacks one. The authoritative receipt is access.controller_read_receipts; do not duplicate or invent receipt timestamps in prose.
+New projects: brief.new_projects must be empty or structured kickoff/handover events with project, event_type (kickoff|handover), event_date (YYYY-MM-DD), text, native url and retained evidence path. Include brief.evidence_cutoff as the actual timezone-aware ISO cutoff. Only use evidenced kickoff/handover dates within previous Monday through actual cutoff. Prototype sends, revisions, reviews and interview bookings are progress, not new-project dates; retain them in project rows/owner actions instead. Unknown dates mean omit from the new-project section, not from the portfolio.
 Schema reminders: access.sources.gmail/obsidian/basicops/meetings use status='passed' and evidence; research.coverage source status='complete' and reason; material_gaps=[] only when global/core gaps are resolved; disclosed project-specific gaps belong in project_gaps, never hide them. evidence_files is a nonempty list of relative {{path,sha256}} entries including inbox-review.json and primary evidence. Inbox boards must each have owner, board_id, section_id, status='complete', terminal=true, selected_actions list, candidates and excluded reasons. Preserve every selected weekly action in concise client groups; explain every removal from the approved action baseline using current evidence. comparison.baseline must be a relative {{path,sha256}} file, projects nonempty, unresolved_regressions=[] only when resolved. Validate structural research with quality.validate(output, require_review=False); that does not authorise sending."""
 
 
@@ -271,7 +303,7 @@ def run(cfg,week,mode,continue_from=None,authorised_catch_up=False):
                     invoke(cfg,work/'research',common+repair_contract+'\nStructural/source validation failed: '+str(e)+'\nCurrent receipt: '+gaps,sock,resume=True)
             def review_once(review_attempt):
                 before={str(p.relative_to(out)):digest(p) for p in safe_files(out)}
-                review=parse(invoke(cfg,work/('review' if review_attempt==0 else 'review-'+str(review_attempt+1)),common+f'Independently review {out}. Do not alter research or payload files. Read the complete rendered brief, latest primary evidence, Inbox selections and baseline comparison. Verify source completeness, correct owners/dates, concise client-grouped actions, no resurrected work/one-off project rows, and no credentials/patient details. Verify every selected action appears and all Inbox sweeps are terminal. For EVERY project and action URL, compare the actual native get/list task identity, current title/Discussion and canonical client/scope. Reject cross-client links, invented URLs, or unexplained website-versus-landing-page/regional scope mismatches even when the URL is valid or appears elsewhere in evidence. Verify access receipts identify successful source-specific read IDs/paths and real read times, and Inbox candidates preserve individual selection/exclusion evidence. Explain any dropped action versus the approved baseline. Reject factual regressions, unsupported claims, unread available evidence, undisclosed gaps or global/core access failures. A missing project-specific record after evidenced searches may be accepted ONLY when accurately limited in the row/action and visibly disclosed in Blockers and information needed with impact, owner and next step, matching project_gaps. Do not reject a correctly disclosed project gap merely because the record is absent. Preserve pending dated commitments when not proven superseded. Return ONLY JSON {{"accepted":true|false,"issues":[],"checked":[...]}}. Never send email or edit tasks.',sock))
+                review=parse(invoke(cfg,work/('review' if review_attempt==0 else 'review-'+str(review_attempt+1)),common+f'Independently review {out}. Do not alter research or payload files. Read the complete rendered brief, latest primary evidence, Inbox selections and baseline comparison. Verify source completeness, correct owners/dates, concise client-grouped actions, no resurrected work/one-off project rows, and no credentials/patient details. Verify every selected action appears and all Inbox sweeps are terminal. For source read timestamps use access.controller_read_receipts and access.sources.<source>.reads, generated from the controller-observed completed results. Match cited native reads to those entries; do not require duplicated model-authored timestamp prose. Reject missing or invented observations. For EVERY project and action URL, compare the actual native get/list task identity, current title/Discussion and canonical client/scope. Reject cross-client links, invented URLs, or unexplained website-versus-landing-page/regional scope mismatches even when the URL is valid or appears elsewhere in evidence. Verify access receipts identify successful source-specific read IDs/paths and real read times, and Inbox candidates preserve individual selection/exclusion evidence. Explain any dropped action versus the approved baseline. Reject factual regressions, unsupported claims, unread available evidence, undisclosed gaps or global/core access failures. A missing project-specific record after evidenced searches may be accepted ONLY when accurately limited in the row/action and visibly disclosed in Blockers and information needed with impact, owner and next step, matching project_gaps. Do not reject a correctly disclosed project gap merely because the record is absent. Preserve pending dated commitments when not proven superseded. Return ONLY JSON {{"accepted":true|false,"issues":[],"checked":[...]}}. Never send email or edit tasks.',sock))
                 if before!={str(p.relative_to(out)):digest(p) for p in safe_files(out)}:raise RuntimeError('Payload changed during review')
                 save(status.parent/('review-attempt-'+str(review_attempt+1)+'.json'),review)
                 return review
@@ -316,7 +348,9 @@ def run(cfg,week,mode,continue_from=None,authorised_catch_up=False):
         finally:server.shutdown();server.server_close();sock.unlink(missing_ok=True)
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('action',choices=['queue','preflight','dry-run','recover','catch-up']);p.add_argument('--week');p.add_argument('--continue-from');p.add_argument('--authorised-catch-up',action='store_true');a=p.parse_args();cfg=json.loads(CONFIG.read_text())
+    p=argparse.ArgumentParser();p.add_argument('action',choices=['queue','preflight','dry-run','recover','catch-up']);p.add_argument('--config', help='Separate operator config for preflight/dry-run only');p.add_argument('--week');p.add_argument('--continue-from');p.add_argument('--authorised-catch-up',action='store_true');a=p.parse_args();
+    if a.config and a.action not in ('preflight','dry-run'):p.error('--config is limited to non-sending candidate tests')
+    cfg=json.loads(Path(a.config).read_text() if a.config else CONFIG.read_text())
     if a.authorised_catch_up and a.action!='catch-up':p.error('--authorised-catch-up requires catch-up')
     if a.action=='queue':
         queue=Path(cfg['state'])/'incoming'

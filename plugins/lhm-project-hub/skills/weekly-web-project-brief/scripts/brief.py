@@ -80,6 +80,32 @@ def blocker_text(b):
     return f"{b['project']}: {b['issue']} Impact: {b['impact']} Next: {b['owner']} — {b['next_step']}"
 
 
+def new_project_items(d):
+    """Progress events cannot stand in for a dated new-project handoff."""
+    items = d.get('new_projects', [])
+    if not isinstance(items, list):
+        raise ValueError('New projects must be a list')
+    if not items:
+        return []
+    cutoff = datetime.fromisoformat(d['evidence_cutoff'].replace('Z', '+00:00'))
+    if cutoff.tzinfo is None:
+        raise ValueError('New projects require a timezone-aware evidence cutoff')
+    start = monday(d['week']) - timedelta(days=7)
+    result = []
+    for item in items:
+        if not isinstance(item, dict) or item.get('event_type') not in ('kickoff', 'handover'):
+            raise ValueError('New projects require an evidenced kickoff or handover')
+        event_day = date.fromisoformat(item['event_date'])
+        if not start <= event_day <= cutoff.astimezone(TZ).date():
+            raise ValueError('New project kickoff/handover is outside the reporting window')
+        for key in ('project', 'text', 'url', 'evidence'):
+            if not isinstance(item.get(key), str) or not item[key].strip():
+                raise ValueError('New project date and source evidence required')
+        result.append({'text': item['project'] + ' — ' + item['event_type'] + ' ' +
+                       item['event_date'] + ': ' + item['text'], 'url': item['url']})
+    return result
+
+
 def render(d):
     week = monday(d['week']).strftime('%-d %B %Y')
     projects = d['projects']
@@ -145,7 +171,7 @@ def render(d):
         parts.append('<h2 style="font-size:19px;margin:26px 0 12px">' + html.escape(title) + '</h2><ul>' + ''.join(entries) + '</ul>')
 
     section('The main things to get moving', d['priorities'])
-    section('New projects this week', d['new_projects'] or ['No new website projects this week.'])
+    section('New projects this week', new_project_items(d) or ['No new website projects this week.'])
     legend = 'Red: blocked or stalled. Orange: needs attention or a progress update. Green: progressing or following the agreed plan.'
     dates = 'Dates are working targets unless stated otherwise. Estimates use eight weeks from confirmed client prototype approval; existing agreed targets take precedence.'
     text += ['Project snapshot', legend, dates]
