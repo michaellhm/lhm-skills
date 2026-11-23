@@ -27,6 +27,8 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 `seo-page-brief` — Turn accepted SEO research into a bounded, implementation-ready page brief package.
 
 `seo-delivery-qa` — Independently verify SEO scope, evidence, artefact delivery, approval boundaries and completion before the Lead advances.
+`client-content-learn` — Refresh a client writing guide from approved page copy and corroborated GitHub edits; retain scoped facts, evidence and incremental learning.
+
 `website-content-agent` — Client website content orchestration: source comparison, user-selected reference templates, sitemap keyword/H1 mapping, briefs, copy, independent editing and healthcare review, Astro integration, client approvals, feedback learning and canonical project handback.
 
 `lhm-page-rollout` — Build a batch of LHM website pages end to end (research, brief, copy, FAQ and schema, internal links, images, staging build, verification and review email). Staging only.
