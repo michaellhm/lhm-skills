@@ -7,6 +7,7 @@ Keep the source of truth in the website repo under `docs/website-content/`, outs
 - `project.md`: verified repo/remote, client knowledge and work paths, playbook, sitemap authority, renderer/content paths, current booking route, template references, build/check commands, publication authorisation and deployment behaviour.
 - `content-plan.json`: one entry per canonical destination; menu aliases point to the same page ID.
 - `content-plan.md`: readable view generated from the JSON, with Draft ready and Client approved checkboxes. Do not edit this view independently of JSON.
+- `how-to-write.md`: client-specific writing guide from `client-content-learn`; approved corpus, semantic client-edit lessons, scoped facts, rule status/evidence and refresh cursor. Read with the profile/playbook before briefing and writing. Keep sensitive evidence in the registered work root where needed.
 - `client-learnings.md`: evidence-backed client preferences, scope, origin page/revision, date, feedback quote or faithful summary, confirmation status and superseded lessons.
 - `action-plan.md`: active scope, ordered next steps, missing facts, blockers and resume instruction.
 - `templates/<family>.md`: discovered page family contract and approved reference URLs/source files. Approval may be pending; record it rather than invent it.
