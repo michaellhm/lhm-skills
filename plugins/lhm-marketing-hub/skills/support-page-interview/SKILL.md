@@ -53,7 +53,7 @@ Wellness On The Lane is a group of independent businesses with clinicians consul
 
 ## Files and saved progress
 
-Create `Interview Files/00-progress.md` and, for each page started, a folder such as `Interview Files/children/`. Use stable lowercase, hyphenated page names, without changing existing names unnecessarily. Keep every path within the opened folder. Suggested section files:
+Create `Interview Files/PROJECT.md` and, for each page started, a folder such as `Interview Files/children/`. Use stable lowercase, hyphenated page names, without changing existing names unnecessarily. Keep every path within the opened folder. Suggested section files:
 
 - `01-audience-and-scope.md`
 - `02-what-people-experience.md`
@@ -86,9 +86,61 @@ Next question: [next unanswered question]
 [Explicit corrections and whether the participant checked this summary.]
 ```
 
-Keep the progress file concise: page/section links, status (`Not started`, `In progress`, `Reviewed by participant`, `Skipped`), next question and unresolved handoffs. Link only actual files. Do not mark every page complete when only one section is done.
+### Project checklist — source of truth between chats
 
-On “continue”, read the progress file and current section from disk before asking anything. Preserve existing work, filenames and material corrections. Do not initialise over answers or start the interview again.
+Create `Interview Files/PROJECT.md` on first setup, before beginning the interview. It is the saved project state, not just a summary of the chat. Include the complete proposed page list below, even though page folders are created only when needed:
+
+```markdown
+# Website interview project
+Practice: Wellness On The Lane
+Participant: Not yet confirmed
+Current page: Children
+Current section: Audience and scope
+Next question: Which ages and concerns should the Children page cover?
+Last saved: [current local date]
+
+## Page checklist
+- [ ] Children — Not started
+- [ ] Teens — Not started
+- [ ] Adults — Not started
+- [ ] Anxiety — Not started
+- [ ] Depression — Not started
+- [ ] Trauma and PTSD — Not started
+- [ ] Chronic pain — Not started
+- [ ] ADHD and autism — Not started
+- [ ] Individual therapy — Not started
+- [ ] Assessments — Not started
+- [ ] Group programs — Not started
+- [ ] Art therapy — Not started
+- [ ] Telehealth — Not started
+- [ ] Clinical supervision — Not started
+
+## Current page sections
+[List the eight sections and their status; link each file once it exists.]
+
+## Completed page handbacks
+[Link saved page summaries and section files.]
+
+## Needs confirmation or another contributor
+[Question, page, owner if known, and whether it prevents completing the interview.]
+
+## Deliberately excluded pages
+[Record exclusions and reasons, separate from completed interviews.]
+```
+
+Adapt this initial list when the participant confirms scope. An unstarted page has no fake file link. Track section status as `Not started`, `In progress`, `Reviewed by participant` or `Skipped`; track pages as `Not started`, `In progress`, `Interview complete`, `Needs review` or `Excluded`. Check `[x]` only for completed interviews, never merely skipped/excluded pages. Record exclusions separately so they are not mistaken for completed work. A checked item means the interview source material is done, not that its website page has been written or approved.
+
+If an older `00-progress.md` exists, read it and its linked section files before creating PROJECT.md. Migrate its actual progress and preserve the old file as history; never reset its answers or create two competing active checklists.
+
+### Completing a page
+
+When the participant says “that page is done” or “finish this service”, save the current section first and inspect the section files. If all relevant sections are reviewed or explicitly skipped with reasons, prepare `<page>/00-page-summary.md`: a concise reusable overview, links to its section files, actual contributor, unresolved facts and review state. Show a short completion summary and get the participant’s confirmation. Their “all done” after reviewing the summary counts as that confirmation; do not ask twice.
+
+Then mark the page `[x] ... — Interview complete` in PROJECT.md, add the summary link, preserve open nonblocking confirmation items, and set the next unfinished relevant page/section/question. If required sections are still unanswered or unreviewed, save the partial work and mark `Needs review` or `In progress`; explain what remains rather than falsely ticking it off. Reopening a completed page for a material correction returns it to `Needs review` until the correction is confirmed.
+
+After both files are verified, say which page was saved and offer the next unfinished page or a pause. Do not automatically close Codex, end the project, start another chat, or begin a different page without the participant’s choice.
+
+At every new chat or “continue/start the website interview” request, read `Interview Files/PROJECT.md` and the current section or relevant completed summary from disk before asking anything. If a saved file and checklist disagree, reconcile from the actual files and confirmed reviews; do not assume checked boxes prove missing files exist. Say briefly what is complete and where the interview stopped, then offer to resume the saved next question or select a different page. The participant can simply say “Continue my website interview”. Preserve existing work, filenames and material corrections. Never rebuild the checklist from chat memory, reset the project or repeat completed interviews unless requested.
 
 ## Conduct the interview and finish each section
 
@@ -113,6 +165,6 @@ On pause, save the current section and progress; name the next question. On corr
 
 ## Handback
 
-When asked, make a ZIP containing only `Interview Files/00-progress.md` and the section Markdown files linked from it. Include partial sections if requested and label their status accurately. Exclude the downloaded skill, `.agents`, settings, hidden files, chat transcripts, patient documents, unrelated files and temporary files. Verify the ZIP member list and contents against saved files. If ZIP creation is unavailable, explain how to compress the `Interview Files` folder manually after checking that it contains only the intended content files.
+When asked, make a ZIP containing only `Interview Files/PROJECT.md` and the section and page-summary Markdown files linked from it. Include partial sections if requested and label their status accurately. Exclude the downloaded skill, `.agents`, settings, hidden files, chat transcripts, patient documents, unrelated files and temporary files. Verify the ZIP member list and contents against saved files. If ZIP creation is unavailable, explain how to compress the `Interview Files` folder manually after checking that it contains only the intended content files.
 
 Save the ZIP beside `Interview Files`, preserve the originals and show the exact local path. The user sends it to Michael themselves. Never email, upload, connect accounts or publish automatically. No paid software, API keys or separate Python helper is needed.

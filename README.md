@@ -388,4 +388,4 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 | --- | --- |
 | `website-project-loop` | Read-only evidence snapshot, report dependency gate and one verified weekly summary per mapped project overview. |
 
-`support-page-interview` is a self-contained SKILL.md for Codex. It explains the workflow, interviews clinicians one question at a time, saves each page section as separate local Markdown with resumable progress, and prepares a content-only ZIP. Includes the WOTL Children-page flow; no companion scripts, agency accounts or automatic uploads.
+`support-page-interview` is a self-contained SKILL.md for Codex. It explains the workflow, interviews clinicians one question at a time, saves each page section as separate local Markdown with a persistent PROJECT.md checklist, page summaries and cross-chat resume, and prepares a content-only ZIP. Includes the WOTL Children-page flow; no companion scripts, agency accounts or automatic uploads.

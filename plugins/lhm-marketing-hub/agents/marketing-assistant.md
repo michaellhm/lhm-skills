@@ -11,7 +11,7 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 ## Skill Catalog
 
-`support-page-interview` — Single-file Codex clinician interview with introductory guidance, separate Markdown files per page section, saved progress and a verified ZIP handback.
+`support-page-interview` — Single-file Codex clinician interview with introductory guidance, separate Markdown files per page section, a persistent PROJECT.md page checklist, cross-chat resume and a verified ZIP handback.
 
 `playbook-strategy-session` — Prepare and coach theme-led client strategy calls for campaign playbooks.
 
