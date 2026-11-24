@@ -1,0 +1,29 @@
+[Unit]
+Description=Task-bound Claude BasicOps and knowledge close-out broker
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStart=/usr/bin/python3 /usr/local/libexec/lhm-task-router/closeout/host_closeout.py
+Restart=on-failure
+RestartSec=5
+UMask=0077
+RuntimeDirectory=lhm-task-closeout
+RuntimeDirectoryMode=0755
+StateDirectory=lhm-task-closeout
+StateDirectoryMode=0700
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/lhm-task-closeout /run/lhm-task-closeout
+PrivateTmp=true
+NoNewPrivileges=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target
