@@ -1,3 +1,6 @@
 # Learned
 
 <!-- Auto-maintained by Claude. Max 50 entries. Oldest/unused entries pruned after 3 months. -->
+- (2026-11-24) Wrangler 4.16x `pages project create` (and `pages deploy` to a project that does not exist yet) now auto-delegates to Cloudflare Workers: run inside an Astro repo it adds @astrojs/cloudflare to astro.config, rewrites package.json/package-lock/.gitignore, writes wrangler.jsonc and public/.assetsignore, and can create a Worker of the same name. Create new Pages projects from an empty scratch folder with `wrangler pages project create <name> --production-branch=main --force`, then run `pages deploy dist` from the repo; afterwards check `git status` is clean.
+- (2026-11-24) When mirroring a live WordPress site, some hosts' bot protection (Convesio "Human Verification Required", ban code EXCESSIVE_REQUESTS) bans the IP after a burst of ~120 parallel requests. Fetch one request at a time with a ~3 s pause, stop immediately on the challenge page or a 429/503, and make the fetcher resumable from its cache; never try to bypass the challenge.
+- (2026-11-24) A new Cloudflare Pages project's *.pages.dev and branch alias URLs fail the TLS handshake (curl status 000) for a few minutes after the first deploy while the certificate is issued; wait for HTTP 200 before running checks instead of treating it as a failed deploy.
