@@ -11,6 +11,8 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 ## Skill Catalog
 
+`support-page-interview` — Local clinician content interviews with one Markdown file per page, saved progress, clinical fact confirmation and a verified ZIP handback.
+
 `playbook-strategy-session` — Prepare and coach theme-led client strategy calls for campaign playbooks.
 
 `prospect-sitemap-opportunity` — Proposed sitemap and interactive opportunity model for a prospect website pitch.
