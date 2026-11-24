@@ -50,7 +50,7 @@ plugins/lhm-marketing-hub/             # The plugin
     seo-page-brief/                    # Page briefs from accepted keyword research
     seo-delivery-qa/                   # Independent SEO artefact and handoff verification
     client-content-learn/             # Learn a client writing guide from approved pages and GitHub edits
-    support-page-interview/           # Local clinician interviews, resumable page Markdown and ZIP handback
+    support-page-interview/           # Single-file Codex clinician interview, separate section Markdown and ZIP handback
     website-content-agent/            # Client website orchestration, independent reviews, content tracker and feedback learning
     lhm-page-rollout/                  # End-to-end website page batches: research, copy, FAQ and schema, internal links, staging build and review email
     site-rollout/                      # Config-driven phased rollout (build: cluster batch on a branch + PR; check: weekly Search Console status, email on problems)
@@ -388,4 +388,4 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 | --- | --- |
 | `website-project-loop` | Read-only evidence snapshot, report dependency gate and one verified weekly summary per mapped project overview. |
 
-`support-page-interview` guides clinicians through the reference-page flow one question at a time, saves local per-page Markdown with resumable progress and unresolved facts, and exports a verified content-only ZIP. Includes a portable Wellness On The Lane starter pack for Nicole; no agency accounts or automatic uploads.
+`support-page-interview` is a self-contained SKILL.md for Codex. It explains the workflow, interviews clinicians one question at a time, saves each page section as separate local Markdown with resumable progress, and prepares a content-only ZIP. Includes the WOTL Children-page flow; no companion scripts, agency accounts or automatic uploads.
