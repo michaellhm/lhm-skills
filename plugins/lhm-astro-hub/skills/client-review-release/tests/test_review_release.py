@@ -134,6 +134,15 @@ class ReleaseTests(unittest.TestCase):
         actual = json.loads((self.root / '.lhm-review/client-config.json').read_text())
         self.assertEqual(actual, self.config)
 
+    def test_client_identity_round_trips(self):
+        self.write('.lhm-review/client-config.json', json.dumps({'client': 'Example'}))
+        self.config['client_identity'] = {'github_login': 'client-user', 'commit_emails': ['1+client-user@users.noreply.github.com']}
+        self.apply(self.proposal())
+        reg = json.loads((self.root / '.lhm-review/client-review.json').read_text())
+        installed = json.loads((self.root / '.lhm-review/client-config.json').read_text())
+        self.assertEqual(reg['config']['client_identity'], self.config['client_identity'])
+        self.assertEqual(installed['client_identity'], self.config['client_identity'])
+
     def test_restored_page_can_be_reviewed_again(self):
         reg = self.apply(self.proposal())
         original = (self.root / 'site/src/pages/index.astro').read_text()
