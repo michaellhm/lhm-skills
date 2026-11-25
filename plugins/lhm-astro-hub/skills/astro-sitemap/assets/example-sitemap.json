@@ -1,0 +1,838 @@
+{
+  "brand": {
+    "name": "My Garden Therapy",
+    "logo_url": "https://www.mygardentherapy.com.au/wp-content/uploads/2024/09/my-garden-therapy.svg",
+    "phone": "03 5215 9400",
+    "primary": "#2E6B3E",
+    "primary_dark": "#1F4D2C",
+    "primary_light": "#E4EFE7",
+    "accent": "#C8A44D",
+    "prepared_by": "Local Health Marketing",
+    "date": "July 2026"
+  },
+  "nav": [
+    {
+      "label": "About Us"
+    },
+    {
+      "label": "What We Do",
+      "mega": true,
+      "groups": [
+        {
+          "title": "Garden Care",
+          "items": [
+            {
+              "label": "Garden Maintenance"
+            },
+            {
+              "label": "Lawn Mowing & Lawn Care",
+              "new": true
+            },
+            {
+              "label": "Hedge Trimming & Pruning",
+              "new": true
+            },
+            {
+              "label": "Weeding & Mulching",
+              "new": true
+            },
+            {
+              "label": "Planting & Accessible Garden Beds",
+              "new": true
+            },
+            {
+              "label": "Green Waste Removal",
+              "new": true
+            }
+          ]
+        },
+        {
+          "title": "Outdoor & Handyman",
+          "items": [
+            {
+              "label": "Outdoor Cleaning & Handyman"
+            },
+            {
+              "label": "Gutter Cleaning",
+              "new": true
+            },
+            {
+              "label": "Window Cleaning",
+              "new": true
+            },
+            {
+              "label": "Pressure Washing",
+              "new": true
+            },
+            {
+              "label": "Home & Garden Repairs",
+              "new": true
+            },
+            {
+              "label": "Fencing & Gates",
+              "new": true
+            }
+          ]
+        },
+        {
+          "title": "Safety & Wellbeing",
+          "items": [
+            {
+              "label": "Safety & Accessibility"
+            },
+            {
+              "label": "Accessible Paths & Ramps",
+              "new": true
+            },
+            {
+              "label": "Grab Rails & Home Safety",
+              "new": true
+            },
+            {
+              "label": "Therapeutic Gardening"
+            },
+            {
+              "label": "Horticultural Therapy",
+              "new": true
+            },
+            {
+              "label": "Social & Companion Gardening",
+              "new": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Who We Help",
+      "new": true,
+      "items": [
+        {
+          "label": "Gardening for Seniors",
+          "new": true
+        },
+        {
+          "label": "Gardening for People with Disability",
+          "new": true
+        },
+        {
+          "label": "Aged Care Gardening",
+          "new": true
+        }
+      ]
+    },
+    {
+      "label": "Getting Started",
+      "groups": [
+        {
+          "title": "Funding Pathways",
+          "items": [
+            {
+              "label": "Support at Home Program",
+              "new": true
+            },
+            {
+              "label": "NDIS Gardening & Home Maintenance",
+              "new": true
+            },
+            {
+              "label": "Home Care Packages",
+              "new": true
+            },
+            {
+              "label": "Privately Funded"
+            },
+            {
+              "label": "Fully Managed Home Care Package"
+            },
+            {
+              "label": "Self Managed Home Care Package"
+            },
+            {
+              "label": "Healthcare Professional Referrals"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Areas We Serve",
+      "new": true,
+      "items": [
+        {
+          "label": "Geelong",
+          "new": true
+        },
+        {
+          "label": "Geelong West",
+          "new": true
+        },
+        {
+          "label": "Newtown",
+          "new": true
+        },
+        {
+          "label": "Belmont",
+          "new": true
+        },
+        {
+          "label": "Highton",
+          "new": true
+        },
+        {
+          "label": "Grovedale & Waurn Ponds",
+          "new": true
+        },
+        {
+          "label": "Armstrong Creek",
+          "new": true
+        },
+        {
+          "label": "Ocean Grove",
+          "new": true
+        },
+        {
+          "label": "Torquay",
+          "new": true
+        },
+        {
+          "label": "Bellarine Peninsula",
+          "new": true
+        },
+        {
+          "label": "Ballarat",
+          "new": true
+        }
+      ]
+    },
+    {
+      "label": "News & Insights"
+    },
+    {
+      "label": "Contact Us"
+    }
+  ],
+  "intro": {
+    "title": "Website content plan — proposed sitemap",
+    "paragraph": "The agreed page architecture for the site, laid out as a visitor would experience it. Hover the navigation above to preview the menus, or scan the full page tree below. Green pages are live today, yellow pages get rebuilt, red pages are still to be written. Cards are grouped in build order so we can work through them phase by phase."
+  },
+  "stats": [
+    {
+      "n": "18",
+      "label": "pages today"
+    },
+    {
+      "n": "~55",
+      "label": "pages proposed"
+    },
+    {
+      "n": "+16",
+      "label": "service pages"
+    },
+    {
+      "n": "11",
+      "label": "location pages"
+    },
+    {
+      "n": "2",
+      "label": "new funding pillars"
+    }
+  ],
+  "sections": [
+    {
+      "title": "Core pages",
+      "cards": [
+        {
+          "head": "Home & key pages",
+          "items": [
+            {
+              "name": "Home",
+              "slug": "/ · refresh + link to new pillars",
+              "status": "enh",
+              "vol": 140,
+              "primary_keyword": "garden maintenance geelong",
+              "secondary_keywords": [
+                "gardening service geelong",
+                "garden care for seniors"
+              ],
+              "audience": "older Geelong homeowners and their families",
+              "intent": "commercial"
+            },
+            {
+              "name": "About Us",
+              "slug": "/about-us/",
+              "status": "have",
+              "vol": null
+            },
+            {
+              "name": "Contact Us",
+              "slug": "/contact-us/",
+              "status": "have",
+              "vol": null
+            },
+            {
+              "name": "News & Insights",
+              "slug": "re-cluster ~40 posts",
+              "status": "enh",
+              "vol": null,
+              "primary_keyword": "gardening tips for seniors",
+              "secondary_keywords": [
+                "garden maintenance advice",
+                "home garden safety"
+              ],
+              "audience": "older homeowners and carers researching garden care",
+              "intent": "informational"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "What We Do — services",
+      "cards": [
+        {
+          "head": "Garden Care",
+          "items": [
+            {
+              "name": "Garden Maintenance",
+              "slug": "/how-can-we-help/garden-maintenance/",
+              "status": "have",
+              "vol": 140
+            },
+            {
+              "name": "Lawn Mowing & Lawn Care",
+              "slug": "/services/lawn-mowing/",
+              "status": "new",
+              "vol": 210,
+              "primary_keyword": "lawn mowing geelong",
+              "secondary_keywords": [
+                "lawn care geelong",
+                "lawn mowing service for seniors"
+              ],
+              "audience": "older homeowners who can no longer mow",
+              "intent": "commercial"
+            },
+            {
+              "name": "Hedge Trimming & Pruning",
+              "slug": "/services/hedge-trimming-pruning/",
+              "status": "new",
+              "vol": 30,
+              "primary_keyword": "hedge trimming geelong",
+              "secondary_keywords": [
+                "pruning service geelong",
+                "hedge cutting near me"
+              ],
+              "audience": "older homeowners with overgrown hedges",
+              "intent": "commercial"
+            },
+            {
+              "name": "Weeding & Mulching",
+              "slug": "/services/weeding-mulching/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "weeding and mulching service",
+              "secondary_keywords": [
+                "garden weeding geelong",
+                "mulching service geelong"
+              ],
+              "audience": "older homeowners who need regular garden upkeep",
+              "intent": "commercial"
+            },
+            {
+              "name": "Planting & Accessible Garden Beds",
+              "slug": "/services/raised-garden-beds/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "raised garden beds for seniors",
+              "secondary_keywords": [
+                "accessible garden beds",
+                "raised garden bed installation geelong"
+              ],
+              "audience": "seniors and people with mobility limits",
+              "intent": "commercial"
+            },
+            {
+              "name": "Green Waste Removal",
+              "slug": "/services/green-waste-removal/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "green waste removal geelong",
+              "secondary_keywords": [
+                "garden waste removal",
+                "green waste pickup geelong"
+              ],
+              "audience": "homeowners with garden waste to clear",
+              "intent": "transactional"
+            }
+          ]
+        },
+        {
+          "head": "Outdoor & Handyman",
+          "items": [
+            {
+              "name": "Outdoor Cleaning & Handyman (hub)",
+              "slug": "/how-can-we-help/outdoor-cleaning.../",
+              "status": "have",
+              "vol": 390
+            },
+            {
+              "name": "Gutter Cleaning",
+              "slug": "/services/gutter-cleaning/",
+              "status": "new",
+              "vol": 320,
+              "primary_keyword": "gutter cleaning geelong",
+              "secondary_keywords": [
+                "gutter cleaning service",
+                "roof gutter clean near me"
+              ],
+              "audience": "older homeowners who cannot use ladders",
+              "intent": "transactional"
+            },
+            {
+              "name": "Window Cleaning",
+              "slug": "/services/window-cleaning/",
+              "status": "new",
+              "vol": 320,
+              "primary_keyword": "window cleaning geelong",
+              "secondary_keywords": [
+                "window cleaning service for seniors"
+              ],
+              "audience": "older homeowners needing outdoor cleaning",
+              "intent": "transactional"
+            },
+            {
+              "name": "Pressure Washing",
+              "slug": "/services/pressure-washing/",
+              "status": "new",
+              "vol": 260,
+              "primary_keyword": "pressure washing geelong",
+              "secondary_keywords": [
+                "driveway pressure washing",
+                "path cleaning geelong"
+              ],
+              "audience": "older homeowners with slippery paths",
+              "intent": "transactional"
+            },
+            {
+              "name": "Home & Garden Repairs",
+              "slug": "/services/handyman/",
+              "status": "new",
+              "vol": 390,
+              "primary_keyword": "handyman geelong",
+              "secondary_keywords": [
+                "garden handyman geelong",
+                "home repairs for seniors"
+              ],
+              "audience": "older homeowners needing small repairs",
+              "intent": "commercial"
+            },
+            {
+              "name": "Fencing & Gates",
+              "slug": "/services/fencing-gates/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "fence repair geelong",
+              "secondary_keywords": [
+                "gate repair geelong",
+                "garden fencing service"
+              ],
+              "audience": "homeowners with damaged fencing",
+              "intent": "commercial"
+            }
+          ]
+        },
+        {
+          "head": "Safety & Accessibility",
+          "items": [
+            {
+              "name": "Safety & Accessibility (hub)",
+              "slug": "/how-can-we-help/safety-accessibility/",
+              "status": "have",
+              "vol": null
+            },
+            {
+              "name": "Accessible Paths & Ramps",
+              "slug": "/services/accessible-paths-ramps/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "accessible garden paths",
+              "secondary_keywords": [
+                "garden ramps for seniors",
+                "non-slip garden paths"
+              ],
+              "audience": "seniors and people with mobility limits",
+              "intent": "commercial"
+            },
+            {
+              "name": "Grab Rails & Home Safety Mods",
+              "slug": "/services/grab-rails-home-safety/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "grab rail installation geelong",
+              "secondary_keywords": [
+                "home safety modifications",
+                "grab rails for seniors"
+              ],
+              "audience": "older adults and carers planning home safety",
+              "intent": "commercial"
+            },
+            {
+              "name": "Fall-Prevention Garden Audit",
+              "slug": "/services/fall-prevention-audit/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "garden fall prevention",
+              "secondary_keywords": [
+                "garden safety audit for seniors"
+              ],
+              "audience": "families and carers worried about falls",
+              "intent": "informational"
+            }
+          ]
+        },
+        {
+          "head": "Therapeutic & Wellbeing",
+          "items": [
+            {
+              "name": "Therapeutic Gardening (hub)",
+              "slug": "/how-can-we-help/therapeutic-gardening/",
+              "status": "have",
+              "vol": 90
+            },
+            {
+              "name": "Horticultural Therapy",
+              "slug": "/services/horticultural-therapy/",
+              "status": "new",
+              "vol": 260,
+              "primary_keyword": "horticultural therapy",
+              "secondary_keywords": [
+                "therapeutic gardening for seniors",
+                "garden therapy for wellbeing"
+              ],
+              "audience": "seniors and carers seeking wellbeing support",
+              "intent": "informational"
+            },
+            {
+              "name": "Social & Companion Gardening",
+              "slug": "/services/companion-gardening/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "companion gardening for seniors",
+              "secondary_keywords": [
+                "social gardening program",
+                "gardening companion service"
+              ],
+              "audience": "isolated older adults and their families",
+              "intent": "commercial"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Who We Help — audience pages",
+      "cards": [
+        {
+          "head": "Who We Help",
+          "url": "/who-we-help/",
+          "items": [
+            {
+              "name": "Gardening for Seniors",
+              "slug": "/who-we-help/seniors/",
+              "status": "new",
+              "vol": 50,
+              "primary_keyword": "gardening services for seniors",
+              "secondary_keywords": [
+                "senior garden maintenance",
+                "garden help for elderly"
+              ],
+              "audience": "seniors and their adult children",
+              "intent": "commercial"
+            },
+            {
+              "name": "Gardening for People with Disability",
+              "slug": "/who-we-help/disability-ndis/",
+              "status": "new",
+              "vol": 320,
+              "primary_keyword": "ndis gardening services",
+              "secondary_keywords": [
+                "gardening for people with disability",
+                "ndis garden maintenance"
+              ],
+              "audience": "NDIS participants and their support coordinators",
+              "intent": "commercial"
+            },
+            {
+              "name": "Aged Care Gardening",
+              "slug": "/who-we-help/aged-care/",
+              "status": "new",
+              "vol": 140,
+              "primary_keyword": "aged care gardening services",
+              "secondary_keywords": [
+                "garden service for aged care",
+                "aged care garden maintenance"
+              ],
+              "audience": "aged care providers and residents' families",
+              "intent": "commercial"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Getting Started — funding pathways",
+      "cards": [
+        {
+          "head": "Funding & Access",
+          "url": "/getting-started/",
+          "items": [
+            {
+              "name": "Support at Home Program",
+              "slug": "/getting-started/support-at-home/",
+              "status": "new",
+              "vol": 3600,
+              "bold": true,
+              "primary_keyword": "support at home gardening",
+              "secondary_keywords": [
+                "support at home garden maintenance",
+                "support at home program services"
+              ],
+              "audience": "older Australians on Support at Home and their families",
+              "intent": "informational"
+            },
+            {
+              "name": "NDIS Gardening & Home Maintenance",
+              "slug": "/getting-started/ndis/",
+              "status": "new",
+              "vol": 590,
+              "bold": true,
+              "primary_keyword": "ndis home and garden maintenance",
+              "secondary_keywords": [
+                "ndis gardening funding",
+                "ndis yard maintenance"
+              ],
+              "audience": "NDIS participants and plan managers",
+              "intent": "informational"
+            },
+            {
+              "name": "Home Care Packages (transition)",
+              "slug": "/getting-started/home-care-packages/",
+              "status": "new",
+              "vol": 6600,
+              "primary_keyword": "home care packages gardening",
+              "secondary_keywords": [
+                "home care package garden maintenance",
+                "can home care packages pay for gardening"
+              ],
+              "audience": "home care package recipients and their families",
+              "intent": "informational"
+            },
+            {
+              "name": "Privately Funded",
+              "slug": "/getting-started/privately-funded/",
+              "status": "have",
+              "vol": null
+            },
+            {
+              "name": "Fully Managed Home Care Package",
+              "slug": "/getting-started/fully-managed.../",
+              "status": "have",
+              "vol": null
+            },
+            {
+              "name": "Self Managed Home Care Package",
+              "slug": "/getting-started/self-managed.../",
+              "status": "have",
+              "vol": null
+            },
+            {
+              "name": "Healthcare Professional Referrals",
+              "slug": "/getting-started/healthcare-professional-referrals/",
+              "status": "have",
+              "vol": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Areas We Serve — location pages",
+      "pill": "All new",
+      "cards": [
+        {
+          "head": "Phase 1 — build first",
+          "items": [
+            {
+              "name": "Geelong",
+              "slug": "/areas-we-serve/geelong/",
+              "status": "new",
+              "vol": 260,
+              "primary_keyword": "gardener geelong",
+              "secondary_keywords": [
+                "garden maintenance geelong",
+                "lawn mowing geelong"
+              ],
+              "audience": "older homeowners and carers in Geelong",
+              "intent": "commercial"
+            },
+            {
+              "name": "Geelong West",
+              "slug": "/areas-we-serve/geelong-west/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "gardener geelong west",
+              "secondary_keywords": [
+                "garden maintenance geelong west",
+                "lawn mowing geelong west"
+              ],
+              "audience": "older homeowners and carers in Geelong West",
+              "intent": "commercial"
+            },
+            {
+              "name": "Ballarat",
+              "slug": "/areas-we-serve/ballarat/",
+              "status": "new",
+              "vol": 320,
+              "primary_keyword": "gardener ballarat",
+              "secondary_keywords": [
+                "garden maintenance ballarat",
+                "lawn mowing ballarat"
+              ],
+              "audience": "older homeowners and carers in Ballarat",
+              "intent": "commercial"
+            },
+            {
+              "name": "Newtown",
+              "slug": "/areas-we-serve/newtown/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "gardener newtown",
+              "secondary_keywords": [
+                "garden maintenance newtown",
+                "lawn mowing newtown"
+              ],
+              "audience": "older homeowners and carers in Newtown",
+              "intent": "commercial"
+            },
+            {
+              "name": "Belmont",
+              "slug": "/areas-we-serve/belmont/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "gardener belmont",
+              "secondary_keywords": [
+                "garden maintenance belmont",
+                "lawn mowing belmont"
+              ],
+              "audience": "older homeowners and carers in Belmont",
+              "intent": "commercial"
+            },
+            {
+              "name": "Highton",
+              "slug": "/areas-we-serve/highton/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "gardener highton",
+              "secondary_keywords": [
+                "garden maintenance highton",
+                "lawn mowing highton"
+              ],
+              "audience": "older homeowners and carers in Highton",
+              "intent": "commercial"
+            }
+          ]
+        },
+        {
+          "head": "Phase 2 — expand after Phase 1",
+          "items": [
+            {
+              "name": "Grovedale & Waurn Ponds",
+              "slug": "/areas-we-serve/grovedale-waurn-ponds/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "gardener grovedale & waurn ponds",
+              "secondary_keywords": [
+                "garden maintenance grovedale & waurn ponds",
+                "lawn mowing grovedale & waurn ponds"
+              ],
+              "audience": "older homeowners and carers in Grovedale & Waurn Ponds",
+              "intent": "commercial"
+            },
+            {
+              "name": "Armstrong Creek",
+              "slug": "/areas-we-serve/armstrong-creek/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "gardener armstrong creek",
+              "secondary_keywords": [
+                "garden maintenance armstrong creek",
+                "lawn mowing armstrong creek"
+              ],
+              "audience": "older homeowners and carers in Armstrong Creek",
+              "intent": "commercial"
+            },
+            {
+              "name": "Ocean Grove",
+              "slug": "/areas-we-serve/ocean-grove/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "gardener ocean grove",
+              "secondary_keywords": [
+                "garden maintenance ocean grove",
+                "lawn mowing ocean grove"
+              ],
+              "audience": "older homeowners and carers in Ocean Grove",
+              "intent": "commercial"
+            },
+            {
+              "name": "Torquay",
+              "slug": "/areas-we-serve/torquay/",
+              "status": "new",
+              "vol": 10,
+              "primary_keyword": "gardener torquay",
+              "secondary_keywords": [
+                "garden maintenance torquay",
+                "lawn mowing torquay"
+              ],
+              "audience": "older homeowners and carers in Torquay",
+              "intent": "commercial"
+            },
+            {
+              "name": "Bellarine Peninsula",
+              "slug": "/areas-we-serve/bellarine/",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "gardener bellarine peninsula",
+              "secondary_keywords": [
+                "garden maintenance bellarine peninsula",
+                "lawn mowing bellarine peninsula"
+              ],
+              "audience": "older homeowners and carers in Bellarine Peninsula",
+              "intent": "commercial"
+            }
+          ]
+        },
+        {
+          "head": "Phase 3 — backlog, once proven",
+          "items": [
+            {
+              "name": "Lara, Corio, Leopold, Drysdale, Bannockburn, Colac, Winchelsea, Surf Coast towns",
+              "slug": "rolled out over time",
+              "status": "new",
+              "vol": null,
+              "primary_keyword": "gardening services surf coast",
+              "secondary_keywords": [
+                "gardener colac",
+                "gardener bannockburn"
+              ],
+              "audience": "older homeowners and carers across the Surf Coast and Geelong region",
+              "intent": "commercial"
+            }
+          ]
+        }
+      ],
+      "note": "<b>On location pages:</b> individual suburb searches are small on their own. These pages aren't built to win suburb head terms; they win the Google map pack and the large \"near me\" long tail (handyman near me 9,900/mo, gardener near me 6,600/mo, lawn mowing near me 4,400/mo) and localise every service. Build Tier 1, prove it, then expand."
+    }
+  ],
+  "footer": "My Garden Therapy — website content plan. Prepared by Local Health Marketing, July 2026. Search volumes: Keywords Everywhere (Australia, average monthly), retrieved July 2026. Build order is grouped by card; volumes are demand indicators, not forecasts."
+}
