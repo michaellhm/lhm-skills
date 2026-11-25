@@ -17,6 +17,9 @@ FORBIDDEN = ["lhm-marketing-hub", "lhm-wordpress-hub", "lhm-project-hub", "lhm-c
 
 REQUIRED_MENTIONS: dict = {
     "skills/astro-prototype/SKILL.md": ["ui-ux-pro-max", "brain/Brand.md", "lhm-prototype", "check_no_inline.py"],
+    "skills/astro-build/SKILL.md": ["site/", "astro-build-standard.md", "astro-form"],
+    "skills/astro-form/SKILL.md": ["GoHighLevel", "D1", "Turnstile"],
+    "skills/astro-form/references/gohighlevel.md": ["GHL_WEBHOOK_URL", "never commit"],
 }
 
 TEXT_SUFFIXES = {".md", ".json", ".py", ".yaml", ".yml", ".txt", ".html", ".css", ".js"}
