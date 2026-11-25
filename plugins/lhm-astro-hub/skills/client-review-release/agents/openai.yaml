@@ -1,0 +1,4 @@
+interface:
+  display_name: "Client review release"
+  short_description: "Prepare guided client website reviews and release questions"
+  default_prompt: "Prepare a client website review release: inspect the repository, propose pages and questions, and wait for approval before applying the batch."
