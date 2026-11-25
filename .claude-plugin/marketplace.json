@@ -197,7 +197,7 @@
       "name": "lhm-astro-hub",
       "source": "./plugins/lhm-astro-hub",
       "description": "Astro website delivery: sitemap, UI UX Pro Max prototype, Astro build, client brain, content rounds and client review.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "category": "website",
       "tags": [
         "astro",
