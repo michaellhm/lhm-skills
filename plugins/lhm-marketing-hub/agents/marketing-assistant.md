@@ -89,6 +89,10 @@ Monday coordination uses a separate receipt-gated board reconciliation after the
 - `visual-qa` — Browser screenshots and design/responsive checks plus guided phone checks feeding the combined report.
 - `website-delivery-qa` — Verify the delivery workflow and evidence; require completed human, client-request and tracking checks for final-site handback.
 
+### Website (Astro)
+
+- `lhm-astro-hub` — Astro website delivery: sitemap, prototype, build, client brain, content rounds (start with /lhm-astro-hub:start-astro)
+
 ### Client website review releases (`lhm-wordpress-hub`)
 
 - `client-review-release` — Install portable client review skills, scan new/changed/pending pages, propose release questions for operator approval, preserve explicit client approvals and prepare staged GitHub-access, local-setup and review emails with verified sharing routes.

@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-205 skills across thirteen Claude Code plugins (5 inbox, 67 marketing, 44 WordPress, 19 GMB/local SEO, 9 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge, 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+225 skills across fourteen Claude Code plugins (5 inbox, 67 marketing, 44 WordPress, 20 Astro, 19 GMB/local SEO, 9 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge, 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -255,6 +255,24 @@ plugins/lhm-project-hub/              # Agency process hub — sales handover th
     anti-ai-writing-guidelines.json     # Shared anti-AI writing guardrails
     checklists/                         # 4 onboarding checklists (billing, platform access, tracking, first 30 days)
     templates/                          # 6 email/doc templates (kickoff, billing, welcome, handover, meeting agenda)
+plugins/lhm-astro-hub/                # Astro website delivery plugin
+  .claude-plugin/plugin.json            # Plugin manifest
+  agents/                               # astro-lead (stage detection, one stage at a time) and content (all writing)
+  commands/start-astro.md               # /lhm-astro-hub:start-astro entry point
+  skills/                               # All 20 skills
+    start-astro/                        # Stage detection and routing
+    client-repo-setup/                  # Single GitHub repo per client with brain/, skills/ and site/
+    astro-sitemap/                      # Approved sitemap as an interactive HTML plan
+    astro-prototype/                    # UI UX Pro Max-driven static prototype and brand style guide
+    astro-build/                        # Astro site built from the approved prototype
+    astro-form/                         # Contact form on Cloudflare Pages
+    build-brain/                        # Client brain from Fathom calls, prototype copy and style guide
+    update-content-brain/               # Brain refresh from approved pages and client edits
+    content-rollout/                    # Page content in rounds, from briefs to reviewed copy
+    client-review-release/              # Client review release for Codex or Claude Code
+    site-launch-qa/                     # Completion and pre-launch QA
+    website-delivery-qa/                # Delivery verification against the dispatch envelope
+    ... and 8 content and SEO skills (copywriting, keyword-research, seo-page-brief, seo-content-writer, seo-delivery-qa, content-quality-auditor, taya-question-discovery, client-update-email)
 plugins/lhm-skill-ops/                # Team skill-improvement pipeline plugin
   .claude-plugin/plugin.json            # Plugin manifest
   skills/                               # All 2 skills
@@ -314,6 +332,10 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 **Deployment** (1 skill): General-purpose WordPress SSH deployment (theme, pages, CPTs, media, customizer, menus, options).
 
 **Cloudflare Pages Forms** (1 skill): End-to-end contact form implementation for Astro/Cloudflare Pages — Cloudflare D1 persistence, Turnstile spam protection, Mailgun/Postmark/Resend email notifications, GA-trackable thank-you pages, and a Basic Auth protected admin submissions view.
+
+### Astro Hub
+
+**Astro Website Delivery** (20 skills): Canonical `/lhm-astro-hub:start-astro` entry and `astro-lead` Department Lead detect the stage a client's site is at and run one stage at a time, stopping at every approval. Stages: single client GitHub repo setup (`client-repo-setup`), approved sitemap (`astro-sitemap`), UI UX Pro Max-driven static prototype and brand style guide (`astro-prototype`), Astro build from the approved prototype (`astro-build`), Cloudflare Pages contact form (`astro-form`), client brain from Fathom calls and approved copy (`build-brain`, `update-content-brain`), content rounds (`content-rollout`) with all writing handed to the `content` agent, client review release (`client-review-release`) and launch QA (`site-launch-qa`, `website-delivery-qa`). Supporting content and SEO skills: `copywriting`, `keyword-research`, `seo-page-brief`, `seo-content-writer`, `seo-delivery-qa`, `content-quality-auditor`, `taya-question-discovery` and `client-update-email`.
 
 ### Content Engine
 
