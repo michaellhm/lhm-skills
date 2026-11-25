@@ -2,10 +2,10 @@
 
 ## Boundary
 
-- Hermes owns intake, durable state, approval state, dispatch, monitoring and the final BasicOps handoff.
-- The installed Claude or Codex worker owns judgement and production through a department Lead and skills.
+- `astro-lead` owns intake, durable state, approval state, dispatch and monitoring. State lives in the client's internal project file (`20 Clients/<client>/project-management/` and `Current Projects.md` in LHM Knowledge, per `obsidian-context-contract.md`).
+- When an external dispatcher such as Hermes supplies the envelope, honour it; otherwise `astro-lead` owns intake and state in the internal project file.
 - A Lead is persistent decision ownership. A skill is a bounded procedure.
-- Hermes must never reproduce a sitemap, prototype, Astro build itself.
+- `astro-lead` delegates sitemaps, prototypes and Astro builds to their skills and never improvises them itself.
 
 ## Lead and routes
 
@@ -29,7 +29,7 @@ website_department_dispatch:
   objective: "one bounded outcome"
   client: "confirmed client"
   canonical_client_path: "path or null"
-  source_task_url: "BasicOps URL or null"
+  source_project_file: "path of the internal project file entry or null"
   source_evidence: []
   approval_state: review_only | approved_for_preparation | approved_for_publish
   mutation_ceiling: read_only | workspace_write | publish_to_prototype_main | deploy
@@ -44,8 +44,8 @@ Missing client facts, repository, branch or approval are gaps, not permission to
 
 ## Loop and handback
 
-`Hermes intake -> astro-lead -> required entry skill -> specialist skills -> website-delivery-qa -> Lead handback -> Hermes state/BasicOps`
+`Intake -> astro-lead -> required entry skill -> specialist skills -> website-delivery-qa -> astro-lead handback -> internal project file`
 
-For sitemap or homepage mock work, `astro-lead` owns creation and feedback revisions. Publishing requires `approved_for_publish`, the exact repository, branch and client path, an independently QA-approved manifest, and a Google Drive readback identifying the exact HTML file, byte count and SHA-256. The Lead passes only those bound values to the root-owned publisher; it never receives a repository credential.
+For sitemap or homepage mock work, `astro-lead` owns creation and feedback revisions. Publishing requires `approved_for_publish` (explicit approval from the user), the exact repository, branch and client path, and an independently QA-approved manifest. The publish gate is: explicit approval, push to the stated repository and branch, then verify the remote commit SHA and the Cloudflare deployment URL.
 
-Return `request_id`, `route`, `lead` (`astro-lead`), `entry_skill_invoked`, `skills_used`, Drive file ID/link/hash, evidence, artefacts, mutations, QA verdict, validation, gaps, URL, commit SHA, next owner and status. Completion requires artefact readback and the stated completion test. Publication additionally requires the observed commit SHA, successful deployment and matching public URL; a local file alone is not published.
+Return `request_id`, `route`, `lead` (`astro-lead`), `entry_skill_invoked`, `skills_used`, evidence, artefacts, mutations, QA verdict, validation, gaps, URL, commit SHA, next owner and status. Completion requires artefact readback and the stated completion test. Publication additionally requires the observed remote commit SHA, a successful deployment and a matching public URL; a local file alone is not published.

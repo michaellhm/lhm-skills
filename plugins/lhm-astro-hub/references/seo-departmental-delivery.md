@@ -9,13 +9,10 @@ Use this contract for LHM and client SEO work. Pilot it on the LHM website rollo
 
 ## Ownership
 
-- **Head of Production:** owns the parent goal, durable machine state, cross-department sequence, BasicOps parent and final acceptance.
-- **SEO Lead (`start-seo`):** owns SEO judgement, the department goal, dynamic action register, dependencies, specialist selection and acceptance of QA-passed work.
-- **SEO specialist:** uses one selected marketplace skill to produce one bounded research, diagnosis or brief outcome. The specialist owns its professional method.
-- **Content Lead:** owns final customer-facing wording, writing-skill selection and editorial acceptance whenever the SEO action requires copy.
-- **SEO Delivery QA:** independently verifies the returned work. It does not repair the artefact or perform the specialist action.
-- **Astro Lead:** receives only an accepted SEO implementation package through Head of Production.
-- **BasicOps Task Manager:** is the only BasicOps mutation boundary.
+- **`astro-lead`:** the only lead in this plugin. Owns the parent goal, durable state in the internal project file, cross-stage sequence, SEO judgement, the department goal, the dynamic action register, dependencies, specialist selection, acceptance of QA-passed work and final acceptance.
+- **SEO specialist:** uses one selected skill to produce one bounded research, diagnosis or brief outcome. The specialist owns its professional method.
+- **Content Lead (`content` agent):** owns final customer-facing wording, writing-skill selection and editorial acceptance whenever the SEO action requires copy.
+- **SEO Delivery QA (`seo-delivery-qa`):** independently verifies the returned work. It does not repair the artefact or perform the specialist action.
 - **Human approver:** owns consequential business decisions and production release authority.
 
 ## Goal hierarchy
@@ -38,7 +35,7 @@ The specialist receives the accepted upstream artefact, not an orchestration sum
 
 ## Production envelope
 
-Head of Production supplies:
+`astro-lead` supplies:
 
 ```yaml
 seo_production_envelope:
@@ -62,20 +59,17 @@ seo_production_envelope:
       relative_root: "seo"
     obsidian:
       project_root: "Observed project root"
-    basicops:
-      task_id: "Observed parent ID or null"
-      task_url: "Observed URL or null"
   permission_ceiling: "research_and_prepare"
   completion_test: []
   available_capabilities: []
-  production_return: "Head of Production"
+  production_return: "astro-lead"
 ```
 
 Do not infer a Drive folder from a client name or from Claude Desktop's selected working folder. If `folder_id` is missing for a file-producing action, return `needs_context` with an exact owner and resume point.
 
 ## Reconcile and build a dynamic action register
 
-Read the accepted context pack, canonical project state, prior accepted artefacts, existing BasicOps parent and current read-only evidence. Classify prior work as `verified_complete`, `complete_unverified`, `partially_complete`, `not_started`, `superseded` or `cannot_verify`.
+Read the accepted context pack, canonical project state, prior accepted artefacts, existing project-file entry and current read-only evidence. Classify prior work as `verified_complete`, `complete_unverified`, `partially_complete`, `not_started`, `superseded` or `cannot_verify`.
 
 Build only the actions needed to achieve the department goal. Do not impose a universal SEO checklist. Allocate stable IDs such as `SEO-01` and preserve them across resumes.
 
@@ -100,7 +94,7 @@ Existing accepted artefacts may satisfy an action when their source, version, sc
 
 ### Canonical state vocabulary
 
-Use these canonical values in new machine state, action registers, QA handbacks and BasicOps milestone updates:
+Use these canonical values in new machine state, action registers, QA handbacks and project-file milestone updates:
 
 - Parent/workflow: `planned`, `ready`, `worker_running`, `qa`, `correction_required`, `waiting_on_dependency`, `waiting_on_capacity`, `needs_context`, `needs_approval`, `waiting_on_capability`, `review_ready`, `completed`, `failed`, `stopped`.
 - Action execution: `waiting`, `ready`, `worker_running`, `qa`, `correction_required`, `accepted`, `cancelled`, `obsolete`, `failed`.
@@ -141,16 +135,16 @@ If no installed skill can satisfy the action, return `waiting_on_capability`. Do
 
 ### Content Department boundary
 
-SEO Lead owns keyword intent, SERP evidence, internal-link requirements, information architecture and the content brief. It does not own final prose.
+`astro-lead` owns keyword intent, SERP evidence, internal-link requirements, information architecture and the content brief. It does not own final prose.
 
 When an SEO action requires new or materially revised customer-facing copy:
 
 1. Produce and QA a versioned `content_brief` under `content-departmental-delivery.md`.
 2. Persist and read back that brief as the accepted SEO artefact.
-3. Return it to Head of Production for Content Lead dispatch.
+3. `astro-lead` dispatches the Content Lead (`content` agent) with it.
 4. Content Lead selects the writing skill, runs the required writing pipeline and independent editorial QA, then returns verified `implementation_ready_copy`.
-5. SEO Lead verifies intent coverage, factual source use, internal links and metadata requirements without silently rewriting the accepted copy.
-6. Head of Production dispatches Astro or another publisher only after the copy artefact contains one selected replacement per field and is `approved_for_implementation`.
+5. `astro-lead` verifies intent coverage, factual source use, internal links and metadata requirements without silently rewriting the accepted copy.
+6. `astro-lead` dispatches Astro or another publisher only after the copy artefact contains one selected replacement per field and is `approved_for_implementation`.
 
 Research suggestions, outlines, candidate paragraphs and `review_ready` alternatives do not satisfy a copy action and must not be handed directly to implementation.
 
@@ -176,7 +170,7 @@ seo_action_dispatch:
     drive_relative_path: "seo/YYYY-MM/"
     obsidian_path: "observed project path"
   completion_test: []
-  return_to: "SEO Lead"
+  return_to: "astro-lead"
 ```
 
 The producing specialist must follow the delivery artefact contract: save to the registered Drive destination, read it or its metadata back, verify the observed parent and return the file ID and URL. The canonical Obsidian file holds state, decisions and run history; do not treat an unregistered local draft as delivery.
@@ -228,31 +222,31 @@ After acceptance:
 1. Write machine state with parent, action, version, input digest, run ID, QA verdict, verified artefacts and next owner.
 2. Read back and validate that checkpoint.
 3. Update the human-readable project state when the milestone is material, then read it back.
-4. Update the single BasicOps parent through BasicOps Task Manager.
+4. Update the client's internal project file (`20 Clients/<client>/project-management/` and `Current Projects.md`) with the milestone.
 5. Only then select another action.
 
 If any required write or readback fails, do not advance or claim completion. Resume at the failed persistence step.
 
 Use the canonical state vocabulary above. Reserve `blocked` for imported history describing a genuine external condition with no authorised next action; classify every active workflow into a canonical resumable or terminal state.
 
-## One BasicOps parent
+## One project-file entry
 
-Use one parent for the delivery outcome. Do not create a subtask for each skill call. If the production envelope has `delivery_destinations.basicops.task_id: null`, SEO Lead must return a `basicops_parent_create_required` request to Head of Production. Head of Production sends it through BasicOps Task Manager using the parent dedupe key, intended outcome, milestone list, ordered actions, completion condition and final `Next handoff:` block. SEO execution pauses at `waiting_on_dependency` with return point `reconcile_basicops_parent`; it does not create the task directly. Resume only after BasicOps Task Manager returns the observed task ID and URL and Head of Production reads the parent back and places those verified values in the production envelope. A duplicate wake must search by the same dedupe key and reuse the verified parent.
+Track the delivery outcome in one entry in the client's internal project file. Do not create an entry for each skill call. Duplicate wakes must search by the same dedupe key and reuse the verified entry.
 
-When a verified parent exists, its discussion contains short blocks for:
+The entry holds short blocks for:
 
 - intended outcome and goal;
 - milestone checklist;
-- ordered actions with department, selected skill and status;
-- accepted Drive artefact links;
+- ordered actions with selected skill and status;
+- accepted artefact links;
 - dependencies, approvals and completion condition;
 - a final `Next handoff:` block.
 
-Update only at meaningful checkpoints: plan established, department artefact accepted, correction or approval required, cross-department handoff, or verified completion.
+Update only at meaningful checkpoints: plan established, artefact accepted, correction or approval required, stage handoff, or verified completion.
 
 ## Approval boundaries
 
-SEO Lead may accept routine research, briefs, copy, recommendations, QA and preparation that stay within approved scope and do not mutate production.
+`astro-lead` may accept routine research, briefs, copy, recommendations, QA and preparation that stay within approved scope and do not mutate production.
 
 Require named human approval for consequential positioning, offers, pricing, guarantees, regulated claims, market priority, destructive consolidation, unresolved brand decisions or scope expansion. Approval belongs to an exact artefact version.
 
@@ -262,7 +256,7 @@ Require production authority for merge, deploy, publish, redirects, indexing/can
 
 ## Astro handoff
 
-After all SEO actions are accepted, return an implementation package to Head of Production. Head of Production, not SEO Lead, formally dispatches Astro Lead.
+After all SEO actions are accepted, `astro-lead` records the implementation package and starts the build stage itself. No separate production hand-off is needed.
 
 ```yaml
 seo_completion_dossier:
@@ -280,17 +274,16 @@ seo_completion_dossier:
   changed_assumptions: []
   unresolved_dependencies: []
   permission_ceiling_observed: true
-  basicops_url: "observed-url"
   recommended_next_handoff:
     trigger: ready_for_astro
-    owner: "Head of Production"
-    action: "Accept the SEO dossier and dispatch Astro Lead"
+    owner: "astro-lead"
+    action: "Accept the SEO dossier and start the build stage"
 ```
 
-Head of Production accepts the dossier against the original brief or returns one bounded production correction. Astro implementation, website QA and a noindex preview remain separate staged actions.
+`astro-lead` accepts the dossier against the original brief or makes one bounded correction. Astro implementation, website QA and a noindex preview remain separate staged actions.
 
 ## Resumption and reconciliation
 
 Use stable parent and action dedupe keys. Before dispatch, check for an accepted action with matching version, input digest, verified Drive artefact and QA verdict. Resume the first incomplete transition, not the beginning of the SEO analysis.
 
-On every wake, reconcile machine state, Drive artefacts, the BasicOps parent and human-readable project state. Repair stale representations from verified acceptance evidence. Never trust a completion claim when Drive or state readback fails.
+On every wake, reconcile machine state, Drive artefacts, the internal project file. Repair stale representations from verified acceptance evidence. Never trust a completion claim when Drive or state readback fails.

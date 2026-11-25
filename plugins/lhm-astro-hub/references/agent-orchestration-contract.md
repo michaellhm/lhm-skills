@@ -1,6 +1,6 @@
 # Agent orchestration contract
 
-Use this contract whenever an agent receives work from Hermes or delegates to another plugin agent or skill.
+Use this contract whenever an agent receives work or delegates to another agent or skill. The Departmental Lead in this plugin is `astro-lead`; when an external dispatcher such as Hermes supplies the context envelope, honour it, otherwise `astro-lead` builds it from the internal project file.
 
 ## Context intake
 
@@ -23,7 +23,7 @@ Existing envelopes that satisfy the fields above remain valid. New staged depart
 For staged departmental work, also accept when supplied:
 - `action_id` and a stable idempotency key
 - `accepted_inputs` containing only upstream artefacts already accepted by the owning Lead
-- `delivery_destinations`, including the exact registered Google Drive folder ID and URL for file-producing work
+- `delivery_destinations`, naming the verified client work root and, for site work, the client repo and branch
 - `completion_test`
 - `return_to` and the durable resume point
 
@@ -55,7 +55,7 @@ An unavailable specialist capability is not permission for a Lead to perform the
 
 When a child finding requires new or materially revised customer-facing copy, the originating Lead must return an accepted `content_brief` under `content-departmental-delivery.md`. Do not pass audit suggestions, candidate headlines or a strategy report directly to a developer or publisher.
 
-Content Lead returns a verified `implementation_ready_copy` artefact after writing and independent editorial QA. Head of Production may dispatch implementation only when that artefact contains one selected replacement per field and its approval state is `approved_for_implementation`. A `review_ready` variant set remains a human decision, not executable work.
+Content Lead returns a verified `implementation_ready_copy` artefact after writing and independent editorial QA. `astro-lead` may dispatch implementation only when that artefact contains one selected replacement per field and its approval state is `approved_for_implementation`. A `review_ready` variant set remains a human decision, not executable work.
 
 Outside a staged Lead action register, independent read-only children may run in parallel when supported. Within any staged departmental Lead loop, never dispatch multiple register actions in parallel, even when they appear read-only: dispatch exactly the first dependency-ready action, accept and persist it, then select again. Run dependent or mutation-capable work sequentially. Never let a child expand its own permissions.
 

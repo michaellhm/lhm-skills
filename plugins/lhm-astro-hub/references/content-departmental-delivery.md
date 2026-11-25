@@ -139,7 +139,7 @@ implementation_ready_copy:
     observed_parent_folder_id: "Observed parent"
     readback_evidence: "Observed name, version and content digest"
   implementation_completion_test: []
-  next_owner: "Head of Production"
+  next_owner: "astro-lead"
 ```
 
 Multiple alternatives may exist in a workshop draft, but `approved_for_implementation` contains exactly one selected replacement per field. If human selection is required, stop at `review_ready` and do not dispatch development.
@@ -159,7 +159,7 @@ The anti-AI check is recorded, not assumed. At minimum, scan for em dashes and t
 
 ## Implementation handoff
 
-Head of Production dispatches the accepted artefact to the developer or publisher. The implementation worker:
+`astro-lead` dispatches the accepted artefact to the developer or publisher. The implementation worker:
 
 1. verifies the copy version and immutable digest;
 2. applies exact replacements only;

@@ -18,7 +18,7 @@ After authorised client work, update the existing appropriate knowledge record w
 
 ## Deliverables
 
-Save briefs, copy, audits, reports, research exports, designs, code/build files and assets under the verified work root using the existing service structure and applicable `skill_name/YYYY-MM/` convention. Temporary local/VPS output is staging until its durable destination is verified. Do not create `Claude Workspace/<client>/`, `Current Clients/Current Clients/`, or a new alias alongside an existing client. Do not duplicate complete deliverables in Obsidian: save a concise durable result and the verified working link there. Detailed executable task state stays in BasicOps.
+Save briefs, copy, audits, reports, research exports, designs, code/build files and assets under the verified work root using the existing service structure and applicable `skill_name/YYYY-MM/` convention. Temporary local/VPS output is staging until its durable destination is verified. Do not create `Claude Workspace/<client>/`, `Current Clients/Current Clients/`, or a new alias alongside an existing client. Do not duplicate complete deliverables in Obsidian: save a concise durable result and the verified working link there. Detailed executable task state stays in the client's `project-management/` notes.
 
 ## Meeting completion
 

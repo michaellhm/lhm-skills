@@ -12,7 +12,7 @@ Read the client or project state before execution. Use the exact registered dest
 | Client state, decisions, run history and next executable stage | Canonical Obsidian service/project file |
 | Website code and technical implementation | Registered repository and branch |
 | Reviewable website implementation | Registered staging/preview environment plus evidence |
-| Human actions, exceptions and handoffs | BasicOps discussion through the approved task workflow |
+| Human actions, exceptions and handoffs | The client's internal project file (`project-management/`) and the `astro-lead` handback |
 | Financial workbooks and sensitive financial evidence | Configured governed finance destination |
 | Notifications | Link to the canonical artefact; never become the primary record |
 
@@ -47,7 +47,7 @@ If the work produces no durable artefact, return `artefact_state: not_required` 
 
 ## Orchestrator responsibility
 
-Hermes or the calling orchestrator records the run, evidence, work state, verified artefact reference and next owner in the canonical state file. It notifies the human by linking to the artefact. It does not recreate the specialist's deliverable when the worker can save it.
+`astro-lead` (or an external dispatcher that supplied the envelope) records the run, evidence, work state, verified artefact reference and next owner in the canonical state file. It notifies the human by linking to the artefact. It does not recreate the specialist's deliverable when the worker can save it.
 
 ## Required handoff
 
