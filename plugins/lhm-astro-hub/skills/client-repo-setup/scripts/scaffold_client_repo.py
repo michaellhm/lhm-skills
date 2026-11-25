@@ -13,10 +13,11 @@ ASSETS = Path(__file__).resolve().parents[1] / "assets"
 
 
 def _templates():
-    return sorted(p for p in ASSETS.rglob("*") if p.is_file())
+    return sorted(p for p in ASSETS.rglob("*")
+                  if p.is_file() and (not p.name.startswith(".") or p.name == ".gitkeep"))
 
 
-def scaffold(root, client_name, client_slug):
+def scaffold(root, client_name, client_slug, github_owner):
     root = Path(root)
     today = datetime.date.today().isoformat()
     plan = []
@@ -31,6 +32,7 @@ def scaffold(root, client_name, client_slug):
         text = src.read_text(encoding="utf-8")
         text = (text.replace("{{client_name}}", client_name)
                     .replace("{{client_slug}}", client_slug)
+                    .replace("{{github_owner}}", github_owner)
                     .replace("{{date}}", today))
         dest = root / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
@@ -44,9 +46,10 @@ def main(argv=None):
     ap.add_argument("--root", required=True)
     ap.add_argument("--client-name", required=True)
     ap.add_argument("--client-slug", required=True)
+    ap.add_argument("--github-owner", required=True)
     args = ap.parse_args(argv)
     try:
-        written = scaffold(Path(args.root), args.client_name, args.client_slug)
+        written = scaffold(Path(args.root), args.client_name, args.client_slug, args.github_owner)
     except FileExistsError as exc:
         print(exc, file=sys.stderr)
         return 1

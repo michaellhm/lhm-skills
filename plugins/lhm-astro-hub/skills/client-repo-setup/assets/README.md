@@ -14,15 +14,13 @@ Install Git, Node (the version in `site/package.json`) and Python 3.10 or newer.
 
 Mac (Terminal):
 
-    git clone https://github.com/OWNER/{{client_slug}}.git ~/Documents/Projects/{{client_slug}}
-    cd ~/Documents/Projects/{{client_slug}}/site && npm install && npm run dev
+    git clone https://github.com/{{github_owner}}/{{client_slug}}.git ~/Documents/{{client_slug}}
+    cd ~/Documents/{{client_slug}}/site && npm install && npm run dev
 
 Windows (PowerShell):
 
-    git clone https://github.com/OWNER/{{client_slug}}.git $env:USERPROFILE\Documents\Projects\{{client_slug}}
-    cd $env:USERPROFILE\Documents\Projects\{{client_slug}}\site; npm install; npm run dev
-
-Replace OWNER with the GitHub owner of this repo.
+    git clone https://github.com/{{github_owner}}/{{client_slug}}.git $env:USERPROFILE\Documents\{{client_slug}}
+    cd $env:USERPROFILE\Documents\{{client_slug}}\site; npm install; npm run dev
 
 ## Your assistant
 

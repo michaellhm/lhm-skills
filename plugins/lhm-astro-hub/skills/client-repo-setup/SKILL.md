@@ -69,12 +69,11 @@ On Windows, use `New-Item -ItemType Directory -Force` and `Set-Location` under `
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/client-repo-setup/scripts/scaffold_client_repo.py \
   --root ~/Documents/Projects/<client>/<slug> \
   --client-name "<Client Name>" \
-  --client-slug <slug>
+  --client-slug <slug> \
+  --github-owner <owner>
 ```
 
 The script fills `{{client_name}}`, `{{client_slug}}` and the scaffold date. If any target file already exists it refuses, lists every existing path and writes nothing. If that happens, tell the user which files exist. Never delete or overwrite them. Either stop, or (only if the user agrees) add just the missing files by hand.
-
-After it runs, replace `OWNER` in `README.md` with the real GitHub owner.
 
 Every brain note starts with empty `> gap: not yet captured` sections. They are filled later from the client's own material, and never guessed. Do not edit the gap lines here.
 
@@ -84,7 +83,8 @@ Every brain note starts with empty `> gap: not yet captured` sections. They are 
 cd ~/Documents/Projects/<client>/<slug>
 git add .
 git commit -m "chore: scaffold client repo"
-git push origin main
+git branch -M main
+git push -u origin main
 ```
 
 All later work during staging pushes straight to `main`. There are no round or review branches.
@@ -93,9 +93,9 @@ All later work during staging pushes straight to `main`. There are no round or r
 
 Per the routing contract, add the repo URL (`https://github.com/<owner>/<slug>`) to the client's canonical overview in the shared LHM Knowledge vault, under its Systems and files links, and read the note back to confirm. If the overview does not exist or the vault is unavailable, say so plainly. Do not create a blank profile or a fallback note.
 
-## Step 8: Add default collaborators (with confirmation)
+## Step 8: Add collaborators (optional)
 
-Offer to add the standard LHM project collaborators with **write** access. Invite `GrumpyGeorgie` directly. For Kristalyn and Jaimee, use only confirmed GitHub usernames. Never guess a username from an email address. If a username is unknown, record the invitation as a follow-up.
+Ask the user who else should have access to the repo, and with what permission. Do not assume a default list. Use only confirmed GitHub usernames, and never guess a username from an email address. If a username is unknown, record the invitation as a follow-up.
 
 ```bash
 gh api --method PUT repos/<owner>/<slug>/collaborators/<username> -f permission=push

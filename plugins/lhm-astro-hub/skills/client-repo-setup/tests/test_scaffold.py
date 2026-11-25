@@ -21,7 +21,7 @@ class ScaffoldTest(unittest.TestCase):
         cls.mod = load()
 
     def run_scaffold(self, root):
-        return self.mod.scaffold(root, "Woodlands Physio", "woodlands-physio")
+        return self.mod.scaffold(root, "Woodlands Physio", "woodlands-physio", "lhm-test")
 
     def test_scaffold_writes_layout(self):
         with tempfile.TemporaryDirectory() as d:
@@ -72,6 +72,25 @@ class ScaffoldTest(unittest.TestCase):
             self.assertIn("Brand.md", str(cm.exception))
             self.assertEqual((root / "README.md").read_text(encoding="utf-8"), "client content")
             self.assertEqual(sorted(p.name for p in root.rglob("*") if p.is_file()), ["Brand.md", "README.md"])
+
+    def test_owner_in_readme(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            self.run_scaffold(root)
+            readme = (root / "README.md").read_text(encoding="utf-8")
+            self.assertIn("github.com/lhm-test/woodlands-physio.git", readme)
+            self.assertNotIn("OWNER", readme)
+
+    def test_stray_dotfiles_skipped(self):
+        stray = SKILL / "assets" / ".DS_Store"
+        stray.write_text("x", encoding="utf-8")
+        try:
+            with tempfile.TemporaryDirectory() as d:
+                written = self.run_scaffold(Path(d))
+                self.assertNotIn(".DS_Store", written)
+                self.assertIn("site/.gitkeep", written)
+        finally:
+            stray.unlink()
 
     def test_changelog_marker(self):
         with tempfile.TemporaryDirectory() as d:
