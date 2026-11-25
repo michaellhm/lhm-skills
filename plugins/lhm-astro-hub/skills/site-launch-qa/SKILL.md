@@ -1,0 +1,312 @@
+---
+name: site-launch-qa
+description: "Combined website completion and pre-launch QA for the Astro site in the client repo's site/ folder, with adaptive coaching for Jaimee, full-site SEO, sitemap generation/repair and GSC verification, real-phone review and tests derived from approved client requests. Runs automated checks (links, SSL, robots.txt, sitemap, console errors, PageSpeed, meta tags, favicon) then walks the user through manual checks that AI cannot verify. Updates the project management doc with QA results at the end. Use this when the user says 'run the QA checklist', 'pre-launch QA', 'site QA', 'launch checklist', 'quality assurance check', 'ready to go live checklist', or 'QA the site before launch'."
+---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
+
+# Site Launch QA
+
+Run the full pre-launch QA checklist for the Astro site in `site/` of the client repo. Offer self-led checks, step-by-step coaching or delegated accessible checks. Use browser automation according to that choice, then guide the reviewer through remaining human/device or account steps. Write a QA results summary and update the project management doc.
+
+## Combined completion workflow
+
+Read and follow [Website completion QA](../../references/website-completion-qa.md) before the phases below. It governs source-based requirements, Jaimee’s real-device checks, tracking evidence, staging/live distinctions and completion status where older checklist wording differs.
+
+Use this as the single completion-QA entry point: gather project requirements, run the automated checks below and a prototype comparison (Phase 1.14) for browser/design evidence, guide Jaimee through the phone and client-request tests, then use `website-delivery-qa` to verify the combined handback. Keep a single report with linked specialist evidence. Do not automatically message Jaimee or assign a task merely because a report was prepared.
+
+## Astro security gate
+
+Review the release candidate before declaring pre-launch QA complete: no secrets in the repo or its history (including `GHL_WEBHOOK_URL`, `GHL_PRIVATE_TOKEN`, `TURNSTILE_SECRET_KEY`, mail keys and admin passwords; they live only in Cloudflare secrets), response headers from `public/_headers` present on the deployed site, Pages Functions in `site/functions/` accept POST only and verify Turnstile first, the admin and upload routes (D1 form path only) sit behind authentication and return `noindex`, and no source maps or `.env` files are served. Record each as pass, fail, pending or blocked with evidence in the combined report, preserving anything unverified. Preserve the existing project launch authority; this gate creates no extra client approval gate.
+
+## Before Starting
+
+1. Read `LEARNED.md` from this skill's directory.
+2. Read `${CLAUDE_PLUGIN_ROOT}/references/website-departmental-delivery.md` and, for client work, `${CLAUDE_PLUGIN_ROOT}/references/obsidian-context-contract.md`.
+3. Read `brain/Profile.md` in the client repo for the business name and site URL. The code under test is the Astro project in `site/`.
+4. Ask the user which URL to run the QA against: the staging `*.pages.dev` URL, or the production domain after an approved production deploy. If a URL is not recorded in the internal project file, ask: "What is the staging or live URL to run the QA against?"
+5. Confirm with the user: "Running QA for the Astro site at [url], does that look right?"
+6. Read `references/checklist-astro.md`.
+
+---
+
+## Phase 1: Automated Checks
+
+Use browser automation (the Playwright MCP, if it is available in this session) to run automated checks. Navigate to the site URL and work through each check below. Offer the coaching mode first. Run authorised automated checks before requesting their related manual confirmations; in self-led or coaching mode, let Jaimee perform checks with guidance and review her evidence rather than silently taking over.
+
+### 1.1 Setup
+
+```
+browser_navigate → site_url
+browser_take_screenshot → confirm page loaded
+```
+
+If the page fails to load, stop and tell the user the site is not reachable at that URL.
+
+### 1.2 SSL / HTTPS
+
+- Confirm the URL is served over HTTPS (no mixed-content warnings)
+- Use `browser_console_messages` to check for mixed-content errors
+- **Pass**: URL is HTTPS, no mixed-content console errors
+- **Fail**: HTTP only, or mixed-content warnings present
+
+### 1.3 Navigation Links
+
+- Use `browser_snapshot` to extract all `<a>` elements in the main nav
+- For each nav link: `browser_navigate` → check HTTP status is not 404/500
+- Check footer links the same way
+- **Pass**: All links resolve to valid pages
+- **Fail**: List any broken links found
+
+### 1.4 404 Page
+
+- Navigate to `[site_url]/this-page-does-not-exist-qa-check`
+- Confirm a custom 404 page appears (not a blank page or hosting default)
+- **Pass**: Custom 404 page with site branding
+- **Fail**: Default hosting 404 or blank page
+
+### 1.5 Favicon
+
+- Use `browser_evaluate` to extract every `link[rel~='icon']` and `link[rel='apple-touch-icon']`, including resolved `href`, `type`, and `sizes`
+- Confirm at least one standard favicon is linked from the document head
+- Request every linked icon URL and confirm it returns a successful response with an image content type
+- For Astro sites, confirm the icon is client-branded and is not Astro's default starter favicon (inspect the asset name/content or compare it with the scaffolded default)
+- Record Apple touch icon absence as a warning; fail it when the build standard or approved design explicitly requires one
+- **Pass**: Branded favicon link present and its asset loads successfully
+- **Fail**: Link missing, asset broken/non-image, or framework/template default still in use
+- **Warning**: Branded favicon works but Apple touch icon is absent
+
+### 1.6 Console Errors
+
+- Navigate to each main page (home, contact, a service page if applicable)
+- Run `browser_console_messages` on each
+- **Pass**: No errors or warnings (info/log messages OK)
+- **Fail**: List any errors or warnings
+
+### 1.7 Robots.txt
+
+Follow [Website SEO QA](../../references/website-seo-qa.md): check the root file, effective rules for intended pages and resources, staging/live restrictions and the production Sitemap directive. Prepare precise corrections for missing or unsuitable rules, then apply only within the established authority and verify live readback. Do not reduce this check to searching for `Disallow: /`.
+
+### 1.8 Sitemap, repair and GSC
+
+Discover the actual sitemap/index and child sitemaps, validate XML and compare all entries against the intended canonical page inventory. If missing or invalid, prepare a platform-appropriate generator/configuration repair and validate it. Follow the bounded repair workflow for application/deployment and verify the resulting live sitemap before authorised GSC submission. Record site-side, deployment and GSC processing results separately. A missing default path, prepared XML or submission acknowledgement alone cannot pass this check.
+
+### 1.9 Full-site SEO audit
+
+Follow the complete inventory and per-page checks in `../../references/website-seo-qa.md`, covering titles, descriptions, canonicals, LHM’s one-H1 convention, heading structure, indexing and image loading/appropriate alt text. Include every agreed public HTML page and cross-page duplicates. Record coverage gaps; the homepage is only the first page, never a substitute for the full inventory.
+
+### 1.10 Mobile Viewport
+
+- `browser_resize` → 390×844 (iPhone 14 viewport)
+- `browser_take_screenshot` → check layout looks correct
+- Check `browser_console_messages` for layout errors
+- **Pass**: Page renders without obvious layout breaks
+- **Fail**: Horizontal scroll, overlapping elements, or layout errors
+
+### 1.11 PageSpeed Score
+
+- Navigate to `https://pagespeed.web.dev/report?url=[encoded_site_url]`
+- `browser_wait_for` → wait for scores to load
+- `browser_take_screenshot` → capture the scores
+- Record mobile and desktop scores
+- **Pass**: Mobile ≥ 50, Desktop ≥ 70 (flag if lower, don't hard-fail)
+
+### 1.12 Google Tag Manager
+
+- Use `browser_evaluate` to check for the GTM script: `document.querySelector("script[src*='googletagmanager.com/gtm.js']") !== null`
+- Also check for the `<noscript>` iframe fallback in the body: `document.querySelector("noscript iframe[src*='googletagmanager']") !== null`
+- Extract the GTM container ID if present (look for `GTM-XXXXXXX` pattern in the script src or inline dataLayer push)
+- **Pass**: GTM script found in `<head>` and noscript fallback in `<body>`, container ID recorded
+- **Fail**: GTM snippet missing entirely
+- **Warning**: Script present but noscript fallback missing (degraded tracking for users with JS disabled)
+
+The GTM presence result above is only the installation check. Complete the account-ID, published-container, duplicate and firing checks in the combined protocol before marking tracking passed.
+
+### 1.13 Copyright Footer
+
+- On homepage, use `browser_evaluate` to check for copyright text in the footer
+- Look for the current year at execution time
+- **Pass**: Copyright text with correct year found
+- **Fail**: Missing or stale year
+
+### Platform-Specific Automated Checks
+
+**Astro checks:**
+- Check for `_astro/` asset paths in page source (confirms build output is serving correctly)
+- Check `browser_console_messages` for hydration errors
+- Test production redirect URLs directly. On Cloudflare Pages, verify a Pages Function is not intercepting a path that should be handled by `public/_redirects`.
+
+### 1.14 Prototype comparison
+
+Compare each built page against the approved prototype at `lhm-prototype/<client>/` at 1440, 768 and 390 px: sections present and in order, typography, colours and spacing, working menu and accordions, images loading without layout shift. Record screenshots and differences. **Pass**: no unaccepted differences. **Fail**: list them.
+
+---
+
+## Phase 2: Automated Check Summary
+
+After completing all automated checks, present a clean summary table:
+
+```
+## Automated QA Results — [site_url]
+
+| Check | Result | Notes |
+|-------|--------|-------|
+| SSL / HTTPS | ✅ Pass | |
+| Navigation Links | ✅ Pass | |
+| 404 Page | ✅ Pass | |
+| Favicon | ✅ Pass | |
+| Console Errors | ⚠️ Warning | 1 error on /contact |
+| robots.txt | ✅ Pass | |
+| Sitemap | ✅ Pass | |
+| Full-site SEO | Pass / Fail / Pending / Blocked | Checked / expected pages; inventory link |
+| Mobile Viewport | ✅ Pass | |
+| PageSpeed (mobile/desktop) | ⚠️ 48 / 72 | Mobile below threshold |
+| Google Tag Manager | ✅ Pass | GTM-XXXXXXX |
+| Copyright Footer | ✅ Pass | |
+| Prototype comparison | ✅ Pass | |
+```
+
+Flag any failures clearly. Do not proceed to Phase 3 until the user has acknowledged the automated results.
+
+---
+
+## Phase 3: Manual Checklist
+
+Follow the coaching mode chosen in the combined protocol. In self-led mode give a short section checklist; in coaching mode give one practical step and wait for the result; in delegated mode run available authorised checks and ask only for human/access-dependent observations. Use the available question/chat interface; the example checklists below are prompts, not mandatory checkbox-tool calls. Never demand blanket confirmation for checks already evidenced.
+
+### Group 0: Jaimee’s phone and client requirements
+
+Run the guided real-device review and the source-linked client requirements matrix in `../../references/website-completion-qa.md`. Ask for exact observations: menu behaviour, dialler number, booking destination and new-tab behaviour where required. Record pending, failed and blocked items; unanswered items are not passes. Browser screenshots do not replace this group.
+
+### Group A: Content & Communication
+
+In self-led mode, offer this compact checklist; in coaching mode, work through its items one at a time:
+
+"**Content & Communication** — please tick off what you've confirmed:
+- Text is checked and free from spelling, grammatical, and formatting errors
+- Page titles and meta descriptions are unique and descriptive across all pages
+- Meaningful images have appropriate alt text; decorative images use empty alt
+- Contact details are correct and easy to find
+- Social media links are set up and pointing to the right profiles"
+
+### Group B: Forms & Thank You Pages
+
+"**Forms & Thank You Pages** — please tick off:
+- All web forms submit correctly (test each one with a real submission)
+- Email notifications from forms arrive at the correct email addresses
+- Thank you pages load correctly after each form submission
+- Spam protection is active on all forms (honeypot or reCAPTCHA)"
+
+### Group C: Infrastructure & Hosting
+
+"**Infrastructure** — please tick off:
+- Domain is pointing to Cloudflare Pages with correct DNS (production only, after approved production deploy)
+- SSL certificate is active (auto-provisioned by Cloudflare)
+- Deployment pipeline is working (push to `main` → auto-deploy confirmed, Pages root directory `site`)
+- Secrets and variables are set in Cloudflare Pages settings (not committed to the repo)"
+
+### Group D: Analytics & Tracking
+
+Apply the tracking/search verification protocol before accepting these confirmations. Record IDs, tested actions and received-event evidence; snippet presence and broad tick boxes alone cannot pass this group.
+
+"**Analytics & Tracking** — please tick off:
+- GA4 tracking is installed and recording sessions (check Real-Time in GA4)
+- Key event tracking is set up and firing (contact form submits, calls, bookings)
+- Google Search Console is set up and site is verified
+- Sitemap has been submitted to GSC
+- GTM container is published and tags are firing correctly (if applicable)"
+
+### Group E: Browser & Device Testing
+
+"**Cross-browser & Device Testing** — please tick off:
+- Tested and working in Chrome
+- Tested and working in Firefox
+- Tested and working in Safari
+- Tested and working in Edge
+- Tested on an iOS device (real device, not just resize)
+- Tested on an Android device (real device, not just resize)"
+
+### Group F: Accessibility
+
+"**Accessibility** — please tick off:
+- Links are recognisable and have a visible focus state
+- All form fields have associated labels (not just placeholder text)
+- Colour contrast passes WCAG AA (use a checker like WebAIM Contrast Checker)
+- Site is usable with a screen reader (basic walkthrough with VoiceOver or NVDA)"
+
+### Group G: Platform-Specific
+
+"**Astro Configuration** — please tick off:
+- Build is running without errors or warnings in the Cloudflare Pages deploy log
+- All secrets and variables are set correctly in production
+- Redirects are configured in `site/public/_redirects` (and no Pages Function overrides them)
+- sitemap plugin is generating correctly"
+
+### Group H: Performance & Caching
+
+"**Performance** — please tick off:
+- Images are using Astro's `<Image>` component with correct sizing
+- Build output has been verified (no unintended large JS bundles)
+- Caching headers are set correctly in `site/public/_headers`"
+
+---
+
+## Phase 4: QA Results File
+
+Save and incrementally update the combined report under the verified `work_root/site-launch-qa/YYYY-MM/qa-launch-results.md`, including pending checks even if the session ends early. Include the source-linked requirements matrix, tester/device details, automated and real-device evidence, tracking/search results, full-site SEO inventory and coverage, sitemap/robots repairs and GSC state, coaching mode/resume step, fix owners, accepted exceptions and retest history from the combined protocol. Do not save a full deliverable in the knowledge root.
+
+Structure:
+
+```markdown
+# Site Launch QA — [Client Name]
+
+**Date:** [today's date]
+**URL:** [site_url]
+**Platform:** Astro (`site/`)
+**Run by:** [ask user for their name if not known]
+
+## Automated Checks
+
+| Check | Result | Notes |
+|-------|--------|-------|
+[populate from Phase 2 table]
+
+## Manual Checks
+
+### Content & Communication
+[list each item with pass, fail, pending, blocked or not_applicable and evidence]
+
+### Forms & Thank You Pages
+[list each item with pass, fail, pending, blocked or not_applicable and evidence]
+
+[... all groups ...]
+
+## Outstanding Issues
+
+[List any items that were not ticked or flagged as failing]
+
+## Sign-off
+
+- [ ] All automated checks passed (or issues noted and accepted)
+- [ ] All manual checks completed
+- [ ] Outstanding issues documented and assigned
+```
+
+---
+
+## Phase 5: PM Doc Update
+
+After writing and reading back the QA results file, run `website-delivery-qa` on the combined handback. Pending mandatory checks, unresolved failures or missing required evidence prevent a completion claim; update progress truthfully instead. Only when eligible for sign-off:
+
+1. Ask the user: "Happy for me to record the QA results in the project file?"
+2. If yes, append the result to the client's internal project file (`20 Clients/<client>/project-management/` in the LHM Knowledge vault, per `${CLAUDE_PLUGIN_ROOT}/references/obsidian-context-contract.md`): "QA completed [date]. Results at `[path]/qa-launch-results.md`. Outstanding items: [count]."
+
+---
+
+## Additional Resources
+
+- `../../references/website-seo-qa.md` — Full-site SEO, sitemap repair, robots.txt and GSC evidence
+- `references/checklist-astro.md` — Full Astro checklist item reference
+- `../../references/website-completion-qa.md` — Guided review, requirements matrix, tracking evidence and the single combined report

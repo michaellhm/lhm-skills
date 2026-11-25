@@ -1,0 +1,195 @@
+# Private Form Uploads with Cloudflare R2
+
+Use this reference whenever an Astro/Cloudflare Pages form accepts a logo, image, PDF, or other customer file.
+
+## Required architecture
+
+1. Browser sends `multipart/form-data`.
+2. Pages Function validates the file.
+3. Function saves it to a private R2 bucket.
+4. Function saves the R2 key and metadata in D1.
+5. Notification email may include the attachment, but must include an authenticated download link.
+6. Admin view exposes the same authenticated download link.
+
+R2 is the durable source. Email attachments are convenience only.
+
+## Wrangler configuration
+
+```toml
+compatibility_date = "YYYY-MM-DD"
+pages_build_output_dir = "dist"
+
+[[r2_buckets]]
+binding = "FORM_UPLOADS"
+bucket_name = "project-form-uploads"
+```
+
+Create the bucket first and keep public access disabled. If Cloudflare says bindings are managed through `wrangler.toml`, do not add the same binding in the dashboard.
+
+Use a current compatibility date. Do not add `formdata_parser_supports_files` with a date on/after `2021-11-03`; current deploys reject the redundant flag.
+
+## Form markup
+
+```html
+<form method="post" action="/api/contact" enctype="multipart/form-data" data-contact-form>
+  <label for="upload">Upload file</label>
+  <input
+    id="upload"
+    name="upload"
+    type="file"
+    accept="image/png,image/jpeg,image/svg+xml,application/pdf"
+  >
+</form>
+```
+
+## Client submission
+
+Build `FormData` once and explicitly set the file:
+
+```js
+const formData = new FormData(form);
+const uploadInput = form.querySelector('input[type="file"][name="upload"]');
+const uploadFile = uploadInput?.files?.[0];
+
+if (uploadFile) {
+  formData.set('upload', uploadFile, uploadFile.name);
+  formData.set('upload_expected', uploadFile.name);
+}
+
+await fetch(form.action, { method: 'POST', body: formData });
+```
+
+If the UI advertises drag/drop, wire it:
+
+```js
+dropZone.addEventListener('dragover', (event) => {
+  event.preventDefault();
+});
+
+dropZone.addEventListener('drop', (event) => {
+  event.preventDefault();
+  const file = event.dataTransfer?.files?.[0];
+  if (!file) return;
+
+  const transfer = new DataTransfer();
+  transfer.items.add(file);
+  uploadInput.files = transfer.files;
+  showUploadPreview(file);
+});
+```
+
+## Server validation and R2 write
+
+Use Blob/File capabilities rather than requiring enumerable properties:
+
+```js
+function getUpload(value) {
+  if (
+    !value
+    || typeof value !== 'object'
+    || typeof value.arrayBuffer !== 'function'
+    || typeof value.stream !== 'function'
+  ) return null;
+
+  if (typeof value.size === 'number' && value.size === 0) return null;
+  return value;
+}
+```
+
+Then validate and save:
+
+```js
+const expectedName = clean(formData.get('upload_expected'), 180);
+const upload = getUpload(formData.get('upload'));
+
+if (expectedName && !upload) {
+  return jsonResponse({
+    ok: false,
+    message: 'Your file was selected but did not upload. Please choose it again.',
+  }, 422);
+}
+
+if (upload && upload.size > 10 * 1024 * 1024) {
+  return jsonResponse({ ok: false, message: 'Files must be 10 MB or smaller.' }, 422);
+}
+
+const fileName = clean(upload?.name || expectedName || 'uploaded-file', 180);
+const extension = fileName.match(/\.([a-z0-9]{1,10})$/i)?.[1]?.toLowerCase() || 'bin';
+const objectKey = `${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}.${extension}`;
+
+if (upload) {
+  await env.FORM_UPLOADS.put(objectKey, upload.stream(), {
+    httpMetadata: {
+      contentType: upload.type || 'application/octet-stream',
+      contentDisposition: `attachment; filename="${safeHeaderFileName(fileName)}"`,
+    },
+    customMetadata: { originalName: fileName },
+  });
+}
+```
+
+Also allow-list types/extensions server-side; never trust `accept` or the browser MIME type alone. If the subsequent D1 insert fails, delete `objectKey` from R2 to avoid orphaned objects.
+
+## D1 metadata
+
+Store at minimum:
+
+```sql
+upload_key TEXT,
+upload_file_name TEXT,
+upload_content_type TEXT,
+upload_size INTEGER
+```
+
+Do not store binary file contents in D1.
+
+## Authenticated download
+
+Create `functions/admin/upload.js`:
+
+```js
+export async function onRequestGet({ request, env }) {
+  if (!isAuthorised(request, env)) return unauthorised();
+
+  const key = new URL(request.url).searchParams.get('key') || '';
+  if (!isValidObjectKey(key)) return new Response('Invalid file reference.', { status: 400 });
+
+  const object = await env.FORM_UPLOADS.get(key);
+  if (!object) return new Response('File not found.', { status: 404 });
+
+  const headers = new Headers();
+  object.writeHttpMetadata(headers);
+  headers.set('etag', object.httpEtag);
+  headers.set('cache-control', 'private, no-store');
+  headers.set('x-robots-tag', 'noindex, nofollow');
+  return new Response(object.body, { headers });
+}
+```
+
+Reuse the submissions admin Basic Auth helper. Validate keys against the exact key format generated by the handler. Never expose the bucket publicly merely to make email links easy.
+
+## Real multipart test
+
+A build is insufficient. Run the Pages Function locally with local D1 and R2, then submit a real file:
+
+```bash
+npx wrangler d1 migrations apply PROJECT_DB --local
+npx wrangler pages dev dist --port 8788
+
+curl -X POST http://127.0.0.1:8788/api/contact \
+  -F 'name=Upload Test' \
+  -F 'phone=0400000000' \
+  -F 'email=test@example.com' \
+  -F 'message=Testing a real multipart upload' \
+  -F 'form_started_at=REPLACE_WITH_CURRENT_EPOCH_MS' \
+  -F 'upload_expected=test-logo.png' \
+  -F 'upload=@/absolute/path/test-logo.png;type=image/png'
+```
+
+Local email can report `not_configured` or fail; that does not invalidate storage testing. Confirm:
+
+- R2 local state contains a non-empty object.
+- D1 latest row contains the object key, exact filename, MIME type, and non-zero size.
+- An authenticated download returns the same byte size.
+
+After deploy, repeat once against the real form and check the private R2 bucket plus D1. If local passes but production receives a string instead of a file, inspect the deployed `compatibility_date` first.

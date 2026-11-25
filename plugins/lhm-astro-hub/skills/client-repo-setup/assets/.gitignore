@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Review toolkit lock (the register and config in .lhm-review/ are committed)
+.lhm-review/*.lock
+
+# Local secrets for Cloudflare Pages Functions
+site/.dev.vars
+
+# Dependencies and build output
+node_modules/
+site/dist/

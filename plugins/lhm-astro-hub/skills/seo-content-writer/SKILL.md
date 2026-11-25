@@ -1,0 +1,251 @@
+---
+name: seo-content-writer
+description: "Creates high-quality, SEO-optimized content that ranks in search engines. Use this when the user mentions 'write a blog post,' 'SEO content,' 'write an article,' 'content writing,' 'blog writing,' 'SEO copywriting,' 'pillar content,' 'write a guide,' 'comparison article,' or 'listicle.' Applies on-page SEO best practices, keyword optimization, CORE-EEAT quality standards, and optimal content structure."
+---
+## Client file routing
+
+For client-specific work, first read [Client knowledge and working-file routing](../../references/obsidian-context-contract.md). Resolve knowledge records in the shared LHM Knowledge vault and deliverables under the verified Claude Workspace/Current Clients folder. These routing rules override legacy single-folder examples; preserve this skill’s narrower approval and privacy rules. For non-client work, retain the appropriate private or internal destination.
+
+
+# SEO Content Writer
+
+## Step 0: Context
+
+Read `brain/Overview.md`, `brain/Profile.md` and `brain/Content Rules.md` from the client repo; every rule in Content Rules is mandatory. The brain replaces `client_profile.md` and `playbook.md` as the voice source. Treat a Content Rules conflict with this skill's defaults as a Content Rules win.
+
+Creates search-engine-optimized content that ranks well while providing genuine value to readers. Applies proven SEO copywriting techniques, proper keyword integration, and optimal content structure.
+
+## When to Use This Skill
+
+- Writing blog posts targeting specific keywords
+- Creating landing pages optimized for search
+- Developing pillar content for topic clusters
+- Writing product descriptions for e-commerce
+- Creating service pages for local SEO
+- Producing how-to guides and tutorials
+- Writing comparison and review articles
+
+## What This Skill Does
+
+1. **Keyword Integration** — naturally incorporates target and related keywords
+2. **Structure Optimization** — creates scannable, well-organized content
+3. **Title & Meta Creation** — writes compelling, click-worthy titles
+4. **Header Optimization** — uses strategic H1-H6 hierarchy
+5. **Internal Linking** — suggests relevant internal link opportunities
+6. **Featured Snippet Optimization** — formats for SERP feature opportunities
+7. **CORE-EEAT Compliance** — applies quality standards during writing
+
+## Mandatory: Route Long-Form Writing Through the 8-Pass Pipeline
+
+Long-form content (over 300 words or page-level web/blog copy) goes through the 8-pass pipeline. `agents/content.md` runs the 8-pass pipeline from `${CLAUDE_PLUGIN_ROOT}/references/8-pass-writing-engine.md`. This skill is responsible for:
+
+1. Validate the accepted research and approved brief supplied for this bounded writing action
+2. Build the structured brief for the pipeline without silently changing the accepted strategy (target keyword, intent, outline, internal/external link targets, and approved voice notes from `brain/Content Rules.md`)
+3. Run the pipeline through `agents/content.md` with content type `blog-post` and the structured brief
+4. Save returned content to the exact registered output destination
+5. Read the saved artefact back and return its verified identity
+6. Perform only the completion checks assigned to this writing action; independent SEO/content QA remains a later Lead-dispatched stage (`content-quality-auditor`)
+
+Do not generate the body content in a single pass.
+
+When invoked by `astro-lead`, this is one bounded writing stage. Do not redo accepted keyword research or page-brief work, do not perform the later independent QA stage, and do not start website implementation. If a required accepted input or verified destination (the client work root's `pages/<page-key>/` folder, or a registered Drive folder) is absent or contradictory, return canonical state `needs_context` to `astro-lead` with the precise gap, Context & Research owner and resume point. Supply legacy `work_state: needs_review` only when an older schema requires it.
+
+## Instructions
+
+When a user requests SEO content:
+
+### 1. Gather Requirements
+
+Before writing anything, gather voice/style guidelines (anti-AI writing rules, tone docs, brand voice) and confirm all internal page URLs the content should link to. Applying style guidelines or adding links after writing forces a full revision pass that risks introducing errors.
+
+If writing multiple articles in a batch, write and confirm one article at a time unless the bounded action contract explicitly defines a safe batch. Writing 4+ full articles in a single session risks hitting context limits mid-batch. Vary word count and structure between posts in a batch (mix 1,200-word posts with 1,800-word posts). Identical-length posts with identical section patterns look artificial.
+
+```markdown
+### Content Requirements
+
+**Primary Keyword**: [main keyword]
+**Secondary Keywords**: [2-5 related keywords]
+**Target Word Count**: [length]
+**Content Type**: [blog/guide/landing page/comparison/listicle]
+**Target Audience**: [who is this for]
+**Search Intent**: [informational/commercial/transactional]
+**Tone**: [professional/casual/technical/friendly]
+**CTA Goal**: [what action should readers take]
+**Internal Link Targets**: [list of confirmed page URLs to link to]
+**Publishing Target**: [Astro page in `site/` of the client repo]
+```
+
+Use frontmatter fields `title`, `seo_title`, `meta_description`, `slug`, `primary_keyword`, `secondary_keywords` and `status`, matching the client's existing `site/` content schema.
+
+### 2. Research and Plan
+
+```markdown
+### Content Research
+
+**SERP Analysis**:
+- Top results format: [what's ranking]
+- Average word count: [X] words
+- Common sections: [list]
+- SERP features: [snippets, PAA, etc.]
+
+**Keyword Map**:
+- Primary: [keyword] — use in title, H1, intro, conclusion
+- Secondary: [keywords] — use in H2s, body paragraphs
+- LSI/Related: [terms] — sprinkle naturally throughout
+- Questions: [PAA questions] — use as H2/H3s or FAQ
+
+**Content Angle**:
+[What unique perspective or value will this content provide?]
+```
+
+### 3. Create Optimized Title
+
+Requirements: include primary keyword (preferably at start), under 60 characters, compelling and click-worthy, match search intent.
+
+
+```markdown
+### Title Options
+
+1. **[Title option 1]** ([X] chars)
+2. **[Title option 2]** ([X] chars)
+3. **[Title option 3]** ([X] chars)
+
+**Recommended**: [Best option with reasoning]
+```
+
+### 4. Write Meta Description
+
+150-160 characters. Include primary keyword, value proposition, and CTA.
+
+### 5. Structure Content with SEO Headers
+
+```markdown
+### Content Structure
+
+**H1**: [Primary keyword in H1 — only one per page]
+
+**Introduction** (100-150 words)
+- Hook reader in first sentence
+- State what they'll learn
+- Include primary keyword in first 100 words
+
+**H2**: [Secondary keyword or question]
+**H2**: [Secondary keyword or question]
+  **H3**: [Sub-topic]
+  **H3**: [Sub-topic]
+**H2**: Frequently Asked Questions
+**Conclusion** — summarize key points, include primary keyword, clear CTA
+```
+
+### 6. Write the Content
+
+Follow this structure for the actual content:
+
+- **Introduction**: Hook → Problem → Promise → Overview
+- **Body sections**: Each H2 covers one main topic with H3 sub-sections
+- **Use variety**: paragraphs, bullet points, tables, blockquotes, bold key phrases
+- **FAQ section**: At least 3 questions, direct answers in 40-60 words each. For blog posts, use bold question + inline answer format (`**Question?** Answer text.`) rather than H3 + separate paragraph. This renders better on most blog templates.
+- **Related Reading**: If linking to other posts in the series, use a list at the end: `- *[Link Text](/path)*`
+- **Section dividers**: Use markdown horizontal rules (`---`) between major sections for visual separation
+- **Conclusion**: Recap → Final insight → CTA
+
+### 7. Apply On-Page SEO Checklist
+
+```markdown
+### On-Page SEO Checklist
+
+**Keyword Placement**:
+- [ ] Primary keyword in title
+- [ ] Primary keyword in H1
+- [ ] Primary keyword in first 100 words
+- [ ] Primary keyword in at least one H2
+- [ ] Primary keyword in conclusion
+- [ ] Secondary keywords in H2s/H3s
+- [ ] Related terms throughout body
+
+**Content Quality**:
+- [ ] Comprehensive coverage of topic
+- [ ] Original insights or data
+- [ ] Actionable takeaways
+- [ ] Expert quotes or citations (for E-E-A-T)
+
+**Readability**:
+- [ ] Short paragraphs (2-4 sentences)
+- [ ] Bullet points and lists
+- [ ] Bold key phrases
+- [ ] Table of contents for long content
+
+**Links**:
+- [ ] Internal links (3-5 relevant pages) — use relative paths (e.g. `/google-ads-management`), not absolute URLs. Absolute internal URLs break on staging and are harder to maintain if the domain changes. Only use full URLs for external domains.
+- [ ] External links (2-3 authoritative sources)
+- [ ] Image alt text with keywords
+```
+
+### 8. Optimize for Featured Snippets
+
+- **Definition snippets**: Clear definition in 40-60 words
+- **List snippets**: Numbered or bulleted lists under H2s
+- **Table snippets**: Comparison tables with clear headers
+- **How-to snippets**: Numbered steps ("Step 1:", "Step 2:")
+
+### 9. Final SEO Review
+
+```markdown
+### Content SEO Score
+
+| Factor | Status | Notes |
+|--------|--------|-------|
+| Title optimized | ✅/❌ | [notes] |
+| Meta description | ✅/❌ | [notes] |
+| H1 with keyword | ✅/❌ | [notes] |
+| Keyword in first 100 words | ✅/❌ | [notes] |
+| H2s optimized | ✅/❌ | [notes] |
+| Internal links | ✅/❌ | [notes] |
+| External links | ✅/❌ | [notes] |
+| FAQ section | ✅/❌ | [notes] |
+| Word count | ✅/❌ | [X] words |
+
+**Overall SEO Score**: [X]/10
+```
+
+## Content Type Templates
+
+- **Blog Post** — 1,200-1,800 words. Hook → sections → FAQ → conclusion
+- **Comparison Article** — 1,500-2,500 words. Quick comparison table → individual reviews → detailed comparison → verdict
+- **Listicle** — 1,500-2,500 words. Summary table → individual items → comparison → FAQ
+- **How-To Guide** — 1,200-2,000 words. Prerequisites → numbered steps → troubleshooting → FAQ
+- **Pillar Page** — 3,000-5,000 words. Chapters with deep coverage, internal links to cluster content
+
+
+## Validation Checkpoints
+
+- [ ] Primary keyword confirmed and matches search intent
+- [ ] Target word count met (minimum 800 words for substantive content)
+- [ ] Keyword density within 1-2% for primary keyword
+- [ ] Internal links included (3-5)
+- [ ] FAQ section present with at least 3 questions
+- [ ] Readability appropriate for target audience
+- [ ] Saved to the dispatched destination (client work root `pages/<page-key>/` or registered Drive parent) and read back successfully
+
+## Production handback
+
+Preserve `parent_goal`, `department_goal` and `action_id` in the return. Include each produced artefact's observed path or Drive file ID, URL where one exists, parent folder, name/version and readback evidence. Do not report completion when a required artefact was not saved and verified. A local draft outside the verified client work root is not a substitute for the dispatched destination.
+
+## Tips for Success
+
+1. **Match search intent** — informational queries need guides, not sales pages
+2. **Front-load value** — put key information early for readers and snippets
+3. **Use data and examples** — specific beats generic every time
+4. **Write for humans first** — SEO optimization should feel natural
+5. **Include visual elements** — break up text with tables, lists, blockquotes
+6. **Verify before editing saved files** — when editing a saved MD file to add links or make revisions, use Grep to verify the exact string exists before running Edit. Saved file wording often differs slightly from the original draft
+7. **Check for formatting side effects** — after any Edit operation that adds markdown links, scan surrounding text for accidentally introduced punctuation changes (especially em dashes from auto-substitution). Also check YAML frontmatter for duplicate field entries after revision passes
+
+## Reference Materials
+
+
+## Related Skills
+
+- **keyword-research** — find keywords to target
+- **content-quality-auditor** — run a full CORE-EEAT quality audit
+- **seo-page-brief** — the brief this skill writes from

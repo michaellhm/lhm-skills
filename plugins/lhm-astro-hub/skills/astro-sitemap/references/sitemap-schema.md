@@ -1,0 +1,132 @@
+# sitemap.json schema
+
+The single data file that drives both generators. Assemble it from your research, then run the scripts. A complete worked example is in `assets/example-sitemap.json`.
+
+## Top-level keys
+
+| Key | Required | Purpose |
+|---|---|---|
+| `brand` | yes | Name, logo, phone, optional header buttons, colours, credit line |
+| `nav` | yes | The proposed top navigation (drives the header and dropdowns) |
+| `intro` | yes | Title and paragraph above the page tree |
+| `stats` | no | The row of headline numbers under the intro |
+| `sections` | yes | The colour-coded page tree, grouped by section, card, page |
+| `footer` | no | Small print at the bottom |
+
+### No opportunity widget
+
+Do not write an `opportunity` key. The `astro-sitemap` skill never uses one. Without it the page has no widget, no JavaScript and no lead estimates.
+
+## brand
+
+```json
+{
+  "name": "My Garden Therapy",
+  "logo_url": "https://…/logo.svg",
+  "phone": "03 5215 9400",
+  "ctas": [
+    {"label": "Book an Appointment", "style": "solid"},
+    {"label": "Refer a Patient", "style": "outline"}
+  ],
+  "cta_position": "strip",
+  "careers_link": false,
+  "primary": "#2E6B3E",
+  "primary_dark": "#1F4D2C",
+  "primary_light": "#E4EFE7",
+  "accent": "#C8A44D",
+  "prepared_by": "Local Health Marketing",
+  "date": "July 2026"
+}
+```
+
+`logo_url` and `phone` are optional. Without a logo the name renders as text; without a phone the green call button is omitted. `ctas` is optional too: a list of header buttons, each with a `label` and a `style` of `solid` (filled, the default) or `outline`. When `ctas` is present the phone shows as a ☎ text link before the buttons, all on one row; without it the header keeps the single green phone button. Set `cta_position` to `"strip"` to move the phone link and buttons into their own dark band above the logo and nav, which suits a long nav; leave it out to keep them inline at the right of the bar. Dropdowns that would run past the right edge of the window flip to right-aligned automatically. `careers_link` defaults to `true`, which shows a small "Careers ↗" link at the right of the bar; set it to `false` to leave it out. Pick brand colours from the client's own site so the mock feels like theirs.
+
+## nav
+
+An ordered list of top-level items. Three shapes:
+
+```json
+{"label": "About Us"}
+{"label": "Who We Help", "new": true, "items": [ … ]}
+{"label": "What We Do", "mega": true, "groups": [ … ]}
+```
+
+- `"new": true` on any item adds a red dot (a new top-level section, or a new page inside a dropdown).
+- Simple dropdown `items`: `[{"label": "Gardening for Seniors", "new": true}, …]`
+- Mega `groups`: `[{"title": "Garden Care", "items": [{"label": "…", "new": true}]}]`
+- Grouped but not mega: use `groups` without `mega: true` for a single column with sub-headings, as used for "Getting Started".
+
+Keep the nav to what fits on one row. The header does not wrap, and a wrapped nav is the most common visual defect in the finished page.
+
+## stats
+
+```json
+[{"n": "18", "label": "pages today"}, {"n": "~55", "label": "pages proposed"}]
+```
+
+## sections, cards, pages
+
+```json
+{
+  "title": "What We Do — services",
+  "pill": "All new",
+  "note": "<b>On location pages:</b> …",
+  "cards": [
+    {
+      "head": "Garden Care",
+      "url": "/who-we-help/",
+      "items": [
+        {"name": "Garden Maintenance", "slug": "/how-can-we-help/garden-maintenance/",
+         "status": "have", "vol": 140},
+        {"name": "Lawn Mowing & Lawn Care", "slug": "/services/lawn-mowing/",
+         "status": "new", "vol": 210},
+        {"name": "Weeding & Mulching", "slug": "/services/weeding-mulching/",
+         "status": "new", "vol": null, "bold": false}
+      ]
+    }
+  ]
+}
+```
+
+`pill`, `note` and `url` are optional. `note` and `pill` accept HTML.
+
+### Page fields
+
+| Field | Meaning |
+|---|---|
+| `name` | Page title shown to the client. Must be **distinct within the spec** — `--since` matches pages across versions on the name, so duplicates collapse into one entry |
+| `slug` | Small mono URL or label under the name (optional) |
+| `status` | `"have"` (green, exists) · `"enh"` (yellow, rebuild) · `"new"` (red) |
+| `vol` | Monthly searches (int). Use `null` or `0` when there is no measured volume, which renders "n/a" |
+| `bold` | `true` to bold the page name. Use sparingly, for the flagship pillars |
+| `primary_keyword` | The one term the page targets. Required for `new` and `enh` pages. Shown under the page name and in the workbook |
+| `secondary_keywords` | List of supporting terms. Recommended for `new` and `enh` pages. Joined with `", "` in the workbook |
+| `audience` | Who the page is for, in plain words. Required for `new` and `enh` pages |
+| `intent` | `"informational"`, `"commercial"` or `"transactional"`. Required for `new` and `enh` pages |
+| `h1` | Optional. The intended H1, used by content rollout. When absent, the primary keyword is the H1 |
+| `template` | Optional. The prototype page this page is built from |
+
+`scripts/page_brief_seed.py sitemap.json --check` lists every `new` or `enh` page (a page with no `status` counts as `new`) that lacks `primary_keyword`, `audience` or `intent`, as `<page name>: <field>`, and exits 1. The sitemap is not approvable until it passes.
+
+The status colour carries the whole argument. Only mark a page `have` if it genuinely exists on the live site today, `enh` if it exists but is weak, and `new` if it does not exist. Never blur these. The credibility of the mock rests on the client recognising their existing pages as green.
+
+## Card grouping as a roadmap
+
+Cards are just labelled groups, so they can carry sequencing as well as taxonomy. Tier and phase headings both work:
+
+```json
+{"head": "Tier 1 — build first", "items": [ … ]}
+{"head": "Phase 2 — months 4-6", "items": [ … ]}
+```
+
+`astro-sitemap` leans on this to express build order, since it has no widget to carry the narrative.
+
+## Comparing versions
+
+Keep each dated version of the spec. Passing an older one as `--since` renders a progress band and a change chip on every page that moved:
+
+```bash
+python scripts/build_sitemap_html.py sitemap.json out.html --since sitemap-2026-04.json
+```
+
+Nothing in the schema changes for this. The comparison reads `sections` → `cards` → `items` from both files and matches on `name`. `brand.date` from the older spec labels the band, so keep it filled in and accurate.
