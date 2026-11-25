@@ -1,0 +1,4 @@
+interface:
+  display_name: "SEO Page Brief"
+  short_description: "Create briefs from accepted SEO research"
+  default_prompt: "Use $seo-page-brief to turn the accepted research into the bounded page brief requested by the SEO Lead."

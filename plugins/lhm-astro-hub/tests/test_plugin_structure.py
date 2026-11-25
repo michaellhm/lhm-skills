@@ -20,6 +20,10 @@ REQUIRED_MENTIONS: dict = {
     "skills/astro-build/SKILL.md": ["site/", "astro-build-standard.md", "astro-form"],
     "skills/astro-form/SKILL.md": ["GoHighLevel", "D1", "Turnstile"],
     "skills/astro-form/references/gohighlevel.md": ["GHL_WEBHOOK_URL", "never commit"],
+    "agents/content.md": ["brain/Content Rules.md"],
+    "skills/content-rollout/SKILL.md": ["brain/Content Rules.md", "page_brief_seed.py", "review_release.py", "brain/Project.md", "client-update-email", "mock-up"],
+    "skills/seo-content-writer/SKILL.md": ["brain/Content Rules.md"],
+    "skills/copywriting/SKILL.md": ["brain/Content Rules.md"],
 }
 
 TEXT_SUFFIXES = {".md", ".json", ".py", ".yaml", ".yml", ".txt", ".html", ".css", ".js"}

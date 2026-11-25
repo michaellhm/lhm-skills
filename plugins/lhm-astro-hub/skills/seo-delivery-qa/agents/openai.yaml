@@ -1,0 +1,4 @@
+interface:
+  display_name: "SEO Delivery QA"
+  short_description: "Verify bounded SEO specialist handbacks"
+  default_prompt: "Use $seo-delivery-qa to verify this returned SEO action before the SEO Lead accepts or advances."
