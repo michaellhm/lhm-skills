@@ -15,7 +15,9 @@ PLUGIN_NAME = "lhm-astro-hub"
 
 FORBIDDEN = ["lhm-marketing-hub", "lhm-wordpress-hub", "lhm-project-hub", "lhm-client-updates-hub"]
 
-REQUIRED_MENTIONS: dict = {}
+REQUIRED_MENTIONS: dict = {
+    "skills/astro-prototype/SKILL.md": ["ui-ux-pro-max", "brain/Brand.md", "lhm-prototype", "check_no_inline.py"],
+}
 
 TEXT_SUFFIXES = {".md", ".json", ".py", ".yaml", ".yml", ".txt", ".html", ".css", ".js"}
 SELF = Path(__file__).resolve()
