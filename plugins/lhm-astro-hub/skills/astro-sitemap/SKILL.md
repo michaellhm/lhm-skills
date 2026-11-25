@@ -175,4 +175,4 @@ For a monthly or quarterly review, `--since` the version you presented last time
 ## Related skills
 
 - `keyword-research` — demand, intent and keyword choice for each new or enhanced page.
-- `content-gap-analysis` — finds the topic gaps that justify the pages in the plan.
+- `taya-question-discovery` — finds the buyer questions that justify the pages in the plan.

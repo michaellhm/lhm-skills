@@ -184,8 +184,5 @@ Save to: `content-strategy/YYYY-MM/taya-question-discovery-[business-type].md`
 
 ## Related Skills
 
-- **content-gap-analysis** — Deeper competitive content gap analysis
 - **keyword-research** — Pull volume and difficulty data for discovered questions
-- **content-strategy** — Plan the full content calendar from the question bank
 - **seo-content-writer** — Write the articles from the priority list
-- **competitor-alternatives** — Build comparison pages from the vs/comparison questions

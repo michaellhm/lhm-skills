@@ -1,6 +1,6 @@
 ---
 name: copywriting
-description: Use this when the user wants to write, rewrite, or improve marketing copy for any page — including homepage, landing pages, pricing pages, feature pages, about pages, or product pages. Also use this when the user says "write copy for," "improve this copy," "rewrite this page," "marketing copy," "headline help," or "CTA copy." For email copy, see email-sequence. For popup copy, see popup-cro.
+description: Use this when the user wants to write, rewrite, or improve marketing copy for any page — including homepage, landing pages, pricing pages, feature pages, about pages, or product pages. Also use this when the user says "write copy for," "improve this copy," "rewrite this page," "marketing copy," "headline help," or "CTA copy." 
 ---
 ## Client file routing
 
@@ -40,18 +40,18 @@ Gather this context (ask if not provided):
 
 ---
 
-## Mandatory: Route Long-Form Writing Through content-writer Agent
+## Mandatory: Route Long-Form Writing Through the 8-Pass Pipeline
 
-Long-form content (over 300 words or page-level web/blog copy) goes through the 8-pass pipeline. This skill is responsible for:
+Long-form content (over 300 words or page-level web/blog copy) goes through the 8-pass pipeline. `agents/content.md` runs the 8-pass pipeline from `${CLAUDE_PLUGIN_ROOT}/references/8-pass-writing-engine.md`. This skill is responsible for:
 
 1. Research and brief construction
 2. Outline planning
-3. Building a `structured_brief` for the content-writer (target keyword, intent, outline, internal/external link targets, client voice notes from `brain/Content Rules.md` and `brain/Profile.md`)
-4. Calling the content-writer agent with `content_type: "page-copy"` and the structured brief
+3. Building a structured brief for the pipeline (target keyword, intent, outline, internal/external link targets, client voice notes from `brain/Content Rules.md` and `brain/Profile.md`)
+4. Running the pipeline through `agents/content.md` with content type `page-copy` and the structured brief
 5. Saving returned content to the agreed output path
 6. Final SEO validation (primary keyword density, internal link count, meta description) where applicable
 
-Do not generate the body content directly. Delegate to content-writer.
+Do not generate the body content in a single pass.
 
 ---
 
@@ -94,7 +94,7 @@ Each section should advance one argument. Build a logical flow down the page.
 - Exclamation points? (remove them)
 - Marketing buzzwords without substance?
 
-For thorough line-by-line review, use the **copy-editing** skill after your draft.
+For a thorough line-by-line review, run the anti-AI editor stage and `content-quality-auditor` after your draft (see `content-rollout`).
 
 ---
 
@@ -259,8 +259,6 @@ For headlines and CTAs, provide 2-3 options:
 
 ## Related Skills
 
-- **copy-editing**: For polishing existing copy (use after your draft)
-- **page-cro**: If page structure/strategy needs work, not just copy
-- **email-sequence**: For email copywriting
-- **popup-cro**: For popup and modal copy
-- **ab-test-setup**: To test copy variations
+- **seo-content-writer**: For search-led blog posts and service pages
+- **content-quality-auditor**: Independent editorial QA of the finished copy
+- **content-rollout**: For page rounds on a client Astro site

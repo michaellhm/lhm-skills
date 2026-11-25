@@ -111,7 +111,7 @@ Present the draft email to the user. Ask:
 
 ## Step 4: Save
 
-Save to: `client_updates/YYYY-MM/client-update-YYYY-MM-DD.md` inside the client folder.
+Save to: `client-update-email/YYYY-MM/client-update-YYYY-MM-DD.md` under the registered client work root.
 
 ## Step 5: Draft Delivery
 
@@ -159,10 +159,8 @@ Never send without the user's explicit approval of the final draft.
 
 ## Related Skills
 
-- **google-ads-monthly-review** — often triggers the need for a client update
-- **seo-audit** — another common trigger for client communication
-- **ga-dashboard** — data source for update emails
+- **content-rollout** — the content round whose client email this skill drafts
 
 ## Rules
 
-- Folder contract: save drafts under `client/skill_name/YYYY-MM/` in the registered client work root.
+- Folder contract: save drafts under `client-update-email/YYYY-MM/` in the registered client work root.

@@ -182,7 +182,7 @@ Score each dimension's 10 items. Here are the key items per dimension:
 - E09: Reader questions anticipated and answered
 - E10: Clear next steps / CTA
 
-**Experience (Exp01-Exp10)**, **Expertise (Ept01-Ept10)**, **Authoritativeness (A01-A10)**, **Trustworthiness (T01-T10)**: See [CORE-EEAT Benchmark](./references/core-eeat-benchmark.md) for all 80 items.
+**Experience (Exp01-Exp10)**, **Expertise (Ept01-Ept10)**, **Authoritativeness (A01-A10)**, **Trustworthiness (T01-T10)**
 
 ### 3. Generate Scorecard
 
@@ -244,11 +244,7 @@ Score each dimension's 10 items. Here are the key items per dimension:
 
 ## Reference Materials
 
-- [CORE-EEAT Benchmark](./references/core-eeat-benchmark.md) — full 80-item checklist with Pass/Partial/Fail criteria for all items
 
 ## Related Skills
 
 - **seo-content-writer** — create content that scores well
-- **geo-content-optimizer** — optimize for AI citations (GEO score)
-- **content-refresher** — update content to improve scores
-- **seo-audit** — broader site-level SEO diagnostics

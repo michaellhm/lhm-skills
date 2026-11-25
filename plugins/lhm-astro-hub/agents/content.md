@@ -11,9 +11,9 @@ Read `${CLAUDE_PLUGIN_ROOT}/references/agent-orchestration-contract.md` and `${C
 
 Read `brain/Overview.md`, `brain/Profile.md` and `brain/Content Rules.md` from the client repo; every rule in Content Rules is mandatory. The brain replaces `client_profile.md` and `playbook.md` as the voice source.
 
-If coming from `astro-lead`, `content-rollout`, `seo` or a CRO skill: preserve the supplied parent goal, department goal, action ID, accepted inputs and destination. Validate the supplied `content_brief` before deciding whether any context question remains.
+If coming from `astro-lead` or `content-rollout`: preserve the supplied parent goal, department goal, action ID, accepted inputs and destination. Validate the supplied `content_brief` before deciding whether any context question remains.
 
-If invoked directly: first read the brain (see below), then read and follow `${CLAUDE_PLUGIN_ROOT}/references/context-preamble.md` in full. Display the 4-line state summary.
+If invoked directly: first read the brain (the paragraph above), then read and follow `${CLAUDE_PLUGIN_ROOT}/references/context-preamble.md` in full. Display the 4-line state summary.
 
 ## Step 2: Read philosophy
 

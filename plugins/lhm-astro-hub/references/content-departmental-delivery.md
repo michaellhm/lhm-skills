@@ -30,14 +30,10 @@ Use this contract whenever approved work creates or materially changes customer-
 
 | Capability | Owning role | Final copy authority |
 |---|---|---|
-| Landing-page audit and CRO diagnosis | `landing-page-optimizer` | Brief only |
-| Competitive analysis, content gaps, TAYA and keyword research | Relevant strategy/research skill | Research input only |
-| Content strategy | `content-strategy` | Strategy and brief input only |
-| Page and conversion copy | `copywriting`, `service-page-generator`, `seo-content-writer` or `content-refresher` | Content Department after QA |
-| Comparison pages | `competitor-alternatives` | Content Department after QA |
-| Copy revision | `copy-editing` | Content Department after QA |
-| Ads, metadata, social and email | Their constrained specialist skill | Content Department acceptance when part of a staged project |
-| GEO optimisation | `geo-content-optimizer` | Brief or verification unless explicitly dispatched to revise accepted copy |
+| TAYA and keyword research | `taya-question-discovery`, `keyword-research` | Research input only |
+| Page and conversion copy | `copywriting` or `seo-content-writer` | Content Department after QA |
+| Copy revision | The anti-AI editor stage in `content-rollout` | Content Department after QA |
+| Page metadata | `seo-page-brief` mapping, written by `seo-content-writer` | Content Department acceptance when part of a staged project |
 | Editorial verification | `content-quality-auditor` | QA verdict, not strategy ownership |
 
 ## Accepted content brief

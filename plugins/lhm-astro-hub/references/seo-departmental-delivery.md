@@ -122,11 +122,11 @@ Select the best installed specialist by capability, inputs, output contract and 
 | Required capability | Skills to consider |
 |---|---|
 | Keyword and intent evidence | `keyword-research` |
-| Content opportunity gaps | `content-gap-analysis` |
+| Buyer-question gaps | `taya-question-discovery` |
 | Page briefs | `seo-page-brief` |
 | New page content brief | `seo-page-brief` or `seo-content-writer` in brief mode, then Content Lead |
-| Existing page improvement brief | `content-refresher` in diagnosis/brief mode, then Content Lead |
-| Technical diagnosis | `seo-audit` or the applicable technical skill |
+| Existing page improvement brief | `seo-page-brief`, then Content Lead |
+| Technical diagnosis | `site-launch-qa` or the applicable technical skill |
 | Independent department QA | `seo-delivery-qa` |
 
 These are candidates, not a rigid sequence. Let the specialist skill own method. The Lead supplies the goal, bounded objective, accepted evidence, permissions, required output and completion test.

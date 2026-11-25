@@ -35,18 +35,18 @@ Creates search-engine-optimized content that ranks well while providing genuine 
 6. **Featured Snippet Optimization** — formats for SERP feature opportunities
 7. **CORE-EEAT Compliance** — applies quality standards during writing
 
-## Mandatory: Route Long-Form Writing Through content-writer Agent
+## Mandatory: Route Long-Form Writing Through the 8-Pass Pipeline
 
-Long-form content (over 300 words or page-level web/blog copy) goes through the 8-pass pipeline. This skill is responsible for:
+Long-form content (over 300 words or page-level web/blog copy) goes through the 8-pass pipeline. `agents/content.md` runs the 8-pass pipeline from `${CLAUDE_PLUGIN_ROOT}/references/8-pass-writing-engine.md`. This skill is responsible for:
 
 1. Validate the accepted research and approved brief supplied for this bounded writing action
-2. Build the `structured_brief` for the content-writer without silently changing the accepted strategy (target keyword, intent, outline, internal/external link targets, and approved voice notes)
-3. Call the content-writer agent with `content_type: "blog-post"` and the structured brief
+2. Build the structured brief for the pipeline without silently changing the accepted strategy (target keyword, intent, outline, internal/external link targets, and approved voice notes from `brain/Content Rules.md`)
+3. Run the pipeline through `agents/content.md` with content type `blog-post` and the structured brief
 4. Save returned content to the exact registered output destination
 5. Read the saved artefact back and return its verified identity
-6. Perform only the completion checks assigned to this writing action; independent SEO/content QA remains a later Lead-dispatched stage
+6. Perform only the completion checks assigned to this writing action; independent SEO/content QA remains a later Lead-dispatched stage (`content-quality-auditor`)
 
-Do not generate the body content directly. Delegate to content-writer.
+Do not generate the body content in a single pass.
 
 When invoked by an SEO Lead, this is one bounded writing stage. Do not redo accepted keyword research or page-brief work, do not perform the later independent QA stage, and do not start website implementation. If a required accepted input or registered Drive destination is absent or contradictory, return canonical state `needs_context` to the SEO Lead with the precise gap, Context & Research owner and resume point. Supply legacy `work_state: needs_review` only when an older schema requires it.
 
@@ -102,7 +102,6 @@ Use frontmatter fields `title`, `seo_title`, `meta_description`, `slug`, `primar
 
 Requirements: include primary keyword (preferably at start), under 60 characters, compelling and click-worthy, match search intent.
 
-See [Title Formulas](./references/title-formulas.md) for proven headline patterns.
 
 ```markdown
 ### Title Options
@@ -217,7 +216,6 @@ Follow this structure for the actual content:
 - **How-To Guide** — 1,200-2,000 words. Prerequisites → numbered steps → troubleshooting → FAQ
 - **Pillar Page** — 3,000-5,000 words. Chapters with deep coverage, internal links to cluster content
 
-See [Content Structure Templates](./references/content-structure-templates.md) for detailed templates.
 
 ## Validation Checkpoints
 
@@ -245,13 +243,9 @@ Preserve `parent_goal`, `department_goal` and `action_id` in the return. Include
 
 ## Reference Materials
 
-- [Title Formulas](./references/title-formulas.md) — proven headline formulas, power words, CTR patterns
-- [Content Structure Templates](./references/content-structure-templates.md) — templates for blog posts, comparisons, listicles, how-tos, pillar pages
 
 ## Related Skills
 
 - **keyword-research** — find keywords to target
-- **geo-content-optimizer** — optimize content for AI citations
-- **meta-tags-optimizer** — create compelling meta tags
 - **content-quality-auditor** — run a full CORE-EEAT quality audit
-- **content-gap-analysis** — identify what content to create
+- **seo-page-brief** — the brief this skill writes from

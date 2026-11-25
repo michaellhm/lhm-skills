@@ -245,7 +245,7 @@ Use Astro's recommended strict config:
 
 ## 3. Converting from HTML prototype
 
-This is the Phase 5 workflow for Astro builds. The HTML prototype (from `html-prototype` or `lp-prototype` skill) is the approved design source of truth.
+This is the Phase 5 workflow for Astro builds. The HTML prototype (from the `astro-prototype` skill) is the approved design source of truth.
 
 ### 3.1 Conversion order
 

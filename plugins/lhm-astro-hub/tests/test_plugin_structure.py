@@ -99,7 +99,7 @@ class PluginStructure(unittest.TestCase):
                     continue
                 if target.startswith("${CLAUDE_PLUGIN_ROOT}/"):
                     continue
-                if not target.startswith(("../", "references/")):
+                if not target.startswith(("../", "./", "references/")):
                     continue
                 path = target.split("#", 1)[0]
                 self.assertTrue((f.parent / path).exists(), f"{f}: broken link {target}")
@@ -114,6 +114,11 @@ class PluginStructure(unittest.TestCase):
             text = path.read_text()
             for needle in needles:
                 self.assertIn(needle, text, f"{rel}: missing required text {needle!r}")
+
+    def test_no_stray_files(self):
+        bad = [f for f in PLUGIN_ROOT.rglob("*")
+               if f.is_file() and (f.name == ".DS_Store" or f.name.endswith(("-e", "~", ".orig", ".bak", ".rej")))]
+        self.assertEqual(bad, [], f"stray/backup files: {bad}")
 
     def test_learned_clean(self):
         for f in plugin_files("LEARNED.md"):
