@@ -18,9 +18,9 @@ Given no verified offer or CTA, the skill records the gap and returns `needs_con
 
 Pass when no offer, guarantee or pricing claim is invented.
 
-## Test 4: Drive readback
+## Test 4: Destination readback
 
-Given a registered Drive folder, the skill saves the brief, verifies its observed parent and returns the file ID and URL.
+Given the verified client work root (or a registered Drive folder), the skill saves the brief in `pages/<page-key>/`, verifies its observed parent and returns the path (or Drive file ID and URL).
 
 Pass when a local file alone is not reported as completed.
 

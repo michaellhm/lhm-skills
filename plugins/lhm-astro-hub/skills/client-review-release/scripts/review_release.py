@@ -10,7 +10,10 @@ import os
 from pathlib import Path
 import tempfile
 
-REGISTER = '.lhm-review/client-review.json'
+REVIEW_DIR = '.lhm-review'
+REGISTER = REVIEW_DIR + '/client-review.json'
+CONFIG = REVIEW_DIR + '/client-config.json'
+LOCK = REVIEW_DIR + '/review.lock'
 PROJECT = 'brain/Project.md'
 SITE = 'site'
 PAGES_DIR = SITE + '/src/pages'
@@ -151,7 +154,12 @@ def propose(root, config, release):
 
 @contextmanager
 def locked(root):
-    path = safe(root, '.client-review.lock')
+    # The lock lives in .lhm-review/ (gitignored). If the lock alone created that
+    # folder, remove it again so a refused operation leaves nothing behind.
+    folder = safe(root, REVIEW_DIR)
+    created = not folder.exists()
+    folder.mkdir(exist_ok=True)
+    path = safe(root, LOCK)
     try:
         fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     except FileExistsError as exc:
@@ -162,6 +170,11 @@ def locked(root):
         yield
     finally:
         path.unlink()
+        if created:
+            try:
+                folder.rmdir()
+            except OSError:
+                pass
 
 
 def atomic_write(path, text):
@@ -183,7 +196,8 @@ STATUS_TEXT = {'approved': 'approved', 'awaiting-review': 'awaiting client revie
 def render_project(reg):
     """brain/Project.md: brain-note frontmatter, then one '## Round <id>' group per release."""
     client = reg.get('client', '') or ''
-    lines = ['---', 'type: project', f'client: {client}', f'updated: {date.today().isoformat()}',
+    # JSON string syntax is valid YAML double-quoted syntax, so colons and quotes stay safe.
+    lines = ['---', 'type: project', f'client: {json.dumps(client, ensure_ascii=False)}', f'updated: {date.today().isoformat()}',
              'sources: []', '---', '', '# Project', '',
              'Generated from .lhm-review/client-review.json. Use review-website to record decisions.', '']
     pages = {p['id']: p for p in reg.get('pages', [])}
@@ -202,14 +216,15 @@ def render_project(reg):
 
 
 def save(root, reg):
-    # Validate both destinations before writing either. JSON is authoritative;
-    # render CLI repairs the derived checklist if its write fails.
+    # Validate every destination before writing any. JSON is authoritative;
+    # render CLI repairs the derived checklist if its write fails. The config
+    # is always written (created if missing) so client_identity reaches the
+    # file detect_stage.py reads.
     jp, mp = safe(root, REGISTER), safe(root, PROJECT)
-    cp = safe(root, '.lhm-review/client-config.json')
+    cp = safe(root, CONFIG)
     jp.parent.mkdir(parents=True, exist_ok=True)
     mp.parent.mkdir(parents=True, exist_ok=True)
-    if cp.exists():
-        atomic_write(cp, json.dumps(reg['config'], indent=2, ensure_ascii=False) + '\n')
+    atomic_write(cp, json.dumps(reg['config'], indent=2, ensure_ascii=False) + '\n')
     atomic_write(jp, json.dumps(reg, indent=2, ensure_ascii=False) + '\n')
     atomic_write(mp, render_project(reg))
 

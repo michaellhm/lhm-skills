@@ -164,13 +164,7 @@ Write the style guide into the client repo's `brain/Brand.md`, keeping its front
 
 Set `updated` to today's date and fill `sources` with where this came from: the UI UX Pro Max run (with the query used), the prototype path, and any client brand material. A `Brand.md` with no `> gap:` lines is treated as "brand written" by the stage detector, so do not leave a placeholder behind, and do not remove a gap that you have not filled.
 
-Then commit and push the client repo to `main`:
-
-```bash
-git add brain/Brand.md
-git commit -m "docs(brain): write brand style guide from prototype"
-git push
-```
+**Write it locally only. Do not commit or push `brain/Brand.md` yet.** A pushed `Brand.md` moves the stage detector on to `astro-build`, so it is committed in Step 9, only after the client approves the prototype. If the design changes during review, update the local `Brand.md` to match the version being reviewed.
 
 ## Step 7: Publish the prototype (after explicit approval)
 
@@ -203,6 +197,23 @@ Options: "Approved", "Changes needed", "Create another page prototype", "Create 
 
 If several versions exist, record which one was approved (for example "v2 approved"). The Astro build starts only from an approved prototype. Changes go in as a new version or a revised page, never by overwriting history.
 
+## Step 9: Record the approval, then push `Brand.md`
+
+Only after the client's explicit approval:
+
+1. Record the prototype approval in the internal project file (LHM Knowledge vault, per the routing contract): the approved version and its `lhm-prototype/<client>/` path, who approved it, when, and the evidence (for example the email or call). Read it back. `astro-lead`, `build-brain` and `astro-build` read the approved version from there.
+2. Make sure the local `brain/Brand.md` matches the approved version, then commit and push the client repo to `main`:
+
+   ```bash
+   git add brain/Brand.md
+   git commit -m "docs(brain): write brand style guide from approved prototype"
+   git push
+   ```
+
+3. Read the push result back and report the actual commit. If the push failed, say so.
+
+If the client has not approved, leave `Brand.md` uncommitted and report the prototype as awaiting approval.
+
 ## Handback
 
-Return the departmental handback per the delivery contract: prototype path, adopt/override/reject table location (`brain/Brand.md`), the `check_no_inline.py` result, the publish commit and URL (or "not published"), and the approval status.
+Return the departmental handback per the delivery contract: prototype path, adopt/override/reject table location (`brain/Brand.md`), the `check_no_inline.py` result, the publish commit and URL (or "not published"), the approval status and where it is recorded, and the `Brand.md` commit (or "not pushed: awaiting approval").

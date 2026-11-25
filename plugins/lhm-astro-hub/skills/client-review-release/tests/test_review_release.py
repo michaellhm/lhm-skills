@@ -207,7 +207,7 @@ class ReleaseTests(unittest.TestCase):
         self.apply(self.proposal({'id': 'round-2', 'routes': ['/services/new/'], 'questions': []}))
         text = (self.root / 'brain/Project.md').read_text()
         self.assertTrue(text.startswith('---\ntype: project\n'))
-        self.assertIn('client: Demo Clinic', text)
+        self.assertIn('client: "Demo Clinic"', text)
         self.assertIn('sources: []', text)
         first, second = text.index('## Round round-1'), text.index('## Round round-2')
         self.assertLess(first, second)
@@ -221,7 +221,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_render_project_without_client_has_empty_client(self):
         text = r.render_project({'pages': [], 'releases': []})
-        self.assertIn('\nclient: \n', text)
+        self.assertIn('\nclient: ""\n', text)
         self.assertIn('updated: ', text)
 
     def test_conservative_coverage_hashes_site_src(self):
@@ -229,6 +229,95 @@ class ReleaseTests(unittest.TestCase):
         self.write('site/src/components/Card.astro', 'card')
         self.assertEqual(len(self.proposal({'id': 'round-2'})['selected']), 1)
         self.assertEqual(self.proposal({'id': 'round-2'})['inventory']['dependency_policy'], 'conservative-all-site-src')
+
+    def test_save_creates_client_config_when_missing(self):
+        self.config['client_identity'] = {'github_login': 'client-user', 'commit_emails': ['1+client-user@users.noreply.github.com']}
+        self.assertFalse((self.root / '.lhm-review/client-config.json').exists())
+        self.apply(self.proposal())
+        installed = json.loads((self.root / '.lhm-review/client-config.json').read_text())
+        self.assertEqual(installed, self.config)
+        self.assertEqual(installed['client_identity']['github_login'], 'client-user')
+
+    def verified_site(self):
+        self.write('site/src/layouts/Base.astro', 'layout')
+        self.write('site/src/components/Card.astro', 'card')
+        self.write('site/src/components/Hero.astro', 'hero')
+        self.write('site/src/pages/about.astro', 'About')
+        self.write('site/src/pages/admin/index.astro', 'Admin')
+        self.write('site/src/pages/thank-you.astro', 'Thanks')
+        self.config['dependency_mapping_verified'] = True
+        self.config['pages'] = [
+            {'id': 'home', 'route': '/', 'sources': ['site/src/pages/index.astro'],
+             'dependencies': ['site/src/layouts/Base.astro', 'site/src/components/Hero.astro']},
+            {'id': 'about', 'route': '/about/', 'sources': ['site/src/pages/about.astro'],
+             'dependencies': ['site/src/layouts/Base.astro']},
+        ]
+        exclude = ['/admin/', '/thank-you/']
+        reg = self.apply(self.proposal({'id': 'round-1', 'questions': [], 'routes': ['/', '/about/'], 'exclude': exclude}))
+        for page_id in ['home', 'about']:
+            r.record_review(self.root, page_id, 'approved', 'Client', 'Explicit client approval', {})
+        # Round 2 adds one new page that uses its own component.
+        self.write('site/src/pages/services/new.astro', 'New service')
+        self.config['pages'].append({'id': 'new', 'route': '/services/new/', 'sources': ['site/src/pages/services/new.astro'],
+                                     'dependencies': ['site/src/layouts/Base.astro', 'site/src/components/Card.astro']})
+        self.write('site/src/components/Card.astro', 'card used by the new page')
+        return {'id': 'round-2', 'questions': [], 'routes': ['/services/new/'], 'exclude': exclude}
+
+    def statuses(self, reg):
+        return {p['id']: p['status'] for p in reg['pages']}
+
+    def test_verified_mapping_round_two_keeps_round_one_approvals(self):
+        release = self.verified_site()
+        p = self.proposal(release)
+        self.assertEqual(p['inventory']['dependency_policy'], 'verified')
+        self.assertEqual([x['route'] for x in p['selected']], ['/services/new/'])
+        self.assertEqual(sorted(x['route'] for x in p['excluded']), ['/admin/', '/thank-you/'])
+        reg = self.apply(p)
+        status = self.statuses(reg)
+        self.assertEqual(status['home'], 'approved')
+        self.assertEqual(status['about'], 'approved')
+        self.assertEqual(status['new'], 'awaiting-review')
+        self.assertNotIn('/admin/', [x['route'] for x in reg['pages']])
+        self.assertIn('- [x] / \u2014 approved', (self.root / 'brain/Project.md').read_text())
+
+    def test_verified_mapping_shared_layout_change_reopens_dependants(self):
+        release = self.verified_site()
+        self.write('site/src/layouts/Base.astro', 'changed shared layout')
+        reg = self.apply(self.proposal(release))
+        status = self.statuses(reg)
+        self.assertEqual(status['home'], 'awaiting-review')
+        self.assertEqual(status['about'], 'awaiting-review')
+        home = next(x for x in reg['pages'] if x['id'] == 'home')
+        self.assertTrue(home['approval_history'])
+        self.assertNotIn('approval', home)
+
+    def test_verified_mapping_unlisted_component_change_keeps_approval(self):
+        release = self.verified_site()
+        # Card.astro already changed, but only the new page lists it.
+        reg = self.apply(self.proposal(release))
+        self.assertEqual(self.statuses(reg)['about'], 'approved')
+        self.write('site/src/components/Hero.astro', 'changed hero')
+        self.assertEqual([x['route'] for x in self.proposal({'id': 'round-3', 'questions': [], 'exclude': ['/admin/', '/thank-you/']})['selected']], ['/', '/services/new/'])
+
+    def test_lock_lives_in_lhm_review(self):
+        with r.locked(self.root):
+            self.assertTrue((self.root / '.lhm-review/review.lock').exists())
+            self.assertFalse((self.root / '.client-review.lock').exists())
+        self.assertFalse((self.root / '.lhm-review/review.lock').exists())
+        self.assertFalse((self.root / '.lhm-review').exists())
+
+    def test_lock_refuses_second_writer(self):
+        with r.locked(self.root):
+            with self.assertRaises(ValueError):
+                with r.locked(self.root):
+                    pass
+        self.assertFalse((self.root / '.lhm-review').exists())
+
+    def test_client_name_with_colon_is_quoted(self):
+        text = r.render_project({'client': 'Smith: Physio "&" Co', 'pages': [], 'releases': []})
+        self.assertIn('\nclient: "Smith: Physio \\"&\\" Co"\n', text)
+        line = next(l for l in text.splitlines() if l.startswith('client: '))
+        self.assertEqual(json.loads(line[len('client: '):]), 'Smith: Physio "&" Co')
 
     def test_register_lives_in_lhm_review(self):
         self.apply(self.proposal())
@@ -308,6 +397,54 @@ class InstallationTests(unittest.TestCase):
             self.assertFalse((root / 'skills').exists())
             self.assertFalse((root / '.lhm-review').exists())
             self.assertEqual(p.read_text(), 'Client custom skill')
+
+    def test_install_appends_gemini_skill_list(self):
+        mod = load_installer()
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            original = '# Demo\n\n- Read `README.md` first.\n'
+            (root / 'GEMINI.md').write_text(original)
+            mod.install(root, 'explicit operator approval')
+            text = (root / 'GEMINI.md').read_text()
+            self.assertTrue(text.startswith(original))
+            for name in ['start-website', 'review-website', 'share-preview', 'finish-review']:
+                self.assertIn(f'skills/{name}/SKILL.md', text)
+            mod.install(root, 'explicit operator approval')
+            self.assertEqual((root / 'GEMINI.md').read_text(), text)
+            self.assertEqual(text.count(mod.GEMINI_START), 1)
+
+    def test_install_creates_gemini_when_missing(self):
+        mod = load_installer()
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            mod.install(root, 'explicit operator approval')
+            self.assertIn('skills/review-website/SKILL.md', (root / 'GEMINI.md').read_text())
+
+    def test_install_refuses_edited_gemini_block(self):
+        mod = load_installer()
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / 'GEMINI.md').write_text('# Demo\n')
+            mod.install(root, 'explicit operator approval')
+            edited = (root / 'GEMINI.md').read_text().replace('review-website', 'my-review')
+            (root / 'GEMINI.md').write_text(edited)
+            manifest = (root / '.lhm-review/manifest.json').read_text()
+            with self.assertRaises(ValueError):
+                mod.install(root, 'explicit operator approval')
+            self.assertEqual((root / 'GEMINI.md').read_text(), edited)
+            self.assertEqual((root / '.lhm-review/manifest.json').read_text(), manifest)
+
+    def test_install_conflict_leaves_gemini_untouched(self):
+        mod = load_installer()
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / 'GEMINI.md').write_text('# Demo\n')
+            p = root / '.claude/skills/review-website/SKILL.md'
+            p.parent.mkdir(parents=True)
+            p.write_text('Client custom skill')
+            with self.assertRaises(ValueError):
+                mod.install(root, 'explicit operator approval')
+            self.assertEqual((root / 'GEMINI.md').read_text(), '# Demo\n')
 
 class CliTests(unittest.TestCase):
     def test_managed_output_refused_before_mutation(self):

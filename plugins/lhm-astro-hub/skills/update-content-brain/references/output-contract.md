@@ -31,15 +31,15 @@ Detailed raw diffs and corpus live in the registered client work root under `bra
 Prepare a JSON manifest from verified approval evidence. The review register stores each approval (person, evidence, timestamp, approved fingerprint) but no Git SHA, so the operator resolves each `approved_revision` from the approval commit and records it; a page with no verifiable revision is a gap and stays out of the manifest. Each page must have `route`, `approved_revision`, `approval_evidence` and a nonempty list of repo-relative textual `sources`. Each supplied approved revision must identify the content the client actually reviewed; do not set HEAD simply to make the check pass. Map dynamic routes to their individual data files plus renderer, not every source file in the repo.
 
 ```json
-{"pages":[{"route":"/services/example/","approved_revision":"<verified Git SHA>","approval_evidence":"<review event/link and approver>","sources":["src/data/services/example.json","src/pages/services/[slug].astro"]}]}
+{"pages":[{"route":"/services/example/","approved_revision":"<verified Git SHA>","approval_evidence":"<review event/link and approver>","sources":["site/src/data/services/example.json","site/src/pages/services/[slug].astro"]}]}
 ```
 
 Invoke with a previously inspected baseline and known client identities:
 
 ```sh
-python3 scripts/collect_evidence.py --repo /verified/site --manifest /work-root/brain-updates/RUN_ID/pages.json \
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/update-content-brain/scripts/collect_evidence.py --repo CLIENT_REPO --manifest /work-root/brain-updates/RUN_ID/pages.json \
   --since <comparison-sha> --head <head-sha> --client-email client@example.org \
   --output /work-root/brain-updates/RUN_ID/evidence.json
 ```
 
-The collector resolves revisions, requires a clean tracked worktree, rejects path escapes and public outputs, checks baseline ancestry, compares source blobs against their approved revision, and saves untruncated text/diffs. Candidate author matches are evidence to inspect, not authenticated client intent. It covers only manifest paths: client-requested agency edits, review discussions and asset changes require separate inspection and must be included in the final coverage statement. It does not fetch/clone, post to GitHub or modify approvals. Missing Git objects or files are errors, not successful partial capture.
+The collector resolves revisions, requires a clean tracked worktree, rejects path escapes and any `--output` inside `--repo`, checks baseline ancestry, compares source blobs against their approved revision, and saves untruncated text/diffs. Candidate author matches are evidence to inspect, not authenticated client intent. It covers only manifest paths: client-requested agency edits, review discussions and asset changes require separate inspection and must be included in the final coverage statement. It does not fetch/clone, post to GitHub or modify approvals. Missing Git objects or files are errors, not successful partial capture.

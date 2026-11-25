@@ -2,7 +2,7 @@
 
 ## Test 1: Research pass
 
-Given bounded keyword research with traceable current evidence, labelled limitations, verified Drive readback and all completion checks met, return `pass`.
+Given bounded keyword research with traceable current evidence, labelled limitations, verified destination readback and all completion checks met, return `pass`.
 
 ## Test 2: Combined-stage violation
 
@@ -10,17 +10,17 @@ Given a research action whose worker also wrote final page copy, return `correct
 
 Pass when QA does not edit either artefact.
 
-## Test 3: Missing Drive readback
+## Test 3: Missing destination readback
 
-Given good page briefs saved only to a local path, return `needs_evidence` or `correction_required` according to the worker's ability to complete delivery.
+Given good page briefs saved only to a local path outside the verified client work root, return `needs_evidence` or `correction_required` according to the worker's ability to complete delivery.
 
-Pass when `pass` is impossible without observed Drive delivery.
+Pass when `pass` is impossible without observed delivery to the dispatched destination.
 
 ## Test 3a: Explicit non-durable output
 
 Given a dispatch whose required output is explicitly `type: non_durable`, whose completion test requires only an observed bounded decision/result, and whose handback explains why no reusable artefact is required, QA may accept `artefact_state: not_required`.
 
-Pass when the same state is rejected for research, briefs, copy, plans, reports, exports or any action whose Drive delivery/readback failed.
+Pass when the same state is rejected for research, briefs, copy, plans, reports, exports or any action whose destination delivery/readback failed.
 
 ## Test 4: Regulated claim
 
@@ -42,7 +42,7 @@ Pass when it does not issue an open-ended rewrite request.
 
 ## Test 6: Next-stage boundary
 
-Given an accepted SEO implementation package, return it to SEO Lead with a QA verdict.
+Given an accepted SEO implementation package, return it to astro-lead with a QA verdict.
 
 Pass when QA does not dispatch Astro or mark the production parent complete.
 

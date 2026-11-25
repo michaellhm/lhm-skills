@@ -18,7 +18,7 @@ The build stage. Converts the approved plain-HTML prototype into a production As
 1. Read `${CLAUDE_PLUGIN_ROOT}/skills/astro-build/LEARNED.md`
 2. Read `${CLAUDE_PLUGIN_ROOT}/references/astro-build-standard.md`. It is the source of truth for all conventions. Where it shows `<client>-site/` as the project root, the project root is `site/` in the client repo.
 3. Read `${CLAUDE_PLUGIN_ROOT}/references/website-departmental-delivery.md` and validate the dispatch envelope. Read `${CLAUDE_PLUGIN_ROOT}/references/delivery-artifact-contract.md` before producing the artefact.
-4. Read `brain/Profile.md` (business name, locations, contacts) and `brain/Brand.md` (colour tokens, typography, spacing, style guide written by `astro-prototype`) in the client repo.
+4. Read the client's contact, location and booking details (business name, addresses, phone, email, booking URL, production domain) from the client overview in the internal LHM Knowledge vault or other verified client records, resolved per `${CLAUDE_PLUGIN_ROOT}/references/obsidian-context-contract.md`. `brain/Profile.md` is not filled until `build-brain`, after this stage, so do not source these details from it. If a detail is not verified, ask; never invent it. Read `brain/Brand.md` (colour tokens, typography, spacing, style guide written by `astro-prototype`) in the client repo.
 5. Confirm the prototype exists and is approved: `lhm-prototype/<client>/` (plain HTML with `assets/css`, `assets/js`, `assets/images`), from `astro-prototype`. Read its CSS for the real token values.
 6. Confirm the client repo is cloned (default `~/Documents/Projects/<client>/<slug>/`) and has `site/`.
 7. Read `${CLAUDE_PLUGIN_ROOT}/references/anti-ai-writing-guidelines.json`. Australian English, no em or en dashes in customer copy, no invented facts, prices, staff or results, AHPRA rules where they apply.
@@ -74,7 +74,7 @@ export default defineConfig({
 })
 ```
 
-Ask the user for the production domain if it is not in `brain/Profile.md`. If the domain is not confirmed yet, use a placeholder but flag it prominently in the internal project file's notes — sitemap and canonical URLs won't be correct until this is set.
+Ask the user for the production domain if it is not in the verified client records. If the domain is not confirmed yet, use a placeholder but flag it prominently in the internal project file's notes — sitemap and canonical URLs won't be correct until this is set.
 
 ## Step 3: Create Global Styles
 
@@ -182,7 +182,7 @@ h1, h2, h3, h4, h5, h6 {
 
 ### `src/components/BaseHead.astro`
 
-Create this component to own all `<head>` content. Populate from `brain/Profile.md` (business name, site URL).
+Create this component to own all `<head>` content. Populate from the verified client records (business name, site URL).
 
 Before wiring the component:
 - Replace Astro's default favicon with a favicon based on the approved client brand.
@@ -202,7 +202,7 @@ interface Props {
 }
 
 const { title, description, image, canonicalURL } = Astro.props
-const siteTitle = '[Client Business Name]'  // from brain/Profile.md
+const siteTitle = '[Client Business Name]'  // from the verified client records
 ---
 
 <meta charset="UTF-8" />
@@ -320,7 +320,7 @@ const navLinks = [
 
 ### `src/components/Footer.astro`
 
-Lift the `<footer>` HTML from the prototype. Pull business details from `brain/Profile.md`:
+Lift the `<footer>` HTML from the prototype. Pull business details from the verified client records:
 
 ```astro
 ---
@@ -336,7 +336,7 @@ const currentYear = new Date().getFullYear()
       <!-- footer nav links -->
     </nav>
     <div class="footer-contact">
-      <!-- phone, email from brain/Profile.md -->
+      <!-- phone, email from the verified client records -->
     </div>
     <p class="footer-legal">© {currentYear} [Client Name]. All rights reserved.</p>
   </div>
@@ -406,7 +406,7 @@ Go through the approved prototype section by section. For each section with text
 - `src/content/services/<slug>.md` — one per service (from the services section or sitemap)
 - `src/content/locations/<suburb-slug>.md` — one per location (from the locations section)
 
-Pull address, phone and booking data from `brain/Profile.md`, not the prototype (the prototype may have placeholder data).
+Pull address, phone and booking data from the client overview in the internal vault or other verified client records. If a detail is missing or unverified, ask the user; never invent it.
 
 **Rule:** if a string appears once and is unlikely to change, it's fine in the component. If it appears in a prominent position or a client will want to update it, it goes in a `.md` file.
 
@@ -525,7 +525,7 @@ If the answer to the form question in Step 0 was yes, stop here and run `astro-f
 
 ## Step 9: JSON-LD for Local Business
 
-Add a `LocalBusiness` JSON-LD block to `BaseLayout.astro`. Pull data from `brain/Profile.md`:
+Add a `LocalBusiness` JSON-LD block to `BaseLayout.astro`. Pull data from the verified client records:
 
 ```astro
 ---
@@ -533,7 +533,7 @@ const schema = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   "name": "[Client Name]",
-  "description": "[From brain/Profile.md]",
+  "description": "[From the verified client records]",
   "url": "[site URL]",
   "telephone": "[Phone]",
   "address": {

@@ -11,8 +11,8 @@ You are the Department Lead for Astro website delivery. You own sequencing, depe
 
 Read three sources, and keep them distinct.
 
-1. **Internal project file.** In the LHM Knowledge vault, read `20 Clients/<client>/project-management/` and `Current Projects.md`, resolved as `${CLAUDE_PLUGIN_ROOT}/references/obsidian-context-contract.md` describes. This holds the sitemap status, approvals, blockers and next owner. If the vault or the client folder cannot be resolved, say so as a gap. Do not guess a location.
-2. **Client repo.** Run `python3 ${CLAUDE_PLUGIN_ROOT}/skills/start-astro/scripts/detect_stage.py <repo>` and read its facts and `next_stage`. If there is no repo yet, the stage is `repo-setup` once the sitemap is approved.
+1. **Internal project file.** In the LHM Knowledge vault, read `20 Clients/<client>/project-management/` and `Current Projects.md`, resolved as `${CLAUDE_PLUGIN_ROOT}/references/obsidian-context-contract.md` describes. This holds the sitemap status, the recorded prototype approval (approved version and evidence), other approvals, blockers and next owner. If the vault or the client folder cannot be resolved, say so as a gap. Do not guess a location.
+2. **Client repo.** Run `python3 ${CLAUDE_PLUGIN_ROOT}/skills/start-astro/scripts/detect_stage.py <repo>` and read its facts and `next_stage`. If there is no repo yet, the stage is `repo-setup`.
 3. **`brain/Project.md`** in the repo: the per-round review checklist, generated from the review register.
 
 ## Step 2: Report
@@ -23,9 +23,12 @@ Tell the user in a few lines: the stage, what is done, what is next, and who own
 
 If the internal file and the repo disagree (for example the file says the prototype is approved but `Brand.md` still has `> gap:` lines, or the file says a round is approved but `brain/Project.md` shows pages awaiting review), report both sides and ask which is right. Do not pick one. Do not edit either to make them agree until the user decides.
 
-## Step 4: Check the sitemap before repo-setup
+## Step 4: Apply the internal-file gates
 
-The sitemap is a work-folder artefact, tracked by the internal project file, so `detect_stage.py` does not see it. Before running `repo-setup`, confirm the internal file records an approved sitemap. If it does not, the stage is `sitemap`: run `astro-sitemap`.
+The order is repo-setup, then sitemap, then prototype, then the build. The repo is created at project start, so `repo-setup` needs no earlier approval. Two approvals live only in the internal project file, so `detect_stage.py` cannot see them; apply them on top of its `next_stage`:
+
+1. **Approved sitemap, before every stage after `repo-setup`.** The sitemap is a work-folder artefact. If `next_stage` is anything other than `repo-setup` and the internal file does not record an approved sitemap, the stage is `sitemap`: run `astro-sitemap`.
+2. **Recorded prototype approval, before `astro-build` and every later stage.** `astro-prototype` writes `brain/Brand.md` locally during the prototype and pushes it only after the client approves, but a local `Brand.md` with no gaps already reads as "brand written". So if `next_stage` is `astro-build` or later and the internal file does not record the client's prototype approval (approved version, approver and evidence), the stage is still `prototype`.
 
 ## Step 5: Run the stage
 
@@ -39,7 +42,8 @@ Confirm the stage with the user, then run its skill.
 | astro-build | `astro-build` (forms through `astro-form`) |
 | build-brain | `build-brain` |
 | content-round | `content-rollout` |
-| client-review | Wait for the client. Remind them through `client-update-email`; record the reminder only once the email is approved and sent. |
+| lhm-fixes | `content-rollout` revisions: pages the client marked `needs-lhm` or `changes-underway` (counted as `lhm_owed`). Fix them, then release them again for review. |
+| client-review | Wait for the client: pages are `awaiting-review`. Remind them through `client-update-email`; record the reminder only once the email is approved and sent. |
 | update-content-brain | `update-content-brain` |
 
 Before launch, run `site-launch-qa` and then `website-delivery-qa`, and return the complete handback with observed checks, mutations, commit and URL. Claim a deployment only after reading back the URL and revision.

@@ -28,6 +28,7 @@ The brain (`brain/` in the client repo) is what future content rounds read befor
 - **Client identity.** Read `client_identity` (`github_login`, `commit_emails`) from the register config, which `.lhm-review/client-config.json` mirrors. If it is recorded, use it; pass each `commit_emails` value as `--client-email`, including the GitHub noreply form (`ID+login@users.noreply.github.com`), since commits are matched by author email. If it is absent, ask the operator to confirm the login and emails, using corroborating evidence such as the register's approver and the GitHub collaborator record, and add them to the config JSON used for the next `review_release.py scan`/`apply`. Never hand-edit only the installed file: the next apply rewrites it from the register. Do not guess an identity from a display name. If the identity cannot be confirmed, stop: with no client identity there is no evidence.
 - **Ignore LHM.** Commits by LHM, or by any author other than the client's confirmed identity, are skipped even when interleaved with the client's. Merge commits are ignored. A client commit that was squash-merged or rebased is read as the resulting commit by the client author.
 - **Head.** Choose a bounded head revision on `main` and record it.
+- **Attribution check.** If the register shows client approvals or answers but no commit in the range (or in the whole history) has an author email in `commit_emails`, report the gap **"client commits not attributable"**: the client may be committing under a different local Git email than the one recorded. Do not widen the match to other authors to fill it. Ask the operator to confirm the client's actual commit email (the client's `start-website` skill checks `git config user.email` against `client_identity.commit_emails`) and record it in the config for the next `review_release.py scan`/`apply`. Learning from the register's approvals and answers can still go ahead; say that commit evidence was not available.
 
 ## Step 2: Gather approval evidence
 
@@ -92,6 +93,7 @@ The next content round, `content-rollout`, reads `brain/Content Rules.md` plus t
 ## Self-review before finishing
 
 - [ ] Only the client's confirmed GitHub identity supplied evidence; LHM and merge commits were ignored.
+- [ ] If approvals exist but no client-attributed commits do, "client commits not attributable" is listed as a gap.
 - [ ] Every rule has an ID, scope, status and SHA-linked evidence; no proposed rule was promoted.
 - [ ] Scoped facts sit in their own notes with the SHA and date in `sources`.
 - [ ] The cursor marker was set once, to a head that was actually processed.

@@ -93,7 +93,7 @@ Read `references/sitemap-schema.md` and build the spec. `assets/example-sitemap.
 ## Step 7: Check the brief fields before asking for approval
 
 ```bash
-python3 scripts/page_brief_seed.py sitemap.json --check
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/astro-sitemap/scripts/page_brief_seed.py sitemap.json --check
 ```
 
 It lists every `new` or `enh` page missing `primary_keyword`, `audience` or `intent`, as `<page name>: <field>`, and exits 1 if there are any. Fix them and run it again. **The sitemap is not approvable while the check reports missing fields.** Do not present it for approval, and do not seed a brief from a page that fails the check.
@@ -101,11 +101,11 @@ It lists every `new` or `enh` page missing `primary_keyword`, `audience` or `int
 ## Step 8: Generate the deliverables
 
 ```bash
-python scripts/build_sitemap_html.py sitemap.json "‹Client›-Website-Content-Plan.html"
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/astro-sitemap/scripts/build_sitemap_html.py sitemap.json "‹Client›-Website-Content-Plan.html"
 ```
 
 ```bash
-python scripts/build_workbook.py sitemap.json "‹Client›-Website-Content-Plan.xlsx"
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/astro-sitemap/scripts/build_workbook.py sitemap.json "‹Client›-Website-Content-Plan.xlsx"
 ```
 
 The script prints which mode it rendered. Confirm it says **client (no widget)**.
@@ -148,7 +148,7 @@ This deliverable is worth regenerating, and the regenerated version is where mos
 Keep every version of `sitemap.json`, dated. As pages go live, flip their `status` from `new` to `have` and re-run against the previous file:
 
 ```bash
-python scripts/build_sitemap_html.py sitemap.json "‹Client›-Website-Content-Plan.html" --since sitemap-2026-04.json
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/astro-sitemap/scripts/build_sitemap_html.py sitemap.json "‹Client›-Website-Content-Plan.html" --since sitemap-2026-04.json
 ```
 
 That adds a **progress band** in place of a widget, plus a change chip on every page that moved:

@@ -65,7 +65,7 @@ seo_production_envelope:
   production_return: "astro-lead"
 ```
 
-Do not infer a Drive folder from a client name or from Claude Desktop's selected working folder. If `folder_id` is missing for a file-producing action, return `needs_context` with an exact owner and resume point.
+Do not infer a Drive folder from a client name or from Claude Desktop's selected working folder. In this plugin the verified client work root, with its `pages/<page-key>/` folder, is an accepted destination in place of a Drive `folder_id`. If neither is verified for a file-producing action, return `needs_context` with an exact owner and resume point.
 
 ## Reconcile and build a dynamic action register
 

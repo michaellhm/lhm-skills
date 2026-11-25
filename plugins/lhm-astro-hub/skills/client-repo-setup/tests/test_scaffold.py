@@ -92,6 +92,31 @@ class ScaffoldTest(unittest.TestCase):
         finally:
             stray.unlink()
 
+    def test_gitignore_written(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            written = self.run_scaffold(root)
+            self.assertIn(".gitignore", written)
+            lines = (root / ".gitignore").read_text(encoding="utf-8").splitlines()
+            for entry in (".DS_Store", ".lhm-review/*.lock", "site/.dev.vars", "node_modules/", "site/dist/"):
+                self.assertIn(entry, lines)
+
+    def test_existing_gitignore_refused(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root / ".gitignore").write_text("mine\n", encoding="utf-8")
+            with self.assertRaises(FileExistsError) as cm:
+                self.run_scaffold(root)
+            self.assertIn(".gitignore", str(cm.exception))
+            self.assertEqual((root / ".gitignore").read_text(encoding="utf-8"), "mine\n")
+
+    def test_profile_has_contact_section(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            self.run_scaffold(root)
+            text = (root / "brain" / "Profile.md").read_text(encoding="utf-8")
+            self.assertIn("## Contact and locations\n\n> gap: not yet captured", text)
+
     def test_changelog_marker(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)

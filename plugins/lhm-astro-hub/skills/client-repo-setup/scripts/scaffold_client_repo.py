@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scaffold a client repo: README, agent files, brain/ notes, site/ and skills/.
+"""Scaffold a client repo: README, .gitignore, agent files, brain/ notes, site/ and skills/.
 
 Refuses (FileExistsError, nothing written) if any target file already exists,
 so it can never overwrite client content.
@@ -10,11 +10,12 @@ import sys
 from pathlib import Path
 
 ASSETS = Path(__file__).resolve().parents[1] / "assets"
+DOTFILES = {".gitkeep", ".gitignore"}  # other dotfiles (e.g. .DS_Store) are never scaffolded
 
 
 def _templates():
     return sorted(p for p in ASSETS.rglob("*")
-                  if p.is_file() and (not p.name.startswith(".") or p.name == ".gitkeep"))
+                  if p.is_file() and (not p.name.startswith(".") or p.name in DOTFILES))
 
 
 def scaffold(root, client_name, client_slug, github_owner):

@@ -9,6 +9,7 @@ CLI: detect_stage.py REPO   prints {"facts": {...}, "next_stage": "..."} as JSON
 """
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -23,6 +24,16 @@ def _load(name, rel):
     return mod
 
 
+BRAIN_CREATED = re.compile(r"[\u2014-] Brain created\b")
+LHM_OWED = {"needs-lhm", "changes-underway"}
+
+
+def _brain_created(log: Path) -> bool:
+    """build-brain writes `## YYYY-MM-DD — Brain created` once the draft is approved."""
+    return log.is_file() and any(BRAIN_CREATED.search(l)
+                                 for l in log.read_text(encoding="utf-8").splitlines())
+
+
 def _has_gap(path: Path) -> bool:
     return any(l.lstrip().startswith("> gap:")
                for l in path.read_text(encoding="utf-8").splitlines())
@@ -31,20 +42,24 @@ def _has_gap(path: Path) -> bool:
 def _register(repo: Path):
     p = repo / ".lhm-review" / "client-review.json"
     if not p.is_file():
-        return [], 0
+        return [], 0, 0
     try:
         reg = json.loads(p.read_text(encoding="utf-8"))
     except ValueError:
-        return [], 0
+        return [], 0, 0
     pages = {pg.get("id"): pg for pg in reg.get("pages", [])}
-    rounds, awaiting = [], set()
+    rounds, awaiting, owed = [], set(), set()
     for rel in reg.get("releases", []):
         rounds.append(rel.get("id"))
         for pid in rel.get("page_ids", []):
             page = pages.get(pid)
-            if page and page.get("status") != "approved":
-                awaiting.add(pid)
-    return rounds, len(awaiting)
+            if not page:
+                continue
+            if page.get("status") == "awaiting-review":
+                awaiting.add(pid)  # waiting on the client
+            elif page.get("status") in LHM_OWED:
+                owed.add(pid)  # waiting on LHM
+    return rounds, len(awaiting), len(owed)
 
 
 def _client_emails(repo: Path):
@@ -91,11 +106,12 @@ def repo_facts(repo: Path) -> dict:
     brain = repo / "brain"
     brand = brain / "Brand.md"
     profile = brain / "Profile.md"
-    rounds, awaiting = _register(repo)
+    rounds, awaiting, owed = _register(repo)
     brain_built = False
     if (brain / "Overview.md").is_file() and profile.is_file():
         problems = _load("check_brain", "build-brain/scripts/check_brain.py").check_brain(brain)
-        brain_built = not problems and not _has_gap(profile)
+        # Honest gaps in Profile.md are expected; the approved brain-created entry is the signal.
+        brain_built = not problems and _brain_created(brain / "Change Log.md")
     return {
         "brain_scaffolded": (brain / "Overview.md").is_file(),
         "brand_written": brand.is_file() and not _has_gap(brand),
@@ -103,6 +119,7 @@ def repo_facts(repo: Path) -> dict:
         "brain_built": brain_built,
         "rounds": rounds,
         "awaiting_review": awaiting,
+        "lhm_owed": owed,
         "unprocessed_client_commits": _unprocessed(repo),
     }
 
@@ -118,6 +135,8 @@ def next_stage(facts: dict) -> str:
         return "build-brain"
     if facts.get("unprocessed_client_commits"):
         return "update-content-brain"
+    if facts.get("lhm_owed", 0) > 0:
+        return "lhm-fixes"
     if facts.get("awaiting_review", 0) > 0:
         return "client-review"
     return "content-round"

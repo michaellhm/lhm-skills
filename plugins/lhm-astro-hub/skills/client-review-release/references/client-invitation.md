@@ -25,7 +25,7 @@ We've prepared the first round of your website review. We'd like you to check th
 
 [Insert the matching access paragraph below.]
 
-Once you can open the repository, open Codex or Claude Code and paste this first prompt:
+Once you can open the repository, open Codex, Claude Code or Gemini CLI and paste this first prompt:
 
 > Help me install this website from [verified repository URL] on my computer. Read its README, brain/Project.md and .lhm-review/workflows.md. Check the required tools for my operating system, preserve existing work and use the project's declared package manager. Start the site locally and open it in my preferred browser, or give me the working URL. If access or setup is missing, explain exactly what I need to do. Do not publish any changes.
 
@@ -57,7 +57,7 @@ We're ready for round [verified round label]. This time we'd like you to review 
 
 [Exact approved release page list and relevant questions. Explain material changed pages and any earlier unanswered items without claiming the first round was complete.]
 
-Open your existing website project in Codex or Claude Code and paste:
+Open your existing website project in Codex, Claude Code or Gemini CLI and paste:
 
 > Run start-website safely, then review-website for release [verified release ID]. Preserve any unfinished local changes and sync only when safe. Read the current .lhm-review/client-review.json and brain/Project.md, open each page in this release one at a time and ask LHM's questions. Let me make changes in chat or edit the real content file directly. Keep earlier approvals for unchanged pages and bring changed content back for review. Ask before recording approval of the current design/content. Finish with finish-review and prepare an email to LHM covering approved pages, remaining questions and blockers. Ask before sharing a preview, which commits and pushes to main; do not publish live.
 

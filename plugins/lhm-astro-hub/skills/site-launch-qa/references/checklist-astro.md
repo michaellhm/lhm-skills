@@ -27,7 +27,7 @@ Full item list for the Astro site in `site/` of the client repo, deployed to Clo
 | All environment variables set in production | Cloudflare Pages → Settings → Variables and Secrets — confirm all required vars and secrets (for example `TURNSTILE_SECRET_KEY`, `GHL_WEBHOOK_URL`) are present for production |
 | No secrets committed to the repo | `git log --all --full-diff -S "SECRET_KEY"` — confirm no env values in history |
 | Deployment pipeline working (push → auto-deploy) | Push a trivial change and confirm Cloudflare Pages deploys it automatically (push to `main`) |
-| Preview deployments working (PRs) | Open a test PR — confirm a preview URL is generated |
+| Staging deployments working (`main`) | Confirm a push to `main` produces a `*.pages.dev` deployment for that commit SHA, and the deployment URL serves that revision |
 | Production domain linked to deployment | Cloudflare Pages → Custom domains — confirm custom domain is set and SSL is active |
 
 ---

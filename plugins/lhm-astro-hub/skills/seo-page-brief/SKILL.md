@@ -1,6 +1,6 @@
 ---
 name: seo-page-brief
-description: Create bounded implementation-ready SEO page briefs from accepted upstream keyword, intent and business evidence. Use this when research has passed SEO Lead acceptance and the user mentions 'page brief', 'content brief' or 'brief for this page', when planning one page or an explicitly scoped page batch, or when an SEO content writer needs an approved brief before writing.
+description: Create bounded implementation-ready SEO page briefs from accepted upstream keyword, intent and business evidence. Use this when research has passed astro-lead acceptance and the user mentions 'page brief', 'content brief' or 'brief for this page', when planning one page or an explicitly scoped page batch, or when an SEO content writer needs an approved brief before writing.
 ---
 ## Client file routing
 
@@ -23,7 +23,7 @@ Require:
 - approved page scope and known existing-page overlap;
 - target audience, geography, offer and brand context;
 - confirmed internal URLs or explicit unknowns;
-- exact Drive folder ID, relative path and output filename;
+- destination: the verified client work root and its `pages/<page-key>/` folder (or an exact registered Drive folder ID when one is dispatched), plus relative path and output filename;
 - permission ceiling and completion test.
 
 Return `needs_context` rather than inventing missing business facts, keyword metrics, URLs, claims or destinations. Do not silently expand the page set.
@@ -50,8 +50,8 @@ Keep research claims traceable to the accepted evidence. Professional judgement 
 
 ## Save and verify
 
-Save the submitted brief to the exact registered Google Drive parent and relative path. Read back its name, parent and content or metadata, then return the observed file ID and URL. Do not claim completion from a temporary local file.
+Save the submitted brief to the dispatched destination: the verified client work root's `pages/<page-key>/` folder, or the exact registered Google Drive parent when one was dispatched. Read back its name, parent folder and content or metadata, then return the observed path (or Drive file ID) and the URL where one exists. Do not claim completion from a temporary local file.
 
 ## Handback
 
-Use `seo_worker_handback` from the departmental contract. Set `next_owner: SEO Delivery QA`. Include the accepted source references, limitations, exact pages covered, Drive parent readback and whether any business or regulated claim requires human approval.
+Use `seo_worker_handback` from the departmental contract. Set `next_owner: SEO Delivery QA`. Include the accepted source references, limitations, exact pages covered, destination readback and whether any business or regulated claim requires human approval.

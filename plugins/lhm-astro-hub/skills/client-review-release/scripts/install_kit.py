@@ -10,7 +10,38 @@ BASE = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('review_release', BASE / 'scripts/review_release.py')
 r = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(r)
-VERSION = '2'
+VERSION = '3'
+GEMINI = 'GEMINI.md'
+GEMINI_START = '<!-- lhm-review-skills:start -->'
+GEMINI_END = '<!-- lhm-review-skills:end -->'
+
+
+def gemini_block(names):
+    """Managed list for Gemini CLI, which reads GEMINI.md but has no skills folder."""
+    lines = [GEMINI_START, '## Website review skills', '',
+             'When the user asks to start, review, preview or finish website work, read and follow the matching file:', '']
+    lines += [f'- `skills/{name}/SKILL.md`' for name in names]
+    lines.append(GEMINI_END)
+    return '\n'.join(lines)
+
+
+def gemini_text(current, block, recorded):
+    """Return GEMINI.md text with the managed list, or None when nothing changes.
+    Client text outside the markers is never touched; an edited list is refused."""
+    if current is None:
+        return block + '\n'
+    starts, ends = current.count(GEMINI_START), current.count(GEMINI_END)
+    if starts == 0 and ends == 0:
+        return current.rstrip('\n') + '\n\n' + block + '\n'
+    if starts != 1 or ends != 1 or current.index(GEMINI_START) > current.index(GEMINI_END):
+        raise ValueError(f'Existing or edited client file needs review: {GEMINI}')
+    s, e = current.index(GEMINI_START), current.index(GEMINI_END) + len(GEMINI_END)
+    existing = current[s:e]
+    if existing == block:
+        return None
+    if recorded != hashlib.sha256(existing.encode()).hexdigest():
+        raise ValueError(f'Existing or edited client file needs review: {GEMINI}')
+    return current[:s] + block + current[e:]
 
 
 def pointer(name, canonical):
@@ -40,6 +71,10 @@ def install(root, approval_evidence):
             if path.exists() and path.read_bytes() != data:
                 if old.get('files', {}).get(rel) != hashlib.sha256(path.read_bytes()).hexdigest():
                     raise ValueError(f'Existing or edited client file needs review: {rel}')
+        gemini_path = r.safe(root, GEMINI)
+        block = gemini_block(sorted(s.name for s in (BASE / 'assets/skills').iterdir()))
+        current = gemini_path.read_text(encoding='utf-8') if gemini_path.exists() else None
+        new_gemini = gemini_text(current, block, old.get('managed_blocks', {}).get(GEMINI))
         config = r.safe(root, '.lhm-review/client-config.json')
         if not config.exists():
             files['.lhm-review/client-config.json'] = (BASE / 'assets/client-config.example.json').read_bytes()
@@ -52,8 +87,11 @@ def install(root, approval_evidence):
             path = r.safe(root, rel)
             path.parent.mkdir(parents=True, exist_ok=True)
             r.atomic_write(path, data.decode('utf-8'))
+        if new_gemini is not None:
+            r.atomic_write(gemini_path, new_gemini)
         manifest = {'toolkit_version': VERSION, 'approval_evidence': approval_evidence,
-                    'files': {rel: hashlib.sha256(data).hexdigest() for rel, data in files.items()}}
+                    'files': {rel: hashlib.sha256(data).hexdigest() for rel, data in files.items()},
+                    'managed_blocks': {GEMINI: hashlib.sha256(block.encode()).hexdigest()}}
         r.atomic_write(manifest_path, json.dumps(manifest, indent=2) + '\n')
         for rel, expected in manifest['files'].items():
             if hashlib.sha256(r.safe(root, rel).read_bytes()).hexdigest() != expected:

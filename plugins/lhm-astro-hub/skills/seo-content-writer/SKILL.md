@@ -48,7 +48,7 @@ Long-form content (over 300 words or page-level web/blog copy) goes through the 
 
 Do not generate the body content in a single pass.
 
-When invoked by an SEO Lead, this is one bounded writing stage. Do not redo accepted keyword research or page-brief work, do not perform the later independent QA stage, and do not start website implementation. If a required accepted input or registered Drive destination is absent or contradictory, return canonical state `needs_context` to the SEO Lead with the precise gap, Context & Research owner and resume point. Supply legacy `work_state: needs_review` only when an older schema requires it.
+When invoked by `astro-lead`, this is one bounded writing stage. Do not redo accepted keyword research or page-brief work, do not perform the later independent QA stage, and do not start website implementation. If a required accepted input or verified destination (the client work root's `pages/<page-key>/` folder, or a registered Drive folder) is absent or contradictory, return canonical state `needs_context` to `astro-lead` with the precise gap, Context & Research owner and resume point. Supply legacy `work_state: needs_review` only when an older schema requires it.
 
 ## Instructions
 
@@ -225,11 +225,11 @@ Follow this structure for the actual content:
 - [ ] Internal links included (3-5)
 - [ ] FAQ section present with at least 3 questions
 - [ ] Readability appropriate for target audience
-- [ ] Saved to the exact registered Drive parent and read back successfully when a Drive destination was supplied
+- [ ] Saved to the dispatched destination (client work root `pages/<page-key>/` or registered Drive parent) and read back successfully
 
 ## Production handback
 
-Preserve `parent_goal`, `department_goal` and `action_id` in the return. Include each produced artefact's observed file ID, URL, parent folder ID, name/version and readback evidence. Do not report completion when a required artefact was not saved and verified. A desktop working folder or local draft is not a substitute for the registered Google Drive destination.
+Preserve `parent_goal`, `department_goal` and `action_id` in the return. Include each produced artefact's observed path or Drive file ID, URL where one exists, parent folder, name/version and readback evidence. Do not report completion when a required artefact was not saved and verified. A local draft outside the verified client work root is not a substitute for the dispatched destination.
 
 ## Tips for Success
 

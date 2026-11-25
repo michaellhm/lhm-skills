@@ -6,4 +6,4 @@ description: "Save website review progress and draft the email to LHM. Use when 
 
 Locate this repository's root by its .lhm-review/workflows.md, not by assuming the current working directory. Read repository instructions, brain/Project.md first, then .lhm-review/workflows.md, .lhm-review/client-config.json and .lhm-review/client-review.json when present. Follow the **finish-review** section of the shared workflow. Missing setup or records are a gap: ask LHM, do not invent review scope.
 
-Preserve local edits, require explicit page approvals, keep publication separate and respect actual tool permissions. Do not fabricate browser/editor access, deploymentURLs or sent emails. End with verified progress, blockers and the exact next step.
+Preserve local edits, require explicit page approvals, keep publication separate and respect actual tool permissions. Do not fabricate browser/editor access, deployment URLs or sent emails. End with verified progress, blockers and the exact next step.

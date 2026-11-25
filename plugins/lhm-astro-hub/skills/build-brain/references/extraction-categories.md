@@ -12,6 +12,7 @@ Every fact written to a note adds its source (call title and date, "prototype co
 - Core values, stated directly or shown in how they talk -> Values
 - Founder's name, background, why they started, business origin -> Founder story
 - What makes them different, proof points (certifications, partnerships, methodology, authority figures), treatment or service philosophy -> Positioning
+- Business name as trading, clinic locations and addresses, phone, email, booking URL and opening hours, only from the client overview in the internal vault, the client's own records or a call transcript -> Contact and locations. Cite each with its source.
 
 ## Product and service details -> `Services.md`
 

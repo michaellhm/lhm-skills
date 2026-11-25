@@ -44,7 +44,12 @@ def collect(repo, manifest, since, head, emails):
         for raw in page["sources"]:
             path = safe_path(raw)
             # Reject symlink objects rather than following references to unrelated files.
-            mode = git(repo, "ls-tree", head, "--", path).split()[0]
+            entry = git(repo, "ls-tree", head, "--", path).split()
+            if not entry:
+                raise ValueError(f"Source not present at head {head[:12]}: {path} (deleted or renamed; update the manifest)")
+            if not git(repo, "ls-tree", approved, "--", path).split():
+                raise ValueError(f"Source not present at approved revision {approved[:12]}: {path}")
+            mode = entry[0]
             if mode != "100644" and mode != "100755":
                 raise ValueError(f"Not a regular source file: {path}")
             current = git(repo, "show", f"{head}:{path}")
@@ -58,7 +63,8 @@ def collect(repo, manifest, since, head, emails):
                        "approval_evidence": page["approval_evidence"],
                        "eligible": all(s["matches_approved"] for s in sources), "sources": sources})
     candidates = []
-    commits = git(repo, "rev-list", "--reverse", f"{since}..{head}").splitlines()
+    # Merge commits carry no authored content of their own; skip them, as the SKILL says.
+    commits = git(repo, "rev-list", "--reverse", "--no-merges", f"{since}..{head}").splitlines()
     identities = {e.lower() for e in emails}
     for commit in commits:
         author = git(repo, "show", "-s", "--format=%ae", commit).strip()
@@ -92,10 +98,12 @@ def main():
     output = Path(a.output).resolve()
     repo = Path(a.repo).resolve()
     if output.is_relative_to(repo):
-        relative = output.relative_to(repo)
-        if relative.parts[0] != "docs" or relative.parts[:2] != ("docs", "website-content"):
-            raise ValueError("Repo evidence must be under docs/website-content, never a public/static route.")
-    result = collect(repo, json.loads(Path(a.manifest).read_text()), a.since, a.head, a.client_email)
+        p.exit(2, "Evidence stopped: --output must be outside the client repo "
+                  "(use the client work root brain-updates/<run-id>/ folder).\n")
+    try:
+        result = collect(repo, json.loads(Path(a.manifest).read_text()), a.since, a.head, a.client_email)
+    except (ValueError, OSError, subprocess.CalledProcessError) as exc:
+        p.exit(2, f"Evidence stopped: {exc}\n")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps({"output": str(output), **result["coverage"]}))

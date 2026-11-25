@@ -68,5 +68,55 @@ class EvidenceTest(unittest.TestCase):
         self.commit('agency change')
         self.assertEqual(len(self.collect()['candidate_client_changes']), 1)
 
+    def test_source_deleted_at_head_is_clear_error(self):
+        self.run_git('rm', '-q', 'copy.json')
+        self.run_git('commit', '-qm', 'remove copy')
+        with self.assertRaises(ValueError) as cm:
+            self.collect()
+        self.assertIn('copy.json', str(cm.exception))
+        self.assertIn('not present at head', str(cm.exception))
+
+    def test_merge_commits_skipped(self):
+        self.run_git('checkout', '-qb', 'side')
+        (self.repo / 'copy.json').write_text('{"copy":"Side branch wording"}')
+        self.commit('client side edit')
+        self.run_git('checkout', '-q', '-')
+        (self.repo / 'other.txt').write_text('agency note')
+        self.run_git('add', 'other.txt')
+        self.run_git('commit', '-qm', 'main change')
+        self.run_git('merge', '-q', '--no-ff', '-m', 'client merge', 'side')
+        merges = self.run_git('rev-list', '--merges', f'{self.base}..HEAD').split()
+        self.assertEqual(len(merges), 1)
+        self.manifest['pages'][0]['approved_revision'] = 'HEAD'
+        result = self.collect()
+        commits = [c['commit'] for c in result['candidate_client_changes']]
+        self.assertNotIn(merges[0], commits)
+        self.assertEqual(result['coverage']['commits_in_range'], 3)
+
+    def cli(self, output):
+        work = tempfile.TemporaryDirectory()
+        self.addCleanup(work.cleanup)
+        manifest = Path(work.name) / 'manifest.json'
+        manifest.write_text(json.dumps(self.manifest))
+        return subprocess.run(['python3', str(Path(__file__).parents[1] / 'scripts/collect_evidence.py'),
+                               '--repo', str(self.repo), '--manifest', str(manifest), '--since', self.base,
+                               '--client-email', 'client@example.org', '--output', str(output)],
+                              capture_output=True, text=True)
+
+    def test_output_inside_repo_refused(self):
+        for rel in ['evidence.json', 'docs/website-content/evidence.json']:
+            result = self.cli(self.repo / rel)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('outside the client repo', result.stderr)
+            self.assertNotIn('Traceback', result.stderr)
+            self.assertFalse((self.repo / rel).exists())
+
+    def test_output_outside_repo_written(self):
+        with tempfile.TemporaryDirectory() as out:
+            target = Path(out) / 'run' / 'evidence.json'
+            result = self.cli(target)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads(target.read_text())['coverage']['routes'], 1)
+
 
 if __name__ == '__main__': unittest.main()

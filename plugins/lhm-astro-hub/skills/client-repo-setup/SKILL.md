@@ -1,6 +1,6 @@
 ---
 name: client-repo-setup
-description: "Create the single GitHub repo for a new Astro website client and scaffold it with README.md, brain/, skills/ and site/. Use this when the user says 'set up the repo', 'create the client repo', 'init the client repo', 'new client repo', 'set up GitHub for this client', 'client-repo-setup', or is starting a new Astro website project. Runs at project start, before the prototype, because the brand style guide is written into brain/ at the prototype stage. Creates one private repo named after the client slug, never a separate prototype repo, and refuses to overwrite anything that already exists."
+description: "Create the single GitHub repo for a new Astro website client and scaffold it with README.md, brain/, skills/ and site/. Use this when the user says 'set up the repo', 'create the client repo', 'init the client repo', 'new client repo', 'set up GitHub for this client', 'client-repo-setup', or is starting a new Astro website project. Runs first, at project start, before the sitemap and the prototype, because the brand style guide is written into brain/ at the prototype stage. Creates one private repo named after the client slug, never a separate prototype repo, and refuses to overwrite anything that already exists."
 ---
 ## Client file routing
 
@@ -13,14 +13,17 @@ Create the one GitHub repo a client's whole website project lives in, and scaffo
 ```
 <client-slug>/
   README.md              written for an AI assistant
+  .gitignore             .DS_Store, the review lock, site/.dev.vars, node_modules/, site/dist/
   AGENTS.md CLAUDE.md GEMINI.md   short pointers for ChatGPT (Codex), Claude and Gemini
   brain/                 ten notes: Overview, Profile, Project, Services, Staff,
                          What We Do, Who We Serve, Brand, Content Rules, Change Log
-  skills/                the client's own skills (installed later)
+  skills/                the client's own review skills (installed in Step 6)
   site/                  the Astro website (Cloudflare Pages builds from here)
+  .lhm-review/           review toolkit, register and config (installed in Step 6)
+  .claude/ .agents/      short skill pointers for Claude Code and Codex (installed in Step 6)
 ```
 
-One repo holds both the brain and the site, so the client's AI project needs one GitHub connection. Run this at project start, before the sitemap and prototype.
+One repo holds both the brain and the site, so the client's AI project needs one GitHub connection. Run this first, at project start: the order is repo-setup, then the sitemap, then the prototype. It needs no approved sitemap.
 
 The rule: **Git syncs code. Drive syncs everything else. They never overlap.** The repo lives at `~/Documents/Projects/<client>/<slug>/` (Mac) or `C:\Users\<you>\Documents\Projects\<client>\<slug>\` (Windows), outside any Drive-synced folder.
 
@@ -44,6 +47,7 @@ Ask, and wait for the answers. Never assume a default for any of them.
 2. **Client name and slug:** the display name, and the slug (lowercase, hyphens only, e.g. `woodlands-physio`). Suggest the slug from the client's knowledge record, but confirm it.
 3. **Operating system:** Mac or Windows, for the path.
 4. **Drive check:** show the target path and ask "Is this path outside your Google Drive / OneDrive sync folder?" If the answer is no or not sure, stop. Do not create anything until it is confirmed.
+5. **Setup approval:** show the owner, slug, path and what will be created (the private repo, the scaffold and the client review toolkit), and ask "Set up this repo?" Wait for an explicit yes. Record it (who approved, when, where, for example "Michael approved repo setup for <slug> in chat, YYYY-MM-DD"); this is the approval evidence for the toolkit install in Step 6.
 
 ## Step 3: Create the repo
 
@@ -77,7 +81,19 @@ The script fills `{{client_name}}`, `{{client_slug}}` and the scaffold date. If 
 
 Every brain note starts with empty `> gap: not yet captured` sections. They are filled later from the client's own material, and never guessed. Do not edit the gap lines here.
 
-## Step 6: Commit and push to `main`
+## Step 6: Install the client review toolkit
+
+Before the first push, install the client's review skills so the repo the client receives already has them:
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/client-review-release/scripts/install_kit.py \
+  --root ~/Documents/Projects/<client>/<slug> \
+  --approval-evidence "<the recorded setup approval from Step 2>"
+```
+
+It writes `skills/<name>/SKILL.md` for each client skill (start-website, review-website, share-preview, finish-review), short pointers in `.claude/skills/` and `.agents/skills/`, a marked skill list in `GEMINI.md` for Gemini CLI, and `.lhm-review/` (workflows, `review_release.py`, an example `client-config.json` and `manifest.json`). It never touches `README.md` or `brain/`. If it stops on a conflicting file, report the exact message and stop; never delete or overwrite the file to get past it. Read back `.lhm-review/manifest.json`. The example config is replaced by the verified one at the first review release (`client-review-release`).
+
+## Step 7: Commit and push to `main`
 
 ```bash
 cd ~/Documents/Projects/<client>/<slug>
@@ -89,11 +105,11 @@ git push -u origin main
 
 All later work during staging pushes straight to `main`. There are no round or review branches.
 
-## Step 7: Record the repo URL
+## Step 8: Record the repo URL
 
 Per the routing contract, add the repo URL (`https://github.com/<owner>/<slug>`) to the client's canonical overview in the shared LHM Knowledge vault, under its Systems and files links, and read the note back to confirm. If the overview does not exist or the vault is unavailable, say so plainly. Do not create a blank profile or a fallback note.
 
-## Step 8: Add collaborators (optional)
+## Step 9: Add collaborators (optional)
 
 Ask the user who else should have access to the repo, and with what permission. Do not assume a default list. Use only confirmed GitHub usernames, and never guess a username from an email address. If a username is unknown, record the invitation as a follow-up.
 
@@ -101,11 +117,11 @@ Ask the user who else should have access to the repo, and with what permission. 
 gh api --method PUT repos/<owner>/<slug>/collaborators/<username> -f permission=push
 ```
 
-## Step 9: Verify and report
+## Step 10: Verify and report
 
 ```bash
 gh repo view <owner>/<slug>
 git -C ~/Documents/Projects/<client>/<slug> status
 ```
 
-The working tree should be clean and the repo visible on GitHub. Tell the user the repo URL, the local path, and which collaborator invitations are still pending. Say that the next step is the sitemap.
+The working tree should be clean and the repo visible on GitHub, with `.lhm-review/manifest.json` and the four client skills committed. Tell the user the repo URL, the local path, the toolkit version from the manifest, and which collaborator invitations are still pending. Say that the next step is the sitemap.

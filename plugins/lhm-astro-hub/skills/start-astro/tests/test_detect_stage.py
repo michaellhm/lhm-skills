@@ -106,7 +106,69 @@ class DetectStageTest(unittest.TestCase):
         (root / ".lhm-review" / "client-review.json").write_text(json.dumps(reg))
         facts = self.detect.repo_facts(root)
         self.assertEqual(facts["rounds"], ["r1", "r2"])
-        self.assertEqual(facts["awaiting_review"], 2)
+        self.assertEqual(facts["awaiting_review"], 1)
+        self.assertEqual(facts["lhm_owed"], 1)
+
+    def test_lhm_owed_counts_needs_lhm_and_changes_underway(self):
+        root = self.repo()
+        (root / ".lhm-review").mkdir()
+        reg = {"schema_version": 1,
+               "pages": [{"id": "a", "route": "/a/", "status": "needs-lhm"},
+                         {"id": "b", "route": "/b/", "status": "changes-underway"},
+                         {"id": "c", "route": "/c/", "status": "approved"}],
+               "releases": [{"id": "r1", "page_ids": ["a", "b", "c"]}]}
+        (root / ".lhm-review" / "client-review.json").write_text(json.dumps(reg))
+        facts = self.detect.repo_facts(root)
+        self.assertEqual(facts["lhm_owed"], 2)
+        self.assertEqual(facts["awaiting_review"], 0)
+
+    def test_lhm_fixes_before_client_review(self):
+        facts = dict(brain_scaffolded=True, brand_written=True, site_built=True, brain_built=True,
+                     rounds=["r1"], awaiting_review=3, lhm_owed=1, unprocessed_client_commits=False)
+        self.assertEqual(self.detect.next_stage(facts), "lhm-fixes")
+
+    def test_client_commits_before_lhm_fixes(self):
+        facts = dict(brain_scaffolded=True, brand_written=True, site_built=True, brain_built=True,
+                     rounds=["r1"], awaiting_review=0, lhm_owed=1, unprocessed_client_commits=True)
+        self.assertEqual(self.detect.next_stage(facts), "update-content-brain")
+
+    def built_site(self):
+        root = self.repo()
+        self.strip_gaps(root, ["Brand.md"])
+        brand = root / "brain" / "Brand.md"
+        brand.write_text(brand.read_text().replace("sources: []", "sources: [prototype v1]"))
+        (root / "site").mkdir(exist_ok=True)
+        (root / "site" / "package.json").write_text("{}")
+        return root
+
+    def add_changelog_entry(self, root, heading):
+        log = root / "brain" / "Change Log.md"
+        log.write_text(log.read_text().replace("(none yet)\n", heading + "\n\nSources: test.\n"))
+
+    def test_clean_brain_without_changelog_entry_is_not_built(self):
+        root = self.built_site()
+        facts = self.detect.repo_facts(root)
+        self.assertFalse(facts["brain_built"])
+        self.assertEqual(self.detect.next_stage(facts), "build-brain")
+
+    def test_brain_created_entry_with_profile_gaps_is_built(self):
+        root = self.built_site()
+        self.add_changelog_entry(root, "## 2026-11-25 — Brain created")
+        self.assertIn("> gap:", (root / "brain" / "Profile.md").read_text())
+        facts = self.detect.repo_facts(root)
+        self.assertTrue(facts["brain_built"])
+        self.assertEqual(self.detect.next_stage(facts), "content-round")
+
+    def test_brain_created_hyphen_variant_accepted(self):
+        root = self.built_site()
+        self.add_changelog_entry(root, "## 2026-11-25 - Brain created")
+        self.assertTrue(self.detect.repo_facts(root)["brain_built"])
+
+    def test_brain_created_entry_needs_clean_check_brain(self):
+        root = self.built_site()
+        self.add_changelog_entry(root, "## 2026-11-25 — Brain created")
+        (root / "brain" / "Staff.md").unlink()
+        self.assertFalse(self.detect.repo_facts(root)["brain_built"])
 
     def test_no_register(self):
         facts = self.detect.repo_facts(self.repo())
