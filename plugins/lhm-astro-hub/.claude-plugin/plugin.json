@@ -1,0 +1,9 @@
+{
+  "name": "lhm-astro-hub",
+  "description": "Astro website delivery: sitemap, UI UX Pro Max prototype, Astro build, client brain, content rounds and client review.",
+  "version": "0.1.0",
+  "author": {
+    "name": "LHM Digital"
+  },
+  "keywords": ["astro", "cloudflare", "website-builder", "client-brain", "agency"]
+}
