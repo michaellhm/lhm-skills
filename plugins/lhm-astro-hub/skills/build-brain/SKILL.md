@@ -35,7 +35,8 @@ Fill the notes as mapped in [extraction categories](references/extraction-catego
 - A note that has facts must have at least one source. `check_brain` fails otherwise.
 - Do not write the Change Log entry yet. It is written in Step 4, only after the draft is approved, because the stage detector treats it as the signal that the brain is built.
 - Leave `Project.md` alone. `client-review-release` rewrites it.
-- Leave `Overview.md` as it is unless a note name changed.
+- Leave `Overview.md` as it is unless a note name changed. Its links are standard markdown links (`[What We Do](What%20We%20Do.md)`) so they work in Obsidian and on GitHub.
+- Keep the `Anti-AI writing (LHM standard, every client)` section in `Content Rules.md` exactly as scaffolded. If an older brain lacks it, add it under Formatting preferences. `check_brain` fails without it.
 
 ## Step 3: Approval stop
 

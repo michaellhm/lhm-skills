@@ -68,8 +68,11 @@ def check_brain(brain_dir: Path) -> list[str]:
                 problems.append(f"{fname}: missing frontmatter key {key}")
         if name == "Overview":
             for other in NOTES:
-                if other != "Overview" and f"[[{other}]]" not in text:
-                    problems.append(f"{fname}: missing link to [[{other}]]")
+                link = f"]({other.replace(' ', '%20')}.md)"
+                if other != "Overview" and link not in text and f"[[{other}]]" not in text:
+                    problems.append(f"{fname}: missing link to {other}.md")
+        if name == "Content Rules" and "Anti-AI writing" not in text:
+            problems.append(f"{fname}: missing the Anti-AI writing section")
         if name in EXEMPT or "sources" not in fields:
             continue
         has_gap = any(l.lstrip().startswith("> gap:") for l in body.splitlines())
