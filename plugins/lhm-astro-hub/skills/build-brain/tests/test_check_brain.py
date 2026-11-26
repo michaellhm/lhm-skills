@@ -80,8 +80,8 @@ class CheckBrainTest(unittest.TestCase):
     def test_overview_missing_link(self):
         brain = self.make_brain()
         p = brain / "Overview.md"
-        p.write_text(p.read_text().replace("- [[Staff]]\n", ""))
-        self.assertIn("Overview.md: missing link to [[Staff]]", self.check.check_brain(brain))
+        p.write_text(p.read_text().replace("- [Staff](Staff.md)\n", ""))
+        self.assertIn("Overview.md: missing link to Staff.md", self.check.check_brain(brain))
 
     def test_exempt_notes_with_facts_and_no_sources(self):
         brain = self.make_brain()

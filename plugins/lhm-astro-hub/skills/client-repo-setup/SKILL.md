@@ -14,7 +14,7 @@ Create the one GitHub repo a client's whole website project lives in, and scaffo
 <client-slug>/
   README.md              written for an AI assistant
   .gitignore             .DS_Store, the review lock, site/.dev.vars, node_modules/, site/dist/
-  AGENTS.md CLAUDE.md GEMINI.md   short pointers for ChatGPT (Codex), Claude and Gemini
+  AGENTS.md CLAUDE.md GEMINI.md   same setup overview for Codex/ChatGPT (AGENTS.md), Claude and Gemini: start with brain/Overview.md, follow Content Rules, use skills/
   brain/                 ten notes: Overview, Profile, Project, Services, Staff,
                          What We Do, Who We Serve, Brand, Content Rules, Change Log
   skills/                the client's own review skills (installed in Step 6)

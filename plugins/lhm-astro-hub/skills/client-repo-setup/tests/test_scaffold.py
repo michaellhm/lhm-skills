@@ -58,7 +58,7 @@ class ScaffoldTest(unittest.TestCase):
             text = (root / "brain" / "Overview.md").read_text(encoding="utf-8")
             for n in NOTES:
                 if n != "Overview":
-                    self.assertIn(f"[[{n}]]", text)
+                    self.assertIn(f"]({n.replace(' ', '%20')}.md)", text)
 
     def test_existing_file_refused(self):
         with tempfile.TemporaryDirectory() as d:
@@ -124,14 +124,14 @@ class ScaffoldTest(unittest.TestCase):
             text = (root / "brain" / "Change Log.md").read_text(encoding="utf-8")
             self.assertTrue(text.rstrip().endswith("<!-- last-processed: none -->"))
 
-    def test_short_agent_files_and_readme(self):
+    def test_agent_files_give_setup_overview(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             self.run_scaffold(root)
             for f in ("AGENTS.md", "CLAUDE.md", "GEMINI.md"):
                 text = (root / f).read_text(encoding="utf-8")
-                self.assertLess(len(text.splitlines()), 10)
-                for needle in ("README.md", "brain/Overview.md", "brain/Content Rules.md", "skills/"):
+                self.assertLess(len(text.splitlines()), 40)
+                for needle in ("README.md", "brain/Overview.md", "brain/Content Rules.md", "skills/", "start-website", "anti-AI"):
                     self.assertIn(needle, text, f)
             self.assertLess(len((root / "README.md").read_text(encoding="utf-8").splitlines()), 60)
 

@@ -11,15 +11,15 @@ Start here. This is the brain for {{client_name}}: what we know about the busine
 
 ## Notes
 
-- [[Profile]]
-- [[Project]]
-- [[Services]]
-- [[Staff]]
-- [[What We Do]]
-- [[Who We Serve]]
-- [[Brand]]
-- [[Content Rules]]
-- [[Change Log]]
+- [Profile](Profile.md)
+- [Project](Project.md)
+- [Services](Services.md)
+- [Staff](Staff.md)
+- [What We Do](What%20We%20Do.md)
+- [Who We Serve](Who%20We%20Serve.md)
+- [Brand](Brand.md)
+- [Content Rules](Content%20Rules.md)
+- [Change Log](Change%20Log.md)
 
 ## How to use it
 
