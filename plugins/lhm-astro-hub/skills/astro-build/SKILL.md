@@ -178,6 +178,27 @@ h1, h2, h3, h4, h5, h6 {
 }
 ```
 
+## Step 3b: Write the design rules into the repo
+
+The approved prototype's design system is the design authority for the build and for every later edit. Write it where every assistant and person working in the repo will see it.
+
+1. In the client repo root `README.md`, add a `## Design rules` section above `## Rules`. Source it from the prototype's design system file (for example `lhm-prototype/<client>/design-system/MASTER.md`), its CSS custom properties and `brain/Brand.md`. Never invent a value. Include:
+   - **Tokens:** a table of font (family, weights, fallback) and every colour token with hex value and use.
+   - **Type, spacing and shape:** heading and body sizes by breakpoint, section spacing, content width, radius, borders, hover and motion limits, image treatment.
+   - **Components and behaviour:** the established components, navigation rules, the principal call to action and the accessibility requirements.
+2. Under it, add `### Changes outside the design system` stating that any new colour, font, size, spacing value, radius, effect, component or layout pattern, or anything that weakens accessibility, is off-system. An AI assistant must:
+   1. stop before making the change;
+   2. warn the human plainly, naming the rule it breaks (for example: "Warning: this goes outside the <Client> design system (rule: ...). Do you want to go ahead, or keep to the system?");
+   3. go ahead only after an explicit yes, and record the exception and approver in the commit message and `brain/Change Log.md`;
+   4. never push an off-system change to `main` silently, and never edit the tokens to make an off-system change look compliant. Changes to the design system itself need LHM sign-off.
+3. Add a final bullet to the README `## Rules` list: "Follow the design rules above. Warn a human before any change outside the design system."
+4. Append to each of `AGENTS.md`, `CLAUDE.md` and `GEMINI.md` (only if not already present): "Follow the design rules in `README.md`. Before any change outside the design system, stop and warn the human, and wait for an explicit yes."
+5. Read the files back. Never overwrite other README content; if a `## Design rules` section already exists, update it in place only with values from the approved sources.
+
+Reference implementation: `lhmorg/australian-sports-physio` commit `068e83b`.
+
+The same rule binds this build: if converting the prototype needs anything outside these rules, stop and warn the user before doing it.
+
 ## Step 4: Build Layout Components
 
 ### `src/components/BaseHead.astro`
@@ -653,7 +674,7 @@ Record screenshots and any differences. Do not mark the build ready until differ
 ## Step 14: Commit and Push
 
 ```bash
-git add site
+git add site README.md AGENTS.md CLAUDE.md GEMINI.md
 git commit -m "feat(site): Astro project scaffold and prototype conversion"
 git push origin main
 ```
