@@ -59,6 +59,8 @@ Routing you to start now — read `${CLAUDE_PLUGIN_ROOT}/agents/start.md` and fo
 
 `lhm-gmb-hub:monthly-cycle-report` — Goal-led monthly SEO investigation, consolidated multi-location work plan, phase close-out, meeting/task reconciliation and AI coaching pack. Portfolio Monday scheduling uses GMB `monthly-loop-setup` with a dedicated CLI-only analytics, delivery and independent-QA runtime plus a card-first Lily/Mailgun HTML digest.
 
+`gtm-audit` — MCP-first GTM, GA4 and Ads tracking audit; PASS/FIX/UNSURE evidence, cross-domain and booking-event source checks, phone tracking, consent and authorised fixes with Preview and rollback. Suggest GTM MCP installation/connection when missing.
+
 `analytics-tracking` — Investigate website, GTM, GA4 and Ads event sources; prepare success-only enquiry tracking, validate GTM imports and verify attribution and duplicate conversion checks.
 
 ### Client knowledge and work routing

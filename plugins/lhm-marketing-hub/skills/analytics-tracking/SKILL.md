@@ -26,6 +26,8 @@ Before implementing tracking, understand:
 
 ## Investigate existing conversion tracking
 
+For a focused container/Tag Assistant or booking cross-domain audit, use [gtm-audit](../gtm-audit/SKILL.md). It uses GTM MCP first, recommends connecting it when missing, and separates evidence-rated audit findings from authorised implementation.
+
 Use [the investigation and GTM import checklist](references/conversion-investigation.md) when enquiries are missing, form events inflate bookings, attribution is missing, or a GTM import fails. Inspect the website/form implementation, GTM live version and workspace, GA4 stream/events, and specific Google Ads conversion actions before choosing a fix. Reported historical counts are leads for investigation, not verified current findings.
 
 Use **google-ads-conversion-audit** for Ads goal and Primary/Secondary assessment, and **google-ads-implementation** for approved account changes. Prefer available GTM/GA4/Ads connectors; when unavailable, use supported browser controls or request the exact export, report or access needed. Never claim an unavailable MCP action succeeded.
