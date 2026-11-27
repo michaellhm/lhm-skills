@@ -4,7 +4,7 @@ A Claude Code plugin marketplace for structured marketing work sessions. Built b
 
 ## What This Is
 
-225 skills across fourteen Claude Code plugins (5 inbox, 67 marketing, 44 WordPress, 20 Astro, 19 GMB/local SEO, 9 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge, 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
+226 skills across fourteen Claude Code plugins (5 inbox, 68 marketing, 44 WordPress, 20 Astro, 19 GMB/local SEO, 9 content engine, 1 learn, 6 finance, 3 client updates, 2 skill ops, 30 project hub, 6 knowledge, 12 system operations and 1 loops skill) with a structured orchestration layer. The plugins enforce a consistent workflow: verify the client folder, load client context, route to the right skill, and save outputs in a predictable folder structure.
 
 ## How It Works
 
@@ -34,7 +34,7 @@ plugins/lhm-marketing-hub/             # The plugin
   agents/content.md                     # Direct content specialist entry
   agents/wordpress.md                   # Direct WordPress content specialist entry
   agents/marketing-assistant.md         # (legacy alias) — routes to start agent
-  skills/                              # All 67 skills
+  skills/                              # All 68 skills
     client-onboarding/                 # Client profile setup
     ad-copy-generator/                 # Google Ads RSA generation
     bid-budget-optimizer/              # Budget and bid strategy
@@ -65,6 +65,7 @@ plugins/lhm-marketing-hub/             # The plugin
     content-quality-auditor/           # CORE-EEAT 80-item quality audit
     pr-content-auditor/                # Rewrite rejected Digital PRs
     content-refresher/                 # Identify and refresh underperforming content
+    gtm-audit/                         # MCP-first GTM, GA4, Ads and booking tracking audit with authorised fixes
     ga-event-config/                   # GA4 event discovery and conversion classification
     ga-dashboard-artifact/             # Analytics dashboard artifact with period comparison
     campaign-playbook-generator/       # Campaign & sales playbooks from transcripts
@@ -301,7 +302,7 @@ plugins/lhm-system-ops/               # Governed CTO engineering and release ope
 
 **SEO & Content** (20 skills): Reusable staged SEO department entry and Lead, accepted-research page briefs, independent SEO delivery QA, proposed sitemap and opportunity model for prospect pitches (live site crawl, demand research, interactive HTML sitemap with an editable impressions-to-leads widget and ongoing-SEO slider, optional workbook), phased website content plan for existing clients (same architecture, build-order grouping, no sales widget, and a `--since` mode that renders a progress band and per-page change chips against a previous version so monthly reviews show what moved), content gap analysis, service page generation, SEO content writing, GEO/AI citation optimization, generic AI recommendation measurement and improvement with fixed buyer panels, captured answers/citations, staging verification, reviewer email and BasicOps handoff (`ai-recommendation-loop`), meta tags optimization, site-wide meta tag refresh (Ads conversion + GSC decline data, slug audit, Rank Math REST push with 301 redirects), CORE-EEAT content quality auditing, PR content rewriting for rejected distributions, content refresh planning. End-to-end website page batch rollout to staging (`lhm-page-rollout`): research, copy, FAQ and schema, internal links, build and review email. Config-driven phased rollout for any client repo (`site-rollout`): `build` writes the next cluster on a branch and opens a PR, `check` reads Search Console weekly and emails only on stalled pages, defects or decisions. Client content learning (`client-content-learn`) refreshes a client-local how-to-write guide from approved pages and evidenced GitHub edits, separating voice patterns, explicit preferences and scoped factual corrections. Client website content orchestration (`website-content-agent`) loads this guide with the client profile and campaign document and adds source comparison, user-selected reference templates, sitemap keyword/H1 mapping, independent editing and healthcare review, Astro integration, revision-bound client approvals, feedback learning and canonical project handback. Homepage concept prototypes for pitches and redesigns (`homepage-prototype`): reads the proposed sitemap and live site, writes three target-market personas and a homepage brief, builds a conservative single-file homepage in the client's own brand with anti-AI design rules (two proven layouts: multi-location Healthstin and the single-clinic Better Backs v2, plus a logo-to-SVG tracing script), verifies desktop and phone, and publishes to lhmstaging only on approval.
 
-**Analytics & Reporting** (2 skills): GA4 event discovery and conversion classification, analytics dashboard artifact with period comparison and visual output.
+**Analytics & Reporting** (3 skills): `gtm-audit` for MCP-first container and runtime audits, event-source tracing, cross-domain and call tracking, evidence-rated findings and authorised implementation with rollback; recommends connecting GTM MCP when unavailable. GA4 event discovery and conversion classification, analytics dashboard artifact with period comparison and visual output.
 
 **SaaS & Growth Marketing** (25 skills): A/B testing, analytics tracking (GTM/GA4/Ads source investigation, success tracking and import validation), competitor pages, content strategy, copy editing, copywriting, email sequences, form CRO, free tool strategy, launch strategy, marketing ideas, marketing psychology, onboarding CRO, page CRO, paid ads, paywall CRO, popup CRO, pricing strategy, product marketing, programmatic SEO, referral programs, schema markup, SEO audit, signup flow CRO, social content.
 

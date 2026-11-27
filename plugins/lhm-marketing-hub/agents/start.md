@@ -31,6 +31,7 @@ Provide these options:
 | SEO, ranking, keyword research, content gap, audit, AI recommendations, ChatGPT visibility, AI visibility baseline | `seo` agent |
 | Blog post, service page, landing page, copywriting, content writing, copy edit | `content` agent |
 | WordPress, update the site, publish a post, meta tags, page copy | `wordpress` agent |
+| GTM audit, audit my container, Tag Assistant, cross-domain tracking, Cliniko tracking audit | `gtm-audit` skill |
 | Analytics, GA dashboard, GA4, traffic report | `ga-dashboard-artifact` skill |
 
 When routing, call the installed specialist agent using the orchestration contract. Hand off the full context envelope so the specialist does not repeat discovery.
